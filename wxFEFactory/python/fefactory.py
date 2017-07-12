@@ -19,15 +19,14 @@ NO     = 0x08
 CANCEL = 0x10
 
 
-def reload(self):
+def reload():
     keys = ['lib', 'modules']
 
-    for name in sys.modules.keys():
+    for name in list(sys.modules):
         for key in keys:
             if name == key or name.startswith(key + '.'):
-                del sys.modules[key]
+                del sys.modules[name]
 
-    fefactory_api.navBar.clear()
     imp.reload(sys.modules[__name__])
 
 

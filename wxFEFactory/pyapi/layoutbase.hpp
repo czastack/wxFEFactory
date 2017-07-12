@@ -1,6 +1,7 @@
 #pragma once
 #include "pyutils.h"
 #include "fefactory_api.h"
+#include "functions.h"
 #include "utils/color.h"
 #include "myapp.h"
 
@@ -285,6 +286,8 @@ public:
 		return LAYOUTS.empty() ? nullptr : LAYOUTS.back();
 	}
 
+	static wxWindow* safeActiveWindow();
+
 	void applyStyleSize()
 	{
 		m_elem->SetSize(getStyleSize());
@@ -527,4 +530,10 @@ void View::addToParent() {
 	{
 		pLayout->add(*this);
 	}
+}
+
+wxWindow* View::safeActiveWindow()
+{
+	Layout *layout = getActiveLayout();
+	return layout ? layout->ptr() : wxGetApp().GetTopWindow();
 }

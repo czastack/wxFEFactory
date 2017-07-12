@@ -1,44 +1,14 @@
-
-#include <wx/filedlg.h>
+#include <wx/wx.h>
 #include "pyutils.h"
 #include "fefactory_api.h"
 #include "myapp.h"
 #include "functions.h"
+#include "console.h"
 #include "layout.hpp"
 #include "feimg.hpp"
-#include "console.h"
 
 py::module fefactory;
 ConsoleHandler pyConsole;
-
-// #define BINDFN(fn) .def(#fn, &PyVbaHandler::fn)
-
-#pragma region module function
-
-void log_message(wxcstr text)
-{
-	pyConsole.consoleWrite(text);
-}
-
-/**
- * Ñ¡ÔñÎÄ¼þ
- */
-wxString choose_file(wxcstr msg, pycref dir, pycref file, pycref wildcard) {
-	wxFileDialog openFileDialog(nullptr, msg, pywxstr(dir), pywxstr(file),
-		pywxstr(wildcard, wxFileSelectorDefaultWildcardStr), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if (openFileDialog.ShowModal() == wxID_CANCEL)
-		return wxNoneString;
-
-	return openFileDialog.GetPath();
-}
-
-int confirm_dialog(wxcstr title, wxcstr msg)
-{
-	return wxMessageBox(msg, title,
-		wxYES_NO | wxCANCEL, nullptr);
-}
-
-#pragma endregion
 
 
 void reloadFefactory()
@@ -84,7 +54,9 @@ PyObject *fefactory_api() {
 		.def("log_message", log_message)
 		.def("choose_file", choose_file, "msg"_a, "dir"_a = None, "file"_a = None, "wildcard"_a = None)
 		.def("confirm_dialog", confirm_dialog)
-		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a);
+		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
+		.def("get_clipboard", get_clipboard)
+		.def("set_clipboard", set_clipboard);
 
 	py::class_<FeImage>(m, "FeImage")
 		.def(py::init<>())
@@ -99,6 +71,7 @@ PyObject *fefactory_api() {
 	return m.ptr();
 }
 
+
 void initPyEnv() {
 	PyImport_AppendInittab("fefactory_api", &fefactory_api);
 	SetEnvironmentVariable(L"PYTHONPATH", L"python");
@@ -110,4 +83,3 @@ void destroyPyEnv()
 {
 	Py_Finalize();
 }
-

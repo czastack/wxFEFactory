@@ -19,7 +19,7 @@ void ConsoleHandler::setConsoleElem(wxTextCtrl* input, wxTextCtrl* output)
 	m_output = output;
 
 	input->Bind(wxEVT_TEXT_ENTER, &ConsoleHandler::OnConsoleInput, this);
-	output->Bind(wxEVT_CHAR, &ConsoleHandler::OnConsoleInputKey, this);
+	input->Bind(wxEVT_CHAR, &ConsoleHandler::OnConsoleInputKey, this);
 
 
 	std::cout.rdbuf(output);

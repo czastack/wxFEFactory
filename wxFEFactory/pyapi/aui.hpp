@@ -48,6 +48,9 @@ public:
 		{
 			wxAuiPaneInfo info;
 
+			// 替换回原指针
+			child.ptr()->SetClientData(&child);
+
 			wxcstr direction = pyDictGet(item->m_kwargs, wxT("direction"), wxNoneString);
 			if (direction != wxNoneString)
 			{
@@ -160,6 +163,9 @@ public:
 		AuiItem *item = (AuiItem*)child.ptr()->GetClientData();
 		if (isPyDict(item->m_kwargs))
 		{
+			// 替换回原指针
+			child.ptr()->SetClientData(&child);
+
 			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
 			if (caption != wxNoneString)
 			{

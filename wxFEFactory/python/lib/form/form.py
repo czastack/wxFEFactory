@@ -1,8 +1,7 @@
 from .fields import Field, Group
-from fefactory_api import PropertyGridListPage as PG
 import ctypes
 
-class FormMetaclass(PG.__class__):
+class FormMetaclass(type):
     SLOTS = ()
 
     def __new__(class_, name, bases, attrs):
@@ -42,7 +41,7 @@ class FormMetaclass(PG.__class__):
         return super().__new__(class_, name, bases, attrs)
 
 
-class BaseForm(PG, metaclass=FormMetaclass):
+class BaseForm(metaclass=FormMetaclass):
     """
     表单基类
     """
@@ -53,15 +52,14 @@ class BaseForm(PG, metaclass=FormMetaclass):
         """
         :param data: 数据字典
         """
-        super().__init__(self.title, data)
+        self.data = data
 
-    def show(self):
-        if super().show():
-            for field in self.fields:
-                field.show(self)
+    def show(self, pg):
+        for field in self.fields:
+            field.show(pg)
 
-            if self.data:
-                self.setValues(self.data)
+        if self.data:
+            self.setValues(self.data)
 
     @classmethod
     def cfield(class_, name):
