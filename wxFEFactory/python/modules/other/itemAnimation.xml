@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Children itemTitle="当前道具" entries="other/itemAnimationIndex.txt" addr="00904164" increment="10" count="5">
+	<!--武器动画-->
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="道具名称" size="1" entries="item/itemList.txt" />
+	<InputItem title="未知 (不是1就是 2)" offset="2"  size="1" />
+	<SimpleSelect title="动画使用代码" offset="4" size="1" entries="other/itemAnimation.txt" />
+	<SimpleSelect title="动画是否使用" offset="5" size="1" entries="other/itemAnimationOn.txt" />
+</Children>

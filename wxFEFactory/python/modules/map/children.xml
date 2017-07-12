@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前地图" entries="map/mapList.txt" addr="00907BCC" increment="4" count="1">
+	<InputItem title="地址" size="4" />
+</Children>

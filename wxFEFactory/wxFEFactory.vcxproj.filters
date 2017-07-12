@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="myapp.cpp" />
+    <ClCompile Include="ProcessHandler\NogbaHandler.cpp">
+      <Filter>ProcessHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessHandler\ProcessHandler.cpp">
+      <Filter>ProcessHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessHandler\VbaHandler.cpp">
+      <Filter>ProcessHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="gba\gba.cpp">
+      <Filter>gba</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessHandler\GbaEmuHandler.cpp">
+      <Filter>ProcessHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="fe\graph.cpp">
+      <Filter>fe</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\fefactory_api.cpp">
+      <Filter>pyapi</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\pyutils.cpp">
+      <Filter>pyapi</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\functions.cpp">
+      <Filter>pyapi</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\console.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="myapp.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="utils\ArrayRef.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\HistorySet.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\utils.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHandler\NogbaHandler.h">
+      <Filter>ProcessHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHandler\ProcessHandler.h">
+      <Filter>ProcessHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHandler\VbaHandler.h">
+      <Filter>ProcessHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="gba\gba.h">
+      <Filter>gba</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHandler\GbaEmuHandler.h">
+      <Filter>ProcessHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="fe\graph.h">
+      <Filter>fe</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\fefactory_api.h">
+      <Filter>pyapi</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\feimg.hpp">
+      <Filter>pyapi</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\pybindext.h">
+      <Filter>pyapi</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\pyutils.h">
+      <Filter>pyapi</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\color.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\menu.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\aui.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layoutbase.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\controls.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layouts.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\datacontrols.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\functions.h">
+      <Filter>pyapi</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\console.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="utils">
+      <UniqueIdentifier>{532fc647-4738-4158-b76a-dfebfc7d34ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProcessHandler">
+      <UniqueIdentifier>{45f4df9e-41f6-4daf-a6be-e703d6c859b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gba">
+      <UniqueIdentifier>{c9903304-187c-484b-ab6c-35b2f57c07d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fe">
+      <UniqueIdentifier>{825aa769-8bb2-47f5-8ee4-b97319bb8f24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi">
+      <UniqueIdentifier>{aafbb4f5-a597-43a0-9d6a-19376a3ba782}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\layout">
+      <UniqueIdentifier>{dc497cd4-3323-4626-9f43-15e74060bff4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前职业" entries="proficiency/proficiencyList.txt" entriesSkip="1" addr="0085B668" increment="54" count="63">
+	<InputItem title="地址" size="0" readOnly="true" />
+	<TextItem title="名称" size="2" />
+	<TextItem title="R键说明" size="2" />
+	<InputItem title="职业ID" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="地图静态形象" size="1" />
+	<SimpleSelect title="移动速度" size="1" entries="proficiency/speed.txt" />
+	<InputItem title="肖像" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="未知" size="1" />
+	<ChildGroup title="初始能力值">
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔力" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+		<InputItem title="体格" size="1" />
+		<InputItem title="移动" size="1" />
+	</ChildGroup>
+	<ChildGroup title="职业能力值上限">
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔力" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+		<InputItem title="体格" size="1" />
+		<InputItem title="未知" size="1" />
+	</ChildGroup>
+	<ChildGroup title="职业成长率">
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔力" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+		<InputItem title="幸运" size="1" />
+	</ChildGroup>
+	<ChildGroup title="转职加成">
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔力" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+	</ChildGroup>
+	<FlagSelect title="能力1" size="1" entries="person/ability1.txt" />
+	<FlagSelect title="能力2" size="1" entries="person/ability2.txt" />
+	<FlagSelect title="能力3" size="1" entries="person/ability3.txt" />
+	<FlagSelect title="能力4" size="1" entries="person/ability4.txt" />
+	<ChildGroup title="武器熟练度">
+		<InputItem title="剑" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="枪" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="斧" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="弓" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="杖" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="理" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="光" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="暗" size="1" entries="item/itemLevel.txt" />
+	</ChildGroup>
+	<BytesInput title="战斗动画指针" size="4" />
+	<BytesInput title="移动类型(指针)" size="4" />
+	<BytesInput title="雨天移动力(指针)" size="4" />
+	<BytesInput title="雪天移动力(指针)" size="4" />
+	<BytesInput title="地形防御(指针)" size="4" />
+	<BytesInput title="地形回避(指针)" size="4" />
+	<BytesInput title="地形魔防(指针)" size="4" />
+	<BytesInput title="地形相关,具体不清楚(指针)" size="4" />
+</Children>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="站立形象" entries="proficiencyMapImage/standingImageList.txt" addr="00903E04" increment="8" count="3">
+	<InputItem title="未知" size="1" />
+	<SimpleSelect title="大小" offset="2" size="1" entries="proficiencyMapImage/size.txt" />
+	<InputItem title="图片指针" offset="4" size="4" />
+</Children>

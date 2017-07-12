@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Children itemTitle="序号" entries="other/supportIndex.txt" addr="00904B7C" increment="8" count="7">
+	<!--支援属性加成-->
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="属性" size="1" entries="person/personAttribute.txt" />
+	<InputItem title="力/魔力" addr="00904B85" size="1" />
+	<InputItem title="防御" addr="00904B86" size="1" />
+	<InputItem title="命中" addr="00904B87" size="1" />
+	<InputItem title="回避" addr="00904B88" size="1" />
+	<InputItem title="必杀" addr="00904B89" size="1" />
+	<InputItem title="必杀回避" addr="00904B8A" size="1" />
+</Children>

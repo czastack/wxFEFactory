@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Children count="32">
+	<ChildGroup title="召唤">
+		<SimpleSelect title="召唤者1" addr="009CFD18" size="1" entries="person/personList.txt" />
+		<SimpleSelect title="被召唤者" addr="009CFD19" size="1" entries="person/personList.txt" />
+		<SimpleSelect title="召唤者2" addr="009CFD1A" size="1" entries="person/personList.txt" />
+		<SimpleSelect title="被召唤者" addr="009CFD1B" size="1" entries="person/personList.txt" />
+		<SimpleSelect title="召唤者3" addr="009CFD1C" size="1" entries="person/personList.txt" />
+		<SimpleSelect title="被召唤者" addr="009CFD1D" size="1" entries="person/personList.txt" />
+	</ChildGroup>
+	<ChildGroup title="必杀判定成功后的瞬杀率(%)">
+		<InputItem title="瞬杀" addr="0002AC8E" size="1" />
+	</ChildGroup>
+	<ChildGroup title="必杀加成">
+		<InputItem title="必杀率(%)" addr="0002ABBA" size="1" />
+	</ChildGroup>
+	<ChildGroup title="呼魔">
+		<SimpleSelect title="可用职业" addr="000244B6" size="1" entries="proficiency/proficiencyList.txt" />
+	</ChildGroup>
+	<ChildGroup title="开锁">
+		<SimpleSelect title="可用职业" addr="00023E4C" size="1" entries="proficiency/proficiencyList.txt" />
+	</ChildGroup>
+	<ChildGroup title="贯通">
+		<SimpleSelect title="起点" addr="0002B21E" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="终点" addr="0002B21A" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="发动依据" addr="0002B222" size="1" entries="other/stuntBase.txt" />
+	</ChildGroup>
+	<ChildGroup title="大盾">
+		<SimpleSelect title="起点" addr="0002B2BA" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="终点" addr="0002B2B6" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="发动依据" addr="0002B2BE" size="1" entries="other/stuntBase.txt" />
+	</ChildGroup>
+	<ChildGroup title="必中">
+		<SimpleSelect title="起点" addr="0002B19A" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="终点" addr="0002B196" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="发动依据" addr="0002B1B0" size="1" entries="other/stuntBase.txt" />
+	</ChildGroup>
+	<ChildGroup title="破魔">
+		<SimpleSelect title="起点" addr="00016A40" size="1" entries="proficiency/proficiencyList.txt" />
+		<SimpleSelect title="终点" addr="00016A3C" size="1" entries="proficiency/proficiencyList.txt" />
+	</ChildGroup>
+	<ChildGroup title="召唤兽职业">
+		<SimpleSelect title="职业" addr="0007D118" size="1" entries="proficiency/proficiencyList.txt" />
+	</ChildGroup>
+</Children>

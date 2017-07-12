@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前调色板" entries="color/palletRelative.txt" addr="009CEC18" increment="7" count="7">
+	<SimpleSelect title="颜色槽1" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽2" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽3" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽4" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽5" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽6" size="1" entries="color/palletList.txt" />
+	<SimpleSelect title="颜色槽7" size="1" entries="color/palletList.txt" />
+</Children>

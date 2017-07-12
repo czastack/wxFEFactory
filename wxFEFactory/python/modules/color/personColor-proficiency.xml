@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前调色板" entries="color/palletRelative.txt" addr="009CDE18" increment="7" count="7">
+	<SimpleSelect title="职业1" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业2" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业3" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业4" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业5" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业6" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="职业7" size="1" entries="proficiency/proficiencyList.txt" />
+</Children>

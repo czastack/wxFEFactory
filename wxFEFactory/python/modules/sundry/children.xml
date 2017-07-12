@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children count="16">
+	<InputItem title="必杀加成" addr="0002ABBA" size="1" />
+	<InputItem title="瞬杀加成" hint="必杀判定成功后的瞬杀率(%)" addr="0002AC8E" size="1" />
+	<InputItem title="多项S熟练度(改成FB)" addr="0002C0B4" size="1" />
+	<InputItem title="等级上限" addr="0002B9C0" size="1" />
+	<InputItem title="转职等级下限-1" addr="0002919E" size="1" />
+	<ChildGroup title="下级职业武器熟练度上限(两个一起改)">
+		<SimpleSelect title="上限" addr="0002C0EA" entries="item/itemLevel.txt" size="1" />
+		<SimpleSelect title="上限" addr="0002C0EE" entries="item/itemLevel.txt" size="1" />
+	</ChildGroup>
+	<ChildGroup title="下级职业武器熟练度上限(两个一起改)">
+		<SimpleSelect title="上限" addr="0002C0E2" entries="item/itemLevel.txt" size="1" />
+		<SimpleSelect title="上限" addr="0002C0E6" entries="item/itemLevel.txt" size="1" />
+	</ChildGroup>
+	<ChildGroup title="熟练度S奖励">
+		<SimpleSelect title="第一个奖励项目" hint="熟练度S奖励" addr="0002ACEA" entries="sundry/SReward.txt" size="1" />
+		<InputItem title="第一个奖励数量" addr="0002ACEE" size="1" />
+		<InputItem title="第二个奖励项目与第一项代码的差" addr="0002ACF2" size="1" />
+		<InputItem title="第二个奖励数量" addr="0002ACF6" size="1" />
+	</ChildGroup>
+</Children>

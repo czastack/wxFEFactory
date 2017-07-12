@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前职业" entries="proficiency/proficiencyList.txt" addr="00A13480" increment="8" count="2">
+	<InputItem title="图片指针" size="4" />
+	<InputItem title="未知指针" size="4" />
+</Children>

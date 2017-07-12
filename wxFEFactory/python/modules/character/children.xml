@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前人物" entries="person/personList.txt" entriesSkip="1" addr="00858288" increment="34" count="51">
+	<InputItem title="地址" size="0" readOnly="true" />
+	<TextItem title="名字" size="2" />
+	<TextItem title="R键说明" size="2" />
+	<InputItem title="人物ID" size="1" />
+	<SimpleSelect title="职业" size="1" entries="proficiency/proficiencyList.txt" />
+	<InputItem title="大头像" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="小头像" size="1" />
+	<SimpleSelect title="属性" size="1" entries="person/personAttribute.txt" />
+	<InputItem title="未知" size="1" />
+	<ChildGroup title="初始能力值">
+		<InputItem title="等级" size="1" />
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔力" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+		<InputItem title="幸运" size="1" />
+		<InputItem title="体格+" size="1" />
+	</ChildGroup>
+	<ChildGroup title="武器熟练度">
+		<InputItem title="剑" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="枪" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="斧" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="弓" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="杖" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="理" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="光" size="1" entries="item/itemLevel.txt" />
+		<InputItem title="暗" size="1" entries="item/itemLevel.txt" />
+	</ChildGroup>
+	<ChildGroup title="职业成长率">
+		<InputItem title="HP" size="1" />
+		<InputItem title="力/魔" size="1" />
+		<InputItem title="技术" size="1" />
+		<InputItem title="速度" size="1" />
+		<InputItem title="防御" size="1" />
+		<InputItem title="魔防" size="1" />
+		<InputItem title="幸运" size="1" />
+	</ChildGroup>
+	<InputItem title="低级职业配色方案" size="1" />
+	<InputItem title="高级职业配色方案" size="1" />
+	<InputItem title="低级职业战斗造型" size="1" />
+	<InputItem title="高级职业战斗造型" size="1" />
+	<InputItem title="未知" size="1" />
+	<FlagSelect title="能力1" size="1" entries="person/ability1.txt" />
+	<FlagSelect title="能力2" size="1" entries="person/ability2.txt" />
+	<FlagSelect title="能力3" size="1" entries="person/ability3.txt" />
+	<FlagSelect title="能力4" size="1" entries="person/ability4.txt" />
+	<BytesInput title="支援指针" size="4" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="未知" size="1" />
+</Children>

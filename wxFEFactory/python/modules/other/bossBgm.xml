@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="序号" entries="other/bossBgmIndex.txt" addr="007A8F94" increment="8" count="3">
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="职业" size="1" entries="person/personList.txt" />
+	<SimpleSelect title="BGM" offset="4" size="1" entries="chapterData/BGMList.txt" />
+</Children>

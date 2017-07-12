@@ -1,0 +1,105 @@
+78
+00	Nothing
+01	The Valiant
+02	Main Theme
+03	Prologue
+04	The Beginning
+05	Treasured Memories
+06	Grim Journey
+07	Ties of Friendship
+08	Ray of Hope
+09	Distant Roads
+0A	Rise Above
+0B	Follow Me!
+0C	Determination
+0D	Truth, Despair, and Hope
+0E	Land of Promise
+0F	Binding Vow
+10	Grasping at Victory
+11	Shadows Approach
+12	Confront the Past
+13	Shadow of the Enemy
+14	Assault
+15	From the Darkness
+16	Twisted Shadows A
+17	Twisted Shadows B
+18	Envoy from the Dark
+19	Attack
+1A	Defense
+1B	The Battle Must Be Won
+1C	Powerful Foe
+1D	The Prince's Despair
+1E	Return of the Demon King
+1F	Sacred Strength
+20	Tethys
+21	Healing
+22	Curing
+23	To a Higher Place
+24	Advance
+25	Tension
+26	Raid!
+27	Reunion
+28	Indignation
+29	Sorrow
+2A	Laughter
+2B	Legacy
+2C	Lyon
+2D	Lost Heart
+2E	Solve the Riddle
+2F	Lights in the Dark
+30	Comrades
+31	Victory
+32	Into the Shadow of Victory
+33	Main Theme (Reprise)
+34	Combat Preparation
+35	Shops
+36	Armories
+37	Bonds
+38	Colosseum Entrance
+39	In the Colosseum
+3A	Colosseum Victory
+3B	Colosseum Defeat
+3C	Victory Song A
+3D	Victory Song B
+3E	Game Over
+3F	In Sorrow's Shroud
+40	Records
+41	Victory and the Future
+42	Fly with the Breeze
+43	Fire Emblem Theme (no intro)
+44	Lyon (Organ Arrangement)
+45	The Final Battle
+46	Epilogue
+47	Windy day
+48	Windy day with birds
+49	Lava boiling
+4A	Nighttime
+4B	Water flowing
+4C	Birds chirping
+4D	Soft swooshy sound
+4E	Wind gusts
+4F	Wind gust stopping
+50	Blizzard
+51	Legendary weapon theme of FE
+52	Outside with birds softly chirping
+53	River
+54	Comrades (again?)
+55	Return of the Demon King (without intro)
+56	Lyon?
+57	Nothing
+58	Nothing
+59	Nothing
+5A	Item Get!
+5B	Level Up!
+5C	Weapon broke
+5D	Nothing
+5E	Weapon broke
+5F	Nothing
+60	??? 8-bit sound
+61	??? 8-bit sound
+62	Nothing
+63	Nothing
+64	Nothing
+65	Cursor
+66	Menu Cursor
+67	Menu Cursor 2

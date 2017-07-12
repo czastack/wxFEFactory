@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Children itemTitle="当前章节" entries="chapterData/chapterList.txt" addr="00904E1C" increment="94" count="15">
+	<!--章节数据-->
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="视野" offset="12" size="1" entries="chapterData/viewList.txt" />
+	<SimpleSelect title="天气" offset="18" size="1" entries="chapterData/whetherList.txt" />
+	<SimpleSelect title="我方BGM" offset="22" size="2" entries="chapterData/BGMList.txt" />
+	<SimpleSelect title="敌方BGM" size="2" entries="chapterData/BGMList.txt" />
+	<SimpleSelect title="NPCBGM" size="2" entries="chapterData/BGMList.txt" />
+	<SimpleSelect title="我方BGM2" size="2" entries="chapterData/BGMList.txt" />
+	<SimpleSelect title="敌方BGM2" size="2" entries="chapterData/BGMList.txt" />
+	<SimpleSelect title="NPCBGM" size="2" entries="chapterData/BGMList.txt" />
+	<InputItem title="墙壁HP" offset="44" size="1" />
+	<InputItem title="剩多少敌人切换BGM" offset="134" size="1" />
+	<InputItem title="胜利条件" offset="138" size="2" />
+	<SimpleSelect title="胜利条件" offset="140" size="1" entries="chapterData/passCondition.txt" />
+	<InputItem title="坚持回合数+1" offset="141" size="1" />
+	<SimpleSelect title="保护对象" offset="142" size="1" entries="person/personList.txt" />
+</Children>

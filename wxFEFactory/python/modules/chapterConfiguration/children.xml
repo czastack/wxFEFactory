@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<Children itemTitle="当前章节" entries="chapterConfiguration/chapterAddr.txt" size="4" increment="1" count="18">
+	<!--章节配置-->
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="角色" size="1" entries="person/personList.txt" />
+	<SimpleSelect title="职业" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="指挥官" size="1" entries="chapterConfiguration/leader.txt" />
+	<SimpleSelect title="等级" size="1" entries="chapterConfiguration/levelList.txt" />
+	<InputItem title="起始坐标-X" size="1" />
+	<InputItem title="起始坐标-Y" size="1" />
+	<InputItem title="未知" size="1" />
+	<InputItem title="出场坐标处理" size="1" />
+	<InputItem title="出场坐标(指针)" size="4" />
+	<SimpleSelect title="物品携带 1" size="1" entries="item/itemList.txt" />
+	<SimpleSelect title="物品携带 2" size="1" entries="item/itemList.txt" />
+	<SimpleSelect title="物品携带 3" size="1" entries="item/itemList.txt" />
+	<SimpleSelect title="物品携带 4" size="1" entries="item/itemList.txt" />
+	<InputItem title="智商1" size="1" entries="chapterConfiguration/IQ1.txt" />
+	<InputItem title="智商2" size="1" entries="chapterConfiguration/IQ2.txt" />
+	<InputItem title="智商3" size="1" entries="chapterConfiguration/IQ3.txt" />
+	<InputItem title="智商4" size="1" entries="chapterConfiguration/IQ4.txt" />
+</Children>

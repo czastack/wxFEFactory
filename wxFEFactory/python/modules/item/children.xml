@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前道具" entries="item/itemList.txt" entriesSkip="1" addr="0085E068" increment="24" count="24">
+	<InputItem title="地址" size="0" readOnly="true" />
+	<TextItem title="名称" size="2" />
+	<TextItem title="R键说明" size="2" />
+	<TextItem title="描述" size="2" />
+	<InputItem title="物品ID" size="1" />
+	<SimpleSelect title="类型" size="1" entries="item/itemType.txt" />
+	<FlagSelect title="特殊属性1" size="1" entries="item/special1.txt" />
+	<FlagSelect title="特殊属性2" size="1" entries="item/special2.txt" />
+	<FlagSelect title="特殊属性3" size="1" entries="item/special3.txt" />
+	<InputItem title="未知" size="1" />
+	<BytesInput title="附加能力指针" size="4" />
+	<BytesInput title="职业特效指针" size="4" />
+	<InputItem title="耐久度" size="1" />
+	<InputItem title="攻击" size="1" />
+	<InputItem title="命中" size="1" />
+	<InputItem title="重量" size="1" />
+	<InputItem title="必杀" size="1" />
+	<SimpleSelect title="射程" size="1" entries="item/itemRange.txt" />
+	<InputItem title="单价" size="2" />
+	<SimpleSelect title="等级" size="1" entries="item/itemLevel.txt" />
+	<InputItem title="图标" size="1" />
+	<InputItem title="杖/物品效果" size="1" />
+	<SimpleSelect title="武器效果" size="1" entries="item/itemEffect.txt" />
+	<InputItem title="熟练度+" size="1" />
+</Children>

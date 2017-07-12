@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children itemTitle="当前职业" entries="proficiency/proficiencyList.txt" addr="009CDD18" increment="2" count="3">
+	<InputItem title="地址" size="0" readOnly="true" />
+	<SimpleSelect title="第一转职选择" size="1" entries="proficiency/proficiencyList.txt" />
+	<SimpleSelect title="第二转职选择" size="1" entries="proficiency/proficiencyList.txt" />
+</Children>

@@ -1,0 +1,257 @@
+256
+00	无/0
+01	0,	Player
+02	0,	NPC
+03	0,	NPC
+04	0,	Enemy
+05	0,	Enemy
+06	0
+07	0
+08	1,	Player
+09	1,	Player
+0A	1,	NPC
+0B	1,	NPC
+0C	1,	Enemy
+0D	1,	Enemy
+0E	1
+0F	1
+10	2,	Player
+11	2,	Player
+12	2,	NPC
+13	2,	NPC
+14	2,	Enemy
+15	2,	Enemy
+16	2
+17	2
+18	3,	Player
+19	3,	Player
+1A	3,	NPC
+1B	3,	NPC
+1C	3,	Enemy
+1D	3,	Enemy
+1E	3
+1F	3
+20	4,	Player
+21	4,	Player
+22	4,	NPC
+23	4,	NPC
+24	4,	Enemy
+25	4,	Enemy
+26	4
+27	4
+28	5,	Player
+29	5,	Player
+2A	5,	NPC
+2B	5,	NPC
+2C	5,	Enemy
+2D	5,	Enemy
+2E	5
+2F	5
+30	6,	Player
+31	6,	Player
+32	6,	NPC
+33	6,	NPC
+34	6,	Enemy
+35	6,	Enemy
+36	6
+37	6
+38	7,	Player
+39	7,	Player
+3A	7,	NPC
+3B	7,	NPC
+3C	7,	Enemy
+3D	7,	Enemy
+3E	7
+3F	7
+40	8,	Player
+41	8,	Player
+42	8,	NPC
+43	8,	NPC
+44	8,	Enemy
+45	8,	Enemy
+46	8
+47	8
+48	9,	Player
+49	9,	Player
+4A	9,	NPC
+4B	9,	NPC
+4C	9,	Enemy
+4D	9,	Enemy
+4E	9
+4F	9
+50	10,	Player	/	Predetermined
+51	10,	Player
+52	10,	NPC
+53	10,	NPC
+54	10,	Enemy
+55	10,	Enemy
+56	10
+57	10
+58	11,	Player
+59	11,	Player
+5A	11,	NPC
+5B	11,	NPC
+5C	11,	Enemy
+5D	11,	Enemy
+5E	11
+5F	11
+60	12,	Player
+61	12,	Player
+62	12,	NPC
+63	12,	NPC
+64	12,	Enemy
+65	12,	Enemy
+66	12
+67	12
+68	13,	Player
+69	13,	Player
+6A	13,	NPC
+6B	13,	NPC
+6C	13,	Enemy
+6D	13,	Enemy
+6E	13
+6F	13
+70	14,	Player
+71	14,	Player
+72	14,	NPC
+73	14,	NPC
+74	14,	Enemy
+75	14,	Enemy
+76	14
+77	14
+78	15,	Player
+79	15,	Player
+7A	15,	NPC
+7B	15,	NPC
+7C	15,	Enemy
+7D	15,	Enemy
+7E	15
+7F	15
+80	16,	Player
+81	16,	Player
+82	16,	NPC
+83	16,	NPC
+84	16,	Enemy
+85	16,	Enemy
+86	16
+87	16
+88	17,	Player
+89	17,	Player
+8A	17,	NPC
+8B	17,	NPC
+8C	17,	Enemy
+8D	17,	Enemy
+8E	17
+8F	17
+90	18,	Player
+91	18,	Player
+92	18,	NPC
+93	18,	NPC
+94	18,	Enemy
+95	18,	Enemy
+96	18
+97	18
+98	19,	Player
+99	19,	Player
+9A	19,	NPC
+9B	19,	NPC
+9C	19,	Enemy
+9D	19,	Enemy
+9E	19
+9F	19
+A0	20,	Player
+A1	20,	Player
+A2	20,	NPC
+A3	20,	NPC
+A4	20,	Enemy
+A5	20,	Enemy
+A6	20
+A7	20
+A8	
+A9	
+AA	
+AB	
+AC	
+AD	
+AE	
+AF	
+B0	
+B1	
+B2	
+B3	
+B4	
+B5	
+B6	
+B7	
+B8	
+B9	
+BA	
+BB	
+BC	
+BD	
+BE	
+BF	
+C0	
+C1	
+C2	
+C3	
+C4	
+C5	
+C6	
+C7	
+C8	
+C9	
+CA	
+CB	
+CC	
+CD	
+CE	
+CF	
+D0	
+D1	
+D2	
+D3	
+D4	
+D5	
+D6	
+D7	
+D8	
+D9	
+DA	
+DB	
+DC	
+DD	
+DE	
+DF	
+E0	
+E1	
+E2	
+E3	
+E4	
+E5	
+E6	
+E7	
+E8	
+E9	
+EA	
+EB	
+EC	
+ED	
+EE	
+EF	
+F0	
+F1	
+F2	
+F3	
+F4	
+F5	
+F6	
+F7	
+F8	
+F9	
+FA	
+FB	
+FC	
+FD	
+FE	
+FF	

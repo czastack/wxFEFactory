@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Children count="1">
+	<SimpleSelect title="斗技场出现职业" addr="005C5EDC" size="1" entries="proficiency/proficiencyList.txt" />
+</Children>
