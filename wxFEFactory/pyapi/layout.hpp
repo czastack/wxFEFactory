@@ -123,7 +123,10 @@ void initLayout(py::module &m)
 			label, "options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")
-		.def(py::init<>());
+		.def(py::init<pyobj>(), key)
+		.def("showPane", &AuiManager::showPane)
+		.def("hidePane", &AuiManager::hidePane)
+		.def("togglePane", &AuiManager::togglePane);
 
 	py::class_t<AuiItem>(layout, "AuiItem")
 		.def_init(py::init<View&, py::kwargs>(), "view"_a)

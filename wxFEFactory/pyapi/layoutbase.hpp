@@ -537,9 +537,11 @@ public:
 		reLayout();
 	}
 
-	virtual void reLayout()
-	{
+	virtual void reLayout() {}
 
+	void addNamed(pycref key, pycref child)
+	{
+		m_named_children[key] = child;
 	}
 
 	friend void initLayout(py::module &m);

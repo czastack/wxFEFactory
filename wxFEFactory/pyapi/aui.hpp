@@ -28,10 +28,14 @@ struct AuiItem
 class AuiManager : public Layout
 {
 public:
-	AuiManager() : Layout(*getActiveLayout())
+	AuiManager(pycref key) : Layout(*getActiveLayout())
 	{
 		m_mgr = new wxAuiManager(m_elem);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this);
+		if (key != None)
+		{
+			m_key = key;
+		}
 	}
 
 	~AuiManager()
@@ -51,9 +55,19 @@ public:
 			// 替换回原指针
 			child.ptr()->SetClientData(&child);
 
-			wxcstr direction = pyDictGet(item->m_kwargs, wxT("direction"), wxNoneString);
-			if (direction != wxNoneString)
+			pyobj data;
+
+			data = pyDictGet(item->m_kwargs, wxT("name"));
+			if (data != None)
 			{
+				info.Name(data.cast<wxString>());
+			}
+
+			data = pyDictGet(item->m_kwargs, wxT("direction"));
+			if (data != None)
+			{
+				wxcstr direction = data.cast<wxString>();
+
 				if (direction == wxT("top"))
 					info.Top();
 				else if (direction == wxT("right"))
@@ -66,31 +80,33 @@ public:
 					info.Center();
 			}
 
-			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
-			if (caption != wxNoneString)
+			data = pyDictGet(item->m_kwargs, wxT("caption"));
+			if (data != None)
 			{
-				info.Caption(caption);
+				info.Caption(data.cast<wxString>());
 			}
 
-			bool closeButton = pyDictGet(item->m_kwargs, wxT("closeButton"), false);
-			if (!closeButton)
+			if (!pyDictGet(item->m_kwargs, wxT("closeButton"), false))
 			{
-				info.CloseButton(closeButton);
+				info.CloseButton(false);
 			}
 
-			if (item->m_kwargs.contains(wxT("maximizeButton")))
+			data = pyDictGet(item->m_kwargs, wxT("maximizeButton"));
+			if (data != None)
 			{
-				info.MaximizeButton(pyDictGet(item->m_kwargs, wxT("maximizeButton"), true));
+				info.MaximizeButton(data.cast<bool>());
 			}
 
-			if (item->m_kwargs.contains(wxT("minimizeButton")))
+			data = pyDictGet(item->m_kwargs, wxT("minimizeButton"));
+			if (data != None)
 			{
-				info.MinimizeButton(pyDictGet(item->m_kwargs, wxT("minimizeButton"), true));
+				info.MinimizeButton(data.cast<bool>());
 			}
 
-			if (item->m_kwargs.contains(wxT("captionVisible")))
+			data = pyDictGet(item->m_kwargs, wxT("captionVisible"));
+			if (data != None)
 			{
-				info.MinimizeButton(pyDictGet(item->m_kwargs, wxT("captionVisible"), true));
+				info.MinimizeButton(data.cast<bool>());
 			}
 
 			m_mgr->AddPane(child, info);
@@ -114,8 +130,16 @@ public:
 		}
 
 		layout();
-		// 引用加一，避免被析构
-		py::cast(this).inc_ref();
+
+		pyobj &self = py::cast(this);
+		if (m_key == None)
+		{
+			// 引用加一，避免被析构
+			self.inc_ref();
+		}
+		else {
+			getActiveLayout()->addNamed(m_key, self);
+		}
 	}
 
 	void reLayout() override
@@ -132,9 +156,31 @@ public:
 
 	void onOwnerClose(class wxCloseEvent &event)
 	{
+		event.Skip();
 		// 引用减一，销毁对象
 		py::cast(this).dec_ref();
-		event.Skip();
+	}
+
+	void hidePane(wxcstr name)
+	{
+		m_mgr->GetPane(name).Hide();
+		layout();
+	}
+
+	void showPane(wxcstr name)
+	{
+		m_mgr->GetPane(name).Show();
+		layout();
+	}
+
+	void togglePane(wxcstr name)
+	{
+		wxAuiPaneInfo &pane = m_mgr->GetPane(name);
+		if (pane.IsShown())
+			pane.Hide();
+		else
+			pane.Show();
+		layout();
 	}
 
 protected:

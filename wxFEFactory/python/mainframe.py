@@ -22,7 +22,7 @@ if __name__ == 'mainframe':
     }
 
     consoleStyle = {
-        'height': 300,
+        'height': 150,
     }
     consoleInputStyle = {
         'expand': True,
@@ -50,22 +50,27 @@ if __name__ == 'mainframe':
         import mainframe
         imp.reload(mainframe)
 
+    def toggleConsole(m):
+        win.aui.togglePane("console")
+
     with ui.MenuBar() as m:
         with ui.Menu("文件"):
             ui.MenuItem("打开\tCtrl+O")
             ui.MenuItem("重启\tCtrl+R", onselect=restart)
             ui.MenuItem("关闭")
+        with ui.Menu("视图"):
+            ui.MenuItem("切换控制台\tCtrl+`", onselect=toggleConsole)
         with ui.Menu("窗口"):
             ui.MenuItem("关闭\tCtrl+W", onselect=closeWindow)
 
     with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=m) as win:
-        with ui.AuiManager():
+        with ui.AuiManager(key="aui"):
             ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=onNav))
             ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True)
             with ui.Vertical(style=consoleStyle) as console:
                 consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
                 consol_input = ui.TextInput(extStyle=0x0400, style=consoleInputStyle)
-            ui.AuiItem(console, direction="bottom", caption="控制台", maximizeButton=True)
+            ui.AuiItem(console, name="console", direction="bottom", caption="控制台", maximizeButton=True)
 
     def onselect(*args):
         print(args)
