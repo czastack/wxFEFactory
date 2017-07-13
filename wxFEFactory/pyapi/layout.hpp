@@ -23,6 +23,7 @@ void initLayout(py::module &m)
 	initMenu(layout);
 
 	py::class_<View>(layout, "View")
+		.def("setContextMenu", &View::setContextMenu)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("key", &View::m_key)
 		.def_readwrite("className", &View::m_class)

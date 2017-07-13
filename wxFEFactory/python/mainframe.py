@@ -66,4 +66,10 @@ if __name__ == 'mainframe':
                 consol_input = TextInput(extStyle=0x0400, style=consoleInputStyle)
             AuiItem(console, direction="bottom", caption="控制台", maximizeButton=True)
 
+    def onselect(*args):
+        print(args)
+
+    with ContextMenu(onselect=onselect) as cm:
+        MenuItem("测试")
+    win.book.setContextMenu(cm)
     fefactory_api.setConsoleElem(consol_input, consol_output)

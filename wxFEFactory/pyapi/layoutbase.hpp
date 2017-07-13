@@ -112,6 +112,29 @@ public:
 		m_elem->SetHelpText(text);
 	}
 
+	void setContextMenu(ContextMenu &menu)
+	{
+		m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
+		m_elem->Bind(wxEVT_MENU, &View::onContextMenu, this);
+		m_contextmenu = py::cast(menu);
+	}
+
+	void onPopMenu(wxContextMenuEvent& event)
+	{
+		if (m_contextmenu)
+		{
+			m_elem->PopupMenu(py::cast<ContextMenu*>(m_contextmenu)->ptr());
+		}
+	}
+
+	void onContextMenu(wxCommandEvent& event)
+	{
+		if (m_contextmenu)
+		{
+			py::cast<ContextMenu*>(m_contextmenu)->onSelect(py::cast(this), event.GetId());
+		}
+	}
+
 	void setStyle(pyobj &style) {
 		m_style = style;
 
@@ -337,6 +360,7 @@ protected:
 	pyobj m_style;
 	pyobj m_key;
 	pyobj m_class;
+	pyobj m_contextmenu;
 
 	static wxVector<Layout*> LAYOUTS;
 

@@ -109,6 +109,11 @@ protected:
 class Menu : public MenuHolder
 {
 public:
+	Menu(py::dict *handlers_ptr) : m_ptr(new wxMenu), m_handlers_ptr(handlers_ptr)
+	{
+
+	}
+
 	Menu(wxcstr text, wxcstr helpStr)
 	{
 		MenuHolder* parent = getActiveMenu();
@@ -165,9 +170,46 @@ public:
 		return m_ptr->GetTitle();
 	}
 
+	wxMenu* ptr()
+	{
+		return m_ptr;
+	}
+
 protected:
 	wxMenu *m_ptr;
 	py::dict *m_handlers_ptr;
+};
+
+
+/**
+ * ÓÒ¼ü²Ëµ¥¸ù²Ëµ¥
+ */
+class ContextMenu: public Menu
+{
+public:
+	ContextMenu(pycref onselect): Menu(&m_handlers), m_onselect(onselect)
+	{
+
+	}
+
+	bool onSelect(pycref view, int id)
+	{
+		if (MenuHolder::onSelect(id))
+		{
+			return true;
+		}
+		else if (!m_onselect.is_none())
+		{
+			pycref item = getMenu(id);
+			pyCall(m_onselect, view, item);
+			return true;
+		}
+		return false;
+	}
+
+private:
+	py::dict m_handlers;
+	pyobj m_onselect;
 };
 
 
@@ -258,6 +300,9 @@ void initMenu(py::module &m)
 
 	py::class_<Menu, MenuHolder>(m, "Menu")
 		.def(py::init<wxcstr, wxcstr>(), "text"_a, "helpStr"_a=wxEmptyString);
+
+	py::class_<ContextMenu, MenuHolder>(m, "ContextMenu")
+		.def(py::init<pyobj>(), "onselect"_a=None);
 
 	py::class_t<MenuItem, BaseMenu>(m, "MenuItem")
 		.def_init(py::init<wxcstr, wxcstr, wxcstr, int, bool, pyobj>(),
