@@ -99,16 +99,19 @@ void initLayout(py::module &m)
 			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, extStyle, key, className, style)
 		.def_property("value", &TextInput::getValue, &TextInput::setValue);
 
+	py::class_<BaseControlWithItems, Control>(layout, "BaseControlWithItems")
+		.def("getSelectedText", &BaseControlWithItems::getSelectedText)
+		.def("getValue", &BaseControlWithItems::getValue)
+		.def("setValue", &BaseControlWithItems::setValue)
+		.def("getSelection", &BaseControlWithItems::getSelection)
+		.def("setSelection", &BaseControlWithItems::setSelection)
+		.def_readwrite("onselect", &BaseControlWithItems::m_listener);
+
 	py::class_<ControlWithItems, Control>(layout, "ControlWithItems")
-		.def("setItems", &ControlWithItems::setItems, "options"_a, "values"_a = None)
-		.def("insertItems", &ControlWithItems::insertItems, "options"_a, "values"_a = None)
-		.def("clear", &ControlWithItems::clear)
-		.def("getSelectedText", &ControlWithItems::getSelectedText)
-		.def("getValue", &ControlWithItems::getValue)
-		.def("setValue", &ControlWithItems::setValue)
-		.def("getSelection", &ControlWithItems::getSelection)
-		.def("setSelection", &ControlWithItems::setSelection)
-		.def_readwrite("onselect", &ComboBox::m_listener);
+		.def("setItems", &ControlWithItems::setItems, "options"_a, "values"_a=None)
+		.def("append", &ControlWithItems::append, "options"_a, "values"_a=None)
+		.def("insert", &ControlWithItems::insert, "options"_a, "values"_a=None, "pos"_a)
+		.def("clear", &ControlWithItems::clear);
 
 	py::class_t<ListBox, ControlWithItems>(layout, "ListBox")
 		.def_init(py::init<py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
@@ -118,7 +121,7 @@ void initLayout(py::module &m)
 		.def_init(py::init<wxcstr, py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			type, "options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 
-	py::class_t<RadioBox, ControlWithItems>(layout, "RadioBox")
+	py::class_t<RadioBox, BaseControlWithItems>(layout, "RadioBox")
 		.def_init(py::init<wxcstr, py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			label, "options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 

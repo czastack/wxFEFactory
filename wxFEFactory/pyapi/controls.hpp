@@ -193,11 +193,11 @@ protected:
 };
 
 
-class ControlWithItems : public Control
+class BaseControlWithItems : public Control
 {
 public:
 	template <class... Args>
-	ControlWithItems(pycref listener, Args ...args) :
+	BaseControlWithItems(pycref listener, Args ...args) :
 		Control(args...), m_listener(listener)
 	{
 
@@ -246,11 +246,6 @@ public:
 		}
 	}
 
-	void setItems(py::iterable &options, pycref values) {
-		clear();
-		insertItems(options, values);
-	}
-
 	pyobj getValue(pyobj i)
 	{
 		if (m_values.is_none())
@@ -276,17 +271,76 @@ public:
 		}
 	}
 
-	virtual void insertItems(py::iterable &options, pycref values) = 0;
-	virtual void clear() = 0;
-	virtual wxString getSelectedText() = 0;
-	virtual int getSelection() = 0;
-	virtual void setSelection(int n) = 0;
+	int getCount()
+	{
+		return m_container().GetCount();
+	}
+
+	wxString getSelectedText()
+	{
+		auto it = ((wxItemContainer*)m_elem);
+		return it->GetString(it->GetSelection());
+	}
+
+	int getSelection()
+	{
+		return m_container().GetSelection();
+	}
+
+	void setSelection(int n)
+	{
+		m_container().SetSelection(n);
+	}
 
 	friend void initLayout(py::module &m);
 
 protected:
 	pyobj m_listener;
 	pyobj m_values;
+
+	wxItemContainerImmutable& m_container()
+	{
+		return *(wxItemContainerImmutable*)m_elem;
+	}
+};
+
+
+
+class ControlWithItems : public BaseControlWithItems
+{
+public:
+	using BaseControlWithItems::BaseControlWithItems;
+
+	void insert(py::iterable &options, pycref values, int pos)
+	{
+		wxArrayString choices;
+		prepareOptions(choices, options, values);
+		m_container().Insert(choices, pos);
+	}
+
+	void append(py::iterable &options, pycref values)
+	{
+		insert(options, values, getCount());
+	}
+
+	void setItems(py::iterable &options, pycref values) {
+		clear();
+		insert(options, values, 0);
+	}
+
+	void clear()
+	{
+		m_container().Clear();
+	}
+
+protected:
+	pyobj m_listener;
+	pyobj m_values;
+
+	wxControlWithItems& m_container()
+	{
+		return *(wxControlWithItems*)m_elem;
+	}
 };
 
 
@@ -301,31 +355,6 @@ public:
 		prepareOptions(choices, options, values);
 		bindElem(new wxListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), choices));
 		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
-	}
-
-	void insertItems(py::iterable &options, pycref values) override {
-		wxArrayString choices;
-		prepareOptions(choices, options, values);
-		m_ctrl().InsertItems(choices, 0);
-	}
-
-	void clear() override
-	{
-		m_ctrl().Clear();
-	}
-
-	wxString getSelectedText() override
-	{
-		return m_ctrl().GetString(m_ctrl().GetSelection());
-	}
-
-	int getSelection() override
-	{
-		return m_ctrl().GetSelection();
-	}
-	void setSelection(int n) override
-	{
-		m_ctrl().SetSelection(n);
 	}
 
 protected:
@@ -363,31 +392,6 @@ public:
 		m_elem->Bind(wxEVT_COMBOBOX, &ComboBox::onSelect, this);
 	}
 
-	void insertItems(py::iterable &options, pycref values) override {
-		wxArrayString choices;
-		prepareOptions(choices, options, values);
-		m_ctrl().Append(choices);
-	}
-
-	void clear() override
-	{
-		m_ctrl().Clear();
-	}
-
-	wxString getSelectedText() override
-	{
-		return m_ctrl().GetString(m_ctrl().GetSelection());
-	}
-
-	int getSelection() override
-	{
-		return m_ctrl().GetSelection();
-	}
-	void setSelection(int n) override
-	{
-		m_ctrl().SetSelection(n);
-	}
-
 protected:
 
 	wxComboBox& m_ctrl()
@@ -397,12 +401,12 @@ protected:
 };
 
 
-class RadioBox : public ControlWithItems
+class RadioBox : public BaseControlWithItems
 {
 public:
 	template <class... Args>
 	RadioBox(wxcstr label, py::iterable &options, pycref values, pyobj &listener, Args ...args) :
-		ControlWithItems(listener, args...)
+		BaseControlWithItems(listener, args...)
 	{
 		wxArrayString choices;
 		prepareOptions(choices, options, values);
@@ -411,29 +415,6 @@ public:
 		m_elem->Bind(wxEVT_RADIOBOX, &ComboBox::onSelect, this);
 	}
 
-	void insertItems(py::iterable &options, pycref values) override {
-		wxArrayString choices;
-		prepareOptions(choices, options, values);
-	}
-
-	void clear() override
-	{
-		// m_ctrl().Clear();
-	}
-
-	wxString getSelectedText() override
-	{
-		return m_ctrl().GetString(m_ctrl().GetSelection());
-	}
-
-	int getSelection() override
-	{
-		return m_ctrl().GetSelection();
-	}
-	void setSelection(int n) override
-	{
-		m_ctrl().SetSelection(n);
-	}
 protected:
 
 	void applyStyle() override
