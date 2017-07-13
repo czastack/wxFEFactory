@@ -57,7 +57,12 @@ public:
 
 	void onMenu(wxCommandEvent & event)
 	{
-		((MenuBar*)((wxFrame*)m_elem)->GetMenuBar()->GetClientData())->onSelect(event.GetId());
+		getMenuBar()->onSelect(event.GetId());
+	}
+
+	MenuBar* getMenuBar()
+	{
+		return ((MenuBar*)((wxFrame*)m_elem)->GetMenuBar()->GetClientData());
 	}
 private:
 

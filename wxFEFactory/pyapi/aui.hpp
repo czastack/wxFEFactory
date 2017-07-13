@@ -206,6 +206,9 @@ public:
 		{
 			event.Veto();
 		}
+		else {
+			pyCall(m_children.attr("remove"), py::cast((View*)m_ctrl().GetPage(event.GetSelection())->GetClientData()));
+		}
 	}
 
 protected:

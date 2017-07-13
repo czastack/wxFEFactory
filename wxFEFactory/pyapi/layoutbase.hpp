@@ -87,6 +87,11 @@ public:
 		m_elem->SetSize(wxSize(width, height));
 	}
 
+	void setMinSize(int width, int height)
+	{
+		m_elem->SetMinSize(wxSize(width, height));
+	}
+
 	void setMaxSize(int width, int height)
 	{
 		m_elem->SetMaxSize(wxSize(width, height));
@@ -112,6 +117,16 @@ public:
 		m_elem->SetHelpText(text);
 	}
 
+	bool getEnabaled()
+	{
+		return ptr()->IsEnabled();
+	}
+
+	bool setEnabaled(bool enabled=true)
+	{
+		return ptr()->Enable(enabled);
+	}
+
 	void setContextMenu(ContextMenu &menu)
 	{
 		m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
@@ -134,6 +149,79 @@ public:
 			py::cast<ContextMenu*>(m_contextmenu)->onSelect(py::cast(this), event.GetId());
 		}
 	}
+
+	pyobj getTypeName() {
+		pyobj self = py::cast(this);
+		return py::getattr(self.get_type(), "__name__");
+	}
+
+	pycref getClassName()
+	{
+		return m_class;
+	}
+
+	pycref getKey()
+	{
+		return m_key;
+	}
+
+	Layout* getParent()
+	{
+		auto elemParent = m_elem->GetParent();
+		return elemParent ? (Layout*)elemParent->GetClientData() : nullptr;
+	}
+
+	operator wxWindow*()
+	{
+		return m_elem;
+	}
+
+	template <typename EventTag>
+	void bindEvt(const EventTag& eventType, pyobj &fn)
+	{
+		if (!fn.is_none())
+		{
+			fn.inc_ref();
+			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto event) {
+				handlerEvent(fn, event);
+			});
+		}
+	}
+
+	template <typename EventType>
+	void handlerEvent(pycref fn, EventType event)
+	{
+		pycref ret = pyCall(fn, py::cast(this));
+		if (!PyObject_IsTrue(ret.ptr()))
+		{
+			event.Skip();
+		}
+	}
+
+	static int parseColor(wxcstr color, uint defval = 0)
+	{
+		u32 rgb = defval;
+		if (!color.IsEmpty())
+		{
+			color.substr(1).ToULong(&rgb, 16);
+			if (color.size() == 4)
+			{
+				Color c;
+				c.fromHalf(rgb);
+				c.c6.swapBR();
+				rgb = c;
+			}
+		}
+		return rgb;
+	}
+
+	static Layout* getActiveLayout()
+	{
+		return LAYOUTS.empty() ? nullptr : LAYOUTS.back();
+	}
+
+	static wxWindow* safeActiveWindow();
+
 
 	void setStyle(pyobj &style) {
 		m_style = style;
@@ -196,6 +284,20 @@ public:
 		return pyDictGet(m_style, key);
 	}
 
+	template<class T>
+	T getStyle(wxcstr key, T defval)
+	{
+		if (py::isinstance<py::list>(m_style))
+		{
+			pyobj &&ret = getStyle(key);
+			return ret.is_none() ? defval : ret.cast<T>();
+		}
+		else
+		{
+			return pyDictGet(m_style, key, defval);
+		}
+	}
+
 	bool hasStyle(pyobj &key)
 	{
 		if (py::isinstance<py::list>(m_style))
@@ -218,104 +320,6 @@ public:
 		return hasStyle(py::str(key));
 	}
 
-	wxSize getStyleSize() {
-		return wxSize(
-			getStyle(STYLE_WIDTH, wxDefaultSize.GetWidth()),
-			getStyle(STYLE_HEIGHT, wxDefaultSize.GetHeight())
-		);
-	}
-
-	pyobj getTypeName() {
-		pyobj self = py::cast(this);
-		return py::getattr(self.get_type(), "__name__");
-	}
-
-	pycref getClassName()
-	{
-		return m_class;
-	}
-
-	pycref getKey()
-	{
-		return m_key;
-	}
-
-	Layout* getParent()
-	{
-		auto elemParent = m_elem->GetParent();
-		return elemParent ? (Layout*)elemParent->GetClientData() : nullptr;
-	}
-
-	operator wxWindow*()
-	{
-		return m_elem;
-	}
-
-	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pyobj &fn)
-	{
-		if (!fn.is_none())
-		{
-			fn.inc_ref();
-			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto event) {
-				handlerEvent(fn, event);
-			});
-		}
-	}
-
-	template <typename EventType>
-	void handlerEvent(pycref fn, EventType event)
-	{
-		pycref ret = pyCall(fn, py::cast(this));
-		if (!PyObject_IsTrue(ret.ptr()))
-		{
-			event.Skip();
-		}
-	}
-
-	template<class T>
-	T getStyle(wxcstr key, T defval)
-	{
-		if (py::isinstance<py::list>(m_style))
-		{
-			pyobj &&ret = getStyle(key);
-			return ret.is_none() ? defval : ret.cast<T>();
-		}
-		else
-		{
-			return pyDictGet(m_style, key, defval);
-		}
-	}
-
-	static int parseColor(wxcstr color, uint defval = 0)
-	{
-		u32 rgb = defval;
-		if (!color.IsEmpty())
-		{
-			color.substr(1).ToULong(&rgb, 16);
-			if (color.size() == 4)
-			{
-				Color c;
-				c.fromHalf(rgb);
-				c.c6.swapBR();
-				rgb = c;
-			}
-		}
-		return rgb;
-	}
-
-	static Layout* getActiveLayout()
-	{
-		return LAYOUTS.empty() ? nullptr : LAYOUTS.back();
-	}
-
-	static wxWindow* safeActiveWindow();
-
-	void applyStyleSize()
-	{
-		m_elem->SetSize(getStyleSize());
-	}
-
 	/**
 	* 尝试应用样式表
 	*/
@@ -333,9 +337,9 @@ public:
 		}
 	}
 
-	void applyStyle()
+	virtual void applyStyle()
 	{
-		if (py::isinstance<py::list>(m_style))
+		/*if (py::isinstance<py::list>(m_style))
 		{
 			for (auto &e : m_style)
 			{
@@ -345,7 +349,76 @@ public:
 		else
 		{
 			applyStyle(m_style);
+		}*/
+
+		pyobj style;
+
+		style = getStyle(STYLE_BACKGROUND);
+		if (style != None)
+		{
+			setBackground(parseColor(style.cast<wxString>(), m_elem->GetBackgroundColour().GetRGB()));
 		}
+
+		style = getStyle(STYLE_COLOR);
+		if (style != None)
+		{
+			setForeground(parseColor(style.cast<wxString>(), m_elem->GetForegroundColour().GetRGB()));
+		}
+
+		style = getStyle(STYLE_FONTSIZE);
+		if (style != None)
+		{
+			wxFont font = m_elem->GetFont();
+			font.SetPointSize(style.cast<int>());
+			m_elem->SetFont(font);
+		}
+
+		style = getStyle(STYLE_FONT);
+		if (style != None)
+		{
+			wxFont font = m_elem->GetFont();
+			
+			// 字重
+			wxcstr weightStr = pyDictGet(style, wxT("weight"), wxNoneString);
+			if (weightStr != wxNoneString)
+			{
+				font.SetWeight(
+					weightStr == wxT("normal") ? wxFONTWEIGHT_NORMAL :
+					weightStr == wxT("light") ? wxFONTWEIGHT_LIGHT :
+					weightStr == wxT("bold") ? wxFONTWEIGHT_BOLD :
+					font.GetWeight()
+				);
+			}
+
+			// 字体样式
+			wxcstr styleStr = pyDictGet(style, wxT("style"), wxNoneString);
+			if (styleStr != wxNoneString)
+			{
+				font.SetStyle(
+					styleStr == wxT("normal") ? wxFONTSTYLE_NORMAL :
+					styleStr == wxT("italic") ? wxFONTSTYLE_ITALIC :
+					styleStr == wxT("slant") ? wxFONTSTYLE_SLANT :
+					font.GetStyle()
+				);
+			}
+
+			font.SetUnderlined(pyDictGet(style, wxT("underline"), false));
+			font.SetFaceName(pyDictGet(style, wxT("face"), wxNoneString));
+
+			m_elem->SetFont(font);
+		}
+	}
+
+	wxSize getStyleSize() {
+		return wxSize(
+			getStyle(STYLE_WIDTH, wxDefaultSize.GetWidth()),
+			getStyle(STYLE_HEIGHT, wxDefaultSize.GetHeight())
+		);
+	}
+
+	void applyStyleSize()
+	{
+		m_elem->SetSize(getStyleSize());
 	}
 
 	wxWindow *ptr()
@@ -363,77 +436,6 @@ protected:
 	pyobj m_contextmenu;
 
 	static wxVector<Layout*> LAYOUTS;
-
-	/**
-	* 应用样式
-	*/
-	void applyStyle(pycref style)
-	{
-		if (style.is_none())
-			return;
-
-		for (auto &e : style)
-		{
-			wxcstr name = e.cast<wxString>();
-			if (name == STYLE_BACKGROUND)
-			{
-				setBackground(parseColor(getStyle(STYLE_BACKGROUND, wxNoneString), m_elem->GetBackgroundColour().GetRGB()));
-			}
-			else if (name == STYLE_COLOR)
-			{
-				setForeground(parseColor(getStyle(STYLE_COLOR, wxNoneString), m_elem->GetForegroundColour().GetRGB()));
-			}
-			else if (name == STYLE_FONTSIZE)
-			{
-				wxFont font = m_elem->GetFont();
-				font.SetPointSize(getStyle(STYLE_FONTSIZE, wxNORMAL_FONT->GetPointSize()));
-				m_elem->SetFont(font);
-			}
-			else if (name == STYLE_FONT)
-			{
-				// 字体
-				auto data = py::dict(getStyle(STYLE_FONT));
-				wxFont font = m_elem->GetFont();
-
-				// 字重
-				wxcstr weightStr = pyDictGet(data, wxT("weight"), wxNoneString);
-				if (weightStr != wxNoneString)
-				{
-					font.SetWeight(
-						weightStr == wxT("normal") ? wxFONTWEIGHT_NORMAL :
-						weightStr == wxT("light") ? wxFONTWEIGHT_LIGHT :
-						weightStr == wxT("bold") ? wxFONTWEIGHT_BOLD :
-						font.GetWeight()
-					);
-				}
-
-				// 字体样式
-				wxcstr styleStr = pyDictGet(data, wxT("style"), wxNoneString);
-				if (styleStr != wxNoneString)
-				{
-					font.SetStyle(
-						styleStr == wxT("normal") ? wxFONTSTYLE_NORMAL :
-						styleStr == wxT("italic") ? wxFONTSTYLE_ITALIC :
-						styleStr == wxT("slant") ? wxFONTSTYLE_SLANT :
-						font.GetStyle()
-					);
-				}
-
-				font.SetUnderlined(pyDictGet(data, wxT("underline"), false));
-				font.SetFaceName(pyDictGet(data, wxT("face"), wxNoneString));
-
-				m_elem->SetFont(font);
-			}
-			else {
-				applyStyle(name);
-			}
-		}
-	}
-
-	virtual bool applyStyle(wxcstr name)
-	{
-		return false;
-	}
 };
 
 wxVector<Layout*> View::LAYOUTS;

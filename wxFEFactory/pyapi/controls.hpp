@@ -157,11 +157,16 @@ public:
 	}
 
 protected:
-	bool applyStyle(wxcstr name) override
+	void applyStyle() override
 	{
-		if (name == STYLE_TEXTALIGN)
+		View::applyStyle();
+
+		pyobj style;
+
+		style = getStyle(STYLE_TEXTALIGN);
+		if (style != None)
 		{
-			wxcstr align = getStyle(STYLE_TEXTALIGN, wxNoneString);
+			wxcstr align = style.cast<wxString>();
 			if (align != wxNoneString) {
 				int style = m_ctrl().GetWindowStyle();
 				if (align == wxT("center"))
@@ -178,9 +183,7 @@ protected:
 				}
 				m_ctrl().SetWindowStyle(style);
 			}
-			return true;
 		}
-		return false;
 	}
 
 	wxTextCtrl& m_ctrl()
@@ -433,11 +436,16 @@ public:
 	}
 protected:
 
-	bool applyStyle(wxcstr name) override
+	void applyStyle() override
 	{
-		if (name == STYLE_FLEXDIRECTION)
+		View::applyStyle();
+
+		pyobj style;
+
+		style = getStyle(STYLE_FLEXDIRECTION);
+		if (style != None)
 		{
-			wxcstr dir = getStyle(STYLE_FLEXDIRECTION, wxNoneString);
+			wxcstr dir = style.cast<wxString>();
 			if (dir != wxNoneString) {
 				int style = m_ctrl().GetWindowStyle();
 				if (dir == wxT("row"))
@@ -450,9 +458,7 @@ protected:
 				}
 				m_ctrl().SetWindowStyle(style);
 			}
-			return true;
 		}
-		return false;
 	}
 
 	wxRadioBox& m_ctrl()

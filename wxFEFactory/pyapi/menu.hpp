@@ -55,57 +55,6 @@ protected:
 };
 
 
-class MenuBar : public MenuHolder
-{
-public:
-	MenuBar(pycref onselect) : m_ptr(new wxMenuBar(0)), m_onselect(onselect)
-	{
-		m_ptr->SetClientData(this);
-	}
-
-	void append(wxMenu *menu, wxcstr text, wxcstr helpStr) override
-	{
-		m_ptr->Append(menu, text);
-	}
-
-	wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kind) override
-	{
-		log_message(wxT("Child of MenuBar must be Menu."));
-		return nullptr;
-	}
-
-	py::dict* getHandlers() override
-	{
-		return &m_handlers;
-	}
-
-	bool onSelect(int id)
-	{
-		if (MenuHolder::onSelect(id))
-		{
-			return true;
-		}
-		else if(!m_onselect.is_none())
-		{
-			pycref item = getMenu(id);
-			pyCall(m_onselect, item);
-			return true;
-		}
-		return false;
-	}
-
-	operator wxMenuBar*()
-	{
-		return m_ptr;
-	}
-
-protected:
-	wxMenuBar *m_ptr;
-	py::dict m_handlers;
-	pyobj m_onselect;
-};
-
-
 class Menu : public MenuHolder
 {
 public:
@@ -213,6 +162,68 @@ private:
 };
 
 
+class MenuBar : public MenuHolder
+{
+public:
+	MenuBar(pycref onselect) : m_ptr(new wxMenuBar(0)), m_onselect(onselect)
+	{
+		m_ptr->SetClientData(this);
+	}
+
+	void append(wxMenu *menu, wxcstr text, wxcstr helpStr) override
+	{
+		m_ptr->Append(menu, text);
+	}
+
+	wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kind) override
+	{
+		log_message(wxT("Child of MenuBar must be Menu."));
+		return nullptr;
+	}
+
+	void remove(Menu &m)
+	{
+		for (int i = m_ptr->GetMenuCount(); i >= 0; --i)
+		{
+			if (m_ptr->GetMenu(i) == m.ptr())
+			{
+				m_ptr->Remove(i);
+			}
+		}
+	}
+
+	py::dict* getHandlers() override
+	{
+		return &m_handlers;
+	}
+
+	bool onSelect(int id)
+	{
+		if (MenuHolder::onSelect(id))
+		{
+			return true;
+		}
+		else if (!m_onselect.is_none())
+		{
+			pycref item = getMenu(id);
+			pyCall(m_onselect, item);
+			return true;
+		}
+		return false;
+	}
+
+	operator wxMenuBar*()
+	{
+		return m_ptr;
+	}
+
+protected:
+	wxMenuBar *m_ptr;
+	py::dict m_handlers;
+	pyobj m_onselect;
+};
+
+
 class MenuItem : public BaseMenu
 {
 public:
@@ -296,7 +307,8 @@ void initMenu(py::module &m)
 		;
 
 	py::class_<MenuBar, MenuHolder>(m, "MenuBar")
-		.def(py::init<pyobj>(), "onselect"_a=None);
+		.def(py::init<pyobj>(), "onselect"_a=None)
+		.def("remove", &MenuBar::remove, "menu"_a);
 
 	py::class_<Menu, MenuHolder>(m, "Menu")
 		.def(py::init<wxcstr, wxcstr>(), "text"_a, "helpStr"_a=wxEmptyString);

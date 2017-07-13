@@ -27,7 +27,8 @@ void initLayout(py::module &m)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("key", &View::m_key)
 		.def_readwrite("className", &View::m_class)
-		.def_static("confirm", &confirm_dialog);
+		.def_static("confirm", &confirm_dialog)
+		.def_property("enabled", &View::getEnabaled, &View::setEnabaled);
 
 	py::class_<Control, View>(layout, "Control");
 
@@ -44,7 +45,8 @@ void initLayout(py::module &m)
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
-			label, "menuBar"_a=nullptr, styles, key, className, style);
+			label, "menuBar"_a=nullptr, styles, key, className, style)
+		.def_property_readonly("menubar", &Window::getMenuBar);
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),

@@ -26,10 +26,30 @@ wxString choose_file(wxcstr msg, pycref dir, pycref file, pycref wildcard) {
 }
 
 
+
+void alert(wxcstr title, wxcstr msg)
+{
+	wxMessageBox(msg, title);
+}
+
 int confirm_dialog(wxcstr title, wxcstr msg)
 {
-	return wxMessageBox(msg, title,
-		wxYES_NO | wxCANCEL, nullptr);
+	return wxMessageBox(msg, title, wxYES_NO | wxCANCEL, nullptr);
+}
+
+pyobj input_dialog(wxcstr title, wxcstr msg, wxcstr defaultValue)
+{
+	wxTextEntryDialog dialog(nullptr, msg, title, defaultValue);
+	pyobj ret;
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		ret = py::cast(dialog.GetValue());
+	}
+	else {
+		ret = None;
+	}
+	dialog.Destroy();
+	return ret;
 }
 
 

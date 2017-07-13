@@ -1,14 +1,15 @@
-from fefactory_api.layout import *
 from modules import modules
 import fefactory_api
 import fefactory
 import traceback
 import imp
 
+ui = fefactory_api.layout
+
 if __name__ == 'mainframe':
     winstyle = {
-        'width': 800,
-        'height': 640,
+        'width': 1200,
+        'height': 960,
     }
 
     styles = {
@@ -49,27 +50,27 @@ if __name__ == 'mainframe':
         import mainframe
         imp.reload(mainframe)
 
-    with MenuBar() as m:
-        with Menu("文件"):
-            MenuItem("打开\tCtrl+O")
-            MenuItem("重启\tCtrl+R", onselect=restart)
-            MenuItem("关闭")
-        with Menu("窗口"):
-            MenuItem("关闭\tCtrl+W", onselect=closeWindow)
+    with ui.MenuBar() as m:
+        with ui.Menu("文件"):
+            ui.MenuItem("打开\tCtrl+O")
+            ui.MenuItem("重启\tCtrl+R", onselect=restart)
+            ui.MenuItem("关闭")
+        with ui.Menu("窗口"):
+            ui.MenuItem("关闭\tCtrl+W", onselect=closeWindow)
 
-    with Window("火纹工厂", style=winstyle, styles=styles, menuBar=m) as win:
-        with AuiManager():
-            AuiItem(ListBox(options=modules, values=lambda x: x, onselect=onNav))
-            AuiItem(AuiNotebook(key="book"), direction="center", maximizeButton=True)
-            with Vertical(style=consoleStyle) as console:
-                consol_output = TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
-                consol_input = TextInput(extStyle=0x0400, style=consoleInputStyle)
-            AuiItem(console, direction="bottom", caption="控制台", maximizeButton=True)
+    with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=m) as win:
+        with ui.AuiManager():
+            ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=onNav))
+            ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True)
+            with ui.Vertical(style=consoleStyle) as console:
+                consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
+                consol_input = ui.TextInput(extStyle=0x0400, style=consoleInputStyle)
+            ui.AuiItem(console, direction="bottom", caption="控制台", maximizeButton=True)
 
     def onselect(*args):
         print(args)
 
-    with ContextMenu(onselect=onselect) as cm:
-        MenuItem("测试")
+    with ui.ContextMenu(onselect=onselect) as cm:
+        ui.MenuItem("测试")
     win.book.setContextMenu(cm)
     fefactory_api.setConsoleElem(consol_input, consol_output)
