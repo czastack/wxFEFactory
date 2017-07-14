@@ -52,10 +52,12 @@ PyObject *fefactory_api() {
 
 	m
 		.def("log_message", log_message)
-		.def("choose_file", choose_file, "msg"_a, "dir"_a = None, "file"_a = None, "wildcard"_a = None)
 		.def("alert", alert, "title"_a, "msg"_a)
 		.def("confirm_dialog", confirm_dialog, "title"_a, "msg"_a)
-		.def("input_dialog", input_dialog, "title"_a, "msg"_a, "defaultValue"_a=wxEmptyString)
+		.def("input_dialog", input_dialog, "title"_a, "msg"_a, "defaultValue"_a = wxEmptyString)
+		.def("longtext_dialog", longtext_dialog, "title"_a, "defaultValue"_a=wxEmptyString, "readonly"_a=false, "small"_a=false)
+		.def("choose_file", choose_file, "msg"_a, "dir"_a=None, "file"_a=None, "wildcard"_a=None, "mustExist"_a=false)
+		.def("choose_dir", choose_dir, "msg"_a, "defaultPath"_a=None, "mustExist"_a=false)
 		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
 		.def("get_clipboard", get_clipboard)
 		.def("set_clipboard", set_clipboard);

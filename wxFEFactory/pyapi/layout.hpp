@@ -41,7 +41,8 @@ void initLayout(py::module &m)
 		.def_readonly("named_children", &Layout::m_named_children);
 
 	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
-		.def("close", &BaseFrame::close);
+		.def("close", &BaseFrame::close)
+		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle);
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),

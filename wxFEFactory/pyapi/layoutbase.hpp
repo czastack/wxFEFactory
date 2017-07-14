@@ -66,7 +66,7 @@ public:
 	}
 
 	virtual ~View() {
-		py::print(m_key);
+		// py::print(m_key);
 	}
 
 	virtual void bindElem(wxWindow *pElem)
@@ -85,16 +85,6 @@ public:
 	void setSize(int width, int height)
 	{
 		m_elem->SetSize(wxSize(width, height));
-	}
-
-	void setMinSize(int width, int height)
-	{
-		m_elem->SetMinSize(wxSize(width, height));
-	}
-
-	void setMaxSize(int width, int height)
-	{
-		m_elem->SetMaxSize(wxSize(width, height));
 	}
 
 	void setPosition(int left, int right)
@@ -220,6 +210,16 @@ public:
 		return LAYOUTS.empty() ? nullptr : LAYOUTS.back();
 	}
 
+	static Layout* safeActiveLayout()
+	{
+		Layout *layout = getActiveLayout();
+		if (!layout)
+		{
+			throw py::value_error("ÊûÑÈÄ†Êó∂Âá∫ÈîôÔºåÊ≤°ÊúâÁà∂ÂÖÉÁ¥†");
+		}
+		return layout;
+	}
+
 	static wxWindow* safeActiveWindow();
 
 
@@ -238,11 +238,11 @@ public:
 		pyobj tmp;
 		if (py::isinstance<py::list>(m_style))
 		{
-			// ◊∑º”
+			// ËøΩÂä†
 			tmp = m_style;
 		}
 		else {
-			// –¬¡–±Ì
+			// Êñ∞ÂàóË°®
 			py::list tmpList = py::list();
 			if (!m_style.is_none())
 			{
@@ -304,7 +304,7 @@ public:
 		{
 			for (auto &e : m_style)
 			{
-				if (e.contains(key))
+				if (e != None && e.contains(key))
 				{
 					return true;
 				}
@@ -312,7 +312,7 @@ public:
 
 			return false;
 		}
-		return m_style.contains(key);
+		return m_style != None && m_style.contains(key);
 	}
 
 	bool hasStyle(wxcstr key)
@@ -321,7 +321,7 @@ public:
 	}
 
 	/**
-	* ≥¢ ‘”¶”√—˘ Ω±Ì
+	* Â∞ùËØïÂ∫îÁî®Ê†∑ÂºèË°®
 	*/
 	void testStyles(pyobj &typecase, pyobj &classcase)
 	{
@@ -378,7 +378,7 @@ public:
 		{
 			wxFont font = m_elem->GetFont();
 			
-			// ◊÷÷ÿ
+			// Â≠óÈáç
 			wxcstr weightStr = pyDictGet(style, wxT("weight"), wxNoneString);
 			if (weightStr != wxNoneString)
 			{
@@ -390,7 +390,7 @@ public:
 				);
 			}
 
-			// ◊÷ÃÂ—˘ Ω
+			// Â≠ó‰ΩìÊ†∑Âºè
 			wxcstr styleStr = pyDictGet(style, wxT("style"), wxNoneString);
 			if (styleStr != wxNoneString)
 			{
@@ -406,6 +406,30 @@ public:
 			font.SetFaceName(pyDictGet(style, wxT("face"), wxNoneString));
 
 			m_elem->SetFont(font);
+		}
+
+		if (hasStyle(STYLE_MINWIDTH) || hasStyle(STYLE_MINHEIGHT))
+		{
+			wxSize size = m_elem->GetMinSize();
+			style = getStyle(STYLE_MINWIDTH);
+			if (style != None)
+				size.SetWidth(style.cast<int>());
+			style = getStyle(STYLE_MINHEIGHT);
+			if (style != None)
+				size.SetHeight(style.cast<int>());
+			m_elem->SetMinSize(size);
+		}
+
+		if (hasStyle(STYLE_MAXWIDTH) || hasStyle(STYLE_MAXHEIGHT))
+		{
+			wxSize size = m_elem->GetMaxSize();
+			style = getStyle(STYLE_MAXWIDTH);
+			if (style != None)
+				size.SetWidth(style.cast<int>());
+			style = getStyle(STYLE_MAXHEIGHT);
+			if (style != None)
+				size.SetHeight(style.cast<int>());
+			m_elem->SetMaxSize(size);
 		}
 	}
 
@@ -480,7 +504,7 @@ public:
 	virtual void __exit__(py::args &args) {
 		LAYOUTS.pop_back();
 
-		// ºÏ≤‚—˘ Ω±Ì
+		// Ê£ÄÊµãÊ†∑ÂºèË°®
 
 		Layout *parent = this;
 		wxVector<pyobj*> styles_list;

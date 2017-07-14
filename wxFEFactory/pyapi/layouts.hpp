@@ -21,6 +21,16 @@ public:
 		}
 	}
 
+	wxString getTitle()
+	{
+		return ((wxTopLevelWindow*)m_elem)->GetTitle();
+	}
+
+	void setTitle(wxcstr title)
+	{
+		((wxTopLevelWindow*)m_elem)->SetTitle(title);
+	}
+
 	void close()
 	{
 		m_elem->Close();
@@ -64,8 +74,6 @@ public:
 	{
 		return ((MenuBar*)((wxFrame*)m_elem)->GetMenuBar()->GetClientData());
 	}
-private:
-
 };
 
 

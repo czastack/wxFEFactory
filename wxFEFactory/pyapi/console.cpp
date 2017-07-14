@@ -2,6 +2,8 @@
 #include <wx/textctrl.h>
 #include "pyutils.h"
 #include "console.h"
+#include "functions.h"
+#include "dialogs.h"
 #include <iostream>
 #include <memory>
 using  namespace std;
@@ -9,9 +11,19 @@ using  namespace std;
 constexpr auto PS1 = _T(">>> "), PS2 = _T("... ");
 
 
-ConsoleHandler::ConsoleHandler() : m_history(new HistorySet) {}
+ConsoleHandler::ConsoleHandler() : m_history(new HistorySet), m_input(nullptr), m_output(nullptr)
+{
+}
 
-ConsoleHandler::~ConsoleHandler() { delete m_history; }
+ConsoleHandler::~ConsoleHandler() {
+	delete m_history;
+
+	if (m_dialog)
+	{
+		m_dialog->Destroy();
+		delete m_dialog;
+	}
+}
 
 void ConsoleHandler::setConsoleElem(wxTextCtrl* input, wxTextCtrl* output)
 {
@@ -43,7 +55,22 @@ void ConsoleHandler::OnConsoleInputKey(wxKeyEvent & event)
 
 void ConsoleHandler::consoleWrite(wxcstr text)
 {
-	m_output->AppendText(text);
+	if (m_output)
+	{
+		m_output->AppendText(text);
+	}
+	else
+	{
+		if (!m_dialog)
+		{
+			m_dialog = new wxLongTextDialog("控制台未初始化");
+			m_dialog->Bind(wxEVT_CLOSE_WINDOW, [](auto) {
+				exit(1);
+			});
+			m_dialog->Show();
+		}
+		m_dialog->getEditor()->AppendText(text);
+	}
 }
 
 void ConsoleHandler::consoleWriteln(wxcstr text)

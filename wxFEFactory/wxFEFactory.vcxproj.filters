@@ -32,6 +32,9 @@
     <ClCompile Include="pyapi\console.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\dialogs.cpp">
+      <Filter>pyapi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -104,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="pyapi\console.h">
       <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\dialogs.h">
+      <Filter>pyapi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

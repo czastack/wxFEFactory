@@ -22,5 +22,6 @@ public:
 private:
 	wxTextCtrl *m_input;
 	wxTextCtrl *m_output;
+	class wxLongTextDialog *m_dialog;
 	class HistorySet *m_history;
 };

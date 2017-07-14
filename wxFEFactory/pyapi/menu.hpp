@@ -104,6 +104,11 @@ public:
 		return m_ptr->Append(id, text, helpStr, kind);
 	}
 
+	void remove()
+	{
+		// m_ptr->Remove();
+	}
+
 	py::dict* getHandlers() override
 	{
 		return m_handlers_ptr;
@@ -183,7 +188,7 @@ public:
 
 	void remove(Menu &m)
 	{
-		for (int i = m_ptr->GetMenuCount(); i >= 0; --i)
+		for (int i = m_ptr->GetMenuCount() - 1; i >= 0; --i)
 		{
 			if (m_ptr->GetMenu(i) == m.ptr())
 			{

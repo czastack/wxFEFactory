@@ -28,7 +28,7 @@ struct AuiItem
 class AuiManager : public Layout
 {
 public:
-	AuiManager(pycref key) : Layout(*getActiveLayout())
+	AuiManager(pycref key) : Layout(*safeActiveLayout())
 	{
 		m_mgr = new wxAuiManager(m_elem);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this);
@@ -41,7 +41,6 @@ public:
 	~AuiManager()
 	{
 		m_mgr->UnInit();
-		m_elem->Destroy();
 		delete m_mgr;
 	}
 
@@ -132,21 +131,19 @@ public:
 		layout();
 
 		pyobj &self = py::cast(this);
-		if (m_key == None)
+		if (m_key != None)
 		{
+			getActiveLayout()->addNamed(m_key, self);
 			// 引用加一，避免被析构
-			self.inc_ref();
 		}
 		else {
-			getActiveLayout()->addNamed(m_key, self);
+			self.inc_ref();
 		}
 	}
 
 	void reLayout() override
 	{
 		layout();
-
-		PyList_Type;
 	}
 
 	void layout()
@@ -158,7 +155,9 @@ public:
 	{
 		event.Skip();
 		// 引用减一，销毁对象
-		py::cast(this).dec_ref();
+		py::cast(this).release().dec_ref();
+		// delete this;
+		m_mgr->UnInit();
 	}
 
 	void hidePane(wxcstr name)
@@ -213,11 +212,13 @@ public:
 			child.ptr()->SetClientData(&child);
 
 			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
-			if (caption != wxNoneString)
-			{
-				
-			}
 			m_ctrl().AddPage(child, caption);
+
+			pycref onclose = pyDictGet(item->m_kwargs, wxT("onclose"));
+			if (onclose != None)
+			{
+				m_close_listeners[py::cast(&child)] = onclose;
+			}
 
 			py::cast(item).dec_ref();
 		}
@@ -241,9 +242,22 @@ public:
 		if (n == -1)
 			n = m_ctrl().GetSelection();
 
-		// PageManager *page = (PageManager*)m_ctrl().GetPage(n)->GetClientData();
-		// return !page || page->OnClose();
+		pyobj page = py::cast(getPage(n));
+		pyobj onclose = pyDictGet(m_close_listeners, page);
+
+		if (onclose != None)
+		{
+			bool ret = PyObject_IsTrue(pyCall(onclose).ptr()) != 0;
+			m_close_listeners.attr("pop")(page);
+			return ret;
+		}
+
 		return true;
+	}
+
+	View* getPage(int n)
+	{
+		return (View*)m_ctrl().GetPage(n)->GetClientData();
 	}
 
 	void OnPageClose(wxAuiNotebookEvent & event)
@@ -253,11 +267,13 @@ public:
 			event.Veto();
 		}
 		else {
-			pyCall(m_children.attr("remove"), py::cast((View*)m_ctrl().GetPage(event.GetSelection())->GetClientData()));
+			pyCall(m_children.attr("remove"), py::cast(getPage(event.GetSelection())));
 		}
 	}
 
 protected:
+	py::dict m_close_listeners;
+
 	wxAuiNotebook& m_ctrl()
 	{
 		return *(wxAuiNotebook*)m_elem;

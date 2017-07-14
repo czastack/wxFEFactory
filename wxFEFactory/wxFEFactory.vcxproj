@@ -90,6 +90,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);E:\VS\wxWidgets-3.1.0\include;E:\VS\wxWidgets-3.1.0\lib\vc_lib\mswud;%(AdditionalIncludeDirectories);D:\Python35\include;E:\VS\pybind11\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;_WINDOWS;NOPCH;WXUSINGDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>D:\Python35\libs;E:\VS\wxWidgets-3.1.0\lib\vc_x64_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -141,6 +142,7 @@
     <ClCompile Include="ProcessHandler\ProcessHandler.cpp" />
     <ClCompile Include="ProcessHandler\VbaHandler.cpp" />
     <ClCompile Include="pyapi\console.cpp" />
+    <ClCompile Include="pyapi\dialogs.cpp" />
     <ClCompile Include="pyapi\fefactory_api.cpp" />
     <ClCompile Include="pyapi\functions.cpp" />
     <ClCompile Include="pyapi\pyutils.cpp" />
@@ -157,6 +159,7 @@
     <ClInclude Include="pyapi\console.h" />
     <ClInclude Include="pyapi\controls.hpp" />
     <ClInclude Include="pyapi\datacontrols.hpp" />
+    <ClInclude Include="pyapi\dialogs.h" />
     <ClInclude Include="pyapi\fefactory_api.h" />
     <ClInclude Include="pyapi\feimg.hpp" />
     <ClInclude Include="pyapi\functions.h" />

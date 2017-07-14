@@ -20,7 +20,7 @@ CANCEL = 0x10
 
 
 def reload():
-    keys = ['lib', 'modules']
+    keys = ['lib', 'modules', 'fe']
 
     for name in list(sys.modules):
         for key in keys:
