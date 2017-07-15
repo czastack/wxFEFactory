@@ -8,14 +8,17 @@
 #include <memory>
 using  namespace std;
 
-constexpr auto PS1 = _T(">>> "), PS2 = _T("... ");
+constexpr auto PS1 = _T(">>> "), PS2 = _T("... "), HISTORY_FILE = _T("python_history.txt");
+constexpr int HISTORY_SIZE = 10;
 
-
-ConsoleHandler::ConsoleHandler() : m_history(new HistorySet), m_input(nullptr), m_output(nullptr)
+ConsoleHandler::ConsoleHandler() : m_history(new HistorySet(HISTORY_SIZE)), m_input(nullptr), m_output(nullptr)
 {
+	m_history->load(HISTORY_FILE);
 }
 
 ConsoleHandler::~ConsoleHandler() {
+	m_history->save(HISTORY_FILE);
+
 	delete m_history;
 
 	if (m_dialog)
@@ -64,7 +67,8 @@ void ConsoleHandler::consoleWrite(wxcstr text)
 		if (!m_dialog)
 		{
 			m_dialog = new wxLongTextDialog("控制台未初始化");
-			m_dialog->Bind(wxEVT_CLOSE_WINDOW, [](auto) {
+			m_dialog->Bind(wxEVT_BUTTON, [this](auto) {
+				m_dialog->Destroy();
 				exit(1);
 			});
 			m_dialog->Show();
@@ -92,8 +96,11 @@ void ConsoleHandler::consoleInput(wxcstr line)
 {
 	consoleWrite(PS1);
 	consoleWriteln(line);
-	m_history->Add(line);
-	m_input->Clear();
+	if (!line.IsEmpty())
+	{
+		m_history->Add(line);
+		m_input->Clear();
 
-	py_interpreter_run(line);
+		py_interpreter_run(line);
+	}
 }

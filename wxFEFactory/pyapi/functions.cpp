@@ -20,9 +20,16 @@ void alert(wxcstr title, wxcstr msg)
 	wxMessageBox(msg, title);
 }
 
-int confirm_dialog(wxcstr title, wxcstr msg)
+int confirm_dialog(wxcstr title, wxcstr msg, int defaultButton)
 {
-	return wxMessageBox(msg, title, wxYES_NO | wxCANCEL, nullptr);
+	int style = wxYES_NO | wxCANCEL;
+
+	if (defaultButton == wxNO)
+		style |= wxNO_DEFAULT;
+	else if (defaultButton == wxCANCEL)
+		style |= wxCANCEL_DEFAULT;
+	
+	return wxMessageBox(msg, title, style, nullptr);
 }
 
 pyobj input_dialog(wxcstr title, wxcstr msg, wxcstr defaultValue)

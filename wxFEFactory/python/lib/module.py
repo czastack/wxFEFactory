@@ -1,5 +1,6 @@
 from mainframe import win
-
+from application import app
+import os
 
 class BaseModule:
     menu = None
@@ -47,3 +48,11 @@ class BaseModule:
         if self.index is not 0:
             title += str(self.index + 1)
         return title
+
+    @classmethod
+    def getName(cls):
+        return cls.__module__.split('.')[1]
+
+    @classmethod
+    def getDir(cls):
+        return os.path.join(app.project.path, cls.getName())

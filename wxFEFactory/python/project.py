@@ -9,6 +9,15 @@ class Project:
         self.title = title or Path.basename(path)
         self.check()
 
+    def getConfigFile(self):
+        return Path.join(self.path, 'project.json')
+
     def check(self):
         if not Path.exists(self.path):
             os.mkdir(self.path)
+
+    def exists(self):
+        return Path.exists(self.getConfigFile())
+
+    def save(self):
+        pass

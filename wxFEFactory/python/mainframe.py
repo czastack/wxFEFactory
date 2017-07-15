@@ -1,7 +1,9 @@
 from modules import modules
 from project import Project
+from application import app
 import fefactory_api
 import fefactory
+import __main__
 import traceback
 import imp
 import os
@@ -40,6 +42,7 @@ if __name__ == 'mainframe':
         try:
             module = __import__('modules.' + name, fromlist=['main']).main
             module.Module()
+            __main__.M = module.Module
 
         except Exception as e:
             print('加载模块%s失败' % name)
@@ -63,9 +66,14 @@ if __name__ == 'mainframe':
     def newProject(self):
         path = fefactory_api.choose_dir("选择新工程文件夹")
         if path:
-            name = fefactory_api.input_dialog("工程名称", "请输入工程名称", Path.basename(path))
-            project = Project(path, name)
+            project = Project(path)
+            if project.exists():
+                fefactory_api.confirm_dialog("提示", "此工程已存在，是否覆盖", fefactory.NO)
+            else:
+                # TODO
+                project.title = fefactory_api.input_dialog("工程名称", "请输入工程名称", Path.basename(path))
             win.title = "%s - %s" % (win.title, project.title)
+            app.project = project
 
     with ui.MenuBar() as m:
         with ui.Menu("文件"):
