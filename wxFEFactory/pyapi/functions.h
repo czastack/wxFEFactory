@@ -13,3 +13,5 @@ wxString choose_dir(wxcstr msg, pycref defaultPath, bool mustExist);
 wxString get_clipboard();
 
 void set_clipboard(wxcstr text);
+
+wxItemKind getItemKind(wxcstr kindStr);

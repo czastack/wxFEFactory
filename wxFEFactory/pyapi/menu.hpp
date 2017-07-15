@@ -83,31 +83,12 @@ public:
 		m_ptr->AppendSubMenu(menu, text, helpStr);
 	}
 
-	wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kindStr) override
+	wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kind) override
 	{
-		wxItemKind kind = wxITEM_NORMAL;
-		if (!kindStr.IsEmpty())
-		{
-			if (kindStr == wxT("check"))
-			{
-				kind = wxITEM_CHECK;
-			}
-			else if (kindStr == wxT("radio"))
-			{
-				kind = wxITEM_RADIO;
-			}
-			else if (kindStr == wxT("dropdown"))
-			{
-				kind = wxITEM_DROPDOWN;
-			}
-		}
-		return m_ptr->Append(id, text, helpStr, kind);
+		return m_ptr->Append(id, text, helpStr, getItemKind(kind));
 	}
 
-	void remove()
-	{
-		// m_ptr->Remove();
-	}
+	void remove(class MenuItem &item);
 
 	py::dict* getHandlers() override
 	{
@@ -259,6 +240,11 @@ public:
 		}
 	}
 
+	wxMenuItem* ptr() const
+	{
+		return m_ptr;
+	}
+
 	wxString getText()
 	{
 		return m_ptr->GetItemLabel();
@@ -298,6 +284,11 @@ bool MenuHolder::onSelect(int id)
 	return false;
 }
 
+void Menu::remove(MenuItem &item)
+{
+	m_ptr->Remove(item.ptr());
+}
+
 
 void initMenu(py::module &m)
 {
@@ -316,7 +307,8 @@ void initMenu(py::module &m)
 		.def("remove", &MenuBar::remove, "menu"_a);
 
 	py::class_<Menu, MenuHolder>(m, "Menu")
-		.def(py::init<wxcstr, wxcstr>(), "text"_a, "helpStr"_a=wxEmptyString);
+		.def(py::init<wxcstr, wxcstr>(), "text"_a, "helpStr"_a=wxEmptyString)
+		.def("remove", &Menu::remove, "menuitem"_a);
 
 	py::class_<ContextMenu, MenuHolder>(m, "ContextMenu")
 		.def(py::init<pyobj>(), "onselect"_a=None);

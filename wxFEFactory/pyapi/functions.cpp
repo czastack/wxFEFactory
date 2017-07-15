@@ -129,3 +129,24 @@ void set_clipboard(wxcstr text)
 		wxTheClipboard->Close();
 	}
 }
+
+wxItemKind getItemKind(wxcstr kindStr)
+{
+	wxItemKind kind = wxITEM_NORMAL;
+	if (!kindStr.IsEmpty())
+	{
+		if (kindStr == wxT("check"))
+		{
+			kind = wxITEM_CHECK;
+		}
+		else if (kindStr == wxT("radio"))
+		{
+			kind = wxITEM_RADIO;
+		}
+		else if (kindStr == wxT("dropdown"))
+		{
+			kind = wxITEM_DROPDOWN;
+		}
+	}
+	return kind;
+}

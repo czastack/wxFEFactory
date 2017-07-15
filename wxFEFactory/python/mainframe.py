@@ -63,8 +63,8 @@ if __name__ == 'mainframe':
     def onselect(*args):
         print(args)
 
-    def newProject(self):
-        path = fefactory_api.choose_dir("选择新工程文件夹")
+    def newProject(m):
+        path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
             if project.exists():
@@ -75,9 +75,17 @@ if __name__ == 'mainframe':
             win.title = "%s - %s" % (win.title, project.title)
             app.project = project
 
+    def openProject(m):
+        path = fefactory_api.choose_dir("选择工程文件夹")
+        if path:
+            project = Project(path)
+            if not project.exists():
+                fefactory_api.alert("提示", "该目录下没有project.json")
+
     with ui.MenuBar() as m:
         with ui.Menu("文件"):
-            ui.MenuItem("打开\tCtrl+O")
+            with ui.Menu("打开"):
+                ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=openProject)
             with ui.Menu("新建"):
                 ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=newProject)
             ui.MenuItem("重启\tCtrl+R", onselect=restart)
@@ -89,14 +97,18 @@ if __name__ == 'mainframe':
 
     with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=m) as win:
         with ui.AuiManager(key="aui"):
+            ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", onselect).realize(), direction="top", captionVisible=False)
             ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=onNav))
             ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True)
             with ui.Vertical(style=consoleStyle) as console:
                 consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
                 consol_input = ui.TextInput(extStyle=0x0400, style=consoleInputStyle)
             ui.AuiItem(console, name="console", direction="bottom", caption="控制台", maximizeButton=True)
+        ui.StatusBar()
 
     with ui.ContextMenu(onselect=onselect) as cm:
         ui.MenuItem("测试")
     win.book.setContextMenu(cm)
     fefactory_api.setConsoleElem(consol_input, consol_output)
+
+    __main__.win = win

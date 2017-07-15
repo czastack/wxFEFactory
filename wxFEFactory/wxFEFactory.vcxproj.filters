@@ -111,6 +111,9 @@
     <ClInclude Include="pyapi\dialogs.h">
       <Filter>pyapi</Filter>
     </ClInclude>
+    <ClInclude Include="pyapi\bars.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">

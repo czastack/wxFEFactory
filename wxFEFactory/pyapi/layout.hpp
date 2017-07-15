@@ -1,9 +1,9 @@
-
 #include "menu.hpp"
 #include "layouts.hpp"
 #include "controls.hpp"
 #include "datacontrols.hpp"
 #include "aui.hpp"
+#include "bars.hpp"
 
 void initLayout(py::module &m)
 {
@@ -17,6 +17,7 @@ void initLayout(py::module &m)
 	auto type = "type"_a=wxEmptyString;
 	auto extStyle = "extStyle"_a=0;
 
+	auto view_init = py::init<pyobj, pyobj, pyobj>();
 	auto layout_init = py::init<pyobj, pyobj, pyobj, pyobj>();
 
 	py::module layout = m.def_submodule("layout");
@@ -47,7 +48,8 @@ void initLayout(py::module &m)
 	py::class_t<Window, BaseFrame>(layout, "Window")
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
 			label, "menuBar"_a=nullptr, styles, key, className, style)
-		.def_property_readonly("menubar", &Window::getMenuBar);
+		.def_property_readonly("menubar", &Window::getMenuBar)
+		.def_property_readonly("statusbar", &Window::getStatusBar);
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
@@ -138,6 +140,25 @@ void initLayout(py::module &m)
 
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
 		.def_init(layout_init, styles, key, className, style);
+
+	auto n = "n"_a;
+
+	py::class_t<ToolBar, Control>(layout, "ToolBar")
+		.def_init(view_init, key, className, style)
+		.def("addTool", &ToolBar::addTool, 
+			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=wxEmptyString, "onclick"_a, "toolid"_a=-1, "kind"_a=wxEmptyString)
+		.def("addSeparator", &ToolBar::addSeparator)
+		.def("realize", &ToolBar::realize);
+
+	py::class_t<StatusBar, Control>(layout, "StatusBar")
+		.def_init(view_init, key, className, style)
+		.def("getText", &StatusBar::getText, n)
+		.def("setText", &StatusBar::setText, "text"_a, n)
+		.def("setFieldsCount", &StatusBar::setFieldsCount, "list"_a)
+		.def("setItemWidths", &StatusBar::setItemWidths, "list"_a)
+		.def("getStatusWidth", &StatusBar::getStatusWidth, n)
+		.def("popStatusText", &StatusBar::popStatusText, n)
+		.def("pushStatusText", &StatusBar::pushStatusText, "text"_a, n);
 
 
 	auto &title_arg = "title"_a;

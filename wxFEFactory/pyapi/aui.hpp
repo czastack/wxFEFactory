@@ -105,7 +105,7 @@ public:
 			data = pyDictGet(item->m_kwargs, wxT("captionVisible"));
 			if (data != None)
 			{
-				info.MinimizeButton(data.cast<bool>());
+				info.CaptionVisible(data.cast<bool>());
 			}
 
 			m_mgr->AddPane(child, info);

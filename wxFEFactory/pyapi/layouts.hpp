@@ -1,6 +1,7 @@
 #pragma once
 #include "layoutbase.hpp"
 #include "menu.hpp"
+#include "bars.hpp"
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include "wx/splitter.h"
@@ -61,7 +62,7 @@ public:
 
 	void setMenu(MenuBar &menubar)
 	{
-		((wxFrame*)m_elem)->SetMenuBar(menubar);
+		m_win().SetMenuBar(menubar);
 		m_elem->Bind(wxEVT_MENU, &Window::onMenu, this);
 	}
 
@@ -72,7 +73,18 @@ public:
 
 	MenuBar* getMenuBar()
 	{
-		return ((MenuBar*)((wxFrame*)m_elem)->GetMenuBar()->GetClientData());
+		return ((MenuBar*)m_win().GetMenuBar()->GetClientData());
+	}
+
+	StatusBar* getStatusBar()
+	{
+		return ((StatusBar*)m_win().GetStatusBar()->GetClientData());
+	}
+
+protected:
+	wxFrame& m_win()
+	{
+		return *(wxFrame*)m_elem;
 	}
 };
 

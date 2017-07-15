@@ -169,6 +169,7 @@
     <ClInclude Include="pyapi\menu.hpp" />
     <ClInclude Include="pyapi\pybindext.h" />
     <ClInclude Include="pyapi\pyutils.h" />
+    <ClInclude Include="pyapi\bars.hpp" />
     <ClInclude Include="types.h" />
     <ClInclude Include="utils\ArrayRef.h" />
     <ClInclude Include="utils\color.h" />

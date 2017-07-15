@@ -1,6 +1,7 @@
 #pragma once
 #undef _
 #include <pybind11/pybind11.h>
+#include <memory>
 #include "types.h"
 #include "pybindext.h"
 
@@ -71,6 +72,20 @@ void addAll(T &array, py::iterable &items)
 	}
 }
 
+template<class T> class wxSharedPtr;
+
+template<class T>
+wxSharedPtr<T> asArray(pycref list, int &n)
+{
+	n = py::len(list);
+	T *data = new T[n];
+	T *it = data;
+	for (auto &e : list)
+	{
+		*it++ = e.cast<T>();
+	}
+	return wxSharedPtr<T>(data);
+}
 
 template <typename... Args>
 py::object pyCall(const py::object & obj, Args &&...args) {
