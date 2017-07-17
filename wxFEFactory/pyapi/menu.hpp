@@ -318,6 +318,7 @@ void initMenu(py::module &m)
 			"text"_a, "helpStr"_a=wxEmptyString, "kind"_a=wxEmptyString,
 			"id"_a=-1, "sep"_a=false, "onselect"_a=None)
 		.def("getId", &MenuItem::getId)
+		.def("getText", &MenuItem::getText)
 		.def_readwrite("onselect", &MenuItem::m_onselect);
 		;
 }

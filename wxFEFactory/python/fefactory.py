@@ -1,9 +1,11 @@
 from modules import modules
+from functools import partial
 import sys
 import fefactory_api
 import traceback
-import imp
+import os
 
+# 重定向标准输出
 class _LogWriter:
     def flush(self):
         pass
@@ -14,20 +16,25 @@ class _LogWriter:
 
 sys.stdout = sys.stderr = _LogWriter()
 
+__builtins__['input'] = partial(fefactory_api.input_dialog, '输入')
+
+# 对话框按钮标识
 YES    = 0x02
 NO     = 0x08
 CANCEL = 0x10
 
 
 def reload():
-    keys = ['lib', 'modules', 'fe']
-
+    """重新加载相关模块"""
     for name in list(sys.modules):
-        for key in keys:
-            if name == key or name.startswith(key + '.'):
-                del sys.modules[name]
+        file = getattr(sys.modules[name], '__file__', None)
+        if file is None:
+            continue
+        pydir = os.path.dirname(__file__)
+        if file and file.startswith(pydir):
+            del sys.modules[name]
 
-    imp.reload(sys.modules[__name__])
+    __import__(__name__)
 
 
 import mainframe

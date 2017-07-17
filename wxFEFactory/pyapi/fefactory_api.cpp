@@ -9,7 +9,7 @@
 
 py::module fefactory;
 ConsoleHandler pyConsole;
-
+pyobj onAppExit;
 
 void reloadFefactory()
 {
@@ -44,6 +44,11 @@ void setConsoleElem(TextInput &input, TextInput &output)
 	pyConsole.setConsoleElem((wxTextCtrl*)input.ptr(), (wxTextCtrl*)output.ptr());
 }
 
+void setOnAppExit(pycref fn)
+{
+	onAppExit = fn;
+}
+
 
 PyObject *fefactory_api() {
 	using namespace py::literals;
@@ -59,6 +64,7 @@ PyObject *fefactory_api() {
 		.def("choose_file", choose_file, "msg"_a, "dir"_a=None, "file"_a=None, "wildcard"_a=None, "mustExist"_a=false)
 		.def("choose_dir", choose_dir, "msg"_a, "defaultPath"_a=None, "mustExist"_a=false)
 		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
+		.def("setOnAppExit", setOnAppExit)
 		.def("get_clipboard", get_clipboard)
 		.def("set_clipboard", set_clipboard);
 
@@ -85,5 +91,9 @@ void initPyEnv() {
 
 void destroyPyEnv()
 {
+	if (onAppExit)
+	{
+		pyCall(onAppExit);
+	}
 	Py_Finalize();
 }

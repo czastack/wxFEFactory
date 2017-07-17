@@ -434,6 +434,10 @@ public:
 	}
 
 	wxSize getStyleSize() {
+		if (m_style == None)
+		{
+			return wxDefaultSize;
+		}
 		return wxSize(
 			getStyle(STYLE_WIDTH, wxDefaultSize.GetWidth()),
 			getStyle(STYLE_HEIGHT, wxDefaultSize.GetHeight())
@@ -566,6 +570,11 @@ public:
 	void addNamed(pycref key, pycref child)
 	{
 		m_named_children[key] = child;
+	}
+
+	void removeChild(View &child)
+	{
+		m_elem->RemoveChild(child);
 	}
 
 	friend void initLayout(py::module &m);

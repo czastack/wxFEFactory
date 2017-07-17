@@ -32,8 +32,5 @@ wxLongTextDialog::wxLongTextDialog(wxcstr title, wxcstr defaultValue, bool reado
 	SetSizer(topsizer);
 	topsizer->SetSizeHints(this);
 
-	if (sm)
-	{
-		SetSize(400, 300);
-	}
+	SetSize(sm ? wxSize(400, 300): wxSize(800, 640));
 }

@@ -62,7 +62,7 @@ T pyDictGet(pycref di, wxcstr key, T defval)
 
 
 template<class T>
-void addAll(T &array, py::iterable &items)
+void addAll(T &array, pycref items)
 {
 	if (!items.is_none())
 	{

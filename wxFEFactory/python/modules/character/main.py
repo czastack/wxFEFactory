@@ -11,11 +11,11 @@ class Module(BaseModule):
     def render(self):
         with ui.SplitterWindow(False, 220) as panel:
             with ui.Vertical(styles=styles):
-                listbox = ui.ListBox(options=['选项1', '选项2'], values=[11,22], className="listbox")
+                self.listbox = ui.ListBox(className="listbox", onselect=self.onselect)
                 with ui.Horizontal(className="footer"):
-                    btnAdd = ui.Button(label="添加", key="add", className="button")
-                    btnDel = ui.Button(label="删除", key="delete", className="button")
-            pg = ui.PropertyGrid()
+                    btnAdd = ui.Button(label="添加", key="add", className="button", onclick=self.onAdd)
+                    btnDel = ui.Button(label="删除", key="delete", className="button", onclick=self.onDel)
+            self.pg = ui.PropertyGrid()
         ui.AuiItem(panel, caption=self.getTitle(), onclose=self.onclose)
         return panel
 
@@ -27,6 +27,20 @@ class Module(BaseModule):
     def onclose(self):
         print("close")
         return super().onclose()
+
+    def onAdd(self, btn):
+        name = input("角色名称")
+        if name:
+            print(self.listbox.className)
+            self.listbox.append([name])
+
+    def onDel(self, btn):
+        pos = self.listbox.getSelection()
+        if pos is not -1:
+            self.listbox.remove(pos)
+
+    def onselect(self, _):
+        print(self.listbox.getValue())
 
 
 styles = {
@@ -40,6 +54,7 @@ styles = {
         },
         'button': {
             'flex': 1,
+            'width': 50,
         }
     }
 }

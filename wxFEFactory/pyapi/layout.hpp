@@ -38,6 +38,7 @@ void initLayout(py::module &m)
 		.def("__exit__", &Layout::__exit__)
 		.def("__getattr__", &Layout::__getattr__)
 		.def("styles", &Layout::setStyles)
+		.def("removeChild", &Layout::removeChild)
 		.def_readonly("children", &Layout::m_children)
 		.def_readonly("named_children", &Layout::m_named_children);
 
@@ -104,28 +105,29 @@ void initLayout(py::module &m)
 
 	py::class_<BaseControlWithItems, Control>(layout, "BaseControlWithItems")
 		.def("getSelectedText", &BaseControlWithItems::getSelectedText)
-		.def("getValue", &BaseControlWithItems::getValue)
+		.def("getValue", &BaseControlWithItems::getValue, "i"_a=None)
 		.def("setValue", &BaseControlWithItems::setValue)
 		.def("getSelection", &BaseControlWithItems::getSelection)
 		.def("setSelection", &BaseControlWithItems::setSelection)
 		.def_readwrite("onselect", &BaseControlWithItems::m_listener);
 
-	py::class_<ControlWithItems, Control>(layout, "ControlWithItems")
+	py::class_<ControlWithItems, BaseControlWithItems>(layout, "ControlWithItems")
 		.def("setItems", &ControlWithItems::setItems, "options"_a, "values"_a=None)
 		.def("append", &ControlWithItems::append, "options"_a, "values"_a=None)
 		.def("insert", &ControlWithItems::insert, "options"_a, "values"_a=None, "pos"_a)
+		.def("remove", &ControlWithItems::remove, "pos"_a)
 		.def("clear", &ControlWithItems::clear);
 
 	py::class_t<ListBox, ControlWithItems>(layout, "ListBox")
-		.def_init(py::init<py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
+		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			"options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 
 	py::class_t<ComboBox, ControlWithItems>(layout, "ComboBox")
-		.def_init(py::init<wxcstr, py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			type, "options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 
 	py::class_t<RadioBox, BaseControlWithItems>(layout, "RadioBox")
-		.def_init(py::init<wxcstr, py::iterable, pyobj, pyobj, pyobj, pyobj, pyobj>(),
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			label, "options"_a=None, "values"_a=None, "onselect"_a=None, key, className, style);
 
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")

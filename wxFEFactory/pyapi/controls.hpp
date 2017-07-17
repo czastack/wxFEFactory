@@ -203,7 +203,7 @@ public:
 
 	}
 
-	void prepareOptions(wxArrayString &array, py::iterable &options, pycref values)
+	void prepareOptions(wxArrayString &array, pyobj options, pycref values)
 	{
 		if (!options.is_none())
 		{
@@ -235,22 +235,27 @@ public:
 	{
 		if (!m_listener.is_none())
 		{
-			int index = event.GetSelection();
+			/*int index = event.GetSelection();
 			if (!m_values.is_none())
 			{
 				(void)pyCall(m_listener, m_values[py::int_(index)], index);
 			}
 			else {
 				(void)pyCall(m_listener, index);
-			}
+			}*/
+			handlerEvent(m_listener, event);
 		}
 	}
 
 	pyobj getValue(pyobj i)
 	{
+		if (i == None)
+		{
+			i = py::cast(getSelection());
+		}
 		if (m_values.is_none())
 		{
-			return py::cast(getSelection());
+			return i;
 		}
 		return m_values[i];
 	}
@@ -271,25 +276,25 @@ public:
 		}
 	}
 
-	int getCount()
+	virtual int getCount()
 	{
-		return m_container().GetCount();
+		return m_ctrl().GetCount();
 	}
 
-	wxString getSelectedText()
+	virtual wxString getSelectedText()
 	{
-		auto it = ((wxItemContainer*)m_elem);
-		return it->GetString(it->GetSelection());
+		auto &it = m_ctrl();
+		return it.GetString(it.GetSelection());
 	}
 
-	int getSelection()
+	virtual int getSelection()
 	{
-		return m_container().GetSelection();
+		return m_ctrl().GetSelection();
 	}
 
-	void setSelection(int n)
+	virtual void setSelection(int n)
 	{
-		m_container().SetSelection(n);
+		m_ctrl().SetSelection(n);
 	}
 
 	friend void initLayout(py::module &m);
@@ -298,12 +303,11 @@ protected:
 	pyobj m_listener;
 	pyobj m_values;
 
-	wxItemContainerImmutable& m_container()
+	wxControlWithItems& m_ctrl()
 	{
-		return *(wxItemContainerImmutable*)m_elem;
+		return *(wxControlWithItems*)m_elem;
 	}
 };
-
 
 
 class ControlWithItems : public BaseControlWithItems
@@ -311,35 +315,31 @@ class ControlWithItems : public BaseControlWithItems
 public:
 	using BaseControlWithItems::BaseControlWithItems;
 
-	void insert(py::iterable &options, pycref values, int pos)
+	void insert(pycref options, pycref values, int pos)
 	{
 		wxArrayString choices;
 		prepareOptions(choices, options, values);
-		m_container().Insert(choices, pos);
+		m_ctrl().Insert(choices, pos);
 	}
 
-	void append(py::iterable &options, pycref values)
+	void append(pycref options, pycref values)
 	{
 		insert(options, values, getCount());
 	}
 
-	void setItems(py::iterable &options, pycref values) {
+	void remove(int pos)
+	{
+		m_ctrl().Delete(pos);
+	}
+
+	void setItems(pycref options, pycref values) {
 		clear();
 		insert(options, values, 0);
 	}
 
 	void clear()
 	{
-		m_container().Clear();
-	}
-
-protected:
-	pyobj m_listener;
-	pyobj m_values;
-
-	wxControlWithItems& m_container()
-	{
-		return *(wxControlWithItems*)m_elem;
+		m_ctrl().Clear();
 	}
 };
 
@@ -348,7 +348,7 @@ class ListBox : public ControlWithItems
 {
 public:
 	template <class... Args>
-	ListBox(py::iterable &options, pycref values, pycref listener, Args ...args) :
+	ListBox(pycref options, pycref values, pycref listener, Args ...args) :
 		ControlWithItems(listener, args...)
 	{
 		wxArrayString choices;
@@ -369,7 +369,7 @@ class ComboBox : public ControlWithItems
 {
 public:
 	template <class... Args>
-	ComboBox(wxcstr type, py::iterable &options, pycref values, pycref listener, Args ...args) :
+	ComboBox(wxcstr type, pycref options, pycref values, pycref listener, Args ...args) :
 		ControlWithItems(listener, args...)
 	{
 		long style = 0L;
@@ -405,7 +405,7 @@ class RadioBox : public BaseControlWithItems
 {
 public:
 	template <class... Args>
-	RadioBox(wxcstr label, py::iterable &options, pycref values, pyobj &listener, Args ...args) :
+	RadioBox(wxcstr label, pycref options, pycref values, pyobj &listener, Args ...args) :
 		BaseControlWithItems(listener, args...)
 	{
 		wxArrayString choices;
@@ -442,6 +442,28 @@ protected:
 		}
 	}
 
+	int getCount() override
+	{
+		return m_ctrl().GetCount();
+	}
+
+	wxString getSelectedText() override
+	{
+		auto &it = m_ctrl();
+		return it.GetString(it.GetSelection());
+	}
+
+	int getSelection() override
+	{
+		return m_ctrl().GetSelection();
+	}
+
+	void setSelection(int n) override
+	{
+		m_ctrl().SetSelection(n);
+	}
+
+protected:
 	wxRadioBox& m_ctrl()
 	{
 		return *(wxRadioBox*)m_elem;
