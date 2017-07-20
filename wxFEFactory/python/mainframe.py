@@ -42,7 +42,7 @@ if __name__ == 'mainframe':
         name = listbox.getValue()
         try:
             module = __import__('modules.' + name, fromlist=['main']).main
-            module.Module()
+            __main__.m = module.Module()
             __main__.M = module.Module
 
         except Exception as e:

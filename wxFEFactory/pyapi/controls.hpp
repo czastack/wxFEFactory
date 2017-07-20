@@ -2,6 +2,7 @@
 #include "layoutbase.hpp"
 #include <wx/button.h>
 #include <wx/stattext.h>
+#include "wxpatch.hpp"
 
 
 class Button : public Control
@@ -56,8 +57,7 @@ public:
 	void trigger()
 	{
 		setChecked(!getChecked());
-		wxCommandEvent event(wxEVT_CHECKBOX, m_elem->GetId());
-		m_elem->wxEvtHandler::AddPendingEvent(event);
+		addPendingEvent(wxEVT_CHECKBOX);
 	}
 
 	void setChecked(bool checked)
@@ -196,9 +196,8 @@ protected:
 class BaseControlWithItems : public Control
 {
 public:
-	template <class... Args>
-	BaseControlWithItems(pycref listener, Args ...args) :
-		Control(args...), m_listener(listener)
+	BaseControlWithItems(pycref listener, pycref key, pycref className, pycref style) :
+		Control(key, className, style), m_listener(listener)
 	{
 
 	}
@@ -231,7 +230,7 @@ public:
 		}
 	}
 
-	virtual void onSelect(wxCommandEvent & event)
+	void onSelect(wxCommandEvent & event)
 	{
 		if (!m_listener.is_none())
 		{
@@ -276,15 +275,30 @@ public:
 		}
 	}
 
+	pyobj getTexts()
+	{
+		const wxArrayString &textArray = m_ctrl().GetStrings();
+		py::list list;
+		for (wxcstr text: textArray)
+		{
+			list.append(text);
+		}
+		return list;
+	}
+
 	virtual int getCount()
 	{
 		return m_ctrl().GetCount();
 	}
 
-	virtual wxString getSelectedText()
+	virtual wxString getText(int pos=-1)
 	{
 		auto &it = m_ctrl();
-		return it.GetString(it.GetSelection());
+		if (pos == -1)
+		{
+			pos = it.GetSelection();
+		}
+		return it.GetString(pos);
 	}
 
 	virtual int getSelection()
@@ -292,9 +306,26 @@ public:
 		return m_ctrl().GetSelection();
 	}
 
-	virtual void setSelection(int n)
+	virtual void doSetSelection(int n)
 	{
 		m_ctrl().SetSelection(n);
+	}
+
+	virtual void triggerSelectEvent()
+	{
+
+	}
+
+	/**
+	 * handle 是否触发事件处理
+	 */
+	void setSelection(int n, bool handle=false)
+	{
+		doSetSelection(n);
+		if (handle)
+		{
+			triggerSelectEvent();
+		}
 	}
 
 	friend void initLayout(py::module &m);
@@ -347,6 +378,8 @@ public:
 class ListBox : public ControlWithItems
 {
 public:
+	using ControlWithItems::ControlWithItems;
+
 	template <class... Args>
 	ListBox(pycref options, pycref values, pycref listener, Args ...args) :
 		ControlWithItems(listener, args...)
@@ -357,10 +390,81 @@ public:
 		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
 	}
 
+	void triggerSelectEvent() override
+	{
+		addPendingEvent(wxEVT_LISTBOX);
+	}
+
 protected:
 	wxListBox& m_ctrl()
 	{
 		return *(wxListBox*)m_elem;
+	}
+};
+
+
+class CheckListBox : public ListBox
+{
+public:
+	using ListBox::ListBox;
+	template <class... Args>
+	CheckListBox(pycref options, pycref values, pycref listener, Args ...args) :
+		ListBox(listener, args...)
+	{
+		wxArrayString choices;
+		prepareOptions(choices, options, values);
+		bindElem(new wxCheckListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), choices));
+		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+	}
+
+	pyobj getCheckedItems()
+	{
+		wxArrayInt items;
+		m_ctrl().GetCheckedItems(items);
+		py::list list;
+		for (int idx : items)
+		{
+			list.append(idx);
+		}
+		return list;
+	}
+
+protected:
+	wxCheckListBox& m_ctrl()
+	{
+		return *(wxCheckListBox*)m_elem;
+	}
+};
+
+
+class RearrangeList : public CheckListBox
+{
+public:
+	template <class... Args>
+	RearrangeList(pycref options, pycref values, pycref listener, Args ...args) :
+		CheckListBox(listener, args...)
+	{
+		wxArrayString choices;
+		wxArrayInt order;
+		prepareOptions(choices, options, values);
+		bindElem(new wxRearrangeListPatched(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), order, choices));
+		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+	}
+
+	void moveUp()
+	{
+		m_ctrl().MoveCurrentUp();
+	}
+
+	void moveDown()
+	{
+		m_ctrl().MoveCurrentDown();
+	}
+
+protected:
+	wxRearrangeList& m_ctrl()
+	{
+		return *(wxRearrangeList*)m_elem;
 	}
 };
 
@@ -392,6 +496,11 @@ public:
 		m_elem->Bind(wxEVT_COMBOBOX, &ComboBox::onSelect, this);
 	}
 
+	void triggerSelectEvent() override
+	{
+		addPendingEvent(wxEVT_COMBOBOX);
+	}
+
 protected:
 
 	wxComboBox& m_ctrl()
@@ -405,7 +514,7 @@ class RadioBox : public BaseControlWithItems
 {
 public:
 	template <class... Args>
-	RadioBox(wxcstr label, pycref options, pycref values, pyobj &listener, Args ...args) :
+	RadioBox(wxcstr label, pycref options, pycref values, pycref listener, Args ...args) :
 		BaseControlWithItems(listener, args...)
 	{
 		wxArrayString choices;
@@ -413,6 +522,36 @@ public:
 
 		bindElem(new wxRadioBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), choices));
 		m_elem->Bind(wxEVT_RADIOBOX, &ComboBox::onSelect, this);
+	}
+
+	int getCount() override
+	{
+		return m_ctrl().GetCount();
+	}
+
+	wxString getText(int pos = -1) override
+	{
+		auto &it = m_ctrl();
+		if (pos == -1)
+		{
+			pos = it.GetSelection();
+		}
+		return it.GetString(pos);
+	}
+
+	int getSelection() override
+	{
+		return m_ctrl().GetSelection();
+	}
+
+	void doSetSelection(int n) override
+	{
+		m_ctrl().SetSelection(n);
+	}
+
+	void triggerSelectEvent() override
+	{
+		addPendingEvent(wxEVT_RADIOBOX);
 	}
 
 protected:
@@ -442,28 +581,6 @@ protected:
 		}
 	}
 
-	int getCount() override
-	{
-		return m_ctrl().GetCount();
-	}
-
-	wxString getSelectedText() override
-	{
-		auto &it = m_ctrl();
-		return it.GetString(it.GetSelection());
-	}
-
-	int getSelection() override
-	{
-		return m_ctrl().GetSelection();
-	}
-
-	void setSelection(int n) override
-	{
-		m_ctrl().SetSelection(n);
-	}
-
-protected:
 	wxRadioBox& m_ctrl()
 	{
 		return *(wxRadioBox*)m_elem;

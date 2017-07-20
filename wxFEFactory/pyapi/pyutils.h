@@ -87,6 +87,17 @@ wxSharedPtr<T> asArray(pycref list, int &n)
 	return wxSharedPtr<T>(data);
 }
 
+template<class T>
+pyobj asPyList(T &array)
+{
+	py::list list;
+	for (const auto &i : array)
+	{
+		list.append(i);
+	}
+	return list;
+}
+
 template <typename... Args>
 py::object pyCall(const py::object & obj, Args &&...args) {
 	try {

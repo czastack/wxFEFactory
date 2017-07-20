@@ -114,6 +114,9 @@
     <ClInclude Include="pyapi\bars.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
+    <ClInclude Include="wxpatch.hpp">
+      <Filter>wx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">
@@ -133,6 +136,9 @@
     </Filter>
     <Filter Include="pyapi\layout">
       <UniqueIdentifier>{dc497cd4-3323-4626-9f43-15e74060bff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wx">
+      <UniqueIdentifier>{b58b684b-307b-4b12-8dcb-0dab4b9021d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

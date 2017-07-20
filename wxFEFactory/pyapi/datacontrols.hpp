@@ -30,7 +30,7 @@ public:
 		}
 	}
 
-	void Append(wxPGProperty* property, py::object &help)
+	void Append(wxPGProperty* property, pycref help)
 	{
 		m_ctrl().Append(property);
 		if (!help.is_none())
@@ -43,34 +43,34 @@ public:
 		m_ctrl().Append(new wxPropertyCategory(title));
 	}
 
-	void addStringProperty(wxcstr title, wxcstr name, py::object help, py::object value) {
+	void addStringProperty(wxcstr title, wxcstr name, pycref help, pycref value) {
 		Append(new wxStringProperty(title, name, pywxstr(value)), help);
 	}
 
-	void addIntProperty(wxcstr title, wxcstr name, py::object help, long value = 0) {
+	void addIntProperty(wxcstr title, wxcstr name, pycref help, long value = 0) {
 		Append(new wxIntProperty(title, name, value), help);
 	}
 
-	void addUIntProperty(wxcstr title, wxcstr name, py::object help, u32 value = 0) {
+	void addUIntProperty(wxcstr title, wxcstr name, pycref help, u32 value = 0) {
 		Append(new wxUIntProperty(title, name, value), help);
 	}
 
-	void addHexProperty(wxcstr title, wxcstr name, py::object help, u32 value = 0) {
+	void addHexProperty(wxcstr title, wxcstr name, pycref help, u32 value = 0) {
 		wxPGProperty* property = new wxUIntProperty(title, name, value);
 		property->SetAttribute(wxPG_UINT_BASE, wxPG_BASE_HEX);
 		// property->SetAttribute(wxPG_UINT_PREFIX, wxPG_PREFIX_0x);
 		Append(property, help);
 	}
 
-	void addFloatProperty(wxcstr title, wxcstr name, py::object help, double value = 0) {
+	void addFloatProperty(wxcstr title, wxcstr name, pycref help, double value = 0) {
 		Append(new wxFloatProperty(title, name, value), help);
 	}
 
-	void addBoolProperty(wxcstr title, wxcstr name, py::object help, bool value = false) {
+	void addBoolProperty(wxcstr title, wxcstr name, pycref help, bool value = false) {
 		Append(new wxBoolProperty(title, name, value), help);
 	}
 
-	void addEnumProperty(wxcstr title, wxcstr name, py::object help, py::iterable py_items, py::iterable py_values, int value = 0) {
+	void addEnumProperty(wxcstr title, wxcstr name, pycref help, const py::iterable &py_items, const py::iterable &py_values, int value = 0) {
 		wxArrayString labels;
 		wxArrayInt values;
 		addAll(labels, py_items);
@@ -78,7 +78,7 @@ public:
 		Append(new wxEnumProperty(title, name, labels, values, value), help);
 	}
 
-	void addFlagsProperty(wxcstr title, wxcstr name, py::object help, py::iterable py_items, py::object py_values, int value = 0) {
+	void addFlagsProperty(wxcstr title, wxcstr name, pycref help, pycref py_items, pycref py_values, int value = 0) {
 		wxArrayString labels;
 		wxArrayInt values;
 		addAll(labels, py_items);
@@ -98,11 +98,11 @@ public:
 		Append(property, help);
 	}
 
-	void addLongStringProperty(wxcstr title, wxcstr name, py::object help, py::object value) {
+	void addLongStringProperty(wxcstr title, wxcstr name, pycref help, pycref value) {
 		Append(new wxLongStringProperty(title, name, pywxstr(value)), help);
 	}
 
-	void addArrayStringProperty(wxcstr title, wxcstr name, py::object help, py::iterable py_values) {
+	void addArrayStringProperty(wxcstr title, wxcstr name, pycref help, const py::iterable &py_values) {
 		wxArrayString values;
 		addAll(values, py_values);
 		Append(new wxArrayStringProperty(title, name, values), help);
@@ -134,58 +134,113 @@ public:
 		return getValue(m_ctrl().GetPropertyByName(name));
 	}
 
-	void setValue(const wxPGProperty* p, py::object pyval) {
+	void setValue(const wxPGProperty* p, pycref pyval) {
+		/*
+		The built-in types are:
+			"bool"
+			"char"
+			"datetime"
+			"double"
+			"list"
+			"long"
+			"longlong"
+			"string"
+			"ulonglong"
+			"arrstring"
+			"void*"
+			If the variant is null, the value type returned is the string "null" (not the empty string).
+		*/
+
 		wxcstr type = p->GetValueType();
+		auto &pg = m_ctrl();
 
 		if (pyval.is_none())
 		{
+			pg.SetPropertyValue(p, wxNoneString);
 			return;
 		}
 
-		auto &pg = m_ctrl();
-
-		if (type == "long")
-			pg.SetPropertyValue(p, pyval.cast<long>());
-		else if (type == "string")
-			pg.SetPropertyValue(p, pyval.cast<wxString>());
-		else if (type == "bool")
-			pg.SetPropertyValue(p, pyval.cast<bool>());
-		else if (type == "arrstring") {
-			py::list pylist(pyval);
-			wxArrayString list;
-			list.SetCount(pylist.size());
-			int i = 0;
-			for (auto &e : pylist)
-			{
-				list[i++] = pyval.cast<wxString>();
+		if (type != "null")
+		{
+			if (type == "long")
+				pg.SetPropertyValue(p, pyval.cast<long>());
+			else if (type == "string")
+				pg.SetPropertyValue(p, pyval.cast<wxString>());
+			else if (type == "bool")
+				pg.SetPropertyValue(p, pyval.cast<bool>());
+			else if (type == "arrstring") {
+				py::list pylist(pyval);
+				wxArrayString list;
+				list.SetCount(pylist.size());
+				int i = 0;
+				for (auto &e : pylist)
+				{
+					list[i++] = pyval.cast<wxString>();
+				}
+				pg.SetPropertyValue(p, list);
 			}
-			pg.SetPropertyValue(p, list);
+		}
+		else
+		{
+			if (wxIsKindOf(p, wxUIntProperty) || wxIsKindOf(p, wxIntProperty))
+				pg.SetPropertyValue(p, pyval.cast<long>());
+			else if (wxIsKindOf(p, wxStringProperty) || wxIsKindOf(p, wxLongStringProperty))
+				pg.SetPropertyValue(p, pyval.cast<wxString>());
+			else if (wxIsKindOf(p, wxBoolProperty))
+				pg.SetPropertyValue(p, pyval.cast<bool>());
+			else if (wxIsKindOf(p, wxArrayStringProperty)) {
+				py::list pylist(pyval);
+				wxArrayString list;
+				list.SetCount(pylist.size());
+				int i = 0;
+				for (auto &e : pylist)
+				{
+					list[i++] = pyval.cast<wxString>();
+				}
+				pg.SetPropertyValue(p, list);
+			}
 		}
 	}
 
-	void setValue(wxcstr name, py::object value) {
+	void setValue(wxcstr name, pycref value) {
 		return setValue(m_ctrl().GetPropertyByName(name), value);
 	}
 
-	void getValues(py::object obj)
+	void getValues(pycref obj)
 	{
-		py::dict data = obj.is_none() ? m_data : obj;
+		pycref data = obj.is_none() ? m_data : obj;
 
 		wxPropertyGridConstIterator it = m_ctrl().GetIterator();
-		for (; !it.AtEnd(); it++)
+		for (; !it.AtEnd(); ++it)
 		{
 			const wxPGProperty* p = *it;
 			data[p->GetName()] = getValue(p);
 		}
 	}
 
-	void setValues(py::dict data)
+	void setValues(pycref data, bool all=false)
 	{
-		wxPropertyGridIterator it = m_ctrl().GetIterator();
-		for (; !it.AtEnd(); it++)
+		wxString text;
+
+		if (all)
 		{
-			wxPGProperty* p = *it;
-			setValue(p, data[p->GetName()]);
+			wxPropertyGridIterator it = m_ctrl().GetIterator();
+			for (; !it.AtEnd(); ++it)
+			{
+				wxPGProperty* p = *it;
+				setValue(p, pyDictGet(data, p->GetName()));
+			}
+		}
+		else
+		{
+			for (auto &item : data) {
+				pystrcpy(text, item);
+				wxPGProperty* p = m_ctrl().GetPropertyByName(text);
+				if (p)
+				{
+					setValue(p, data[item]);
+				}
+			}
 		}
 	}
 
@@ -197,10 +252,10 @@ public:
 	/**
 	* °ó¶¨Êý¾Ý
 	*/
-	void bindData(py::object data)
+	void bindData(pycref data)
 	{
 		m_data = data;
-		setValues(data);
+		setValues(data, true);
 	}
 
 	void setTwowayBinding(bool twoway) {
@@ -210,7 +265,7 @@ public:
 	friend void initLayout(py::module &m);
 
 protected:
-	py::dict m_data;
+	pyobj m_data; // py::dict
 	bool m_changed = false;
 	bool m_twoway = false;
 
@@ -239,7 +294,7 @@ public:
 		}
 	}
 
-	void insertItems(py::iterable rows, int pos = -1, bool create = true)
+	void insertItems(const py::iterable &rows, int pos = -1, bool create = true)
 	{
 		wxListItem info;
 		auto &li = m_ctrl();

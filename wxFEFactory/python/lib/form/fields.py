@@ -40,6 +40,11 @@ class Group(Field):
             field.show(pg)
 
 
+class Int(Field):
+    def show(self, pg):
+        pg.addIntProperty(self.label, self.name)
+
+
 class Uint(Field):
     def show(self, pg):
         pg.addHexProperty(self.label, self.name)

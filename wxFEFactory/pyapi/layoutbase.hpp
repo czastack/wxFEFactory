@@ -53,16 +53,12 @@ class Layout;
 class View
 {
 public:
-	View(pycref key, pycref className, pycref style)
-		:m_key(key), m_class(className), m_style(style)
-	{
-
-	}
+	View(pycref key, pycref className, pycref style);
 
 	View(wxWindow* elem)
-		:m_key(None), m_class(None), m_style(None), m_elem(elem)
+		:View(None, None, None)
 	{
-
+		m_elem = elem;
 	}
 
 	virtual ~View() {
@@ -172,7 +168,7 @@ public:
 		if (!fn.is_none())
 		{
 			fn.inc_ref();
-			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto event) {
+			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
 				handlerEvent(fn, event);
 			});
 		}
@@ -181,10 +177,32 @@ public:
 	template <typename EventType>
 	void handlerEvent(pycref fn, EventType event)
 	{
-		pycref ret = pyCall(fn, py::cast(this));
+		pycref ret = pyCall(fn, this);
 		if (!PyObject_IsTrue(ret.ptr()))
 		{
 			event.Skip();
+		}
+	}
+
+	template <typename EventType>
+	void addPendingEvent(wxEventTypeTag<EventType> etype)
+	{
+		EventType event(etype, m_elem->GetId());
+		m_elem->wxEvtHandler::AddPendingEvent(event);
+	}
+
+	/**
+	 * 不推荐使用，现在不支持移除事件
+	 * 会传wxKeyEvent实例过去，需要手动Skip
+	 */
+	void setOnKeyDown(pycref fn)
+	{
+		if (!fn.is_none())
+		{
+			fn.inc_ref();
+			((wxEvtHandler*)m_elem)->Bind(wxEVT_KEY_DOWN, [fn, this](auto &event) {
+				pyCall(fn, this, &event);
+			});
 		}
 	}
 
@@ -323,8 +341,11 @@ public:
 	/**
 	* 尝试应用样式表
 	*/
-	void testStyles(pyobj &typecase, pyobj &classcase)
+	void testStyles(pycref styles)
 	{
+		pycref typecase = pyDictGet(styles, wxT("type"), None);
+		pycref classcase = pyDictGet(styles, wxT("class"), None);
+
 		pyobj style = pyDictGet(typecase, getTypeName());
 		if (!style.is_none())
 		{
@@ -502,35 +523,50 @@ public:
 
 	virtual pyobj __enter__() {
 		LAYOUTS.push_back(this);
+
+		Layout *parent = getParent();
+		tmp_styles_list = new wxVector<PyObject*>;
+
+		bool only_self = false; // 父元素的临时列表还没释放，本次只要检查自己的
+		if (parent && parent->tmp_styles_list)
+		{
+			for (auto e: *parent->tmp_styles_list)
+			{
+				tmp_styles_list->push_back(e);
+			}
+			only_self = true;
+		}
+
+		parent = this;
+		while (parent) {
+			if (!parent->m_styles.is_none())
+			{
+				if (py::isinstance<py::list>(parent->m_styles))
+				{
+					for (auto &e : parent->m_styles)
+					{
+						if (e != None)
+							tmp_styles_list->push_back(e.ptr());
+					}
+				}
+				else if (parent->m_styles != None)
+				{
+					tmp_styles_list->push_back(parent->m_styles.ptr());
+				}
+			}
+
+			if (only_self)
+				break;
+
+			parent = parent->getParent();
+		}
+
 		return py::cast(this);
 	}
 
 	virtual void __exit__(py::args &args) {
 		LAYOUTS.pop_back();
 
-		// 检测样式表
-
-		Layout *parent = this;
-		wxVector<pyobj*> styles_list;
-		while (parent) {
-			if (!parent->m_styles.is_none())
-			{
-				styles_list.push_back(&parent->m_styles);
-			}
-			parent = parent->getParent();
-		}
-		auto it = styles_list.rbegin();
-		while (it != styles_list.rend())
-		{
-			pyobj typecase = pyDictGet(**it, wxT("type"), None);
-			pyobj classcase = pyDictGet(**it, wxT("class"), None);
-			++it;
-
-			for (auto &child : m_children)
-			{
-				py::cast<View*>(child)->testStyles(typecase, classcase);
-			}
-		}
 		for (auto &e : m_children)
 		{
 			View &child = *py::cast<View*>(e);
@@ -542,6 +578,10 @@ public:
 			child.applyStyle();
 			onAdd(child);
 		}
+
+		// 释放临时样式表
+		delete tmp_styles_list;
+		tmp_styles_list = nullptr;
 	}
 
 	pyobj __getattr__(pyobj key)
@@ -549,20 +589,28 @@ public:
 		return pyDictGet(m_named_children, key);
 	}
 
-	void setStyles(py::dict styles)
+	void setStyles(pycref styles)
 	{
 		m_styles = styles;
-		py::dict typecase = pyDictGet(styles, wxT("type"), None);
-		py::dict classcase = pyDictGet(styles, wxT("class"), None);
 
-		if (!typecase.is_none() || classcase.is_none())
+		if (!styles.is_none())
 		{
 			for (auto &child : m_children)
 			{
-				py::cast<View*>(child)->testStyles(typecase, classcase);
+				py::cast<View*>(child)->testStyles(styles);
 			}
 		}
 		reLayout();
+	}
+
+	void testChildStyle(View &child)
+	{
+		// 检测样式表
+		if (tmp_styles_list)
+		for (auto e: *tmp_styles_list)
+		{
+			child.testStyles(py::reinterpret_borrow<py::object>(e));
+		}
 	}
 
 	virtual void reLayout() {}
@@ -582,8 +630,19 @@ protected:
 	py::list m_children;
 	py::dict m_named_children;
 	pyobj m_styles;
+	wxVector<PyObject*> *tmp_styles_list;
 };
 
+
+View::View(pycref key, pycref className, pycref style)
+	:m_key(key), m_class(className), m_style(style)
+{
+	Layout* pLayout = getActiveLayout();
+	if (pLayout)
+	{
+		pLayout->testChildStyle(*this);
+	}
+}
 
 void View::addToParent() {
 	Layout* pLayout = getActiveLayout();

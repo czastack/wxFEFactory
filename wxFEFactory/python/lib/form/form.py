@@ -54,12 +54,9 @@ class BaseForm(metaclass=FormMetaclass):
         """
         self.data = data
 
-    def show(self, pg):
+    def initPg(self, pg):
         for field in self.fields:
             field.show(pg)
-
-        if self.data:
-            self.setValues(self.data)
 
     @classmethod
     def cfield(class_, name):

@@ -175,6 +175,7 @@
     <ClInclude Include="utils\color.h" />
     <ClInclude Include="utils\HistorySet.hpp" />
     <ClInclude Include="utils\utils.h" />
+    <ClInclude Include="wxpatch.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

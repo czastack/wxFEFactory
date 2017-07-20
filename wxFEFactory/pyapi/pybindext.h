@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
+#include "utils/utils.h"
 
 namespace pybind11 {
 	/*class wstr : public str {
@@ -85,7 +86,27 @@ namespace pybind11 {
 			bool success = false;
 		};
 #endif
+
+		HAS_MEM_FUNC(Add, hasAdd);
+
+		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<hasAdd<ArrayType>::value>> {
+		public:
+			bool load(handle src, bool) {
+				addAll(value, py::reinterpret_borrow<py::object>(src));
+				return true;
+			}
+
+			static handle cast(const ArrayType &src, return_value_policy /* policy */, handle /* parent */) {
+				return asPyList(src).inc_ref();
+			}
+
+			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArray"));
+		protected:
+			bool success = false;
+		};
 	}
+
+
 
 	/*template <typename... options>
 	class class_cza : public class_<options...>
