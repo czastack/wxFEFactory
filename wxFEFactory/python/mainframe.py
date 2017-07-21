@@ -1,69 +1,94 @@
 from modules import modules
 from project import Project
 from application import app
+from fe.ferom import FeRomRW
+import os
+import traceback
+import __main__
 import fefactory_api
 import fefactory
-import __main__
-import traceback
-import os
 Path = os.path
 
 ui = fefactory_api.layout
 
-if __name__ == 'mainframe':
-    winstyle = {
-        'width': 1200,
-        'height': 960,
-    }
+class MainFrame:
+    def __init__(self):
+        self.render()
+        if hasattr(app, 'project'):
+            self.onOpenProject(app.project)
 
-    styles = {
-        'type': {
+    def render(self):
+        with ui.MenuBar() as menubar:
+            with ui.Menu("文件"):
+                with ui.Menu("新建"):
+                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=self.newProject)
+                with ui.Menu("打开"):
+                    ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=self.openProject)
+                with ui.Menu("最近的工程"):
+                    for path in app.config['recent_project']:
+                        ui.MenuItem(path, onselect=self.doOpenProject)
+                    if app.config['recent_project']:
+                       ui.MenuItem("清除列表", onselect=self.clearRecentProject, sep=True) 
+                ui.MenuItem("从ROM中读取内容", onselect=self.readFromRom)
+                ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
+                ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
+            with ui.Menu("视图"):
+                ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
+            with ui.Menu("窗口"):
+                pass
 
-        },
-        'class': {
-            
-        }
-    }
+        with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
+            with ui.AuiManager(key="aui"):
+                ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
+                ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=self.onNav), captionVisible=False)
+                ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
+                with ui.Vertical(style=consoleStyle) as console:
+                    self.consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
+                    with ui.Horizontal(className="expand"):
+                        self.consol_input = ui.TextInput(extStyle=0x0400, className="expand console-input")
+                        ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                    with ui.Horizontal(className="expand").show(False):
+                        self.consol_input_multi = ui.TextInput(className="console-input console-input-multi", multiline=True)
+                        with ui.Vertical(className="expand"):
+                            ui.Button(label="∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                            ui.Button(label=">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码")
+                ui.AuiItem(console, name="console", direction="bottom", caption="控制台", maximizeButton=True)
+            ui.StatusBar()
 
-    consoleStyle = {
-        'height': 150,
-    }
-    consoleInputStyle = {
-        'expand': True,
-        'showPadding': '1 0 0 0',
-    }
-    consoleOutputStyle = {
-        'expand': True,
-        'flex': 1,
-    }
-
-    def onNav(listbox):
+        with ui.ContextMenu(onselect=self.onselect) as cm:
+            ui.MenuItem("测试")
+        
+        self.win = win
+        self.console = console
+        win.book.setContextMenu(cm)
+        fefactory_api.setConsoleElem(self.consol_input, self.consol_output)
+        
+    def onNav(self, listbox):
         """左边导航切换模块"""
         name = listbox.getValue()
         try:
             module = __import__('modules.' + name, fromlist=['main']).main
             __main__.m = module.Module()
-            __main__.M = module.Module
 
         except Exception as e:
             print('加载模块%s失败' % name)
             traceback.print_exc()
 
-    def closeWindow(m=None):
-        win.close()
+    def closeWindow(self, m=None):
+        self.win.close()
 
-    def restart(m):
-        closeWindow()
+    def restart(self, m):
+        self.closeWindow()
         fefactory.reload()
 
-    def toggleConsole(m):
+    def toggleConsole(self, m):
         """显示/隐藏控制台"""
-        win.aui.togglePane("console")
+        self.win.aui.togglePane("console")
 
-    def onselect(*args):
+    def onselect(self, *args):
         print(args)
 
-    def newProject(m):
+    def newProject(self, m):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -73,9 +98,9 @@ if __name__ == 'mainframe':
                 # TODO
                 project.title = fefactory_api.input_dialog("工程名称", "请输入工程名称", Path.basename(path))
             app.onChangeProject(project)
-            onOpenProject(project)
+            self.onOpenProject(project)
 
-    def openProject(m):
+    def openProject(self, m):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -84,57 +109,67 @@ if __name__ == 'mainframe':
             else:
                 fefactory_api.alert("提示", "该目录下没有project.json")
 
-    def doOpenProject(m):
+    def doOpenProject(self, m):
         path = m.getText()
         print(path)
         if path != app.project.path:
             project = Project(path)
             app.onChangeProject(project)
-            onOpenProject(project)
+            self.onOpenProject(project)
 
-    def onOpenProject(project):
-        win.title = "%s - %s" % (win.title, project.title)
+    def onOpenProject(self, project):
+        self.win.title = "%s - %s" % (self.win.title, project.title)
 
-    def clearRecentProject(m):
+    def clearRecentProject(self, m):
         pass
 
-    with ui.MenuBar() as m:
-        with ui.Menu("文件"):
-            with ui.Menu("新建"):
-                ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=newProject)
-            with ui.Menu("打开"):
-                ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=openProject)
-            with ui.Menu("最近的工程"):
-                for path in app.config['recent_project']:
-                    ui.MenuItem(path, onselect=doOpenProject)
-                if app.config['recent_project']:
-                   ui.MenuItem("清除列表", onselect=clearRecentProject, sep=True) 
-            ui.MenuItem("重启\tCtrl+R", onselect=restart)
-            ui.MenuItem("退出\tCtrl+Q", onselect=closeWindow)
-        with ui.Menu("视图"):
-            ui.MenuItem("切换控制台\tCtrl+`", onselect=toggleConsole)
-        with ui.Menu("窗口"):
-            pass
+    def toggleConsolInputMulti(self, btn):
+        p1 = self.consol_input.parent
+        p2 = self.consol_input_multi.parent
+        p1.show(not p1.isShow())
+        p2.show(not p2.isShow())
+        self.console.reLayout()
 
-    with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=m) as win:
-        with ui.AuiManager(key="aui"):
-            ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", onselect).realize(), direction="top", captionVisible=False)
-            ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=onNav), captionVisible=False)
-            ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
-            with ui.Vertical(style=consoleStyle) as console:
-                consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
-                consol_input = ui.TextInput(extStyle=0x0400, style=consoleInputStyle)
-            ui.AuiItem(console, name="console", direction="bottom", caption="控制台", maximizeButton=True)
-        ui.StatusBar()
+    def consolInputMultiRun(self, btn):
+        exec(self.consol_input_multi.value, vars(__main__))
 
-    with ui.ContextMenu(onselect=onselect) as cm:
-        ui.MenuItem("测试")
-    
-    win.book.setContextMenu(cm)
-    fefactory_api.setConsoleElem(consol_input, consol_output)
+    def readFromRom(self, m):
+        rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba|*.zip|*.zip')
+        reader = FeRomRW(rom)
+        print(reader.getRomTitle())
 
-    if hasattr(app, 'project'):
-        onOpenProject(app.project)
+winstyle = {
+    'width': 1200,
+    'height': 960,
+}
+
+styles = {
+    'type': {
+
+    },
+    'class': {
+        'fill': {'flex': 1},
+        'expand': {'expand': True},
+        'console-input': {
+            'expand': True,
+            'flex': 1,
+        },
+        'console-input-multi': {'height': 80},
+        'btn-sm': {'width': 30,}
+    }
+}
+
+consoleStyle = {
+    'height': 150,
+}
+consoleOutputStyle = {
+    'expand': True,
+    'flex': 1,
+    'showPadding': '0 0 1 0',
+}
+
+if __name__ == 'mainframe':
+    frame = MainFrame()
 
     __main__.app = app
-    __main__.win = win
+    __main__.win = win = frame.win

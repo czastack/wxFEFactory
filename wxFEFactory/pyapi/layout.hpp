@@ -26,11 +26,15 @@ void initLayout(py::module &m)
 	py::class_<View>(layout, "View")
 		.def("setContextMenu", &View::setContextMenu)
 		.def("setOnKeyDown", &View::setOnKeyDown)
+		.def("isShow", &View::isShow)
+		.def("show", &View::show, "show"_a=true)
+		.def("setToolTip", &View::setToolTip)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("key", &View::m_key)
 		.def_readwrite("className", &View::m_class)
 		.def_static("confirm", &confirm_dialog)
-		.def_property("enabled", &View::getEnabaled, &View::setEnabaled);
+		.def_property("enabled", &View::getEnabaled, &View::setEnabaled)
+		.def_property_readonly("parent", &View::getParent);
 
 	py::class_<Control, View>(layout, "Control");
 
@@ -40,6 +44,7 @@ void initLayout(py::module &m)
 		.def("__getattr__", &Layout::__getattr__)
 		.def("styles", &Layout::setStyles)
 		.def("removeChild", &Layout::removeChild)
+		.def("reLayout", &Layout::reLayout)
 		.def_readonly("children", &Layout::m_children)
 		.def_readonly("named_children", &Layout::m_named_children);
 

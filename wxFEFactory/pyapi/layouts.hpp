@@ -37,7 +37,7 @@ public:
 		m_elem->Close();
 	}
 
-	void onClose(class wxCloseEvent &event)
+	virtual void onClose(class wxCloseEvent &event)
 	{
 		// 引用减一，销毁对象
 		py::cast(this).dec_ref();
@@ -64,6 +64,7 @@ public:
 	{
 		m_win().SetMenuBar(menubar);
 		m_elem->Bind(wxEVT_MENU, &Window::onMenu, this);
+		py::cast(&menubar).inc_ref();
 	}
 
 	void onMenu(wxCommandEvent & event)
@@ -79,6 +80,12 @@ public:
 	StatusBar* getStatusBar()
 	{
 		return ((StatusBar*)m_win().GetStatusBar()->GetClientData());
+	}
+
+	void onClose(class wxCloseEvent &event) override
+	{
+		py::cast(getMenuBar()).dec_ref();
+		BaseFrame::onClose(event);
 	}
 
 protected:
@@ -200,6 +207,7 @@ public:
 
 	void reLayout() override
 	{
+		/*
 		int flex, flag, padding;
 		wxSizerItem *item;
 		wxSizer *sizer = m_elem->GetSizer();
@@ -212,7 +220,7 @@ public:
 			item->SetProportion(flex);
 			item->SetFlag(flag);
 			item->SetBorder(padding);
-		}
+		}*/
 		layout();
 	}
 

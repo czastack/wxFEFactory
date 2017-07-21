@@ -98,9 +98,10 @@ public:
 		m_elem->SetBackgroundColour(wxColor(rgb));
 	}
 
-	void setHelpText(wxcstr text)
+	View& setToolTip(wxcstr text)
 	{
-		m_elem->SetHelpText(text);
+		m_elem->SetToolTip(text);
+		return *this;
 	}
 
 	bool getEnabaled()
@@ -111,6 +112,17 @@ public:
 	bool setEnabaled(bool enabled=true)
 	{
 		return ptr()->Enable(enabled);
+	}
+
+	View& show(bool show_)
+	{
+		ptr()->Show(show_);
+		return *this;
+	}
+
+	bool isShow()
+	{
+		return ptr()->IsShown();
 	}
 
 	void setContextMenu(ContextMenu &menu)
@@ -351,10 +363,24 @@ public:
 		{
 			addStyle(style);
 		}
-		style = pyDictGet(classcase, getClassName());
-		if (!style.is_none())
+		if (py::isinstance<py::list>(m_class))
 		{
-			addStyle(style);
+			for (auto &e : m_class)
+			{
+				style = pyDictGet(classcase, py::reinterpret_borrow<py::object>(e));
+				if (!style.is_none())
+				{
+					addStyle(style);
+				}
+			}
+		}
+		else
+		{
+			style = pyDictGet(classcase, m_class);
+			if (!style.is_none())
+			{
+				addStyle(style);
+			}
 		}
 	}
 
@@ -637,6 +663,10 @@ protected:
 View::View(pycref key, pycref className, pycref style)
 	:m_key(key), m_class(className), m_style(style)
 {
+	if (py::isinstance<py::str>(m_class) && m_class.contains(" "))
+	{
+		m_class = m_class.attr("split")(" ");
+	}
 	Layout* pLayout = getActiveLayout();
 	if (pLayout)
 	{
