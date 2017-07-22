@@ -29,6 +29,7 @@ class MainFrame:
                         ui.MenuItem(path, onselect=self.doOpenProject)
                     if app.config['recent_project']:
                        ui.MenuItem("清除列表", onselect=self.clearRecentProject, sep=True) 
+                ui.MenuItem("打开工程所在文件夹", onselect=self.openProjectDir)
                 ui.MenuItem("从ROM中读取内容", onselect=self.readFromRom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
@@ -93,10 +94,11 @@ class MainFrame:
         if path:
             project = Project(path)
             if project.exists():
-                fefactory_api.confirm_dialog("提示", "此工程已存在，是否覆盖", fefactory.NO)
+                # TODO
+                fefactory_api.confirm_yes("此工程已存在，是否覆盖", fefactory_api.NO)
             else:
                 # TODO
-                project.title = fefactory_api.input_dialog("工程名称", "请输入工程名称", Path.basename(path))
+                project.title = input("请输入工程名称", Path.basename(path))
             app.onChangeProject(project)
             self.onOpenProject(project)
 
@@ -120,6 +122,10 @@ class MainFrame:
     def onOpenProject(self, project):
         self.win.title = "%s - %s" % (self.win.title, project.title)
 
+    def openProjectDir(self, m):
+        if app.project_confirm():
+            os.startfile(app.project.path)
+
     def clearRecentProject(self, m):
         pass
 
@@ -136,7 +142,8 @@ class MainFrame:
     def readFromRom(self, m):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba|*.zip|*.zip')
         reader = FeRomRW(rom)
-        print(reader.getRomTitle())
+        if not reader.closed:
+            print(reader.getRomTitle())
 
 winstyle = {
     'width': 1200,
@@ -154,7 +161,7 @@ styles = {
             'expand': True,
             'flex': 1,
         },
-        'console-input-multi': {'height': 80},
+        'console-input-multi': {'height': 70},
         'btn-sm': {'width': 30,}
     }
 }

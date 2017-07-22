@@ -1,7 +1,55 @@
 from gba.rom import RomRW
+from . import config
+from .fedict import FeDict
+import os
 
 class FeRomRW(RomRW):
     __slots__ = ()
 
     FONT_POINTER = 0x06E0
-    POINTER_START_POINTER = 0x06DC
+    TEXT_TABLE_POINTER = 0x06DC
+
+    def __init__(self, path, mode=None):
+        RomRW.__init__(self, path, mode=mode)
+
+        code = self.getRomCode()
+        if code not in config.romcode:
+            print(f'{self.name}不是火纹的rom, code={code}')
+            self.close()
+        else:
+            self.key = config.romcode[code]
+        self._dict = None
+
+    def openDict(self):
+        # 码表路径，默认放在本文件夹下面
+        path = config.dictmap[self.key]
+        path = os.path.join(os.path.dirname(__file__), path)
+
+        huffstart = self.read32(self.FONT_POINTER)
+        huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
+        self._dict = FeDict((self.name, huffstart & self.addrmask, huffsize), path)
+
+    def getTextEntryPtr(self, i):
+        """
+        读取文本指针表项的值（地址）
+        i从0开始
+        """
+        return self.read32(self.read32(self.TEXT_TABLE_POINTER) + 4 + i * 4)
+
+    def getTextEntryText(self, i):
+        """
+        读取文本指针表项的内容（文本）
+        i从0开始
+        """
+        return self.readText(self.getTextEntryPtr(i))
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self._file.read(1)[0]
+
+    def readText(self, addr):
+        if self._dict is None:
+            self.openDict()
+        return self._dict.decodeHaffuman(self.pos(addr))

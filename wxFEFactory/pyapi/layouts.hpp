@@ -382,3 +382,12 @@ protected:
 };
 
 
+class StaticBox : public Layout
+{
+public:
+	template <class... Args>
+	StaticBox(wxcstr label, Args ...args) : Layout(args...)
+	{
+		bindElem(new wxStaticBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+	}
+};

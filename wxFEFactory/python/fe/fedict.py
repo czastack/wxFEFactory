@@ -22,7 +22,10 @@ class TreeNode:
         return self.left
 
 
-class HaffumanDictionary(Dictionary):
+class FeDict(Dictionary):
+    """
+    火纹文本字典类 HaffumanDictionary
+    """
     __slots__ = ('tree', 'leafmap')
 
     def __init__(self, huffmandata, codetable, lowrange=None, ctrltable=None):
@@ -143,7 +146,7 @@ class HaffumanDictionary(Dictionary):
 
 if __name__ == '__main__' or __name__ == 'builtins':
     workdir = 'E:/GBA/fe8/'
-    di = HaffumanDictionary((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt') 
+    di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt') 
     # print(di.encodeHaffuman('铁剑'))
     print(di.decodeHaffuman(b'\x93\xe4\x93\xbf\x01'))
 

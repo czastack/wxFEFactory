@@ -32,7 +32,6 @@ void initLayout(py::module &m)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("key", &View::m_key)
 		.def_readwrite("className", &View::m_class)
-		.def_static("confirm", &confirm_dialog)
 		.def_property("enabled", &View::getEnabaled, &View::setEnabaled)
 		.def_property_readonly("parent", &View::getParent);
 
@@ -84,7 +83,11 @@ void initLayout(py::module &m)
 
 	py::class_t<SplitterWindow, Layout>(layout, "SplitterWindow")
 		.def_init(py::init<bool, int, pyobj, pyobj, pyobj, pyobj>(),
-			"horizontal"_a=false, "sashpos"_a=0, styles, key, className, style);
+			"horizontal"_a = false, "sashpos"_a = 0, styles, key, className, style);
+
+	py::class_t<StaticBox, Layout>(layout, "StaticBox")
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
+			label, styles, key, className, style);
 
 	py::class_t<Button, Control>(layout, "Button")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
@@ -109,6 +112,13 @@ void initLayout(py::module &m)
 			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, extStyle, key, className, style)
 		.def_property("value", &TextInput::getValue, &TextInput::setValue);
 
+	py::class_t<SpinCtrl, Control>(layout, "SpinCtrl")
+		.def_init(py::init<wxcstr, int, int, int, pyobj, pyobj, pyobj>(),
+			"value"_a=wxEmptyString, "min"_a, "max"_a, "initial"_a, key, className, style)
+		.def_property("value", &SpinCtrl::getValue, &SpinCtrl::setValue)
+		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
+		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);
+
 	auto options = "options"_a=None,
 		values = "values"_a=None, 
 		onselect = "onselect"_a=None;
@@ -116,6 +126,7 @@ void initLayout(py::module &m)
 	py::class_<BaseControlWithItems, Control>(layout, "BaseControlWithItems")
 		.def("getText", &BaseControlWithItems::getText, "pos"_a=-1)
 		.def("getTexts", &BaseControlWithItems::getTexts)
+		.def("setText", &BaseControlWithItems::setText, "text"_a, "pos"_a=-1)
 		.def("getValue", &BaseControlWithItems::getValue, "i"_a=None)
 		.def("setValue", &BaseControlWithItems::setValue)
 		.def("getSelection", &BaseControlWithItems::getSelection)
@@ -237,8 +248,6 @@ void initLayout(py::module &m)
 	// PyObject_SetAttrString(layout.ptr(), "NORMAL", PyLong_FromLong(wxACCEL_NORMAL));
 */
 
-#define ATTR_INT(obj, name, pre) PyObject_SetAttrString(obj, #name, PyLong_FromLong(pre##name))
-
 #define ATTR_ACCEL(name) ATTR_INT(KeyEvent.ptr(), name, wxACCEL_)
 	ATTR_ACCEL(NORMAL),
 	ATTR_ACCEL(ALT),
@@ -309,6 +318,4 @@ void initLayout(py::module &m)
 	ATTR_KEYCODE(WINDOWS_RIGHT),
 	ATTR_KEYCODE(WINDOWS_MENU);
 #undef ATTR_KEYCODE
-
-#undef ATTR_INT
 }

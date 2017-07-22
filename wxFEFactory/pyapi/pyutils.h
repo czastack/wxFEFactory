@@ -123,6 +123,9 @@ inline py::handle getSelf(const T *ptr)
  */
 void py_interpreter_run(wxcstr line);
 
+
+#define ATTR_INT(obj, name, pre) PyObject_SetAttrString(obj, #name, PyLong_FromLong(pre##name))
+
 /**
  * ºÏ≤È¿‡–Õ
  */

@@ -403,13 +403,25 @@ public:
 		style = getStyle(STYLE_BACKGROUND);
 		if (style != None)
 		{
-			setBackground(parseColor(style.cast<wxString>(), m_elem->GetBackgroundColour().GetRGB()));
+			if (py::isinstance<py::str>(style))
+			{
+				setBackground(parseColor(style.cast<wxString>(), m_elem->GetBackgroundColour().GetRGB()));
+			}
+			else {
+				setBackground(style.cast<int>());
+			}
 		}
 
 		style = getStyle(STYLE_COLOR);
 		if (style != None)
 		{
-			setForeground(parseColor(style.cast<wxString>(), m_elem->GetForegroundColour().GetRGB()));
+			if (py::isinstance<py::str>(style))
+			{
+				setForeground(parseColor(style.cast<wxString>(), m_elem->GetForegroundColour().GetRGB()));
+			}
+			else {
+				setForeground(style.cast<int>());
+			}
 		}
 
 		style = getStyle(STYLE_FONTSIZE);

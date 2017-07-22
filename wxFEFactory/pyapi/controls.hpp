@@ -2,6 +2,7 @@
 #include "layoutbase.hpp"
 #include <wx/button.h>
 #include <wx/stattext.h>
+#include <wx/spinctrl.h>
 #include "wxpatch.hpp"
 
 
@@ -146,9 +147,9 @@ public:
 		bindElem(new wxTextCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), style));
 	}
 
-	void setValue(wxcstr label)
+	void setValue(wxcstr value)
 	{
-		m_ctrl().SetValue(label);
+		m_ctrl().SetValue(value);
 	}
 
 	wxString getValue()
@@ -189,6 +190,53 @@ protected:
 	wxTextCtrl& m_ctrl()
 	{
 		return *(wxTextCtrl*)m_elem;
+	}
+};
+
+
+class SpinCtrl: public Control
+{
+public:
+	template <class... Args>
+	SpinCtrl(wxcstr value, int min, int max, int initial, Args ...args) : Control(args...)
+	{
+		bindElem(new wxSpinCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), 
+			wxSP_ARROW_KEYS | wxALIGN_RIGHT, min, max, initial));
+	}
+
+	void setValue(int value)
+	{
+		m_ctrl().SetValue(value);
+	}
+
+	int getValue() const
+	{
+		return m_ctrl().GetValue();
+	}
+
+	void setMin(int min)
+	{
+		m_ctrl().SetMin(min);
+	}
+
+	int getMin() const
+	{
+		return m_ctrl().GetMin();
+	}
+
+	void setMax(int max)
+	{
+		m_ctrl().SetMax(max);
+	}
+
+	int getMax()
+	{
+		return m_ctrl().GetMax();
+	}
+protected:
+	wxSpinCtrl& m_ctrl() const
+	{
+		return *(wxSpinCtrl*)m_elem;
 	}
 };
 
@@ -291,14 +339,39 @@ public:
 		return m_ctrl().GetCount();
 	}
 
-	virtual wxString getText(int pos=-1)
+	virtual wxString doGetText(int pos)
 	{
-		auto &it = m_ctrl();
+		return m_ctrl().GetString(pos);
+	}
+
+	virtual void doSetText(int pos, wxcstr text)
+	{
+		m_ctrl().SetString(pos, text);
+	}
+
+	wxString getText(int pos=-1)
+	{
 		if (pos == -1)
 		{
-			pos = it.GetSelection();
+			pos = getSelection();
 		}
-		return it.GetString(pos);
+		if (pos != -1)
+		{
+			return doGetText(pos);
+		}
+		return wxNoneString;
+	}
+
+	void setText(wxcstr text, int pos=-1)
+	{
+		if (pos == -1)
+		{
+			pos = getSelection();
+		}
+		if (pos != -1)
+		{
+			doSetText(pos, text);
+		}
 	}
 
 	virtual int getSelection()
@@ -529,14 +602,14 @@ public:
 		return m_ctrl().GetCount();
 	}
 
-	wxString getText(int pos = -1) override
+	wxString doGetText(int pos) override
 	{
-		auto &it = m_ctrl();
-		if (pos == -1)
-		{
-			pos = it.GetSelection();
-		}
-		return it.GetString(pos);
+		return m_ctrl().GetString(pos);
+	}
+
+	void doSetText(int pos, wxcstr text) override
+	{
+		m_ctrl().SetString(pos, text);
 	}
 
 	int getSelection() override
