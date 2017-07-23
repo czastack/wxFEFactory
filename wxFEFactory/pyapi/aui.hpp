@@ -248,7 +248,10 @@ public:
 		if (onclose != None)
 		{
 			bool ret = PyObject_IsTrue(pyCall(onclose).ptr()) != 0;
-			m_close_listeners.attr("pop")(page);
+			if (ret)
+			{
+				m_close_listeners.attr("pop")(page);
+			}
 			return ret;
 		}
 

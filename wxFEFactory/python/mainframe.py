@@ -63,13 +63,17 @@ class MainFrame:
         self.console = console
         win.book.setContextMenu(cm)
         fefactory_api.setConsoleElem(self.consol_input, self.consol_output)
+
+    def getModule(self, name):
+        module = __import__('modules.' + name, fromlist=['main']).main
+        return module.Module
         
     def onNav(self, listbox):
         """左边导航切换模块"""
         name = listbox.getValue()
         try:
-            module = __import__('modules.' + name, fromlist=['main']).main
-            __main__.m = module.Module()
+            Module = self.getModule(name)
+            __main__.m = Module()
 
         except Exception as e:
             print('加载模块%s失败' % name)
@@ -140,10 +144,23 @@ class MainFrame:
         exec(self.consol_input_multi.value, vars(__main__))
 
     def readFromRom(self, m):
-        rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba|*.zip|*.zip')
-        reader = FeRomRW(rom)
-        if not reader.closed:
-            print(reader.getRomTitle())
+        # rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba|*.zip|*.zip')
+        # reader = FeRomRW(rom)
+        # if not reader.closed:
+        #     print(reader.getRomTitle())
+        with ui.StdModalDialog("选择执行导入的模块", style={'width': 400, 'height': 300}) as dialog:
+            listbox = ui.CheckListBox(options=modules, values=lambda x: x)
+        if dialog.showOnce():
+            for i in listbox.getCheckedItems():
+                name = modules[i][1]
+                try:
+                    Module = self.getModule(name)
+                    print(Module)
+
+                except Exception as e:
+                    print('加载模块%s失败' % name)
+                    traceback.print_exc()
+
 
 winstyle = {
     'width': 1200,

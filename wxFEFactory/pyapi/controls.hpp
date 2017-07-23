@@ -494,12 +494,19 @@ public:
 	{
 		wxArrayInt items;
 		m_ctrl().GetCheckedItems(items);
-		py::list list;
-		for (int idx : items)
+		return asPyList(items);
+	}
+
+	void setCheckedItems(pyobj list)
+	{
+		auto &ctrl = m_ctrl();
+		for (uint i = 0; i < ctrl.GetCount(); ++i)
 		{
-			list.append(idx);
+			ctrl.Check(i, false);
 		}
-		return list;
+		for (auto &item : list) {
+			ctrl.Check(item.cast<int>(), true);
+		}
 	}
 
 protected:

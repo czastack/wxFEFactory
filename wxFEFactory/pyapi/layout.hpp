@@ -59,6 +59,11 @@ void initLayout(py::module &m)
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
+			label, styles, key, className, style)
+		.def("showOnce", &Dialog::showOnce);
+
+	py::class_t<StdModalDialog, Dialog>(layout, "StdModalDialog")
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, styles, key, className, style);
 
 	py::class_t<Vertical, Layout>(layout, "Vertical")
@@ -149,7 +154,8 @@ void initLayout(py::module &m)
 	py::class_t<CheckListBox, ListBox>(layout, "CheckListBox")
 		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			options, values, onselect, key, className, style)
-		.def("getCheckedItems", &CheckListBox::getCheckedItems);
+		.def("getCheckedItems", &CheckListBox::getCheckedItems)
+		.def("setCheckedItems", &CheckListBox::setCheckedItems);
 
 	py::class_t<RearrangeList, CheckListBox>(layout, "RearrangeList")
 		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
@@ -223,7 +229,8 @@ void initLayout(py::module &m)
 		.def("bindData", &PropertyGrid::bindData)
 		.def("setTwowayBinding", &PropertyGrid::setTwowayBinding, "twoway"_a=true)
 		.def_readwrite("data", &PropertyGrid::m_data)
-		.def_readwrite("twoway", &PropertyGrid::m_twoway);
+		.def_readwrite("twoway", &PropertyGrid::m_twoway)
+		.def_readwrite("changed", &PropertyGrid::m_changed);
 
 	py::class_t<ListView, Control>(layout, "ListView")
 		.def_init(py::init<pyobj, pyobj, pyobj>(), key, className, style)

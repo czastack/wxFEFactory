@@ -46,7 +46,12 @@ class Module(BaseModule):
         return menu
 
     def onclose(self):
-        print("close")
+        if self.pg.changed:
+            choice = self.confirm('保存修改', '有修改，是否保存？', self.CANCEL)
+            if choice is self.CANCEL:
+                return False
+            elif choice is self.YES:
+                self.onSave(None)
         return super().onclose()
 
     def onAdd(self, btn):
@@ -75,6 +80,7 @@ class Module(BaseModule):
             self.pg.setValues({'name': newname})
 
     def onSave(self, btn):
+        self.pg.changed = False
         self.dumpJson('characters', list(self.itervalues()))
 
     def getCurData(self):

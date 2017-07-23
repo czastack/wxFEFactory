@@ -102,10 +102,22 @@ public:
 	template <class... Args>
 	Dialog(wxcstr title, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), 
+		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(),
 			wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX));
-		m_elem->SetSizeHints(wxDefaultSize, wxDefaultSize);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
+	}
+
+	bool showOnce()
+	{
+		bool ret = m_win().ShowModal() == wxID_OK;
+		m_win().Destroy();
+		return ret;
+	}
+
+protected:
+	wxDialog& m_win()
+	{
+		return *(wxDialog*)m_elem;
 	}
 };
 
@@ -389,5 +401,42 @@ public:
 	StaticBox(wxcstr label, Args ...args) : Layout(args...)
 	{
 		bindElem(new wxStaticBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+	}
+};
+
+
+class StdModalDialog : public Dialog
+{
+public:
+	using Dialog::Dialog;
+
+	pyobj __enter__() override
+	{
+		long style = m_elem->GetWindowStyle();
+		style |= wxRESIZE_BORDER | wxCLIP_CHILDREN;
+		m_elem->SetWindowStyle(style);
+
+		auto ret = Layout::__enter__();
+		wxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
+		m_elem->SetSizer(topsizer);
+		return ret;
+	}
+
+	void __exit__(py::args &args) override
+	{
+		Layout::__exit__(args);
+
+		wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
+		buttonSizer->AddButton(new wxButton(m_elem, wxID_OK));
+		buttonSizer->AddButton(new wxButton(m_elem, wxID_CANCEL));
+		buttonSizer->Realize();
+
+		wxSizer* topsizer = m_elem->GetSizer();
+		topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
+	}
+
+	void onAdd(View &child) override
+	{
+		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	}
 };
