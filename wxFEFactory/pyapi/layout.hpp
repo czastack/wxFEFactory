@@ -155,7 +155,9 @@ void initLayout(py::module &m)
 		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			options, values, onselect, key, className, style)
 		.def("getCheckedItems", &CheckListBox::getCheckedItems)
-		.def("setCheckedItems", &CheckListBox::setCheckedItems);
+		.def("setCheckedItems", &CheckListBox::setCheckedItems)
+		.def("checkAll", &CheckListBox::checkAll, "checked"_a=true)
+		.def("reverseCheck", &CheckListBox::reverseCheck);
 
 	py::class_t<RearrangeList, CheckListBox>(layout, "RearrangeList")
 		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
@@ -219,15 +221,19 @@ void initLayout(py::module &m)
 		.def("addHexProperty", &PropertyGrid::addHexProperty, title_arg, name_arg, help_arg, value_0)
 		.def("addFloatProperty", &PropertyGrid::addFloatProperty, title_arg, name_arg, help_arg, value_0)
 		.def("addBoolProperty", &PropertyGrid::addBoolProperty, title_arg, name_arg, help_arg, "value"_a=false)
-		.def("addEnumProperty", &PropertyGrid::addEnumProperty, title_arg, name_arg, help_arg, "items"_a, "values"_a, value_0)
-		.def("addFlagsProperty", &PropertyGrid::addFlagsProperty, title_arg, name_arg, help_arg, "items"_a, "values"_a=None, value_0)
+		.def("addEnumProperty", &PropertyGrid::addEnumProperty, title_arg, name_arg, help_arg, "labels"_a=None, "values"_a=None, value_0)
+		.def("addFlagsProperty", &PropertyGrid::addFlagsProperty, title_arg, name_arg, help_arg, "labels"_a, "values"_a=None, value_0)
 		.def("addLongStringProperty", &PropertyGrid::addLongStringProperty, title_arg, name_arg, help_arg, "value"_a=None)
 		.def("addArrayStringProperty", &PropertyGrid::addArrayStringProperty, title_arg, name_arg, help_arg, "values"_a)
+		.def("setEnumChoices", &PropertyGrid::setEnumChoices, "name"_a, "labels"_a, "values"_a=None)
 		.def("getValues", &PropertyGrid::getValues, "data"_a=None)
 		.def("setValues", &PropertyGrid::setValues, "data"_a, "all"_a=false)
 		.def("setReadonly", &PropertyGrid::setReadonly)
 		.def("bindData", &PropertyGrid::bindData)
-		.def("setTwowayBinding", &PropertyGrid::setTwowayBinding, "twoway"_a=true)
+		.def("setTwowayBinding", &PropertyGrid::setTwowayBinding, "twoway"_a = true)
+		.def("setOnchange", &PropertyGrid::setOnchange)
+		.def("setOnhighlight", &PropertyGrid::setOnhighlight)
+		.def("setOnselected", &PropertyGrid::setOnselected)
 		.def_readwrite("data", &PropertyGrid::m_data)
 		.def_readwrite("twoway", &PropertyGrid::m_twoway)
 		.def_readwrite("changed", &PropertyGrid::m_changed);

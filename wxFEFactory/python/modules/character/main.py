@@ -3,6 +3,7 @@ from mainframe import ui
 from . import forms
 from . import config
 import json
+import fefactory_api
 
 class Module(BaseModule):
 
@@ -38,7 +39,12 @@ class Module(BaseModule):
         self.listbox.setOnKeyDown(self.onListBoxKey)
         self.listbox.setContextMenu(listmenu)
         self.pg.setTwowayBinding()
+        self.pg.setOnchange(self.onPgChange)
+        self.pg.setOnselected(self.test2)
         return panel
+
+    def test2(self, pg, name):
+        print('onSelected', name)
 
     def getMenu(self):
         with ui.Menu(self.getTitle()) as menu:
@@ -59,10 +65,13 @@ class Module(BaseModule):
         if name:
             self.doAdd(name)
 
-    def doAdd(self, name):
+    def doAdd(self, name, data=None):
+        """
+        添加列表项
+        """
         self.listbox.append([name])
         if name not in self.data_map:
-            self.data_map[name] = {'name': name}
+            self.data_map[name] = data or {'name': name}
 
     def onDel(self, btn):
         pos = self.listbox.getSelection()
@@ -91,6 +100,7 @@ class Module(BaseModule):
             self._pg_inited = True
             self.form.initPg(self.pg)
 
+        self._lastpos = self.listbox.getSelection()
         self.pg.bindData(self.getCurData())
 
     def onListBoxKey(self, lb, event):
@@ -102,6 +112,13 @@ class Module(BaseModule):
             elif code == event.DOWN:
                 self.listbox.moveDown()
         event.Skip()
+
+    def onPgChange(self, pg, name, value):
+        if name == 'name':
+            if value != self.listbox.getText() and value in self.listbox.getTexts():
+                fefactory_api.alert('名称已存在')
+                return False
+            self.listbox.setText(value, self._lastpos)
 
     def onClear(self, m):
         """清空列表"""
@@ -115,8 +132,14 @@ class Module(BaseModule):
 
     def readFrom(self, reader):
         conf = config.ADDR_MAP[reader.key]
-        
-
+        count = 0xF
+        buff = reader.read(conf['addr'], count * conf['step'])
+        ptr = self.form.ptr_from_bytes(buff, len(buff))
+        for i in range(count):
+            item = self.form.struct_to_dict(ptr[i])
+            name = reader.getTextEntryText(item['name'])
+            item['name'] = name
+            self.doAdd(name, item)
 
 styles = {
     'class': {

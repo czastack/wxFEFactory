@@ -80,7 +80,7 @@ public:
 	{
 		if (!m_listener.is_none())
 		{
-			handlerEvent(m_listener, event);
+			handleEvent(m_listener, event);
 		}
 	}
 
@@ -250,26 +250,12 @@ public:
 
 	}
 
-	void prepareOptions(wxArrayString &array, pyobj options, pycref values)
+	void prepareOptions(wxArrayString &array, pyobj options, pyobj values)
 	{
 		if (!options.is_none())
 		{
-			if (py::isinstance<py::function>(values))
-			{
-				py::list tmpOptions, tmpValues;
-				for (auto &e : options)
-				{
-					py::tuple item = values(e);
-					tmpOptions.append(item[0]);
-					tmpValues.append(item[1]);
-				}
-				options = tmpOptions;
-				m_values = tmpValues;
-			}
-			else
-			{
-				m_values = values;
-			}
+			::prepareOptions(options, values);
+			m_values = values;
 			addAll(array, options);
 		}
 		else
@@ -290,13 +276,13 @@ public:
 			else {
 				(void)pyCall(m_listener, index);
 			}*/
-			handlerEvent(m_listener, event);
+			handleEvent(m_listener, event);
 		}
 	}
 
 	pyobj getValue(pyobj i)
 	{
-		if (i == None)
+		if (i.is_none())
 		{
 			i = py::cast(getSelection());
 		}
@@ -506,6 +492,24 @@ public:
 		}
 		for (auto &item : list) {
 			ctrl.Check(item.cast<int>(), true);
+		}
+	}
+
+	void checkAll(bool checked=true)
+	{
+		auto &ctrl = m_ctrl();
+		for (uint i = 0; i < ctrl.GetCount(); ++i)
+		{
+			ctrl.Check(i, checked);
+		}
+	}
+
+	void reverseCheck()
+	{
+		auto &ctrl = m_ctrl();
+		for (uint i = 0; i < ctrl.GetCount(); ++i)
+		{
+			ctrl.Check(i, !ctrl.IsChecked(i));
 		}
 	}
 

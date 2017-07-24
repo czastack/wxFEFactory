@@ -175,19 +175,18 @@ public:
 	}
 
 	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pyobj &fn)
+	void bindEvt(const EventTag& eventType, pycref fn)
 	{
 		if (!fn.is_none())
 		{
 			fn.inc_ref();
 			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
-				handlerEvent(fn, event);
+				handleEvent(fn, event);
 			});
 		}
 	}
 
-	template <typename EventType>
-	void handlerEvent(pycref fn, EventType event)
+	void handleEvent(pycref fn, wxEvent &event)
 	{
 		pycref ret = pyCall(fn, this);
 		if (!PyObject_IsTrue(ret.ptr()))
@@ -493,7 +492,7 @@ public:
 	}
 
 	wxSize getStyleSize() {
-		if (m_style == None)
+		if (m_style.is_none())
 		{
 			return wxDefaultSize;
 		}

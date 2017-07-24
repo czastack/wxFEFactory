@@ -9,7 +9,7 @@ class PropertyGrid: public Control
 public:
 	template <class... Args>
 	PropertyGrid(pycref data, Args ...args):
-		Control(args...), m_data(data.is_none() ? py::dict() : data)
+		Control(args...), m_data(data.is_none() ? py::dict() : data), m_onchange(None)
 	{
 		bindElem(new wxPropertyGrid(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 
@@ -17,7 +17,7 @@ public:
 		pg.SetExtraStyle(wxPG_EX_HELP_AS_TOOLTIPS);
 		pg.SetCaptionBackgroundColour(0xeeeeee);
 		pg.SetMarginColour(0xeeeeee);
-		pg.Bind(wxEVT_PG_CHANGED, &PropertyGrid::OnChange, this);
+		pg.Bind(wxEVT_PG_CHANGING, &PropertyGrid::OnChange, this);
 	}
 
 	void OnChange(wxPropertyGridEvent &event)
@@ -26,8 +26,63 @@ public:
 		if (m_twoway)
 		{
 			auto p = event.GetProperty();
-			m_data[p->GetName()] = getValue(event.GetProperty());
+			pycref name = py::cast(p->GetName());
+			pycref value = getValue(event.GetValue());
+			if (m_onchange != None)
+			{
+				pycref ret = pyCall(m_onchange, this, name, value);
+				if (ret.ptr() == Py_False)
+				{
+					// 返回False忽略当前改动
+					event.Veto();
+					return;
+				}
+				else if (ret.ptr() != Py_True)
+				{
+					event.Skip();
+				}
+			}
+			m_data[name] = value;
 		}
+		else {
+			event.Skip();
+		}
+	}
+
+	template <typename EventTag>
+	void bindEvt(const EventTag& eventType, pycref fn)
+	{
+		if (!fn.is_none())
+		{
+			fn.inc_ref();
+			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
+				handleEvent(fn, event);
+			});
+		}
+	}
+
+	void handleEvent(pycref fn, wxPropertyGridEvent &event)
+	{
+		pycref ret = pyCall(fn, this, event.GetPropertyName());
+		if (!PyObject_IsTrue(ret.ptr()))
+		{
+			event.Skip();
+		}
+	}
+
+	void setOnchange(pycref onchang)
+	{
+		m_onchange = onchang;
+	}
+
+	void setOnhighlight(pycref fn)
+	{
+		bindEvt(wxEVT_PG_HIGHLIGHTED, fn);
+	}
+
+	void setOnselected(pycref fn)
+	{
+		bindEvt(wxEVT_PG_SELECTED, fn);
 	}
 
 	void Append(wxPGProperty* property, pycref help)
@@ -70,12 +125,9 @@ public:
 		Append(new wxBoolProperty(title, name, value), help);
 	}
 
-	void addEnumProperty(wxcstr title, wxcstr name, pycref help, const py::iterable &py_items, const py::iterable &py_values, int value = 0) {
-		wxArrayString labels;
-		wxArrayInt values;
-		addAll(labels, py_items);
-		addAll(values, py_values);
-		Append(new wxEnumProperty(title, name, labels, values, value), help);
+	void addEnumProperty(wxcstr title, wxcstr name, pycref help, pyobj labels, pyobj values, int value = 0) {
+		prepareOptions(labels, values, true);
+		Append(new wxEnumProperty(title, name, py::cast<wxArrayString>(labels), py::cast<wxArrayInt>(values), value), help);
 	}
 
 	void addFlagsProperty(wxcstr title, wxcstr name, pycref help, pycref py_items, pycref py_values, int value = 0) {
@@ -108,8 +160,18 @@ public:
 		Append(new wxArrayStringProperty(title, name, values), help);
 	}
 
-	py::object getValue(const wxPGProperty* p) {
-		const wxVariant &&value = p->GetValue();
+	void setEnumChoices(wxcstr name, pyobj labels, pyobj values)
+	{
+		wxPGProperty *p = m_ctrl().GetPropertyByName(name);
+		if (wxIsKindOf(p, wxEnumProperty))
+		{
+			prepareOptions(labels, values, true);
+			wxPGChoices choices(py::cast<wxArrayString>(labels), py::cast<wxArrayInt>(values));
+			((wxEnumProperty*)p)->SetChoices(choices);
+		}
+	}
+
+	pyobj getValue(const wxVariant& value) {
 		wxcstr type = value.GetType();
 		if (type == "long")
 			return py::cast(value.GetLong());
@@ -130,7 +192,11 @@ public:
 		return None;
 	}
 
-	py::object getValue(wxcstr name) {
+	pyobj getValue(const wxPGProperty* p) {
+		return getValue(p->GetValue());
+	}
+
+	pyobj getValue(wxcstr name) {
 		return getValue(m_ctrl().GetPropertyByName(name));
 	}
 
@@ -262,10 +328,21 @@ public:
 		m_twoway = twoway;
 	}
 
+	wxString getSelectedName()
+	{
+		wxPGProperty* p = m_ctrl().GetSelection();
+		if (p)
+		{
+			return p->GetName();
+		}
+		return wxNoneString;
+	}
+
 	friend void initLayout(py::module &m);
 
 protected:
 	pyobj m_data; // py::dict
+	pyobj m_onchange;
 	bool m_changed = false;
 	bool m_twoway = false;
 

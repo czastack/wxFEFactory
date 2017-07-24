@@ -1,4 +1,5 @@
 from .fields import Field, Group
+from lib.lazy import lazyclassmethod
 import ctypes
 
 class FormMetaclass(type):
@@ -48,23 +49,62 @@ class BaseForm(metaclass=FormMetaclass):
 
     __abstract__ = True
 
-    def __init__(self, data=None):
+    def __init__(self):
         """
         :param data: 数据字典
         """
-        self.data = data
+        pass
 
     def initPg(self, pg):
+        self.elem = pg
         for field in self.fields:
-            field.show(pg)
+            field.createProperty(pg)
 
     @classmethod
     def cfield(class_, name):
         return getattr(class_.structure, name)
 
     @classmethod
+    def cfield_names(class_):
+        for field in class_.structure._fields_:
+            yield field[0]
+
+    @classmethod
     def size(class_):
         return ctypes.sizeof(class_.structure)
 
-    def bytes(self):
-        return self.data
+    @classmethod
+    def ptr_from_bytes(class_, data, length=0):
+        """
+        :param data: bytes 
+        """
+        length      = length or ctypes.sizeof(class_.structure)
+        stream      = (ctypes.c_char * length)()
+        stream.raw  = data
+        ptr         = ctypes.cast(stream, ctypes.POINTER(class_.structure))
+        return ptr
+
+    @classmethod
+    def struct_to_bytes(class_, s):
+        """
+        :param s: struct object
+        """
+        length  = ctypes.sizeof(s)
+        ptr     = ctypes.cast(ctypes.pointer(s), ctypes.POINTER(ctypes.c_char * length))
+        return ptr.contents.raw
+
+    @classmethod
+    def struct_to_dict(class_, s):
+        data = {}
+        for name in class_.cfield_names():
+            data[name] = getattr(s, name)
+        return data
+
+    @classmethod
+    def dict_to_struct(class_, data):
+        s = class_.structure()
+        for name in class_.cfield_names():
+            if name in data:
+                setattr(s, name, data[name])
+        return s
+

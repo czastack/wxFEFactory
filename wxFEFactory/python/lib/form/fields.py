@@ -34,39 +34,36 @@ class Group(Field):
         super().__init__(name, label, 0)
         self.children = children
 
-    def show(self, pg):
+    def createProperty(self, pg):
         pg.addCategory(self.label)
         for field in self.children:
-            field.show(pg)
+            field.createProperty(pg)
 
 
 class Int(Field):
-    def show(self, pg):
+    def createProperty(self, pg):
         pg.addIntProperty(self.label, self.name)
 
 
 class Uint(Field):
-    def show(self, pg):
+    def createProperty(self, pg):
         pg.addHexProperty(self.label, self.name)
 
 
 class Text(Field):
-    def show(self, pg):
+    def createProperty(self, pg):
         pg.addStringProperty(self.label, self.name)
 
 
 class SimpleSelect(Field):
     __slots__ = ('options',)
 
-    def __init__(self, name, label, size, options):
+    def __init__(self, name, label, size, options=None):
         super().__init__(name, label, size)
         self.options = options
 
-    def show(self, pg):
-        pg.addEnumProperty(self.label, self.name, None, 
-            (x[0] for x in self.options), 
-            (x[1] for x in self.options), 
-        )
+    def createProperty(self, pg):
+        pg.addEnumProperty(self.label, self.name, None, self.options, None)
 
 
 class FlagSelect(Field):
@@ -76,10 +73,10 @@ class FlagSelect(Field):
         super().__init__(name, label, size)
         self.options = options
 
-    def show(self, pg):
-        pg.addFlagsProperty(self.label, self.name)
+    def createProperty(self, pg):
+        pg.addFlagsProperty(self.label, self.name, None, self.options)
 
 
 class Bytes(Field):
-    def show(self, pg):
+    def createProperty(self, pg):
         pg.addHexProperty(self.label, self.name)

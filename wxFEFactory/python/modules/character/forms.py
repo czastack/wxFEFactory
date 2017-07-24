@@ -1,4 +1,6 @@
 from lib.form import fm, BaseForm
+from . import strings
+from ..item.options import itemLevel
 
 class CharacterForm(BaseForm):
     addr = 0x00858288
@@ -9,11 +11,11 @@ class CharacterForm(BaseForm):
         fm.Text("name", "名字", 2),
         fm.Text("title", "R键说明", 2),
         fm.Uint("id", "人物ID", 1),
-        # fm.SimpleSelect("profession", "职业", 1),
+        fm.SimpleSelect("profession", "职业", 1),
         fm.Uint("bigPortrait", "大头像", 1),
         fm.Uint("unknown1", "未知", 1),
         fm.Uint("smallPortrait", "小头像", 1),
-        # fm.SimpleSelect("attribute", "属性", 1),
+        fm.SimpleSelect("attribute", "属性", 1, strings.attr),
         fm.Uint("unknown2", "未知", 1),
 
         fm.Group("initial", "初始能力值", [
@@ -29,14 +31,14 @@ class CharacterForm(BaseForm):
         ]),
 
         fm.Group("prof", "武器熟练度", [
-            fm.Uint("sword", "剑", 1),
-            fm.Uint("spear", "枪", 1),
-            fm.Uint("axe", "斧", 1),
-            fm.Uint("arch", "弓", 1),
-            fm.Uint("wand", "杖", 1),
-            fm.Uint("physics", "理", 1),
-            fm.Uint("light", "光", 1),
-            fm.Uint("dark", "暗", 1),
+            fm.SimpleSelect("sword", "剑", 1, itemLevel),
+            fm.SimpleSelect("spear", "枪", 1, itemLevel),
+            fm.SimpleSelect("axe", "斧", 1, itemLevel),
+            fm.SimpleSelect("arch", "弓", 1, itemLevel),
+            fm.SimpleSelect("wand", "杖", 1, itemLevel),
+            fm.SimpleSelect("physics", "理", 1, itemLevel),
+            fm.SimpleSelect("light", "光", 1, itemLevel),
+            fm.SimpleSelect("dark", "暗", 1, itemLevel),
         ]),
 
         fm.Group("growth", "职业成长率", [
@@ -54,10 +56,10 @@ class CharacterForm(BaseForm):
         fm.Uint("lowLevelProfMode", "低级职业战斗造型", 1),
         fm.Uint("highLevelProfMode", "高级职业战斗造型", 1),
         fm.Uint("unknown3", "未知", 1),
-        # fm.FlagSelect("ability1", "能力1", 1),
-        # fm.FlagSelect("ability2", "能力2", 1),
-        # fm.FlagSelect("ability3", "能力3", 1),
-        # fm.FlagSelect("ability4", "能力4", 1),
+        fm.FlagSelect("attrs1", "能力1", 1, strings.attrs1),
+        fm.FlagSelect("attrs2", "能力2", 1, strings.attrs2),
+        fm.FlagSelect("attrs3", "能力3", 1, strings.attrs3),
+        fm.FlagSelect("attrs4", "能力4", 1, strings.attrs4),
         fm.Bytes("supportPtr", "支援指针", 4),
         fm.Uint("unknown4", "未知", 1),
         fm.Uint("unknown5", "未知", 1),

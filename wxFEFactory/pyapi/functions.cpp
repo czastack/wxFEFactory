@@ -1,3 +1,4 @@
+#include <pybind11/eval.h>
 #include <wx/wx.h>
 #include <wx/clipbrd.h>
 #include <wx/filedlg.h>
@@ -128,6 +129,15 @@ void set_clipboard(wxcstr text)
 		wxTheClipboard->SetData(new wxTextDataObject(text));
 		wxTheClipboard->Close();
 	}
+}
+
+void exec_file(py::str file, pyobj scope)
+{
+	if (scope.is_none())
+	{
+		scope = py::module::import("__main__").attr("__dict__");
+	}
+	py::eval_file(file, scope);
 }
 
 wxItemKind getItemKind(wxcstr kindStr)

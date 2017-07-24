@@ -65,6 +65,7 @@ PyObject *fefactory_api() {
 		.def("choose_dir", choose_dir, "msg"_a, "defaultPath"_a=None, "mustExist"_a=false)
 		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
 		.def("setOnAppExit", setOnAppExit)
+		.def("exec_file", &exec_file)
 		.def("get_clipboard", get_clipboard)
 		.def("set_clipboard", set_clipboard);
 

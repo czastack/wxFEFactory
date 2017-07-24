@@ -2,6 +2,7 @@ from modules import modules
 from project import Project
 from application import app
 from fe.ferom import FeRomRW
+from lib import exui
 import os
 import traceback
 import __main__
@@ -30,7 +31,7 @@ class MainFrame:
                     if app.config['recent_project']:
                        ui.MenuItem("清除列表", onselect=self.clearRecentProject, sep=True) 
                 ui.MenuItem("打开工程所在文件夹", onselect=self.openProjectDir)
-                ui.MenuItem("从ROM中读取内容", onselect=self.readFromRom)
+                ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.readFromRom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
             with ui.Menu("视图"):
@@ -41,7 +42,7 @@ class MainFrame:
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager(key="aui"):
                 ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
-                ui.AuiItem(ui.ListBox(options=modules, values=lambda x: x, onselect=self.onNav), captionVisible=False)
+                ui.AuiItem(ui.ListBox(options=modules, onselect=self.onNav), captionVisible=False)
                 ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(style=consoleStyle) as console:
                     self.consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
@@ -144,22 +145,23 @@ class MainFrame:
         exec(self.consol_input_multi.value, vars(__main__))
 
     def readFromRom(self, m):
-        # rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba|*.zip|*.zip')
-        # reader = FeRomRW(rom)
-        # if not reader.closed:
-        #     print(reader.getRomTitle())
-        with ui.StdModalDialog("选择执行导入的模块", style={'width': 400, 'height': 300}) as dialog:
-            listbox = ui.CheckListBox(options=modules, values=lambda x: x)
-        if dialog.showOnce():
-            for i in listbox.getCheckedItems():
-                name = modules[i][1]
-                try:
-                    Module = self.getModule(name)
-                    print(Module)
+        rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
+        reader = FeRomRW(rom)
+        if not reader.closed:
+            print(reader.getRomTitle())
+            dialog = exui.ListDialog("选择执行导入的模块", style={'width': 640, 'height': 480}, listbox={'options': modules})
+            if dialog.showOnce():
+                for i in listbox.getCheckedItems():
+                    name = modules[i][1]
+                    try:
+                        Module = self.getModule(name)
+                        m = Module()
+                        m.readFrom(reader)
+                        __main__.m = m
 
-                except Exception as e:
-                    print('加载模块%s失败' % name)
-                    traceback.print_exc()
+                    except Exception as e:
+                        print('加载模块%s失败' % name)
+                        traceback.print_exc()
 
 
 winstyle = {

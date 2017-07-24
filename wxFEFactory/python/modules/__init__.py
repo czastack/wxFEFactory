@@ -1,5 +1,5 @@
 modules = [
-    ("人物修改", "character"),
+    ("角色修改", "character"),
     # ("道具修改", "item"),
     # ("职业修改", "proficiency"),
     # ("程序杂项修改", "sundry"),

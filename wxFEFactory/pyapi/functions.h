@@ -14,4 +14,6 @@ wxString get_clipboard();
 
 void set_clipboard(wxcstr text);
 
+void exec_file(py::str file, pyobj scope);
+
 wxItemKind getItemKind(wxcstr kindStr);
