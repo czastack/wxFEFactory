@@ -78,6 +78,19 @@ public:
 
 	void addToParent();
 
+	/**
+	 * 在Layout的onAdd中__exit__先被调用，返回false将不被onAdd(child)
+	 */
+	bool beforeAdded()
+	{
+		if (!m_added)
+		{
+			m_added = true;
+			return true;
+		}
+		return false;
+	}
+
 	void setSize(int width, int height)
 	{
 		m_elem->SetSize(wxSize(width, height));
@@ -520,6 +533,7 @@ protected:
 	pyobj m_key;
 	pyobj m_class;
 	pyobj m_contextmenu;
+	bool m_added = false;
 
 	static wxVector<Layout*> LAYOUTS;
 };
@@ -556,7 +570,7 @@ public:
 		m_children.append(py::cast(&child));
 	}
 
-	virtual void onAdd(View &child) {}
+	virtual void doAdd(View &child) {}
 
 	virtual pyobj __enter__() {
 		LAYOUTS.push_back(this);
@@ -607,13 +621,17 @@ public:
 		for (auto &e : m_children)
 		{
 			View &child = *py::cast<View*>(e);
+			if (!child.beforeAdded())
+			{
+				continue;
+			}
 
 			if (!child.getKey().is_none())
 			{
 				m_named_children[child.getKey()] = py::cast(&child);
 			}
 			child.applyStyle();
-			onAdd(child);
+			doAdd(child);
 		}
 
 		// 释放临时样式表
@@ -640,14 +658,9 @@ public:
 		reLayout();
 	}
 
-	void testChildStyle(View &child)
+	auto getStylesList()
 	{
-		// 检测样式表
-		if (tmp_styles_list)
-		for (auto e: *tmp_styles_list)
-		{
-			child.testStyles(py::reinterpret_borrow<py::object>(e));
-		}
+		return tmp_styles_list;
 	}
 
 	virtual void reLayout() {}
@@ -660,6 +673,7 @@ public:
 	void removeChild(View &child)
 	{
 		m_elem->RemoveChild(child);
+		m_children.attr("remove")(child);
 	}
 
 	friend void initLayout(py::module &m);
@@ -681,7 +695,15 @@ View::View(pycref key, pycref className, pycref style)
 	Layout* pLayout = getActiveLayout();
 	if (pLayout)
 	{
-		pLayout->testChildStyle(*this);
+		// 检测样式表
+		auto styles_list = pLayout->getStylesList();
+		if (styles_list)
+		{
+			for (auto e : *styles_list)
+			{
+				testStyles(py::reinterpret_borrow<py::object>(e));
+			};
+		}
 	}
 }
 

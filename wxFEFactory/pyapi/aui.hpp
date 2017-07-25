@@ -44,7 +44,7 @@ public:
 		delete m_mgr;
 	}
 
-	void onAdd(View &child) override
+	void doAdd(View &child) override
 	{
 		AuiItem *item = (AuiItem*)child.ptr()->GetClientData();
 		if (isPyDict(item->m_kwargs))
@@ -120,13 +120,7 @@ public:
 
 	void __exit__(py::args &args) override
 	{
-		LAYOUTS.pop_back();
-
-		for (auto &e : m_children)
-		{
-			View &child = *py::cast<View*>(e);
-			onAdd(child);
-		}
+		Layout::__exit__(args);
 
 		layout();
 
@@ -203,7 +197,7 @@ public:
 		
 	}
 
-	void onAdd(View &child) override
+	void doAdd(View &child) override
 	{
 		AuiItem *item = (AuiItem*)child.ptr()->GetClientData();
 		if (isPyDict(item->m_kwargs))

@@ -16,9 +16,9 @@ class BaseModule:
     from fefactory_api import alert, confirm, confirm_yes, YES, NO, CANCEL, longtext_dialog
 
     def __init__(self):
-        ins = __class__.INS
+        ins = self.__class__.INS
         if ins is None:
-            ins = __class__.INS = []
+            ins = self.__class__.INS = []
         
         try:
             self.index = ins.index(None)
@@ -38,7 +38,7 @@ class BaseModule:
         """标签页关闭回调，返回False会取消关闭"""
         if self.menu:
             win.menubar.remove(self.menu)
-        __class__.INS[__class__.INS.index(self)] = None
+        self.__class__.INS[self.__class__.INS.index(self)] = None
         return True
 
     def readFrom(self, reader):
@@ -60,7 +60,7 @@ class BaseModule:
         pass
 
     def getFirstOtherInstance(self):
-        for it in __class__.INS:
+        for it in self.__class__.INS:
             if it is not None and it is not self:
                 return it
 
@@ -137,7 +137,7 @@ class BaseListBoxModuel(BaseModule):
 
         self.listbox.setOnKeyDown(self.onListBoxKey)
 
-        contextmenu = self.render_contextmenu
+        contextmenu = self.render_contextmenu()
         if contextmenu:
             self.listbox.setContextMenu(contextmenu)
         return panel

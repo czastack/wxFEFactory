@@ -209,7 +209,7 @@ public:
 		*pPadding = child.getStyle(STYLE_PADDING, 5);
 	}
 
-	void onAdd(View &child) override
+	void doAdd(View &child) override
 	{
 		// Layout::add(child);
 		int flex, flag, padding;
@@ -435,7 +435,7 @@ public:
 		topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
 	}
 
-	void onAdd(View &child) override
+	void doAdd(View &child) override
 	{
 		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	}
