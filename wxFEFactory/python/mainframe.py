@@ -10,7 +10,7 @@ import fefactory_api
 import fefactory
 Path = os.path
 
-ui = fefactory_api.layout
+ui = fefactory_api.ui
 
 class MainFrame:
     def __init__(self):

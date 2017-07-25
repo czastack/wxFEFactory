@@ -23,7 +23,7 @@ public:
 	void OnChange(wxPropertyGridEvent &event)
 	{
 		m_changed = true;
-		if (m_twoway)
+		if (m_autosave)
 		{
 			auto p = event.GetProperty();
 			pycref name = py::cast(p->GetName());
@@ -272,7 +272,7 @@ public:
 		return setValue(m_ctrl().GetPropertyByName(name), value);
 	}
 
-	void getValues(pycref obj)
+	pyobj getValues(pycref obj)
 	{
 		pycref data = obj.is_none() ? m_data : obj;
 
@@ -282,6 +282,7 @@ public:
 			const wxPGProperty* p = *it;
 			data[p->GetName()] = getValue(p);
 		}
+		return data;
 	}
 
 	void setValues(pycref data, bool all=false)
@@ -324,10 +325,6 @@ public:
 		setValues(data, true);
 	}
 
-	void setTwowayBinding(bool twoway) {
-		m_twoway = twoway;
-	}
-
 	wxString getSelectedName()
 	{
 		wxPGProperty* p = m_ctrl().GetSelection();
@@ -344,7 +341,7 @@ protected:
 	pyobj m_data; // py::dict
 	pyobj m_onchange;
 	bool m_changed = false;
-	bool m_twoway = false;
+	bool m_autosave = false;
 
 	wxPropertyGrid& m_ctrl()
 	{

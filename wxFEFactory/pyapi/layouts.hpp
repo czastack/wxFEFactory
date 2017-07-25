@@ -175,7 +175,7 @@ public:
 			{
 				flag |= wxALIGN_BOTTOM;
 			}
-			else if (vertical == wxT("center"))
+			else if (vertical == wxT("middle"))
 			{
 				flag |= wxALIGN_CENTER_VERTICAL;
 			}

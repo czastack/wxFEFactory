@@ -21,6 +21,7 @@ void initLayout(py::module &m)
 	auto layout_init = py::init<pyobj, pyobj, pyobj, pyobj>();
 
 	py::module layout = m.def_submodule("layout");
+	setattr(m, "ui", layout);
 	initMenu(layout);
 
 	py::class_<View>(layout, "View")
@@ -137,14 +138,21 @@ void initLayout(py::module &m)
 		.def("getSelection", &BaseControlWithItems::getSelection)
 		.def("setSelection", &BaseControlWithItems::setSelection, "pos"_a, "handle"_a=false)
 		.def("getCount", &BaseControlWithItems::getCount)
+		.def("__getitem__", &BaseControlWithItems::__getitem__)
+		.def("__setitem__", &BaseControlWithItems::__setitem__)
 		.def("__len__", &BaseControlWithItems::getCount)
-		.def_readwrite("onselect", &BaseControlWithItems::m_listener);
+		.def_readwrite("onselect", &BaseControlWithItems::m_listener)
+		.def_property("text", &BaseControlWithItems::getText1, &BaseControlWithItems::setText1)
+		.def_property("value", &BaseControlWithItems::getValue1, &BaseControlWithItems::setValue1)
+		.def_property_readonly("index", &BaseControlWithItems::getSelection)
+		.def_property_readonly("count", &BaseControlWithItems::getCount);
 
 	py::class_<ControlWithItems, BaseControlWithItems>(layout, "ControlWithItems")
 		.def("setItems", &ControlWithItems::setItems, "options"_a, "values"_a=None)
 		.def("append", &ControlWithItems::append, "options"_a, "values"_a=None)
-		.def("insert", &ControlWithItems::insert, "options"_a, "values"_a=None, "pos"_a)
-		.def("remove", &ControlWithItems::remove, "pos"_a)
+		.def("insert", &ControlWithItems::insert, "options"_a, "values"_a = None, "pos"_a)
+		.def("__delitem__", &ControlWithItems::pop)
+		.def("pop", &ControlWithItems::pop, "pos"_a)
 		.def("clear", &ControlWithItems::clear);
 
 	py::class_t<ListBox, ControlWithItems>(layout, "ListBox")
@@ -230,12 +238,11 @@ void initLayout(py::module &m)
 		.def("setValues", &PropertyGrid::setValues, "data"_a, "all"_a=false)
 		.def("setReadonly", &PropertyGrid::setReadonly)
 		.def("bindData", &PropertyGrid::bindData)
-		.def("setTwowayBinding", &PropertyGrid::setTwowayBinding, "twoway"_a = true)
 		.def("setOnchange", &PropertyGrid::setOnchange)
 		.def("setOnhighlight", &PropertyGrid::setOnhighlight)
 		.def("setOnselected", &PropertyGrid::setOnselected)
 		.def_readwrite("data", &PropertyGrid::m_data)
-		.def_readwrite("twoway", &PropertyGrid::m_twoway)
+		.def_readwrite("autosave", &PropertyGrid::m_autosave)
 		.def_readwrite("changed", &PropertyGrid::m_changed);
 
 	py::class_t<ListView, Control>(layout, "ListView")

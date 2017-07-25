@@ -16,6 +16,7 @@ class BaseModule:
     from fefactory_api import alert, confirm, confirm_yes, YES, NO, CANCEL, longtext_dialog
 
     def __init__(self):
+        # 同一模块打开的实例列表
         ins = self.__class__.INS
         if ins is None:
             ins = self.__class__.INS = []
@@ -38,7 +39,17 @@ class BaseModule:
         """标签页关闭回调，返回False会取消关闭"""
         if self.menu:
             win.menubar.remove(self.menu)
-        self.__class__.INS[self.__class__.INS.index(self)] = None
+        ins = self.__class__.INS
+        ins[ins.index(self)] = None
+
+        i = len(ins)
+        while i:
+            i -= 1
+            if ins[i] is None:
+                ins.pop()
+            else:
+                break
+
         return True
 
     def readFrom(self, reader):
@@ -166,7 +177,7 @@ class BaseListBoxModuel(BaseModule):
 
     def onRename(self, m):
         """重命名列表项"""
-        name = self.listbox.getText()
+        name = self.listbox.text
         if name:
             newname = input("新名称", name)
             self.listbox.setText(newname)
@@ -174,13 +185,21 @@ class BaseListBoxModuel(BaseModule):
 
     def onDel(self, btn):
         """删除一项"""
-        pos = self.listbox.getSelection()
+        pos = self.listbox.index
         if pos is not -1:
             if self.confirm('提示', '确认删除该项？', self.NO) is self.YES:
-                text = self.listbox.getText(pos)
-                self.listbox.remove(pos)
+                text = self.listbox[pos]
+                self.listbox.pop(pos)
                 return pos, text
         return -1, None
+
+    def moveUp(self):
+        """上移一项"""
+        self.listbox.moveUp()
+
+    def moveDown(self):
+        """下移一项"""
+        self.listbox.moveDown()
 
     def onListBoxKey(self, lb, event):
         """按键监听"""
@@ -188,11 +207,9 @@ class BaseListBoxModuel(BaseModule):
         if mod == event.CTRL:
             code = event.GetKeyCode()
             if code == event.UP:
-                # 上移一项
-                self.listbox.moveUp()
+                self.moveUp()
             elif code == event.DOWN:
-                # 下移一项
-                self.listbox.moveDown()
+                self.moveDown()
         event.Skip()
 
     def doAdd(self, text):

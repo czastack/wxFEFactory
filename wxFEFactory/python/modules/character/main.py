@@ -23,7 +23,13 @@ class Module(BaseListBoxModuel):
     def render_right(self):
         self.pg = ui.PropertyGrid(className="fill")
         with ui.Horizontal(className="footer"):
-            ui.Button(label="保存", className="button", onclick=self.onSave)
+            ui.CheckBox(label="自动保存", checked=True, onchange=self.onSwichAutoSave, className="vcenter")
+            ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
+            ui.Button(label="保存文件", className="button", onclick=self.onSave)
+
+        self.pg.autosave = True
+        self.pg.setOnchange(self.onPgChange)
+        self.pg.setOnselected(self.test2)
 
     def doGetTitle(self):
         return self.form.title
@@ -66,32 +72,42 @@ class Module(BaseListBoxModuel):
             item['name'] = newname
             self.pg.setValues({'name': newname})
 
+    def onSaveIt(self, btn):
+        item_data = self.getCurData()
+        if item_data:
+            item_data.update(self.pg.getValues())
+
     def onSave(self, btn):
         self.pg.changed = False
         self.dumpJson('characters', list(self.itervalues()))
 
     def getCurData(self):
-        return self.data_map[self.listbox.getText()]
+        text = self.listbox.text
+        if text:
+            return self.data_map[text]
 
     def onListSelect(self, _):
         if self._pg_inited is False:
             self._pg_inited = True
             self.form.initPg(self.pg)
 
-        self._lastpos = self.listbox.getSelection()
+        self._lastpos = self.listbox.index
         self.pg.bindData(self.getCurData())
 
     def onPgChange(self, pg, name, value):
         if name == 'name':
-            if value != self.listbox.getText() and value in self.listbox.getTexts():
+            if value != self.listbox.text and value in self.listbox.getTexts():
                 fefactory_api.alert('名称已存在')
                 return False
-            self.listbox.setText(value, self._lastpos)
+            self.listbox[self._lastpos] = value
 
     def onClear(self, m):
         """清空列表"""
         if super().onClear(m):
             self.data_map = {}
+
+    def onSwichAutoSave(self, checkbox):
+        self.pg.autosave = checkbox.checked
 
     def itervalues(self):
         for text in self.listbox.getTexts():

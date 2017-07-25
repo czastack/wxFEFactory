@@ -280,44 +280,31 @@ public:
 		}
 	}
 
-	pyobj getValue(pyobj i)
+	virtual int getSelection()
 	{
-		if (i.is_none())
-		{
-			i = py::cast(getSelection());
-		}
-		if (m_values.is_none())
-		{
-			return i;
-		}
-		return m_values[i];
+		return m_ctrl().GetSelection();
 	}
 
-	void setValue(pyobj value)
+	virtual void doSetSelection(int n)
 	{
-		if (m_values.is_none())
-		{
-			setSelection(value.cast<int>());
-		}
-		else
-		{
-			pyobj ret = pyCall(m_values.attr("find"), value);
-			if (!ret.is_none())
-			{
-				setSelection(ret.cast<int>());
-			}
-		}
+		m_ctrl().SetSelection(n);
 	}
 
-	pyobj getTexts()
+	virtual void triggerSelectEvent()
 	{
-		const wxArrayString &textArray = m_ctrl().GetStrings();
-		py::list list;
-		for (wxcstr text: textArray)
+
+	}
+
+	/**
+	* handle 是否触发事件处理
+	*/
+	void setSelection(int n, bool handle = false)
+	{
+		doSetSelection(n);
+		if (handle)
 		{
-			list.append(text);
+			triggerSelectEvent();
 		}
-		return list;
 	}
 
 	virtual int getCount()
@@ -360,31 +347,74 @@ public:
 		}
 	}
 
-	virtual int getSelection()
+	auto getText1()
 	{
-		return m_ctrl().GetSelection();
+		return getText();
 	}
 
-	virtual void doSetSelection(int n)
+	void setText1(wxcstr text)
 	{
-		m_ctrl().SetSelection(n);
+		setText(text);
 	}
 
-	virtual void triggerSelectEvent()
+	pyobj getValue(pyobj i=None)
 	{
-
-	}
-
-	/**
-	 * handle 是否触发事件处理
-	 */
-	void setSelection(int n, bool handle=false)
-	{
-		doSetSelection(n);
-		if (handle)
+		if (i.is_none())
 		{
-			triggerSelectEvent();
+			i = py::cast(getSelection());
 		}
+		if (m_values.is_none())
+		{
+			return i;
+		}
+		return m_values[i];
+	}
+
+	void setValue(pyobj value)
+	{
+		if (m_values.is_none())
+		{
+			setSelection(value.cast<int>());
+		}
+		else
+		{
+			pyobj ret = pyCall(m_values.attr("find"), value);
+			if (!ret.is_none())
+			{
+				setSelection(ret.cast<int>());
+			}
+		}
+	}
+
+	auto getValue1()
+	{
+		return getValue();
+	}
+
+	void setValue1(pycref value)
+	{
+		setValue(value);
+	}
+
+	pyobj getTexts()
+	{
+		const wxArrayString &textArray = m_ctrl().GetStrings();
+		py::list list;
+		for (wxcstr text : textArray)
+		{
+			list.append(text);
+		}
+		return list;
+	}
+
+	wxString __getitem__(int i)
+	{
+		return getText(i);
+	}
+
+	void __setitem__(int i, wxcstr text)
+	{
+		return setText(text, i);
 	}
 
 	friend void initLayout(py::module &m);
@@ -417,7 +447,7 @@ public:
 		insert(options, values, getCount());
 	}
 
-	void remove(int pos)
+	void pop(int pos)
 	{
 		m_ctrl().Delete(pos);
 	}

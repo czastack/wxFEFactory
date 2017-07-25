@@ -8,6 +8,9 @@ styles = {
         'footer': {
             'expand': True,
         },
+        'vcenter': {
+            'verticalAlign': 'middle',
+        },
         'button': {
             'flex': 1,
             'width': 50,
