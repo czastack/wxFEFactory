@@ -74,7 +74,9 @@ class MainFrame:
         name = listbox.getValue()
         try:
             Module = self.getModule(name)
-            __main__.m = Module()
+            m = Module()
+            m.attach()
+            __main__.m = m
 
         except Exception as e:
             print('加载模块%s失败' % name)
@@ -151,13 +153,13 @@ class MainFrame:
             print(reader.getRomTitle())
             dialog = exui.ListDialog("选择执行导入的模块", style={'width': 640, 'height': 480}, listbox={'options': modules})
             if dialog.showOnce():
-                for i in listbox.getCheckedItems():
+                for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
                     try:
                         Module = self.getModule(name)
                         m = Module()
+                        m.attach()
                         m.readFrom(reader)
-                        __main__.m = m
 
                     except Exception as e:
                         print('加载模块%s失败' % name)

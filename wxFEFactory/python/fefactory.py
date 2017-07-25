@@ -40,7 +40,7 @@ def reload():
 
 
 __builtins__['input'] = partial(fefactory_api.input, '输入')
-fefactory_api.alert = alert
-fefactory_api.confirm_yes = confirm_yes
+fefactory_api.alert = staticmethod(alert)
+fefactory_api.confirm_yes = staticmethod(confirm_yes)
 
 import mainframe

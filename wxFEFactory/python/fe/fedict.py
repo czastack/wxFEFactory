@@ -1,4 +1,4 @@
-from gba.dictionary import Dictionary
+from gba.dictionary import Dictionary, CtrlCode
 import ctypes
 
 
@@ -99,7 +99,22 @@ class FeDict(Dictionary):
             if not break_continue and (code & 0xFF) is 0:
                 break
 
-        return ''.join(self.getChar(code) for code in result)
+        text = []
+        i = 0
+        for code in result:
+            word = self.getChar(code)
+            if word is not None:
+                text.append(word)
+            elif self.ctrltable and code in self.ctrltable:
+                word, i = self.ctrltable[code].decode(data, i)
+                text.append(word)
+            else:
+                print(f"Error: {code} can't decode")
+            i += 1
+
+        return ''.join(text)
+
+        # return ''.join(self.getChar(code) for code in result)
 
     def encodeHaffuman(self, text, buf=None, null=True):
         """

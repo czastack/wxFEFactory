@@ -26,7 +26,7 @@ class FormMetaclass(type):
 
             structure_name = (name[:-4] if name.endswith('Form') else name) + 'Structure'
             structure = type(structure_name, (ctypes.Structure,), {
-                '_fields_': [(field.name, field.CTYPE) for field in base_fields if field.size],
+                '_fields_': [(field.name, field.CTYPE) for field in base_fields if field.size > 0],
                 '__module__': attrs['__module__'],
             })
 

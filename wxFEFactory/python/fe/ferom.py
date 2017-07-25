@@ -1,7 +1,12 @@
 from gba.rom import RomRW
 from . import config
-from .fedict import FeDict
+from .fedict import FeDict, CtrlCode
 import os
+
+ctrltable = (
+    CtrlCode(0x0100, "br"),
+    CtrlCode(0x0200, "br2")
+)
 
 class FeRomRW(RomRW):
     __slots__ = ()
@@ -27,7 +32,7 @@ class FeRomRW(RomRW):
 
         huffstart = self.read32(self.FONT_POINTER)
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
-        self._dict = FeDict((self.name, huffstart & self.addrmask, huffsize), path)
+        self._dict = FeDict((self.name, huffstart & self.addrmask, huffsize), path, None, ctrltable)
 
     def getTextEntryPtr(self, i):
         """

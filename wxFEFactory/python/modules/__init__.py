@@ -16,4 +16,5 @@ modules = [
     # ("支援属性加成修改", "other"),
     # ("转职修改", "other"),
     # ("Boss战BGM", "other"),
+    ("文本列表", "strings"),
 ]

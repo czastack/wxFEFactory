@@ -7,7 +7,6 @@ class CharacterForm(BaseForm):
     title = "角色"
 
     fields = [
-        fm.Uint("addr", "地址", 0),
         fm.Text("name", "名字", 2),
         fm.Text("title", "R键说明", 2),
         fm.Uint("id", "人物ID", 1),
