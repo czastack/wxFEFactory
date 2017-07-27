@@ -18,7 +18,7 @@ class Module(BaseListBoxModuel):
             count += 1
 
     def render_right(self):
-        with ui.GridLayout(cols=4, key="infobar", style=infobar_style):
+        with ui.GridLayout(cols=4, key="infobar", className="container"):
             ui.Text("地址", className="vcenter")
             ui.TextInput(readonly=True)
         self.textarea = ui.TextInput(multiline=True, className="fill")
@@ -115,9 +115,3 @@ class Module(BaseListBoxModuel):
         count = self.listbox.count
         super().doAdd("%04X" % count for count in range(count, len(texts) + count))
         self.data_list.extend(texts)
-
-
-infobar_style = {
-    'padding': 10,
-    'showPadding': '1',
-}

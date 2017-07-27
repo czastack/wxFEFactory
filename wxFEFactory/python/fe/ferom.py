@@ -26,10 +26,13 @@ class FeRomRW(RomRW):
             self.key = config.romcode[code]
         self._dict = None
 
-    def openDict(self):
+    def openDict(self, path=None):
         # 码表路径，默认放在本文件夹下面
-        path = config.dictmap[self.key]
-        path = os.path.join(os.path.dirname(__file__), path)
+        if path is None:
+            path = config.dictmap[self.key]
+            path = os.path.join(os.path.dirname(__file__), path)
+
+        self._dict_path = path
 
         huffstart = self.read32(self.FONT_POINTER)
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
@@ -52,6 +55,10 @@ class FeRomRW(RomRW):
         i从0开始
         """
         return self.readText(self.getTextEntryPtr(i))
+
+    @property
+    def dict_path(self):
+        return getattr(self, '_dict_path', None)
 
     def __iter__(self):
         return self

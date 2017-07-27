@@ -67,12 +67,17 @@ class FeDict(Dictionary):
         self.tree = root
         self.leafmap = leafmap
 
-    def decodeHaffuman(self, data):
+    def decodeHaffuman(self, data, result=None):
+        """
+        :param result: 返回解码后的code列表
+        """
         curbyte = 0
         bit = 0
         code = 0
-        result = []
         it = iter(data)
+
+        if result is None:
+            result = []
 
         while True:
             node = self.tree
@@ -173,6 +178,17 @@ class FeDict(Dictionary):
                     text.append(word)
             else:
                 char = char << 8 | byte
+
+    @staticmethod
+    def code_list_to_bytes(codes):
+        result = bytearray(len(codes) * 2)
+        i = 0
+        for code in codes:
+            result[i] = code & 0xFF
+            result[i + 1] = (code >> 8) & 0xFF
+            i += 2
+        return result
+
 
 if __name__ == '__main__' or __name__ == 'builtins':
     # workdir = 'E:/GBA/fe8/'

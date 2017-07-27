@@ -4,6 +4,7 @@ from modules import modules
 from tools import tools
 from fe.ferom import FeRomRW
 from lib import exui
+from commonstyle import dialog_style
 import os
 import traceback
 import __main__
@@ -50,7 +51,7 @@ class MainFrame:
                 with ui.Vertical(style=consoleStyle) as console:
                     self.consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
                     with ui.Horizontal(className="expand"):
-                        self.consol_input = ui.TextInput(extStyle=0x0400, className="expand console-input")
+                        self.consol_input = ui.TextInput(exstyle=0x0400, className="expand console-input")
                         ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
                     with ui.Horizontal(className="expand").show(False):
                         self.consol_input_multi = ui.TextInput(className="console-input console-input-multi", multiline=True)
@@ -168,7 +169,7 @@ class MainFrame:
         reader = FeRomRW(rom)
         if not reader.closed:
             print(reader.getRomTitle())
-            dialog = exui.ListDialog("选择执行导入的模块", style=dialogStyle, listbox={'choices': self.module_names})
+            dialog = exui.ListDialog("选择执行导入的模块", style=dialog_style, listbox={'choices': self.module_names})
             if dialog.showOnce():
                 for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
@@ -183,9 +184,10 @@ class MainFrame:
                         traceback.print_exc()
 
     def openTool(self, m):
-        dialog = exui.ChoiceDialog("选择工具", style=dialogStyle, combobox={'choices': self.tool_names})
-        dialog.combobox.setOnenter(self.onToolPanelEnter)
+        dialog = exui.ChoiceDialog("选择工具", style=dialog_style, combobox={'choices': self.tool_names})
+        dialog.combobox.setOnEnter(self.onToolPanelEnter)
         dialog.combobox.onselect = self.onToolOpen
+        self.dialog = dialog
         dialog.showOnce()
 
     def onToolPanelEnter(self, cb):
@@ -193,7 +195,11 @@ class MainFrame:
 
     def onToolOpen(self, cb):
         name = tools[cb.index][1]
-        print(self.getTool(name))
+        Tool = self.getTool(name)
+        tool = Tool()
+        tool.attach()
+        self.dialog.endModal()
+        del self.dialog
 
 winstyle = {
     'width': 1200,
@@ -224,8 +230,6 @@ consoleOutputStyle = {
     'flex': 1,
     'showPadding': '0 0 1 0',
 }
-
-dialogStyle = {'width': 640, 'height': 480}
 
 if __name__ == 'mainframe':
     frame = MainFrame()

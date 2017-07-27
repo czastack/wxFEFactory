@@ -26,7 +26,7 @@ void init_layout(py::module &m)
 	auto styles = "styles"_a=None;
 	auto label = "label"_a;
 	auto type = "type"_a=wxEmptyString;
-	auto extStyle = "extStyle"_a=0;
+	auto exstyle = "exstyle"_a=0;
 
 	auto view_init = py::init<pyobj, pyobj, pyobj>();
 	auto layout_init = py::init<pyobj, pyobj, pyobj, pyobj>();
@@ -75,7 +75,8 @@ void init_layout(py::module &m)
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, styles, key, className, style)
-		.def("showOnce", &Dialog::showOnce);
+		.def("showOnce", &Dialog::showOnce)
+		.def("endModal", &Dialog::endModal);
 
 	py::class_t<StdModalDialog, Dialog>(layout, "StdModalDialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
@@ -95,7 +96,12 @@ void init_layout(py::module &m)
 	py::class_t<FlexGridLayout, Layout>(layout, "FlexGridLayout")
 		.def_init(py::init<int, int, int, int, pyobj, pyobj, pyobj, pyobj>(),
 			"rows"_a=0, "cols"_a=2, "vgap"_a=0, "hgap"_a=0,
-			styles, key, className, style);
+			styles, key, className, style)
+		.def("AddGrowableRow", &FlexGridLayout::AddGrowableRow, "index"_a, "flex"_a=0)
+		.def("RemoveGrowableRow", &FlexGridLayout::RemoveGrowableRow, "index"_a)
+		.def("AddGrowableCol", &FlexGridLayout::AddGrowableCol, "index"_a, "flex"_a=0)
+		.def("RemoveGrowableCol", &FlexGridLayout::RemoveGrowableCol, "index"_a)
+		.def_property("flexDirection", &FlexGridLayout::GetFlexibleDirection, &FlexGridLayout::SetFlexibleDirection);
 
 	py::class_t<ScrollView, Layout>(layout, "ScrollView")
 		.def_init(py::init<bool, pyobj, pyobj, pyobj, pyobj>(),
@@ -128,13 +134,14 @@ void init_layout(py::module &m)
 		.def("setText", &Text::setText);
 
 	py::class_t<TextInput, Control>(layout, "TextInput")
-		.def_init(py::init<wxcstr, wxcstr, bool, bool, int, pyobj, pyobj, pyobj>(),
-			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, extStyle, key, className, style)
+		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),
+			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, exstyle, key, className, style)
+		.def("setOnEnter", &TextInput::setOnEnter)
 		.def_property("value", &TextInput::getValue, &TextInput::setValue);
 
 	py::class_t<SearchCtrl, Control>(layout, "SearchCtrl")
-		.def_init(py::init<wxcstr, bool, bool, int, pyobj, pyobj, pyobj>(),
-			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, extStyle, key, className, style)
+		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),
+			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, exstyle, key, className, style)
 		.def("setOnsubmit", &SearchCtrl::setOnsubmit)
 		.def("setOncancel", &SearchCtrl::setOncancel)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
@@ -199,13 +206,49 @@ void init_layout(py::module &m)
 	py::class_t<ComboBox, ControlWithItems>(layout, "ComboBox")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			type, choices, onselect, key, className, style)
-		.def("setOnenter", &ComboBox::setOnenter, "onenter"_a)
+		.def("setOnEnter", &ComboBox::setOnEnter)
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, BaseControlWithItems>(layout, "RadioBox")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			label, choices, onselect, key, className, style);
 
+	py::class_t<Hr, Control>(layout, "Hr")
+		.def_init(py::init<bool, pyobj, pyobj, pyobj>(),
+			"vertical"_a=false, key, className, style);
+
+	auto pyFilePickerCtrl = py::class_t<FilePickerCtrl, Control>(layout, "FilePickerCtrl")
+		.def_init(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj, pyobj>(),
+			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "wildcard"_a=(const char*)wxFileSelectorDefaultWildcardStr,
+			"exstyle"_a=(long)(wxFLP_DEFAULT_STYLE|wxFLP_SMALL), key, className, style)
+		.def("setOnchange", &FilePickerCtrl::setOnchange)
+		.def_property("path", &FilePickerCtrl::getPath, &FilePickerCtrl::setPath)
+		.ptr();
+
+	#define ATTR_FLP_STYLE(name) ATTR_INT(pyFilePickerCtrl, name, wxFLP_)
+		ATTR_FLP_STYLE(FILE_MUST_EXIST),
+		ATTR_FLP_STYLE(OPEN),
+		ATTR_FLP_STYLE(OVERWRITE_PROMPT),
+		ATTR_FLP_STYLE(SAVE),
+		ATTR_FLP_STYLE(SMALL),
+		ATTR_FLP_STYLE(USE_TEXTCTRL);
+	#undef ATTR_FLP_STYLE
+
+	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(layout, "DirPickerCtrl")
+		.def_init(py::init<wxcstr, wxcstr, long, pyobj, pyobj, pyobj>(),
+			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "exstyle"_a=(long)(wxDIRP_DEFAULT_STYLE|wxDIRP_SMALL), key, className, style)
+		.def("setOnchange", &DirPickerCtrl::setOnchange)
+		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)
+		.ptr();
+
+	#define ATTR_DIRP_STYLE(name) ATTR_INT(pyDirPickerCtrl, name, wxDIRP_)
+		ATTR_DIRP_STYLE(DIR_MUST_EXIST),
+		ATTR_DIRP_STYLE(SMALL),
+		ATTR_DIRP_STYLE(USE_TEXTCTRL);
+	#undef ATTR_FLP_STYLE
+
+
+	// aui
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")
 		.def(py::init<pyobj>(), key)
 		.def("showPane", &AuiManager::showPane)
@@ -280,9 +323,10 @@ void init_layout(py::module &m)
 	py::class_<wxEvent>(layout, "Event")
 		.def("Skip", &wxEvent::Skip, "skip"_a=true);
 
-	auto & KeyEvent = py::class_<wxKeyEvent, wxEvent>(layout, "KeyEvent")
+	auto KeyEvent = py::class_<wxKeyEvent, wxEvent>(layout, "KeyEvent")
 		.def("GetKeyCode", &wxKeyEvent::GetKeyCode)
-		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); });
+		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); })
+		.ptr();
 /*
 	py::detail::type_record rec;
 	rec.name = "KEYCODE";
@@ -293,7 +337,7 @@ void init_layout(py::module &m)
 	// PyObject_SetAttrString(layout.ptr(), "NORMAL", PyLong_FromLong(wxACCEL_NORMAL));
 */
 
-#define ATTR_ACCEL(name) ATTR_INT(KeyEvent.ptr(), name, wxACCEL_)
+#define ATTR_ACCEL(name) ATTR_INT(KeyEvent, name, wxACCEL_)
 	ATTR_ACCEL(NORMAL),
 	ATTR_ACCEL(ALT),
 	ATTR_ACCEL(CTRL),
@@ -302,7 +346,7 @@ void init_layout(py::module &m)
 	ATTR_ACCEL(CMD);
 #undef ATTR_ACCEL
 
-#define ATTR_KEYCODE(name) ATTR_INT(KeyEvent.ptr(), name, WXK_)
+#define ATTR_KEYCODE(name) ATTR_INT(KeyEvent, name, WXK_)
 	ATTR_KEYCODE(CONTROL_A), ATTR_KEYCODE(CONTROL_B), ATTR_KEYCODE(CONTROL_C), ATTR_KEYCODE(CONTROL_D), ATTR_KEYCODE(CONTROL_E), ATTR_KEYCODE(CONTROL_F), ATTR_KEYCODE(CONTROL_G),
 	ATTR_KEYCODE(CONTROL_H), ATTR_KEYCODE(CONTROL_I), ATTR_KEYCODE(CONTROL_J), ATTR_KEYCODE(CONTROL_K), ATTR_KEYCODE(CONTROL_L), ATTR_KEYCODE(CONTROL_M), ATTR_KEYCODE(CONTROL_N),
 	ATTR_KEYCODE(CONTROL_O), ATTR_KEYCODE(CONTROL_P), ATTR_KEYCODE(CONTROL_Q), ATTR_KEYCODE(CONTROL_R), ATTR_KEYCODE(CONTROL_S), ATTR_KEYCODE(CONTROL_T),
@@ -312,7 +356,7 @@ void init_layout(py::module &m)
 	ATTR_KEYCODE(RETURN),
 	ATTR_KEYCODE(ESCAPE),
 	ATTR_KEYCODE(SPACE),
-	ATTR_INT(KeyEvent.ptr(), _DELETE, WXK),
+	ATTR_INT(KeyEvent, _DELETE, WXK),
 	ATTR_KEYCODE(LBUTTON),
 	ATTR_KEYCODE(RBUTTON),
 	ATTR_KEYCODE(MBUTTON),
@@ -363,4 +407,8 @@ void init_layout(py::module &m)
 	ATTR_KEYCODE(WINDOWS_RIGHT),
 	ATTR_KEYCODE(WINDOWS_MENU);
 #undef ATTR_KEYCODE
+
+
+	ATTR_INT(layout.ptr(), VERTICAL, wx),
+	ATTR_INT(layout.ptr(), HORIZONTAL, wx);
 }

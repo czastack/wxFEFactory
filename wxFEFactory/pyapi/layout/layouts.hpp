@@ -62,7 +62,7 @@ public:
 
 	void setMenu(MenuBar &menubar)
 	{
-		m_win().SetMenuBar(menubar);
+		win().SetMenuBar(menubar);
 		m_elem->Bind(wxEVT_MENU, &Window::onMenu, this);
 		py::cast(&menubar).inc_ref();
 	}
@@ -74,22 +74,27 @@ public:
 
 	MenuBar* getMenuBar()
 	{
-		return ((MenuBar*)m_win().GetMenuBar()->GetClientData());
+		auto menubar = win().GetMenuBar();
+		return menubar ? ((MenuBar*)menubar->GetClientData()): nullptr;
 	}
 
 	StatusBar* getStatusBar()
 	{
-		return ((StatusBar*)m_win().GetStatusBar()->GetClientData());
+		return ((StatusBar*)win().GetStatusBar()->GetClientData());
 	}
 
 	void onClose(class wxCloseEvent &event) override
 	{
-		py::cast(getMenuBar()).dec_ref();
+		auto menubar = getMenuBar();
+		
+		if (menubar)
+			py::cast(menubar).dec_ref();
+
 		BaseFrame::onClose(event);
 	}
 
 protected:
-	wxFrame& m_win()
+	wxFrame& win()
 	{
 		return *(wxFrame*)m_elem;
 	}
@@ -109,13 +114,18 @@ public:
 
 	bool showOnce()
 	{
-		bool ret = m_win().ShowModal() == wxID_OK;
-		m_win().Destroy();
+		bool ret = win().ShowModal() == wxID_OK;
+		win().Destroy();
 		return ret;
 	}
 
+	void endModal()
+	{
+		win().EndModal(wxID_OK);
+	}
+
 protected:
-	wxDialog& m_win()
+	wxDialog& win()
 	{
 		return *(wxDialog*)m_elem;
 	}
@@ -311,9 +321,21 @@ public:
 		bindElem(new wxPanel(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 		
 		wxFlexGridSizer* sizer = new wxFlexGridSizer(rows, cols, vgap, hgap);
-		sizer->SetFlexibleDirection(wxBOTH);
 		sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 		m_elem->SetSizer(sizer);
+	}
+
+	void AddGrowableRow(size_t idx, int proportion = 0) { get_sizer().AddGrowableRow(idx, proportion); }
+	void RemoveGrowableRow(size_t idx) { get_sizer().RemoveGrowableRow(idx); }
+	void AddGrowableCol(size_t idx, int proportion = 0) { get_sizer().AddGrowableCol(idx, proportion); }
+	void RemoveGrowableCol(size_t idx) { get_sizer().RemoveGrowableCol(idx); }
+
+	void SetFlexibleDirection(int direction) { get_sizer().SetFlexibleDirection(direction); }
+	int GetFlexibleDirection() const { return get_sizer().GetFlexibleDirection(); }
+
+	wxFlexGridSizer& get_sizer() const
+	{
+		return *(wxFlexGridSizer*)m_elem->GetSizer();
 	}
 };
 
@@ -327,7 +349,7 @@ public:
 		bindElem(new wxScrolledWindow(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(),
 			wxHSCROLL | wxVSCROLL));
 		m_elem->SetSizer(new wxBoxSizer(horizontal ? wxHORIZONTAL: wxVERTICAL));
-		m_ctrl().SetScrollRate(5, 5);
+		ctrl().SetScrollRate(5, 5);
 	}
 
 	void layout() override
@@ -335,9 +357,7 @@ public:
 		m_elem->GetSizer()->FitInside(m_elem);
 		m_elem->Layout();
 	}
-
-protected:
-	wxScrolledWindow& m_ctrl()
+	wxScrolledWindow& ctrl()
 	{
 		return *(wxScrolledWindow*)m_elem;
 	}
@@ -365,16 +385,16 @@ public:
 		if (len == 1)
 		{
 			View &child = *py::cast<View*>(m_children[0]);
-			m_ctrl().Initialize(child);
+			ctrl().Initialize(child);
 		}
 		else if (len == 2)
 		{
 			View &child1 = *py::cast<View*>(m_children[0]);
 			View &child2 = *py::cast<View*>(m_children[1]);
 			if (m_horizontal)
-				m_ctrl().SplitHorizontally(child1, child2, m_sashpos);
+				ctrl().SplitHorizontally(child1, child2, m_sashpos);
 			else
-				m_ctrl().SplitVertically(child1, child2, m_sashpos);
+				ctrl().SplitVertically(child1, child2, m_sashpos);
 		}
 	}
 
@@ -383,14 +403,14 @@ public:
 		return m_horizontal;
 	}
 
-protected:
-	bool m_horizontal;
-	int m_sashpos;
-
-	wxSplitterWindow& m_ctrl()
+	wxSplitterWindow& ctrl()
 	{
 		return *(wxSplitterWindow*)m_elem;
 	}
+
+protected:
+	bool m_horizontal;
+	int m_sashpos;
 };
 
 

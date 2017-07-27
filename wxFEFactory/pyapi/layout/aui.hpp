@@ -206,7 +206,7 @@ public:
 			child.ptr()->SetClientData(&child);
 
 			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
-			m_ctrl().AddPage(child, caption);
+			ctrl().AddPage(child, caption);
 
 			pycref onclose = pyDictGet(item->m_kwargs, wxT("onclose"));
 			if (onclose != None)
@@ -225,16 +225,16 @@ public:
 	void closePage()
 	{
 		if (canPageClose())
-			m_ctrl().DeletePage(m_ctrl().GetSelection());
+			ctrl().DeletePage(ctrl().GetSelection());
 	}
 
 	bool canPageClose(int n=-1)
 	{
-		if (m_ctrl().GetPageCount() == 0)
+		if (ctrl().GetPageCount() == 0)
 			return false;
 
 		if (n == -1)
-			n = m_ctrl().GetSelection();
+			n = ctrl().GetSelection();
 
 		pyobj page = py::cast(getPage(n));
 		pyobj onclose = pyDictGet(m_close_listeners, page);
@@ -254,7 +254,7 @@ public:
 
 	View* getPage(int n)
 	{
-		return (View*)m_ctrl().GetPage(n)->GetClientData();
+		return (View*)ctrl().GetPage(n)->GetClientData();
 	}
 
 	void OnPageClose(wxAuiNotebookEvent & event)
@@ -268,11 +268,11 @@ public:
 		}
 	}
 
-protected:
-	py::dict m_close_listeners;
-
-	wxAuiNotebook& m_ctrl()
+	wxAuiNotebook& ctrl()
 	{
 		return *(wxAuiNotebook*)m_elem;
 	}
+
+protected:
+	py::dict m_close_listeners;
 };

@@ -13,7 +13,7 @@ public:
 	{
 		bindElem(new wxPropertyGrid(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 
-		auto &pg = m_ctrl();
+		auto &pg = ctrl();
 		pg.SetExtraStyle(wxPG_EX_HELP_AS_TOOLTIPS);
 		pg.SetCaptionBackgroundColour(0xeeeeee);
 		pg.SetMarginColour(0xeeeeee);
@@ -87,7 +87,7 @@ public:
 
 	void Append(wxPGProperty* property, pycref help)
 	{
-		m_ctrl().Append(property);
+		ctrl().Append(property);
 		if (!help.is_none())
 		{
 			property->SetHelpString(help.cast<wxString>());
@@ -95,7 +95,7 @@ public:
 	}
 
 	void addCategory(wxcstr title) {
-		m_ctrl().Append(new wxPropertyCategory(title));
+		ctrl().Append(new wxPropertyCategory(title));
 	}
 
 	void addStringProperty(wxcstr title, wxcstr name, pycref help, pycref value) {
@@ -162,7 +162,7 @@ public:
 
 	void setEnumChoices(wxcstr name, pyobj labels, pyobj values)
 	{
-		wxPGProperty *p = m_ctrl().GetPropertyByName(name);
+		wxPGProperty *p = ctrl().GetPropertyByName(name);
 		if (wxIsKindOf(p, wxEnumProperty))
 		{
 			prepareOptions(labels, values, true);
@@ -197,7 +197,7 @@ public:
 	}
 
 	pyobj getValue(wxcstr name) {
-		return getValue(m_ctrl().GetPropertyByName(name));
+		return getValue(ctrl().GetPropertyByName(name));
 	}
 
 	void setValue(const wxPGProperty* p, pycref pyval) {
@@ -218,7 +218,7 @@ public:
 		*/
 
 		wxcstr type = p->GetValueType();
-		auto &pg = m_ctrl();
+		auto &pg = ctrl();
 
 		if (pyval.is_none())
 		{
@@ -269,14 +269,14 @@ public:
 	}
 
 	void setValue(wxcstr name, pycref value) {
-		return setValue(m_ctrl().GetPropertyByName(name), value);
+		return setValue(ctrl().GetPropertyByName(name), value);
 	}
 
 	pyobj getValues(pycref obj)
 	{
 		pycref data = obj.is_none() ? m_data : obj;
 
-		wxPropertyGridConstIterator it = m_ctrl().GetIterator();
+		wxPropertyGridConstIterator it = ctrl().GetIterator();
 		for (; !it.AtEnd(); ++it)
 		{
 			const wxPGProperty* p = *it;
@@ -291,7 +291,7 @@ public:
 
 		if (all)
 		{
-			wxPropertyGridIterator it = m_ctrl().GetIterator();
+			wxPropertyGridIterator it = ctrl().GetIterator();
 			for (; !it.AtEnd(); ++it)
 			{
 				wxPGProperty* p = *it;
@@ -302,7 +302,7 @@ public:
 		{
 			for (auto &item : data) {
 				pystrcpy(text, item);
-				wxPGProperty* p = m_ctrl().GetPropertyByName(text);
+				wxPGProperty* p = ctrl().GetPropertyByName(text);
 				if (p)
 				{
 					setValue(p, data[item]);
@@ -313,7 +313,7 @@ public:
 
 	void setReadonly(wxcstr name, bool readonly = true)
 	{
-		m_ctrl().GetPropertyByName(name)->SetFlagRecursively(wxPG_PROP_READONLY, readonly);
+		ctrl().GetPropertyByName(name)->SetFlagRecursively(wxPG_PROP_READONLY, readonly);
 	}
 
 	/**
@@ -327,12 +327,17 @@ public:
 
 	wxString getSelectedName()
 	{
-		wxPGProperty* p = m_ctrl().GetSelection();
+		wxPGProperty* p = ctrl().GetSelection();
 		if (p)
 		{
 			return p->GetName();
 		}
 		return wxNoneString;
+	}
+
+	wxPropertyGrid& ctrl()
+	{
+		return *(wxPropertyGrid*)m_elem;
 	}
 
 	friend void init_layout(py::module &m);
@@ -342,11 +347,6 @@ protected:
 	pyobj m_onchange;
 	bool m_changed = false;
 	bool m_autosave = false;
-
-	wxPropertyGrid& m_ctrl()
-	{
-		return *(wxPropertyGrid*)m_elem;
-	}
 };
 
 
@@ -364,14 +364,14 @@ public:
 	{
 		wxString text;
 		for (auto &item : columns) {
-			m_ctrl().AppendColumn(pystrcpy(text, item));
+			ctrl().AppendColumn(pystrcpy(text, item));
 		}
 	}
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true)
 	{
 		wxListItem info;
-		auto &li = m_ctrl();
+		auto &li = ctrl();
 		info.m_mask = wxLIST_MASK_TEXT;
 		info.m_itemId = pos != -1 ? pos : li.GetItemCount();
 		if (!create && pos == -1)
@@ -390,8 +390,7 @@ public:
 		}
 	}
 
-protected:
-	wxListView& m_ctrl()
+	wxListView& ctrl()
 	{
 		return *(wxListView*)m_elem;
 	}

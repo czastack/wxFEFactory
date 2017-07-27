@@ -10,7 +10,7 @@ public:
 	ToolBar(Args ...args) : Control(args...)
 	{
 		bindElem(new wxToolBar(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxTB_DEFAULT_STYLE | wxTB_TEXT));
-		m_ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBar::onClick, this);
+		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBar::onClick, this);
 	}
 
 	ToolBar& addTool(wxcstr label, wxcstr shortHelp, wxcstr bitmap, pycref onclick, int toolid, wxcstr kind)
@@ -21,24 +21,24 @@ public:
 		{
 			bp.LoadFile(bitmap, wxBITMAP_TYPE_PNG);
 		}
-		wxToolBarToolBase *tool = m_ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
+		wxToolBarToolBase *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
 		m_listeners[py::cast(tool->GetId())] = onclick;
 		return *this;
 	}
 
 	ToolBar& addSeparator() {
-		m_ctrl().AddSeparator();
+		ctrl().AddSeparator();
 		return *this;
 	}
 
 	ToolBar& realize() {
-		m_ctrl().Realize();
+		ctrl().Realize();
 		return *this;
 	}
 
 	void clear()
 	{
-		m_ctrl().ClearTools();
+		ctrl().ClearTools();
 	}
 
 	void onClick(wxCommandEvent &event)
@@ -52,17 +52,17 @@ public:
 
 	void setToolText(int id, wxcstr label)
 	{
-		wxToolBarToolBase *tool = m_ctrl().FindById(id);
+		wxToolBarToolBase *tool = ctrl().FindById(id);
 		tool->SetLabel(label);
+	}
+
+	wxToolBar& ctrl()
+	{
+		return *(wxToolBar*)m_elem;
 	}
 
 protected:
 	py::dict m_listeners;
-
-	wxToolBar& m_ctrl()
-	{
-		return *(wxToolBar*)m_elem;
-	}
 };
 
 
@@ -86,12 +86,12 @@ public:
 
 	wxString getText(int n) const
 	{
-		return m_ctrl().GetStatusText(n);
+		return ctrl().GetStatusText(n);
 	}
 
 	StatusBar& setText(wxcstr text, int n)
 	{
-		m_ctrl().SetStatusText(text, n);
+		ctrl().SetStatusText(text, n);
 		return *this;
 	}
 
@@ -99,7 +99,7 @@ public:
 	{
 		int n;
 		auto ptr = asArray<int>(list, n);
-		m_ctrl().SetFieldsCount(n, ptr.get());
+		ctrl().SetFieldsCount(n, ptr.get());
 		return *this;
 	}
 
@@ -107,27 +107,25 @@ public:
 	{
 		int n;
 		auto ptr = asArray<int>(list, n);
-		m_ctrl().SetStatusWidths(n, ptr.get());
+		ctrl().SetStatusWidths(n, ptr.get());
 		return *this;
 	}
 
 	int getStatusWidth(int n) const
 	{
-		return m_ctrl().GetStatusWidth(n);
+		return ctrl().GetStatusWidth(n);
 	}
 
 	void popStatusText(int n)
 	{
-		m_ctrl().PopStatusText(n);
+		ctrl().PopStatusText(n);
 	}
 
 	void pushStatusText(wxcstr text, int n)
 	{
-		m_ctrl().PushStatusText(text, n);
+		ctrl().PushStatusText(text, n);
 	}
-
-protected:
-	wxStatusBar& m_ctrl() const
+	wxStatusBar& ctrl() const
 	{
 		return *(wxStatusBar*)m_elem;
 	}

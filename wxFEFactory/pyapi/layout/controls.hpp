@@ -4,6 +4,8 @@
 #include <wx/stattext.h>
 #include <wx/spinctrl.h>
 #include <wx/srchctrl.h>
+#include <wx/statline.h>
+#include <wx/filepicker.h>
 #include "wxpatch.h"
 
 
@@ -24,11 +26,9 @@ public:
 
 	void setLabel(wxcstr label)
 	{
-		m_ctrl().SetLabel(label);
+		ctrl().SetLabel(label);
 	}
-
-protected:
-	wxButton& m_ctrl()
+	wxButton& ctrl()
 	{
 		return *(wxButton*)m_elem;
 	}
@@ -64,17 +64,17 @@ public:
 
 	void setChecked(bool checked)
 	{
-		m_ctrl().SetValue(checked);
+		ctrl().SetValue(checked);
 	}
 
 	bool getChecked()
 	{
-		return m_ctrl().GetValue();
+		return ctrl().GetValue();
 	}
 
 	void setLabel(wxcstr label)
 	{
-		m_ctrl().SetLabel(label);
+		ctrl().SetLabel(label);
 	}
 
 	void onChange(wxCommandEvent & event)
@@ -85,14 +85,15 @@ public:
 		}
 	}
 
-	friend void init_layout(py::module &m);
-protected:
-	pyobj m_change;
-
-	wxCheckBox& m_ctrl()
+	wxCheckBox& ctrl()
 	{
 		return *(wxCheckBox*)m_elem;
 	}
+
+	friend void init_layout(py::module &m);
+
+protected:
+	pyobj m_change;
 };
 
 
@@ -107,11 +108,9 @@ public:
 
 	void setText(wxcstr label)
 	{
-		m_ctrl().SetLabel(label);
+		ctrl().SetLabel(label);
 	}
-
-protected:
-	wxStaticText& m_ctrl()
+	wxStaticText& ctrl()
 	{
 		return *(wxStaticText*)m_elem;
 	}
@@ -122,7 +121,7 @@ class TextInput : public Control
 {
 public:
 	template <class... Args>
-	TextInput(wxcstr value, wxcstr type, bool readonly, bool multiline, int extStyle, Args ...args) : Control(args...)
+	TextInput(wxcstr value, wxcstr type, bool readonly, bool multiline, long exstyle, Args ...args) : Control(args...)
 	{
 		long style = 0L;
 		if (readonly)
@@ -141,21 +140,26 @@ public:
 		{
 
 		}
-		if (extStyle)
+		if (exstyle)
 		{
-			style |= extStyle;
+			style |= exstyle;
 		}
 		bindElem(new wxTextCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), style));
 	}
 
 	void setValue(wxcstr value)
 	{
-		m_ctrl().SetValue(value);
+		ctrl().SetValue(value);
 	}
 
 	wxString getValue()
 	{
-		return m_ctrl().GetValue();
+		return ctrl().GetValue();
+	}
+
+	void setOnEnter(pycref fn)
+	{
+		bindEvt(wxEVT_TEXT_ENTER, fn);
 	}
 
 protected:
@@ -170,7 +174,7 @@ protected:
 		{
 			wxcstr align = style.cast<wxString>();
 			if (align != wxNoneString) {
-				long style = m_ctrl().GetWindowStyle();
+				long style = ctrl().GetWindowStyle();
 				if (align == wxT("center"))
 				{
 					style |= wxTE_CENTER;
@@ -183,12 +187,12 @@ protected:
 				{
 					style |= wxTE_LEFT;
 				}
-				m_ctrl().SetWindowStyle(style);
+				ctrl().SetWindowStyle(style);
 			}
 		}
 	}
 
-	wxTextCtrl& m_ctrl()
+	wxTextCtrl& ctrl()
 	{
 		return *(wxTextCtrl*)m_elem;
 	}
@@ -199,28 +203,28 @@ class SearchCtrl: public Control
 {
 public:
 	template <class... Args>
-	SearchCtrl(wxcstr value, bool search_button, bool cancel_button, int extStyle, Args ...args) : Control(args...)
+	SearchCtrl(wxcstr value, bool search_button, bool cancel_button, long exstyle, Args ...args) : Control(args...)
 	{
-		bindElem(new wxSearchCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), extStyle));
+		bindElem(new wxSearchCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), exstyle));
 		
 		if (!search_button)
 		{
-			m_ctrl().ShowSearchButton(false);
+			ctrl().ShowSearchButton(false);
 		}
 		if (cancel_button)
 		{
-			m_ctrl().ShowCancelButton(true);
+			ctrl().ShowCancelButton(true);
 		}
 	}
 
 	void setValue(wxcstr value)
 	{
-		m_ctrl().SetValue(value);
+		ctrl().SetValue(value);
 	}
 
 	wxString getValue()
 	{
-		return m_ctrl().GetValue();
+		return ctrl().GetValue();
 	}
 
 	void setOnsubmit(pycref fn)
@@ -233,7 +237,7 @@ public:
 		bindEvt(wxEVT_SEARCHCTRL_CANCEL_BTN, fn);
 	}
 
-	wxSearchCtrl& m_ctrl()
+	wxSearchCtrl& ctrl()
 	{
 		return *(wxSearchCtrl*)m_elem;
 	}
@@ -252,35 +256,34 @@ public:
 
 	void setValue(int value)
 	{
-		m_ctrl().SetValue(value);
+		ctrl().SetValue(value);
 	}
 
 	int getValue() const
 	{
-		return m_ctrl().GetValue();
+		return ctrl().GetValue();
 	}
 
 	void setMin(int min)
 	{
-		m_ctrl().SetMin(min);
+		ctrl().SetMin(min);
 	}
 
 	int getMin() const
 	{
-		return m_ctrl().GetMin();
+		return ctrl().GetMin();
 	}
 
 	void setMax(int max)
 	{
-		m_ctrl().SetMax(max);
+		ctrl().SetMax(max);
 	}
 
 	int getMax()
 	{
-		return m_ctrl().GetMax();
+		return ctrl().GetMax();
 	}
-protected:
-	wxSpinCtrl& m_ctrl() const
+	wxSpinCtrl& ctrl() const
 	{
 		return *(wxSpinCtrl*)m_elem;
 	}
@@ -306,12 +309,12 @@ public:
 
 	virtual int getSelection()
 	{
-		return m_ctrl().GetSelection();
+		return ctrl().GetSelection();
 	}
 
 	virtual void doSetSelection(int n)
 	{
-		m_ctrl().SetSelection(n);
+		ctrl().SetSelection(n);
 	}
 
 	virtual void triggerSelectEvent()
@@ -333,17 +336,17 @@ public:
 
 	virtual int getCount()
 	{
-		return m_ctrl().GetCount();
+		return ctrl().GetCount();
 	}
 
 	virtual wxString doGetText(int pos)
 	{
-		return m_ctrl().GetString(pos);
+		return ctrl().GetString(pos);
 	}
 
 	virtual void doSetText(int pos, wxcstr text)
 	{
-		m_ctrl().SetString(pos, text);
+		ctrl().SetString(pos, text);
 	}
 
 	wxString getText(int pos=-1)
@@ -383,7 +386,7 @@ public:
 
 	pyobj getTexts()
 	{
-		const wxArrayString &textArray = m_ctrl().GetStrings();
+		const wxArrayString &textArray = ctrl().GetStrings();
 		py::list list;
 		for (wxcstr text : textArray)
 		{
@@ -402,15 +405,15 @@ public:
 		return setText(text, i);
 	}
 
+	wxControlWithItems& ctrl()
+	{
+		return *(wxControlWithItems*)m_elem;
+	}
+
 	friend void init_layout(py::module &m);
 
 protected:
 	pyobj m_onselect;
-
-	wxControlWithItems& m_ctrl()
-	{
-		return *(wxControlWithItems*)m_elem;
-	}
 };
 
 
@@ -421,7 +424,7 @@ public:
 
 	void insert(pycref text, int pos)
 	{
-		m_ctrl().Insert(py::cast<wxString>(text), pos);
+		ctrl().Insert(py::cast<wxString>(text), pos);
 	}
 
 	void append(pycref text)
@@ -431,7 +434,7 @@ public:
 
 	void insertItems(pycref choices, int pos)
 	{
-		m_ctrl().Insert(py::cast<wxArrayString>(choices), pos);
+		ctrl().Insert(py::cast<wxArrayString>(choices), pos);
 	}
 
 	void appendItems(pycref choices)
@@ -441,7 +444,7 @@ public:
 
 	void pop(int pos)
 	{
-		m_ctrl().Delete(pos);
+		ctrl().Delete(pos);
 	}
 
 	void setItems(pycref choices) {
@@ -451,7 +454,7 @@ public:
 
 	void clear()
 	{
-		m_ctrl().Clear();
+		ctrl().Clear();
 	}
 };
 
@@ -473,9 +476,7 @@ public:
 	{
 		addPendingEvent(wxEVT_LISTBOX);
 	}
-
-protected:
-	wxListBox& m_ctrl()
+	wxListBox& ctrl()
 	{
 		return *(wxListBox*)m_elem;
 	}
@@ -497,42 +498,40 @@ public:
 	pyobj getCheckedItems()
 	{
 		wxArrayInt items;
-		m_ctrl().GetCheckedItems(items);
+		ctrl().GetCheckedItems(items);
 		return asPyList(items);
 	}
 
 	void setCheckedItems(pyobj list)
 	{
-		auto &ctrl = m_ctrl();
-		for (uint i = 0; i < ctrl.GetCount(); ++i)
+		auto &el = ctrl();
+		for (uint i = 0; i < el.GetCount(); ++i)
 		{
-			ctrl.Check(i, false);
+			el.Check(i, false);
 		}
 		for (auto &item : list) {
-			ctrl.Check(item.cast<int>(), true);
+			el.Check(item.cast<int>(), true);
 		}
 	}
 
 	void checkAll(bool checked=true)
 	{
-		auto &ctrl = m_ctrl();
-		for (uint i = 0; i < ctrl.GetCount(); ++i)
+		auto &el = ctrl();
+		for (uint i = 0; i < el.GetCount(); ++i)
 		{
-			ctrl.Check(i, checked);
+			el.Check(i, checked);
 		}
 	}
 
 	void reverseCheck()
 	{
-		auto &ctrl = m_ctrl();
-		for (uint i = 0; i < ctrl.GetCount(); ++i)
+		auto &el = ctrl();
+		for (uint i = 0; i < el.GetCount(); ++i)
 		{
-			ctrl.Check(i, !ctrl.IsChecked(i));
+			el.Check(i, !el.IsChecked(i));
 		}
 	}
-
-protected:
-	wxCheckListBox& m_ctrl()
+	wxCheckListBox& ctrl()
 	{
 		return *(wxCheckListBox*)m_elem;
 	}
@@ -553,16 +552,14 @@ public:
 
 	void moveUp()
 	{
-		m_ctrl().MoveCurrentUp();
+		ctrl().MoveCurrentUp();
 	}
 
 	void moveDown()
 	{
-		m_ctrl().MoveCurrentDown();
+		ctrl().MoveCurrentDown();
 	}
-
-protected:
-	wxRearrangeList& m_ctrl()
+	wxRearrangeList& ctrl()
 	{
 		return *(wxRearrangeList*)m_elem;
 	}
@@ -611,7 +608,7 @@ public:
 
 		if (!(style & wxCB_READONLY))
 		{
-			m_ctrl().AutoComplete(m_ctrl().GetStrings());
+			ctrl().AutoComplete(ctrl().GetStrings());
 		}
 	}
 
@@ -622,15 +619,15 @@ public:
 
 	wxString getValue()
 	{
-		return m_ctrl().GetValue();
+		return ctrl().GetValue();
 	}
 
 	void setValue(wxcstr value)
 	{
-		m_ctrl().SetValue(value);
+		ctrl().SetValue(value);
 	}
 
-	void setOnenter(pycref fn)
+	void setOnEnter(pycref fn)
 	{
 		bindEvt(wxEVT_TEXT_ENTER, fn);
 	}
@@ -641,9 +638,7 @@ public:
 		bindEvt(wxEVT_TEXT, fn);
 	}*/
 
-protected:
-
-	wxComboBox& m_ctrl()
+	wxComboBox& ctrl()
 	{
 		return *(wxComboBox*)m_elem;
 	}
@@ -663,32 +658,37 @@ public:
 
 	int getCount() override
 	{
-		return m_ctrl().GetCount();
+		return ctrl().GetCount();
 	}
 
 	wxString doGetText(int pos) override
 	{
-		return m_ctrl().GetString(pos);
+		return ctrl().GetString(pos);
 	}
 
 	void doSetText(int pos, wxcstr text) override
 	{
-		m_ctrl().SetString(pos, text);
+		ctrl().SetString(pos, text);
 	}
 
 	int getSelection() override
 	{
-		return m_ctrl().GetSelection();
+		return ctrl().GetSelection();
 	}
 
 	void doSetSelection(int n) override
 	{
-		m_ctrl().SetSelection(n);
+		ctrl().SetSelection(n);
 	}
 
 	void triggerSelectEvent() override
 	{
 		addPendingEvent(wxEVT_RADIOBOX);
+	}
+
+	wxRadioBox& ctrl()
+	{
+		return *(wxRadioBox*)m_elem;
 	}
 
 protected:
@@ -704,7 +704,7 @@ protected:
 		{
 			wxcstr dir = style.cast<wxString>();
 			if (dir != wxNoneString) {
-				long style = m_ctrl().GetWindowStyle();
+				long style = ctrl().GetWindowStyle();
 				if (dir == wxT("row"))
 				{
 					style |= wxRA_SPECIFY_ROWS;
@@ -713,13 +713,82 @@ protected:
 				{
 					style |= wxRA_SPECIFY_COLS;
 				}
-				m_ctrl().SetWindowStyle(style);
+				ctrl().SetWindowStyle(style);
 			}
 		}
 	}
+};
 
-	wxRadioBox& m_ctrl()
+
+class Hr : public Control
+{
+public:
+	template <class... Args>
+	Hr(bool vertical, Args ...args) : Control(args...)
 	{
-		return *(wxRadioBox*)m_elem;
+		bindElem(new wxStaticLine(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(),
+			vertical ? wxLI_VERTICAL: wxLI_HORIZONTAL));
+	}
+};
+
+
+class FilePickerCtrl : public Control 
+{
+public:
+	template <class... Args>
+	FilePickerCtrl(wxcstr path, wxcstr msg, wxcstr wildcard, long exstyle, Args ...args) : Control(args...)
+	{
+		bindElem(new wxFilePickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wildcard, wxDefaultPosition, getStyleSize(), exstyle));
+	}
+
+	wxString getPath()
+	{
+		return ctrl().GetPath();
+	}
+
+	void setPath(wxcstr path)
+	{
+		ctrl().SetPath(path);
+	}
+
+	void setOnchange(pycref fn)
+	{
+		bindEvt(wxEVT_FILEPICKER_CHANGED, fn);
+	}
+
+	wxFilePickerCtrl& ctrl()
+	{
+		return *(wxFilePickerCtrl*)m_elem;
+	}
+};
+
+
+class DirPickerCtrl : public Control 
+{
+public:
+	template <class... Args>
+	DirPickerCtrl(wxcstr path, wxcstr msg, long exstyle, Args ...args) : Control(args...)
+	{
+		bindElem(new wxDirPickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wxDefaultPosition, getStyleSize(), exstyle));
+	}
+
+	wxString getPath()
+	{
+		return ctrl().GetPath();
+	}
+
+	void setPath(wxcstr path)
+	{
+		ctrl().SetPath(path);
+	}
+
+	void setOnchange(pycref fn)
+	{
+		bindEvt(wxEVT_DIRPICKER_CHANGED, fn);
+	}
+
+	wxDirPickerCtrl& ctrl()
+	{
+		return *(wxDirPickerCtrl*)m_elem;
 	}
 };
