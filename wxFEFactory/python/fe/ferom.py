@@ -1,4 +1,5 @@
 from gba.rom import RomRW
+from lib.lazy import lazy
 from . import config
 from .fedict import FeDict, CtrlCode
 import os
@@ -34,12 +35,16 @@ class FeRomRW(RomRW):
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
         self._dict = FeDict((self.name, huffstart & self.addrmask, huffsize), path, None, ctrltable)
 
+    @lazy
+    def text_table_start(self):
+        return self.read32(self.TEXT_TABLE_POINTER) + 4
+
     def getTextEntryPtr(self, i):
         """
         读取文本指针表项的值（地址）
         i从0开始
         """
-        return self.read32(self.read32(self.TEXT_TABLE_POINTER) + 4 + i * 4)
+        return self.read32(self.text_table_start + i * 4)
 
     def getTextEntryText(self, i):
         """
@@ -53,6 +58,12 @@ class FeRomRW(RomRW):
 
     def __next__(self):
         return self._file.read(1)[0]
+
+    def __getitem__(self, i):
+        pass
+
+    def __setitem__(self, i):
+        pass
 
     def readText(self, addr):
         if self._dict is None:

@@ -2,7 +2,6 @@
 #include "fe/graph.h"
 #include <wx/image.h>
 
-using namespace FEF;
 
 class FeImage: wxImage
 {
@@ -11,6 +10,8 @@ public:
 
 	void create(int width, int height, int tileStride, py::bytes tiles, py::bytes pal, py::iterable moveArgs)
 	{
+		using namespace FEF;
+
 		Destroy();
 		Create(width, height, false);
 		SetOption(wxIMAGE_OPTION_PNG_FORMAT, wxPNG_TYPE_PALETTE);
@@ -33,6 +34,8 @@ public:
 
 	py::bytes toTiles(int width, int height, int tileStride, size_t size, py::iterable moveArgs)
 	{
+		using namespace FEF;
+
 		OffsetTilesData tilesData;
 		Palette24 palette;
 		py::bytes buff(nullptr, size);
@@ -53,6 +56,8 @@ public:
 
 	void fillColor(py::iterable rects, int index)
 	{
+		using namespace FEF;
+
 		if (IsOk())
 		{
 			Color24 color;

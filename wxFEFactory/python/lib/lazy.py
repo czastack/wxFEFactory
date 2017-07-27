@@ -2,8 +2,8 @@ from functools import partial
 
 
 def lazy(func, type_=property):
+    name = '_' + func.__name__
     def _deco(self):
-        name = '_' + func.__name__
         val = getattr(self, name, None)
         if val is None:
             val = func(self)
@@ -13,8 +13,8 @@ def lazy(func, type_=property):
 
 
 def classlazy(func, type_=property):
+    name = '_' + func.__name__
     def _deco(self):
-        name = '_' + func.__name__
         val = getattr(self.__class__, name, None)
         if val is None:
             val = func(self)

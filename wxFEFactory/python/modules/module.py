@@ -1,32 +1,17 @@
 from mainframe import win, ui
 from application import app
 from lib.lazy import lazyclassmethod
+from lib.basescene import BaseScene
 from commonstyle import styles
 from . import modules
 import os
 import json
+import types
 
 DUMP_INDENT = app.getConfig('json_indent', 4)
 
-class BaseModule:
+class BaseModule(BaseScene):
     menu = None
-    INS = None
-
-    # 这些方法可以在实例中用self访问
-    from fefactory_api import alert, confirm, confirm_yes, YES, NO, CANCEL, longtext_dialog
-
-    def __init__(self):
-        # 同一模块打开的实例列表
-        ins = self.__class__.INS
-        if ins is None:
-            ins = self.__class__.INS = []
-        
-        try:
-            self.index = ins.index(None)
-            ins[self.index] = self
-        except ValueError:
-            self.index = len(ins)
-            ins.append(self)
 
     def attach(self):
         """模块加载完毕后调用，用于添加视图到主窗口"""
@@ -37,18 +22,10 @@ class BaseModule:
 
     def onclose(self):
         """标签页关闭回调，返回False会取消关闭"""
+        super().onclose()
+
         if self.menu:
             win.menubar.remove(self.menu)
-        ins = self.__class__.INS
-        ins[ins.index(self)] = None
-
-        i = len(ins)
-        while i:
-            i -= 1
-            if ins[i] is None:
-                ins.pop()
-            else:
-                break
 
         return True
 
@@ -69,11 +46,6 @@ class BaseModule:
         :return: 返回Menu对象
         """
         pass
-
-    def getFirstOtherInstance(self):
-        for it in self.__class__.INS:
-            if it is not None and it is not self:
-                return it
 
     def getTitle(self):
         """
@@ -108,7 +80,7 @@ class BaseModule:
     def loadJson(class_, name, defval={}):
         """从模块工作目录读取一个json文件"""
         try:
-            with open(os.path.join(class_.getDir(), name + '.json')) as file:
+            with open(os.path.join(class_.getDir(), name + '.json'), encoding="utf-8") as file:
                 ret = json.load(file)
         except Exception: #FileNotFoundError, json.decoder.JSONDecodeError
             ret = defval
@@ -120,8 +92,8 @@ class BaseModule:
         dir_ = class_.getDir()
         if not os.path.exists(dir_):
             os.mkdir(dir_)
-        with open(os.path.join(dir_, name + '.json'), 'w') as file:
-            json.dump(data, file, indent=indent)
+        with open(os.path.join(dir_, name + '.json'), 'w', encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=indent)
         print("保存成功: " + file.name)
 
 
@@ -214,4 +186,8 @@ class BaseListBoxModuel(BaseModule):
 
     def doAdd(self, text):
         """添加列表项"""
-        self.listbox.append([text])
+        if isinstance(text, types.GeneratorType):
+            text = tuple(text)
+        elif not isinstance(text, (list, tuple)):
+            text = (text,)
+        self.listbox.appendItems(text)

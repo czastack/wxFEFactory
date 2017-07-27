@@ -1,4 +1,3 @@
-#include <windows.h>
 #include "VbaHandler.h"
 #include "utils/utils.h"
 
@@ -9,7 +8,7 @@ bool VbaHandler::attach(){
 
 	if (bResult) {
 		VBA_PtrStruct table;
-		ProcessHandler::read(MAP_ADDR, sizeof(table), &table);
+		rawRead(MAP_ADDR, sizeof(table), &table);
 		for (int i = 0; i < lengthof(mPtrTable); ++i)
 		{
 			mPtrTable[i] = table[i].dwPointer;
@@ -24,7 +23,7 @@ BOOL CALLBACK VbaHandler::EnumVBAWindowProc(HWND hWnd, LPARAM lParam)
 	static CONST TCHAR szName[] = TEXT("VisualBoyAdvance");
 	static CONST DWORD cchNameLength = sizeof(szName) / sizeof(szName[0]);
 
-	static CONST DWORD cchNameSpeedLength = "VisualBoyAdvance-nnn%"_len;
+	static CONST DWORD cchNameSpeedLength = (DWORD)"VisualBoyAdvance-nnn%"_len;
 
 	TCHAR szWindowName[cchNameSpeedLength];
 	DWORD cchWindowName;

@@ -1,6 +1,7 @@
 #include "types.h"
+#include "gba.h"
 
-u32 GBA_MEMORY_SIZE[9] = {
+GBA_MEM_TABLE GBA_MEMORY_SIZE = {
 	0x00003FFF, //BIOS
 	0,		    //Const
 	0x0003FFFF, //WRAM

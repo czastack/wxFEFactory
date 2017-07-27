@@ -6,8 +6,8 @@
 #include "pyutils.h"
 #include "functions.h"
 #include "fefactory_api.h"
-#include "console.h"
-#include "dialogs.h"
+#include "layout/console.h"
+#include "layout/dialogs.h"
 
 void log_message(wxcstr text)
 {

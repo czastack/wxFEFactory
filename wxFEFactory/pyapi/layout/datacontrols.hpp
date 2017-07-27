@@ -335,7 +335,7 @@ public:
 		return wxNoneString;
 	}
 
-	friend void initLayout(py::module &m);
+	friend void init_layout(py::module &m);
 
 protected:
 	pyobj m_data; // py::dict

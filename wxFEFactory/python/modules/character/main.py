@@ -118,9 +118,13 @@ class Module(BaseListBoxModuel):
         count = 0xFF
         buff = reader.read(conf['addr'], count * conf['step'])
         ptr = self.form.ptr_from_bytes(buff, len(buff))
+        texts = []
         for i in range(count):
             item = self.form.struct_to_dict(ptr[i])
             name = reader.getTextEntryText(item['name'])
             item['name'] = name
             item['title'] = reader.getTextEntryText(item['title'])
-            self.doAdd(name, item)
+            self.data_map[name] = item
+            texts.append(name)
+
+        super().doAdd(texts)

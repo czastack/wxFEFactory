@@ -1,6 +1,7 @@
-from modules import modules
-from project import Project
 from application import app
+from project import Project
+from modules import modules
+from tools import tools
 from fe.ferom import FeRomRW
 from lib import exui
 import os
@@ -36,13 +37,15 @@ class MainFrame:
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
             with ui.Menu("视图"):
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
+            with ui.Menu("工具"):
+                ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.openTool)
             with ui.Menu("窗口"):
                 pass
 
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager(key="aui"):
                 ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
-                ui.AuiItem(ui.ListBox(options=modules, onselect=self.onNav), captionVisible=False)
+                ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(style=consoleStyle) as console:
                     self.consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
@@ -65,13 +68,25 @@ class MainFrame:
         win.book.setContextMenu(cm)
         fefactory_api.setConsoleElem(self.consol_input, self.consol_output)
 
+    @property
+    def module_names(self):
+        return (m[0] for m in modules)
+
+    @property
+    def tool_names(self):
+        return (f'{t[1]}: {t[0]}' for t in tools)
+
     def getModule(self, name):
         module = __import__('modules.' + name, fromlist=['main']).main
         return module.Module
+
+    def getTool(self, name):
+        module = __import__('tools.' + name, fromlist=['main']).main
+        return module.Tool
         
     def onNav(self, listbox):
         """左边导航切换模块"""
-        name = listbox.getValue()
+        name = modules[listbox.index][1]
         try:
             Module = self.getModule(name)
             m = Module()
@@ -148,10 +163,12 @@ class MainFrame:
 
     def readFromRom(self, m):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
+        if not rom:
+            return
         reader = FeRomRW(rom)
         if not reader.closed:
             print(reader.getRomTitle())
-            dialog = exui.ListDialog("选择执行导入的模块", style={'width': 640, 'height': 480}, listbox={'options': modules})
+            dialog = exui.ListDialog("选择执行导入的模块", style=dialogStyle, listbox={'choices': self.module_names})
             if dialog.showOnce():
                 for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
@@ -165,6 +182,18 @@ class MainFrame:
                         print('加载模块%s失败' % name)
                         traceback.print_exc()
 
+    def openTool(self, m):
+        dialog = exui.ChoiceDialog("选择工具", style=dialogStyle, combobox={'choices': self.tool_names})
+        dialog.combobox.setOnenter(self.onToolPanelEnter)
+        dialog.combobox.onselect = self.onToolOpen
+        dialog.showOnce()
+
+    def onToolPanelEnter(self, cb):
+        print(cb)
+
+    def onToolOpen(self, cb):
+        name = tools[cb.index][1]
+        print(self.getTool(name))
 
 winstyle = {
     'width': 1200,
@@ -195,6 +224,8 @@ consoleOutputStyle = {
     'flex': 1,
     'showPadding': '0 0 1 0',
 }
+
+dialogStyle = {'width': 640, 'height': 480}
 
 if __name__ == 'mainframe':
     frame = MainFrame()

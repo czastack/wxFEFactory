@@ -68,7 +68,7 @@ class FeDict(Dictionary):
         self.leafmap = leafmap
 
     def decodeHaffuman(self, data):
-        currentByte = 0
+        curbyte = 0
         bit = 0
         code = 0
         result = []
@@ -81,14 +81,14 @@ class FeDict(Dictionary):
             while node:
                 bit -= 1
                 if bit < 0:
-                    currentByte = next(it)
+                    curbyte = next(it)
                     bit = 7
 
-                if (currentByte & 1) is 0:
+                if (curbyte & 1) is 0:
                     node = node.left
                 else:
                     node = node.right
-                currentByte >>= 1
+                curbyte >>= 1
                 if node.isLeaf():
                     code = node.value
                     if (code & 0xFF00) is not 0:
@@ -109,7 +109,7 @@ class FeDict(Dictionary):
                 word, i = self.ctrltable[code].decode(data, i)
                 text.append(word)
             else:
-                print(f"Error: {code} can't decode")
+                print("Error: %04X can't decode" % code)
             i += 1
 
         return ''.join(text)
@@ -158,10 +158,30 @@ class FeDict(Dictionary):
 
         return result
 
+    def decode_one(self, data):
+        # TODO
+        char = 0
+        result = []
+        it = iter(data)
+        while True:
+            curbyte = next(it)
+            if curbyte is 0:
+                break
+            if char is 0:
+                if self.ctrltable and curbyte in self.ctrltable:
+                    word, i = self.ctrltable[curbyte].decode(data, i)
+                    text.append(word)
+            else:
+                char = char << 8 | byte
 
 if __name__ == '__main__' or __name__ == 'builtins':
-    workdir = 'E:/GBA/fe8/'
-    di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt') 
+    # workdir = 'E:/GBA/fe8/'
+    # di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt') 
     # print(di.encodeHaffuman('铁剑'))
-    print(di.decodeHaffuman(b'\x93\xe4\x93\xbf\x01'))
+    # print(di.decodeHaffuman(b'\x93\xe4\x93\xbf\x01'))
+
+    # import os
+    # di = FeDict((r'E:\GBA\rom\烈火之剑汉化版.gba', 0xbb5a80, 0x58ec), os.path.join(os.path.dirname(__file__), 'dict-fe7.txt'))
+    # print(di.decodeHaffuman(b'\xCD\x1B'))
+    pass
 

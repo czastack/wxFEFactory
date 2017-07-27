@@ -1,9 +1,9 @@
-#include "utils/HistorySet.hpp"
 #include <wx/textctrl.h>
-#include "pyutils.h"
+#include "../pyutils.h"
+#include "../functions.h"
 #include "console.h"
-#include "functions.h"
 #include "dialogs.h"
+#include "utils/HistorySet.hpp"
 #include <iostream>
 #include <memory>
 using  namespace std;

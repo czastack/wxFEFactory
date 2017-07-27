@@ -1,6 +1,6 @@
 romcode = {
-	"AE7J": "fe6",
-	"AFEJ": "fe7",
+	"AFEJ": "fe6",
+	"AE7J": "fe7",
 	"BE8J": "fe8"
 }
 

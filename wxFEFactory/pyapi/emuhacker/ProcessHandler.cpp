@@ -1,6 +1,5 @@
-#include <windows.h>
 #include "ProcessHandler.h"
-
+#include "types.h"
 
 ProcessHandler::ProcessHandler():mProcess(nullptr)
 {
@@ -38,7 +37,7 @@ void ProcessHandler::close(){
 	}
 }
 
-bool ProcessHandler::attachByWindowName(LPCTSTR className, LPCTSTR windowName){
+bool ProcessHandler::attachByWindowName(CSTR className, CSTR windowName){
 	return attachByWindowHandle(FindWindow(className, windowName));
 }
 
@@ -65,51 +64,74 @@ bool ProcessHandler::isValid()
 	return false;
 }
 
-bool ProcessHandler::read(u32 address, size_t size, LPVOID buffer){
+bool ProcessHandler::rawRead(addr_t addr, size_t size, LPVOID buffer)
+{
+	return ReadProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
+}
+
+bool ProcessHandler::rawWrite(addr_t addr, size_t size, LPCVOID buffer)
+{
+	return WriteProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
+}
+
+bool ProcessHandler::read(addr_t addr, size_t size, LPVOID buffer){
 	if(isValid())
 	{
-		return ReadProcessMemory(mProcess, (LPCVOID)address, buffer, size, NULL) != 0;
+		addr = prepareAddr(addr, size);
+		if (addr) {
+			return rawRead(addr, size, buffer);
+		}
 	}
 	return false;
 }
 
-bool ProcessHandler::write(u32 address, size_t size, LPCVOID buffer){
+bool ProcessHandler::write(addr_t addr, size_t size, LPCVOID buffer){
 	if(isValid())
 	{
-		return WriteProcessMemory(mProcess, (LPVOID)address, buffer, size, NULL) != 0;
+		addr = prepareAddr(addr, size);
+		if (addr) {
+			return rawWrite(addr, size, buffer);
+		}
 	}
 	return false;
 }
 
-bool ProcessHandler::ptrRead(u32 address, u32 offset, size_t size, LPVOID buffer){
-	if(read(address, sizeof(address), &address))
-		return read(address + offset, size, buffer);
+bool ProcessHandler::add(addr_t addr, int value)
+{
+	u32 origin = read<u32>(addr);
+	origin += value;
+	return write(addr, origin);
+}
+
+bool ProcessHandler::ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer){
+	if(read(addr, sizeof(addr), &addr))
+		return read(addr + offset, size, buffer);
 	return false;
 }
 
-bool ProcessHandler::ptrWrite(u32 address, u32 offset, size_t size, LPCVOID buffer){
-	if(read(address, sizeof(address), &address))
-		return write(address + offset, size, buffer);
+bool ProcessHandler::ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer){
+	if(read(addr, sizeof(addr), &addr))
+		return write(addr + offset, size, buffer);
 	return false;
 }
 
-bool ProcessHandler::readLastPtr(const PtrEntry &entry, u32 *addrPtr){
-	u32 addr = entry.baseAddr;
+bool ProcessHandler::readLastPtr(const PtrEntry &entry, addr_t *addrPtr){
+	addr_t addr = entry.baseAddr;
 	for (int i = 0; i < entry.ptrLevel - 1; i++){
 		if(!read(addr, sizeof(addr), &addr))
 			return false;
-		addr += entry.offsets[i];
+		addr = addr + entry.offsets[i];
 	}
 	*addrPtr = addr;
 	return true;
 }
 
 bool ProcessHandler::ptrsRead(const PtrEntry &entry, size_t size, LPVOID buffer){
-	u32 addr;
+	addr_t addr;
 	return readLastPtr(entry, &addr) && ptrRead(addr, entry.lastOffset(), size, buffer);
 }
 
 bool ProcessHandler::ptrsWrite(const PtrEntry &entry, size_t size, LPCVOID buffer){
-	u32 addr;
+	addr_t addr;
 	return readLastPtr(entry, &addr) && ptrWrite(addr, entry.lastOffset(), size, buffer);
 }

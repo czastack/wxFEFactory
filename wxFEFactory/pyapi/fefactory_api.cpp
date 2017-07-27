@@ -3,8 +3,9 @@
 #include "fefactory_api.h"
 #include "myapp.h"
 #include "functions.h"
-#include "console.h"
-#include "layout.hpp"
+#include "layout/console.h"
+#include "layout/layout.h"
+#include "emuhacker/emuhacker.h"
 #include "feimg.hpp"
 
 py::module fefactory;
@@ -38,12 +39,6 @@ void reloadFefactory()
 	}
 }
 
-
-void setConsoleElem(TextInput &input, TextInput &output)
-{
-	pyConsole.setConsoleElem((wxTextCtrl*)input.ptr(), (wxTextCtrl*)output.ptr());
-}
-
 void setOnAppExit(pycref fn)
 {
 	onAppExit = fn;
@@ -63,7 +58,6 @@ PyObject *fefactory_api() {
 		.def("longtext_dialog", longtext_dialog, "title"_a, "defaultValue"_a=wxEmptyString, "readonly"_a=false, "small"_a=false)
 		.def("choose_file", choose_file, "msg"_a, "dir"_a=None, "file"_a=None, "wildcard"_a=None, "mustExist"_a=false)
 		.def("choose_dir", choose_dir, "msg"_a, "defaultPath"_a=None, "mustExist"_a=false)
-		.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
 		.def("setOnAppExit", setOnAppExit)
 		.def("exec_file", &exec_file)
 		.def("get_clipboard", get_clipboard)
@@ -82,7 +76,8 @@ PyObject *fefactory_api() {
 		.def("savePng", &FeImage::savePng, "path"_a)
 		.def("view", &FeImage::view, "title"_a);
 
-	initLayout(m);
+	init_layout(m);
+	init_emuhacker(m);
 	return m.ptr();
 }
 

@@ -1,0 +1,32 @@
+
+
+class BaseScene:
+    INS = None
+
+    # 这些方法可以在实例中用self访问
+    from fefactory_api import alert, confirm, confirm_yes, YES, NO, CANCEL, longtext_dialog
+
+    def __init__(self):
+        # 同一类实例列表
+        ins = self.__class__.INS
+        if ins is None:
+            ins = self.__class__.INS = []
+        
+        try:
+            self.index = ins.index(None)
+            ins[self.index] = self
+        except ValueError:
+            self.index = len(ins)
+            ins.append(self)
+
+    def onclose(self):
+        ins = self.__class__.INS
+        ins[ins.index(self)] = None
+
+        i = len(ins)
+        while i:
+            i -= 1
+            if ins[i] is None:
+                ins.pop()
+            else:
+                break

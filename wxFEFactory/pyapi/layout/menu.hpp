@@ -1,6 +1,6 @@
 #pragma once
-#include "pyutils.h"
-#include "fefactory_api.h"
+#include "../pyutils.h"
+#include "../fefactory_api.h"
 #include "myapp.h"
 
 
@@ -14,7 +14,7 @@ public:
 		return MENUS.empty() ? nullptr : MENUS.back();
 	}
 
-	friend void initMenu(py::module &m);
+	friend void init_menu(py::module &m);
 };
 
 class MenuHolder : public BaseMenu
@@ -265,7 +265,7 @@ public:
 		return false;
 	}
 
-	friend void initMenu(py::module &m);
+	friend void init_menu(py::module &m);
 
 private:
 	wxMenuItem *m_ptr;
@@ -290,7 +290,7 @@ void Menu::remove(MenuItem &item)
 }
 
 
-void initMenu(py::module &m)
+void init_menu(py::module &m)
 {
 	using namespace py::literals;
 

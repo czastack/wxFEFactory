@@ -1,11 +1,22 @@
+#include <wx/wx.h>
+#include "../pyutils.h"
+#include "../functions.h"
+#include "layout.h"
 #include "menu.hpp"
 #include "layouts.hpp"
 #include "controls.hpp"
 #include "datacontrols.hpp"
 #include "aui.hpp"
 #include "bars.hpp"
+#include "console.h"
 
-void initLayout(py::module &m)
+void setConsoleElem(TextInput &input, TextInput &output)
+{
+	pyConsole.setConsoleElem((wxTextCtrl*)input.ptr(), (wxTextCtrl*)output.ptr());
+}
+
+
+void init_layout(py::module &m)
 {
 	using namespace py::literals;
 
@@ -21,8 +32,11 @@ void initLayout(py::module &m)
 	auto layout_init = py::init<pyobj, pyobj, pyobj, pyobj>();
 
 	py::module layout = m.def_submodule("layout");
+	init_menu(layout);
 	setattr(m, "ui", layout);
-	initMenu(layout);
+
+	// 为了方便，setConsoleElem 挂在外层模块，但在这里定义
+	m.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a);
 
 	py::class_<View>(layout, "View")
 		.def("setContextMenu", &View::setContextMenu)
@@ -107,7 +121,7 @@ void initLayout(py::module &m)
 		.def("setLabel", &CheckBox::setLabel)
 		.def("trigger", &CheckBox::trigger)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked)
-		.def_readwrite("onchange", &CheckBox::m_listener);
+		.def_readwrite("onchange", &CheckBox::m_change);
 
 	py::class_t<Text, Control>(layout, "Text")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(), label, key, className, style)
@@ -118,6 +132,13 @@ void initLayout(py::module &m)
 			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, extStyle, key, className, style)
 		.def_property("value", &TextInput::getValue, &TextInput::setValue);
 
+	py::class_t<SearchCtrl, Control>(layout, "SearchCtrl")
+		.def_init(py::init<wxcstr, bool, bool, int, pyobj, pyobj, pyobj>(),
+			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, extStyle, key, className, style)
+		.def("setOnsubmit", &SearchCtrl::setOnsubmit)
+		.def("setOncancel", &SearchCtrl::setOncancel)
+		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
+
 	py::class_t<SpinCtrl, Control>(layout, "SpinCtrl")
 		.def_init(py::init<wxcstr, int, int, int, pyobj, pyobj, pyobj>(),
 			"value"_a=wxEmptyString, "min"_a, "max"_a, "initial"_a, key, className, style)
@@ -125,43 +146,41 @@ void initLayout(py::module &m)
 		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
 		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);
 
-	auto options = "options"_a=None,
-		values = "values"_a=None, 
+	auto choices = "choices"_a=None,
 		onselect = "onselect"_a=None;
 
 	py::class_<BaseControlWithItems, Control>(layout, "BaseControlWithItems")
 		.def("getText", &BaseControlWithItems::getText, "pos"_a=-1)
 		.def("getTexts", &BaseControlWithItems::getTexts)
 		.def("setText", &BaseControlWithItems::setText, "text"_a, "pos"_a=-1)
-		.def("getValue", &BaseControlWithItems::getValue, "i"_a=None)
-		.def("setValue", &BaseControlWithItems::setValue)
 		.def("getSelection", &BaseControlWithItems::getSelection)
 		.def("setSelection", &BaseControlWithItems::setSelection, "pos"_a, "handle"_a=false)
 		.def("getCount", &BaseControlWithItems::getCount)
 		.def("__getitem__", &BaseControlWithItems::__getitem__)
 		.def("__setitem__", &BaseControlWithItems::__setitem__)
 		.def("__len__", &BaseControlWithItems::getCount)
-		.def_readwrite("onselect", &BaseControlWithItems::m_listener)
+		.def_readwrite("onselect", &BaseControlWithItems::m_onselect)
 		.def_property("text", &BaseControlWithItems::getText1, &BaseControlWithItems::setText1)
-		.def_property("value", &BaseControlWithItems::getValue1, &BaseControlWithItems::setValue1)
 		.def_property_readonly("index", &BaseControlWithItems::getSelection)
 		.def_property_readonly("count", &BaseControlWithItems::getCount);
 
 	py::class_<ControlWithItems, BaseControlWithItems>(layout, "ControlWithItems")
-		.def("setItems", &ControlWithItems::setItems, "options"_a, "values"_a=None)
-		.def("append", &ControlWithItems::append, "options"_a, "values"_a=None)
-		.def("insert", &ControlWithItems::insert, "options"_a, "values"_a = None, "pos"_a)
+		.def("append", &ControlWithItems::append, "text"_a)
+		.def("insert", &ControlWithItems::insert, "text"_a, "pos"_a)
+		.def("appendItems", &ControlWithItems::appendItems, "choices"_a)
+		.def("insertItems", &ControlWithItems::insertItems, "choices"_a, "pos"_a)
+		.def("setItems", &ControlWithItems::setItems, "choices"_a)
 		.def("__delitem__", &ControlWithItems::pop)
 		.def("pop", &ControlWithItems::pop, "pos"_a)
 		.def("clear", &ControlWithItems::clear);
 
 	py::class_t<ListBox, ControlWithItems>(layout, "ListBox")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
-			options, values, onselect, key, className, style);
+		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
+			choices, onselect, key, className, style);
 
 	py::class_t<CheckListBox, ListBox>(layout, "CheckListBox")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
-			options, values, onselect, key, className, style)
+		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
+			choices, onselect, key, className, style)
 		.def("getCheckedItems", &CheckListBox::getCheckedItems)
 		.def("setCheckedItems", &CheckListBox::setCheckedItems)
 		.def("checkAll", &CheckListBox::checkAll, "checked"_a=true)
@@ -169,17 +188,23 @@ void initLayout(py::module &m)
 
 	py::class_t<RearrangeList, CheckListBox>(layout, "RearrangeList")
 		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
-			options, values, onselect, key, className, style)
+			choices, "order"_a=py::list(), onselect, key, className, style)
 		.def("moveUp", &RearrangeList::moveUp)
 		.def("moveDown", &RearrangeList::moveDown);
 
+	py::class_t<Choice, ControlWithItems>(layout, "Choice")
+		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
+			choices, onselect, key, className, style);
+
 	py::class_t<ComboBox, ControlWithItems>(layout, "ComboBox")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
-			type, options, values, onselect, key, className, style);
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj>(),
+			type, choices, onselect, key, className, style)
+		.def("setOnenter", &ComboBox::setOnenter, "onenter"_a)
+		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, BaseControlWithItems>(layout, "RadioBox")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj, pyobj>(),
-			label, options, values, onselect, key, className, style);
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj, pyobj>(),
+			label, choices, onselect, key, className, style);
 
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")
 		.def(py::init<pyobj>(), key)

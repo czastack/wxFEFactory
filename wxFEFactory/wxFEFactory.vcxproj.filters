@@ -2,21 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="myapp.cpp" />
-    <ClCompile Include="ProcessHandler\NogbaHandler.cpp">
-      <Filter>ProcessHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessHandler\ProcessHandler.cpp">
-      <Filter>ProcessHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessHandler\VbaHandler.cpp">
-      <Filter>ProcessHandler</Filter>
-    </ClCompile>
-    <ClCompile Include="gba\gba.cpp">
-      <Filter>gba</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessHandler\GbaEmuHandler.cpp">
-      <Filter>ProcessHandler</Filter>
-    </ClCompile>
     <ClCompile Include="fe\graph.cpp">
       <Filter>fe</Filter>
     </ClCompile>
@@ -29,11 +14,47 @@
     <ClCompile Include="pyapi\functions.cpp">
       <Filter>pyapi</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\console.cpp">
+    <ClCompile Include="pyapi\layout\console.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\dialogs.cpp">
-      <Filter>pyapi</Filter>
+    <ClCompile Include="pyapi\layout\dialogs.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\nds\DeSmuMEHandler.cpp">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\gba\gba.cpp">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\emuhacker.cpp">
+      <Filter>pyapi\emuhacker</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\gba\GbaEmuHandler.cpp">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\nds\nds.cpp">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\nds\NdsEmuHandler.cpp">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\gba\VbaHandler.cpp">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp">
+      <Filter>pyapi\emuhacker</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\nds\NogbaNdsHandler.cpp">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\emuhacker\gba\NogbaHandler.cpp">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\layout.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="wxpatch.cpp">
+      <Filter>wx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,21 +68,6 @@
     </ClInclude>
     <ClInclude Include="utils\utils.h">
       <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessHandler\NogbaHandler.h">
-      <Filter>ProcessHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessHandler\ProcessHandler.h">
-      <Filter>ProcessHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessHandler\VbaHandler.h">
-      <Filter>ProcessHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="gba\gba.h">
-      <Filter>gba</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessHandler\GbaEmuHandler.h">
-      <Filter>ProcessHandler</Filter>
     </ClInclude>
     <ClInclude Include="fe\graph.h">
       <Filter>fe</Filter>
@@ -81,52 +87,76 @@
     <ClInclude Include="utils\color.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\menu.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\aui.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layoutbase.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\controls.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layouts.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\datacontrols.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\functions.h">
       <Filter>pyapi</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\console.h">
+    <ClInclude Include="pyapi\layout\aui.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\dialogs.h">
-      <Filter>pyapi</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\bars.hpp">
+    <ClInclude Include="pyapi\layout\bars.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
-    <ClInclude Include="wxpatch.hpp">
+    <ClInclude Include="pyapi\layout\console.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\controls.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\datacontrols.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\dialogs.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\nds\DeSmuMEHandler.h">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\gba\gba.h">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\emuhacker.h">
+      <Filter>pyapi\emuhacker</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\gba\GbaEmuHandler.h">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\layoutbase.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\layouts.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\menu.hpp">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\nds\nds.h">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\nds\NdsEmuHandler.h">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\gba\VbaHandler.h">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\ProcessHandler.h">
+      <Filter>pyapi\emuhacker</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\nds\NogbaNdsHandler.h">
+      <Filter>pyapi\emuhacker\nds</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\emuhacker\gba\NogbaHandler.h">
+      <Filter>pyapi\emuhacker\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\layout.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="wxpatch.h">
       <Filter>wx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">
       <UniqueIdentifier>{532fc647-4738-4158-b76a-dfebfc7d34ef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ProcessHandler">
-      <UniqueIdentifier>{45f4df9e-41f6-4daf-a6be-e703d6c859b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="gba">
-      <UniqueIdentifier>{c9903304-187c-484b-ab6c-35b2f57c07d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="fe">
       <UniqueIdentifier>{825aa769-8bb2-47f5-8ee4-b97319bb8f24}</UniqueIdentifier>
@@ -139,6 +169,15 @@
     </Filter>
     <Filter Include="wx">
       <UniqueIdentifier>{b58b684b-307b-4b12-8dcb-0dab4b9021d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\emuhacker">
+      <UniqueIdentifier>{45f4df9e-41f6-4daf-a6be-e703d6c859b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\emuhacker\gba">
+      <UniqueIdentifier>{e048cae9-4b3e-42e6-873e-36711373f8e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\emuhacker\nds">
+      <UniqueIdentifier>{715e84aa-c6b5-4cc8-a2a7-81f7b070b13a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

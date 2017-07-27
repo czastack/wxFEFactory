@@ -1,9 +1,10 @@
 #pragma once
-#include "pyutils.h"
-#include "fefactory_api.h"
-#include "functions.h"
+#include "../pyutils.h"
+#include "../fefactory_api.h"
+#include "../functions.h"
 #include "utils/color.h"
 #include "myapp.h"
+#include "menu.hpp"
 
 
 #define STYLE_WIDTH          wxT("width")
@@ -525,7 +526,7 @@ public:
 		return m_elem;
 	}
 
-	friend void initLayout(py::module &m);
+	friend void init_layout(py::module &m);
 
 protected:
 	wxWindow *m_elem;
@@ -676,7 +677,7 @@ public:
 		m_children.attr("remove")(child);
 	}
 
-	friend void initLayout(py::module &m);
+	friend void init_layout(py::module &m);
 protected:
 	py::list m_children;
 	py::dict m_named_children;

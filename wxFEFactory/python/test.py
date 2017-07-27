@@ -18,7 +18,7 @@ btnstyle = {
     'padding': 10,
     'showPadding': '1',
     'fontSize': 20,
-    'verticalAlign': 'center',
+    'verticalAlign': 'middle',
 }
 
 styles = {
@@ -88,8 +88,8 @@ with Window("测试窗口", style=winstyle, styles=styles, menuBar=m) as win:
     #     RadioBox(label="Radios", options=['选项1', '选项2'], values=[11,22], onselect=onselect, key="select")
 
     with GridLayout(cols=2, key="gl"):
-        CheckBox(label="Check me", onchange=onchange, alignRight=True, key="cb")
+        Choice(choices=['1','2'])
         Button(label="按钮", onclick=onclick, key="btn")
         Text(label="标签", key="label")
-        TextInput(value="123", className="input", key="input")
+        SearchCtrl(value="123", className="input", key="input")
 
