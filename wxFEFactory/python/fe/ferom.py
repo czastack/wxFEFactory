@@ -72,7 +72,16 @@ class FeRomRW(RomRW):
     def __setitem__(self, i):
         pass
 
-    def readText(self, addr):
+    def readText(self, addr, codebuff=None):
         if self._dict is None:
             self.openDict()
-        return self._dict.decodeHaffuman(self.pos(addr))
+        if addr >> 28 is 8:
+            # 打过补丁的处理
+            text = self._dict.decode_it(self.pos(addr), codebuff)
+        else:
+            code_list = [] if codebuff is not None else None
+            text = self._dict.decodeHaffuman(self.pos(addr), code_list)
+            if codebuff is not None:
+                codebuff.extend(self._dict.code_list_to_bytes(code_list))
+
+        return text

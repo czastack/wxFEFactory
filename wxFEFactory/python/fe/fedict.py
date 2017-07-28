@@ -163,22 +163,6 @@ class FeDict(Dictionary):
 
         return result
 
-    def decode_one(self, data):
-        # TODO
-        char = 0
-        result = []
-        it = iter(data)
-        while True:
-            curbyte = next(it)
-            if curbyte is 0:
-                break
-            if char is 0:
-                if self.ctrltable and curbyte in self.ctrltable:
-                    word, i = self.ctrltable[curbyte].decode(data, i)
-                    text.append(word)
-            else:
-                char = char << 8 | byte
-
     @staticmethod
     def code_list_to_bytes(codes):
         result = bytearray(len(codes) * 2)

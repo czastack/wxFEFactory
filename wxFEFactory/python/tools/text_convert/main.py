@@ -36,8 +36,10 @@ class Tool(BaseTool):
 
         self.win = win
         self.rom_picker.setOnchange(self.onRomChange)
+        self.dict_picker.setOnchange(self.onDictChange)
         self.text_view.setOnEnter(self.onConvertText)
         self.code_view.setOnEnter(self.onConvertCode)
+        self.dict_picker.enabled = False
 
     def onclose(self, m=None):
         super().onclose()
@@ -46,8 +48,14 @@ class Tool(BaseTool):
     def onRomChange(self, picker):
         self.reader = FeRomRW(picker.path)
         if not self.reader.closed:
+            self.dict_picker.enabled = True
             self.reader.openDict()
             self.dict_picker.path = self.reader.dict_path
+        else:
+            self.dict_picker.enabled = False
+
+    def onDictChange(self, picker):
+        self.reader.openDict(picker.path)
 
     def onConvertText(self, tv):
         di = self.reader._dict

@@ -531,6 +531,7 @@ public:
 			el.Check(i, !el.IsChecked(i));
 		}
 	}
+
 	wxCheckListBox& ctrl()
 	{
 		return *(wxCheckListBox*)m_elem;
