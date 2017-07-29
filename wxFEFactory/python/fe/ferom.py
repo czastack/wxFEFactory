@@ -73,6 +73,11 @@ class FeRomRW(RomRW):
         pass
 
     def readText(self, addr, codebuff=None):
+        """
+        从rom中读取文本，遇结束符00结束
+        :param codebuff: 用于返回原始字码 byte数组
+        """
+
         if self._dict is None:
             self.openDict()
         if addr >> 28 is 8:

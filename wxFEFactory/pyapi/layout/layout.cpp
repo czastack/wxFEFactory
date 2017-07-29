@@ -27,6 +27,7 @@ void init_layout(py::module &m)
 	auto label = "label"_a;
 	auto type = "type"_a=wxEmptyString;
 	auto exstyle = "exstyle"_a=0;
+	auto n = "n"_a;
 
 	auto view_init = py::init<pyobj, pyobj, pyobj>();
 	auto layout_init = py::init<pyobj, pyobj, pyobj, pyobj>();
@@ -114,6 +115,18 @@ void init_layout(py::module &m)
 	py::class_t<StaticBox, Layout>(layout, "StaticBox")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, styles, key, className, style);
+
+	py::class_t<Notebook, Layout>(layout, "Notebook")
+		.def_init(layout_init, styles, key, className, style)
+		.def("getPage", &Notebook::getPage)
+		.def("getPageCount", &Notebook::getPageCount)
+		.def("setPageText", &Notebook::setPageText)
+		.def("getPageText", &Notebook::getPageText)
+		.def_property("index", &Notebook::getSelection, &Notebook::setSelection);
+
+
+
+	// controls
 
 	py::class_t<Button, Control>(layout, "Button")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
@@ -248,6 +261,11 @@ void init_layout(py::module &m)
 	#undef ATTR_FLP_STYLE
 
 
+	auto pyItem = py::class_t<Item>(layout, "Item")
+		.def_init(py::init<View&, py::kwargs>(), "view"_a)
+		.def("getView", &AuiItem::operator View&);
+
+
 	// aui
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")
 		.def(py::init<pyobj>(), key)
@@ -255,14 +273,14 @@ void init_layout(py::module &m)
 		.def("hidePane", &AuiManager::hidePane)
 		.def("togglePane", &AuiManager::togglePane);
 
-	py::class_t<AuiItem>(layout, "AuiItem")
-		.def_init(py::init<View&, py::kwargs>(), "view"_a)
-		.def("getView", &AuiItem::operator View&);
+	setattr(layout, "AuiItem", pyItem);
 
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
-		.def_init(layout_init, styles, key, className, style);
+		.def_init(layout_init, styles, key, className, style)
+		.def("getPage", &AuiNotebook::getPage);
 
-	auto n = "n"_a;
+
+	// bars
 
 	py::class_t<ToolBar, Control>(layout, "ToolBar")
 		.def_init(view_init, key, className, style)
@@ -281,6 +299,8 @@ void init_layout(py::module &m)
 		.def("popStatusText", &StatusBar::popStatusText, n)
 		.def("pushStatusText", &StatusBar::pushStatusText, "text"_a, n);
 
+
+	// datacontrols
 
 	auto &title_arg = "title"_a;
 	auto &name_arg = "name"_a;

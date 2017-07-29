@@ -4,7 +4,8 @@
 #include "bars.hpp"
 #include <wx/sizer.h>
 #include <wx/panel.h>
-#include "wx/splitter.h"
+#include <wx/splitter.h>
+#include <wx/notebook.h>
 
 
 class BaseFrame : public Layout
@@ -421,6 +422,68 @@ public:
 	StaticBox(wxcstr label, Args ...args) : Layout(args...)
 	{
 		bindElem(new wxStaticBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+	}
+};
+
+
+class Notebook : public Layout
+{
+public:
+	template <class... Args>
+	Notebook(Args ...args) : Layout(args...)
+	{
+		bindElem(new wxNotebook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
+	}
+
+	void doAdd(View &child) override
+	{
+		Item *item = (Item*)child.ptr()->GetClientData();
+		if (isPyDict(item->m_kwargs))
+		{
+			// Ìæ»»»ØÔ­Ö¸Õë
+			child.ptr()->SetClientData(&child);
+
+			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
+			ctrl().AddPage(child, caption);
+
+			py::cast(item).dec_ref();
+		}
+		else
+		{
+			log_message(wxString::Format("Child of %s must be Item.", "Notebook"));
+		}
+	}
+
+	size_t getPageCount() const {
+		return ctrl().GetPageCount();
+	}
+
+	int getSelection() {
+		return ctrl().GetSelection();
+	}
+
+	int setSelection(int n) {
+		return ctrl().SetSelection(n);
+	}
+
+	bool setPageText(size_t n, wxcstr text)
+	{
+		return ctrl().SetPageText(n, text);
+	}
+
+	wxString getPageText(size_t n) const
+	{
+		return ctrl().GetPageText(n);
+	}
+
+	View* getPage(int n)
+	{
+		return (View*)ctrl().GetPage(n)->GetClientData();
+	}
+
+	wxNotebook& ctrl() const
+	{
+		return *(wxNotebook*)m_elem;
 	}
 };
 

@@ -721,3 +721,28 @@ wxWindow* View::safeActiveWindow()
 	Layout *layout = getActiveLayout();
 	return layout ? layout->ptr() : wxGetApp().GetTopWindow();
 }
+
+
+
+class Item
+{
+public:
+	Item(View &view, py::kwargs &kwargs) :
+		m_view(view), m_kwargs(kwargs)
+	{
+	}
+
+	void __init()
+	{
+		m_view.ptr()->SetClientData(this);
+		py::cast(this).inc_ref();
+	}
+
+	operator View &()
+	{
+		return m_view;
+	}
+
+	pyobj m_kwargs;
+	View &m_view;
+};

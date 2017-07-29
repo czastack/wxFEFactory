@@ -2,27 +2,7 @@
 #include "layoutbase.hpp"
 #include <wx/aui/aui.h>
 
-struct AuiItem
-{
-	AuiItem(View &view, py::kwargs kwargs) :
-		m_view(view), m_kwargs(kwargs)
-	{
-	}
-
-	void __init()
-	{
-		m_view.ptr()->SetClientData(this);
-		py::cast(this).inc_ref();
-	}
-
-	operator View &()
-	{
-		return m_view;
-	}
-
-	pyobj m_kwargs;
-	View &m_view;
-};
+using AuiItem = Item;
 
 
 class AuiManager : public Layout
