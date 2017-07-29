@@ -68,6 +68,7 @@ class MainFrame:
         self.console = console
         win.book.setContextMenu(cm)
         fefactory_api.setConsoleElem(self.consol_input, self.consol_output)
+        self.console.setOnFileDrop(self.onConsoleFileDrop)
 
     @property
     def module_names(self):
@@ -161,6 +162,17 @@ class MainFrame:
 
     def consolInputMultiRun(self, btn):
         exec(self.consol_input_multi.value, vars(__main__))
+
+    def onConsoleFileDrop(self, files):
+        # scope = __main__.__dict__
+        scope = {'__builtins__': __main__.__builtins__}
+        for file in files:
+            if file.endswith('.py'):
+                print('执行脚本: ' + file)
+                fefactory_api.exec_file(file, scope)
+
+        if scope != __main__.__dict__:
+            __main__.last_scope = scope
 
     def readFromRom(self, m):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')

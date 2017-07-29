@@ -175,6 +175,7 @@
     <ClInclude Include="pyapi\fefactory_api.h" />
     <ClInclude Include="pyapi\feimg.hpp" />
     <ClInclude Include="pyapi\functions.h" />
+    <ClInclude Include="pyapi\layout\drop.hpp" />
     <ClInclude Include="pyapi\layout\layoutbase.hpp" />
     <ClInclude Include="pyapi\layout\layouts.hpp" />
     <ClInclude Include="pyapi\layout\layout.h" />

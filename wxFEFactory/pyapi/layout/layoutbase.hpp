@@ -5,6 +5,7 @@
 #include "utils/color.h"
 #include "myapp.h"
 #include "menu.hpp"
+#include "drop.hpp"
 
 
 #define STYLE_WIDTH          wxT("width")
@@ -229,6 +230,11 @@ public:
 				pyCall(fn, this, &event);
 			});
 		}
+	}
+
+	void setOnFileDrop(pycref ondrop)
+	{
+		m_elem->SetDropTarget(new FileDropListener(ondrop));
 	}
 
 	static int parseColor(wxcstr color, uint defval = 0)

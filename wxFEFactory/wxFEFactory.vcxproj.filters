@@ -50,11 +50,11 @@
     <ClCompile Include="pyapi\emuhacker\gba\NogbaHandler.cpp">
       <Filter>pyapi\emuhacker\gba</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\layout.cpp">
-      <Filter>pyapi\layout</Filter>
-    </ClCompile>
     <ClCompile Include="wxpatch.cpp">
       <Filter>wx</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\layout.cpp">
+      <Filter>pyapi\layout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +152,9 @@
     </ClInclude>
     <ClInclude Include="wxpatch.h">
       <Filter>wx</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\drop.hpp">
+      <Filter>pyapi\layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
