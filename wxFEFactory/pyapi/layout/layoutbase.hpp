@@ -129,6 +129,16 @@ public:
 		return ptr()->Enable(enabled);
 	}
 
+	wxString getLabel()
+	{
+		return m_elem->GetLabel();
+	}
+
+	void setLabel(wxcstr label)
+	{
+		m_elem->SetLabel(label);
+	}
+
 	View& show(bool show_)
 	{
 		ptr()->Show(show_);
@@ -178,11 +188,7 @@ public:
 		return m_key;
 	}
 
-	Layout* getParent()
-	{
-		auto elemParent = m_elem->GetParent();
-		return elemParent ? (Layout*)elemParent->GetClientData() : nullptr;
-	}
+	Layout* getParent();
 
 	operator wxWindow*()
 	{
@@ -683,12 +689,48 @@ public:
 		m_children.attr("remove")(child);
 	}
 
+	View* findFocus()
+	{
+		auto pChild = m_elem->FindFocus();
+		return pChild ? (View*)pChild->GetClientData() : nullptr;
+	}
+
 	friend void init_layout(py::module &m);
 protected:
 	py::list m_children;
 	py::dict m_named_children;
 	pyobj m_styles;
 	wxVector<PyObject*> *tmp_styles_list;
+};
+
+
+class Item
+{
+public:
+	Item(View &view, py::kwargs &kwargs) :
+		m_view(view), m_kwargs(kwargs)
+	{
+	}
+
+	void __init()
+	{
+		m_view.ptr()->SetClientData(this);
+		py::cast(this).inc_ref();
+	}
+
+	View* getView()
+	{
+		return &m_view;
+	}
+
+	static bool isInstance(void *ptr)
+	{
+
+		return isPyDict(((Item*)ptr)->m_kwargs) && ((Item*)ptr)->m_view.ptr();
+	}
+
+	pyobj m_kwargs;
+	View &m_view;
 };
 
 
@@ -728,27 +770,16 @@ wxWindow* View::safeActiveWindow()
 	return layout ? layout->ptr() : wxGetApp().GetTopWindow();
 }
 
-
-
-class Item
+Layout* View::getParent()
 {
-public:
-	Item(View &view, py::kwargs &kwargs) :
-		m_view(view), m_kwargs(kwargs)
+	auto elemParent = m_elem->GetParent();
+	void *parent = elemParent ? (Layout*)elemParent->GetClientData() : nullptr;
+	if (parent)
 	{
+		if (Item::isInstance(parent))
+		{
+			parent = ((Item*)parent)->getView();
+		}
 	}
-
-	void __init()
-	{
-		m_view.ptr()->SetClientData(this);
-		py::cast(this).inc_ref();
-	}
-
-	operator View &()
-	{
-		return m_view;
-	}
-
-	pyobj m_kwargs;
-	View &m_view;
-};
+	return (Layout*)parent;
+}

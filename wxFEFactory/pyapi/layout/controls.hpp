@@ -24,10 +24,6 @@ public:
 		bindEvt(wxEVT_BUTTON, fn);
 	}
 
-	void setLabel(wxcstr label)
-	{
-		ctrl().SetLabel(label);
-	}
 	wxButton& ctrl()
 	{
 		return *(wxButton*)m_elem;
@@ -72,11 +68,6 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void setLabel(wxcstr label)
-	{
-		ctrl().SetLabel(label);
-	}
-
 	void onChange(wxCommandEvent & event)
 	{
 		if (!m_change.is_none())
@@ -106,10 +97,6 @@ public:
 		bindElem(new wxStaticText(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
 	}
 
-	void setText(wxcstr label)
-	{
-		ctrl().SetLabel(label);
-	}
 	wxStaticText& ctrl()
 	{
 		return *(wxStaticText*)m_elem;

@@ -61,13 +61,13 @@ void init_emuhacker(pybind11::module & m)
 			return self.write(addr, size, bytesGetBuff(data));
 		}, addr_a, size_a, data_a)
 		.def("add", &ProcessHandler::add)
-		.def("readFloat", [](ProcessHandler& self, u32 addr, float value) {
-			return self.write(addr, value);
-		})
 		.def("readFloat", [](ProcessHandler& self, u32 addr) {
 			return self.read<float>(addr);
 		})
-		.def("ptrsRead", [](ProcessHandler& self, u32 addr, py::iterable &args, pycref type) {
+		.def("writeFloat", [](ProcessHandler& self, u32 addr, float value) {
+			return self.write(addr, value);
+		})
+		.def("ptrsRead", [](ProcessHandler& self, u32 addr, py::iterable &args, pycref type, pycref size) {
 			const auto &builtin = py::module::import("builtins");
 			wxArrayInt offsets = py::cast<wxArrayInt>(args);
 			if (type == builtin.attr("float"))
@@ -78,16 +78,16 @@ void init_emuhacker(pybind11::module & m)
 			{
 				return py::cast(self.ptrsRead<bool>(addr, offsets));
 			}
-			else if (PY_IS_TYPE(type, PyLong))
+			else if (type == builtin.attr("int"))
 			{
 				UINT data = 0;
-				if (self.ptrsRead(addr, offsets, py::cast<int>(type), &data))
+				if (self.ptrsRead(addr, offsets, py::cast<int>(size), &data))
 				{
 					return py::cast(data);
 				}
 			}
 			return (pyobj&)(None);
-		}, addr_a, offsets_a, type_a)
+		}, addr_a, offsets_a, type_a, "size"_a = 4)
 		.def("ptrsWrite", [](ProcessHandler& self, u32 addr, py::iterable &args, pycref data, pycref size) {
 			const auto &builtin = py::module::import("builtins");
 			wxArrayInt offsets = py::cast<wxArrayInt>(args);
@@ -102,7 +102,7 @@ void init_emuhacker(pybind11::module & m)
 			else if (PY_IS_TYPE(data, PyLong))
 			{
 				UINT tmp = data.cast<UINT64>();
-				self.ptrsWrite(addr, offsets, py::cast<int>(size), &tmp);
+				return self.ptrsWrite(addr, offsets, py::cast<int>(size), &tmp);
 			}
 			return false;
 		}, addr_a, offsets_a, data_a, "size"_a=4);

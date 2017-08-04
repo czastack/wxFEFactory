@@ -94,6 +94,25 @@ public:
 		BaseFrame::onClose(event);
 	}
 
+	bool isKeepTop()
+	{
+		long style = m_elem->GetWindowStyle();
+		return (style & wxSTAY_ON_TOP) != 0;
+	}
+
+	void keepTop(bool top)
+	{
+		long style = m_elem->GetWindowStyle();
+		if (top)
+		{
+			style |= wxSTAY_ON_TOP;
+		}
+		else {
+			style &= ~wxSTAY_ON_TOP;
+		}
+		m_elem->SetWindowStyle(style);
+	}
+
 protected:
 	wxFrame& win()
 	{
@@ -415,13 +434,16 @@ protected:
 };
 
 
-class StaticBox : public Layout
+class StaticBox : public SizerLayout
 {
 public:
 	template <class... Args>
-	StaticBox(wxcstr label, Args ...args) : Layout(args...)
+	StaticBox(wxcstr label, Args ...args) : SizerLayout(args...)
 	{
 		bindElem(new wxStaticBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+		wxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		sizer->InsertSpacer(0, 15);
+		m_elem->SetSizer(sizer);
 	}
 };
 
@@ -438,7 +460,7 @@ public:
 	void doAdd(View &child) override
 	{
 		Item *item = (Item*)child.ptr()->GetClientData();
-		if (isPyDict(item->m_kwargs))
+		if (Item::isInstance(item))
 		{
 			// Ìæ»»»ØÔ­Ö¸Õë
 			child.ptr()->SetClientData(&child);

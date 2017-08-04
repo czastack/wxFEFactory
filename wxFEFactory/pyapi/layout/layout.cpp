@@ -61,6 +61,7 @@ void init_layout(py::module &m)
 		.def("styles", &Layout::setStyles)
 		.def("removeChild", &Layout::removeChild)
 		.def("reLayout", &Layout::reLayout)
+		.def("findFocus", &Layout::findFocus)
 		.def_readonly("children", &Layout::m_children)
 		.def_readonly("named_children", &Layout::m_named_children);
 
@@ -71,6 +72,7 @@ void init_layout(py::module &m)
 	py::class_t<Window, BaseFrame>(layout, "Window")
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
 			label, "menuBar"_a=nullptr, styles, key, className, style)
+		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
 		.def_property_readonly("menubar", &Window::getMenuBar)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
 
@@ -115,7 +117,10 @@ void init_layout(py::module &m)
 
 	py::class_t<StaticBox, Layout>(layout, "StaticBox")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
-			label, styles, key, className, style);
+			label, styles, key, className, style)
+		.def("getLabel", &StaticBox::getLabel)
+		.def("setLabel", &StaticBox::setLabel)
+		.def_property("label", &StaticBox::getLabel, &StaticBox::setLabel);
 
 	py::class_t<Notebook, Layout>(layout, "Notebook")
 		.def_init(layout_init, styles, key, className, style)
@@ -133,19 +138,25 @@ void init_layout(py::module &m)
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, "onclick"_a=None, key, className, style)
 		.def("setOnclick", &Button::setOnclick)
-		.def("setLabel", &Button::setLabel);
+		.def("getLabel", &Button::getLabel)
+		.def("setLabel", &Button::setLabel)
+		.def_property("label", &Button::getLabel, &Button::setLabel);
 
 	py::class_t<CheckBox, Control>(layout, "CheckBox")
 		.def_init(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj, pyobj>(), 
 			label, "checked"_a=false, "alignRight"_a=false, "onchange"_a = None, key, className, style)
+		.def("getLabel", &CheckBox::getLabel)
 		.def("setLabel", &CheckBox::setLabel)
 		.def("trigger", &CheckBox::trigger)
+		.def_property("label", &Button::getLabel, &Button::setLabel)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked)
 		.def_readwrite("onchange", &CheckBox::m_change);
 
 	py::class_t<Text, Control>(layout, "Text")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(), label, key, className, style)
-		.def("setText", &Text::setText);
+		.def("getLabel", &Text::getLabel)
+		.def("setLabel", &Text::setLabel)
+		.def_property("label", &Text::getLabel, &Text::setLabel);
 
 	py::class_t<TextInput, Control>(layout, "TextInput")
 		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),
@@ -264,7 +275,7 @@ void init_layout(py::module &m)
 
 	auto pyItem = py::class_t<Item>(layout, "Item")
 		.def_init(py::init<View&, py::kwargs>(), "view"_a)
-		.def("getView", &AuiItem::operator View&);
+		.def("getView", &AuiItem::getView);
 
 
 	// aui

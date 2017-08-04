@@ -30,7 +30,7 @@ class Module(BaseListBoxModuel):
             self.help_view = ui.TextInput(readonly=True, className="fill")
 
         self.pg = ui.PropertyGrid(className="fill")
-        with ui.Horizontal(className="footer"):
+        with ui.Horizontal(className="expand"):
             ui.CheckBox(label="自动保存", checked=True, onchange=self.onSwichAutoSave, className="vcenter")
             ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
             ui.Button(label="保存文件", className="button", onclick=self.onSave)

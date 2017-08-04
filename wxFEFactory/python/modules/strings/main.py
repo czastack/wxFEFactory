@@ -29,7 +29,7 @@ class Module(BaseListBoxModuel):
             infobar.AddGrowableRow(1)
             
         self.textarea = ui.TextInput(multiline=True, className="fill")
-        with ui.Horizontal(className="footer"):
+        with ui.Horizontal(className="expand"):
             ui.ComboBox(type="readonly", className="fill")
             ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
             ui.Button(label="保存文件", className="button", onclick=self.onSave)
