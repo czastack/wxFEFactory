@@ -2,18 +2,9 @@
 #include "types.h"
 #include <windows.h>
 
-typedef size_t addr_t; typedef wchar_t* STR;
+typedef size_t addr_t;
+typedef wchar_t* STR;
 typedef const wchar_t* CSTR;
-
-typedef struct
-{
-	addr_t baseAddr;
-	int ptrLevel;
-	u32 offsets[4];
-	u32 lastOffset() const{
-		return offsets[ptrLevel - 1];
-	}
-} PtrEntry;
 
 
 class ProcessHandler
@@ -22,8 +13,8 @@ public:
 	ProcessHandler();
 	virtual ~ProcessHandler();
 
-	virtual bool attach() = 0;
-	virtual addr_t prepareAddr(addr_t addr, size_t size) = 0;
+	virtual bool attach() { return false; }
+	virtual addr_t prepareAddr(addr_t addr, size_t size) { return addr; };
 
 	/*
 	 * close the handle
@@ -59,10 +50,40 @@ public:
 	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer);
 	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer);
 
-	bool readLastPtr(const PtrEntry &entry, addr_t *addrPtr);
+	template<typename ListType>
+	bool ProcessHandler::readLastPtr(addr_t addr, const ListType &offsets, addr_t *addrPtr) {
+		for (auto const offset : offsets) {
+			if (!read(addr, sizeof(addr), &addr))
+				return false;
+			addr = addr + offset;
+		}
+		*addrPtr = addr;
+		return true;
+	}
 
-	bool ptrsRead(const PtrEntry &entry, size_t size, LPVOID buffer);
-	bool ptrsWrite(const PtrEntry &entry, size_t size, LPCVOID buffer);
+	template<typename ListType>
+	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
+		addr_t lastAddr;
+		return readLastPtr(addr, offsets, &lastAddr) && read(lastAddr, size, buffer);
+	}
+
+	template<typename ListType>
+	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
+		addr_t lastAddr;
+		return readLastPtr(addr, offsets, &lastAddr) && write(lastAddr, size, buffer);
+	}
+
+
+	UINT64 readUint(addr_t addr, size_t size)
+	{
+		UINT64 data = 0;
+		return read(addr, size, &data);
+	}
+
+	bool writeUint(addr_t addr, size_t size, UINT64 data)
+	{
+		return write(addr, size, &data);
+	}
 
 	/**
 	 * 读取数据到数组
@@ -91,19 +112,39 @@ public:
 	/**
 	 * 写入数据
 	 */
-	template<typename TYPE>
-	bool write(addr_t addr, TYPE &buff) {
-		return write(addr, sizeof(TYPE), &buff);
+	template<typename ValueType>
+	bool write(addr_t addr, ValueType &buff) {
+		return write(addr, sizeof(ValueType), &buff);
 	}
 
 	/**
 	 * 读取数据
 	 */
-	template<typename T=u8>
-	T read(addr_t addr) {
-		T data;
+	template<typename ValueType=u8>
+	ValueType read(addr_t addr) {
+		ValueType data;
 		read(addr, data);
 		return data;
+	}
+
+	/**
+	 * 多级指针读取数据
+	 */
+	template<typename ValueType, typename ListType>
+	ValueType ptrsRead(addr_t addr, const ListType &offsets)
+	{
+		ValueType data;
+		ptrsRead(addr, offsets, sizeof(data), &data);
+		return data;
+	}
+
+	/**
+	* 多级指针写入数据
+	*/
+	template<typename ValueType, typename ListType>
+	bool ptrsWrite(addr_t addr, const ListType &offsets, const ValueType buff)
+	{
+		return ptrsWrite(addr, offsets, sizeof(buff), &buff);
 	}
 
 private:

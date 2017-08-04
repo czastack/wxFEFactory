@@ -18,6 +18,10 @@ styles = {
         'container': {
             'padding': 10,
             'showPadding': '1',
+        },
+        'label_left': {
+            'padding': 10,
+            'showPadding': '0 1 0 1',
         }
     }
 }

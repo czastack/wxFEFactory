@@ -1,6 +1,6 @@
 from ..module import BaseListBoxModuel
 from mainframe import ui
-from commonstyle import styles, dialog_style
+from commonstyle import dialog_style
 from lib import exui
 
 
@@ -19,11 +19,15 @@ class Module(BaseListBoxModuel):
             count += 1
 
     def render_right(self):
-        with ui.GridLayout(cols=4, key="infobar", className="container"):
-            ui.Text("地址", className="vcenter")
-            self.addr_view = ui.TextInput(readonly=True)
-            ui.Text("代码", className="vcenter")
-            self.code_view = ui.TextInput(readonly=True)
+        with ui.FlexGridLayout(cols=2, vgap=10, className="expand container") as infobar:
+            ui.Text("地址", className="vcenter label_left")
+            self.addr_view = ui.TextInput(readonly=True, className="expand")
+            ui.Text("代码", className="vcenter label_left")
+            self.code_view = ui.TextInput(readonly=True, multiline=True, className="expand")
+
+            infobar.AddGrowableCol(1)
+            infobar.AddGrowableRow(1)
+            
         self.textarea = ui.TextInput(multiline=True, className="fill")
         with ui.Horizontal(className="footer"):
             ui.ComboBox(type="readonly", className="fill")

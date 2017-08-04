@@ -11,8 +11,8 @@ import __main__
 import fefactory_api
 import fefactory
 Path = os.path
-
 ui = fefactory_api.ui
+
 
 class MainFrame:
     def __init__(self):
@@ -40,6 +40,7 @@ class MainFrame:
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
             with ui.Menu("工具"):
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.openTool)
+                ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attachEmu, kind="check")
             with ui.Menu("窗口"):
                 pass
 
@@ -210,8 +211,33 @@ class MainFrame:
         Tool = self.getTool(name)
         tool = Tool()
         tool.attach()
+        __main__.tool = tool
         self.dialog.endModal()
         del self.dialog
+
+    def attachEmu(self, m):
+        if m.checked:
+            from fefactory_api.emuhacker import VbaHandler, NogbaHandler
+            from fe.ferom import FeEmuRW
+            
+            attached = False
+            for Emu in VbaHandler, NogbaHandler:
+                emu = Emu()
+                if emu.attach():
+                    attached = True
+                    break
+            if attached:
+                __main__.emu = emu
+                __main__.femu = FeEmuRW(emu)
+                print("现在可以在控制台用emu对象操作模拟器了")
+            else:
+                print("未检查到正在运行的模拟器，现在支持VBA, NO$GBA等模拟器")
+                m.checked = False
+        else:
+            if __main__.emu:
+                __main__.emu.close()
+                __main__.emu = None
+
 
 winstyle = {
     'width': 1200,
@@ -248,3 +274,5 @@ if __name__ == 'mainframe':
 
     __main__.app = app
     __main__.win = win = frame.win
+    __main__.fefactory_api = fefactory_api
+    __main__.copy = fefactory_api.set_clipboard

@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="myapp.cpp" />
-    <ClCompile Include="fe\graph.cpp">
-      <Filter>fe</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\fefactory_api.cpp">
       <Filter>pyapi</Filter>
     </ClCompile>
@@ -56,6 +53,12 @@
     <ClCompile Include="pyapi\layout\layout.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\fe\graph.cpp">
+      <Filter>pyapi\fe</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\fe\fe.cpp">
+      <Filter>pyapi\fe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -69,13 +72,7 @@
     <ClInclude Include="utils\utils.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="fe\graph.h">
-      <Filter>fe</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\fefactory_api.h">
-      <Filter>pyapi</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\feimg.hpp">
       <Filter>pyapi</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\pybindext.h">
@@ -156,13 +153,19 @@
     <ClInclude Include="pyapi\layout\drop.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
+    <ClInclude Include="pyapi\fe\graph.h">
+      <Filter>pyapi\fe</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\fe\feimg.hpp">
+      <Filter>pyapi\fe</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\fe\fe.h">
+      <Filter>pyapi\fe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">
       <UniqueIdentifier>{532fc647-4738-4158-b76a-dfebfc7d34ef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="fe">
-      <UniqueIdentifier>{825aa769-8bb2-47f5-8ee4-b97319bb8f24}</UniqueIdentifier>
     </Filter>
     <Filter Include="pyapi">
       <UniqueIdentifier>{aafbb4f5-a597-43a0-9d6a-19376a3ba782}</UniqueIdentifier>
@@ -181,6 +184,9 @@
     </Filter>
     <Filter Include="pyapi\emuhacker\nds">
       <UniqueIdentifier>{715e84aa-c6b5-4cc8-a2a7-81f7b070b13a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\fe">
+      <UniqueIdentifier>{4355aa40-6f0a-4d4c-85ec-7a0df1ec5438}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

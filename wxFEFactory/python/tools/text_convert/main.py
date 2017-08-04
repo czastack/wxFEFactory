@@ -21,7 +21,7 @@ class Tool(BaseTool):
             with ui.Vertical():
                 with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as container:
                     ui.Text("Rom", className="vcenter")
-                    self.rom_picker = ui.FilePickerCtrl(className="fill")
+                    self.rom_picker = ui.FilePickerCtrl(wildcard="*.gba|*.gba", className="fill")
                     ui.Text("码表", className="vcenter")
                     self.dict_picker = ui.FilePickerCtrl(className="fill")
                     ui.Text("文本")
@@ -40,6 +40,7 @@ class Tool(BaseTool):
         self.text_view.setOnEnter(self.onConvertText)
         self.code_view.setOnEnter(self.onConvertCode)
         self.dict_picker.enabled = False
+        self.reader = None
 
     def onclose(self, m=None):
         super().onclose()
@@ -58,6 +59,9 @@ class Tool(BaseTool):
         self.reader.openDict(picker.path)
 
     def onConvertText(self, tv):
+        if not self.reader:
+            print("请先选择Rom")
+            return
         di = self.reader._dict
         text = tv.value
         codebytes = di.encode(text)
@@ -66,14 +70,22 @@ class Tool(BaseTool):
         self.haff_view.value = haffbytes.hex().upper()
 
     def onConvertCode(self, tv):
+        if not self.reader:
+            print("请先选择Rom")
+            return
         di = self.reader._dict
         codebytes = bytes.fromhex(tv.value)
         try:
             text = di.decode(codebytes, True)
         except KeyError as e:
-            print("%02X" % e.args[0] + '不在码表中')
-            return
+            print("%04X" % e.args[0] + '不在码表中', '忽略文本转换')
+            text = ''
 
-        haffbytes = di.encodeHaffuman(text)
+        try:
+            haffbytes = di.encodeHaffumanCode(di.bytes_to_code_list(codebytes))
+        except ValueError as e:
+            print(e.args[0], '忽略哈夫曼编码转换')
+            haffbytes = b''
+
         self.text_view.value = text
         self.haff_view.value = haffbytes.hex().upper()

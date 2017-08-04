@@ -134,10 +134,11 @@ void py_interpreter_run(wxcstr line);
 /**
  * ¼ì²éÀàÐÍ
  */
+#define PY_IS_TYPE(obj, type) obj.ptr()->ob_type == &##type##_Type
 #define GEN_TYPE_CHECK(type)\
 	inline bool is##type(pycref obj)\
 	{\
-		return obj.ptr()->ob_type == &##type##_Type;\
+		return PY_IS_TYPE(obj, type);\
 	}
 
 GEN_TYPE_CHECK(PyDict)

@@ -21,6 +21,14 @@ class Module(BaseListBoxModuel):
             self.doAdd(item['name'])
 
     def render_right(self):
+        with ui.Horizontal(className="container expand") as infobar:
+            ui.ComboBox(type="readonly", choices=('地址预览', *(key for key in config.ADDR_MAP)), 
+                onselect=self.onPreviewAddrChoiceChange).setSelection(0, True)
+            ui.Text("地址", className="vcenter label_left")
+            self.addr_view = ui.TextInput(readonly=True)
+            ui.Text("说明", className="vcenter label_left")
+            self.help_view = ui.TextInput(readonly=True, className="fill")
+
         self.pg = ui.PropertyGrid(className="fill")
         with ui.Horizontal(className="footer"):
             ui.CheckBox(label="自动保存", checked=True, onchange=self.onSwichAutoSave, className="vcenter")
@@ -29,13 +37,18 @@ class Module(BaseListBoxModuel):
 
         self.pg.autosave = True
         self.pg.setOnchange(self.onPgChange)
-        self.pg.setOnselected(self.test2)
+        self.pg.setOnselected(self.onFieldSelect)
 
     def doGetTitle(self):
         return self.form.title
 
-    def test2(self, pg, name):
-        print('onSelected', name)
+    def onFieldSelect(self, pg, name):
+        # 预览地址
+        addr = self.get_property_addr(name)
+        if addr:
+            self.addr_view.value = "%08X" % addr
+        else:
+            self.addr_view.value = ""
 
     def onclose(self):
         if self.pg.changed:
@@ -108,6 +121,23 @@ class Module(BaseListBoxModuel):
 
     def onSwichAutoSave(self, checkbox):
         self.pg.autosave = checkbox.checked
+
+    def onPreviewAddrChoiceChange(self, choice):
+        """预览地址选项改变"""
+        if choice.index:
+            key = choice.text
+            self.preview_addr_conf = config.ADDR_MAP[key]
+        else:
+            self.preview_addr_conf = None
+
+    def get_property_addr(self, name):
+        """获取某字段的预览地址"""
+        if self.preview_addr_conf:
+            field = self.form.cfield(name)
+            if field:
+                base = self.preview_addr_conf['addr']
+                step = self.preview_addr_conf['step']
+                return base + self.listbox.index * step + field.offset
 
     def itervalues(self):
         for text in self.listbox.getTexts():

@@ -325,13 +325,14 @@ public:
 	/**
 	* handle 是否触发事件处理
 	*/
-	void setSelection(int n, bool handle = false)
+	auto setSelection(int n, bool handle = false)
 	{
 		doSetSelection(n);
 		if (handle)
 		{
 			triggerSelectEvent();
 		}
+		return this;
 	}
 
 	virtual int getCount()

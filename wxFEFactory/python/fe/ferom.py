@@ -1,4 +1,4 @@
-from gba.rom import RomRW
+from gba.rom import BaseRomRW, RomProxyRW, RomHandler
 from lib.lazy import lazy
 from . import config
 from .fedict import FeDict, CtrlCode
@@ -9,15 +9,12 @@ ctrltable = (
     CtrlCode(0x0200, "br2")
 )
 
-class FeRomRW(RomRW):
-    __slots__ = ()
 
+class FeRomHandler(RomHandler):
     FONT_POINTER = 0x06E0
     TEXT_TABLE_POINTER = 0x06DC
 
-    def __init__(self, path, mode=None):
-        RomRW.__init__(self, path, mode=mode)
-
+    def __init__(self):
         code = self.getRomCode()
         if code not in config.romcode:
             print(f'{self.name}不是火纹的rom, code={code}')
@@ -36,7 +33,7 @@ class FeRomRW(RomRW):
 
         huffstart = self.read32(self.FONT_POINTER)
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
-        self._dict = FeDict((self.name, huffstart & self.addrmask, huffsize), path, None, ctrltable)
+        self._dict = FeDict(self.read(huffstart, huffsize), path, None, ctrltable)
 
     @lazy
     def text_table_start(self):
@@ -66,12 +63,6 @@ class FeRomRW(RomRW):
     def __next__(self):
         return self._file.read(1)[0]
 
-    def __getitem__(self, i):
-        pass
-
-    def __setitem__(self, i):
-        pass
-
     def readText(self, addr, codebuff=None):
         """
         从rom中读取文本，遇结束符00结束
@@ -90,3 +81,28 @@ class FeRomRW(RomRW):
                 codebuff.extend(self._dict.code_list_to_bytes(code_list))
 
         return text
+
+
+class FeRomRW(BaseRomRW, FeRomHandler):
+    def __init__(self, path, mode=None):
+        BaseRomRW.__init__(self, path, mode=mode)
+        FeRomHandler.__init__(self)
+
+
+class FeEmuRW(RomProxyRW, FeRomHandler):
+    def __init__(self, emu):
+        RomProxyRW.__init__(self, emu)
+        FeRomHandler.__init__(self)
+        self._pos = 0
+
+    def pos(self, pos):
+        self._pos = pos
+        return self
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        ret = self.read8(self._pos)
+        self._pos += 1
+        return ret

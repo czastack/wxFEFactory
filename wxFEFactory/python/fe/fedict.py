@@ -33,15 +33,26 @@ class FeDict(Dictionary):
         :param huffmandata: 包含哈夫曼树的顺序存储数据 (file, start, size)
         """
         super().__init__(codetable, lowrange, ctrltable)
-        self.buildtree(*huffmandata)
+        self.buildtree(huffmandata)
         
 
-    def buildtree(self, file, start, size):
+    def buildtree(self, huffmandata):
         # 生成哈夫曼树
-        buff = ctypes.create_string_buffer(size)
-        with open(file, 'rb') as f:
-            f.seek(start)
-            f.readinto(buff)
+        buff = None
+
+        if isinstance(huffmandata, (tuple, list)):
+            file, start, size = huffmandata
+            buff = ctypes.create_string_buffer(size)
+            with open(file, 'rb') as f:
+                f.seek(start)
+                f.readinto(buff)
+        elif isinstance(huffmandata, (bytes, bytearray)):
+            size = len(huffmandata)
+            buff = ctypes.create_string_buffer(size)
+            buff.raw = huffmandata
+
+        if buff is None:
+            raise ValueError("生成哈夫曼树失败")
 
         nodes = ctypes.cast(buff, LP_CNODE)
         leafmap = {}
@@ -125,17 +136,32 @@ class FeDict(Dictionary):
         """
         :param null: 把\0添加到结尾
         """
+        codes = []
+        for ch in text:
+            code = self.getCode(ch)
+            if code is 0x00:
+                raise ValueError("码表中没有这个字：" + ch)
+            codes.append(code)
+
+        if null:
+            codes.append(0x00)
+
+        return self.encodeHaffumanCode(codes, buf)
+            
+
+    def encodeHaffumanCode(self, codes, buf=None):
+        """
+        codes 字码数组
+        """
         result = bytearray() if buf is None else buf
         byte = 0
         bit  = 0
         # 因哈夫曼值从根结点开始，先从叶结点往上，写入逆序的比特流，再用huffmanBit控制比特位逆转
         huffmanBit = 0
-        if null:
-            text += '\0'
-        for ch in text:
-            node = self.leafmap.get(self.getCode(ch), None)
+        for code in codes:
+            node = self.leafmap.get(code, None)
             if node is None:
-                raise ValueError("码表中没有这个字：" + ch)
+                raise ValueError("哈夫曼树中没有这个编码：" + ("%04X" % code))
 
             parent = node.parent
             huffmanCode = 0
@@ -168,10 +194,19 @@ class FeDict(Dictionary):
         result = bytearray(len(codes) * 2)
         i = 0
         for code in codes:
-            result[i] = code & 0xFF
-            result[i + 1] = (code >> 8) & 0xFF
+            # 火纹的每个字码写到rom中也一致（高低四位逆序）
+            result[i] = (code >> 8) & 0xFF
+            result[i + 1] = code & 0xFF
             i += 2
         return result
+
+    @staticmethod
+    def bytes_to_code_list(codebytes):
+        codes = []
+        for i in range(0, len(codebytes), 2):
+            codes.append((codebytes[i] << 8) | codebytes[i + 1])
+            i += 2
+        return codes
 
 
 if __name__ == '__main__' or __name__ == 'builtins':

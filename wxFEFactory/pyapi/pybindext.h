@@ -137,5 +137,12 @@ namespace pybind11 {
 			def("__init__", [](type *self_, Args... args) { (new (self_) type(args...)->*(&type::__init))(); }, extra...);
 			return *this;
 		}
+
+/*
+		auto &def_alias(const char *alias, const char *origin)
+		{
+			py::setattr(*this, alias, this->attr(origin));
+			return *this;
+		}*/
 	};
 }

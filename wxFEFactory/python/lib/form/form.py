@@ -62,7 +62,7 @@ class BaseForm(metaclass=FormMetaclass):
 
     @classmethod
     def cfield(class_, name):
-        return getattr(class_.structure, name)
+        return getattr(class_.structure, name, None)
 
     @classmethod
     def cfield_names(class_):

@@ -114,24 +114,3 @@ bool ProcessHandler::ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buff
 		return write(addr + offset, size, buffer);
 	return false;
 }
-
-bool ProcessHandler::readLastPtr(const PtrEntry &entry, addr_t *addrPtr){
-	addr_t addr = entry.baseAddr;
-	for (int i = 0; i < entry.ptrLevel - 1; i++){
-		if(!read(addr, sizeof(addr), &addr))
-			return false;
-		addr = addr + entry.offsets[i];
-	}
-	*addrPtr = addr;
-	return true;
-}
-
-bool ProcessHandler::ptrsRead(const PtrEntry &entry, size_t size, LPVOID buffer){
-	addr_t addr;
-	return readLastPtr(entry, &addr) && ptrRead(addr, entry.lastOffset(), size, buffer);
-}
-
-bool ProcessHandler::ptrsWrite(const PtrEntry &entry, size_t size, LPCVOID buffer){
-	addr_t addr;
-	return readLastPtr(entry, &addr) && ptrWrite(addr, entry.lastOffset(), size, buffer);
-}

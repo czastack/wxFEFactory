@@ -1,9 +1,9 @@
 from modules import modules
 from functools import partial
 import sys
+import os
 import fefactory_api
 import traceback
-import os
 
 if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     # 重定向标准输出
