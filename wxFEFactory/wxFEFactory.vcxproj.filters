@@ -59,6 +59,24 @@
     <ClCompile Include="pyapi\fe\fe.cpp">
       <Filter>pyapi\fe</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\layout\layouts.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\layoutbase.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\menu.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\datacontrols.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\controls.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\aui.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -87,19 +105,10 @@
     <ClInclude Include="pyapi\functions.h">
       <Filter>pyapi</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\aui.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\layout\bars.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\layout\console.h">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\controls.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\datacontrols.hpp">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\layout\dialogs.h">
@@ -116,15 +125,6 @@
     </ClInclude>
     <ClInclude Include="pyapi\emuhacker\gba\GbaEmuHandler.h">
       <Filter>pyapi\emuhacker\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\layoutbase.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\layouts.hpp">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\menu.hpp">
-      <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\emuhacker\nds\nds.h">
       <Filter>pyapi\emuhacker\nds</Filter>
@@ -161,6 +161,24 @@
     </ClInclude>
     <ClInclude Include="pyapi\fe\fe.h">
       <Filter>pyapi\fe</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\layouts.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\layoutbase.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\menu.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\datacontrols.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\controls.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\aui.h">
+      <Filter>pyapi\layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

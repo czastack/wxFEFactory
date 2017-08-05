@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.hpp"
+#include "layoutbase.h"
 #include <wx/button.h>
 #include <wx/stattext.h>
 #include <wx/spinctrl.h>
@@ -94,8 +94,10 @@ public:
 	template <class... Args>
 	Text(wxcstr label, Args ...args) : Control(args...)
 	{
-		bindElem(new wxStaticText(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+		bindElem(new wxStaticText(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), getAlignStyle()));
 	}
+
+	long getAlignStyle();
 
 	wxStaticText& ctrl()
 	{
@@ -131,6 +133,7 @@ public:
 		{
 			style |= exstyle;
 		}
+		style |= ((Text*)this)->getAlignStyle();
 		bindElem(new wxTextCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), style));
 	}
 
@@ -150,34 +153,6 @@ public:
 	}
 
 protected:
-	void applyStyle() override
-	{
-		View::applyStyle();
-
-		pyobj style;
-
-		style = getStyle(STYLE_TEXTALIGN);
-		if (style != None)
-		{
-			wxcstr align = style.cast<wxString>();
-			if (align != wxNoneString) {
-				long style = ctrl().GetWindowStyle();
-				if (align == wxT("center"))
-				{
-					style |= wxTE_CENTER;
-				}
-				else if (align == wxT("right"))
-				{
-					style |= wxTE_RIGHT;
-				}
-				else if (align == wxT("left"))
-				{
-					style |= wxTE_LEFT;
-				}
-				ctrl().SetWindowStyle(style);
-			}
-		}
-	}
 
 	wxTextCtrl& ctrl()
 	{
@@ -682,30 +657,7 @@ public:
 
 protected:
 
-	void applyStyle() override
-	{
-		View::applyStyle();
-
-		pyobj style;
-
-		style = getStyle(STYLE_FLEXDIRECTION);
-		if (style != None)
-		{
-			wxcstr dir = style.cast<wxString>();
-			if (dir != wxNoneString) {
-				long style = ctrl().GetWindowStyle();
-				if (dir == wxT("row"))
-				{
-					style |= wxRA_SPECIFY_ROWS;
-				}
-				else if (dir == wxT("column"))
-				{
-					style |= wxRA_SPECIFY_COLS;
-				}
-				ctrl().SetWindowStyle(style);
-			}
-		}
-	}
+	void applyStyle() override;
 };
 
 

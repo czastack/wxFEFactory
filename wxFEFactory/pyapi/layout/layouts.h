@@ -1,6 +1,6 @@
 #pragma once
-#include "layoutbase.hpp"
-#include "menu.hpp"
+#include "layoutbase.h"
+#include "menu.h"
 #include "bars.hpp"
 #include <wx/sizer.h>
 #include <wx/panel.h>
@@ -33,6 +33,11 @@ public:
 		((wxTopLevelWindow*)m_elem)->SetTitle(title);
 	}
 
+	void setOnclose(pycref onclose)
+	{
+		m_onclose = onclose;
+	}
+
 	void close()
 	{
 		m_elem->Close();
@@ -40,10 +45,18 @@ public:
 
 	virtual void onClose(class wxCloseEvent &event)
 	{
+		if (!m_onclose.is_none())
+		{
+			handleEvent(m_onclose, event);
+		}
+
 		// 引用减一，销毁对象
 		py::cast(this).dec_ref();
 		event.Skip();
 	}
+
+protected:
+	pyobj m_onclose;
 };
 
 
@@ -59,6 +72,7 @@ public:
 			setMenu(*menuBar);
 		}
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_onclose = None;
 	}
 
 	void setMenu(MenuBar &menubar)
@@ -68,7 +82,7 @@ public:
 		py::cast(&menubar).inc_ref();
 	}
 
-	void onMenu(wxCommandEvent & event)
+	void onMenu(wxCommandEvent &event)
 	{
 		getMenuBar()->onSelect(event.GetId());
 	}
@@ -112,12 +126,42 @@ public:
 		}
 		m_elem->SetWindowStyle(style);
 	}
-
 protected:
 	wxFrame& win()
 	{
 		return *(wxFrame*)m_elem;
 	}
+};
+
+
+class HotkeyWindow : public Window
+{
+public:
+	template <class... Args>
+	HotkeyWindow(Args ...args) : Window(args...)
+	{
+		m_elem->Bind(wxEVT_HOTKEY, &HotkeyWindow::onHotkey, this);
+	}
+
+	bool prepareHotkey(pyobj &hotkeyId, WORD &int_hotkeyId);
+
+	void RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyCode, pycref onhotkey);
+
+	void UnregisterHotKey(pyobj hotkeyId, bool force = false);
+
+	void stopHotkey();
+
+	void onHotkey(wxKeyEvent &event);
+
+	void onClose(class wxCloseEvent &event) override
+	{
+		stopHotkey();
+
+		Window::onClose(event);
+	}
+protected:
+
+	py::dict m_hotkey_map;
 };
 
 
@@ -130,6 +174,7 @@ public:
 		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(),
 			wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
+		m_onclose = None;
 	}
 
 	bool showOnce()
@@ -160,84 +205,7 @@ public:
 	/**
 	* 获取布局参数
 	*/
-	void getBoxArg(View &child, int *pFlex, int *pFlag, int *pPadding)
-	{
-		int flag = 0;
-		if (child.getStyle(STYLE_EXPAND, false))
-		{
-			flag |= wxEXPAND;
-		}
-
-		wxcstr showPad = child.getStyle(STYLE_SHOWPADDING, wxNoneString);
-
-		if (showPad != wxNoneString)
-		{
-			if (showPad.size() == 1)
-			{
-				if (showPad[0] != '0')
-					flag |= wxALL;
-			}
-			else if (showPad.size() == 7)
-			{
-				if (showPad[0] != '0')
-					flag |= wxTOP;
-				if (showPad[2] != '0')
-					flag |= wxRIGHT;
-				if (showPad[4] != '0')
-					flag |= wxBOTTOM;
-				if (showPad[6] != '0')
-					flag |= wxLEFT;
-			}
-			else {
-				log_message(wxString::Format(wxT("%s: %s not available"), STYLE_SHOWPADDING, showPad));
-			}
-		}
-
-		wxcstr vertical = child.getStyle(STYLE_VERTICALALIGN, wxNoneString);
-
-		if (vertical != wxNoneString)
-		{
-			if (vertical == wxT("top"))
-			{
-				flag |= wxALIGN_TOP;
-			}
-			else if (vertical == wxT("bottom"))
-			{
-				flag |= wxALIGN_BOTTOM;
-			}
-			else if (vertical == wxT("middle"))
-			{
-				flag |= wxALIGN_CENTER_VERTICAL;
-			}
-			else {
-				log_message(wxString::Format(wxT("%s: %s not available"), STYLE_VERTICALALIGN, vertical));
-			}
-		}
-
-		wxcstr align = child.getStyle(STYLE_ALIGN, wxNoneString);
-
-		if (align != wxNoneString)
-		{
-			if (vertical == wxT("left"))
-			{
-				flag |= wxALIGN_LEFT;
-			}
-			else if (vertical == wxT("right"))
-			{
-				flag |= wxALIGN_RIGHT;
-			}
-			else if (vertical == wxT("center"))
-			{
-				flag |= wxALIGN_CENTER_HORIZONTAL;
-			}
-			else {
-				log_message(wxString::Format(wxT("%s: %s not available"), STYLE_ALIGN, vertical));
-			}
-		}
-		*pFlag = flag;
-		*pFlex = child.getStyle(STYLE_FLEX, 0);
-		*pPadding = child.getStyle(STYLE_PADDING, 5);
-	}
+	void getBoxArg(View &child, int *pFlex, int *pFlag, int *pPadding);
 
 	void doAdd(View &child) override
 	{
@@ -393,30 +361,7 @@ public:
 		bindElem(new wxSplitterWindow(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
 
-	void __exit__(py::args &args) override
-	{
-		int len = m_children.size();
-		if (len > 2)
-		{
-			log_message("SplitterWindow 不支持大于2个子元素");
-			return;
-		}
-		Layout::__exit__(args);
-		if (len == 1)
-		{
-			View &child = *py::cast<View*>(m_children[0]);
-			ctrl().Initialize(child);
-		}
-		else if (len == 2)
-		{
-			View &child1 = *py::cast<View*>(m_children[0]);
-			View &child2 = *py::cast<View*>(m_children[1]);
-			if (m_horizontal)
-				ctrl().SplitHorizontally(child1, child2, m_sashpos);
-			else
-				ctrl().SplitVertically(child1, child2, m_sashpos);
-		}
-	}
+	void __exit__(py::args &args) override;
 
 	bool isHorizontal()
 	{
@@ -457,24 +402,7 @@ public:
 		bindElem(new wxNotebook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
 
-	void doAdd(View &child) override
-	{
-		Item *item = (Item*)child.ptr()->GetClientData();
-		if (Item::isInstance(item))
-		{
-			// 替换回原指针
-			child.ptr()->SetClientData(&child);
-
-			wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
-			ctrl().AddPage(child, caption);
-
-			py::cast(item).dec_ref();
-		}
-		else
-		{
-			log_message(wxString::Format("Child of %s must be Item.", "Notebook"));
-		}
-	}
+	void doAdd(View &child) override;
 
 	size_t getPageCount() const {
 		return ctrl().GetPageCount();
@@ -515,30 +443,9 @@ class StdModalDialog : public Dialog
 public:
 	using Dialog::Dialog;
 
-	pyobj __enter__() override
-	{
-		long style = m_elem->GetWindowStyle();
-		style |= wxRESIZE_BORDER | wxCLIP_CHILDREN;
-		m_elem->SetWindowStyle(style);
+	pyobj __enter__() override;
 
-		auto ret = Layout::__enter__();
-		wxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
-		m_elem->SetSizer(topsizer);
-		return ret;
-	}
-
-	void __exit__(py::args &args) override
-	{
-		Layout::__exit__(args);
-
-		wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
-		buttonSizer->AddButton(new wxButton(m_elem, wxID_OK));
-		buttonSizer->AddButton(new wxButton(m_elem, wxID_CANCEL));
-		buttonSizer->Realize();
-
-		wxSizer* topsizer = m_elem->GetSizer();
-		topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
-	}
+	void __exit__(py::args &args) override;
 
 	void doAdd(View &child) override
 	{

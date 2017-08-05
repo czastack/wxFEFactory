@@ -2,11 +2,11 @@
 #include "../pyutils.h"
 #include "../functions.h"
 #include "layout.h"
-#include "menu.hpp"
-#include "layouts.hpp"
-#include "controls.hpp"
-#include "datacontrols.hpp"
-#include "aui.hpp"
+#include "menu.h"
+#include "layouts.h"
+#include "controls.h"
+#include "datacontrols.h"
+#include "aui.h"
 #include "bars.hpp"
 #include "console.h"
 
@@ -67,6 +67,7 @@ void init_layout(py::module &m)
 
 	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
 		.def("close", &BaseFrame::close)
+		.def("setOnclose", &BaseFrame::setOnclose)
 		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle);
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
@@ -75,6 +76,12 @@ void init_layout(py::module &m)
 		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
 		.def_property_readonly("menubar", &Window::getMenuBar)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
+
+	py::class_t<HotkeyWindow, Window>(layout, "HotkeyWindow")
+		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
+			label, "menuBar"_a = nullptr, styles, key, className, style)
+		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
+		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a=false);
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
@@ -358,7 +365,19 @@ void init_layout(py::module &m)
 	auto KeyEvent = py::class_<wxKeyEvent, wxEvent>(layout, "KeyEvent")
 		.def("GetKeyCode", &wxKeyEvent::GetKeyCode)
 		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); })
-		.ptr();
+		.def("getWXK", [](wxKeyEvent &event, wxChar *keystr) {
+			int ch = keystr[0];
+			if ('0' <= ch && ch <= '9' || 'A' <= ch && ch <= 'Z') {
+				// 0~9, A~Z
+				return ch;
+			}
+			else if ('a' <= ch && ch <= 'z')
+			{
+				return ch - 32;
+			}
+			return 0;
+		}).ptr();
+
 /*
 	py::detail::type_record rec;
 	rec.name = "KEYCODE";
@@ -379,10 +398,6 @@ void init_layout(py::module &m)
 #undef ATTR_ACCEL
 
 #define ATTR_KEYCODE(name) ATTR_INT(KeyEvent, name, WXK_)
-	ATTR_KEYCODE(CONTROL_A), ATTR_KEYCODE(CONTROL_B), ATTR_KEYCODE(CONTROL_C), ATTR_KEYCODE(CONTROL_D), ATTR_KEYCODE(CONTROL_E), ATTR_KEYCODE(CONTROL_F), ATTR_KEYCODE(CONTROL_G),
-	ATTR_KEYCODE(CONTROL_H), ATTR_KEYCODE(CONTROL_I), ATTR_KEYCODE(CONTROL_J), ATTR_KEYCODE(CONTROL_K), ATTR_KEYCODE(CONTROL_L), ATTR_KEYCODE(CONTROL_M), ATTR_KEYCODE(CONTROL_N),
-	ATTR_KEYCODE(CONTROL_O), ATTR_KEYCODE(CONTROL_P), ATTR_KEYCODE(CONTROL_Q), ATTR_KEYCODE(CONTROL_R), ATTR_KEYCODE(CONTROL_S), ATTR_KEYCODE(CONTROL_T),
-	ATTR_KEYCODE(CONTROL_U), ATTR_KEYCODE(CONTROL_V), ATTR_KEYCODE(CONTROL_W), ATTR_KEYCODE(CONTROL_X), ATTR_KEYCODE(CONTROL_Y), ATTR_KEYCODE(CONTROL_Z),
 	ATTR_KEYCODE(BACK),
 	ATTR_KEYCODE(TAB),
 	ATTR_KEYCODE(RETURN),

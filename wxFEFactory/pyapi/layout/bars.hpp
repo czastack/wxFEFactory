@@ -1,7 +1,7 @@
 #pragma once
 #include <wx/sharedptr.h>
-#include "layoutbase.hpp"
 #include <wx/artprov.h>
+#include "layoutbase.h"
 
 class ToolBar : public Control
 {
