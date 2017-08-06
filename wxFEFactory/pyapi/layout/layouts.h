@@ -147,6 +147,8 @@ public:
 
 	void RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyCode, pycref onhotkey);
 
+	void RegisterHotKeys(py::iterable & items);
+
 	void UnregisterHotKey(pyobj hotkeyId, bool force = false);
 
 	void stopHotkey();

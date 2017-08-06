@@ -7,6 +7,7 @@
 #include "layout/layout.h"
 #include "emuhacker/emuhacker.h"
 #include "fe/fe.h"
+#include "auto/auto.h"
 
 py::module fefactory;
 ConsoleHandler pyConsole;
@@ -70,6 +71,7 @@ PyObject *fefactory_api() {
 	init_layout(m);
 	init_emuhacker(m);
 	init_fe(m);
+	init_auto(m);
 	return m.ptr();
 }
 

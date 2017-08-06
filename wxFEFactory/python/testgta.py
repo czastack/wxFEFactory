@@ -1,10 +1,12 @@
 from lib import exui
 from commonstyle import dialog_style, styles
 from fefactory_api.emuhacker import ProcessHandler
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL
+from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.sendkey import auto, TextVK
 import math
 import os
 import json
+import time
 import __main__
 import fefactory_api
 import fefactory
@@ -324,7 +326,7 @@ class GTA_VC_Cheat:
         with ui.HotkeyWindow("罪恶都市Hack", style=win_style, styles=styles, menuBar=menubar) as win:
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
-                    ui.Button("检测", className="vcenter", onclick=self.checkAtach)
+                    ui.Button("检测", className="vcenter", onclick=self.checkAttach)
                     self.attach_status_view = ui.Text("", className="label_left grow")
                     ui.CheckBox("保持最前", onchange=self.swithKeeptop)
                 with ui.Notebook(className="fill"):
@@ -343,14 +345,18 @@ class GTA_VC_Cheat:
             self.weight_view = InputField("weight", "重量", None, (0xB8,), float)
             self.stamina_view = InputField("stamina", "体力", None, (0x600,), float)
             self.star_view = InputField("star", "通缉等级", None, (0x5f4, 0x20), int)
+            ui.Text("")
+            ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
         with Group("vehicle", "汽车", VEHICLE_BASE, handler=self.handler):
             self.vehicle_hp_view = InputField("vehicle_hp", "HP", None, (0x204,), float)
             self.vehicle_roll_view = CoordsField('roll', '滚动', None, (0x04,))
             self.vehicle_dir_view = CoordsField('dir', '方向', None, (0x14,))
-            self.vehicle_coord_view = CoordsField('coord', '坐标', None, (0x34,))
+            self.vehicle_coord_view = CoordsField('coord', '坐标', None, (0x34,), savable=True)
             self.vehicle_speed_view = CoordsField('spped', '速度', None, (0x70,))
             self.vehicle_turn_view = CoordsField('turn', 'Turn', None, (0x7C,))
             self.weight_view = InputField("weight", "重量", None, (0xB8,), float)
+            ui.Text("")
+            ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
         with Group("global", "全局", 0, handler=self.handler):
             self.camera_view = CoordsField('camera', '摄像机', 0x7E46B8, ())
             self.camera_z_rot_view = InputField("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
@@ -374,14 +380,19 @@ class GTA_VC_Cheat:
         global ins
         ins = None
 
-    def checkAtach(self, btn):
+    def checkAttach(self, btn):
         className = 'Grand theft auto 3'
         windowName = 'GTA: Vice City'
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
-            self.win.RegisterHotKey('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick)
-            self.win.RegisterHotKey('raiseUp', MOD_ALT, getVK(' '), self.raiseUp)
-            self.win.RegisterHotKey('stop', MOD_ALT, getVK('x'), self.stop)
+            self.win.RegisterHotKeys((
+                ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
+                ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+                ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
+                ('toUp', MOD_ALT, getVK('.'), self.toUp),
+                ('stop', MOD_ALT, getVK('x'), self.stop),
+                ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
+            ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
@@ -394,16 +405,18 @@ class GTA_VC_Cheat:
 
     @property
     def z_speed_ptr(self):
-        speed_view = self.speed_view if self.isInVehicle else self.vehicle_speed_view
+        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         offsets = list(speed_view.offsets)
         offsets[-1] += 8
-        return self.handler.readLastPtr(self.speed_view.addr, offsets)
+        return self.handler.readLastPtr(speed_view.addr, offsets)
 
-    def jetPackTick(self, hotkeyId=None):
+    def jetPackTick(self, hotkeyId=None, useSpeed=False):
         PI = math.pi
         HALF_PI = PI / 2
         jetPackSpeed = self.jetPackSpeed
-        if self.isInVehicle:
+        isInVehicle = self.isInVehicle
+
+        if isInVehicle:
             coord_view = self.vehicle_coord_view
             speed_view = self.vehicle_speed_view
             rotz = self.camera_z_rot_view.mem_value
@@ -418,29 +431,69 @@ class GTA_VC_Cheat:
         xVal = math.cos(rotz)
         yVal = math.sin(rotz)
 
-        coords = coord_view.mem_value
-        coords[0] += xVal * jetPackSpeed;
-        coords[1] += yVal * jetPackSpeed;
-        if False: # Z
-            rotx = self.camera_x_rot_view.mem_value;
-            coords[2] += rotx / HALF_PI * jetPackSpeed;
+        if not useSpeed:
+            target = coord_view
+            values = target.mem_value
+            values[0] += xVal * jetPackSpeed
+            values[1] += yVal * jetPackSpeed
+        else:
+            # speed up
+            target = speed_view
+            values = target.mem_value
+            values[0] += xVal * 0.5
+            values[1] += yVal * 0.5
+            if not isInVehicle:
+                values[2] = 0.2
+                self.raiseUp(speed=0.2)
+                time.sleep(0.1)
         
-        coord_view.mem_value = coords
-        speed_view.mem_value = (0, 0, 0.0066016)
+        target.mem_value = values
 
-        if False: # UP or FALSE
-            speed_ptr = self.z_speed_ptr
-            z_speed = jetPackSpeed * PI * 2
-            if False: # Donw
-                z_speed *= -1
-            self.handler.writeFloat(speed_ptr, z_speed)
 
-    def raiseUp(self, hotkeyId=None):
-        self.handler.writeFloat(self.z_speed_ptr, 1.0)
+        # if False: # UP or FALSE
+        #     speed_ptr = self.z_speed_ptr
+        #     z_speed = jetPackSpeed * PI * 2
+        #     if False: # Donw
+        #         z_speed *= -1
+        #     self.handler.writeFloat(speed_ptr, z_speed)
+
+    def raiseUp(self, hotkeyId=None, speed=1.0):
+        self.handler.writeFloat(self.z_speed_ptr, speed)
+
+    def toUp(self, hotkeyId=None):
+        view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
+        offsets = list(view.offsets)
+        offsets[-1] += 8
+        ptr = self.handler.readLastPtr(view.addr, offsets)
+        self.handler.writeFloat(ptr, self.handler.readFloat(ptr) + 10)
 
     def stop(self, hotkeyId=None):
-        speed_view = self.speed_view if self.isInVehicle else self.vehicle_speed_view
+        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
+
+    def restoreHp(self, hotkeyId=None):
+        if self.isInVehicle:
+            self.vehicle_hp_view.mem_value = 2000
+        else:
+            self.hp_view.mem_value = 200
+
+    def fromPlayerCoord(self, btn):
+        self.vehicle_coord_view.input_value = self.coord_view.input_value
+
+    def fromVehicleCoord(self, btn):
+        self.coord_view.input_value = self.vehicle_coord_view.input_value
+
+    def promptWrite(self, text):
+        text = (text + '\0').encode('utf-16le')
+        TEXT1_ADDR = 0x7D3E40
+        TEXT2_ADDR = 0x939028
+        
+        self.handler.ptrsWrite(TEXT1_ADDR, (), text)
+        time.sleep(0.01);
+        self.handler.ptrsWrite(TEXT2_ADDR, (), text)
+
+    def inputCheat(self, text):
+        auto.sendKey(TextVK(text), 20)
 
 
 ins = None
@@ -449,7 +502,7 @@ btn_style = {
 }
 win_style = {
     'width': 640,
-    'height': 800,
+    'height': 820,
 }
 
 def run():

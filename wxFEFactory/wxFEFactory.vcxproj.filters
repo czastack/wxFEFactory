@@ -77,6 +77,9 @@
     <ClCompile Include="pyapi\layout\aui.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\auto\auto.cpp">
+      <Filter>pyapi\auto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -180,6 +183,9 @@
     <ClInclude Include="pyapi\layout\aui.h">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
+    <ClInclude Include="pyapi\auto\auto.h">
+      <Filter>pyapi\auto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">
@@ -205,6 +211,9 @@
     </Filter>
     <Filter Include="pyapi\fe">
       <UniqueIdentifier>{4355aa40-6f0a-4d4c-85ec-7a0df1ec5438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\auto">
+      <UniqueIdentifier>{e6f09b6c-d7a1-43f5-b392-87a13ae38b9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

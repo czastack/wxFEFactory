@@ -14,7 +14,7 @@ bool HotkeyWindow::prepareHotkey(pyobj & hotkeyId, WORD & int_hotkeyId)
 	}
 	else
 	{
-		py::print(hotkeyId, "²»Ö§³ÖµÄ¸ñÊ½");
+		py::print(hotkeyId, "ä¸æ”¯æŒçš„æ ¼å¼");
 		return false;
 	}
 	return true;
@@ -27,7 +27,7 @@ void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyC
 	{
 		if (m_hotkey_map.contains(hotkeyId))
 		{
-			py::print(hotkeyId, "ÒÑ¾­ÔÚÊ¹ÓÃÁË");
+			py::print(hotkeyId, "å·²ç»åœ¨ä½¿ç”¨äº†");
 			return;
 		}
 		if (m_elem->RegisterHotKey(_hotkeyId, modifiers, virtualKeyCode))
@@ -36,8 +36,17 @@ void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyC
 			onhotkey.inc_ref();
 		}
 		else {
-			py::print(hotkeyId, "ÈÈ¼ü×¢²áÊ§°Ü");
+			py::print(hotkeyId, "çƒ­é”®æ³¨å†Œå¤±è´¥");
 		}
+	}
+}
+
+void HotkeyWindow::RegisterHotKeys(py::iterable &items)
+{
+	for (auto e: items)
+	{
+		const py::tuple &item = e.cast<py::tuple>();
+		RegisterHotKey(item[0], item[1].cast<int>(), item[2].cast<int>(), item[3]);
 	}
 }
 
@@ -80,7 +89,7 @@ void HotkeyWindow::onHotkey(wxKeyEvent & event)
 }
 
 /**
-* »ñÈ¡²¼¾Ö²ÎÊý
+* èŽ·å–å¸ƒå±€å‚æ•°
 */
 
 void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPadding)
@@ -167,7 +176,7 @@ void SplitterWindow::__exit__(py::args & args)
 	int len = m_children.size();
 	if (len > 2)
 	{
-		log_message("SplitterWindow ²»Ö§³Ö´óÓÚ2¸ö×ÓÔªËØ");
+		log_message("SplitterWindow ä¸æ”¯æŒå¤§äºŽ2ä¸ªå­å…ƒç´ ");
 		return;
 	}
 	Layout::__exit__(args);
@@ -192,7 +201,7 @@ void Notebook::doAdd(View & child)
 	Item *item = (Item*)child.ptr()->GetClientData();
 	if (Item::isInstance(item))
 	{
-		// Ìæ»»»ØÔ­Ö¸Õë
+		// æ›¿æ¢å›žåŽŸæŒ‡é’ˆ
 		child.ptr()->SetClientData(&child);
 
 		wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);

@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
     <ClCompile Include="pyapi\emuhacker\gba\gba.cpp" />
     <ClCompile Include="pyapi\emuhacker\gba\GbaEmuHandler.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="wxpatch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="pyapi\auto\auto.h" />
     <ClInclude Include="pyapi\emuhacker\emuhacker.h" />
     <ClInclude Include="pyapi\emuhacker\gba\gba.h" />
     <ClInclude Include="pyapi\emuhacker\gba\GbaEmuHandler.h" />

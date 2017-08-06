@@ -81,6 +81,7 @@ void init_layout(py::module &m)
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
 			label, "menuBar"_a = nullptr, styles, key, className, style)
 		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
+		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a=false);
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
