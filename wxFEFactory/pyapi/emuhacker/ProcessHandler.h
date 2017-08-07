@@ -47,37 +47,11 @@ public:
 
 	bool add(addr_t addr, int value);
 
-	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer);
-	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer);
-
-	template<typename ListType>
-	bool ProcessHandler::readLastPtr(addr_t addr, const ListType &offsets, addr_t *addrPtr) {
-		for (auto const offset : offsets) {
-			if (!read(addr, sizeof(addr), &addr))
-				return false;
-			addr = addr + offset;
-		}
-		*addrPtr = addr;
-		return true;
-	}
-
-	template<typename ListType>
-	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
-		addr_t lastAddr;
-		return readLastPtr(addr, offsets, &lastAddr) && read(lastAddr, size, buffer);
-	}
-
-	template<typename ListType>
-	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
-		addr_t lastAddr;
-		return readLastPtr(addr, offsets, &lastAddr) && write(lastAddr, size, buffer);
-	}
-
-
 	UINT64 readUint(addr_t addr, size_t size)
 	{
 		UINT64 data = 0;
-		return read(addr, size, &data);
+		read(addr, size, &data);
+		return data;
 	}
 
 	bool writeUint(addr_t addr, size_t size, UINT64 data)
@@ -113,7 +87,7 @@ public:
 	 * 写入数据
 	 */
 	template<typename ValueType>
-	bool write(addr_t addr, ValueType &buff) {
+	bool write(addr_t addr, const ValueType &buff) {
 		return write(addr, sizeof(ValueType), &buff);
 	}
 
@@ -127,26 +101,36 @@ public:
 		return data;
 	}
 
+	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer);
+	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer);
+
+	template<typename ListType>
+	addr_t ProcessHandler::readLastAddr(addr_t addr, const ListType &offsets) {
+		for (auto const offset : offsets) {
+			if (!read(addr, sizeof(addr), &addr))
+				return 0;
+			addr = addr + offset;
+		}
+		return addr;
+	}
+
 	/**
-	 * 多级指针读取数据
-	 */
-	template<typename ValueType, typename ListType>
-	ValueType ptrsRead(addr_t addr, const ListType &offsets)
-	{
-		ValueType data;
-		ptrsRead(addr, offsets, sizeof(data), &data);
-		return data;
+	* 多级指针读取数据
+	*/
+	template<typename ListType>
+	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
+		addr_t lastAddr = readLastAddr(addr, offsets);
+		return lastAddr && read(lastAddr, size, buffer);
 	}
 
 	/**
 	* 多级指针写入数据
 	*/
-	template<typename ValueType, typename ListType>
-	bool ptrsWrite(addr_t addr, const ListType &offsets, const ValueType buff)
-	{
-		return ptrsWrite(addr, offsets, sizeof(buff), &buff);
+	template<typename ListType>
+	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
+		addr_t lastAddr = readLastAddr(addr, offsets);
+		return lastAddr && write(lastAddr, size, buffer);
 	}
-
 private:
 	HANDLE		mProcess;
 };
