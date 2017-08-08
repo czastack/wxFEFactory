@@ -99,16 +99,16 @@ class Tool:
                     ui.Text("上天（有速度）: alt+空格")
                     ui.Text("往上（无速度）: alt+.")
                     ui.Text("恢复HP: alt+h")
-                    ui.Text("恢复大量HP(1000生命，1000护甲): alt+shift+h")
+                    ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
         with Group("global", "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=3, vgap=10, className="fill container"):
                 ui.Button("杀掉附近的人", onclick=self.killNearPerson)
-                ui.Button("附近人的车起火", onclick=self.nearPersonCarBoom)
-                ui.Button("附近人的车翻转", onclick=self.nearPersonCarFlip)
-                ui.Button("附近人的车叠罗汉", onclick=self.nearPersonCarPutAtOne)
-                ui.Button("附近人的车上天", onclick=self.nearPersonCarFly)
-                ui.Button("附近人上天", onclick=self.nearPersonFly)
+                ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
+                ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
+                ui.Button("附近的车叠罗汉", onclick=self.nearVehiclePutAtOne)
+                ui.Button("附近的车上天", onclick=self.nearVehicleFly)
+                ui.Button("附近的人上天", onclick=self.nearPersonFly)
 
     def closeWindow(self, m=None):
         self.onClose()
@@ -231,8 +231,8 @@ class Tool:
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
-            self.hp_view.mem_value = 1000
-            self.ap_view.mem_value = 1000
+            self.hp_view.mem_value = 999
+            self.ap_view.mem_value = 999
 
     def fromPlayerCoord(self, btn):
         self.vehicle_coord_view.input_value = self.coord_view.input_value
@@ -271,46 +271,66 @@ class Tool:
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def killNearPerson(self, btn=None):
-        for p in self.player.nearPersions:
+        for p in self.player.nearPersons:
             p.hp = 0
 
-    def nearPersonCarBoom(self, btn=None):
-        for p in self.player.nearPersions:
-            car = p.lastCar
-            if car:
-                car.hp = 0
+    def nearVehicleBoom(self, btn=None):
+        for v in self.getNearVehicles():
+            v.hp = 0
 
-    def nearPersonCarFlip(self, btn=None):
-        for p in self.player.nearPersions:
-            car = p.lastCar
-            if car:
-                car.dir[0] = 1
+    def nearVehicleFlip(self, btn=None):
+        for v in self.getNearVehicles():
+            v.dir[2] = 16
+            v.dir[0] = 6
 
-    def nearPersonCarPutAtOne(self, btn=None):
+    def nearVehiclePutAtOne(self, btn=None):
         first = None
-        for p in self.player.nearPersions:
-            car = p.lastCar
-            if car:
-                if not first:
-                    first = car
-                    first.speed = (0, 0, 0)
-                    coord = first.coord.values()
-                    lastZ = coord[2] + 8
-                else:
-                    car.coord = coord
-                    car.coord[2] = lastZ
-                    lastZ += 8
+        for v in self.getNearVehicles():
+            if not first:
+                first = v
+                first.speed = (0, 0, 0)
+                coord = first.coord.values()
+                lastZ = coord[2] + 8
+            else:
+                v.coord = coord
+                v.coord[2] = lastZ
+                lastZ += 8
 
-    def nearPersonCarFly(self, btn=None):
-        for p in self.player.nearPersions:
-            car = p.lastCar
-            if car:
-                car.speed[2] = 1
+    def nearVehicleFly(self, btn=None):
+        for v in self.getNearVehicles():
+            v.speed[2] = 1
 
     def nearPersonFly(self, btn=None):
-        for p in self.player.nearPersions:
+        for p in self.player.nearPersons:
             p.speed[2] = 1
 
+    def getPersons(self):
+        pool_ptr = self.handler.read32(0x97F2AC)
+        pool_start = self.handler.read32(pool_ptr)
+        pool_size = self.handler.read32(pool_ptr + 8)
+        for i in range(pool_size):
+            yield models.Player(pool_start, self.handler)
+            pool_start += 0xdb0
+
+    def getNearPersons(self, distance=100):
+        coord = self.player.coord.values()
+        for p in self.getPersons():
+            if p.hp != 0 and p.distance(coord) <= distance:
+                yield p
+
+    def getVehicles(self):
+        pool_ptr = self.handler.read32(0xA0FDE4)
+        pool_start = self.handler.read32(pool_ptr)
+        pool_size = self.handler.read32(pool_ptr + 8)
+        for i in range(pool_size):
+            yield models.Vehicle(pool_start, self.handler)
+            pool_start += 0x5dc
+
+    def getNearVehicles(self, distance=100):
+        coord = self.player.coord.values()
+        for v in self.getVehicles():
+            if v.hp != 0 and v.distance(coord) <= distance:
+                yield v
 
 
 ins = None

@@ -4,6 +4,7 @@ import sys
 import os
 import fefactory_api
 import traceback
+import __main__
 
 if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     # 重定向标准输出
@@ -45,6 +46,10 @@ def reload():
                 continue
         if file.startswith(pydir):
             del sys.modules[name]
+
+    for name in list(__main__.__dict__):
+        if not name.startswith('__'):
+            del __main__.__dict__[name]
 
     __import__(__name__)
 

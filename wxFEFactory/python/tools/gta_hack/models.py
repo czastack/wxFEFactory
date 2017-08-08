@@ -1,4 +1,15 @@
 from lib.hack.model import Model, Field, CoordsField
+import math
+
+
+def distance(p1, p2):
+    """求三围空间两点坐标"""
+    return math.sqrt(
+          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
+        + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
+        + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
+    )
+
 
 class Player(Model):
     PLAYER1 = 0
@@ -43,7 +54,7 @@ class Player(Model):
         return Vehicle(ptr, self.handler) if ptr else None
 
     @property
-    def nearPersions(self):
+    def nearPersons(self):
         offset = 0x56c
         for i in range(10):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
@@ -60,6 +71,9 @@ class Player(Model):
             print("not available i")
             return
         return self.handler.write32(self.addr + 0x408 + i * 4, weapon)
+
+    def distance(self, obj):
+        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
 
 class Vehicle(Model):
@@ -84,6 +98,10 @@ class Vehicle(Model):
         for i in range(4):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
+
+    def distance(self, obj):
+        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
+
 
 class Weapon:
     NONE = 0
