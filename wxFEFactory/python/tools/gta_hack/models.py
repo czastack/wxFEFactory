@@ -40,7 +40,6 @@ class Player(Model):
     speed = CoordsField(0x70)
     weight = Field(0xB8, float)
     stamina = Field(0x600, float)
-    wanted = Field(0x5f4, int)
     isInVehicle = Field(0x5f4, bool, 1)
     cur_weapon = Field(0x504, int)
     crouch = Field(0x150, bool)
@@ -59,6 +58,18 @@ class Player(Model):
         for i in range(10):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
+
+    @property
+    def wantedLevel(self):
+        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
+        if wanted_ptr:
+            return self.handler.read32(wanted_ptr + 0x20)
+
+    @wantedLevel.setter
+    def wantedLevel(self, val):
+        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
+        if wanted_ptr:
+            return self.handler.write(wanted_ptr + 0x20, val)
 
     def getWeapon(self, i):
         if i < 0 or i > 5:
@@ -101,6 +112,9 @@ class Vehicle(Model):
 
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
+
+    def stop(self):
+        self.speed = (0, 0, 0)
 
 
 class Weapon:

@@ -72,6 +72,7 @@ class Tool:
             ui.Text("")
             ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
         with Group("global", "全局", 0, handler=self.handler):
+            self.money_view = InputField("money", "金钱", 0x94ADC8, (), int)
             self.camera_view = CoordsField("camera", "摄像机", 0x7E46B8, ())
             self.camera_z_rot_view = InputField("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
             self.camera_x_rot_view = InputField("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
@@ -85,7 +86,7 @@ class Tool:
             CheckBoxField("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
             CheckBoxField("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
             CheckBoxField("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
-        with Group("global", "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
                     choices=(item[0] for item in vehicle_list))
@@ -101,14 +102,18 @@ class Tool:
                     ui.Text("恢复HP: alt+h")
                     ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
-        with Group("global", "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
                 ui.Button("杀掉附近的人", onclick=self.killNearPerson)
                 ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
-                ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
+                ui.Button("附近的车下陷", onclick=self.nearVehicleDown)
                 ui.Button("附近的车叠罗汉", onclick=self.nearVehiclePutAtOne)
                 ui.Button("附近的车上天", onclick=self.nearVehicleFly)
                 ui.Button("附近的人上天", onclick=self.nearPersonFly)
+                ui.Button("跳上一辆车", onclick=self.jumpOnVehicle)
+        with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
+            with ui.Vertical(className="fill container"):
+                ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def closeWindow(self, m=None):
         self.onClose()
@@ -139,6 +144,7 @@ class Tool:
                 ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                 ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                 ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
+                ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
             ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -270,40 +276,6 @@ class Tool:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
-    def killNearPerson(self, btn=None):
-        for p in self.player.nearPersons:
-            p.hp = 0
-
-    def nearVehicleBoom(self, btn=None):
-        for v in self.getNearVehicles():
-            v.hp = 0
-
-    def nearVehicleFlip(self, btn=None):
-        for v in self.getNearVehicles():
-            v.dir[2] = 16
-            v.dir[0] = 6
-
-    def nearVehiclePutAtOne(self, btn=None):
-        first = None
-        for v in self.getNearVehicles():
-            if not first:
-                first = v
-                first.speed = (0, 0, 0)
-                coord = first.coord.values()
-                lastZ = coord[2] + 8
-            else:
-                v.coord = coord
-                v.coord[2] = lastZ
-                lastZ += 8
-
-    def nearVehicleFly(self, btn=None):
-        for v in self.getNearVehicles():
-            v.speed[2] = 1
-
-    def nearPersonFly(self, btn=None):
-        for p in self.player.nearPersons:
-            p.speed[2] = 1
-
     def getPersons(self):
         pool_ptr = self.handler.read32(0x97F2AC)
         pool_start = self.handler.read32(pool_ptr)
@@ -328,9 +300,85 @@ class Tool:
 
     def getNearVehicles(self, distance=100):
         coord = self.player.coord.values()
+        mycarAddr = self.handler.read32(VEHICLE_BASE)
         for v in self.getVehicles():
             if v.hp != 0 and v.distance(coord) <= distance:
-                yield v
+                if v.addr != mycarAddr:
+                    yield v
+
+    def killNearPerson(self, btn=None):
+        for p in self.player.nearPersons:
+            p.hp = 0
+
+    def nearVehicleBoom(self, btn=None):
+        for v in self.getNearVehicles():
+            v.hp = 0
+
+    def nearVehicleDown(self, btn=None):
+        for v in self.getNearVehicles():
+            v.coord[2] -= 0.7
+
+    def nearVehiclePutAtOne(self, btn=None):
+        first = None
+        for v in self.getNearVehicles():
+            if not first:
+                first = v
+                first.speed = (0, 0, 0)
+                coord = first.coord.values()
+                lastZ = coord[2] + 8
+            else:
+                v.coord = coord
+                v.coord[2] = lastZ
+                lastZ += 8
+
+    def nearVehicleFly(self, btn=None):
+        for v in self.getNearVehicles():
+            v.coord[2] += 1
+            v.speed[2] = 1
+
+    def jumpOnVehicle(self, btn=None):
+        for v in self.getNearVehicles():
+            if v.numPassengers:
+                v.stop()
+                coord = v.coord.values()
+                coord[2] += 1
+                self.player.coord = coord
+                break
+
+    def nearPersonFly(self, btn=None):
+        for p in self.player.nearPersons:
+            p.speed[2] = 1
+
+    def g3l2json(self, btn=None):
+        """g3l坐标转json"""
+        path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
+        if path:
+            with open(path) as file:
+                if not file.readline().strip() == '[Locks]':
+                    fefactory_api.alert('不支持的格式')
+                    return
+
+                coord = [0, 0, 0]
+                datas = []
+                while True:
+                    line = file.readline()
+                    if not line:
+                        break
+                    line = line.strip()
+                    if line.startswith('x='):
+                        coord[0] = float(line[2:])
+                    elif line.startswith('y='):
+                        coord[1] = float(line[2:])
+                    elif line.startswith('z='):
+                        coord[2] = float(line[2:])
+                    elif line.startswith('desc='):
+                        datas.append({'name': line[5:], 'value': tuple(coord)})
+
+            jsonpath = path[:path.rfind('.') + 1] + 'json'
+            with open(jsonpath, 'w', encoding="utf-8") as file:
+                json.dump(datas, file, ensure_ascii=False)
+
+            fefactory_api.alert('转换成功: ' + jsonpath)
 
 
 ins = None

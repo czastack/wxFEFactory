@@ -243,18 +243,19 @@ class CoordsField(Field):
             self.data_list.pop(pos)
 
     def onSave(self, btn):
-        file = fefactory_api.choose_file("选择保存文件", file=self.lastfile, wildcard='*.json')
-        if file:
-            self.lastfile = file
-            with open(file, 'w', encoding="utf-8") as file:
+        path = fefactory_api.choose_file("选择保存文件", file=self.lastfile, wildcard='*.json')
+        if path:
+            self.lastfile = path
+            with open(path, 'w', encoding="utf-8") as file:
                 json.dump(self.data_list, file, ensure_ascii=False)
 
     def onLoad(self, btn):
-        file = fefactory_api.choose_file("选择要读取的文件", file=self.lastfile, wildcard='*.json')
-        if file:
-            self.lastfile = file
-            with open(file, encoding="utf-8") as file:
+        path = fefactory_api.choose_file("选择要读取的文件", file=self.lastfile, wildcard='*.json')
+        if path:
+            self.lastfile = path
+            with open(path, encoding="utf-8") as file:
                 self.data_list = json.load(file)
+                self.listbox.clear()
                 self.listbox.appendItems(tuple(data['name'] for data in self.data_list))
 
     def onListBoxSel(self, lb):
