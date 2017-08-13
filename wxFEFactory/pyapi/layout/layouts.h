@@ -155,6 +155,11 @@ public:
 
 	void onHotkey(wxKeyEvent &event);
 
+	pyobj getHotkeys()
+	{
+		return py::module::import("types").attr("MappingProxyType")(m_hotkey_map);
+	}
+
 	void onClose(class wxCloseEvent &event) override
 	{
 		stopHotkey();

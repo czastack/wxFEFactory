@@ -9,7 +9,7 @@ class Field:
         return obj.handler.read(obj.addr + self.offset, self.size, self.type)
 
     def __set__(self, obj, val):
-        obj.handler.write(obj.addr + self.offset, self.type(val), self.size)
+        obj.handler.write(obj.addr + self.offset, self.size, self.type(val))
 
 
 class CoordsField:

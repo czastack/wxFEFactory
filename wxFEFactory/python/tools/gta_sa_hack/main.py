@@ -154,10 +154,10 @@ class Tool:
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.player_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_BP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_FP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_DP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_EP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_FP)),
                     ]
                     ui.Button("再次应用", onclick=self.apply_player_special).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", VEHICLE_BASE, handler=self.handler):
@@ -175,10 +175,10 @@ class Tool:
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.vehicle_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_BP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_FP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_DP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_EP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_FP)),
                     ]
                     ui.Button("再次应用", onclick=self.apply_vehicle_special).setToolTip("切换载具后需要再次应用")
         with Group("weapon", "武器", None, handler=self.handler):
@@ -262,27 +262,25 @@ class Tool:
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
 
-            self.player = models.Player(self.handler.read32(PLAYER_BASE), self.handler)
-
-            self.win.RegisterHotKeys((
-                ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-                ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-                ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
-                ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
-                ('toUp', MOD_ALT, getVK('.'), self.toUp),
-                ('stop', MOD_ALT, getVK('x'), self.stop),
-                ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
-                ('restoreHpLarge', MOD_ALT | MOD_SHIFT, getVK('h'), self.restoreHpLarge),
-                ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
-                ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
-                ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
-                ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
-                ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
-            ))
+            if not self.win.hotkeys:
+                self.win.RegisterHotKeys((
+                    ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
+                    ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
+                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+                    ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
+                    ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
+                    ('toUp', MOD_ALT, getVK('.'), self.toUp),
+                    ('stop', MOD_ALT, getVK('x'), self.stop),
+                    ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
+                    ('restoreHpLarge', MOD_ALT | MOD_SHIFT, getVK('h'), self.restoreHpLarge),
+                    ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
+                    ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+                    ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                    ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
+                    ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
+                    ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
+                    ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
+                ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
@@ -291,6 +289,18 @@ class Tool:
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)
+
+    @property
+    def player(self):
+        player_addr = self.handler.read32(PLAYER_BASE)
+        if player_addr is 0:
+            return None
+        player = getattr(self, '_player', None)
+        if not player:
+            player = self._player = models.Player(player_addr, self.handler)
+        elif player.addr != player_addr:
+            player.addr = player_addr
+        return player
 
     @property
     def isInVehicle(self):
@@ -379,21 +389,6 @@ class Tool:
 
     def fromVehicleCoord(self, btn):
         self.coord_view.input_value = self.vehicle_coord_view.input_value
-
-    def promptWrite(self, text):
-        text = (text + '\0').encode('utf-16le')
-        TEXT1_ADDR = 0x7D3E40
-        TEXT2_ADDR = 0x939028
-        
-        self.handler.ptrsWrite(TEXT1_ADDR, (), text)
-        time.sleep(0.01)
-        self.handler.ptrsWrite(TEXT2_ADDR, (), text)
-
-    def bigbang(self, hotkeyId=None):
-        self.inputCheat('bigbang')
-
-    def spawnVehicle(self, hotkeyId=None):
-        self.inputCheat('betterthanwalking')
 
     def onSpawnVehicleIdChange(self, lb):
         self.spwan_vehicle_id = vehicle_list[lb.index][1]
@@ -520,8 +515,7 @@ class Tool:
     def cheat_sync(self, btn=None):
         cheat_config = self.get_cheat_config()
         for index, view in enumerate(self.cheat_views):
-            if self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1:
-                view.checked = True
+            view.checked = self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1
 
     def inject_spawn_code(self, btn=None):
         cheat_config = self.get_cheat_config()
