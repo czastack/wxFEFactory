@@ -9,7 +9,7 @@ class Field:
         return obj.handler.read(obj.addr + self.offset, self.size, self.type)
 
     def __set__(self, obj, val):
-        obj.handler.write(obj.addr + self.offset, self.size, self.type(val))
+        obj.handler.write(obj.addr + self.offset, self.type(val), self.size)
 
 
 class CoordsField:
@@ -17,7 +17,7 @@ class CoordsField:
         self.offset = offset
 
     def __get__(self, obj, type=None):
-        return CoordsData(obj.handler, obj.addr + self.offset)
+        return CoordsData(obj.addr + self.offset, obj.handler)
 
     def __set__(self, obj, val):
         if isinstance(val, CoordsData) and val.addr == obj.addr + self.offset:
@@ -29,7 +29,7 @@ class CoordsField:
 
 
 class CoordsData:
-    def __init__(self, handler, addr):
+    def __init__(self, addr, handler):
         self.handler = handler
         self.addr = addr
         self._pos = 0

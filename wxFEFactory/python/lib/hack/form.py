@@ -3,7 +3,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Field:
+class Widget:
     GROUPS = []
 
     def __init__(self, name, label, addr, offsets=()):
@@ -41,7 +41,7 @@ class Field:
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
     
 
-class Group(Field):
+class Group(Widget):
 
     def __init__(self, name, label, addr, flexgrid=True, hasfootbar=True, handler=None):
         super().__init__(name, label, addr)
@@ -93,7 +93,7 @@ class GroupBox(Group):
         self.view = ui.StaticBox(self.label, className="fill container")
 
 
-class InputField(Field):
+class InputWidget(Widget):
     def __init__(self, name, label, addr, offsets, type_=None, size=4):
         super().__init__(name, label, addr, offsets)
         self.type = type_
@@ -120,7 +120,7 @@ class InputField(Field):
         self.mem_value = self.view.value
 
 
-class CheckBoxField(Field):
+class CheckBoxWidget(Widget):
     def __init__(self, name, label, addr, offsets, enableData=None, disableData=None):
         """
         :param enableData: 激活时写入的数据
@@ -138,7 +138,7 @@ class CheckBoxField(Field):
         self._handler.ptrsWrite(self.addr, self.offsets, data, len(data))
 
 
-class CoordsField(Field):
+class CoordsWidget(Widget):
     def __init__(self, name, label, addr, offsets, savable=False):
         self.savable = savable
         super().__init__(name, label, addr, offsets)

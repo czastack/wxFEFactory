@@ -57,6 +57,8 @@ bool process_write(ProcessHandler& self, u32 addr, size_t size, pycref data)
 	}
 	else if (PY_IS_TYPE(data, PyBytes))
 	{
+		if (size == 0)
+			size = py::len(data);
 		return self.write(addr, size, bytesGetBuff(data));
 	}
 

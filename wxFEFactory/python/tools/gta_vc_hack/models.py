@@ -116,6 +116,10 @@ class Vehicle(Model):
     def stop(self):
         self.speed = (0, 0, 0)
 
+    def flip(self):
+        self.dir[0] = -self.dir[0]
+        self.dir[1] = -self.dir[1]
+
 
 class Weapon:
     NONE = 0

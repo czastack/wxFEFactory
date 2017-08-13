@@ -1,5 +1,5 @@
 from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, InputField, CheckBoxField, CoordsField
+from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from commonstyle import dialog_style, styles
@@ -18,7 +18,7 @@ PLAYER_BASE  = 0x94AD28
 VEHICLE_BASE = 0x7E49C0
 MONEY_BASE   = 0x94ADC8
 SPAWN_VEHICLE_ID_BASE = 0x4ACA36
-
+# 冰淇淋任务卖出数? 00828D3C
 
 class Tool:
 
@@ -51,41 +51,41 @@ class Tool:
 
     def render_main(self):
         with Group("player", "角色", PLAYER_BASE, handler=self.handler):
-            self.hp_view = InputField("hp", "生命", None, (0x354,), float)
-            self.ap_view = InputField("ap", "防弹衣", None, (0x358,), float)
-            self.rot_view = InputField("rotation", "旋转", None, (0x378,), float)
-            self.coord_view = CoordsField("coord", "坐标", None, (0x34,), savable=True)
-            self.speed_view = CoordsField("speed", "速度", None, (0x70,))
-            self.weight_view = InputField("weight", "重量", None, (0xB8,), float)
-            self.stamina_view = InputField("stamina", "体力", None, (0x600,), float)
-            self.star_view = InputField("star", "通缉等级", None, (0x5f4, 0x20), int)
+            self.hp_view = InputWidget("hp", "生命", None, (0x354,), float)
+            self.ap_view = InputWidget("ap", "防弹衣", None, (0x358,), float)
+            self.rot_view = InputWidget("rotation", "旋转", None, (0x378,), float)
+            self.coord_view = CoordsWidget("coord", "坐标", None, (0x34,), savable=True)
+            self.speed_view = CoordsWidget("speed", "速度", None, (0x70,))
+            self.weight_view = InputWidget("weight", "重量", None, (0xB8,), float)
+            self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
+            self.star_view = InputWidget("star", "通缉等级", None, (0x5f4, 0x20), int)
             ui.Text("")
             ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
         with Group("vehicle", "汽车", VEHICLE_BASE, handler=self.handler):
-            self.vehicle_hp_view = InputField("vehicle_hp", "HP", None, (0x204,), float)
-            self.vehicle_roll_view = CoordsField("roll", "滚动", None, (0x04,))
-            self.vehicle_dir_view = CoordsField("dir", "方向", None, (0x14,))
-            self.vehicle_coord_view = CoordsField("coord", "坐标", None, (0x34,), savable=True)
-            self.vehicle_speed_view = CoordsField("speed", "速度", None, (0x70,))
-            self.vehicle_turn_view = CoordsField("turn", "Turn", None, (0x7C,))
-            self.weight_view = InputField("weight", "重量", None, (0xB8,), float)
+            self.vehicle_hp_view = InputWidget("vehicle_hp", "HP", None, (0x204,), float)
+            self.vehicle_roll_view = CoordsWidget("roll", "滚动", None, (0x04,))
+            self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,))
+            self.vehicle_coord_view = CoordsWidget("coord", "坐标", None, (0x34,), savable=True)
+            self.vehicle_speed_view = CoordsWidget("speed", "速度", None, (0x70,))
+            self.vehicle_turn_view = CoordsWidget("turn", "Turn", None, (0x7C,))
+            self.weight_view = InputWidget("weight", "重量", None, (0xB8,), float)
             ui.Text("")
             ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputField("money", "金钱", 0x94ADC8, (), int)
-            self.camera_view = CoordsField("camera", "摄像机", 0x7E46B8, ())
-            self.camera_z_rot_view = InputField("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
-            self.camera_x_rot_view = InputField("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
-            CheckBoxField("god1", "角色无伤1", 0x5267DC, (), b'\xEB\x10', b'\x75\x15')
-            CheckBoxField("god2", "角色无伤2", 0x5267D5, (), b'\x90\x90', b'\x75\x1C')
-            CheckBoxField("vehicle_god1", "汽车无伤1", 0x5A9801, (), b'\xc7\x41\x04\x00\x00\x00\x00\xc2\x04', b'\x88\x41\x04\xc2\x04\x00\x00\x00\x00')
-            CheckBoxField("vehicle_god2", "汽车无伤2", 0x588A77, (), b'\x90\x90', b'\x75\x09')
-            CheckBoxField("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
-            CheckBoxField("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-            CheckBoxField("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
-            CheckBoxField("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
-            CheckBoxField("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
-            CheckBoxField("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
+            self.money_view = InputWidget("money", "金钱", 0x94ADC8, (), int)
+            self.camera_view = CoordsWidget("camera", "摄像机", 0x7E46B8, ())
+            self.camera_z_rot_view = InputWidget("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
+            self.camera_x_rot_view = InputWidget("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
+            CheckBoxWidget("god1", "角色无伤1", 0x5267DC, (), b'\xEB\x10', b'\x75\x15')
+            CheckBoxWidget("god2", "角色无伤2", 0x5267D5, (), b'\x90\x90', b'\x75\x1C')
+            CheckBoxWidget("vehicle_god1", "汽车无伤1", 0x5A9801, (), b'\xc7\x41\x04\x00\x00\x00\x00\xc2\x04', b'\x88\x41\x04\xc2\x04\x00\x00\x00\x00')
+            CheckBoxWidget("vehicle_god2", "汽车无伤2", 0x588A77, (), b'\x90\x90', b'\x75\x09')
+            CheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
+            CheckBoxWidget("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
+            CheckBoxWidget("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
+            CheckBoxWidget("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
+            CheckBoxWidget("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
+            CheckBoxWidget("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
@@ -99,6 +99,7 @@ class Tool:
                     ui.Text("弹射起步: alt+m")
                     ui.Text("上天（有速度）: alt+空格")
                     ui.Text("往上（无速度）: alt+.")
+                    ui.Text("下坠: alt+shift+空格")
                     ui.Text("恢复HP: alt+h")
                     ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
@@ -110,6 +111,7 @@ class Tool:
                 ui.Button("附近的车叠罗汉", onclick=self.nearVehiclePutAtOne)
                 ui.Button("附近的车上天", onclick=self.nearVehicleFly)
                 ui.Button("附近的人上天", onclick=self.nearPersonFly)
+                ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
                 ui.Button("跳上一辆车", onclick=self.jumpOnVehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -136,6 +138,7 @@ class Tool:
                 ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
                 ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
                 ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
+                ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
                 ('toUp', MOD_ALT, getVK('.'), self.toUp),
                 ('stop', MOD_ALT, getVK('x'), self.stop),
                 ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
@@ -145,6 +148,8 @@ class Tool:
                 ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                 ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
                 ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
+                ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
+                ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
             ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -215,6 +220,9 @@ class Tool:
 
     def raiseUp(self, hotkeyId=None, speed=1.0):
         self.handler.writeFloat(self.z_speed_ptr, speed)
+
+    def goDown(self, hotkeyId=None, speed=0.5):
+        self.handler.writeFloat(self.z_speed_ptr, -speed)
 
     def toUp(self, hotkeyId=None):
         view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
@@ -345,9 +353,16 @@ class Tool:
                 self.player.coord = coord
                 break
 
+    def nearVehicleFlip(self, btn=None):
+        for v in self.getNearVehicles():
+            v.flip()
+
     def nearPersonFly(self, btn=None):
         for p in self.player.nearPersons:
             p.speed[2] = 1
+
+    def vehicleFlip(self, _=None):
+        grad = self.player.lastCar.flip()
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""
