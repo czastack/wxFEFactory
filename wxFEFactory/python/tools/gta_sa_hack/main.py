@@ -174,6 +174,7 @@ class Tool:
             self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
             ui.Text("")
             with ui.Vertical(className="fill"):
+                ui.CheckBox("锁车", onchange=self.vehicleLockDoor)
                 with ui.Horizontal(className="expand"):
                     ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
                     ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
@@ -204,7 +205,10 @@ class Tool:
             InputWidget("car_prof", "驾驶技术", CAR_PROF_ADDR, (), int)
             InputWidget("bike_prof", "摩托车技术", BIKE_PROF_ADDR, (), int)
             InputWidget("cycle_prof", "自行车技术", CYCLE_PROF_ADDR, (), int)
-            InputWidget("flying_prof", "飞行技术", FLYING_PROF_ADDR, (), int)
+            InputWidget("days_in_game", "天数", DAYS_IN_GAME_ADDR, (), int)
+            InputWidget("curr_hour", "当前小时", CURR_HOUR_ADDR, (), int, 1)
+            InputWidget("curr_minute", "当前分钟", CURR_MINUTE_ADDR, (), int, 1)
+            InputWidget("curr_weekday", "当前星期", CURR_WEEKDAY_ADDR, (), int, 1)
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -219,8 +223,12 @@ class Tool:
                 with ui.Horizontal(className="fill container"):
                     ui.Button("同步", onclick=self.cheat_sync)
                     ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
-                    self.spawn_code_injected_view = ui.Text("")
-
+                    self.spawn_code_injected_view = ui.Text("", className="vcenter")
+        with Group(None, "女友进度", 0, handler=self.handler):
+            # TODO
+            GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
+            for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
+                InputWidget(label, label, GIRL_FRIEND_PROGRESS_ADDR[i], (), int)
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
@@ -240,6 +248,7 @@ class Tool:
                     ui.Text("附近的人上天: alt+f")
                     ui.Text("附近的车翻转: alt+shift+k")
                     ui.Text("自己的车翻转: alt+k")
+                    ui.Text("瞬移到地图指针处: ctrl+alt+g")
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
                 ui.Button("杀掉附近的人", onclick=self.killNearPerson)
@@ -250,6 +259,8 @@ class Tool:
                 ui.Button("附近的人上天", onclick=self.nearPersonFly)
                 ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
                 ui.Button("跳上一辆车", onclick=self.jumpOnVehicle)
+                ui.Button("召唤上一辆车回来", onclick=self.callVehicle)
+                ui.Button("回到上一辆车旁边", onclick=self.goVehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
@@ -286,6 +297,7 @@ class Tool:
                     ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
                     ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
+                    ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -307,6 +319,10 @@ class Tool:
         elif player.addr != player_addr:
             player.addr = player_addr
         return player
+
+    @property
+    def vehicle(self):
+        return models.Vehicle(self.handler.read32(VEHICLE_BASE), self.handler)
 
     @property
     def isInVehicle(self):
@@ -501,7 +517,14 @@ class Tool:
             p.speed[2] = 1
 
     def vehicleFlip(self, _=None):
-        grad = self.player.lastCar.flip()
+        car = self.player.lastCar
+        if car:
+            car.flip()
+
+    def moveToMapPtr(self, _=None):
+        coord = self.vehicle.coord
+        coord[0] = self.handler.readFloat(MAP_X_ADDR)
+        coord[1] = self.handler.readFloat(MAP_Y_ADDR)
 
     def setPlayerSpecial(self, checkbox, bitindex):
         """设置玩家特殊属性"""
@@ -537,14 +560,16 @@ class Tool:
         cheat_config = self.get_cheat_config()
 
         if not self.spawn_code_injected:
-            self.handler.write(cheat_config['CodeInjectJumpAddr'], 0, cheat_config['bInjectedJump'])
-            self.handler.write(cheat_config['CodeInjectCodeAddr'], 0, cheat_config['bInjectedCode'])
-            self.spawn_code_injected = True
-            self.spawn_code_injected_view.value = "已插入"
+            if (
+                self.handler.write(cheat_config['CodeInjectJumpAddr'], 0, cheat_config['bInjectedJump'])
+                and self.handler.write(cheat_config['CodeInjectCodeAddr'], 0, cheat_config['bInjectedCode'])
+            ):
+                self.spawn_code_injected = True
+                self.spawn_code_injected_view.label = "已插入"
         else:
             self.handler.write(cheat_config['CodeInjectJumpAddr'], 0, cheat_config['bNotInjectedJump'])
             self.spawn_code_injected = False
-            self.spawn_code_injected_view.value = ""
+            self.spawn_code_injected_view.label = ""
 
     def freeze_timer(self, cb):
         """冻结任务中的计时"""
@@ -570,6 +595,40 @@ class Tool:
         carid = getattr(self, 'spwan_vehicle_id', None)
         if carid:
             self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
+
+    def vehicleLockDoor(self, cb):
+        car = self.player.lastCar
+        if car:
+            if cb.checked:
+                car.lockDoor()
+            else:
+                car.unLockDoor()
+
+    def callVehicle(self, _=None):
+        """召唤上一辆车回来"""
+        car = self.player.lastCar
+        if car:
+            PI = math.pi
+            HALF_PI = PI / 2
+            rotz = self.rot_view.mem_value
+            rotz += HALF_PI
+            if rotz > PI:
+                rotz += PI * 2
+
+            xVal = math.cos(rotz)
+            yVal = math.sin(rotz)
+            coord = self.player.coord.values()
+            coord[0] += xVal * 5
+            coord[1] += yVal * 5
+            car.coord = coord
+
+    def goVehicle(self, _=None):
+        """回到上一辆车旁边"""
+        car = self.player.lastCar
+        if car:
+            coord = car.coord.values()
+            coord[2] += 5
+            self.player.coord = coord
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""
@@ -606,7 +665,7 @@ class Tool:
 ins = None
 win_style = {
     'width': 640,
-    'height': 820,
+    'height': 900,
 }
 
 def run():

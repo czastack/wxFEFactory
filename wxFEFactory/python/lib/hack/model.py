@@ -47,9 +47,11 @@ class CoordsData:
         self._pos = 0
         return self
 
-    def next(self):
+    def __next__(self):
         if self._pos < 3:
-            return self[self._pos]
+            ret = self[self._pos]
+            self._pos += 1
+            return ret
         raise StopIteration
 
 

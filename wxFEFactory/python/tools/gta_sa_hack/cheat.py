@@ -85,6 +85,16 @@ version_config = {
             0x969153, # Boats can Fly
             0x969160, # Cars can Fly
         ],
+
+        # 和女友的进度
+        'GIRL_FRIEND_PROGRESS_ADDR': [
+            0xA49EFC, # Denise
+            0xA49F00, # Michelle
+            0xA49F04, # Helena
+            0xA49F0C, # Katie
+            0xA49F08, # Barbara
+            0xA49F10, # Millie
+        ]
     },
     'V1.1': {
         'CodeInjectNOP_FreezeTimerDownAddr': 0x44CBD6,
