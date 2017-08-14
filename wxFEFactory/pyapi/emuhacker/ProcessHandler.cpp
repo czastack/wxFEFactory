@@ -104,13 +104,15 @@ bool ProcessHandler::add(addr_t addr, int value)
 }
 
 bool ProcessHandler::ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer){
-	if(read(addr, sizeof(addr), &addr))
+	addr = readAddr(addr);
+	if(addr)
 		return read(addr + offset, size, buffer);
 	return false;
 }
 
 bool ProcessHandler::ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer){
-	if(read(addr, sizeof(addr), &addr))
+	addr = readAddr(addr);
+	if (addr)
 		return write(addr + offset, size, buffer);
 	return false;
 }

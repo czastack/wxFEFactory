@@ -9,12 +9,23 @@ typedef const wchar_t* CSTR;
 
 class ProcessHandler
 {
+private:
+	HANDLE		mProcess;
+
 public:
+	bool        m_addr_is32 = true; // 目标是32位地址
+
 	ProcessHandler();
 	virtual ~ProcessHandler();
 
 	virtual bool attach() { return false; }
-	virtual addr_t prepareAddr(addr_t addr, size_t size) { return addr; };
+	virtual addr_t prepareAddr(addr_t addr, size_t size) {
+		return 
+// #ifdef _WIN64
+// 			m_addr_is32 ? (addr & 0xFFFFFFFF) :
+// #endif
+			addr;
+	};
 
 	/*
 	 * close the handle
@@ -101,15 +112,38 @@ public:
 		return data;
 	}
 
+	addr_t readAddr(addr_t addr)
+	{
+#ifdef _WIN64
+		if (m_addr_is32)
+		{
+			addr &= 0xFFFFFFFF;
+		}
+#endif
+
+		if (!read(addr,
+#ifdef _WIN64
+			m_addr_is32 ? sizeof(u32) :
+#endif
+			sizeof(addr), &addr))
+		{
+			return 0;
+		}
+
+		return addr;
+	}
+
 	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer);
 	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer);
 
 	template<typename ListType>
 	addr_t ProcessHandler::readLastAddr(addr_t addr, const ListType &offsets) {
 		for (auto const offset : offsets) {
-			if (!read(addr, sizeof(addr), &addr))
+			addr = readAddr(addr);
+			if (!addr)
 				return 0;
-			addr = addr + offset;
+
+			addr += offset;
 		}
 		return addr;
 	}
@@ -119,8 +153,8 @@ public:
 	*/
 	template<typename ListType>
 	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
-		addr_t lastAddr = readLastAddr(addr, offsets);
-		return lastAddr && read(lastAddr, size, buffer);
+		addr = readLastAddr(addr, offsets);
+		return addr && read(addr, size, buffer);
 	}
 
 	/**
@@ -128,9 +162,7 @@ public:
 	*/
 	template<typename ListType>
 	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
-		addr_t lastAddr = readLastAddr(addr, offsets);
-		return lastAddr && write(lastAddr, size, buffer);
+		addr = readLastAddr(addr, offsets);
+		return addr && write(addr, size, buffer);
 	}
-private:
-	HANDLE		mProcess;
 };

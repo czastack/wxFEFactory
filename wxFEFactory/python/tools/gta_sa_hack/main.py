@@ -19,6 +19,8 @@ ACTOR_POOL_POINTER   = 0x00B74490
 ACTOR_POINTER_SELF   = 0x00B7CD98
 VEHICLE_POOL_POINTER = 0x00B74494
 VEHICLE_POINTER_SELF = 0x00B6F980
+MAP_X_ADDR = 0x00BA67B8
+MAP_Y_ADDR = 0x00BA67BC
 
 PLAYER_BASE  = 0xB6F5F0
 PLAYER2_BASE  = 0xB7CD98
@@ -149,7 +151,9 @@ class Tool:
             # self.star_view = InputWidget("star", "通缉等级", None, (0x5f4, 0x20), int)
             ui.Text("")
             with ui.Vertical(className="fill"):
-                ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
+                with ui.Horizontal(className="expand"):
+                    ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
+                    ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
                 ui.Hr()
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
@@ -170,7 +174,9 @@ class Tool:
             self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
             ui.Text("")
             with ui.Vertical(className="fill"):
-                ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+                with ui.Horizontal(className="expand"):
+                    ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+                    ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
                 ui.Hr()
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
@@ -390,6 +396,16 @@ class Tool:
     def fromVehicleCoord(self, btn):
         self.coord_view.input_value = self.vehicle_coord_view.input_value
 
+    def playerCoordFromMap(self, btn=None):
+        # 从大地图读取坐标
+        self.coord_view.views[0].value = str(self.handler.readFloat(MAP_X_ADDR))
+        self.coord_view.views[1].value = str(self.handler.readFloat(MAP_Y_ADDR))
+
+    def vehicleCoordFromMap(self, btn=None):
+        # 从大地图读取坐标
+        self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(MAP_X_ADDR))
+        self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(MAP_Y_ADDR))
+
     def onSpawnVehicleIdChange(self, lb):
         self.spwan_vehicle_id = vehicle_list[lb.index][1]
 
@@ -524,11 +540,11 @@ class Tool:
             self.handler.write(cheat_config['CodeInjectJumpAddr'], 0, cheat_config['bInjectedJump'])
             self.handler.write(cheat_config['CodeInjectCodeAddr'], 0, cheat_config['bInjectedCode'])
             self.spawn_code_injected = True
-            spawn_code_injected_view.value = "已插入"
+            self.spawn_code_injected_view.value = "已插入"
         else:
             self.handler.write(cheat_config['CodeInjectJumpAddr'], 0, cheat_config['bNotInjectedJump'])
             self.spawn_code_injected = False
-            spawn_code_injected_view.value = ""
+            self.spawn_code_injected_view.value = ""
 
     def freeze_timer(self, cb):
         """冻结任务中的计时"""

@@ -200,11 +200,15 @@ class CoordsWidget(Widget):
         offsets = list(self.offsets)
         it = iter(values)
         for child in self.views:
+            value = next(it)
+            if value == '':
+                continue
+            value = float(value)
             if offsets:
-                self._handler.ptrsWrite(self.addr, offsets, float(next(it)))
+                self._handler.ptrsWrite(self.addr, offsets, value)
                 offsets[-1] += 4
             else:
-                self._handler.writeFloat(self.addr, float(next(it)))
+                self._handler.writeFloat(self.addr, value)
 
     @property
     def input_value(self):

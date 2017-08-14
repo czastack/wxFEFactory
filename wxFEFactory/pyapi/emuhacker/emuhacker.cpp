@@ -9,7 +9,7 @@
 #include <windows.h>
 
 
-pyobj process_read(ProcessHandler& self, u32 addr, size_t size, pycref type)
+pyobj process_read(ProcessHandler& self, addr_t addr, size_t size, pycref type)
 {
 	const auto &builtin = py::module::import("builtins");
 	if (type == builtin.attr("float"))
@@ -40,7 +40,7 @@ pyobj process_read(ProcessHandler& self, u32 addr, size_t size, pycref type)
 }
 
 
-bool process_write(ProcessHandler& self, u32 addr, size_t size, pycref data)
+bool process_write(ProcessHandler& self, addr_t addr, size_t size, pycref data)
 {
 	if (PY_IS_TYPE(data, PyFloat))
 	{
@@ -66,7 +66,7 @@ bool process_write(ProcessHandler& self, u32 addr, size_t size, pycref data)
 }
 
 
-addr_t readLastAddr(ProcessHandler& self, u32 addr, py::iterable &args)
+addr_t readLastAddr(ProcessHandler& self, addr_t addr, py::iterable &args)
 {
 	wxArrayInt offsets = py::cast<wxArrayInt>(args);
 	return self.readLastAddr(addr, offsets);
@@ -91,25 +91,25 @@ void init_emuhacker(pybind11::module & m)
 		.def("attachByWindowName", &ProcessHandler::attachByWindowName)
 		.def("readUint", &ProcessHandler::readUint)
 		.def("writeUint", &ProcessHandler::writeUint)
-		.def("read8", [](ProcessHandler& self, u32 addr) {
+		.def("read8", [](ProcessHandler& self, addr_t addr) {
 			return self.readUint(addr, sizeof(u8));
 		})
-		.def("read16", [](ProcessHandler& self, u32 addr) {
+		.def("read16", [](ProcessHandler& self, addr_t addr) {
 			return self.readUint(addr, sizeof(u16));
 		})
-		.def("read32", [](ProcessHandler& self, u32 addr) {
+		.def("read32", [](ProcessHandler& self, addr_t addr) {
 			return self.readUint(addr, sizeof(u32));
 		})
 		.def("read64", [](ProcessHandler& self, UINT64 addr) {
 			return self.readUint(addr, sizeof(UINT64));
 		})
-		.def("write8", [](ProcessHandler& self, u32 addr, UINT64 data) {
+		.def("write8", [](ProcessHandler& self, addr_t addr, UINT64 data) {
 			return self.writeUint(addr, sizeof(u8), data);
 		})
-		.def("write16", [](ProcessHandler& self, u32 addr, UINT64 data) {
+		.def("write16", [](ProcessHandler& self, addr_t addr, UINT64 data) {
 			return self.writeUint(addr, sizeof(u8), data);
 		})
-		.def("write32", [](ProcessHandler& self, u32 addr, UINT64 data) {
+		.def("write32", [](ProcessHandler& self, addr_t addr, UINT64 data) {
 			return self.writeUint(addr, sizeof(u32), data);
 		})
 		.def("write64", [](ProcessHandler& self, UINT64 addr, UINT64 data) {
@@ -118,19 +118,20 @@ void init_emuhacker(pybind11::module & m)
 		.def("read", process_read, addr_a, size_a, type_a)
 		.def("write", process_write, addr_a, size_a, data_a)
 		.def("add", &ProcessHandler::add)
-		.def("readFloat", [](ProcessHandler& self, u32 addr) {
+		.def("readFloat", [](ProcessHandler& self, addr_t addr) {
 			return self.read<float>(addr);
 		})
-		.def("writeFloat", [](ProcessHandler& self, u32 addr, float value) {
+		.def("writeFloat", [](ProcessHandler& self, addr_t addr, float value) {
 			return self.write(addr, value);
 		})
 		.def("readLastAddr", readLastAddr, addr_a, offsets_a)
-		.def("ptrsRead", [](ProcessHandler& self, u32 addr, py::iterable &args, pycref type, pycref size) {
+		.def("ptrsRead", [](ProcessHandler& self, addr_t addr, py::iterable &args, pycref type, pycref size) {
 			return process_read(self, readLastAddr(self, addr, args), size.cast<size_t>(), type);
 		}, addr_a, offsets_a, type_a, "size"_a = 4)
-		.def("ptrsWrite", [](ProcessHandler& self, u32 addr, py::iterable &args, pycref data, pycref size) {
+		.def("ptrsWrite", [](ProcessHandler& self, addr_t addr, py::iterable &args, pycref data, pycref size) {
 			return process_write(self, readLastAddr(self, addr, args), size.cast<size_t>(), data);
-		}, addr_a, offsets_a, data_a, "size"_a=4);
+		}, addr_a, offsets_a, data_a, "size"_a=4)
+		.def_readwrite("addr_is32", &ProcessHandler::m_addr_is32);
 
 	py::class_<VbaHandler, ProcessHandler>(emuhacker, "VbaHandler")
 		.def(py::init<>());
