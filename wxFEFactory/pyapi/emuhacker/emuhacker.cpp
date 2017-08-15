@@ -124,12 +124,38 @@ void init_emuhacker(pybind11::module & m)
 		.def("writeFloat", [](ProcessHandler& self, addr_t addr, float value) {
 			return self.write(addr, value);
 		})
+		.def("ptrRead", [](ProcessHandler& self, addr_t addr, u32 offset, pycref type, pycref size) {
+			addr = self.readAddr(addr);
+			if (addr)
+			{
+				return process_read(self, addr + offset, size.cast<size_t>(), type);
+			}
+			return py::cast(false);
+		}, addr_a, offsets_a, type_a, "size"_a = 4)
+		.def("ptrWrite", [](ProcessHandler& self, addr_t addr, u32 offset, pycref data, pycref size) {
+			addr = self.readAddr(addr);
+			if (addr)
+			{
+				return process_write(self, addr + offset, size.cast<size_t>(), data);
+			}
+			return false;
+		}, addr_a, offsets_a, data_a, "size"_a=4)
 		.def("readLastAddr", readLastAddr, addr_a, offsets_a)
 		.def("ptrsRead", [](ProcessHandler& self, addr_t addr, py::iterable &args, pycref type, pycref size) {
-			return process_read(self, readLastAddr(self, addr, args), size.cast<size_t>(), type);
+			addr = readLastAddr(self, addr, args);
+			if (addr)
+			{
+				return process_read(self, addr, size.cast<size_t>(), type);
+			}
+			return py::cast(false);
 		}, addr_a, offsets_a, type_a, "size"_a = 4)
 		.def("ptrsWrite", [](ProcessHandler& self, addr_t addr, py::iterable &args, pycref data, pycref size) {
-			return process_write(self, readLastAddr(self, addr, args), size.cast<size_t>(), data);
+			addr = readLastAddr(self, addr, args);
+			if (addr)
+			{
+				return process_write(self, addr, size.cast<size_t>(), data);
+			}
+			return false;
 		}, addr_a, offsets_a, data_a, "size"_a=4)
 		.def_readwrite("addr_is32", &ProcessHandler::m_addr_is32);
 

@@ -56,7 +56,12 @@ public:
 	bool read(addr_t addr, size_t size, LPVOID buffer);
 	bool write(addr_t addr, size_t size, LPCVOID buffer);
 
-	bool add(addr_t addr, int value);
+	bool add(addr_t addr, int value)
+	{
+		u32 origin = read<u32>(addr);
+		origin += value;
+		return write(addr, origin);
+	}
 
 	UINT64 readUint(addr_t addr, size_t size)
 	{
@@ -133,8 +138,18 @@ public:
 		return addr;
 	}
 
-	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer);
-	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer);
+	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer) {
+		addr = readAddr(addr);
+		if (addr)
+			return read(addr + offset, size, buffer);
+		return false;
+	}
+	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer) {
+		addr = readAddr(addr);
+		if (addr)
+			return write(addr + offset, size, buffer);
+		return false;
+	}
 
 	template<typename ListType>
 	addr_t ProcessHandler::readLastAddr(addr_t addr, const ListType &offsets) {

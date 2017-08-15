@@ -1,6 +1,6 @@
 from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, Widget, InputWidget, CheckBoxWidget, CoordsWidget
+from lib.hack.form import Group, Widget, InputWidget, CheckBoxWidget, CoordsWidget, ProxyInputWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from commonstyle import dialog_style, styles
@@ -26,6 +26,7 @@ PLAYER_BASE  = 0xB6F5F0
 PLAYER2_BASE  = 0xB7CD98
 VEHICLE_BASE = 0xB6F3B8
 MONEY_BASE   = 0xB7CE50
+WANTED_LEVEL_ADDR = 0xB7CD9C
 
 MAX_HEALTH_STAT_ADDR = 0xB793E0
 ENERGY_STAT_ADDR = 0xB790B4
@@ -147,8 +148,8 @@ class Tool:
             self.coord_view = CoordsWidget("coord", "坐标", None, (0x14, 0x30), savable=True)
             self.speed_view = CoordsWidget("speed", "速度", None, (0x44,))
             self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
+            self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.getWantedLevel, self.setWantedLevel)
             # self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
-            # self.star_view = InputWidget("star", "通缉等级", None, (0x5f4, 0x20), int)
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
@@ -220,7 +221,7 @@ class Tool:
                     ]
                     ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
                     ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
-                with ui.Horizontal(className="fill container"):
+                with ui.Horizontal(className="container"):
                     ui.Button("同步", onclick=self.cheat_sync)
                     ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
                     self.spawn_code_injected_view = ui.Text("", className="vcenter")
@@ -629,6 +630,19 @@ class Tool:
             coord = car.coord.values()
             coord[2] += 5
             self.player.coord = coord
+
+    def getWantedLevel(self):
+        ptr = self.handler.read32(WANTED_LEVEL_ADDR)
+        return self.handler.read8(ptr + 0x2C)
+
+    def setWantedLevel(self, level):
+        level = int(level)
+        ptr = self.handler.read32(WANTED_LEVEL_ADDR)
+        cops = (0, 1, 3, 5, 9, 1, 2)[level]
+        wantedLevel = (0, 60, 200, 700, 1500, 3000, 5000)[level]
+        self.handler.write32(ptr, wantedLevel)
+        self.handler.write8(ptr + 0x19, cops)
+        self.handler.write8(ptr + 0x2C, level)
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""

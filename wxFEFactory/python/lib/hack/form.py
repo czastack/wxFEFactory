@@ -93,17 +93,34 @@ class GroupBox(Group):
         self.view = ui.StaticBox(self.label, className="fill container")
 
 
-class InputWidget(Widget):
-    def __init__(self, name, label, addr, offsets, type_=None, size=4):
-        super().__init__(name, label, addr, offsets)
-        self.type = type_
-        self.size = size
-
+class BaseInputWidget(Widget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", exstyle=0x0400)
             self.render_btn()
+
+    @property
+    def input_value(self):
+        return self.view.value
+
+    @input_value.setter
+    def input_value(self, value):
+        self.view.value = str(value)
+
+    def read(self):
+        self.input_value = str(self.mem_value)
+
+    def write(self):
+        self.mem_value = self.input_value
+
+
+
+class InputWidget(BaseInputWidget):
+    def __init__(self, name, label, addr, offsets, type_=None, size=4):
+        super().__init__(name, label, addr, offsets)
+        self.type = type_
+        self.size = size
 
     @property
     def mem_value(self):
@@ -113,11 +130,20 @@ class InputWidget(Widget):
     def mem_value(self, value):
         self._handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
 
-    def read(self):
-        self.view.value = str(self.mem_value)
 
-    def write(self):
-        self.mem_value = self.view.value
+class ProxyInputWidget(BaseInputWidget):
+    def __init__(self, name, label, read, write):
+        super().__init__(name, label, None, None)
+        self.doRead = read
+        self.doWrite = write
+
+    @property
+    def mem_value(self):
+        return self.doRead()
+
+    @mem_value.setter
+    def mem_value(self, value):
+        self.doWrite(value)
 
 
 class CheckBoxWidget(Widget):
