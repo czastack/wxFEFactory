@@ -116,7 +116,7 @@ class Vehicle(SAObject):
     def lockDoor(self):
         self.door_status = 2
 
-    def unLockDoor(self):
+    def unlockDoor(self):
         self.door_status = 1
 
     def repair(self):

@@ -51,8 +51,9 @@ class Group(Widget):
         self.handler = handler or (self._handler if self.parent else None)
 
     def render(self):
-        self.view = ui.Vertical(className="fill container")
-        ui.Item(self.view, caption=self.label)
+        with ui.ScrollView(className="fill") as root:
+            self.view = ui.Vertical(className="fill container")
+        ui.Item(root, caption=self.label)
 
     def appendChild(self, child):
         self.children.append(child)

@@ -29,7 +29,7 @@ SPAWN_VEHICLE_ID_BASE = 0x1301000
 version_config = {
     'V1.0': {
         # 计时器地址
-        'CodeInjectNOP_FreezeTimerDownAddr': 0x44CB54,
+        'CodeInjectNOP_FreezeTimerDownAddr': 0x44CB55,
         'CodeInjectNOP_FreezeTimerUpAddr': 0x44CBAB,
 
         # 载具生产

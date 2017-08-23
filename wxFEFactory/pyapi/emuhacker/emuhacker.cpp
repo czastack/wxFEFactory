@@ -107,7 +107,7 @@ void init_emuhacker(pybind11::module & m)
 			return self.writeUint(addr, sizeof(u8), data);
 		})
 		.def("write16", [](ProcessHandler& self, addr_t addr, UINT64 data) {
-			return self.writeUint(addr, sizeof(u8), data);
+			return self.writeUint(addr, sizeof(u16), data);
 		})
 		.def("write32", [](ProcessHandler& self, addr_t addr, UINT64 data) {
 			return self.writeUint(addr, sizeof(u32), data);
