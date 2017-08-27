@@ -92,8 +92,8 @@ class Tool:
                     choices=(item[0] for item in vehicle_list))
                 with ui.ScrollView(className="fill container"):
                     ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: ctrl+alt+[")
-                    ui.Text("切换下一辆: ctrl+alt+]")
+                    ui.Text("切换上一辆: alt+[")
+                    ui.Text("切换下一辆: alt+]")
                     ui.Text("向前穿墙: alt+w")
                     ui.Text("向前穿墙大: alt+shift+w")
                     ui.Text("弹射起步: alt+m")

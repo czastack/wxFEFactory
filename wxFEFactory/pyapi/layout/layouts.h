@@ -23,6 +23,34 @@ public:
 		}
 	}
 
+	void setSize(py::tuple &size)
+	{
+		m_elem->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
+	}
+
+	pyobj getSize()
+	{
+		py::tuple ret = py::tuple(2);
+		const wxSize &sz = m_elem->GetSize();
+		ret[0] = sz.GetWidth();
+		ret[1] = sz.GetHeight();
+		return ret;
+	}
+
+	void setPosition(py::tuple &point)
+	{
+		m_elem->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
+	}
+
+	pyobj getPosition()
+	{
+		py::tuple ret = py::tuple(2);
+		const wxPoint &pt = m_elem->GetPosition();
+		ret[0] = pt.x;
+		ret[1] = pt.y;
+		return ret;
+	}
+
 	wxString getTitle()
 	{
 		return ((wxTopLevelWindow*)m_elem)->GetTitle();

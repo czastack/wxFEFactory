@@ -15,8 +15,17 @@ ui = fefactory_api.ui
 
 
 class MainFrame:
-    def __init__(self):
+    def __init__(self, start_option=None):
         self.render()
+
+        if start_option:
+            size = start_option.get('size', None)
+            if size:
+                self.win.size = size
+            position = start_option.get('position', None)
+            if position:
+                self.win.position = position
+
         if hasattr(app, 'project'):
             self.onOpenProject(app.project)
 
@@ -105,7 +114,7 @@ class MainFrame:
 
     def restart(self, m):
         self.closeWindow()
-        fefactory.reload()
+        fefactory.reload({"size": self.win.size, "position": self.win.position})
 
     def toggleConsole(self, m):
         """显示/隐藏控制台"""
@@ -270,7 +279,7 @@ consoleOutputStyle = {
 }
 
 if __name__ == 'mainframe':
-    frame = MainFrame()
+    frame = MainFrame(getattr(__main__, 'start_option', None))
 
     __main__.app = app
     __main__.win = win = frame.win

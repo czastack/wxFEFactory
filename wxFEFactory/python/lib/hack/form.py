@@ -1,4 +1,5 @@
 import json
+import types
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -39,6 +40,35 @@ class Widget:
 
     def __repr__(self):
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
+
+
+class ModelWidget:
+    def __init__(self, name, label, ins, prop, **kwargs):
+        super().__init__(name, label, addr=None, offsets=None, **kwargs)
+        self._ins = ins
+        self.prop = prop
+
+    @property
+    def ins(self):
+        if isinstance(self._ins, types.FunctionType):
+            return self._ins()
+        return self._ins
+
+    @property
+    def mem_value(self):
+        ins = self.ins
+        return (
+            getattr(ins, self.props) if isinstance(self.props, str) else 
+            self.props.__get__(ins, ins.__class__)
+        )
+
+    @mem_value.setter
+    def mem_value(self, value):
+        ins = self.ins
+        if isinstance(self.props, str):
+            setattr(ins, self.props, value)
+        else:
+            self.props.__set__(ins, value)
     
 
 class Group(Widget):
@@ -145,6 +175,10 @@ class ProxyInputWidget(BaseInputWidget):
     @mem_value.setter
     def mem_value(self, value):
         self.doWrite(value)
+
+
+class ModelInputWidget(ModelWidget, BaseInputWidget):
+    pass
 
 
 class CheckBoxWidget(Widget):
@@ -323,6 +357,10 @@ class CoordsWidget(Widget):
             self.data_list[index + 1], self.data_list[index] = self.data_list[index], self.data_list[index + 1]
             self.listbox.setText(self.data_list[index]['name'], index)
             self.listbox.setText(self.data_list[index + 1]['name'], index + 1)
+
+
+class ModelCoordsWidget(ModelWidget, CoordsWidget):
+    pass
 
 
 btn_style = {

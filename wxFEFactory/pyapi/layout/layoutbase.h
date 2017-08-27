@@ -93,16 +93,6 @@ public:
 		return false;
 	}
 
-	void setSize(int width, int height)
-	{
-		m_elem->SetSize(wxSize(width, height));
-	}
-
-	void setPosition(int left, int right)
-	{
-		m_elem->SetPosition(wxPoint(left, right));
-	}
-
 	void setForeground(uint rgb)
 	{
 		m_elem->SetForegroundColour(wxColor(rgb));

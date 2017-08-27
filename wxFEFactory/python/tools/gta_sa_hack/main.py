@@ -56,6 +56,7 @@ WEATHER_LOCK_ADDR = 0xC81318
 WEATHER_TO_GO_ADDR = 0xC8131C
 WEATHER_CURRENT_ADDR = 0xC81320
 
+CAM_Z_ADDR = 0xB6F99C
 
 
 class WeaponWidget(Widget):
@@ -167,7 +168,7 @@ class Tool:
                     ui.Button("再次应用", onclick=self.apply_player_special).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", VEHICLE_BASE, handler=self.handler):
             self.vehicle_hp_view = InputWidget("vehicle_hp", "HP", None, (0x4c0,), float)
-            self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,))
+            self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,0x10))
             self.vehicle_grad_view = CoordsWidget("grad", "旋转", None, (0x14, 0))
             self.vehicle_coord_view = CoordsWidget("coord", "坐标", None, (0x14, 0x30), savable=True)
             self.vehicle_speed_view = CoordsWidget("speed", "速度", None, (0x44,))
@@ -206,6 +207,7 @@ class Tool:
             InputWidget("car_prof", "驾驶技术", CAR_PROF_ADDR, (), int)
             InputWidget("bike_prof", "摩托车技术", BIKE_PROF_ADDR, (), int)
             InputWidget("cycle_prof", "自行车技术", CYCLE_PROF_ADDR, (), int)
+            InputWidget("cycle_prof", "飞机技术", FLYING_PROF_ADDR, (), int)
             InputWidget("days_in_game", "天数", DAYS_IN_GAME_ADDR, (), int)
             InputWidget("curr_hour", "当前小时", CURR_HOUR_ADDR, (), int, 1)
             InputWidget("curr_minute", "当前分钟", CURR_MINUTE_ADDR, (), int, 1)
@@ -236,8 +238,8 @@ class Tool:
                     choices=(item[0] for item in vehicle_list))
                 with ui.ScrollView(className="fill container"):
                     ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: ctrl+alt+[")
-                    ui.Text("切换下一辆: ctrl+alt+]")
+                    ui.Text("切换上一辆: alt+[")
+                    ui.Text("切换下一辆: alt+]")
                     ui.Text("向前穿墙: alt+w")
                     ui.Text("向前穿墙大: alt+shift+w")
                     ui.Text("弹射起步: alt+m")
@@ -247,6 +249,7 @@ class Tool:
                     ui.Text("恢复HP: alt+h")
                     ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近的人上天: alt+f")
+                    ui.Text("附近的人和车上天: alt+shift+f")
                     ui.Text("附近的车翻转: alt+shift+k")
                     ui.Text("自己的车翻转: alt+k")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
@@ -288,6 +291,7 @@ class Tool:
                     ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
                     ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
                     ('toUp', MOD_ALT, getVK('.'), self.toUp),
+                    ('toDown', MOD_ALT | MOD_SHIFT, getVK('.'), self.toDown),
                     ('stop', MOD_ALT, getVK('x'), self.stop),
                     ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
                     ('restoreHpLarge', MOD_ALT | MOD_SHIFT, getVK('h'), self.restoreHpLarge),
@@ -296,9 +300,11 @@ class Tool:
                     ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                     ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
                     ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
+                    ('nearFly', MOD_ALT | MOD_SHIFT, getVK('f'), self.nearFly),
                     ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
                     ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
+                    ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -375,6 +381,21 @@ class Tool:
         
         target.mem_value = values
 
+    def dir_correct(self, _=None):
+        # 按当前视角方向旋转
+        if self.isInVehicle:
+            mycar = self.vehicle
+            mycar.coord[2] += 0.05
+            self.handler.write(mycar.pos.addr, 0, self.handler.read(CAM_Z_ADDR, 28, bytes))
+            mycar.flip()
+        else:
+            PI = math.pi
+            HALF_PI = PI / 2
+            cam_x = self.handler.readFloat(CAM_Z_ADDR)
+            cam_y = self.handler.readFloat(CAM_Z_ADDR + 4)
+            rot = -math.atan2(cam_x, cam_y) - HALF_PI
+            self.rot_view.mem_value = rot
+
     def raiseUp(self, hotkeyId=None, speed=0):
         if not speed:
             speed = 0.6 if self.isInVehicle else 1.0
@@ -383,12 +404,11 @@ class Tool:
     def goDown(self, hotkeyId=None, speed=0.5):
         self.handler.writeFloat(self.z_speed_ptr, -speed)
 
-    def toUp(self, hotkeyId=None):
-        view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
-        offsets = list(view.offsets)
-        offsets[-1] += 8
-        ptr = self.handler.readLastAddr(view.addr, offsets)
-        self.handler.writeFloat(ptr, self.handler.readFloat(ptr) + 10)
+    def toUp(self, _=None):
+        self.vehicle.coord[2] += 10
+
+    def toDown(self, _=None):
+        self.vehicle.coord[2] -= 6
 
     def stop(self, hotkeyId=None):
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
@@ -516,6 +536,10 @@ class Tool:
     def nearPersonFly(self, btn=None):
         for p in self.getNearPersons():
             p.speed[2] = 1
+
+    def nearFly(self, btn=None):
+        self.nearPersonFly()
+        self.nearVehicleFly()
 
     def vehicleFlip(self, _=None):
         car = self.player.lastCar

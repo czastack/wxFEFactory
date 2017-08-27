@@ -33,7 +33,7 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     fefactory_api.fefactory_inited = True
 
 
-def reload():
+def reload(start_option=None):
     """重新加载相关模块"""
     pydir = os.path.dirname(__file__)
     for name in list(sys.modules):
@@ -50,6 +50,9 @@ def reload():
     for name in list(__main__.__dict__):
         if not name.startswith('__'):
             del __main__.__dict__[name]
+
+    if start_option:
+        __main__.start_option = start_option
 
     __import__(__name__)
 

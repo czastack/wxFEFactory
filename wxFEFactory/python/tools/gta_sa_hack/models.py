@@ -1,5 +1,6 @@
 from lib.hack.model import Model, Field, CoordsField
 from lib.lazy import lazy
+from .vehicle import vehicle_list
 import math
 
 
@@ -14,6 +15,7 @@ def distance(p1, p2):
 
 class Pos(Model):
     grad = CoordsField(0)
+    looking = CoordsField(0x10)
     coord = CoordsField(0x30)
 
 
@@ -25,6 +27,7 @@ class SAObject(Model):
 
     special = Field(0x42, int, 1) # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
     speed = CoordsField(0x44)
+    model_id = Field(0x22, int, 2)
 
     @property
     def pos(self):
@@ -91,6 +94,15 @@ class Vehicle(SAObject):
     door_status = Field(0x4f8, int)
 
     @property
+    def name(self):
+        model_id = self.model_id
+        try:
+            item = next(filter(lambda x: x[1] == model_id, vehicle_list))
+            return item[0]
+        except:
+            return None
+
+    @property
     def grad(self):
         return self.pos.grad
 
@@ -118,10 +130,6 @@ class Vehicle(SAObject):
 
     def unlockDoor(self):
         self.door_status = 1
-
-    def repair(self):
-        self.hp = 1000
-        self.handler.write32(self.addr + 0x5b4, 0)
 
     def flip(self):
         grad = self.grad

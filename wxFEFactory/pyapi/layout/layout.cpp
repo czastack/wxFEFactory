@@ -68,7 +68,9 @@ void init_layout(py::module &m)
 	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
 		.def("close", &BaseFrame::close)
 		.def("setOnclose", &BaseFrame::setOnclose)
-		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle);
+		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle)
+		.def_property("size", &BaseFrame::getSize, &BaseFrame::setSize)
+		.def_property("position", &BaseFrame::getPosition, &BaseFrame::setPosition);
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
 		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj, pyobj>(),
