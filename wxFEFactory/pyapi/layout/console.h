@@ -8,8 +8,9 @@ public:
 
 	void setConsoleElem(wxTextCtrl* input, wxTextCtrl* output);
 
-	void OnConsoleInput(wxCommandEvent &event) { consoleInput(event.GetString()); }
+	void OnConsoleInput(class wxCommandEvent &event) { consoleInput(event.GetString()); }
 	void OnConsoleInputKey(class wxKeyEvent &event);
+	void OnConsoleInputPaste(class wxClipboardTextEvent &event);
 	void consoleInput(wxcstr line);
 	void consoleWrite(wxcstr text);
 	void consoleWriteln(wxcstr text);

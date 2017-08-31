@@ -358,7 +358,7 @@ class Tool:
             p.speed[2] = 1
 
     def vehicleFlip(self, _=None):
-        grad = self.player.lastCar.flip()
+        self.player.lastCar.flip()
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""

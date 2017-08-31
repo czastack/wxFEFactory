@@ -51,6 +51,7 @@ class Vehicle(Entity):
         self.speed = (0, 0, 0)
 
     def flip(self):
+        self.coord[2] += 0.05
         self.dir[0] = -self.dir[0]
         self.dir[1] = -self.dir[1]
 

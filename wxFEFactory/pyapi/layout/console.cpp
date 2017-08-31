@@ -35,7 +35,7 @@ void ConsoleHandler::setConsoleElem(wxTextCtrl* input, wxTextCtrl* output)
 
 	input->Bind(wxEVT_TEXT_ENTER, &ConsoleHandler::OnConsoleInput, this);
 	input->Bind(wxEVT_CHAR, &ConsoleHandler::OnConsoleInputKey, this);
-
+	input->Bind(wxEVT_TEXT_PASTE, &ConsoleHandler::OnConsoleInputPaste, this);
 
 	std::cout.rdbuf(output);
 	std::cerr.rdbuf(output);
@@ -54,6 +54,42 @@ void ConsoleHandler::OnConsoleInputKey(wxKeyEvent & event)
 		m_output->Clear();
 	else
 		event.Skip();
+}
+
+void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
+{
+	wxcstr text = get_clipboard();
+	if (text.Contains('\n'))
+	{
+		int start = 0;
+		int i = 0;
+		wxString line;
+		for(;;)
+		{
+			i = text.find('\n', i);
+			if (i == wxNOT_FOUND)
+			{
+				i = text.size();
+			}
+			line = text.substr(start, i);
+
+			if (i < text.size())
+			{
+				consoleInput(line);
+			}
+			else
+			{
+				break;
+			}
+			++i;
+			start = i;
+		}
+		setConsoleInput(line);
+	}
+	else
+	{
+		event.Skip();
+	}
 }
 
 void ConsoleHandler::consoleWrite(wxcstr text)

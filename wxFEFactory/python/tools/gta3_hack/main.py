@@ -1,3 +1,4 @@
+from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
 from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget, ModelInputWidget, ModelCoordsWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
@@ -66,12 +67,17 @@ class Tool:
             self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
-            ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+            with ui.Horizontal(className="expand"):
+                ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+                ui.Button(label="锁车", onclick=self.vehicleLockDoor)
+                ui.Button(label="开锁", onclick=partial(self.vehicleLockDoor, lock=False))
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(13):
                 self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i))
+
+            ui.Button(label="一键最大", onclick=self.weaponMax)
 
         with Group("global", "全局", 0, handler=self.handler):
             self.money_view = InputWidget("money", "金钱", address.MONEY_BASE, (), int)
@@ -373,7 +379,21 @@ class Tool:
         self.nearVehicleFly()
 
     def vehicleFlip(self, _=None):
-        grad = self.player.lastCar.flip()
+        self.player.lastCar.flip()
+
+    def vehicleLockDoor(self, btn=None, lock=True):
+        car = self.player.lastCar
+        if car:
+            if lock:
+                car.lockDoor()
+            else:
+                car.unlockDoor()
+
+    def weaponMax(self, _=None):
+        for v in self.weapon_views:
+            v.id_view.index = 1
+            if v.has_ammo:
+                v.ammo_view.value = 9999
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""
