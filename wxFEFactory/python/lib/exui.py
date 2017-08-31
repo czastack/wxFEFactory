@@ -61,8 +61,8 @@ class CheckChoiceDialog(ListDialog):
 
         self.fields = [item[0] for item in choices]
 
-    def showOnce(self):
-        ret = super().showOnce()
+    def showModal(self):
+        ret = super().showModal()
         if ret:
             checked_list = self.listbox.getCheckedItems()
             for name in self.fields:

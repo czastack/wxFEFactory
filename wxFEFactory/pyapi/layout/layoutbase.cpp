@@ -34,6 +34,23 @@ void View::addToParent() {
 	}
 }
 
+int View::parseColor(wxcstr color, uint defval)
+{
+	u32 rgb = defval;
+	if (!color.IsEmpty())
+	{
+		color.substr(1).ToULong(&rgb, 16);
+		if (color.size() == 4)
+		{
+			Color c;
+			c.fromHalf(rgb);
+			c.c6.swapBR();
+			rgb = c;
+		}
+	}
+	return rgb;
+}
+
 wxWindow* View::safeActiveWindow()
 {
 	Layout *layout = getActiveLayout();
@@ -251,6 +268,36 @@ Layout* View::getParent()
 		}
 	}
 	return (Layout*)parent;
+}
+
+void View::_handleEvent(wxEvent & event)
+{
+	py::object event_list = pyDictGet(m_event_table, py::int_(event.GetEventType()));
+
+	py::object callback;
+	py::object ret;
+
+	if (!event_list.is_none())
+	{
+		for (auto e : event_list)
+		{
+			callback = py::reinterpret_borrow<py::object>(e);
+			if (isPyDict(callback))
+			{
+				if (PyObject_IsTrue(pyDictGet(callback, "arg_event").ptr()))
+				{
+					ret = pyCall(callback["callback"], this, &event);
+				}
+			}
+			else {
+				ret = pyCall(callback, this);
+			}
+			if (!PyObject_IsTrue(ret.ptr()))
+			{
+				event.Skip();
+			}
+		}
+	}
 }
 
 pyobj Layout::__enter__() {

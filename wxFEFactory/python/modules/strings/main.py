@@ -90,14 +90,14 @@ class Module(BaseListBoxModuel):
         index = self.listbox.index
         if index != 0:
             self.data_list[index - 1], self.data_list[index] = self.data_list[index], self.data_list[index - 1]
-            self.listbox.setSelection(index - 1)
+            self.listbox.index = index - 1
 
     def moveDown(self):
         """下移一项"""
         index = self.listbox.index
         if index != self.listbox.count - 1:
             self.data_list[index + 1], self.data_list[index] = self.data_list[index], self.data_list[index + 1]
-            self.listbox.setSelection(index + 1)
+            self.listbox.index = index + 1
 
     def onClear(self, m):
         """清空列表"""
@@ -113,7 +113,7 @@ class Module(BaseListBoxModuel):
             ('show_code', '是否显示文本的码表代码'),
         ), style=dialog_style)
 
-        if not choice.showOnce():
+        if not choice.showModal():
             print("取消操作")
             return
 

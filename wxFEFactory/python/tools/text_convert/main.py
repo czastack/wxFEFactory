@@ -35,8 +35,8 @@ class Tool(BaseTool):
                         container.AddGrowableRow(i)
 
         self.win = win
-        self.rom_picker.setOnchange(self.onRomChange)
-        self.dict_picker.setOnchange(self.onDictChange)
+        self.rom_picker.setOnChange(self.onRomChange)
+        self.dict_picker.setOnChange(self.onDictChange)
         self.text_view.setOnEnter(self.onConvertText)
         self.code_view.setOnEnter(self.onConvertCode)
         self.dict_picker.enabled = False

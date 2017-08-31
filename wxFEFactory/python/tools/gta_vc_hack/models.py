@@ -12,26 +12,7 @@ def distance(p1, p2):
 
 
 class Player(Model):
-    PLAYER1 = 0
-    PLAYER2 = 1
-    PLAYER3 = 2
-    PLAYER4 = 3
-    CIVMALE = 4
-    CIVFEMALE = 5
-    COP = 6
-    GANG1 = 7
-    GAMG2 = 8
-    GANG3 = 9
-    GANG4 = 10
-    GANG5 = 11
-    GANG6 = 12
-    GANG7 = 13
-    GANG8 = 14
-    GANG9 = 15
-    EMERGENCY = 16
-    FIREMAN = 17
-    CRIMINAL = 18
-    SPECIAL = 1
+    SIZE = 0xdb0
 
     hp = Field(0x354, float)
     ap = Field(0x358, float)
@@ -46,6 +27,7 @@ class Player(Model):
     isOnGround = Field(0x150, bool)
     modelid = Field(0xe8, int, 1)
     fastShoot = Field(0x141, int, 1)
+    isInCar = Field(0x3AC, int, 1)
 
     @property
     def lastCar(self):
@@ -88,6 +70,8 @@ class Player(Model):
 
 
 class Vehicle(Model):
+    SIZE = 0x5dc
+
     hp = Field(0x204, float)
     roll = CoordsField(0x04)
     dir = CoordsField(0x14)

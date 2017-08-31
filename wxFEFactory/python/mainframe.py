@@ -192,7 +192,7 @@ class MainFrame:
         if not reader.closed:
             print(reader.getRomTitle())
             dialog = exui.ListDialog("选择执行导入的模块", style=dialog_style, listbox={'choices': self.module_names})
-            if dialog.showOnce():
+            if dialog.showModal():
                 for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
                     try:
@@ -210,7 +210,7 @@ class MainFrame:
         dialog.combobox.setOnEnter(self.onToolPanelEnter)
         dialog.combobox.onselect = self.onToolOpen
         self.dialog = dialog
-        dialog.showOnce()
+        dialog.showModal()
 
     def onToolPanelEnter(self, cb):
         print(cb)

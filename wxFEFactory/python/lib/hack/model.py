@@ -1,12 +1,17 @@
+from lib.utils import normalFloat
+
 
 class Field:
-    def __init__(self, offset, type_=None, size=4):
+    def __init__(self, offset, type_=int, size=4):
         self.offset = offset
         self.type = type_
         self.size = size
 
     def __get__(self, obj, type=None):
-        return obj.handler.read(obj.addr + self.offset, self.size, self.type)
+        ret = obj.handler.read(obj.addr + self.offset, self.size, self.type)
+        if self.type is float:
+            ret = normalFloat(ret)
+        return ret
 
     def __set__(self, obj, val):
         obj.handler.write(obj.addr + self.offset, self.size, self.type(val))
@@ -55,7 +60,23 @@ class CoordsData:
         raise StopIteration
 
 
+class ModelField(Field):
+    def __init__(self, offset, modelClass):
+        super().__init__(offset)
+        self.modelClass = modelClass
+
+    def __get__(self, obj, type=None):
+        return self.modelClass(super().__get__(obj, type), obj.handler)
+
+    def __set__(self, obj, val):
+        raise AttributeError("can't set attribute")
+
+
 class Model:
     def __init__(self, addr, handler):
         self.addr = addr
         self.handler = handler
+
+    def next(self):
+        self.addr += self.SIZE
+        return self

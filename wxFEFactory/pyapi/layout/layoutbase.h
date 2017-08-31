@@ -98,9 +98,19 @@ public:
 		m_elem->SetForegroundColour(wxColor(rgb));
 	}
 
+	uint getForeground()
+	{
+		return m_elem->GetForegroundColour().GetRGB();
+	}
+
 	void setBackground(uint rgb)
 	{
 		m_elem->SetBackgroundColour(wxColor(rgb));
+	}
+
+	uint getBackground()
+	{
+		return m_elem->GetBackgroundColour().GetRGB();
 	}
 
 	View& setToolTip(wxcstr text)
@@ -163,6 +173,11 @@ public:
 		}
 	}
 
+	void refresh()
+	{
+		m_elem->Refresh();
+	}
+
 	pyobj getTypeName() {
 		pyobj self = py::cast(this);
 		return py::getattr(self.get_type(), "__name__");
@@ -186,16 +201,7 @@ public:
 	}
 
 	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pycref fn)
-	{
-		if (!fn.is_none())
-		{
-			fn.inc_ref();
-			((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
-				handleEvent(fn, event);
-			});
-		}
-	}
+	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false);
 
 	void handleEvent(pycref fn, wxEvent &event)
 	{
@@ -203,6 +209,19 @@ public:
 		if (!PyObject_IsTrue(ret.ptr()))
 		{
 			event.Skip();
+		}
+	}
+
+	void _handleEvent(wxEvent &event);
+
+	template <typename EventTag>
+	void removeEvt(const EventTag& eventType, pycref fn)
+	{
+		py::object event_list = pyDictGet(m_event_table, py::int_((int)eventType));
+
+		if (!event_list.is_none())
+		{
+			event_list.attr("remove")(fn);
 		}
 	}
 
@@ -214,18 +233,14 @@ public:
 	}
 
 	/**
-	 * 不推荐使用，现在不支持移除事件
 	 * 会传wxKeyEvent实例过去，需要手动Skip
 	 */
 	void setOnKeyDown(pycref fn)
 	{
-		if (!fn.is_none())
-		{
-			fn.inc_ref();
-			((wxEvtHandler*)m_elem)->Bind(wxEVT_KEY_DOWN, [fn, this](auto &event) {
-				pyCall(fn, this, &event);
-			});
-		}
+		py::dict arg;
+		arg["callback"] = fn;
+		arg["arg_event"] = py::bool_(true);
+		bindEvt(wxEVT_KEY_DOWN, arg);
 	}
 
 	void setOnFileDrop(pycref ondrop)
@@ -233,22 +248,17 @@ public:
 		m_elem->SetDropTarget(new FileDropListener(ondrop));
 	}
 
-	static int parseColor(wxcstr color, uint defval = 0)
+	void setOnDoubleClick(pycref fn)
 	{
-		u32 rgb = defval;
-		if (!color.IsEmpty())
-		{
-			color.substr(1).ToULong(&rgb, 16);
-			if (color.size() == 4)
-			{
-				Color c;
-				c.fromHalf(rgb);
-				c.c6.swapBR();
-				rgb = c;
-			}
-		}
-		return rgb;
+		bindEvt(wxEVT_LEFT_DCLICK, fn);
 	}
+
+	void setOnClick(pycref fn)
+	{
+		bindEvt(wxEVT_LEFT_DOWN, fn);
+	}
+
+	static int parseColor(wxcstr color, uint defval = 0);
 
 	static Layout* getActiveLayout()
 	{
@@ -339,6 +349,7 @@ protected:
 	pyobj m_key;
 	pyobj m_class;
 	pyobj m_contextmenu;
+	py::dict m_event_table;
 	bool m_added = false;
 
 	static wxVector<Layout*> LAYOUTS;
@@ -448,3 +459,37 @@ public:
 	pyobj m_kwargs;
 	View &m_view;
 };
+
+
+template<typename EventTag>
+void View::bindEvt(const EventTag & eventType, pycref fn, bool reset)
+{
+	if (!fn.is_none())
+	{
+		/*fn.inc_ref();
+		((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
+		handleEvent(fn, event);
+		});*/
+
+		py::int_ eventKey((int)eventType);
+		py::object event_list;
+
+		if (m_event_table.contains(eventKey))
+		{
+			event_list = m_event_table[eventKey];
+
+			if (reset)
+			{
+				event_list.attr("clear")();
+			}
+		}
+		else
+		{
+			event_list = py::list();
+			m_event_table[eventKey] = event_list;
+
+			((wxEvtHandler*)m_elem)->Bind(eventType, &View::_handleEvent, this);
+		}
+		event_list.attr("append")(fn);
+	}
+}

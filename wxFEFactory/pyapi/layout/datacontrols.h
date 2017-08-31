@@ -43,17 +43,17 @@ public:
 		}
 	}
 
-	void setOnchange(pycref onchang)
+	void setOnChange(pycref onchang)
 	{
 		m_onchange = onchang;
 	}
 
-	void setOnhighlight(pycref fn)
+	void setOnHighlight(pycref fn)
 	{
 		bindEvt(wxEVT_PG_HIGHLIGHTED, fn);
 	}
 
-	void setOnselected(pycref fn)
+	void setOnSelected(pycref fn)
 	{
 		bindEvt(wxEVT_PG_SELECTED, fn);
 	}

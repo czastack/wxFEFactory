@@ -16,10 +16,10 @@ public:
 	Button(wxcstr label, pyobj &onclick, Args ...args) : Control(args...)
 	{
 		bindElem(new wxButton(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
-		setOnclick(onclick);
+		setOnClick(onclick);
 	}
 
-	void setOnclick(pyobj &fn)
+	void setOnClick(pyobj &fn)
 	{
 		bindEvt(wxEVT_BUTTON, fn);
 	}
@@ -189,12 +189,12 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void setOnsubmit(pycref fn)
+	void setOnSubmit(pycref fn)
 	{
 		bindEvt(wxEVT_SEARCHCTRL_SEARCH_BTN, fn);
 	}
 
-	void setOncancel(pycref fn)
+	void setOnCancel(pycref fn)
 	{
 		bindEvt(wxEVT_SEARCHCTRL_CANCEL_BTN, fn);
 	}
@@ -692,7 +692,7 @@ public:
 		ctrl().SetPath(path);
 	}
 
-	void setOnchange(pycref fn)
+	void setOnChange(pycref fn)
 	{
 		bindEvt(wxEVT_FILEPICKER_CHANGED, fn);
 	}
@@ -723,7 +723,7 @@ public:
 		ctrl().SetPath(path);
 	}
 
-	void setOnchange(pycref fn)
+	void setOnChange(pycref fn)
 	{
 		bindEvt(wxEVT_DIRPICKER_CHANGED, fn);
 	}

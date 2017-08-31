@@ -1,6 +1,7 @@
 from lib.hack.model import Model, Field, CoordsField
 from lib.lazy import lazy
 from .vehicle import vehicle_list
+from . import address
 import math
 
 
@@ -13,13 +14,26 @@ def distance(p1, p2):
     )
 
 
+class Pool(Model):
+    start = Field(0)
+    max_count = Field(8)
+
+    def __init__(self, ptr, handler, item_class=None):
+        super().__init__(handler.read32(ptr), handler)
+        self.item_class = item_class
+
+    def __getitem__(self, i):
+        if self.item_class:
+            return self.item_class(self.start + i * self.item_class.SIZE, self.handler)
+
+
 class Pos(Model):
     grad = CoordsField(0)
     looking = CoordsField(0x10)
     coord = CoordsField(0x30)
 
 
-class SAObject(Model):
+class Entity(Model):
     SPECIAL_BP = 2
     SPECIAL_FP = 3
     SPECIAL_DP = 6
@@ -51,7 +65,9 @@ class SAObject(Model):
             self.special &= ~(1 << 1)
 
 
-class Player(SAObject):
+class Player(Entity):
+    SIZE = 0x7c4
+
     hp = Field(0x540, float)
     maxhp = Field(0x544, float)
     ap = Field(0x548, float)
@@ -59,6 +75,7 @@ class Player(SAObject):
     rotation = Field(0x55c, float)
     cur_weapon_slop = Field(0x718, int, 1)
     weight = Field(0x8c, float)
+    isInCar = Field(0x46C, int, 1)
     # stamina = Field(0x600, float)
     # isInVehicle = Field(0x5f4, bool, 1)
 
@@ -84,7 +101,9 @@ class Player(SAObject):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
 
-class Vehicle(SAObject):
+class Vehicle(Entity):
+    SIZE = 0xa18
+
     hp = Field(0x4c0, float)
     weight = Field(0x8c, float)
     numPassengers = Field(0x484, int, 1)
@@ -92,6 +111,11 @@ class Vehicle(SAObject):
     dirt = Field(0x4b0, float) # 0.0~15.0
     _tranler = Field(0x4c8, int)
     door_status = Field(0x4f8, int)
+
+    body_color = Field(0x434, int, 1)
+    stripe_color = Field(0x435, int, 1)
+    body2_color = Field(0x436, int, 1)
+    stripe2_color = Field(0x437, int, 1)
 
     @property
     def name(self):
@@ -155,7 +179,7 @@ class WeaponSet(Model):
 class WeaponItem(Model):
     SIZE = 28
 
-    id = Field(0x0, int) # 武器id
+    id = Field(0) # 武器id
     state = Field(0x4, int)
     ammo_clip = Field(0x8, int) # 弹夹数
     ammo = Field(0xC, int) # 弹药数
@@ -168,93 +192,30 @@ class WeaponItem(Model):
             self.id, self.ammo = other
 
 
-# 有弹药数的武器分组
-SLOT_HAS_AMMO = [2, 3, 4, 5, 6, 7, 8, 9]
+class Marker(Model):
+    SIZE = 40
 
-WEAPON_NONE = ( 0, -1, "无" )
+    MARKER_TYPE_CAR = 1
+    MARKER_TYPE_CHAR = 2
+    MARKER_TYPE_OBJECT = 3
+    MARKER_TYPE_COORDS = 4
+    MARKER_TYPE_CONTACT = 5
 
-WEAPON_LIST = [
-    [
-        # (id, model, name)
-        WEAPON_NONE,
-        ( 1, 331, "指节套环" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 2, 333, "高尔夫杆" ),
-        ( 3, 334, "警棍" ),
-        ( 4, 335, "小刀" ),
-        ( 5, 336, "棒球棍" ),
-        ( 6, 337, "铁铲" ),
-        ( 7, 338, "武士刀" ),
-        ( 8, 339, "桌球棍" ),
-        ( 9, 341, "电锯" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 22, 346, "手枪" ),
-        ( 23, 347, "消音手枪" ),
-        ( 24, 348, "沙漠之鹰" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 25, 349, "霰弹枪" ),
-        ( 26, 350, "短管霰弹枪" ),
-        ( 27, 351, "SPAZ12" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 28, 352, "乌兹" ),
-        ( 29, 353, "MP5" ),
-        ( 32, 372, "Tech9" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 30, 355, "AK47" ),
-        ( 31, 356, "M4" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 33, 357, "打猎步枪" ),
-        ( 34, 358, "狙击步枪" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 35, 359, "火箭发射器" ),
-        ( 36, 360, "热感应RPG" ),
-        ( 37, 361, "火焰发射器" ),
-        ( 38, 362, "机枪" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 16, 342, "手榴弹" ),
-        ( 17, 343, "催泪弹" ),
-        ( 18, 344, "燃烧瓶" ),
-        ( 39, 363, "遥控炸药包" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 41, 365, "喷雾器" ),
-        ( 42, 366, "灭火器" ),
-        ( 43, 367, "照相机" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 10, 321, "Dildo 1" ),
-        ( 11, 322, "Dildo 2" ),
-        ( 12, 323, "Vibe 1" ),
-        ( 13, 324, "Vibe 2" ),
-        ( 14, 325, "鲜花" ),
-        ( 15, 326, "藤条" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 44, 368, "夜视镜" ),
-        ( 45, 369, "热能感应器" ),
-        ( 46, 371, "降落伞" ),
-    ],
-    [
-        WEAPON_NONE,
-        ( 40, 364, "Detonator" ),
-    ],
-]
+    color = Field(0)
+    poolIndex = Field(4, int)
+    coord = CoordsField(8)
+    _blip = Field(38, int, 1)
+
+    @property
+    def blipType(self):
+        return self._blip >> 2
+
+    @property
+    def entity(self):
+        blipType = self.blipType
+        if blipType is __class__.MARKER_TYPE_CAR:
+            return Pool(address.VEHICLE_POOL_POINTER, self.handler, Vehicle)[self.poolIndex >> 8]
+        elif blipType is __class__.MARKER_TYPE_CHAR:
+            return Pool(address.ACTOR_POOL_POINTER, self.handler, Player)[self.poolIndex >> 8]
+        elif blipType is __class__.MARKER_TYPE_OBJECT:
+            pass

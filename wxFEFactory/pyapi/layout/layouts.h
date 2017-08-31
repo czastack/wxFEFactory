@@ -61,7 +61,7 @@ public:
 		((wxTopLevelWindow*)m_elem)->SetTitle(title);
 	}
 
-	void setOnclose(pycref onclose)
+	void setOnClose(pycref onclose)
 	{
 		m_onclose = onclose;
 	}
@@ -212,11 +212,14 @@ public:
 		m_onclose = None;
 	}
 
-	bool showOnce()
+	virtual ~Dialog()
 	{
-		bool ret = win().ShowModal() == wxID_OK;
 		win().Destroy();
-		return ret;
+	}
+
+	bool showModal()
+	{
+		return win().ShowModal() == wxID_OK;
 	}
 
 	void endModal()

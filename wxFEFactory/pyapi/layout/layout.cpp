@@ -46,10 +46,15 @@ void init_layout(py::module &m)
 		.def("show", &View::show, "show"_a=true)
 		.def("setToolTip", &View::setToolTip)
 		.def("setOnFileDrop", &View::setOnFileDrop)
+		.def("setOnClick", &View::setOnClick)
+		.def("setOnDoubleClick", &View::setOnDoubleClick)
+		.def("refresh", &View::refresh)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("key", &View::m_key)
 		.def_readwrite("className", &View::m_class)
 		.def_property("enabled", &View::getEnabaled, &View::setEnabaled)
+		.def_property("background", &View::getBackground, &View::setBackground)
+		.def_property("color", &View::getForeground, &View::setForeground)
 		.def_property_readonly("parent", &View::getParent);
 
 	py::class_<Control, View>(layout, "Control");
@@ -67,7 +72,7 @@ void init_layout(py::module &m)
 
 	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
 		.def("close", &BaseFrame::close)
-		.def("setOnclose", &BaseFrame::setOnclose)
+		.def("setOnClose", &BaseFrame::setOnClose)
 		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle)
 		.def_property("size", &BaseFrame::getSize, &BaseFrame::setSize)
 		.def_property("position", &BaseFrame::getPosition, &BaseFrame::setPosition);
@@ -90,7 +95,7 @@ void init_layout(py::module &m)
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, styles, key, className, style)
-		.def("showOnce", &Dialog::showOnce)
+		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal);
 
 	py::class_t<StdModalDialog, Dialog>(layout, "StdModalDialog")
@@ -148,7 +153,7 @@ void init_layout(py::module &m)
 	py::class_t<Button, Control>(layout, "Button")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, "onclick"_a=None, key, className, style)
-		.def("setOnclick", &Button::setOnclick)
+		.def("setOnClick", &Button::setOnClick)
 		.def("getLabel", &Button::getLabel)
 		.def("setLabel", &Button::setLabel)
 		.def_property("label", &Button::getLabel, &Button::setLabel);
@@ -178,8 +183,8 @@ void init_layout(py::module &m)
 	py::class_t<SearchCtrl, Control>(layout, "SearchCtrl")
 		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),
 			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, exstyle, key, className, style)
-		.def("setOnsubmit", &SearchCtrl::setOnsubmit)
-		.def("setOncancel", &SearchCtrl::setOncancel)
+		.def("setOnSubmit", &SearchCtrl::setOnSubmit)
+		.def("setOnCancel", &SearchCtrl::setOnCancel)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
 
 	py::class_t<SpinCtrl, Control>(layout, "SpinCtrl")
@@ -204,7 +209,7 @@ void init_layout(py::module &m)
 		.def("__len__", &BaseControlWithItems::getCount)
 		.def_readwrite("onselect", &BaseControlWithItems::m_onselect)
 		.def_property("text", &BaseControlWithItems::getText1, &BaseControlWithItems::setText1)
-		.def_property_readonly("index", &BaseControlWithItems::getSelection)
+		.def_property("index", &BaseControlWithItems::getSelection, &BaseControlWithItems::doSetSelection)
 		.def_property_readonly("count", &BaseControlWithItems::getCount);
 
 	py::class_<ControlWithItems, BaseControlWithItems>(layout, "ControlWithItems")
@@ -257,7 +262,7 @@ void init_layout(py::module &m)
 		.def_init(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj, pyobj>(),
 			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "wildcard"_a=(const char*)wxFileSelectorDefaultWildcardStr,
 			"exstyle"_a=(long)(wxFLP_DEFAULT_STYLE|wxFLP_SMALL), key, className, style)
-		.def("setOnchange", &FilePickerCtrl::setOnchange)
+		.def("setOnChange", &FilePickerCtrl::setOnChange)
 		.def_property("path", &FilePickerCtrl::getPath, &FilePickerCtrl::setPath)
 		.ptr();
 
@@ -273,7 +278,7 @@ void init_layout(py::module &m)
 	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(layout, "DirPickerCtrl")
 		.def_init(py::init<wxcstr, wxcstr, long, pyobj, pyobj, pyobj>(),
 			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "exstyle"_a=(long)(wxDIRP_DEFAULT_STYLE|wxDIRP_SMALL), key, className, style)
-		.def("setOnchange", &DirPickerCtrl::setOnchange)
+		.def("setOnChange", &DirPickerCtrl::setOnChange)
 		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)
 		.ptr();
 
@@ -349,9 +354,9 @@ void init_layout(py::module &m)
 		.def("setValues", &PropertyGrid::setValues, "data"_a, "all"_a=false)
 		.def("setReadonly", &PropertyGrid::setReadonly)
 		.def("bindData", &PropertyGrid::bindData)
-		.def("setOnchange", &PropertyGrid::setOnchange)
-		.def("setOnhighlight", &PropertyGrid::setOnhighlight)
-		.def("setOnselected", &PropertyGrid::setOnselected)
+		.def("setOnChange", &PropertyGrid::setOnChange)
+		.def("setOnHighlight", &PropertyGrid::setOnHighlight)
+		.def("setOnSelected", &PropertyGrid::setOnSelected)
 		.def_readwrite("data", &PropertyGrid::m_data)
 		.def_readwrite("autosave", &PropertyGrid::m_autosave)
 		.def_readwrite("changed", &PropertyGrid::m_changed);

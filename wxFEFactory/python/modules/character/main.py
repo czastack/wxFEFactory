@@ -36,8 +36,8 @@ class Module(BaseListBoxModuel):
             ui.Button(label="保存文件", className="button", onclick=self.onSave)
 
         self.pg.autosave = True
-        self.pg.setOnchange(self.onPgChange)
-        self.pg.setOnselected(self.onFieldSelect)
+        self.pg.setOnChange(self.onPgChange)
+        self.pg.setOnSelected(self.onFieldSelect)
 
     def doGetTitle(self):
         return self.form.title

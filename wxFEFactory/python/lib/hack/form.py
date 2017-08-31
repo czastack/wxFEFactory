@@ -1,3 +1,4 @@
+from lib.utils import normalFloat
 import json
 import types
 import fefactory_api
@@ -42,33 +43,49 @@ class Widget:
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
 
 
+class TwoWayWidget(Widget):
+    def read(self):
+        value = self.mem_value
+        if value:
+            self.input_value = self.mem_value
+
+    def write(self):
+        self.mem_value = self.input_value
+
+
 class ModelWidget:
-    def __init__(self, name, label, ins, prop, **kwargs):
-        super().__init__(name, label, addr=None, offsets=None, **kwargs)
-        self._ins = ins
-        self.prop = prop
+    def __init__(self, name, label, ins=None, prop=None, **kwargs):
+        """
+        :param ins: Model实例，或者返回Model实例的函数，在Widget中用addr占位
+        :param prop: Widget对应Field的属性对象或者名称，在Widget中用offsets占位
+        """
+        super().__init__(name, label, addr=ins, offsets=prop or name, **kwargs)
 
     @property
     def ins(self):
-        if isinstance(self._ins, types.FunctionType):
-            return self._ins()
-        return self._ins
+        if callable(self.addr):
+            return self.addr()
+        return self.addr
 
     @property
     def mem_value(self):
         ins = self.ins
-        return (
-            getattr(ins, self.props) if isinstance(self.props, str) else 
-            self.props.__get__(ins, ins.__class__)
-        )
+        if ins:
+            prop = self.offsets
+            return (
+                getattr(ins, prop) if isinstance(prop, str) else 
+                prop.__get__(ins, ins.__class__)
+            )
 
     @mem_value.setter
     def mem_value(self, value):
         ins = self.ins
-        if isinstance(self.props, str):
-            setattr(ins, self.props, value)
-        else:
-            self.props.__set__(ins, value)
+        if ins:
+            prop = self.offsets
+            if isinstance(prop, str):
+                setattr(ins, prop, value)
+            else:
+                prop.__set__(ins, value)
     
 
 class Group(Widget):
@@ -124,7 +141,7 @@ class GroupBox(Group):
         self.view = ui.StaticBox(self.label, className="fill container")
 
 
-class BaseInputWidget(Widget):
+class BaseInputWidget(TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
@@ -139,23 +156,20 @@ class BaseInputWidget(Widget):
     def input_value(self, value):
         self.view.value = str(value)
 
-    def read(self):
-        self.input_value = str(self.mem_value)
-
-    def write(self):
-        self.mem_value = self.input_value
-
 
 
 class InputWidget(BaseInputWidget):
-    def __init__(self, name, label, addr, offsets, type_=None, size=4):
+    def __init__(self, name, label, addr, offsets=(), type_=int, size=4):
         super().__init__(name, label, addr, offsets)
         self.type = type_
         self.size = size
 
     @property
     def mem_value(self):
-        return self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        ret = self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        if self.type is float:
+            ret = normalFloat(ret)
+        return ret
 
     @mem_value.setter
     def mem_value(self, value):
@@ -182,7 +196,7 @@ class ModelInputWidget(ModelWidget, BaseInputWidget):
 
 
 class CheckBoxWidget(Widget):
-    def __init__(self, name, label, addr, offsets, enableData=None, disableData=None):
+    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
         """
         :param enableData: 激活时写入的数据
         :param disableData: 关闭时写入的数据
@@ -199,8 +213,8 @@ class CheckBoxWidget(Widget):
         self._handler.ptrsWrite(self.addr, self.offsets, data, len(data))
 
 
-class CoordsWidget(Widget):
-    def __init__(self, name, label, addr, offsets, savable=False):
+class CoordsWidget(TwoWayWidget):
+    def __init__(self, name, label, addr, offsets=(), savable=False):
         self.savable = savable
         super().__init__(name, label, addr, offsets)
 
@@ -252,7 +266,7 @@ class CoordsWidget(Widget):
                 value = self._handler.ptrsRead(self.addr, offsets, float)
                 offsets[-1] += 4
             else:
-                value = self._handler.readFloat(self.addr)
+                value = normalFloat(self._handler.readFloat(self.addr))
             ret.append(value)
         return ret
 
@@ -280,12 +294,6 @@ class CoordsWidget(Widget):
         it = iter(values)
         for child in self.views:
             child.value = str(next(it))
-
-    def read(self):
-        self.input_value = self.mem_value
-
-    def write(self):
-        self.mem_value = self.input_value
 
     def onAdd(self, btn):
         name = self.name_view.value
@@ -361,6 +369,44 @@ class CoordsWidget(Widget):
 
 class ModelCoordsWidget(ModelWidget, CoordsWidget):
     pass
+
+
+class BaseSelectWidget(TwoWayWidget):
+    def render(self):
+        super().render()
+        with ui.Horizontal(className="fill"):
+            self.view = ui.Choice(className="fill", choices=self.choices)
+            self.render_btn()
+
+    @property
+    def input_value(self):
+        return self.view.index
+
+    @input_value.setter
+    def input_value(self, value):
+        self.view.index = value
+
+
+class SelectWidget(BaseSelectWidget):
+    def __init__(self, name, label, addr, offsets, choices, type_=int, size=4):
+        self.choices = choices
+        self.type = type_
+        self.size = size
+        super().__init__(name, label, addr, offsets)
+
+    @property
+    def mem_value(self):
+        return self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+
+    @mem_value.setter
+    def mem_value(self, value):
+        self._handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+
+
+class ModelSelectWidget(ModelWidget, BaseSelectWidget):
+    def __init__(self, name, label, ins, prop, choices):
+        self.choices = choices
+        super().__init__(name, label, ins, prop)
 
 
 btn_style = {

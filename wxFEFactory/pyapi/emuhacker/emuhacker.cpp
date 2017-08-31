@@ -118,6 +118,7 @@ void init_emuhacker(pybind11::module & m)
 		.def("read", process_read, addr_a, size_a, type_a)
 		.def("write", process_write, addr_a, size_a, data_a)
 		.def("add", &ProcessHandler::add)
+		.def("readAddr", &ProcessHandler::readAddr)
 		.def("readFloat", [](ProcessHandler& self, addr_t addr) {
 			return self.read<float>(addr);
 		})

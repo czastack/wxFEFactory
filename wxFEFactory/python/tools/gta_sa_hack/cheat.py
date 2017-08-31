@@ -5,27 +5,6 @@ NOP = 0x9090
 
 SPAWN_VEHICLE_ID_BASE = 0x1301000
 
-# CHEAT_NEVER_WANTED = 0
-# CHEAT_NEVER_GET_HUNGRY = 1
-# CHEAT_INFINITE_HEALTH = 2
-# CHEAT_INFINITE_OXYGEN = 3
-# CHEAT_INFINITE_AMMO = 4
-# CHEAT_TANK_MODE = 5
-# CHEAT_MEGA_PUNCH = 6
-# CHEAT_MEGA_JUMP = 7
-# CHEAT_MAX_RESPECT = 8
-# CHEAT_MAX_SEX_APPEAL = 9
-# CHEAT_FAST_CARS = 10
-# CHEAT_CHEAP_CARS = 11
-# CHEAT_INFINITE_RUN = 12
-# CHEAT_FIREPROOF = 13
-# CHEAT_PERFECT_HANDLING = 14
-# CHEAT_DECREASED_TRAFFIC = 15
-# CHEAT_HUGE_BUNNY_HOP = 16
-# CHEAT_ALL_CARS_HAVE_NITRO = 17
-# CHEAT_BOATS_CAN_FLY = 18
-# CHEAT_CARS_CAN_FLY = 19
-
 version_config = {
     'V1.0': {
         # 计时器地址
@@ -84,6 +63,20 @@ version_config = {
             0x969165, # All cars have Nitro
             0x969153, # Boats can Fly
             0x969160, # Cars can Fly
+        ],
+
+        # 武器熟练度
+        'WEAPON_PROF_ADDR': [
+            0xB79494,
+            0xB79498,
+            0xB7949C,
+            0xB794A0,
+            0xB794A4,
+            0xB794A8,
+            0xB794AC,
+            0xB794B0,
+            0xB794B4,
+            0xB794B8,
         ],
 
         # 和女友的进度

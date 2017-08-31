@@ -1,11 +1,15 @@
 from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, Widget, InputWidget, CheckBoxWidget, CoordsWidget, ProxyInputWidget
+from lib.hack.form import Group, Widget, InputWidget, CheckBoxWidget, CoordsWidget, ProxyInputWidget, SelectWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
+from lib.utils import normalFloat
 from commonstyle import dialog_style, styles
 from .vehicle import vehicle_list
-from . import models, cheat
+from .widgets import WeaponWidget, ColorWidget
+from .data import weather_list
+from .models import Player, Vehicle, Marker
+from . import cheat, address
 import math
 import os
 import json
@@ -13,100 +17,6 @@ import time
 import __main__
 import fefactory_api
 ui = fefactory_api.ui
-
-
-ACTOR_POOL_POINTER   = 0x00B74490
-ACTOR_POINTER_SELF   = 0x00B7CD98
-VEHICLE_POOL_POINTER = 0x00B74494
-VEHICLE_POINTER_SELF = 0x00B6F980
-MAP_X_ADDR = 0x00BA67B8
-MAP_Y_ADDR = 0x00BA67BC
-
-PLAYER_BASE  = 0xB6F5F0
-PLAYER2_BASE  = 0xB7CD98
-VEHICLE_BASE = 0xB6F3B8
-MONEY_BASE   = 0xB7CE50
-WANTED_LEVEL_ADDR = 0xB7CD9C
-
-MAX_HEALTH_STAT_ADDR = 0xB793E0
-ENERGY_STAT_ADDR = 0xB790B4
-WEAPON_PROF_STAT_ADDR = 0xB79494
-
-CHEAT_COUNT_ADDR = 0xB79044
-CHEAT_STAT_ADDR = 0x96918C
-OPENED_ISLANDS_ADDR = 0xB790F4
-
-FAT_STAT_ADDR = 0xB793D4
-STAMINA_STAT_ADDR = 0xB793D8
-MUSCLE_STAT_ADDR = 0xB793DC
-LUNG_CAPACITY_ADDR = 0xB791A4
-GAMBLING_STAT_ADDR = 0xB794C4
-CAR_PROF_ADDR = 0xB790A0
-BIKE_PROF_ADDR = 0xB791B4
-CYCLE_PROF_ADDR = 0xB791B8
-FLYING_PROF_ADDR = 0xB7919C
-
-DAYS_IN_GAME_ADDR = 0xB79038
-CURR_HOUR_ADDR = 0xB70153
-CURR_MINUTE_ADDR = 0xB70152
-CURR_WEEKDAY_ADDR = 0xB7014E # 1 to 7
-GAME_SPEED_MS_ADDR = 0xB7015C # Defines how many ms = 1 second... default 1000, set to 1 for a headache
-GAME_SPEED_PCT_ADDR = 0xB7CB64 # defines the speed of the game, 1 = 100%, float
-WEATHER_LOCK_ADDR = 0xC81318
-WEATHER_TO_GO_ADDR = 0xC8131C
-WEATHER_CURRENT_ADDR = 0xC81320
-
-CAM_Z_ADDR = 0xB6F99C
-
-
-class WeaponWidget(Widget):
-    def __init__(self, name, label, slot):
-         self.slot = slot
-         self.has_ammo = self.slot in models.SLOT_HAS_AMMO
-         super().__init__(name, label, None, None)
-
-    def render(self):
-        super().render()
-        with ui.Horizontal(className="fill"):
-            self.id_view = ui.Choice(className="fill", choices=(item[2] for item in models.WEAPON_LIST[self.slot]))
-            if self.has_ammo:
-                self.ammo_view = ui.SpinCtrl(className="fill", min=0, max=9999, initial=0)
-            self.render_btn()
-
-    @property
-    def mem_value(self):
-        handler = self._handler
-        return models.Player(handler.read32(PLAYER_BASE), handler).weapons[self.slot]
-
-    @mem_value.setter
-    def mem_value(self, value):
-        self.mem_value.set(value)
-
-    @property
-    def input_value(self):
-        id_ = models.WEAPON_LIST[self.slot][self.id_view.index][0]
-        ammo = self.ammo_view.value if self.has_ammo else 0
-        return (id_, ammo)
-
-    @input_value.setter
-    def input_value(self, value):
-        weapon_id =  value.id
-        i = 0
-        for item in models.WEAPON_LIST[self.slot]:
-            if item[0] == weapon_id:
-                break
-            i += 1
-        else:
-            return
-        self.id_view.setSelection(i)
-        if self.has_ammo:
-            self.ammo_view.value = value.ammo
-
-    def read(self):
-        self.input_value = self.mem_value
-
-    def write(self):
-        self.mem_value = self.input_value
 
 
 class Tool:
@@ -137,11 +47,11 @@ class Tool:
                 with ui.Notebook(className="fill"):
                     self.render_main()
 
-        win.setOnclose(self.onClose)
+        win.setOnClose(self.onClose)
         self.win = win
 
     def render_main(self):
-        with Group("player", "角色", PLAYER_BASE, handler=self.handler):
+        with Group("player", "角色", address.PLAYER_BASE, handler=self.handler):
             self.hp_view = InputWidget("hp", "生命", None, (0x540,), float)
             self.maxhp_view = InputWidget("maxhp", "最大生命", None, (0x544,), float)
             self.ap_view = InputWidget("ap", "防弹衣", None, (0x548,), float)
@@ -160,13 +70,13 @@ class Tool:
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.player_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=models.Player.SPECIAL_FP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_FP)),
                     ]
                     ui.Button("再次应用", onclick=self.apply_player_special).setToolTip("死亡或者重新读档后需要再次应用")
-        with Group("vehicle", "汽车", VEHICLE_BASE, handler=self.handler):
+        with Group("vehicle", "汽车", address.VEHICLE_BASE, handler=self.handler):
             self.vehicle_hp_view = InputWidget("vehicle_hp", "HP", None, (0x4c0,), float)
             self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,0x10))
             self.vehicle_grad_view = CoordsWidget("grad", "旋转", None, (0x14, 0))
@@ -176,42 +86,59 @@ class Tool:
             self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
             ui.Text("")
             with ui.Vertical(className="fill"):
-                ui.CheckBox("锁车", onchange=self.vehicleLockDoor)
                 with ui.Horizontal(className="expand"):
                     ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
                     ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
+                    ui.Button(label="锁车", onclick=self.vehicleLockDoor)
+                    ui.Button(label="开锁", onclick=partial(self.vehicleLockDoor, lock=False))
                 ui.Hr()
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.vehicle_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=models.Vehicle.SPECIAL_FP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_FP)),
                     ]
                     ui.Button("再次应用", onclick=self.apply_vehicle_special).setToolTip("切换载具后需要再次应用")
-        with Group("weapon", "武器", None, handler=self.handler):
+            ui.Text("颜色")
+            with ui.Horizontal(className="fill"):
+                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color")
+                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color")
+                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color")
+                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color")
+
+        with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(13):
                 self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i))
+
+        with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
+            self.weapon_prop_views = [
+                ProxyInputWidget("weapon_prop_%d" % i, label, 
+                    partial(self.get_weapon_prop, index=i), partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
+                        '手枪', '消音手枪', '沙漠之鹰', '霰弹枪', '短管霰弹枪', '战斗霰弹枪', 'MP5', 'Tech9', 'AK47', 'M4',
+                    ))
+            ]
             
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputWidget("money", "金钱", MONEY_BASE, (), int)
-            InputWidget("cheat_count", "作弊次数", CHEAT_COUNT_ADDR, (), int)
-            InputWidget("cheat_stat", "作弊状态", CHEAT_STAT_ADDR, (), int)
-            InputWidget("fat_stat", "肥胖度", FAT_STAT_ADDR, (), float)
-            InputWidget("stamina_stat", "耐力值", STAMINA_STAT_ADDR, (), float)
-            InputWidget("muscle_stat", "肌肉值", MUSCLE_STAT_ADDR, (), float)
-            InputWidget("lung_capacity", "肺活量", LUNG_CAPACITY_ADDR, (), int)
-            InputWidget("gambling_stat", "赌博技术", GAMBLING_STAT_ADDR, (), int)
-            InputWidget("car_prof", "驾驶技术", CAR_PROF_ADDR, (), int)
-            InputWidget("bike_prof", "摩托车技术", BIKE_PROF_ADDR, (), int)
-            InputWidget("cycle_prof", "自行车技术", CYCLE_PROF_ADDR, (), int)
-            InputWidget("cycle_prof", "飞机技术", FLYING_PROF_ADDR, (), int)
-            InputWidget("days_in_game", "天数", DAYS_IN_GAME_ADDR, (), int)
-            InputWidget("curr_hour", "当前小时", CURR_HOUR_ADDR, (), int, 1)
-            InputWidget("curr_minute", "当前分钟", CURR_MINUTE_ADDR, (), int, 1)
-            InputWidget("curr_weekday", "当前星期", CURR_WEEKDAY_ADDR, (), int, 1)
+            self.money_view = InputWidget("money", "金钱", address.MONEY_BASE)
+            InputWidget("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
+            InputWidget("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
+            InputWidget("fat_stat", "肥胖度", address.FAT_STAT_ADDR, (), float)
+            InputWidget("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, (), float)
+            InputWidget("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, (), float)
+            InputWidget("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
+            InputWidget("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
+            InputWidget("car_prof", "驾驶技术", address.CAR_PROF_ADDR)
+            InputWidget("bike_prof", "摩托车技术", address.BIKE_PROF_ADDR)
+            InputWidget("cycle_prof", "自行车技术", address.CYCLE_PROF_ADDR)
+            InputWidget("cycle_prof", "飞机技术", address.FLYING_PROF_ADDR)
+            InputWidget("days_in_game", "天数", address.DAYS_IN_GAME_ADDR)
+            InputWidget("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
+            InputWidget("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
+            InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
+            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), weather_list)
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -229,9 +156,9 @@ class Tool:
                     self.spawn_code_injected_view = ui.Text("", className="vcenter")
         with Group(None, "女友进度", 0, handler=self.handler):
             # TODO
-            GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
+            address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
             for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
-                InputWidget(label, label, GIRL_FRIEND_PROGRESS_ADDR[i], (), int)
+                InputWidget(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
@@ -258,7 +185,8 @@ class Tool:
                 ui.Button("杀掉附近的人", onclick=self.killNearPerson)
                 ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
                 ui.Button("附近的车下陷", onclick=self.nearVehicleDown)
-                ui.Button("附近的车叠罗汉", onclick=self.nearVehiclePutAtOne)
+                ui.Button("附近的车移到眼前", onclick=self.nearVehicleToFront)
+                ui.Button("附近的人移到眼前", onclick=self.nearPersonToFront)
                 ui.Button("附近的车上天", onclick=self.nearVehicleFly)
                 ui.Button("附近的人上天", onclick=self.nearPersonFly)
                 ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
@@ -305,6 +233,11 @@ class Tool:
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
                     ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
                     ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
+                    ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
+                    ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
+                    ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
+                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
+                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.nearPersonToFront),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -317,19 +250,20 @@ class Tool:
 
     @property
     def player(self):
-        player_addr = self.handler.read32(PLAYER_BASE)
+        player_addr = self.handler.read32(address.PLAYER_BASE)
         if player_addr is 0:
             return None
         player = getattr(self, '_player', None)
         if not player:
-            player = self._player = models.Player(player_addr, self.handler)
+            player = self._player = Player(player_addr, self.handler)
         elif player.addr != player_addr:
             player.addr = player_addr
         return player
 
-    @property
-    def vehicle(self):
-        return models.Vehicle(self.handler.read32(VEHICLE_BASE), self.handler)
+    def _vehicle(self):
+        return Vehicle(self.handler.read32(address.VEHICLE_BASE), self.handler)
+
+    vehicle = property(_vehicle)
 
     @property
     def isInVehicle(self):
@@ -386,13 +320,13 @@ class Tool:
         if self.isInVehicle:
             mycar = self.vehicle
             mycar.coord[2] += 0.05
-            self.handler.write(mycar.pos.addr, 0, self.handler.read(CAM_Z_ADDR, 28, bytes))
+            self.handler.write(mycar.pos.addr, 0, self.handler.read(address.CAM_Z_ADDR, 28, bytes))
             mycar.flip()
         else:
             PI = math.pi
             HALF_PI = PI / 2
-            cam_x = self.handler.readFloat(CAM_Z_ADDR)
-            cam_y = self.handler.readFloat(CAM_Z_ADDR + 4)
+            cam_x = self.handler.readFloat(address.CAM_Z_ADDR)
+            cam_y = self.handler.readFloat(address.CAM_Z_ADDR + 4)
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
             self.rot_view.mem_value = rot
 
@@ -435,13 +369,13 @@ class Tool:
 
     def playerCoordFromMap(self, btn=None):
         # 从大地图读取坐标
-        self.coord_view.views[0].value = str(self.handler.readFloat(MAP_X_ADDR))
-        self.coord_view.views[1].value = str(self.handler.readFloat(MAP_Y_ADDR))
+        self.coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
+        self.coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
 
     def vehicleCoordFromMap(self, btn=None):
         # 从大地图读取坐标
-        self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(MAP_X_ADDR))
-        self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(MAP_Y_ADDR))
+        self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
+        self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
 
     def onSpawnVehicleIdChange(self, lb):
         self.spwan_vehicle_id = vehicle_list[lb.index][1]
@@ -459,32 +393,32 @@ class Tool:
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def getPersons(self):
-        pool_ptr = self.handler.read32(ACTOR_POOL_POINTER)
+        pool_ptr = self.handler.read32(address.ACTOR_POOL_POINTER)
         pool_start = self.handler.read32(pool_ptr)
         pool_size = self.handler.read32(pool_ptr + 8)
         for i in range(pool_size):
-            yield models.Player(pool_start, self.handler)
-            pool_start += 0x7c4
+            yield Player(pool_start, self.handler)
+            pool_start += Player.SIZE
 
     def getNearPersons(self, distance=100):
         coord = self.player.coord.values()
-        myaddr = self.handler.read32(PLAYER_BASE)
+        myaddr = self.handler.read32(address.PLAYER_BASE)
         for p in self.getPersons():
             if p.hp != 0 and p.distance(coord) <= distance:
                 if p.addr != myaddr:
                     yield p
 
     def getVehicles(self):
-        pool_ptr = self.handler.read32(VEHICLE_POOL_POINTER)
+        pool_ptr = self.handler.read32(address.VEHICLE_POOL_POINTER)
         pool_start = self.handler.read32(pool_ptr)
         pool_size = self.handler.read32(pool_ptr + 8)
         for i in range(pool_size):
-            yield models.Vehicle(pool_start, self.handler)
-            pool_start += 0xa18
+            yield Vehicle(pool_start, self.handler)
+            pool_start += Vehicle.SIZE
 
     def getNearVehicles(self, distance=100):
         coord = self.player.coord.values()
-        mycarAddr = self.handler.read32(VEHICLE_BASE)
+        mycarAddr = self.handler.read32(address.VEHICLE_BASE)
         for v in self.getVehicles():
             if v.hp != 0 and v.distance(coord) <= distance:
                 if v.addr != mycarAddr:
@@ -502,23 +436,15 @@ class Tool:
         for v in self.getNearVehicles():
             v.coord[2] -= 0.7
 
-    def nearVehiclePutAtOne(self, btn=None):
-        first = None
-        for v in self.getNearVehicles():
-            if not first:
-                first = v
-                first.speed = (0, 0, 0)
-                coord = first.coord.values()
-                lastZ = coord[2] + 8
-            else:
-                v.coord = coord
-                v.coord[2] = lastZ
-                lastZ += 8
+    def nearVehicleToFront(self, btn=None):
+        coord = self.get_front_coord()
+        for p in self.getNearVehicles():
+            p.coord = coord
 
-    def nearVehicleFly(self, btn=None):
-        for v in self.getNearVehicles():
-            v.coord[2] += 1
-            v.speed[2] = 1
+    def nearPersonToFront(self, btn=None):
+        coord = self.get_front_coord()
+        for p in self.getNearPersons():
+            p.coord = coord
 
     def nearVehicleFlip(self, btn=None):
         for v in self.getNearVehicles():
@@ -537,6 +463,11 @@ class Tool:
         for p in self.getNearPersons():
             p.speed[2] = 1
 
+    def nearVehicleFly(self, btn=None):
+        for v in self.getNearVehicles():
+            v.coord[2] += 1
+            v.speed[2] = 1
+
     def nearFly(self, btn=None):
         self.nearPersonFly()
         self.nearVehicleFly()
@@ -548,8 +479,8 @@ class Tool:
 
     def moveToMapPtr(self, _=None):
         coord = self.vehicle.coord
-        coord[0] = self.handler.readFloat(MAP_X_ADDR)
-        coord[1] = self.handler.readFloat(MAP_Y_ADDR)
+        coord[0] = self.handler.readFloat(address.MAP_X_ADDR)
+        coord[1] = self.handler.readFloat(address.MAP_Y_ADDR)
 
     def setPlayerSpecial(self, checkbox, bitindex):
         """设置玩家特殊属性"""
@@ -580,6 +511,15 @@ class Tool:
         cheat_config = self.get_cheat_config()
         for index, view in enumerate(self.cheat_views):
             view.checked = self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1
+
+    """武器熟练度"""
+    def get_weapon_prop(self, index):
+        addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
+        return normalFloat(self.handler.readFloat(addr))
+
+    def set_weapon_prop(self, value, index):
+        addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
+        return self.handler.writeFloat(addr, value)
 
     def inject_spawn_code(self, btn=None):
         cheat_config = self.get_cheat_config()
@@ -621,31 +561,35 @@ class Tool:
         if carid:
             self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
 
-    def vehicleLockDoor(self, cb):
+    def vehicleLockDoor(self, btn=None, lock=True):
         car = self.player.lastCar
         if car:
-            if cb.checked:
+            if lock:
                 car.lockDoor()
             else:
-                car.unLockDoor()
+                car.unlockDoor()
+
+    """获取前面一点的坐标"""
+    def get_front_coord(self):
+        PI = math.pi
+        HALF_PI = PI / 2
+        rotz = self.rot_view.mem_value
+        rotz += HALF_PI
+        if rotz > PI:
+            rotz += PI * 2
+
+        xVal = math.cos(rotz)
+        yVal = math.sin(rotz)
+        coord = self.player.coord.values()
+        coord[0] += xVal * 5
+        coord[1] += yVal * 5
+        return coord
 
     def callVehicle(self, _=None):
         """召唤上一辆车回来"""
         car = self.player.lastCar
         if car:
-            PI = math.pi
-            HALF_PI = PI / 2
-            rotz = self.rot_view.mem_value
-            rotz += HALF_PI
-            if rotz > PI:
-                rotz += PI * 2
-
-            xVal = math.cos(rotz)
-            yVal = math.sin(rotz)
-            coord = self.player.coord.values()
-            coord[0] += xVal * 5
-            coord[1] += yVal * 5
-            car.coord = coord
+            car.coord = self.get_front_coord()
 
     def goVehicle(self, _=None):
         """回到上一辆车旁边"""
@@ -656,17 +600,69 @@ class Tool:
             self.player.coord = coord
 
     def getWantedLevel(self):
-        ptr = self.handler.read32(WANTED_LEVEL_ADDR)
+        ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
         return self.handler.read8(ptr + 0x2C)
 
     def setWantedLevel(self, level):
         level = int(level)
-        ptr = self.handler.read32(WANTED_LEVEL_ADDR)
+        ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
         cops = (0, 1, 3, 5, 9, 1, 2)[level]
         wantedLevel = (0, 60, 200, 700, 1500, 3000, 5000)[level]
         self.handler.write32(ptr, wantedLevel)
         self.handler.write8(ptr + 0x19, cops)
         self.handler.write8(ptr + 0x2C, level)
+
+    """重新获取人/车标记点"""
+    def re_cal_markers(self, _=None):
+        addr = address.MARKER_ADDR
+        it = Marker(addr, self.handler)
+        self._markers = []
+
+        for i in range(175):
+            blipType = it.blipType
+            if blipType is Marker.MARKER_TYPE_CAR or blipType is Marker.MARKER_TYPE_CHAR:
+                self._markers.append(Marker(it.addr, self.handler))
+
+            it.next()
+
+        self._marker_index = 0
+
+    """到下一处 人/车标记点"""
+    def go_next_marker(self, _=None):
+        if not hasattr(self, '_markers'):
+            self.re_cal_markers()
+
+        while True:
+            try:
+                entity = self._markers[self._marker_index].entity
+            except IndexError:
+                self.re_cal_markers()
+                return
+            if entity:
+                self.vehicle.coord = self._markers[self._marker_index].entity.coord
+                break
+            self._marker_index += 1
+
+    """人/车标记点目标移到眼前"""
+    def move_marker_to_front(self, _=None):
+        if not hasattr(self, '_markers'):
+            self.re_cal_markers()
+
+        moved_car_addr = []
+        front_coord = self.get_front_coord()
+
+        for marker in self._markers:
+            entity = marker.entity
+            if isinstance(entity, Player):
+                car = entity.lastCar
+                if car and car.hp > 1: 
+                    if car.addr not in moved_car_addr:
+                        moved_car_addr.append(car.addr)
+                        car.coord = front_coord
+                else:
+                    entity.coord = front_coord
+            elif isinstance(entity, Vehicle):
+                entity.coord = front_coord
 
     def g3l2json(self, btn=None):
         """g3l坐标转json"""
@@ -702,8 +698,8 @@ class Tool:
 
 ins = None
 win_style = {
-    'width': 640,
-    'height': 900,
+    'width': 680,
+    'height': 920,
 }
 
 def run():
