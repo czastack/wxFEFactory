@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "NdsEmuHandler.h"
 #include "utils/utils.h"
 
@@ -15,3 +17,5 @@ addr_t NdsEmuHandler::prepareAddr(addr_t addr, size_t size)
 	}
 	return 0;
 }
+
+#endif

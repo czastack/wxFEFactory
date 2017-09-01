@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "types.h"
 #include "nds.h"
 
@@ -19,3 +21,5 @@ NDS_MEM_TABLE NDS_MEMORY_SIZE = {
 	// 0x00000003,  // EX 
 	// 0x00007FFF,  // FX 
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "VbaHandler.h"
 #include "utils/utils.h"
 
@@ -53,3 +55,6 @@ BOOL CALLBACK VbaHandler::EnumVBAWindowProc(HWND hWnd, LPARAM lParam)
 
 	return bContinue;
 }
+
+
+#endif

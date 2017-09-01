@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include <wx/wx.h>
 #include "emuhacker.h"
 #include "../pyutils.h"
@@ -169,3 +171,5 @@ void init_emuhacker(pybind11::module & m)
 	py::class_<DeSmuMEHandler, ProcessHandler>(emuhacker, "DeSmuMEHandler")
 		.def(py::init<>());
 }
+
+#endif

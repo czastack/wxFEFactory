@@ -248,6 +248,11 @@ public:
 		m_elem->SetDropTarget(new FileDropListener(ondrop));
 	}
 
+	void setOnTextDrop(pycref ondrop)
+	{
+		m_elem->SetDropTarget(new TextDropListener(ondrop));
+	}
+
 	void setOnDoubleClick(pycref fn)
 	{
 		bindEvt(wxEVT_LEFT_DCLICK, fn);

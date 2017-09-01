@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "types.h"
 #include "gba.h"
 
@@ -15,3 +17,5 @@ GBA_MEM_TABLE GBA_MEMORY_SIZE = {
 	// 	0x01FFFFFF,
 	// 	0x0000FFFF,
 };
+
+#endif

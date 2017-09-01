@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "NogbaHandler.h"
 
 bool NogbaHandler::attach()
@@ -12,3 +14,5 @@ bool NogbaHandler::attach()
 	
 	return succeed;
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "DeSmuMEHandler.h"
 #include "nds.h"
 
@@ -18,3 +20,5 @@ addr_t DeSmuMEHandler::prepareAddr(addr_t addr, size_t size)
 	}
 	return false;
 }
+
+#endif

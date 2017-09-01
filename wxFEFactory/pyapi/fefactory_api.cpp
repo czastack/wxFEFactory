@@ -5,9 +5,11 @@
 #include "functions.h"
 #include "layout/console.h"
 #include "layout/layout.h"
-#include "emuhacker/emuhacker.h"
 #include "fe/fe.h"
+#ifdef __WXMSW__
 #include "auto/auto.h"
+#include "emuhacker/emuhacker.h"
+#endif
 
 py::module fefactory;
 ConsoleHandler pyConsole;
@@ -69,9 +71,11 @@ PyObject *fefactory_api() {
 	ATTR_INT(m.ptr(), CANCEL, wx);
 
 	init_layout(m);
-	init_emuhacker(m);
 	init_fe(m);
+#ifdef __WXMSW__
 	init_auto(m);
+	init_emuhacker(m);
+#endif
 	return m.ptr();
 }
 

@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "auto.h"
 #undef _
 #include <pybind11/pybind11.h>
@@ -139,3 +141,5 @@ void init_auto(py::module & m)
 	PyObject_SetAttrString(auto_.ptr(), "UNICODE", PyLong_FromLong(KEYEVENTF_UNICODE));
 	PyObject_SetAttrString(auto_.ptr(), "SCANCODE", PyLong_FromLong(KEYEVENTF_SCANCODE));
 }
+
+#endif

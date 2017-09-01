@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "GbaEmuHandler.h"
 #include "utils/utils.h"
 
@@ -14,3 +16,5 @@ addr_t GbaEmuHandler::prepareAddr(addr_t addr, size_t size)
 	}
 	return 0;
 }
+
+#endif

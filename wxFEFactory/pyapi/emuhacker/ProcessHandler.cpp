@@ -1,3 +1,5 @@
+#ifdef __WXMSW__
+
 #include "ProcessHandler.h"
 #include "types.h"
 
@@ -95,3 +97,5 @@ bool ProcessHandler::write(addr_t addr, size_t size, LPCVOID buffer){
 	}
 	return false;
 }
+
+#endif

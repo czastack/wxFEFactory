@@ -22,3 +22,24 @@ public:
 private:
 	pyobj m_ondrop;
 };
+
+
+class TextDropListener : public wxTextDropTarget {
+public:
+	TextDropListener(pycref ondrop) : m_ondrop(ondrop) {}
+	virtual bool OnDropText(wxCoord x, wxCoord y, wxcstr text)
+	{
+		if (m_ondrop)
+		{
+			pycref ret = pyCall(m_ondrop, text);
+			if (ret.ptr() == Py_False)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+private:
+	pyobj m_ondrop;
+};
