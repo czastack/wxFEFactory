@@ -45,10 +45,12 @@ class Tool(BaseTool):
         self.listbox.setItems(self.textinput.value.split('\n'))
 
     def item_prev(self, _=None):
-        self.listbox.prev()
+        self.listbox.prev(False)
+        self.onSelectChange(self.listbox)
 
     def item_next(self, _=None):
-        self.listbox.next()
+        self.listbox.next(False)
+        self.onSelectChange(self.listbox)
 
     def item_prev_input(self, _=None):
         self.item_prev()
@@ -58,9 +60,11 @@ class Tool(BaseTool):
     def item_next_input(self, _=None):
         self.item_next()
         time.sleep(0.8)
+        print(fefactory_api.get_clipboard())
         auto.sendKey(auto.CombKey(MOD_CONTROL, getVK('v')), 10)
 
     def onSelectChange(self, listbox):
+        print(listbox.index, listbox.text)
         fefactory_api.set_clipboard(listbox.text)
 
 

@@ -368,7 +368,7 @@ public:
 		return setText(text, i);
 	}
 
-	void prev()
+	void prev(bool handle = true)
 	{
 		int pos = getSelection();
 		if (pos == 0)
@@ -376,10 +376,10 @@ public:
 			pos = getCount();
 		}
 		
-		setSelection(pos - 1, true);
+		setSelection(pos - 1, handle);
 	}
 
-	void next()
+	void next(bool handle = true)
 	{
 		int pos = getSelection();
 		if (pos == getCount() - 1)
@@ -387,7 +387,7 @@ public:
 			pos = -1;
 		}
 
-		setSelection(pos + 1, true);
+		setSelection(pos + 1, handle);
 	}
 
 	wxControlWithItems& ctrl()
