@@ -119,8 +119,7 @@ class Tool:
         self.win.close()
 
     def onClose(self, _=None):
-        global ins
-        ins = None
+        pass
 
     def checkAttach(self, _=None):
         className = 'Grand theft auto 3'
@@ -427,15 +426,7 @@ class Tool:
             fefactory_api.alert('转换成功: ' + jsonpath)
 
 
-ins = None
 win_style = {
     'width': 640,
     'height': 820,
 }
-
-def run():
-    global ins
-    ins = GTA_VC_Cheat()
-
-if __name__ == 'testgta':
-    run()

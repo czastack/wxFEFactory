@@ -202,8 +202,7 @@ class Tool:
         self.win.close()
 
     def onClose(self, _=None):
-        global ins
-        ins = None
+        pass
 
     def checkAttach(self, btn=None):
         className = 'Grand theft auto San Andreas'
@@ -701,10 +700,3 @@ win_style = {
     'width': 680,
     'height': 920,
 }
-
-def run():
-    global ins
-    ins = GTA_VC_Cheat()
-
-if __name__ == 'testgta':
-    run()

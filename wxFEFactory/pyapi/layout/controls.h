@@ -368,6 +368,28 @@ public:
 		return setText(text, i);
 	}
 
+	void prev()
+	{
+		int pos = getSelection();
+		if (pos == 0)
+		{
+			pos = getCount();
+		}
+		
+		setSelection(pos - 1, true);
+	}
+
+	void next()
+	{
+		int pos = getSelection();
+		if (pos == getCount() - 1)
+		{
+			pos = -1;
+		}
+
+		setSelection(pos + 1, true);
+	}
+
 	wxControlWithItems& ctrl()
 	{
 		return *(wxControlWithItems*)m_elem;
