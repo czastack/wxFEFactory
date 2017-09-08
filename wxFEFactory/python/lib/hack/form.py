@@ -276,7 +276,7 @@ class CoordsWidget(TwoWayWidget):
         it = iter(values)
         for child in self.views:
             value = next(it)
-            if value == '':
+            if value is None or value == '':
                 continue
             value = float(value)
             if offsets:
@@ -287,7 +287,7 @@ class CoordsWidget(TwoWayWidget):
 
     @property
     def input_value(self):
-        return map(lambda v: float(v.value), self.views)
+        return map(lambda v: v.value and float(v.value), self.views)
 
     @input_value.setter
     def input_value(self, values):

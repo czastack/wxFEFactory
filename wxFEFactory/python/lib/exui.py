@@ -71,3 +71,22 @@ class CheckChoiceDialog(ListDialog):
 
         self.listbox = None
         return ret
+
+
+class HotkeyCtrl(ui.TextInput):
+
+    def __init__(self, *args, **kwargs):
+        kwargs['readonly'] = True
+        kwargs['exstyle'] = 0x0400
+        super().__init__(*args, **kwargs)
+        self.setOnKeyDown(self.onKey)
+
+    def onKey(self, v, event):
+        mod = event.GetModifiers()
+        code = event.GetKeyCode()
+        if mod == event.CTRL:
+            if code == event.UP:
+                pass
+            elif code == event.DOWN:
+                pass
+        event.Skip()

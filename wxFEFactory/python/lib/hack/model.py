@@ -30,7 +30,11 @@ class CoordsField:
         else:
             it = iter(val)
             for i in range(3):
-                obj.handler.writeFloat(obj.addr + self.offset + i * 4, float(next(it)))
+                value = next(it)
+                if value is None or value == '':
+                    continue
+                value = float(value)
+                obj.handler.writeFloat(obj.addr + self.offset + i * 4, value)
 
 
 class CoordsData:
