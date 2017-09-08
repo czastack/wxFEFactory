@@ -370,6 +370,11 @@ public:
 
 	void prev(bool handle = true)
 	{
+		if (!getCount())
+		{
+			return;
+		}
+
 		int pos = getSelection();
 		if (pos == 0)
 		{
@@ -381,6 +386,11 @@ public:
 
 	void next(bool handle = true)
 	{
+		if (!getCount())
+		{
+			return;
+		}
+
 		int pos = getSelection();
 		if (pos == getCount() - 1)
 		{
