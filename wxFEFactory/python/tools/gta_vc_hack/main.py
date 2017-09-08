@@ -1,12 +1,13 @@
 from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget
+from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget, ModelInputWidget, ModelCoordsWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from commonstyle import dialog_style, styles
 from . import address
-from .vehicle import vehicle_list
 from .models import Player, Vehicle
+from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from ..gta_base.main import BaseGTATool
+from ..gta_base.widgets import WeaponWidget
 import math
 import os
 import json
@@ -17,6 +18,9 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGTATool):
+    address = address
+    Player = Player
+    Vehicle = Vehicle
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -24,6 +28,7 @@ class Tool(BaseGTATool):
 
     def attach(self):
         self.render()
+        self.checkAttach()
 
     def render(self):
         with ui.MenuBar() as menubar:
@@ -46,27 +51,34 @@ class Tool(BaseGTATool):
         self.win = win
 
     def render_main(self):
-        with Group("player", "角色", address.PLAYER_BASE, handler=self.handler):
-            self.hp_view = InputWidget("hp", "生命", None, (0x354,), float)
-            self.ap_view = InputWidget("ap", "防弹衣", None, (0x358,), float)
-            self.rot_view = InputWidget("rotation", "旋转", None, (0x378,), float)
-            self.coord_view = CoordsWidget("coord", "坐标", None, (0x34,), savable=True)
-            self.speed_view = CoordsWidget("speed", "速度", None, (0x70,))
-            self.weight_view = InputWidget("weight", "重量", None, (0xB8,), float)
-            self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
-            self.star_view = InputWidget("star", "通缉等级", None, (0x5f4, 0x20), int)
+        with Group("player", "角色", self._player, handler=self.handler):
+            self.hp_view = ModelInputWidget("hp", "生命")
+            self.ap_view = ModelInputWidget("ap", "防弹衣")
+            self.rot_view = ModelInputWidget("rotation", "旋转")
+            self.coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
+            self.speed_view = ModelCoordsWidget("speed", "速度")
+            self.weight_view = ModelInputWidget("weight", "重量")
+            self.stamina_view = ModelInputWidget("stamina", "体力")
+            self.wanted_view = ModelInputWidget("wanted_level", "通缉等级")
             ui.Text("")
             ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
-        with Group("vehicle", "汽车", address.VEHICLE_BASE, handler=self.handler):
-            self.vehicle_hp_view = InputWidget("vehicle_hp", "HP", None, (0x204,), float)
-            self.vehicle_roll_view = CoordsWidget("roll", "滚动", None, (0x04,))
-            self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,))
-            self.vehicle_coord_view = CoordsWidget("coord", "坐标", None, (0x34,), savable=True)
-            self.vehicle_speed_view = CoordsWidget("speed", "速度", None, (0x70,))
-            self.vehicle_turn_view = CoordsWidget("turn", "Turn", None, (0x7C,))
-            self.weight_view = InputWidget("weight", "重量", None, (0xB8,), float)
+        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
+            self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+            self.vehicle_roll_view = ModelCoordsWidget("roll", "滚动")
+            self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
+            self.vehicle_coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
+            self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
+            self.vehicle_turn_view = ModelCoordsWidget("turn", "Turn")
+            self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+
+
+        with Group("weapon", "武器槽", None, handler=self.handler):
+            self.weapon_views = []
+            for i in range(11):
+                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
+
         with Group("global", "全局", 0, handler=self.handler):
             self.money_view = InputWidget("money", "金钱", address.MONEY_BASE, (), int)
             self.camera_view = CoordsWidget("camera", "摄像机", 0x7E46B8, ())
@@ -85,7 +97,7 @@ class Tool(BaseGTATool):
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
-                    choices=(item[0] for item in vehicle_list))
+                    choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     ui.Text("根据左边列表生产载具: alt+V")
                     ui.Text("切换上一辆: alt+[")
@@ -104,7 +116,8 @@ class Tool(BaseGTATool):
                 ui.Button("杀掉附近的人", onclick=self.killNearPerson)
                 ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
                 ui.Button("附近的车下陷", onclick=self.nearVehicleDown)
-                ui.Button("附近的车叠罗汉", onclick=self.nearVehiclePutAtOne)
+                ui.Button("附近的车移到眼前", onclick=self.nearVehicleToFront)
+                ui.Button("附近的人移到眼前", onclick=self.nearPersonToFront)
                 ui.Button("附近的车上天", onclick=self.nearVehicleFly)
                 ui.Button("附近的人上天", onclick=self.nearPersonFly)
                 ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
@@ -120,13 +133,11 @@ class Tool(BaseGTATool):
     def onClose(self, _=None):
         pass
 
-    def checkAttach(self, btn):
+    def checkAttach(self, _=None):
         className = 'Grand theft auto 3'
         windowName = 'GTA: Vice City'
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
-
-            self.player = Player(self.handler.read32(address.PLAYER_BASE), self.handler)
 
             if not self.win.hotkeys:
                 self.win.RegisterHotKeys((
@@ -146,109 +157,13 @@ class Tool(BaseGTATool):
                     ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
                     ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
+                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
+                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.nearPersonToFront),
+                    ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
+                    ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
-
-    def swithKeeptop(self, cb):
-        self.win.keeptop = cb.checked
-
-    def inputCheat(self, text):
-        auto.sendKey(TextVK(text), 10)
-
-    @property
-    def isInVehicle(self):
-        return self.vehicle_hp_view.mem_value >= 1
-
-    @property
-    def z_speed_ptr(self):
-        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
-        offsets = list(speed_view.offsets)
-        offsets[-1] += 8
-        return self.handler.readLastAddr(speed_view.addr, offsets)
-
-    def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
-        PI = math.pi
-        HALF_PI = PI / 2
-        jetPackSpeed = detal or self.jetPackSpeed
-        isInVehicle = self.isInVehicle
-
-        if isInVehicle:
-            coord_view = self.vehicle_coord_view
-            speed_view = self.vehicle_speed_view
-            rotz = self.camera_z_rot_view.mem_value
-        else:
-            coord_view = self.coord_view
-            speed_view = self.speed_view
-            rotz = self.rot_view.mem_value
-            rotz += HALF_PI
-            if rotz > PI:
-                rotz += PI * 2
-
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
-
-        if not useSpeed:
-            target = coord_view
-            values = target.mem_value
-            values[0] += xVal * jetPackSpeed
-            values[1] += yVal * jetPackSpeed
-        else:
-            # speed up
-            target = speed_view
-            values = target.mem_value
-            values[0] += xVal * 0.5
-            values[1] += yVal * 0.5
-            if not isInVehicle:
-                values[2] = 0.2
-                self.raiseUp(speed=0.2)
-                time.sleep(0.1)
-        
-        target.mem_value = values
-
-
-        # if False: # UP or FALSE
-        #     speed_ptr = self.z_speed_ptr
-        #     z_speed = jetPackSpeed * PI * 2
-        #     if False: # Donw
-        #         z_speed *= -1
-        #     self.handler.writeFloat(speed_ptr, z_speed)
-
-    def raiseUp(self, hotkeyId=None, speed=1.0):
-        self.handler.writeFloat(self.z_speed_ptr, speed)
-
-    def goDown(self, hotkeyId=None, speed=0.5):
-        self.handler.writeFloat(self.z_speed_ptr, -speed)
-
-    def toUp(self, hotkeyId=None):
-        view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
-        offsets = list(view.offsets)
-        offsets[-1] += 8
-        ptr = self.handler.readLastAddr(view.addr, offsets)
-        self.handler.writeFloat(ptr, self.handler.readFloat(ptr) + 10)
-
-    def stop(self, hotkeyId=None):
-        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
-        speed_view.mem_value = (0, 0, 0)
-
-    def restoreHp(self, hotkeyId=None):
-        if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
-        else:
-            self.hp_view.mem_value = 200
-
-    def restoreHpLarge(self, hotkeyId=None):
-        if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
-        else:
-            self.hp_view.mem_value = 999
-            self.ap_view.mem_value = 999
-
-    def fromPlayerCoord(self, btn):
-        self.vehicle_coord_view.input_value = self.coord_view.input_value
-
-    def fromVehicleCoord(self, btn):
-        self.coord_view.input_value = self.vehicle_coord_view.input_value
 
     def promptWrite(self, text):
         text = (text + '\0').encode('utf-16le')
@@ -266,17 +181,17 @@ class Tool(BaseGTATool):
         self.inputCheat('betterthanwalking')
 
     def onSpawnVehicleIdChange(self, lb):
-        self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, vehicle_list[lb.index][1])
+        self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
 
     def onSpawnVehicleIdPrev(self, hotkeyId=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
-            pos = len(vehicle_list)
+            pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
     def onSpawnVehicleIdNext(self, hotkeyId=None):
         pos = self.spawn_vehicle_id_view.index
-        if pos == len(vehicle_list) - 1:
+        if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
@@ -288,12 +203,6 @@ class Tool(BaseGTATool):
             yield Player(pool_start, self.handler)
             pool_start += Player.SIZE
 
-    def getNearPersons(self, distance=100):
-        coord = self.player.coord.values()
-        for p in self.getPersons():
-            if p.hp != 0 and p.distance(coord) <= distance:
-                yield p
-
     def getVehicles(self):
         pool_ptr = self.handler.read32(address.VEHICLE_POOL_POINTER)
         pool_start = self.handler.read32(pool_ptr)
@@ -302,66 +211,8 @@ class Tool(BaseGTATool):
             yield Vehicle(pool_start, self.handler)
             pool_start += Vehicle.SIZE
 
-    def getNearVehicles(self, distance=100):
-        coord = self.player.coord.values()
-        mycarAddr = self.handler.read32(address.VEHICLE_BASE)
-        for v in self.getVehicles():
-            if v.hp != 0 and v.distance(coord) <= distance:
-                if v.addr != mycarAddr:
-                    yield v
-
-    def killNearPerson(self, btn=None):
-        for p in self.player.nearPersons:
-            p.hp = 0
-
-    def nearVehicleBoom(self, btn=None):
-        for v in self.getNearVehicles():
-            v.hp = 0
-
-    def nearVehicleDown(self, btn=None):
-        for v in self.getNearVehicles():
-            v.coord[2] -= 0.7
-
-    def nearVehiclePutAtOne(self, btn=None):
-        first = None
-        for v in self.getNearVehicles():
-            if not first:
-                first = v
-                first.speed = (0, 0, 0)
-                coord = first.coord.values()
-                lastZ = coord[2] + 8
-            else:
-                v.coord = coord
-                v.coord[2] = lastZ
-                lastZ += 8
-
-    def nearVehicleFly(self, btn=None):
-        for v in self.getNearVehicles():
-            v.coord[2] += 1
-            v.speed[2] = 1
-
-    def jumpOnVehicle(self, btn=None):
-        for v in self.getNearVehicles():
-            if v.numPassengers:
-                v.stop()
-                coord = v.coord.values()
-                coord[2] += 1
-                self.player.coord = coord
-                break
-
-    def nearVehicleFlip(self, btn=None):
-        for v in self.getNearVehicles():
-            v.flip()
-
-    def nearPersonFly(self, btn=None):
-        for p in self.player.nearPersons:
-            p.speed[2] = 1
-
-    def vehicleFlip(self, _=None):
-        self.player.lastCar.flip()
-
 
 win_style = {
     'width': 640,
-    'height': 820,
+    'height': 860,
 }

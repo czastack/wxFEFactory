@@ -8,13 +8,24 @@ class Field:
         self.size = size
 
     def __get__(self, obj, type=None):
-        ret = obj.handler.read(obj.addr + self.offset, self.size, self.type)
+        ret = obj.handler.read(obj.addr + self.offset, self.type, self.size)
         if self.type is float:
             ret = normalFloat(ret)
         return ret
 
     def __set__(self, obj, val):
-        obj.handler.write(obj.addr + self.offset, self.size, self.type(val))
+        obj.handler.write(obj.addr + self.offset, self.type(val), self.size)
+
+
+class OffsetsField(Field):
+    def __get__(self, obj, type=None):
+        ret = obj.handler.ptrsRead(obj.addr + self.offset[0], self.offset[1:], self.type, self.size)
+        if self.type is float:
+            ret = normalFloat(ret)
+        return ret
+
+    def __set__(self, obj, val):
+        obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], self.type(val), self.size)
 
 
 class CoordsField:

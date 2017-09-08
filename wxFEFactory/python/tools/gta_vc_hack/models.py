@@ -1,4 +1,6 @@
-from lib.hack.model import Model, Field, CoordsField
+from lib.hack.model import Model, Field, OffsetsField, CoordsField
+from ..gta_base.models import WeaponSet
+from lib.lazy import lazy
 import math
 
 
@@ -21,13 +23,17 @@ class Player(Model):
     speed = CoordsField(0x70)
     weight = Field(0xB8, float)
     stamina = Field(0x600, float)
-    isInVehicle = Field(0x5f4, bool, 1)
+    isInVehicle = Field(0x3AC, bool, 1)
     cur_weapon = Field(0x504, int)
     crouch = Field(0x150, bool)
     isOnGround = Field(0x150, bool)
     modelid = Field(0xe8, int, 1)
     fastShoot = Field(0x141, int, 1)
-    isInCar = Field(0x3AC, int, 1)
+    wanted_level = OffsetsField((0x5f4, 0x20), int, 1)
+
+    @lazy
+    def weapons(self):
+        return WeaponSet(self.addr + 0x408, self.handler, 11)
 
     @property
     def lastCar(self):
@@ -40,30 +46,6 @@ class Player(Model):
         for i in range(10):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
-
-    @property
-    def wantedLevel(self):
-        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-        if wanted_ptr:
-            return self.handler.read32(wanted_ptr + 0x20)
-
-    @wantedLevel.setter
-    def wantedLevel(self, val):
-        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-        if wanted_ptr:
-            return self.handler.write(wanted_ptr + 0x20, val)
-
-    def getWeapon(self, i):
-        if i < 0 or i > 5:
-            print("not available i")
-            return
-        return self.handler.read32(self.addr + 0x408 + i * 4)
-
-    def setWeapon(self, i, weapon):
-        if i < 0 or i > 5:
-            print("not available i")
-            return
-        return self.handler.write32(self.addr + 0x408 + i * 4, weapon)
 
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
@@ -103,43 +85,3 @@ class Vehicle(Model):
     def flip(self):
         self.dir[0] = -self.dir[0]
         self.dir[1] = -self.dir[1]
-
-
-class Weapon:
-    NONE = 0
-    BRASSKNUCKLE = 1
-    SCREWDRIVER = 2
-    GOLFCLUB = 3
-    NITESTICK = 4
-    KNIFECUR = 5
-    BAT = 6
-    HAMMER = 7
-    CLEAVER = 8
-    MACHETE = 9
-    KATANA = 10
-    CHNSAW = 11
-    GRENADE = 12
-    BOMB = 13
-    TEARGAS = 14
-    MOLOTOV = 15
-    MISSILE = 16
-    COLT45 = 17
-    PYTHON = 18
-    CHROMEGUN = 19
-    SHOTGSPA = 20
-    BUDDYSHOT = 21
-    TEC9 = 22
-    UZI = 23
-    INGRAMS1 = 24
-    MP5LGN = 25
-    M4 = 26
-    RUGER = 27
-    SNIPER = 28
-    LASER = 29
-    ROCKETLA = 30
-    FLAME = 31
-    M60 = 32
-    MINIGUN = 33
-    DETONATOR = 34
-    HELIGUN = 35
-    CAMERA = 3

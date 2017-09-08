@@ -81,18 +81,6 @@ class Player(Entity):
     collidingCar = ModelField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
-    # @property
-    # def wantedLevel(self):
-    #     wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-    #     if wanted_ptr:
-    #         return self.handler.read32(wanted_ptr + 0x20)
-
-    # @wantedLevel.setter
-    # def wantedLevel(self, val):
-    #     wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-    #     if wanted_ptr:
-    #         return self.handler.write(wanted_ptr + 0x20, val)
-
     @lazy
     def weapons(self):
         return WeaponSet(self.addr + 0x35c, self.handler)

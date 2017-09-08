@@ -19,6 +19,11 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGTATool):
+    address = address
+    Player = Player
+    Vehicle = Vehicle
+
+    safe_speed_rate = 0.3
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -57,7 +62,7 @@ class Tool(BaseGTATool):
             self.speed_view = ModelCoordsWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             # self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
-            # self.star_view = InputWidget("star", "通缉等级", None, (0x5f4, 0x20), int)
+            self.star_view = InputWidget("star", "通缉等级", address.WANTED_BASE, (0x53c, 0x18), int)
             ui.Text("")
             ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
@@ -155,126 +160,6 @@ class Tool(BaseGTATool):
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
-    def _player(self):
-        player_addr = self.handler.read32(address.PLAYER_BASE)
-        if player_addr is 0:
-            return None
-        player = getattr(self, '_playerins', None)
-        if not player:
-            player = self._playerins = Player(player_addr, self.handler)
-        elif player.addr != player_addr:
-            player.addr = player_addr
-        return player
-
-    def _vehicle(self):
-        addr = self.handler.read32(address.VEHICLE_BASE)
-        if addr:
-            return Vehicle(addr, self.handler)
-
-    player = property(_player)
-    vehicle = property(_vehicle)
-
-    @property
-    def isInVehicle(self):
-        return self.player.isInVehicle
-
-    def swithKeeptop(self, cb):
-        self.win.keeptop = cb.checked
-
-    def inputCheat(self, text):
-        auto.sendKey(TextVK(text), 10)
-
-    @property
-    def player_entity(self):
-        return self.vehicle if self.isInVehicle else self.player
-
-    def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
-        PI = math.pi
-        HALF_PI = PI / 2
-        jetPackSpeed = detal or self.jetPackSpeed
-        isInVehicle = self.isInVehicle
-
-        if isInVehicle:
-            coord_view = self.vehicle_coord_view
-            speed_view = self.vehicle_speed_view
-            # rotz = self.camera_z_rot_view.mem_value
-        else:
-            coord_view = self.coord_view
-            speed_view = self.speed_view
-        
-        rotz = self.rot_view.mem_value
-        rotz += HALF_PI
-        if rotz > PI:
-            rotz += PI * 2
-
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
-
-        if not useSpeed:
-            target = coord_view
-            values = target.mem_value.values()
-            values[0] += xVal * jetPackSpeed
-            values[1] += yVal * jetPackSpeed
-        else:
-            # speed up
-            target = speed_view
-            values = target.mem_value.values()
-            values[0] += xVal * 0.3
-            values[1] += yVal * 0.3
-            if not isInVehicle:
-                values[2] = 0.2
-                self.raiseUp(speed=0.2)
-                time.sleep(0.1)
-        
-        target.mem_value = values
-
-    def raiseUp(self, hotkeyId=None, speed=1.0):
-        self.player_entity.speed[2] = speed
-
-    def goDown(self, hotkeyId=None, speed=0.5):
-        self.player_entity.speed[2] = -speed
-
-    def toUp(self, hotkeyId=None):
-        self.player_entity.coord[2] += 10
-
-    def stop(self, hotkeyId=None):
-        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
-        speed_view.mem_value = (0, 0, 0)
-
-    def restoreHp(self, hotkeyId=None):
-        if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
-        else:
-            self.hp_view.mem_value = 200
-
-    def restoreHpLarge(self, hotkeyId=None):
-        if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
-        else:
-            self.hp_view.mem_value = 999
-            self.ap_view.mem_value = 999
-
-    def fromPlayerCoord(self, btn):
-        self.vehicle_coord_view.input_value = self.coord_view.input_value
-
-    def fromVehicleCoord(self, btn):
-        self.coord_view.input_value = self.vehicle_coord_view.input_value
-
-    def promptWrite(self, text):
-        text = (text + '\0').encode('utf-16le')
-        TEXT1_ADDR = 0x7D3E40
-        TEXT2_ADDR = 0x939028
-        
-        self.handler.ptrsWrite(TEXT1_ADDR, (), text)
-        time.sleep(0.01)
-        self.handler.ptrsWrite(TEXT2_ADDR, (), text)
-
-    def bigbang(self, hotkeyId=None):
-        self.inputCheat('bigbang')
-
-    def spawnVehicle(self, hotkeyId=None):
-        self.inputCheat('betterthanwalking')
-
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, vehicle_list[lb.index][1])
 
@@ -298,12 +183,6 @@ class Tool(BaseGTATool):
             yield Player(pool_start, self.handler)
             pool_start += Player.SIZE
 
-    def getNearPersons(self, distance=100):
-        coord = self.player.coord.values()
-        for p in self.getPersons():
-            if p.hp != 0 and p.distance(coord) <= distance:
-                yield p
-
     def getVehicles(self):
         pool_ptr = self.handler.read32(address.VEHICLE_POOL_POINTER)
         pool_start = self.handler.read32(pool_ptr)
@@ -311,81 +190,6 @@ class Tool(BaseGTATool):
         for i in range(pool_size):
             yield Vehicle(pool_start, self.handler)
             pool_start += Vehicle.SIZE
-
-    def getNearVehicles(self, distance=100):
-        coord = self.player.coord.values()
-        mycarAddr = self.handler.read32(address.VEHICLE_BASE)
-        for v in self.getVehicles():
-            if v.hp != 0 and v.distance(coord) <= distance:
-                if v.addr != mycarAddr:
-                    yield v
-
-    def killNearPerson(self, btn=None):
-        for p in self.getNearPersons():
-            p.hp = 0
-
-    def nearVehicleBoom(self, btn=None):
-        for v in self.getNearVehicles():
-            v.hp = 0
-
-    def nearVehicleDown(self, btn=None):
-        for v in self.getNearVehicles():
-            v.coord[2] -= 0.7
-
-    """获取前面一点的坐标"""
-    def get_front_coord(self):
-        PI = math.pi
-        HALF_PI = PI / 2
-        rotz = self.rot_view.mem_value
-        rotz += HALF_PI
-        if rotz > PI:
-            rotz += PI * 2
-
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
-        coord = self.player.coord.values()
-        coord[0] += xVal * 5
-        coord[1] += yVal * 5
-        return coord
-
-    def nearVehicleToFront(self, btn=None):
-        coord = self.get_front_coord()
-        for p in self.getNearVehicles():
-            p.coord = coord
-
-    def nearPersonToFront(self, btn=None):
-        coord = self.get_front_coord()
-        for p in self.getNearPersons():
-            p.coord = coord
-
-    def jumpOnVehicle(self, btn=None):
-        for v in self.getNearVehicles():
-            if v.numPassengers:
-                v.stop()
-                coord = v.coord.values()
-                coord[2] += 1
-                self.player.coord = coord
-                break
-
-    def nearVehicleFlip(self, _=None):
-        for v in self.getNearVehicles():
-            v.flip()
-
-    def nearPersonFly(self, _=None):
-        for p in self.getNearPersons():
-            p.speed[2] = 1
-
-    def nearVehicleFly(self, btn=None):
-        for v in self.getNearVehicles():
-            v.coord[2] += 1
-            v.speed[2] = 1
-
-    def nearFly(self, btn=None):
-        self.nearPersonFly()
-        self.nearVehicleFly()
-
-    def vehicleFlip(self, _=None):
-        self.player.lastCar.flip()
 
     def vehicleLockDoor(self, btn=None, lock=True):
         car = self.player.lastCar

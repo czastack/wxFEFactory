@@ -46,7 +46,7 @@ class Widget:
 class TwoWayWidget(Widget):
     def read(self):
         value = self.mem_value
-        if value:
+        if value is not None:
             self.input_value = self.mem_value
 
     def write(self):

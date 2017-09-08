@@ -75,9 +75,7 @@ class Player(Entity):
     rotation = Field(0x55c, float)
     cur_weapon_slop = Field(0x718, int, 1)
     weight = Field(0x8c, float)
-    isInCar = Field(0x46C, int, 1)
-    # stamina = Field(0x600, float)
-    # isInVehicle = Field(0x5f4, bool, 1)
+    isInVehicle = Field(0x46C, int, 1)
 
     @property
     def lastCar(self):
