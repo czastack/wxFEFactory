@@ -66,33 +66,33 @@ bool ProcessHandler::isValid()
 	return false;
 }
 
-bool ProcessHandler::rawRead(addr_t addr, size_t size, LPVOID buffer)
+bool ProcessHandler::rawRead(addr_t addr, LPVOID buffer, size_t size)
 {
 	return ReadProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
 }
 
-bool ProcessHandler::rawWrite(addr_t addr, size_t size, LPCVOID buffer)
+bool ProcessHandler::rawWrite(addr_t addr, LPCVOID buffer, size_t size)
 {
 	return WriteProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
 }
 
-bool ProcessHandler::read(addr_t addr, size_t size, LPVOID buffer){
+bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 	if(isValid())
 	{
 		addr = prepareAddr(addr, size);
 		if (addr) {
-			return rawRead(addr, size, buffer);
+			return rawRead(addr, buffer, size);
 		}
 	}
 	return false;
 }
 
-bool ProcessHandler::write(addr_t addr, size_t size, LPCVOID buffer){
+bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 	if(isValid())
 	{
 		addr = prepareAddr(addr, size);
 		if (addr) {
-			return rawWrite(addr, size, buffer);
+			return rawWrite(addr, buffer, size);
 		}
 	}
 	return false;

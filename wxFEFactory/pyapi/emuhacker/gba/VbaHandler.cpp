@@ -10,7 +10,7 @@ bool VbaHandler::attach(){
 
 	if (bResult) {
 		VBA_PtrStruct table;
-		rawRead(MAP_ADDR, sizeof(table), &table);
+		rawRead(MAP_ADDR, &table, sizeof(table));
 		for (int i = 0; i < lengthof(mPtrTable); ++i)
 		{
 			mPtrTable[i] = table[i].dwPointer;

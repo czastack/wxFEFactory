@@ -8,8 +8,8 @@ bool NogbaHandler::attach()
 	
 	if (succeed) {
 		u32 address;
-		if (succeed = ProcessHandler::read(PTR_TABLE_BASE, sizeof(address), &address))
-			rawRead(address + PTR_TABLE_OFFSET, sizeof(mPtrTable), &mPtrTable);
+		if (succeed = ProcessHandler::read(PTR_TABLE_BASE, &address, sizeof(address)))
+			rawRead(address + PTR_TABLE_OFFSET, &mPtrTable, sizeof(mPtrTable));
 	}
 	
 	return succeed;

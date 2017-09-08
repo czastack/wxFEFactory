@@ -8,8 +8,8 @@ bool NogbaNdsHandler::attach()
 
 	if (succeed) {
 		u32 address;
-		if (succeed = rawRead(PTR_TABLE_BASE, sizeof(address), &address))
-			rawRead(address + PTR_TABLE_OFFSET, sizeof(mPtrTable), &mPtrTable);
+		if (succeed = rawRead(PTR_TABLE_BASE, &address, sizeof(address)))
+			rawRead(address + PTR_TABLE_OFFSET, &mPtrTable, sizeof(mPtrTable));
 	}
 
 	return succeed;

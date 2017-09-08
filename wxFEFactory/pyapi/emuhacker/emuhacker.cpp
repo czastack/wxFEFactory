@@ -11,7 +11,7 @@
 #include <windows.h>
 
 
-pyobj process_read(ProcessHandler& self, addr_t addr, size_t size, pycref type)
+pyobj process_read(ProcessHandler& self, addr_t addr, pycref type, size_t size)
 {
 	const auto &builtin = py::module::import("builtins");
 	if (type == builtin.attr("float"))
@@ -25,7 +25,7 @@ pyobj process_read(ProcessHandler& self, addr_t addr, size_t size, pycref type)
 	else if (type == builtin.attr("int"))
 	{
 		UINT data = 0;
-		if (self.read(addr, size, &data))
+		if (self.read(addr, &data, size))
 		{
 			return py::cast(data);
 		}
@@ -34,7 +34,7 @@ pyobj process_read(ProcessHandler& self, addr_t addr, size_t size, pycref type)
 	else
 	{
 		char *buf = new char[size];
-		self.read(addr, size, buf);
+		self.read(addr, buf, size);
 		py::bytes ret(buf, size);
 		delete buf;
 		return ret;
@@ -42,7 +42,7 @@ pyobj process_read(ProcessHandler& self, addr_t addr, size_t size, pycref type)
 }
 
 
-bool process_write(ProcessHandler& self, addr_t addr, size_t size, pycref data)
+bool process_write(ProcessHandler& self, addr_t addr, pycref data, size_t size)
 {
 	if (PY_IS_TYPE(data, PyFloat))
 	{
@@ -55,13 +55,13 @@ bool process_write(ProcessHandler& self, addr_t addr, size_t size, pycref data)
 	else if (PY_IS_TYPE(data, PyLong))
 	{
 		UINT tmp = data.cast<UINT64>();
-		return self.write(addr, size, &tmp);
+		return self.write(addr, &tmp, size);
 	}
 	else if (PY_IS_TYPE(data, PyBytes))
 	{
 		if (size == 0)
 			size = py::len(data);
-		return self.write(addr, size, bytesGetBuff(data));
+		return self.write(addr, bytesGetBuff(data), size);
 	}
 
 	return false;
@@ -106,16 +106,16 @@ void init_emuhacker(pybind11::module & m)
 			return self.readUint(addr, sizeof(UINT64));
 		})
 		.def("write8", [](ProcessHandler& self, addr_t addr, UINT64 data) {
-			return self.writeUint(addr, sizeof(u8), data);
+			return self.writeUint(addr, data, sizeof(u8));
 		})
 		.def("write16", [](ProcessHandler& self, addr_t addr, UINT64 data) {
-			return self.writeUint(addr, sizeof(u16), data);
+			return self.writeUint(addr, data, sizeof(u16));
 		})
 		.def("write32", [](ProcessHandler& self, addr_t addr, UINT64 data) {
-			return self.writeUint(addr, sizeof(u32), data);
+			return self.writeUint(addr, data, sizeof(u32));
 		})
 		.def("write64", [](ProcessHandler& self, UINT64 addr, UINT64 data) {
-			return self.writeUint(addr, sizeof(UINT64), data);
+			return self.writeUint(addr, data, sizeof(UINT64));
 		})
 		.def("read", process_read, addr_a, size_a, type_a)
 		.def("write", process_write, addr_a, size_a, data_a)
@@ -131,7 +131,7 @@ void init_emuhacker(pybind11::module & m)
 			addr = self.readAddr(addr);
 			if (addr)
 			{
-				return process_read(self, addr + offset, size.cast<size_t>(), type);
+				return process_read(self, addr + offset, type, size.cast<size_t>());
 			}
 			return py::cast(false);
 		}, addr_a, offsets_a, type_a, "size"_a = 4)
@@ -139,7 +139,7 @@ void init_emuhacker(pybind11::module & m)
 			addr = self.readAddr(addr);
 			if (addr)
 			{
-				return process_write(self, addr + offset, size.cast<size_t>(), data);
+				return process_write(self, addr + offset, data, size.cast<size_t>());
 			}
 			return false;
 		}, addr_a, offsets_a, data_a, "size"_a=4)
@@ -148,7 +148,7 @@ void init_emuhacker(pybind11::module & m)
 			addr = readLastAddr(self, addr, args);
 			if (addr)
 			{
-				return process_read(self, addr, size.cast<size_t>(), type);
+				return process_read(self, addr, type, size.cast<size_t>());
 			}
 			return py::cast(false);
 		}, addr_a, offsets_a, type_a, "size"_a = 4)
@@ -156,7 +156,7 @@ void init_emuhacker(pybind11::module & m)
 			addr = readLastAddr(self, addr, args);
 			if (addr)
 			{
-				return process_write(self, addr, size.cast<size_t>(), data);
+				return process_write(self, addr, data, size.cast<size_t>());
 			}
 			return false;
 		}, addr_a, offsets_a, data_a, "size"_a=4)

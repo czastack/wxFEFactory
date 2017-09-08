@@ -50,11 +50,11 @@ public:
 
 	bool isValid();
 
-	bool rawRead(addr_t addr, size_t size, LPVOID buffer);
-	bool rawWrite(addr_t addr, size_t size, LPCVOID buffer);
+	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
+	bool rawWrite(addr_t addr, LPCVOID buffer, size_t size);
 
-	bool read(addr_t addr, size_t size, LPVOID buffer);
-	bool write(addr_t addr, size_t size, LPCVOID buffer);
+	bool read(addr_t addr, LPVOID buffer, size_t size);
+	bool write(addr_t addr, LPCVOID buffer, size_t size);
 
 	bool add(addr_t addr, int value)
 	{
@@ -66,13 +66,13 @@ public:
 	UINT64 readUint(addr_t addr, size_t size)
 	{
 		UINT64 data = 0;
-		read(addr, size, &data);
+		read(addr, &data, size);
 		return data;
 	}
 
-	bool writeUint(addr_t addr, size_t size, UINT64 data)
+	bool writeUint(addr_t addr, UINT64 data, size_t size)
 	{
-		return write(addr, size, &data);
+		return write(addr, &data, size);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public:
 	 */
 	template<size_t size, typename TYPE>
 	bool read(addr_t addr, TYPE(&arr)[size]) {
-		return read(addr, size * sizeof(TYPE), arr);
+		return read(addr, arr, size * sizeof(TYPE));
 	}
 
 	/**
@@ -88,7 +88,7 @@ public:
 	 */
 	template<size_t size, typename TYPE>
 	bool write(addr_t addr, TYPE(&arr)[size]) {
-		return write(addr, size * sizeof(TYPE), arr);
+		return write(addr, arr, size * sizeof(TYPE));
 	}
 
 	/**
@@ -96,7 +96,7 @@ public:
 	 */
 	template<typename TYPE>
 	bool read(addr_t addr, TYPE &buff) {
-		return read(addr, sizeof(TYPE), &buff);
+		return read(addr, &buff, sizeof(TYPE));
 	}
 
 	/**
@@ -104,7 +104,7 @@ public:
 	 */
 	template<typename ValueType>
 	bool write(addr_t addr, const ValueType &buff) {
-		return write(addr, sizeof(ValueType), &buff);
+		return write(addr, &buff, sizeof(ValueType));
 	}
 
 	/**
@@ -126,11 +126,11 @@ public:
 		}
 #endif
 
-		if (!read(addr,
+		if (!read(addr, &addr,
 #ifdef _WIN64
 			m_addr_is32 ? sizeof(u32) :
 #endif
-			sizeof(addr), &addr))
+			sizeof(addr)))
 		{
 			return 0;
 		}
@@ -141,13 +141,13 @@ public:
 	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer) {
 		addr = readAddr(addr);
 		if (addr)
-			return read(addr + offset, size, buffer);
+			return read(addr + offset, buffer, size);
 		return false;
 	}
 	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer) {
 		addr = readAddr(addr);
 		if (addr)
-			return write(addr + offset, size, buffer);
+			return write(addr + offset, buffer, size);
 		return false;
 	}
 
@@ -169,7 +169,7 @@ public:
 	template<typename ListType>
 	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
 		addr = readLastAddr(addr, offsets);
-		return addr && read(addr, size, buffer);
+		return addr && read(addr, buffer, size);
 	}
 
 	/**
@@ -178,6 +178,6 @@ public:
 	template<typename ListType>
 	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
 		addr = readLastAddr(addr, offsets);
-		return addr && write(addr, size, buffer);
+		return addr && write(addr, buffer, size);
 	}
 };
