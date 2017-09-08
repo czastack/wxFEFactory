@@ -8,6 +8,7 @@ from . import address
 from .vehicle import vehicle_list
 from .models import Player, Vehicle
 from .widgets import WeaponWidget
+from ..gta_base.main import BaseGTATool
 import math
 import os
 import json
@@ -17,7 +18,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool:
+class Tool(BaseGTATool):
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -74,8 +75,8 @@ class Tool:
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
-            for i in range(13):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i))
+            for i in range(1, 13):
+                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i))
 
             ui.Button(label="一键最大", onclick=self.weaponMax)
 
@@ -148,6 +149,8 @@ class Tool:
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
                     ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
                     ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.nearPersonToFront),
+                    ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
+                    ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -171,6 +174,10 @@ class Tool:
     player = property(_player)
     vehicle = property(_vehicle)
 
+    @property
+    def isInVehicle(self):
+        return self.player.isInVehicle
+
     def swithKeeptop(self, cb):
         self.win.keeptop = cb.checked
 
@@ -179,13 +186,13 @@ class Tool:
 
     @property
     def player_entity(self):
-        return self.vehicle if self.player.isInVehicle else self.player
+        return self.vehicle if self.isInVehicle else self.player
 
     def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
         PI = math.pi
         HALF_PI = PI / 2
         jetPackSpeed = detal or self.jetPackSpeed
-        isInVehicle = self.player.isInVehicle
+        isInVehicle = self.isInVehicle
 
         if isInVehicle:
             coord_view = self.vehicle_coord_view
@@ -231,17 +238,17 @@ class Tool:
         self.player_entity.coord[2] += 10
 
     def stop(self, hotkeyId=None):
-        speed_view = self.vehicle_speed_view if self.player.isInVehicle else self.speed_view
+        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
 
     def restoreHp(self, hotkeyId=None):
-        if self.player.isInVehicle:
+        if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 200
 
     def restoreHpLarge(self, hotkeyId=None):
-        if self.player.isInVehicle:
+        if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 999
@@ -314,7 +321,7 @@ class Tool:
                     yield v
 
     def killNearPerson(self, btn=None):
-        for p in self.player.nearPersons:
+        for p in self.getNearPersons():
             p.hp = 0
 
     def nearVehicleBoom(self, btn=None):
@@ -365,7 +372,7 @@ class Tool:
             v.flip()
 
     def nearPersonFly(self, _=None):
-        for p in self.player.nearPersons:
+        for p in self.getNearPersons():
             p.speed[2] = 1
 
     def nearVehicleFly(self, btn=None):
@@ -393,37 +400,6 @@ class Tool:
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
-
-    def g3l2json(self, btn=None):
-        """g3l坐标转json"""
-        path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
-        if path:
-            with open(path) as file:
-                if not file.readline().strip() == '[Locks]':
-                    fefactory_api.alert('不支持的格式')
-                    return
-
-                coord = [0, 0, 0]
-                datas = []
-                while True:
-                    line = file.readline()
-                    if not line:
-                        break
-                    line = line.strip()
-                    if line.startswith('x='):
-                        coord[0] = float(line[2:])
-                    elif line.startswith('y='):
-                        coord[1] = float(line[2:])
-                    elif line.startswith('z='):
-                        coord[2] = float(line[2:])
-                    elif line.startswith('desc='):
-                        datas.append({'name': line[5:], 'value': tuple(coord)})
-
-            jsonpath = path[:path.rfind('.') + 1] + 'json'
-            with open(jsonpath, 'w', encoding="utf-8") as file:
-                json.dump(datas, file, ensure_ascii=False)
-
-            fefactory_api.alert('转换成功: ' + jsonpath)
 
 
 win_style = {

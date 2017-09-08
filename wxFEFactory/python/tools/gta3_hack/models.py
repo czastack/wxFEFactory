@@ -81,24 +81,17 @@ class Player(Entity):
     collidingCar = ModelField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
-    @property
-    def nearPersons(self):
-        offset = 0x56c
-        for i in range(10):
-            yield Player(self.handler.read32(self.addr + offset), self.handler)
-            offset += 4
+    # @property
+    # def wantedLevel(self):
+    #     wanted_ptr = self.handler.read32(self.addr + 0x5f4)
+    #     if wanted_ptr:
+    #         return self.handler.read32(wanted_ptr + 0x20)
 
-    @property
-    def wantedLevel(self):
-        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-        if wanted_ptr:
-            return self.handler.read32(wanted_ptr + 0x20)
-
-    @wantedLevel.setter
-    def wantedLevel(self, val):
-        wanted_ptr = self.handler.read32(self.addr + 0x5f4)
-        if wanted_ptr:
-            return self.handler.write(wanted_ptr + 0x20, val)
+    # @wantedLevel.setter
+    # def wantedLevel(self, val):
+    #     wanted_ptr = self.handler.read32(self.addr + 0x5f4)
+    #     if wanted_ptr:
+    #         return self.handler.write(wanted_ptr + 0x20, val)
 
     @lazy
     def weapons(self):
