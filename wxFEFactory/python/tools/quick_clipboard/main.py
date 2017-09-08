@@ -29,11 +29,12 @@ class Tool(BaseTool):
                 ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
 
         with ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar) as win:
-            with ui.Vertical():
-                self.textinput = ui.TextInput(className="expand", multiline=True, style={'height': 200})
-                self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
-                with ui.Horizontal(className="expand container"):
-                    ui.Button("输入", onclick=self.input_text)
+            with ui.Vertical(className="container"):
+                with ui.Vertical(className="container fill"):
+                    self.textinput = ui.TextInput(className="expand", multiline=True, style={'height': 200})
+                    self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
+                    with ui.Horizontal(className="expand top_padding"):
+                        ui.Button("输入", onclick=self.input_text)
 
 
         self.win = win
@@ -54,18 +55,19 @@ class Tool(BaseTool):
 
     def item_prev_input(self, _=None):
         self.item_prev()
-        time.sleep(0.8)
-        auto.sendKey(auto.CombKey(MOD_CONTROL, getVK('v')), 10)
+        time.sleep(0.5)
+        self.paste()
 
     def item_next_input(self, _=None):
         self.item_next()
-        time.sleep(0.8)
-        print(fefactory_api.get_clipboard())
-        auto.sendKey(auto.CombKey(MOD_CONTROL, getVK('v')), 10)
+        time.sleep(0.5)
+        self.paste()
 
     def onSelectChange(self, listbox):
-        print(listbox.index, listbox.text)
         fefactory_api.set_clipboard(listbox.text)
+
+    def paste(self):
+        auto.sendKey(auto.CombKey(MOD_CONTROL, getVK('v')), 10)
 
 
 win_style = {
