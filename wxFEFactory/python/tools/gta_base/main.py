@@ -1,3 +1,4 @@
+from lib.win32.sendkey import auto, TextVK
 import math
 import time
 import fefactory_api
@@ -35,10 +36,17 @@ class BaseGTATool:
     def player_entity(self):
         return self.vehicle if self.isInVehicle else self.player
 
-    def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
-        """弹射起步"""
+    def get_rotz(self):
         PI = math.pi
         HALF_PI = PI / 2
+        rotz = self.rot_view.mem_value
+        rotz += HALF_PI
+        if rotz > PI:
+            rotz += PI * 2
+        return rotz
+
+    def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
+        """弹射起步"""
         jetPackSpeed = detal or self.jetPackSpeed
         isInVehicle = self.isInVehicle
 
@@ -49,11 +57,7 @@ class BaseGTATool:
             coord_view = self.coord_view
             speed_view = self.speed_view
         
-        rotz = self.rot_view.mem_value
-        rotz += HALF_PI
-        if rotz > PI:
-            rotz += PI * 2
-
+        rotz = self.get_rotz()
         xVal = math.cos(rotz)
         yVal = math.sin(rotz)
 
@@ -120,12 +124,7 @@ class BaseGTATool:
 
     def get_front_coord(self):
         """获取前面一点的坐标"""
-        PI = math.pi
-        HALF_PI = PI / 2
-        rotz = self.rot_view.mem_value
-        rotz += HALF_PI
-        if rotz > PI:
-            rotz += PI * 2
+        rotz = self.get_rotz()
 
         xVal = math.cos(rotz)
         yVal = math.sin(rotz)
@@ -182,12 +181,12 @@ class BaseGTATool:
     def jumpOnVehicle(self, btn=None):
         """跳上附近的一辆行驶中的车"""
         for v in self.getNearVehicles():
-            if v.numPassengers:
-                v.stop()
-                coord = v.coord.values()
-                coord[2] += 1
-                self.player.coord = coord
-                break
+            # if v.numPassengers:
+            v.stop()
+            coord = v.coord.values()
+            coord[2] += 1
+            self.player.coord = coord
+            break
 
     def nearVehicleFlip(self, _=None):
         """附近的载具上下翻转"""

@@ -155,6 +155,8 @@ class Tool(BaseGTATool):
                     ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                     ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
                     ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
+                    ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
+                    ('nearFly', MOD_ALT | MOD_SHIFT, getVK('f'), self.nearFly),
                     ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
                     ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
                     ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
@@ -164,6 +166,18 @@ class Tool(BaseGTATool):
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
+
+    def get_rotz(self):
+        if self.isInVehicle:
+            rotz = self.camera_z_rot_view.mem_value
+        else:
+            PI = math.pi
+            HALF_PI = PI / 2
+            rotz = self.rot_view.mem_value
+            rotz += HALF_PI
+            if rotz > PI:
+                rotz += PI * 2
+        return rotz
 
     def promptWrite(self, text):
         text = (text + '\0').encode('utf-16le')
