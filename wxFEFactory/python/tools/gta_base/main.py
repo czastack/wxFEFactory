@@ -89,6 +89,9 @@ class BaseGTATool:
     def toUp(self, hotkeyId=None):
         self.player_entity.coord[2] += 10
 
+    def toDown(self, hotkeyId=None):
+        self.player_entity.coord[2] -= 6
+
     def stop(self, hotkeyId=None):
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
@@ -181,12 +184,13 @@ class BaseGTATool:
     def jumpOnVehicle(self, btn=None):
         """跳上附近的一辆行驶中的车"""
         for v in self.getNearVehicles():
-            # if v.numPassengers:
-            v.stop()
-            coord = v.coord.values()
-            coord[2] += 1
-            self.player.coord = coord
-            break
+            if v.driver:
+                print(v.driver.hp)
+                v.stop()
+                coord = v.coord.values()
+                coord[2] += 1
+                self.player.coord = coord
+                break
 
     def nearVehicleFlip(self, _=None):
         """附近的载具上下翻转"""

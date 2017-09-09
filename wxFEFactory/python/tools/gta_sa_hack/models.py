@@ -64,6 +64,9 @@ class Entity(Model):
         else:
             self.special &= ~(1 << 1)
 
+    def distance(self, obj):
+        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
+
 
 class Player(Entity):
     SIZE = 0x7c4
@@ -75,7 +78,7 @@ class Player(Entity):
     rotation = Field(0x55c, float)
     cur_weapon_slop = Field(0x718, int, 1)
     weight = Field(0x8c, float)
-    isInVehicle = Field(0x46C, int, 1)
+    _isInVehicle = Field(0x530, int, 1)
 
     @property
     def lastCar(self):
@@ -87,6 +90,10 @@ class Player(Entity):
         ptr = self.handler.read32(self.addr + 0x584)
         return Vehicle(ptr, self.handler) if ptr else None
 
+    @property
+    def isInVehicle(self):
+        return self._isInVehicle == 50
+
     @lazy
     def weapons(self):
         return WeaponSet(self.addr + 0x5a0, self.handler)
@@ -94,9 +101,6 @@ class Player(Entity):
     @property
     def cur_weapon(self):
         return self.weapons[self.cur_weapon_slop]
-
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
 
 class Vehicle(Entity):
@@ -139,8 +143,11 @@ class Vehicle(Entity):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
 
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
+    @property
+    def driver(self):
+        addr = self.handler.read32(self.addr + 0x460)
+        if addr:
+            return Player(addr, self.handler)
 
     @property
     def trailer(self):

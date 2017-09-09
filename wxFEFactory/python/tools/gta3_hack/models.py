@@ -45,7 +45,9 @@ class Vehicle(Entity):
 
     @property
     def driver(self):
-        return Player(self.handler.read32(self.addr + 0x1a4), self.handler)
+        addr = self.handler.read32(self.addr + 0x1a4)
+        if addr:
+            return Player(addr, self.handler)
 
     def stop(self):
         self.speed = (0, 0, 0)

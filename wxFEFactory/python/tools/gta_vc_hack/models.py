@@ -76,6 +76,12 @@ class Vehicle(Model):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
 
+    @property
+    def driver(self):
+        addr = self.handler.read32(self.addr + 0x1a8)
+        if addr:
+            return Player(addr, self.handler)
+
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 

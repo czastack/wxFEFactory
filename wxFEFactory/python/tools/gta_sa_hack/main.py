@@ -1,6 +1,8 @@
 from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, Widget, InputWidget, CheckBoxWidget, CoordsWidget, ProxyInputWidget, SelectWidget
+from lib.hack.form import (
+    Group, InputWidget, ProxyInputWidget, SelectWidget, ModelInputWidget, ModelCoordsWidget
+)
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.utils import normalFloat
@@ -55,16 +57,15 @@ class Tool(BaseGTATool):
         self.win = win
 
     def render_main(self):
-        with Group("player", "角色", address.PLAYER_BASE, handler=self.handler):
-            self.hp_view = InputWidget("hp", "生命", None, (0x540,), float)
-            self.maxhp_view = InputWidget("maxhp", "最大生命", None, (0x544,), float)
-            self.ap_view = InputWidget("ap", "防弹衣", None, (0x548,), float)
-            self.rot_view = InputWidget("rotation", "旋转", None, (0x55c,), float)
-            self.coord_view = CoordsWidget("coord", "坐标", None, (0x14, 0x30), savable=True)
-            self.speed_view = CoordsWidget("speed", "速度", None, (0x44,))
-            self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
+        with Group("player", "角色", self._player, handler=self.handler):
+            self.hp_view = ModelInputWidget("hp", "生命")
+            self.maxhp_view = ModelInputWidget("maxhp", "最大生命")
+            self.ap_view = ModelInputWidget("ap", "防弹衣")
+            self.rot_view = ModelInputWidget("rotation", "旋转")
+            self.coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
+            self.speed_view = ModelCoordsWidget("speed", "速度")
+            self.weight_view = ModelInputWidget("weight", "重量")
             self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.getWantedLevel, self.setWantedLevel)
-            # self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
@@ -80,14 +81,13 @@ class Tool(BaseGTATool):
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_FP)),
                     ]
                     ui.Button("再次应用", onclick=self.apply_player_special).setToolTip("死亡或者重新读档后需要再次应用")
-        with Group("vehicle", "汽车", address.VEHICLE_BASE, handler=self.handler):
-            self.vehicle_hp_view = InputWidget("vehicle_hp", "HP", None, (0x4c0,), float)
-            self.vehicle_dir_view = CoordsWidget("dir", "方向", None, (0x14,0x10))
-            self.vehicle_grad_view = CoordsWidget("grad", "旋转", None, (0x14, 0))
-            self.vehicle_coord_view = CoordsWidget("coord", "坐标", None, (0x14, 0x30), savable=True)
-            self.vehicle_speed_view = CoordsWidget("speed", "速度", None, (0x44,))
-            self.spin_view = CoordsWidget("spin", "轮子", None, (0x50,))
-            self.weight_view = InputWidget("weight", "重量", None, (0x8c,), float)
+        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
+            self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+            self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
+            self.vehicle_grad_view = ModelCoordsWidget("grad", "旋转")
+            self.vehicle_coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
+            self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
+            self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
