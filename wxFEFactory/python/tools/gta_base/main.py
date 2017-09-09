@@ -185,7 +185,6 @@ class BaseGTATool:
         """跳上附近的一辆行驶中的车"""
         for v in self.getNearVehicles():
             if v.driver:
-                print(v.driver.hp)
                 v.stop()
                 coord = v.coord.values()
                 coord[2] += 1
