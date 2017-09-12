@@ -7,12 +7,11 @@ from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.utils import normalFloat
 from commonstyle import dialog_style, styles
-from .vehicle import vehicle_list
-from .widgets import WeaponWidget, ColorWidget
-from .data import weather_list
+from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
 from .models import Player, Vehicle, Marker
 from . import cheat, address
 from ..gta_base.main import BaseGTATool
+from ..gta_base.widgets import WeaponWidget, ColorWidget
 import math
 import os
 import json
@@ -38,9 +37,6 @@ class Tool(BaseGTATool):
 
     def render(self):
         with ui.MenuBar() as menubar:
-            with ui.Menu("文件"):
-                with ui.Menu("新建"):
-                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=None)
             with ui.Menu("窗口"):
                 ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
 
@@ -52,8 +48,6 @@ class Tool(BaseGTATool):
                     ui.CheckBox("保持最前", onchange=self.swithKeeptop)
                 with ui.Notebook(className="fill"):
                     self.render_main()
-
-        win.setOnClose(self.onClose)
         self.win = win
 
     def render_main(self):
@@ -107,15 +101,15 @@ class Tool(BaseGTATool):
                     ui.Button("再次应用", onclick=self.apply_vehicle_special).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
-                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color")
-                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color")
-                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color")
-                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color")
+                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", COLOR_LIST)
+                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color", COLOR_LIST)
+                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color", COLOR_LIST)
+                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color", COLOR_LIST)
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(13):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i))
+                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
 
         with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
             self.weapon_prop_views = [
@@ -142,7 +136,7 @@ class Tool(BaseGTATool):
             InputWidget("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
             InputWidget("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
             InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
-            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), weather_list)
+            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), WEATHER_LIST)
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -166,7 +160,7 @@ class Tool(BaseGTATool):
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
-                    choices=(item[0] for item in vehicle_list))
+                    choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     ui.Text("根据左边列表生产载具: alt+V")
                     ui.Text("切换上一辆: alt+[")
@@ -202,11 +196,7 @@ class Tool(BaseGTATool):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def closeWindow(self, m=None):
-        self.onClose()
         self.win.close()
-
-    def onClose(self, _=None):
-        pass
 
     def checkAttach(self, btn=None):
         className = 'Grand theft auto San Andreas'
@@ -271,17 +261,17 @@ class Tool(BaseGTATool):
         self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
 
     def onSpawnVehicleIdChange(self, lb):
-        self.spwan_vehicle_id = vehicle_list[lb.index][1]
+        self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
 
     def onSpawnVehicleIdPrev(self, hotkeyId=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
-            pos = len(vehicle_list)
+            pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
     def onSpawnVehicleIdNext(self, hotkeyId=None):
         pos = self.spawn_vehicle_id_view.index
-        if pos == len(vehicle_list) - 1:
+        if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 

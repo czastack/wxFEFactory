@@ -46,8 +46,6 @@ class Tool(BaseGTATool):
                     ui.CheckBox("保持最前", onchange=self.swithKeeptop)
                 with ui.Notebook(className="fill"):
                     self.render_main()
-
-        win.setOnClose(self.onClose)
         self.win = win
 
     def render_main(self):
@@ -127,11 +125,7 @@ class Tool(BaseGTATool):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def closeWindow(self, m=None):
-        self.onClose()
         self.win.close()
-
-    def onClose(self, _=None):
-        pass
 
     def checkAttach(self, _=None):
         className = 'Grand theft auto 3'

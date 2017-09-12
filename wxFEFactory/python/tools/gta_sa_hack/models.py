@@ -1,17 +1,9 @@
 from lib.hack.model import Model, Field, CoordsField
 from lib.lazy import lazy
-from .vehicle import vehicle_list
+from .data import VEHICLE_LIST
+from ..gta_base.models import Physicle, WeaponSet
 from . import address
 import math
-
-
-def distance(p1, p2):
-    """求三围空间两点坐标"""
-    return math.sqrt(
-          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
-        + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
-        + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
-    )
 
 
 class Pool(Model):
@@ -33,7 +25,7 @@ class Pos(Model):
     coord = CoordsField(0x30)
 
 
-class Entity(Model):
+class Entity(Physicle):
     SPECIAL_BP = 2
     SPECIAL_FP = 3
     SPECIAL_DP = 6
@@ -63,9 +55,6 @@ class Entity(Model):
             self.special |= 1 << bitindex
         else:
             self.special &= ~(1 << 1)
-
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
 
 class Player(Entity):
@@ -123,7 +112,7 @@ class Vehicle(Entity):
     def name(self):
         model_id = self.model_id
         try:
-            item = next(filter(lambda x: x[1] == model_id, vehicle_list))
+            item = next(filter(lambda x: x[1] == model_id, VEHICLE_LIST))
             return item[0]
         except:
             return None

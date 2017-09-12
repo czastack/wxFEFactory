@@ -1,19 +1,14 @@
 from lib.hack.model import Model, Field, OffsetsField, CoordsField
-from ..gta_base.models import WeaponSet
+from ..gta_base.models import Physicle, WeaponSet
 from lib.lazy import lazy
 import math
 
 
-def distance(p1, p2):
-    """求三围空间两点坐标"""
-    return math.sqrt(
-          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
-        + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
-        + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
-    )
+class Entity(Physicle):
+    pass
 
 
-class Player(Model):
+class Player(Entity):
     SIZE = 0xdb0
 
     hp = Field(0x354, float)
@@ -47,11 +42,8 @@ class Player(Model):
             yield Player(self.handler.read32(self.addr + offset), self.handler)
             offset += 4
 
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
-
-class Vehicle(Model):
+class Vehicle(Entity):
     SIZE = 0x5dc
 
     hp = Field(0x204, float)

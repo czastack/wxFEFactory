@@ -49,3 +49,59 @@ class WeaponWidget(TwoWayWidget):
         self.id_view.index = i
         if self.has_ammo:
             self.ammo_view.value = value.ammo
+
+
+class ColorWidget(ModelWidget, TwoWayWidget):
+    view_style = {'width': 50}
+    color_item_style = {'width': 35, 'height': 35}
+
+    def __init__(self, name, label, ins, prop, color_list):
+        super().__init__(name, label, ins, prop)
+        self.color_list = color_list
+
+    def render(self):
+        super().render()
+        self.view = ui.Text("", style=self.view_style, className="label_left")
+        self.view.background = 0xaabccc
+        self.view.setOnDoubleClick(self.onDoubleClick)
+        self.view.setOnClick(self.onClick)
+
+    def onClick(self, _):
+        self.read()
+
+    def onDoubleClick(self, _):
+        __class__.cur_view = self
+        self.dialog.showModal()
+
+    @property
+    def dialog(self):
+        cls = __class__
+        dialog = getattr(cls, '_dialog', None)
+
+        if not dialog:
+            with ui.StdModalDialog("选择颜色", style=dialog_style) as dialog:
+                with ui.GridLayout(cols=13, vgap=10, className="fill container"):
+                    for color in self.color_list:
+                        view = ui.Text("", style=cls.color_item_style)
+                        view.background = color
+                        view.setOnDoubleClick(cls.onSelectColor)
+            cls._dialog = dialog
+
+        return dialog
+
+    @classmethod
+    def onSelectColor(cls, item):
+        cls.cur_view.view.background = item.background
+        cls.cur_view.view.refresh()
+        cls.cur_view.write()
+        cls.cur_view = None
+        cls._dialog.endModal()
+
+    @property
+    def input_value(self):
+        return self.color_list.index(self.view.background)
+
+    @input_value.setter
+    def input_value(self, value):
+        self.view.background = self.color_list[value]
+        self.view.refresh()

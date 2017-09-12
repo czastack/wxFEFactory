@@ -1,6 +1,20 @@
 from lib.hack.model import Model, Field
 
 
+def distance(p1, p2):
+    """求三围空间两点坐标"""
+    return math.sqrt(
+          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
+        + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
+        + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
+    )
+
+
+class Physicle(Model):
+    def distance(self, obj):
+        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
+
+
 class WeaponSet(Model):
     def __init__(self, addr, handler, size=13, item_size=24):
         super().__init__(addr, handler)
@@ -21,8 +35,6 @@ class WeaponSet(Model):
 
 
 class WeaponItem(Model):
-    SIZE = 24
-
     id = Field(0) # 武器id
     state = Field(0x4, int)
     ammo_clip = Field(0x8, int) # 弹夹数

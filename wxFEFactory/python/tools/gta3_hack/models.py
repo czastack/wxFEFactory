@@ -1,25 +1,14 @@
 from lib.hack.model import Model, Field, CoordsField, ModelField
 from lib.lazy import lazy
+from ..gta_base.models import Physicle, WeaponSet
 import math
 
 
-def distance(p1, p2):
-    """求三围空间两点坐标"""
-    return math.sqrt(
-          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
-        + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
-        + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
-    )
-
-
-class Entity(Model):
+class Entity(Physicle):
     coord = CoordsField(0x34)
     speed = CoordsField(0x78)
     weight = Field(0xc0, float)
     modelid = Field(0x5c, int, 1)
-
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
 
 class Vehicle(Entity):
@@ -85,39 +74,8 @@ class Player(Entity):
 
     @lazy
     def weapons(self):
-        return WeaponSet(self.addr + 0x35c, self.handler)
+        return WeaponSet(self.addr + 0x35c, self.handler, 13)
 
     @property
     def cur_weapon(self):
         return self.weapons[self.cur_weapon_slop]
-
-
-class WeaponSet(Model):
-
-    def __getitem__(self, i):
-        if i < 0 or i > 12:
-            print("not available i")
-            return
-        return WeaponItem(self.addr + i * WeaponItem.SIZE, self.handler)
-
-    def __setitem__(self, i, item):
-        if i < 0 or i > 12:
-            print("not available i")
-            return
-        self[i].set(item)
-
-
-class WeaponItem(Model):
-    SIZE = 24
-
-    id = Field(0) # 武器id
-    state = Field(0x4, int)
-    ammo_clip = Field(0x8, int) # 弹夹数
-    ammo = Field(0xC, int) # 弹药数
-
-    def set(self, other):
-        if isinstance(other, WeaponItem):
-            self.id = other.id
-            self.ammo = other.ammo
-        elif isinstance(other, (tuple, list)):
-            self.id, self.ammo = other
