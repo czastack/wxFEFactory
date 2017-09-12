@@ -2,6 +2,7 @@
 
 #include "ProcessHandler.h"
 #include "types.h"
+#include <psapi.h>
 
 ProcessHandler::ProcessHandler():mProcess(nullptr)
 {
@@ -96,6 +97,22 @@ bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 		}
 	}
 	return false;
+}
+
+/**
+ * Get MainModuleAddress
+ */
+addr_t ProcessHandler::GetProcessBaseAddress()
+{
+	HMODULE     baseModule;
+	DWORD       bytesRequired;
+
+	if (EnumProcessModules(mProcess, &baseModule, sizeof(baseModule), &bytesRequired))
+	{
+		return (addr_t)baseModule;
+	}
+
+	return 0;
 }
 
 #endif

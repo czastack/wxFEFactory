@@ -160,6 +160,7 @@ void init_emuhacker(pybind11::module & m)
 			}
 			return false;
 		}, addr_a, offsets_a, data_a, "size"_a=4)
+		.def_property_readonly("base", &ProcessHandler::GetProcessBaseAddress)
 		.def_readwrite("addr_is32", &ProcessHandler::m_addr_is32);
 
 	py::class_<VbaHandler, ProcessHandler>(emuhacker, "VbaHandler")

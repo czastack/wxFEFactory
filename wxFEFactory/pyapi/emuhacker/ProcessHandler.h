@@ -180,4 +180,6 @@ public:
 		addr = readLastAddr(addr, offsets);
 		return addr && write(addr, buffer, size);
 	}
+
+	addr_t GetProcessBaseAddress();
 };
