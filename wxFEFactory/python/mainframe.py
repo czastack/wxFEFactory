@@ -59,12 +59,12 @@ class MainFrame:
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(style=consoleStyle) as console:
-                    self.consol_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
+                    self.console_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
                     with ui.Horizontal(className="expand"):
-                        self.consol_input = ui.TextInput(exstyle=0x0400, className="expand console-input")
+                        self.console_input = ui.TextInput(exstyle=0x0400, className="expand console-input")
                         ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
                     with ui.Horizontal(className="expand").show(False):
-                        self.consol_input_multi = ui.TextInput(className="console-input console-input-multi", multiline=True)
+                        self.console_input_multi = ui.TextInput(className="console-input console-input-multi", multiline=True)
                         with ui.Vertical(className="expand"):
                             ui.Button(label="∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
                             ui.Button(label=">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码")
@@ -77,8 +77,9 @@ class MainFrame:
         self.win = win
         self.console = console
         win.book.setContextMenu(cm)
-        fefactory_api.setConsoleElem(self.consol_input, self.consol_output)
+        fefactory_api.setConsoleElem(self.console_input, self.console_output)
         self.console.setOnFileDrop(self.onConsoleFileDrop)
+        self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
     @property
     def module_names(self):
@@ -164,14 +165,14 @@ class MainFrame:
         pass
 
     def toggleConsolInputMulti(self, btn):
-        p1 = self.consol_input.parent
-        p2 = self.consol_input_multi.parent
+        p1 = self.console_input.parent
+        p2 = self.console_input_multi.parent
         p1.show(not p1.isShow())
         p2.show(not p2.isShow())
         self.console.reLayout()
 
-    def consolInputMultiRun(self, btn):
-        exec(self.consol_input_multi.value, vars(__main__))
+    def consolInputMultiRun(self, _=None):
+        exec(self.console_input_multi.value, vars(__main__))
 
     def onConsoleFileDrop(self, files):
         # scope = __main__.__dict__
@@ -183,6 +184,24 @@ class MainFrame:
 
         if scope != __main__.__dict__:
             __main__.last_scope = scope
+
+    def on_console_input_multi_key(self, text_input, event):
+        """控制台多行输入框按键事件"""
+        mod = event.GetModifiers()
+        code = event.GetKeyCode()
+        if code == event.TAB:
+            text_input.writeText('    ')
+            return True
+        if mod == event.CTRL:
+            if code == event.RETURN:
+                self.consolInputMultiRun()
+                return True
+            elif code == event.getWXK('a'):
+                text_input.selectAll()
+                return True
+            elif code == event.getWXK('l'):
+                self.console_output.clear()
+                return True
 
     def readFromRom(self, m):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')

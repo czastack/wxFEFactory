@@ -1,6 +1,16 @@
 from lib.utils import normalFloat
 
 
+class Model:
+    def __init__(self, addr, handler):
+        self.addr = addr
+        self.handler = handler
+
+    def next(self):
+        self.addr += self.SIZE
+        return self
+
+
 class Field:
     def __init__(self, offset, type_=int, size=4):
         self.offset = offset
@@ -26,6 +36,18 @@ class OffsetsField(Field):
 
     def __set__(self, obj, val):
         obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], self.type(val), self.size)
+
+
+class ModelField(Field):
+    def __init__(self, offset, modelClass):
+        super().__init__(offset)
+        self.modelClass = modelClass
+
+    def __get__(self, obj, type=None):
+        return self.modelClass(super().__get__(obj, type), obj.handler)
+
+    def __set__(self, obj, val):
+        raise AttributeError("can't set attribute")
 
 
 class CoordsField:
@@ -73,25 +95,3 @@ class CoordsData:
             self._pos += 1
             return ret
         raise StopIteration
-
-
-class ModelField(Field):
-    def __init__(self, offset, modelClass):
-        super().__init__(offset)
-        self.modelClass = modelClass
-
-    def __get__(self, obj, type=None):
-        return self.modelClass(super().__get__(obj, type), obj.handler)
-
-    def __set__(self, obj, val):
-        raise AttributeError("can't set attribute")
-
-
-class Model:
-    def __init__(self, addr, handler):
-        self.addr = addr
-        self.handler = handler
-
-    def next(self):
-        self.addr += self.SIZE
-        return self

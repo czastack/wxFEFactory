@@ -1,22 +1,9 @@
 from lib.hack.model import Model, Field, CoordsField
 from lib.lazy import lazy
 from .data import VEHICLE_LIST
-from ..gta_base.models import Physicle, WeaponSet
+from ..gta_base.models import Physicle, WeaponSet, Pool
 from . import address
 import math
-
-
-class Pool(Model):
-    start = Field(0)
-    max_count = Field(8)
-
-    def __init__(self, ptr, handler, item_class=None):
-        super().__init__(handler.read32(ptr), handler)
-        self.item_class = item_class
-
-    def __getitem__(self, i):
-        if self.item_class:
-            return self.item_class(self.start + i * self.item_class.SIZE, self.handler)
 
 
 class Pos(Model):
@@ -34,6 +21,7 @@ class Entity(Physicle):
     special = Field(0x42, int, 1) # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
     speed = CoordsField(0x44)
     model_id = Field(0x22, int, 2)
+    weight = Field(0x8c, float)
 
     @property
     def pos(self):
@@ -66,7 +54,6 @@ class Player(Entity):
     cur_rotation = Field(0x558, float)
     rotation = Field(0x55c, float)
     cur_weapon_slop = Field(0x718, int, 1)
-    weight = Field(0x8c, float)
     _isInVehicle = Field(0x530, int, 1)
 
     @property
@@ -85,7 +72,7 @@ class Player(Entity):
 
     @lazy
     def weapons(self):
-        return WeaponSet(self.addr + 0x5a0, self.handler)
+        return WeaponSet(self.addr + 0x5a0, self.handler, 13, 28)
 
     @property
     def cur_weapon(self):
@@ -96,7 +83,6 @@ class Vehicle(Entity):
     SIZE = 0xa18
 
     hp = Field(0x4c0, float)
-    weight = Field(0x8c, float)
     numPassengers = Field(0x484, int, 1)
     maxPassengers = Field(0x488, int, 1)
     dirt = Field(0x4b0, float) # 0.0~15.0
@@ -153,37 +139,10 @@ class Vehicle(Entity):
         grad = self.grad
         grad[0] = -grad[0]
         grad[1] = -grad[1]
-        
-
-class WeaponSet(Model):
-
-    def __getitem__(self, i):
-        if i < 0 or i > 12:
-            print("not available i")
-            return
-        return WeaponItem(self.addr + i * WeaponItem.SIZE, self.handler)
-
-    def __setitem__(self, i, item):
-        if i < 0 or i > 12:
-            print("not available i")
-            return
-        self[i].set(item)
 
 
-class WeaponItem(Model):
-    SIZE = 28
-
-    id = Field(0) # 武器id
-    state = Field(0x4, int)
-    ammo_clip = Field(0x8, int) # 弹夹数
-    ammo = Field(0xC, int) # 弹药数
-
-    def set(self, other):
-        if isinstance(other, WeaponItem):
-            self.id = other.id
-            self.ammo = other.ammo
-        elif isinstance(other, (tuple, list)):
-            self.id, self.ammo = other
+class Object(Entity):
+    SIZE = 0x19c
 
 
 class Marker(Model):
@@ -208,8 +167,8 @@ class Marker(Model):
     def entity(self):
         blipType = self.blipType
         if blipType is __class__.MARKER_TYPE_CAR:
-            return Pool(address.VEHICLE_POOL_POINTER, self.handler, Vehicle)[self.poolIndex >> 8]
+            return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
         elif blipType is __class__.MARKER_TYPE_CHAR:
-            return Pool(address.ACTOR_POOL_POINTER, self.handler, Player)[self.poolIndex >> 8]
+            return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
             pass

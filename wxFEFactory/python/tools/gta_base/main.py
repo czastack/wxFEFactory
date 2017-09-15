@@ -1,4 +1,5 @@
 from lib.win32.sendkey import auto, TextVK
+from .models import Pool
 import math
 import time
 import fefactory_api
@@ -12,7 +13,7 @@ class BaseGTATool:
         auto.sendKey(TextVK(text), 10)
 
     def _player(self):
-        player_addr = self.handler.read32(self.address.PLAYER_BASE)
+        player_addr = self.handler.read32(self.address.PLAYER_PTR)
         if player_addr is 0:
             return None
         player = getattr(self, '_playerins', None)
@@ -23,7 +24,7 @@ class BaseGTATool:
         return player
 
     def _vehicle(self):
-        return self.Vehicle(self.handler.read32(self.address.VEHICLE_BASE), self.handler)
+        return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
     player = property(_player)
     vehicle = property(_vehicle)
@@ -75,44 +76,44 @@ class BaseGTATool:
             values[1] += yVal * speed_rate
             if not isInVehicle:
                 values[2] = 0.2
-                self.raiseUp(speed=0.2)
+                self.raise_up(speed=0.2)
                 time.sleep(0.1)
         
         target.mem_value = values
 
-    def raiseUp(self, hotkeyId=None, speed=1.0):
+    def raise_up(self, hotkeyId=None, speed=1.0):
         self.player_entity.speed[2] = speed
 
-    def goDown(self, hotkeyId=None, speed=0.5):
+    def go_down(self, hotkeyId=None, speed=0.5):
         self.player_entity.speed[2] = -speed
 
-    def toUp(self, hotkeyId=None):
+    def to_up(self, hotkeyId=None):
         self.player_entity.coord[2] += 10
 
-    def toDown(self, hotkeyId=None):
+    def to_down(self, hotkeyId=None):
         self.player_entity.coord[2] -= 6
 
     def stop(self, hotkeyId=None):
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
 
-    def restoreHp(self, hotkeyId=None):
+    def restore_hp(self, hotkeyId=None):
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 200
 
-    def restoreHpLarge(self, hotkeyId=None):
+    def restore_hp_large(self, hotkeyId=None):
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 999
             self.ap_view.mem_value = 999
 
-    def fromPlayerCoord(self, btn):
+    def from_player_coord(self, btn):
         self.vehicle_coord_view.input_value = self.coord_view.input_value
 
-    def fromVehicleCoord(self, btn):
+    def from_vehicle_coord(self, btn):
         self.coord_view.input_value = self.vehicle_coord_view.input_value
 
     def go_prev_pos(self, _=None):
@@ -136,54 +137,62 @@ class BaseGTATool:
         coord[1] += yVal * 5
         return coord
 
-    def getNearPersons(self, distance=100):
+    def get_persons(self):
+        pool = Pool(self.address.PED_POOL, self.handler, self.Player)
+        return iter(pool)
+
+    def get_near_persons(self, distance=100):
         """获取附近的人"""
         coord = self.player.coord.values()
-        myaddr = self.handler.read32(self.address.PLAYER_BASE)
-        for p in self.getPersons():
-            if p.hp != 0 and p.distance(coord) <= distance:
+        myaddr = self.handler.read32(self.address.PLAYER_PTR)
+        for p in self.get_persons():
+            if p.hp > 0 and v.coord[2] > 0 and p.distance(coord) <= distance:
                 if p.addr != myaddr:
                     yield p
 
-    def getNearVehicles(self, distance=100):
+    def get_vehicles(self):
+        pool = Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
+        return iter(pool)
+
+    def get_near_vehicles(self, distance=100):
         """获取附近的载具"""
         coord = self.player.coord.values()
-        mycarAddr = self.handler.read32(self.address.VEHICLE_BASE)
-        for v in self.getVehicles():
-            if v.hp != 0 and v.distance(coord) <= distance:
+        mycarAddr = self.handler.read32(self.address.VEHICLE_PTR)
+        for v in self.get_vehicles():
+            if v.coord[2] > 0 and v.distance(coord) <= distance:
                 if v.addr != mycarAddr:
                     yield v
 
-    def killNearPerson(self, btn=None):
+    def kill_near_persons(self, btn=None):
         """杀死附近的人"""
-        for p in self.getNearPersons():
+        for p in self.get_near_persons():
             p.hp = 0
 
-    def nearVehicleBoom(self, btn=None):
+    def near_vehicles_boom(self, btn=None):
         """摧毁附近的载具"""
-        for v in self.getNearVehicles():
+        for v in self.get_near_vehicles():
             v.hp = 0
 
-    def nearVehicleDown(self, btn=None):
+    def near_vehicles_down(self, btn=None):
         """获取附近的载具下陷"""
-        for v in self.getNearVehicles():
+        for v in self.get_near_vehicles():
             v.coord[2] -= 0.7
 
-    def nearVehicleToFront(self, btn=None):
+    def near_vehicles_to_front(self, btn=None):
         """获取附近的载具移到眼前"""
         coord = self.get_front_coord()
-        for p in self.getNearVehicles():
+        for p in self.get_near_vehicles():
             p.coord = coord
 
-    def nearPersonToFront(self, btn=None):
+    def near_persons_to_front(self, btn=None):
         """附近的人移到眼前"""
         coord = self.get_front_coord()
-        for p in self.getNearPersons():
+        for p in self.get_near_persons():
             p.coord = coord
 
-    def jumpOnVehicle(self, btn=None):
+    def jump_on_vehicle(self, btn=None):
         """跳上附近的一辆行驶中的车"""
-        for v in self.getNearVehicles():
+        for v in self.get_near_vehicles():
             if v.driver:
                 v.stop()
                 coord = v.coord.values()
@@ -191,38 +200,38 @@ class BaseGTATool:
                 self.player.coord = coord
                 break
 
-    def nearVehicleFlip(self, _=None):
+    def near_vehicles_flip(self, _=None):
         """附近的载具上下翻转"""
-        for v in self.getNearVehicles():
+        for v in self.get_near_vehicles():
             v.flip()
 
-    def nearPersonFly(self, _=None):
+    def near_persons_fly(self, _=None):
         """附近的人上天"""
-        for p in self.getNearPersons():
+        for p in self.get_near_persons():
             p.speed[2] = 1
 
-    def nearVehicleFly(self, btn=None):
+    def near_vehicles_fly(self, btn=None):
         """获取附近的载具上天"""
-        for v in self.getNearVehicles():
+        for v in self.get_near_vehicles():
             v.coord[2] += 1
             v.speed[2] = 1
 
-    def nearFly(self, btn=None):
+    def near_fly(self, btn=None):
         """获取附近的人/载具上天"""
-        self.nearPersonFly()
-        self.nearVehicleFly()
+        self.near_persons_fly()
+        self.near_vehicles_fly()
 
-    def vehicleFlip(self, _=None):
+    def vehicle_flip(self, _=None):
         """当前的载具翻转"""
         self.player.lastCar.flip()
 
-    def callVehicle(self, _=None):
+    def call_vehicle(self, _=None):
         """召唤上一辆车回来"""
         car = self.player.lastCar
         if car:
             car.coord = self.get_front_coord()
 
-    def goVehicle(self, _=None):
+    def go_vehicle(self, _=None):
         """回到上一辆车旁边"""
         car = self.player.lastCar
         if car:

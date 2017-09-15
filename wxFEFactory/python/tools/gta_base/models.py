@@ -1,4 +1,5 @@
 from lib.hack.model import Model, Field
+import math
 
 
 def distance(p1, p2):
@@ -46,3 +47,31 @@ class WeaponItem(Model):
             self.ammo = other.ammo
         elif isinstance(other, (tuple, list)):
             self.id, self.ammo = other
+
+
+class Pool(Model):
+    _start = Field(0)
+    _size = Field(8)
+
+    def __init__(self, ptr, handler, item_class=None):
+        super().__init__(handler.read32(ptr), handler)
+        self.item_class = item_class
+        self._i = 0
+        self.start = self._start
+        self.size = self._size
+
+    def __getitem__(self, i):
+        if self.item_class:
+            return self.item_class(self.start + i * self.item_class.SIZE, self.handler)
+
+    def __iter__(self):
+        self._i = 0
+        return self
+
+    def __next__(self):
+        if self._i == self.size:
+            raise StopIteration
+
+        item = self[self._i]
+        self._i += 1
+        return item

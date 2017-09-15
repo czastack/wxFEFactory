@@ -7,9 +7,9 @@ from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.utils import normalFloat
 from commonstyle import dialog_style, styles
+from . import cheat, address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
-from .models import Player, Vehicle, Marker
-from . import cheat, address
+from .models import Player, Vehicle
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
 import math
@@ -63,7 +63,7 @@ class Tool(BaseGTATool):
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
-                    ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
+                    ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                     ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
                 ui.Hr()
                 ui.Text("防止主角受到来自以下的伤害")
@@ -85,10 +85,10 @@ class Tool(BaseGTATool):
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
-                    ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+                    ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
                     ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
-                    ui.Button(label="锁车", onclick=self.vehicleLockDoor)
-                    ui.Button(label="开锁", onclick=partial(self.vehicleLockDoor, lock=False))
+                    ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+                    ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
                 ui.Hr()
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
@@ -120,7 +120,7 @@ class Tool(BaseGTATool):
             ]
             
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputWidget("money", "金钱", address.MONEY_BASE)
+            self.money_view = InputWidget("money", "金钱", address.MONEY)
             InputWidget("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
             InputWidget("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
             InputWidget("fat_stat", "肥胖度", address.FAT_STAT_ADDR, (), float)
@@ -180,17 +180,17 @@ class Tool(BaseGTATool):
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
-                ui.Button("杀掉附近的人", onclick=self.killNearPerson)
-                ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
-                ui.Button("附近的车下陷", onclick=self.nearVehicleDown)
-                ui.Button("附近的车移到眼前", onclick=self.nearVehicleToFront)
-                ui.Button("附近的人移到眼前", onclick=self.nearPersonToFront)
-                ui.Button("附近的车上天", onclick=self.nearVehicleFly)
-                ui.Button("附近的人上天", onclick=self.nearPersonFly)
-                ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
+                ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
+                ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
+                ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
+                ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
+                ui.Button("附近的人移到眼前", onclick=self.near_persons_to_front)
+                ui.Button("附近的车上天", onclick=self.near_vehicles_fly)
+                ui.Button("附近的人上天", onclick=self.near_persons_fly)
+                ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
                 ui.Button("跳上一辆车", onclick=self.jumpOnVehicle)
-                ui.Button("召唤上一辆车回来", onclick=self.callVehicle)
-                ui.Button("回到上一辆车旁边", onclick=self.goVehicle)
+                ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
+                ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
@@ -209,28 +209,29 @@ class Tool(BaseGTATool):
                     ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
                     ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
                     ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                    ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
-                    ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
-                    ('toUp', MOD_ALT, getVK('.'), self.toUp),
-                    ('toDown', MOD_ALT | MOD_SHIFT, getVK('.'), self.toDown),
+                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
+                    ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
+                    ('to_up', MOD_ALT, getVK('.'), self.to_up),
+                    ('to_down', MOD_ALT | MOD_SHIFT, getVK('.'), self.to_down),
                     ('stop', MOD_ALT, getVK('x'), self.stop),
-                    ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
-                    ('restoreHpLarge', MOD_ALT | MOD_SHIFT, getVK('h'), self.restoreHpLarge),
+                    ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
+                    ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
                     ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
                     ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                     ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                     ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
-                    ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
-                    ('nearFly', MOD_ALT | MOD_SHIFT, getVK('f'), self.nearFly),
-                    ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
-                    ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
+                    ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
+                    ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
+                    ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
+                    ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
                     ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
                     ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                     ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
                     ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
                     ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.nearPersonToFront),
+                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
+                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
+                    ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
                 ))
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
@@ -274,22 +275,6 @@ class Tool(BaseGTATool):
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
-
-    def getPersons(self):
-        pool_ptr = self.handler.read32(address.ACTOR_POOL_POINTER)
-        pool_start = self.handler.read32(pool_ptr)
-        pool_size = self.handler.read32(pool_ptr + 8)
-        for i in range(pool_size):
-            yield Player(pool_start, self.handler)
-            pool_start += Player.SIZE
-
-    def getVehicles(self):
-        pool_ptr = self.handler.read32(address.VEHICLE_POOL_POINTER)
-        pool_start = self.handler.read32(pool_ptr)
-        pool_size = self.handler.read32(pool_ptr + 8)
-        for i in range(pool_size):
-            yield Vehicle(pool_start, self.handler)
-            pool_start += Vehicle.SIZE
 
     def moveToMapPtr(self, _=None):
         coord = self.vehicle.coord
@@ -375,7 +360,7 @@ class Tool(BaseGTATool):
         if carid:
             self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
 
-    def vehicleLockDoor(self, btn=None, lock=True):
+    def vehicle_lock_door(self, btn=None, lock=True):
         car = self.player.lastCar
         if car:
             if lock:
@@ -399,13 +384,13 @@ class Tool(BaseGTATool):
     """重新获取人/车标记点"""
     def re_cal_markers(self, _=None):
         addr = address.MARKER_ADDR
-        it = Marker(addr, self.handler)
+        it = models.Marker(addr, self.handler)
         self._markers = []
 
         for i in range(175):
             blipType = it.blipType
-            if blipType is Marker.MARKER_TYPE_CAR or blipType is Marker.MARKER_TYPE_CHAR:
-                self._markers.append(Marker(it.addr, self.handler))
+            if blipType is models.Marker.MARKER_TYPE_CAR or blipType is models.Marker.MARKER_TYPE_CHAR:
+                self._markers.append(models.Marker(it.addr, self.handler))
 
             it.next()
 
@@ -447,6 +432,23 @@ class Tool(BaseGTATool):
                     entity.coord = front_coord
             elif isinstance(entity, Vehicle):
                 entity.coord = front_coord
+
+    def get_objects(self):
+        pool = models.Pool(address.OBJECT_POOL, self.handler, models.Object)
+        return iter(pool)
+
+    def get_near_objects(self, distance=100):
+        """获取附近的人"""
+        coord = self.player.coord.values()
+        for o in self.get_objects():
+            if o.coord[2] > 0 and o.distance(coord) <= distance:
+                yield o
+
+    def near_objects_to_front(self, _=None):
+        """附近的人移到眼前"""
+        coord = self.get_front_coord()
+        for o in self.get_near_objects():
+            o.coord = coord
 
 
 ins = None

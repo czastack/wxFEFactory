@@ -59,7 +59,7 @@ class Tool(BaseGTATool):
             self.stamina_view = ModelInputWidget("stamina", "体力")
             self.wanted_view = ModelInputWidget("wanted_level", "通缉等级")
             ui.Text("")
-            ui.Button(label="车坐标->人坐标", onclick=self.fromVehicleCoord)
+            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordsWidget("roll", "滚动")
@@ -69,7 +69,7 @@ class Tool(BaseGTATool):
             self.vehicle_turn_view = ModelCoordsWidget("turn", "Turn")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
-            ui.Button(label="人坐标->车坐标", onclick=self.fromPlayerCoord)
+            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
 
 
         with Group("weapon", "武器槽", None, handler=self.handler):
@@ -78,7 +78,7 @@ class Tool(BaseGTATool):
                 self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
 
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputWidget("money", "金钱", address.MONEY_BASE, (), int)
+            self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
             self.camera_view = CoordsWidget("camera", "摄像机", 0x7E46B8, ())
             self.camera_z_rot_view = InputWidget("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
             self.camera_x_rot_view = InputWidget("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
@@ -111,14 +111,14 @@ class Tool(BaseGTATool):
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
-                ui.Button("杀掉附近的人", onclick=self.killNearPerson)
-                ui.Button("附近的车起火", onclick=self.nearVehicleBoom)
-                ui.Button("附近的车下陷", onclick=self.nearVehicleDown)
-                ui.Button("附近的车移到眼前", onclick=self.nearVehicleToFront)
-                ui.Button("附近的人移到眼前", onclick=self.nearPersonToFront)
-                ui.Button("附近的车上天", onclick=self.nearVehicleFly)
-                ui.Button("附近的人上天", onclick=self.nearPersonFly)
-                ui.Button("附近的车翻转", onclick=self.nearVehicleFlip)
+                ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
+                ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
+                ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
+                ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
+                ui.Button("附近的人移到眼前", onclick=self.near_persons_to_front)
+                ui.Button("附近的车上天", onclick=self.near_vehicles_fly)
+                ui.Button("附近的人上天", onclick=self.near_persons_fly)
+                ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
                 ui.Button("跳上一辆车", onclick=self.jumpOnVehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -138,23 +138,23 @@ class Tool(BaseGTATool):
                     ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
                     ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
                     ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                    ('raiseUp', MOD_ALT, getVK(' '), self.raiseUp),
-                    ('goDown', MOD_ALT | MOD_SHIFT, getVK(' '), self.goDown),
-                    ('toUp', MOD_ALT, getVK('.'), self.toUp),
+                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
+                    ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
+                    ('to_up', MOD_ALT, getVK('.'), self.to_up),
                     ('stop', MOD_ALT, getVK('x'), self.stop),
-                    ('restoreHp', MOD_ALT, getVK('h'), self.restoreHp),
-                    ('restoreHpLarge', MOD_ALT | MOD_SHIFT, getVK('h'), self.restoreHpLarge),
+                    ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
+                    ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
                     ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
                     ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                     ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                     ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
                     ('jumpOnVehicle', MOD_ALT, getVK('j'), self.jumpOnVehicle),
-                    ('nearPersonFly', MOD_ALT, getVK('f'), self.nearPersonFly),
-                    ('nearFly', MOD_ALT | MOD_SHIFT, getVK('f'), self.nearFly),
-                    ('vehicleFlip', MOD_ALT, getVK('k'), self.vehicleFlip),
-                    ('nearVehicleFlip', MOD_ALT | MOD_SHIFT, getVK('k'), self.nearVehicleFlip),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.nearVehicleToFront),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.nearPersonToFront),
+                    ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
+                    ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
+                    ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
+                    ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
+                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
+                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
                     ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
                     ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
                 ))
@@ -202,22 +202,6 @@ class Tool(BaseGTATool):
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
-
-    def getPersons(self):
-        pool_ptr = self.handler.read32(address.ACTOR_POOL_POINTER)
-        pool_start = self.handler.read32(pool_ptr)
-        pool_size = self.handler.read32(pool_ptr + 8)
-        for i in range(pool_size):
-            yield Player(pool_start, self.handler)
-            pool_start += Player.SIZE
-
-    def getVehicles(self):
-        pool_ptr = self.handler.read32(address.VEHICLE_POOL_POINTER)
-        pool_start = self.handler.read32(pool_ptr)
-        pool_size = self.handler.read32(pool_ptr + 8)
-        for i in range(pool_size):
-            yield Vehicle(pool_start, self.handler)
-            pool_start += Vehicle.SIZE
 
 
 win_style = {
