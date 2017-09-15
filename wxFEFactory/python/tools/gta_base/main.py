@@ -146,7 +146,7 @@ class BaseGTATool:
         coord = self.player.coord.values()
         myaddr = self.handler.read32(self.address.PLAYER_PTR)
         for p in self.get_persons():
-            if p.hp > 0 and v.coord[2] > 0 and p.distance(coord) <= distance:
+            if p.hp > 0 and p.coord[2] > 0 and p.distance(coord) <= distance:
                 if p.addr != myaddr:
                     yield p
 
