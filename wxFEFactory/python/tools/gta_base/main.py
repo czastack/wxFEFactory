@@ -46,7 +46,7 @@ class BaseGTATool:
             rotz += PI * 2
         return rotz
 
-    def jetPackTick(self, hotkeyId=None, useSpeed=False, detal=0):
+    def jetPackTick(self, _=None, useSpeed=False, detal=0):
         """弹射起步"""
         jetPackSpeed = detal or self.jetPackSpeed
         isInVehicle = self.isInVehicle
@@ -81,29 +81,29 @@ class BaseGTATool:
         
         target.mem_value = values
 
-    def raise_up(self, hotkeyId=None, speed=1.0):
+    def raise_up(self, _=None, speed=1.0):
         self.player_entity.speed[2] = speed
 
-    def go_down(self, hotkeyId=None, speed=0.5):
+    def go_down(self, _=None, speed=0.5):
         self.player_entity.speed[2] = -speed
 
-    def to_up(self, hotkeyId=None):
+    def to_up(self, _=None):
         self.player_entity.coord[2] += 10
 
-    def to_down(self, hotkeyId=None):
+    def to_down(self, _=None):
         self.player_entity.coord[2] -= 6
 
-    def stop(self, hotkeyId=None):
+    def stop(self, _=None):
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
 
-    def restore_hp(self, hotkeyId=None):
+    def restore_hp(self, _=None):
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 200
 
-    def restore_hp_large(self, hotkeyId=None):
+    def restore_hp_large(self, _=None):
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
@@ -163,34 +163,34 @@ class BaseGTATool:
                 if v.addr != mycarAddr:
                     yield v
 
-    def kill_near_persons(self, btn=None):
+    def kill_near_persons(self, _=None):
         """杀死附近的人"""
         for p in self.get_near_persons():
             p.hp = 0
 
-    def near_vehicles_boom(self, btn=None):
+    def near_vehicles_boom(self, _=None):
         """摧毁附近的载具"""
         for v in self.get_near_vehicles():
             v.hp = 0
 
-    def near_vehicles_down(self, btn=None):
+    def near_vehicles_down(self, _=None):
         """获取附近的载具下陷"""
         for v in self.get_near_vehicles():
             v.coord[2] -= 0.7
 
-    def near_vehicles_to_front(self, btn=None):
+    def near_vehicles_to_front(self, _=None):
         """获取附近的载具移到眼前"""
         coord = self.get_front_coord()
         for p in self.get_near_vehicles():
             p.coord = coord
 
-    def near_persons_to_front(self, btn=None):
+    def near_persons_to_front(self, _=None):
         """附近的人移到眼前"""
         coord = self.get_front_coord()
         for p in self.get_near_persons():
             p.coord = coord
 
-    def jump_on_vehicle(self, btn=None):
+    def jump_on_vehicle(self, _=None):
         """跳上附近的一辆行驶中的车"""
         for v in self.get_near_vehicles():
             if v.driver:
@@ -210,13 +210,13 @@ class BaseGTATool:
         for p in self.get_near_persons():
             p.speed[2] = 1
 
-    def near_vehicles_fly(self, btn=None):
+    def near_vehicles_fly(self, _=None):
         """获取附近的载具上天"""
         for v in self.get_near_vehicles():
             v.coord[2] += 1
             v.speed[2] = 1
 
-    def near_fly(self, btn=None):
+    def near_fly(self, _=None):
         """获取附近的人/载具上天"""
         self.near_persons_fly()
         self.near_vehicles_fly()
@@ -239,7 +239,7 @@ class BaseGTATool:
             coord[2] += 5
             self.player.coord = coord
 
-    def g3l2json(self, btn=None):
+    def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
         if path:

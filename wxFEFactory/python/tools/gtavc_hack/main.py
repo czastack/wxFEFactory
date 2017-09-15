@@ -182,22 +182,22 @@ class Tool(BaseGTATool):
         time.sleep(0.01)
         self.handler.ptrsWrite(TEXT2_ADDR, (), text)
 
-    def bigbang(self, hotkeyId=None):
+    def bigbang(self, _=None):
         self.inputCheat('bigbang')
 
-    def spawnVehicle(self, hotkeyId=None):
+    def spawnVehicle(self, _=None):
         self.inputCheat('betterthanwalking')
 
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
 
-    def onSpawnVehicleIdPrev(self, hotkeyId=None):
+    def onSpawnVehicleIdPrev(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
             pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
-    def onSpawnVehicleIdNext(self, hotkeyId=None):
+    def onSpawnVehicleIdNext(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1

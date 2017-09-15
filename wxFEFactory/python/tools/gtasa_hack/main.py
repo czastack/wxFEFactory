@@ -198,7 +198,7 @@ class Tool(BaseGTATool):
     def closeWindow(self, m=None):
         self.win.close()
 
-    def checkAttach(self, btn=None):
+    def checkAttach(self, _=None):
         className = 'Grand theft auto San Andreas'
         windowName = 'GTA: San Andreas'
         if self.handler.attachByWindowName(className, windowName):
@@ -251,12 +251,12 @@ class Tool(BaseGTATool):
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
             self.rot_view.mem_value = rot
 
-    def playerCoordFromMap(self, btn=None):
+    def playerCoordFromMap(self, _=None):
         # 从大地图读取坐标
         self.coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
         self.coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
 
-    def vehicleCoordFromMap(self, btn=None):
+    def vehicleCoordFromMap(self, _=None):
         # 从大地图读取坐标
         self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
         self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
@@ -264,13 +264,13 @@ class Tool(BaseGTATool):
     def onSpawnVehicleIdChange(self, lb):
         self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
 
-    def onSpawnVehicleIdPrev(self, hotkeyId=None):
+    def onSpawnVehicleIdPrev(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
             pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
-    def onSpawnVehicleIdNext(self, hotkeyId=None):
+    def onSpawnVehicleIdNext(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
@@ -289,12 +289,12 @@ class Tool(BaseGTATool):
         """设置当前汽车特殊属性"""
         self.player.lastCar.setSpecial(checkbox.checked, bitindex)
 
-    def apply_player_special(self, btn=None):
+    def apply_player_special(self, _=None):
         for cb in self.player_special_views:
             if cb.checked:
                 cb.onchange(cb)
 
-    def apply_vehicle_special(self, btn=None):
+    def apply_vehicle_special(self, _=None):
         for cb in self.vehicle_special_views:
             if cb.checked:
                 cb.onchange(cb)
@@ -306,7 +306,7 @@ class Tool(BaseGTATool):
         cheat_config = self.get_cheat_config()
         self.handler.write8(cheat_config['CHEATS_ADDR'][index], 1 if checkbox.checked else 0)
 
-    def cheat_sync(self, btn=None):
+    def cheat_sync(self, _=None):
         cheat_config = self.get_cheat_config()
         for index, view in enumerate(self.cheat_views):
             view.checked = self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1
@@ -320,7 +320,7 @@ class Tool(BaseGTATool):
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
         return self.handler.writeFloat(addr, value)
 
-    def inject_spawn_code(self, btn=None):
+    def inject_spawn_code(self, _=None):
         cheat_config = self.get_cheat_config()
 
         if not self.spawn_code_injected:
@@ -355,12 +355,12 @@ class Tool(BaseGTATool):
         else:
             self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
-    def spawnVehicle(self, hotkeyId=None):
+    def spawnVehicle(self, _=None):
         carid = getattr(self, 'spwan_vehicle_id', None)
         if carid:
             self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
 
-    def vehicle_lock_door(self, btn=None, lock=True):
+    def vehicle_lock_door(self, _=None, lock=True):
         car = self.player.lastCar
         if car:
             if lock:

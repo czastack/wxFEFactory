@@ -155,19 +155,19 @@ class Tool(BaseGTATool):
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
 
-    def onSpawnVehicleIdPrev(self, hotkeyId=None):
+    def onSpawnVehicleIdPrev(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
             pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
-    def onSpawnVehicleIdNext(self, hotkeyId=None):
+    def onSpawnVehicleIdNext(self, _=None):
         pos = self.spawn_vehicle_id_view.index
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
-    def vehicle_lock_door(self, btn=None, lock=True):
+    def vehicle_lock_door(self, _=None, lock=True):
         car = self.player.lastCar
         if car:
             if lock:
