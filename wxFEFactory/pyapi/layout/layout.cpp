@@ -179,7 +179,12 @@ void init_layout(py::module &m)
 		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),
 			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, exstyle, key, className, style)
 		.def("setOnEnter", &TextInput::setOnEnter)
-		.def_property("value", &TextInput::getValue, &TextInput::setValue);
+		.def("appendText", &TextInput::appendText)
+		.def("writeText", &TextInput::writeText)
+		.def("selectAll", &TextInput::selectAll)
+		.def("clear", &TextInput::clear)
+		.def_property("value", &TextInput::getValue, &TextInput::setValue)
+		.def_property("selection", &TextInput::getSelection, &TextInput::setSelection);
 
 	py::class_t<SearchCtrl, Control>(layout, "SearchCtrl")
 		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj, pyobj>(),

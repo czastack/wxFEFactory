@@ -152,6 +152,40 @@ public:
 		bindEvt(wxEVT_TEXT_ENTER, fn);
 	}
 
+	void appendText(wxcstr text)
+	{
+		ctrl().AppendText(text);
+	}
+
+	void writeText(wxcstr text)
+	{
+		ctrl().WriteText(text);
+	}
+
+	void clear()
+	{
+		ctrl().Clear();
+	}
+
+	void getSelection()
+	{
+		py::tuple selection(2);
+		long start, end;
+		ctrl().GetSelection(&start, &end);
+		selection[0] = start;
+		selection[0] = end;
+	}
+
+	void setSelection(py::tuple &selection)
+	{
+		ctrl().SetSelection(selection[0].cast<long>(), selection[1].cast<long>());
+	}
+
+	void selectAll()
+	{
+		ctrl().SelectAll();
+	}
+
 protected:
 
 	wxTextCtrl& ctrl()
