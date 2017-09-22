@@ -50,6 +50,8 @@ public:
 
 	bool isValid();
 
+	auto GetProcess() { return mProcess; }
+
 	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
 	bool rawWrite(addr_t addr, LPCVOID buffer, size_t size);
 

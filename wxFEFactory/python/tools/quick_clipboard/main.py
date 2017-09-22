@@ -35,6 +35,11 @@ class Tool(BaseTool):
                     self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
                     with ui.Horizontal(className="expand top_padding"):
                         ui.Button("输入", onclick=self.input_text)
+                    with ui.ScrollView(className="fill container"):
+                        ui.Text("切换上一个: alt+[")
+                        ui.Text("切换下一个: alt+]")
+                        ui.Text("切换并粘贴上一个: alt+shift+[")
+                        ui.Text("切换并粘贴下一个: alt+shift+]")
 
 
         self.win = win

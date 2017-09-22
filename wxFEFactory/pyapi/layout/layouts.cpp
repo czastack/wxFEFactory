@@ -23,11 +23,13 @@ bool HotkeyWindow::prepareHotkey(pyobj & hotkeyId, WORD & int_hotkeyId)
 void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyCode, pycref onhotkey)
 {
 	WORD _hotkeyId;
+	const pyobj origin_hotkey_id = hotkeyId;
+
 	if (prepareHotkey(hotkeyId, _hotkeyId))
 	{
 		if (m_hotkey_map.contains(hotkeyId))
 		{
-			py::print(hotkeyId, "已经在使用了");
+			py::print(origin_hotkey_id, "已经在使用了");
 			return;
 		}
 		if (m_elem->RegisterHotKey(_hotkeyId, modifiers, virtualKeyCode))
@@ -36,7 +38,7 @@ void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyC
 			onhotkey.inc_ref();
 		}
 		else {
-			py::print(hotkeyId, "热键注册失败");
+			py::print(origin_hotkey_id, "热键注册失败");
 		}
 	}
 }

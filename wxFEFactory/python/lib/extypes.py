@@ -2,10 +2,6 @@ def astr(text):
     """确保是字符串类型"""
     return text if isinstance(text, str) else str(text)
 
-def is_list_or_tuple(var):
-    """是否是列表或元组"""
-    return isinstance(var, list) or isinstance(var, tuple)
-
 def list_re(li, fn):
     """列表元素映射"""
     for i in range(len(li)):
@@ -25,6 +21,18 @@ def puts(dst, src, keys=None):
     for key in keys or src:
         dst[key] = src[key]
 
+
+def append_or(dic, key, value):
+    if key in dic:
+        dic[key].append(value)
+    else:
+        dic[key] = [value]
+
+def make_tuple(*args):
+    return args
+
+def make_list(*args):
+    return list(args)
 
 
 class Map(dict):
@@ -76,8 +84,8 @@ class Dict:
         return self._data[key]
 
     def __setitem__(self, key, value):
-        if is_list_or_tuple(key):
-            if is_list_or_tuple(value):
+        if isinstance(key, (list, tuple)):
+            if isinstance(value, (list, tuple)):
                 val = iter(value).__next__
             else:
                 val = lambda: value
@@ -93,12 +101,10 @@ class Dict:
         return __class__.__name__ + '(' + self.__str__() + ')'
 
     def __and__(self, keys):
-        if is_list_or_tuple(keys):
+        if isinstance(key, (list, tuple)):
             return __class__({key: self.__getattr__(key) for key in keys})
 
     puts = puts
-
-# add_method_proxy(Dict, '__dict__', ['__str__', '__iter__', '__getitem__', '__setitem__'])
 
 
 class Dicts:
@@ -111,7 +117,7 @@ class Dicts:
     __slots__ = ('__ref', 'data')
 
     def __init__(self, array):
-        if is_list_or_tuple(array):
+        if isinstance(key, (list, tuple)):
             self.__ref = None
             self.data = array
         else:
