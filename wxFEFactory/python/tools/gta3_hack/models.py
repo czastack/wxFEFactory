@@ -47,10 +47,10 @@ class Vehicle(Entity):
         self.dir[0] = -self.dir[0]
         self.dir[1] = -self.dir[1]
 
-    def lockDoor(self):
+    def lock_door(self):
         self.door_status = 2
 
-    def unlockDoor(self):
+    def unlock_door(self):
         self.door_status = 1
 
     def ignoreDamage(self, ignore=True):

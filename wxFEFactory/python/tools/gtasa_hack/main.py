@@ -358,9 +358,9 @@ class Tool(BaseGTATool):
         car = self.player.lastCar
         if car:
             if lock:
-                car.lockDoor()
+                car.lock_door()
             else:
-                car.unlockDoor()
+                car.unlock_door()
 
     def getWantedLevel(self):
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)

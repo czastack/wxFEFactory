@@ -37,7 +37,7 @@ class BaseGTATool:
         return self.player.isInVehicle
 
     @property
-    def player_entity(self):
+    def entity(self):
         return self.vehicle if self.isInVehicle else self.player
 
     def get_rotz(self):
@@ -85,16 +85,16 @@ class BaseGTATool:
         target.mem_value = values
 
     def raise_up(self, _=None, speed=1.0):
-        self.player_entity.speed[2] = speed
+        self.entity.speed[2] = speed
 
     def go_down(self, _=None, speed=0.5):
-        self.player_entity.speed[2] = -speed
+        self.entity.speed[2] = -speed
 
     def to_up(self, _=None):
-        self.player_entity.coord[2] += 10
+        self.entity.coord[2] += 10
 
     def to_down(self, _=None):
-        self.player_entity.coord[2] -= 6
+        self.entity.coord[2] -= 6
 
     def stop(self, _=None):
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
@@ -273,7 +273,7 @@ class BaseGTATool:
                 self.re_cal_markers()
                 return
             if entity:
-                self.vehicle.coord = self._markers[self._marker_index].entity.coord
+                self.entity.coord = entity.coord
                 break
             self._marker_index += 1
 

@@ -23,6 +23,7 @@ class Tool(BaseGTATool):
     Player = Player
     Vehicle = Vehicle
     MARKER_RANGE = 32
+    SPHERE_RANGE = 16
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -135,6 +136,8 @@ class Tool(BaseGTATool):
                         ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
                         ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                         ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                        ('re_cal_spheres', MOD_ALT, getVK(";"), self.re_cal_spheres),
+                        ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere),
                     ) + self.get_common_hotkeys()
                 )
         else:
@@ -181,6 +184,35 @@ class Tool(BaseGTATool):
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
+
+    def re_cal_spheres(self, _=None):
+        """重新获取人/车标记点"""
+        addr = self.address.SPHERE_ARRAY
+        it = self.models.Sphere(addr, self.handler)
+        self._spheres = []
+
+        for i in range(self.SPHERE_RANGE):
+            if it.coord[0]:
+                self._spheres.append(it.clone())
+            it.next()
+
+        self._sphere_index = 0
+
+    def go_next_sphere(self, _=None):
+        """到下一处 人/车标记点"""
+        if not hasattr(self, '_spheres'):
+            self.re_cal_spheres()
+
+        while True:
+            try:
+                item = self._spheres[self._sphere_index]
+            except IndexError:
+                self.re_cal_spheres()
+                return
+            if item.coord[0]:
+                self.entity.coord = item.coord
+                break
+            self._sphere_index += 1
 
 
 win_style = {

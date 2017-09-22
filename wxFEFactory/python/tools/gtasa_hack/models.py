@@ -129,10 +129,10 @@ class Vehicle(Entity):
         ptr = self._tranler
         return Vehicle(ptr, self.handler) if ptr else None
 
-    def lockDoor(self):
+    def lock_door(self):
         self.door_status = 2
 
-    def unlockDoor(self):
+    def unlock_door(self):
         self.door_status = 1
 
     def flip(self):

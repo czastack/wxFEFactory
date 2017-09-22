@@ -10,6 +10,9 @@ class Model:
         self.addr += self.SIZE
         return self
 
+    def clone(self):
+        return self.__class__(self.addr, self.handler)
+
 
 class Field:
     def __init__(self, offset, type_=int, size=4):

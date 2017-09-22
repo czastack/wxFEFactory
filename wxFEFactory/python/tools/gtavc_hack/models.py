@@ -61,6 +61,7 @@ class Vehicle(Entity):
     secondaryColor = Field(0x1a1, int, 1)
     numPassengers = Field(0x1cc, int, 1)
     maxPassengers = Field(0x1d0, int, 1)
+    door_status = Field(0x230, int, 1)
 
     @property
     def passengers(self):
@@ -81,6 +82,12 @@ class Vehicle(Entity):
     def flip(self):
         self.dir[0] = -self.dir[0]
         self.dir[1] = -self.dir[1]
+
+    def lock_door(self):
+        self.door_status = 2
+
+    def unlock_door(self):
+        self.door_status = 1
 
 
 class Marker(Model):
@@ -104,3 +111,9 @@ class Marker(Model):
             return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
             pass
+
+
+class Sphere(Model):
+    SIZE = 24
+
+    coord = CoordsField(8)

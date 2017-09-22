@@ -144,9 +144,9 @@ class Tool(BaseGTATool):
         car = self.player.lastCar
         if car:
             if lock:
-                car.lockDoor()
+                car.lock_door()
             else:
-                car.unlockDoor()
+                car.unlock_door()
 
     def weapon_max(self, _=None):
         for v in self.weapon_views:
