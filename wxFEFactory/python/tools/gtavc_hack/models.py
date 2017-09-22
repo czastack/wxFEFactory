@@ -1,6 +1,7 @@
 from lib.hack.model import Model, Field, OffsetsField, CoordsField
-from ..gta_base.models import Physicle, WeaponSet
 from lib.lazy import lazy
+from ..gta_base.models import Physicle, WeaponSet, Pool
+from . import address
 import math
 
 
@@ -9,7 +10,7 @@ class Entity(Physicle):
 
 
 class Player(Entity):
-    SIZE = 0xdb0
+    SIZE = 0x6d8
 
     hp = Field(0x354, float)
     ap = Field(0x358, float)
@@ -74,12 +75,32 @@ class Vehicle(Entity):
         if addr:
             return Player(addr, self.handler)
 
-    def distance(self, obj):
-        return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
-
     def stop(self):
         self.speed = (0, 0, 0)
 
     def flip(self):
         self.dir[0] = -self.dir[0]
         self.dir[1] = -self.dir[1]
+
+
+class Marker(Model):
+    SIZE = 56
+
+    MARKER_TYPE_CAR = 1
+    MARKER_TYPE_PED = 2
+    MARKER_TYPE_OBJECT = 3
+
+    color = Field(0)
+    blipType = Field(4)
+    poolIndex = Field(8)
+    coord = CoordsField(12)
+
+    @property
+    def entity(self):
+        blipType = self.blipType
+        if blipType is __class__.MARKER_TYPE_CAR:
+            return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
+        elif blipType is __class__.MARKER_TYPE_PED:
+            return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
+        elif blipType is __class__.MARKER_TYPE_OBJECT:
+            pass

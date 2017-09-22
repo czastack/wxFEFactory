@@ -1,8 +1,11 @@
+from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from .models import Pool
 import math
 import time
 import fefactory_api
+import fefactory_api
+ui = fefactory_api.ui
 
 
 class BaseGTATool:
@@ -71,7 +74,7 @@ class BaseGTATool:
             # speed up
             target = speed_view
             values = target.mem_value.values()
-            speed_rate = getattr(self, 'safe_speed_rate', 0.5)
+            speed_rate = getattr(self, 'SAFE_SPEED_RATE', 0.5)
             values[0] += xVal * speed_rate
             values[1] += yVal * speed_rate
             if not isInVehicle:
@@ -239,6 +242,62 @@ class BaseGTATool:
             coord[2] += 5
             self.player.coord = coord
 
+    #----------------------------------------------------------------------
+    # MARKER
+    #----------------------------------------------------------------------
+    def re_cal_markers(self, _=None):
+        """重新获取人/车标记点"""
+        Marker = self.models.Marker
+        addr = self.address.MARKER_ARRAY
+        it = Marker(addr, self.handler)
+        self._markers = []
+
+        for i in range(self.MARKER_RANGE):
+            blipType = it.blipType
+            if blipType is Marker.MARKER_TYPE_CAR or blipType is Marker.MARKER_TYPE_PED:
+                self._markers.append(Marker(it.addr, self.handler))
+
+            it.next()
+
+        self._marker_index = 0
+
+    def go_next_marker(self, _=None):
+        """到下一处 人/车标记点"""
+        if not hasattr(self, '_markers'):
+            self.re_cal_markers()
+
+        while True:
+            try:
+                entity = self._markers[self._marker_index].entity
+            except IndexError:
+                self.re_cal_markers()
+                return
+            if entity:
+                self.vehicle.coord = self._markers[self._marker_index].entity.coord
+                break
+            self._marker_index += 1
+
+    def move_marker_to_front(self, _=None):
+        """人/车标记点目标移到眼前"""
+        if not hasattr(self, '_markers'):
+            self.re_cal_markers()
+
+        moved_car_addr = []
+        front_coord = self.get_front_coord()
+
+        for marker in self._markers:
+            entity = marker.entity
+            if isinstance(entity, self.Player):
+                car = entity.lastCar
+                if car and car.hp > 1: 
+                    if car.addr not in moved_car_addr:
+                        moved_car_addr.append(car.addr)
+                        car.coord = front_coord
+                else:
+                    entity.coord = front_coord
+            elif isinstance(entity, self.Vehicle):
+                entity.coord = front_coord
+
     def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
@@ -269,3 +328,50 @@ class BaseGTATool:
                 json.dump(datas, file, ensure_ascii=False)
 
             fefactory_api.alert('转换成功: ' + jsonpath)
+
+    def render_common_text(self):
+        ui.Text("向前穿墙: alt+w")
+        ui.Text("向前穿墙大: alt+shift+w")
+        ui.Text("弹射起步: alt+m")
+        ui.Text("上天（有速度）: alt+空格")
+        ui.Text("往上（无速度）: alt+.")
+        ui.Text("下坠: alt+shift+空格")
+        ui.Text("恢复HP: alt+h")
+        ui.Text("恢复大量HP: alt+shift+h")
+        ui.Text("跳上一辆车: alt+j")
+        ui.Text("附近的人上天: alt+f")
+        ui.Text("附近的人和载具上天: alt+shift+f")
+        ui.Text("自己的车翻转: alt+k")
+        ui.Text("附近的人和载具翻转: alt+shift+k")
+        ui.Text("附近的人移到眼前: alt+shift+p")
+        ui.Text("附近的载具移到眼前: alt+p")
+        ui.Text("瞬移到上一个地点: alt+shift+,")
+        ui.Text("瞬移到下一个地点: alt+shift+.")
+        ui.Text("重新获取雷达上标记的目标: alt+'")
+        ui.Text("瞬移到下一个标记目标处: alt+/")
+        ui.Text("把获取到的标记目标移到眼前: alt+shift+/")
+
+    def get_common_hotkeys(self):
+        return (
+            ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
+            ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
+            ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+            ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
+            ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
+            ('to_up', MOD_ALT, getVK('.'), self.to_up),
+            ('stop', MOD_ALT, getVK('x'), self.stop),
+            ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
+            ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
+            ('jump_on_vehicle', MOD_ALT, getVK('j'), self.jump_on_vehicle),
+            ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
+            ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
+            ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
+            ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
+            ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
+            ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
+            ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
+            ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
+            ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
+            ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
+            ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
+        )

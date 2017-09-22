@@ -23,8 +23,10 @@ ui = fefactory_api.ui
 
 class Tool(BaseGTATool):
     address = address
+    models = models
     Player = Player
     Vehicle = Vehicle
+    MARKER_RANGE = 175
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -74,7 +76,8 @@ class Tool(BaseGTATool):
                         ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_BP)),
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_FP)),
                     ]
-                    ui.Button("再次应用", onclick=self.apply_player_special).setToolTip("死亡或者重新读档后需要再次应用")
+                    ui.Button("全部", onclick=self.player_special_all)
+                    ui.Button("再次应用", onclick=self.player_special_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
@@ -98,7 +101,8 @@ class Tool(BaseGTATool):
                         ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_BP)),
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_FP)),
                     ]
-                    ui.Button("再次应用", onclick=self.apply_vehicle_special).setToolTip("切换载具后需要再次应用")
+                    ui.Button("全部", onclick=self.player_special_all)
+                    ui.Button("再次应用", onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
                 self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", COLOR_LIST)
@@ -137,6 +141,7 @@ class Tool(BaseGTATool):
             InputWidget("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
             InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
             SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), WEATHER_LIST)
+            InputWidget("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -162,21 +167,10 @@ class Tool(BaseGTATool):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
+                    self.render_common_text()
                     ui.Text("根据左边列表生产载具: alt+V")
                     ui.Text("切换上一辆: alt+[")
                     ui.Text("切换下一辆: alt+]")
-                    ui.Text("向前穿墙: alt+w")
-                    ui.Text("向前穿墙大: alt+shift+w")
-                    ui.Text("弹射起步: alt+m")
-                    ui.Text("上天（有速度）: alt+空格")
-                    ui.Text("往上（无速度）: alt+.")
-                    ui.Text("下坠: alt+shift+空格")
-                    ui.Text("恢复HP: alt+h")
-                    ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
-                    ui.Text("附近的人上天: alt+f")
-                    ui.Text("附近的人和车上天: alt+shift+f")
-                    ui.Text("附近的车翻转: alt+shift+k")
-                    ui.Text("自己的车翻转: alt+k")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
@@ -205,34 +199,18 @@ class Tool(BaseGTATool):
             self.attach_status_view.label = windowName + ' 正在运行'
 
             if not self.win.hotkeys:
-                self.win.RegisterHotKeys((
-                    ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-                    ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
-                    ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
-                    ('to_up', MOD_ALT, getVK('.'), self.to_up),
-                    ('to_down', MOD_ALT | MOD_SHIFT, getVK('.'), self.to_down),
-                    ('stop', MOD_ALT, getVK('x'), self.stop),
-                    ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
-                    ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
-                    ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                    ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                    ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                    ('jump_on_vehicle', MOD_ALT, getVK('j'), self.jump_on_vehicle),
-                    ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
-                    ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
-                    ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
-                    ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
-                    ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
-                    ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-                    ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
-                    ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
-                    ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
-                    ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
-                ))
+                self.win.RegisterHotKeys(
+                    (
+                        ('turnAndJetPackTickSpeed', MOD_ALT | MOD_SHIFT, getVK('m'), self.turnAndJetPackTickSpeed),
+                        ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
+                        ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
+                        ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
+                        ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
+                        ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+                        ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                    )
+                    + self.get_common_hotkeys()
+                )
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
@@ -289,15 +267,27 @@ class Tool(BaseGTATool):
         """设置当前汽车特殊属性"""
         self.player.lastCar.setSpecial(checkbox.checked, bitindex)
 
-    def apply_player_special(self, _=None):
+    def player_special_all(self, _=None):
+        for cb in self.player_special_views:
+            if not cb.checked:
+                cb.checked = True
+            cb.onchange(cb)
+
+    def player_special_apply(self, _=None):
         for cb in self.player_special_views:
             if cb.checked:
                 cb.onchange(cb)
 
-    def apply_vehicle_special(self, _=None):
+    def vehicle_special_apply(self, _=None):
         for cb in self.vehicle_special_views:
             if cb.checked:
                 cb.onchange(cb)
+
+    def vehicle_special_all(self, _=None):
+        for cb in self.vehicle_special_views:
+            if not cb.checked:
+                cb.checked = True
+            cb.onchange(cb)
 
     def get_cheat_config(self):
         return cheat.version_config['V1.0']
@@ -311,8 +301,12 @@ class Tool(BaseGTATool):
         for index, view in enumerate(self.cheat_views):
             view.checked = self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1
 
-    """武器熟练度"""
+    def turnAndJetPackTickSpeed(self, _=None):
+        self.dir_correct()
+        self.jetPackTick(useSpeed=True)
+
     def get_weapon_prop(self, index):
+        """武器熟练度"""
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
         return normalFloat(self.handler.readFloat(addr))
 
@@ -380,58 +374,6 @@ class Tool(BaseGTATool):
         self.handler.write32(ptr, wantedLevel)
         self.handler.write8(ptr + 0x19, cops)
         self.handler.write8(ptr + 0x2C, level)
-
-    """重新获取人/车标记点"""
-    def re_cal_markers(self, _=None):
-        addr = address.MARKER_ADDR
-        it = models.Marker(addr, self.handler)
-        self._markers = []
-
-        for i in range(175):
-            blipType = it.blipType
-            if blipType is models.Marker.MARKER_TYPE_CAR or blipType is models.Marker.MARKER_TYPE_CHAR:
-                self._markers.append(models.Marker(it.addr, self.handler))
-
-            it.next()
-
-        self._marker_index = 0
-
-    """到下一处 人/车标记点"""
-    def go_next_marker(self, _=None):
-        if not hasattr(self, '_markers'):
-            self.re_cal_markers()
-
-        while True:
-            try:
-                entity = self._markers[self._marker_index].entity
-            except IndexError:
-                self.re_cal_markers()
-                return
-            if entity:
-                self.vehicle.coord = self._markers[self._marker_index].entity.coord
-                break
-            self._marker_index += 1
-
-    """人/车标记点目标移到眼前"""
-    def move_marker_to_front(self, _=None):
-        if not hasattr(self, '_markers'):
-            self.re_cal_markers()
-
-        moved_car_addr = []
-        front_coord = self.get_front_coord()
-
-        for marker in self._markers:
-            entity = marker.entity
-            if isinstance(entity, Player):
-                car = entity.lastCar
-                if car and car.hp > 1: 
-                    if car.addr not in moved_car_addr:
-                        moved_car_addr.append(car.addr)
-                        car.coord = front_coord
-                else:
-                    entity.coord = front_coord
-            elif isinstance(entity, Vehicle):
-                entity.coord = front_coord
 
     def get_objects(self):
         pool = models.Pool(address.OBJECT_POOL, self.handler, models.Object)

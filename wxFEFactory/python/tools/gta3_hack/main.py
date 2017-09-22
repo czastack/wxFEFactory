@@ -4,7 +4,7 @@ from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget, Mode
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from commonstyle import dialog_style, styles
-from . import address
+from . import address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from .models import Player, Vehicle
 from ..gta_base.main import BaseGTATool
@@ -20,10 +20,12 @@ ui = fefactory_api.ui
 
 class Tool(BaseGTATool):
     address = address
+    models = models
     Player = Player
     Vehicle = Vehicle
+    MARKER_RANGE = 32
 
-    safe_speed_rate = 0.3
+    SAFE_SPEED_RATE = 0.3
 
     def __init__(self):
         self.handler = ProcessHandler()
@@ -89,18 +91,7 @@ class Tool(BaseGTATool):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
-                    ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: alt+[")
-                    ui.Text("切换下一辆: alt+]")
-                    ui.Text("向前穿墙: alt+w")
-                    ui.Text("向前穿墙大: alt+shift+w")
-                    ui.Text("弹射起步: alt+m")
-                    ui.Text("上天（有速度）: alt+空格")
-                    ui.Text("往上（无速度）: alt+.")
-                    ui.Text("下坠: alt+shift+空格")
-                    ui.Text("恢复HP: alt+h")
-                    ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
-                    ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
+                    self.render_common_text()
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
                 ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
@@ -112,6 +103,8 @@ class Tool(BaseGTATool):
                 ui.Button("附近的人上天", onclick=self.near_persons_fly)
                 ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
                 ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
+                ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
+                ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
@@ -126,29 +119,9 @@ class Tool(BaseGTATool):
             self.attach_status_view.label = windowName + ' 正在运行'
 
             if not self.win.hotkeys:
-                self.win.RegisterHotKeys((
-                    ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-                    ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
-                    ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
-                    ('to_up', MOD_ALT, getVK('.'), self.to_up),
-                    ('stop', MOD_ALT, getVK('x'), self.stop),
-                    ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
-                    ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
-                    # ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                    # ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                    # ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                    ('jump_on_vehicle', MOD_ALT, getVK('j'), self.jump_on_vehicle),
-                    ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
-                    ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
-                    ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
-                    ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
-                    ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
-                    ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
-                ))
+                self.win.RegisterHotKeys(
+                    self.get_common_hotkeys()
+                )
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 

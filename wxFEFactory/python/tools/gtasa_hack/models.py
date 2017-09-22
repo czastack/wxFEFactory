@@ -149,7 +149,7 @@ class Marker(Model):
     SIZE = 40
 
     MARKER_TYPE_CAR = 1
-    MARKER_TYPE_CHAR = 2
+    MARKER_TYPE_PED = 2
     MARKER_TYPE_OBJECT = 3
     MARKER_TYPE_COORDS = 4
     MARKER_TYPE_CONTACT = 5
@@ -168,7 +168,7 @@ class Marker(Model):
         blipType = self.blipType
         if blipType is __class__.MARKER_TYPE_CAR:
             return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
-        elif blipType is __class__.MARKER_TYPE_CHAR:
+        elif blipType is __class__.MARKER_TYPE_PED:
             return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
             pass
