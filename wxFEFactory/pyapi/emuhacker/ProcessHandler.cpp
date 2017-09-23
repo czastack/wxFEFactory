@@ -3,6 +3,8 @@
 #include "ProcessHandler.h"
 #include "types.h"
 #include <psapi.h>
+#include <iostream>
+
 
 ProcessHandler::ProcessHandler():mProcess(nullptr)
 {
@@ -50,7 +52,7 @@ bool ProcessHandler::attachByWindowHandle(HWND hWnd){
 		DWORD	dwProcessId;
 		close();
 		GetWindowThreadProcessId(hWnd, &dwProcessId);
-		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, dwProcessId);
+		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD, FALSE, dwProcessId);
 		return mProcess != nullptr;
 	}
 	return false;
@@ -102,7 +104,7 @@ bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 /**
  * Get MainModuleAddress
  */
-addr_t ProcessHandler::GetProcessBaseAddress()
+addr_t ProcessHandler::getProcessBaseAddress()
 {
 	HMODULE     baseModule;
 	DWORD       bytesRequired;
@@ -113,6 +115,52 @@ addr_t ProcessHandler::GetProcessBaseAddress()
 	}
 
 	return 0;
+}
+
+addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
+{
+	addr_t fnAddr = alloc_memory(size);
+	if (fnAddr == NULL)
+	{
+		std::cout << "Alloc function failed" << std::endl;
+		return 0;
+	}
+
+	if (!rawWrite(fnAddr, buf, size))
+	{
+		std::cout << "Write function failed" << std::endl;
+		return 0;
+	}
+	return fnAddr;
+}
+
+addr_t ProcessHandler::alloc_memory(size_t size)
+{
+	return (addr_t)VirtualAllocEx(mProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+}
+
+void ProcessHandler::free_memory(addr_t addr)
+{
+	VirtualFreeEx(mProcess, (LPVOID)addr, 0, MEM_RELEASE);
+}
+
+DWORD ProcessHandler::remote_call(addr_t addr, LONG_PTR arg)
+{
+	HANDLE hThread = CreateRemoteThread(mProcess, NULL, 0, (PTHREAD_START_ROUTINE)addr, (LPVOID)arg, 0, NULL);
+
+	if (!hThread)
+	{
+		std::cout << "CreateRemoteThread failed: " << GetLastError() << std::endl;
+		return 0;
+	}
+
+	WaitForSingleObject(hThread, INFINITE);
+
+	DWORD code;
+	GetExitCodeThread(hThread, &code);
+
+	CloseHandle(hThread);
+	return code;
 }
 
 #endif

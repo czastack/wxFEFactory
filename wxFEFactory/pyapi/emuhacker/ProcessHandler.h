@@ -47,10 +47,11 @@ public:
 	/*
 	 * return value is TRUE, if this object has attached to a valid process handle
 	 */
-
 	bool isValid();
 
-	auto GetProcess() { return mProcess; }
+	auto getProcess() { return mProcess; }
+
+	DWORD getProcessId() { return ::GetProcessId(mProcess); }
 
 	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
 	bool rawWrite(addr_t addr, LPCVOID buffer, size_t size);
@@ -183,5 +184,12 @@ public:
 		return addr && write(addr, buffer, size);
 	}
 
-	addr_t GetProcessBaseAddress();
+	addr_t getProcessBaseAddress();
+
+	addr_t write_function(LPCVOID buf, size_t size);
+
+	addr_t alloc_memory(size_t size);
+	void free_memory(addr_t addr);
+
+	DWORD remote_call(addr_t addr, LONG_PTR arg);
 };

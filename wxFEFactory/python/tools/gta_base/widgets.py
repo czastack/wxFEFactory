@@ -4,11 +4,12 @@ from commonstyle import dialog_style
 
 
 class WeaponWidget(TwoWayWidget):
-    def __init__(self, name, label, slot, slot_no_ammo, weapon_list, player):
+    def __init__(self, name, label, slot, slot_no_ammo, weapon_list, player, callback=None):
          self.slot = slot
          self.has_ammo = self.slot not in slot_no_ammo
          self.weapon_list = weapon_list
          self.player = player
+         self.callback = callback
          super().__init__(name, label, None, None)
 
     def render(self):
@@ -20,6 +21,10 @@ class WeaponWidget(TwoWayWidget):
             self.render_btn()
 
     @property
+    def selected_item(self):
+        return self.weapon_list[self.slot][self.id_view.index]
+
+    @property
     def mem_value(self):
         player = self.player
         if callable(player):
@@ -29,10 +34,12 @@ class WeaponWidget(TwoWayWidget):
     @mem_value.setter
     def mem_value(self, value):
         self.mem_value.set(value)
+        if self.callback:
+            self.callback(self)
 
     @property
     def input_value(self):
-        id_ = self.weapon_list[self.slot][self.id_view.index][0]
+        id_ = self.selected_item[0]
         ammo = self.ammo_view.value if self.has_ammo else 0
         return (id_, ammo)
 

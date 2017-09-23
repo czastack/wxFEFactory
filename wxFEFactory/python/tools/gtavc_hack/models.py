@@ -27,9 +27,14 @@ class Player(Entity):
     fastShoot = Field(0x141, int, 1)
     wanted_level = OffsetsField((0x5f4, 0x20), int, 1)
 
-    @lazy
+    @property
     def weapons(self):
-        return WeaponSet(self.addr + 0x408, self.handler, 11)
+        weaponset = getattr(self, '_weaponset', None)
+        if not weaponset:
+            weaponset = self._weaponset = WeaponSet(self.addr + 0x408, self.handler, 11)
+        else:
+            weaponset.addr = self.addr + 0x408
+        return weaponset
 
     @property
     def lastCar(self):
