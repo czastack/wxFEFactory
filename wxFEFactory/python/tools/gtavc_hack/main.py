@@ -173,7 +173,7 @@ class Tool(BaseGTATool):
         return self.handler.read8(address.MODEL_INFO + 20 * model_id) == 1
 
     def load_model(self, model_id):
-        if not self.is_model_loaded(model_id):
+        if model_id > 0 and not self.is_model_loaded(model_id):
             self.handler.remote_call(self.RequestModel, model_id)
             self.handler.remote_call(self.LoadRequestedModels, 0)
 

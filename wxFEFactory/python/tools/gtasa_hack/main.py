@@ -28,6 +28,13 @@ class Tool(BaseGTATool):
     Vehicle = Vehicle
     MARKER_RANGE = 175
 
+    FUNCTION_REQUEST_MODEL = b'\x55\x8B\xEC\x51\xC7\x45\xFC\xe0\x87\x40\x00\x6A\x06\xFF\x75\x08\xFF\x55\xFC\x83\xC4\x08\x8B\xE5\x5D\xC3'
+    FUNCTION_LOAD_REQUESTED_MODELS = b'\x55\x8B\xEC\x51\xC7\x45\xFC\x10\xea\x40\x00\x6A\x00\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
+    FUNCTION_IS_MODEL_LOADED = (
+        b'\x55\x8B\xEC\x83\xEC\x08\xC7\x45\xF8\xC0\x44\x40\x00\xC7\x45\xFC\x00\x00\x00\x00\xFF\x75\x08\xFF\x55\xF8\x0F\xB6\xC0'
+        b'\x89\x45\xFC\x58\x8B\x45\xFC\x8B\xE5\x5D\xC3'
+    )
+
     def __init__(self):
         self.handler = ProcessHandler()
         self.jetPackSpeed = 2.0
@@ -113,7 +120,9 @@ class Tool(BaseGTATool):
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(13):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
+                self.weapon_views.append(
+                    WeaponWidget("weapon%d" % i, "武器槽%d" % (i + 1), i, SLOT_NO_AMMO, WEAPON_LIST, self._player, self.on_weapon_change)
+                )
 
         with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
             self.weapon_prop_views = [
@@ -190,7 +199,21 @@ class Tool(BaseGTATool):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def closeWindow(self, m=None):
+        self.onClose()
         self.win.close()
+
+    def onClose(self, _=None):
+        self.free_remote_function()
+
+    def init_remote_function(self):
+        self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)
+        self.LoadRequestedModels = self.handler.write_function(self.FUNCTION_LOAD_REQUESTED_MODELS)
+        self.IsModelLoaded = self.handler.write_function(self.FUNCTION_IS_MODEL_LOADED)
+
+    def free_remote_function(self):
+        self.handler.free_memory(self.RequestModel)
+        self.handler.free_memory(self.LoadRequestedModels)
+        self.handler.free_memory(self.IsModelLoaded)
 
     def checkAttach(self, _=None):
         className = 'Grand theft auto San Andreas'
@@ -211,8 +234,22 @@ class Tool(BaseGTATool):
                     )
                     + self.get_common_hotkeys()
                 )
+            else:
+                self.free_remote_function()
+            self.init_remote_function()
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
+
+    def is_model_loaded(self, model_id):
+        return self.handler.remote_call(self.IsModelLoaded, model_id)
+
+    def load_model(self, model_id):
+        if model_id > 0 and not self.is_model_loaded(model_id):
+            self.handler.remote_call(self.RequestModel, model_id)
+            self.handler.remote_call(self.LoadRequestedModels, 0)
+
+    def on_weapon_change(self, weapon_view):
+        self.load_model(weapon_view.selected_item[1])
 
     def dir_correct(self, _=None):
         # 按当前视角方向旋转

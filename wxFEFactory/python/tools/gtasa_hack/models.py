@@ -70,9 +70,14 @@ class Player(Entity):
     def isInVehicle(self):
         return self._isInVehicle == 50
 
-    @lazy
+    @property
     def weapons(self):
-        return WeaponSet(self.addr + 0x5a0, self.handler, 13, 28)
+        weaponset = getattr(self, '_weaponset', None)
+        if not weaponset:
+            weaponset = self._weaponset = WeaponSet(self.addr + 0x5a0, self.handler, 13, 28)
+        else:
+            weaponset.addr = self.addr + 0x5a0
+        return weaponset
 
     @property
     def cur_weapon(self):
