@@ -141,7 +141,7 @@ class Tool(BaseGTATool):
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def vehicle_lock_door(self, _=None, lock=True):
-        car = self.player.lastCar
+        car = self.player.vehicle
         if car:
             if lock:
                 car.lock_door()

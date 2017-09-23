@@ -226,17 +226,17 @@ class BaseGTATool:
 
     def vehicle_flip(self, _=None):
         """当前的载具翻转"""
-        self.player.lastCar.flip()
+        self.player.vehicle.flip()
 
     def call_vehicle(self, _=None):
         """召唤上一辆车回来"""
-        car = self.player.lastCar
+        car = self.player.vehicle
         if car:
             car.coord = self.get_front_coord()
 
     def go_vehicle(self, _=None):
         """回到上一辆车旁边"""
-        car = self.player.lastCar
+        car = self.player.vehicle
         if car:
             coord = car.coord.values()
             coord[2] += 5
@@ -288,7 +288,7 @@ class BaseGTATool:
         for marker in self._markers:
             entity = marker.entity
             if isinstance(entity, self.Player):
-                car = entity.lastCar
+                car = entity.vehicle
                 if car and car.hp > 1: 
                     if car.addr not in moved_car_addr:
                         moved_car_addr.append(car.addr)
@@ -297,6 +297,16 @@ class BaseGTATool:
                     entity.coord = front_coord
             elif isinstance(entity, self.Vehicle):
                 entity.coord = front_coord
+
+    def lock_door(self):
+        car = self.player.vehicle
+        if car:
+            car.lock_door()
+
+    def unlock_door(self):
+        car = self.player.vehicle
+        if car:
+            car.unlock_door()
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
@@ -350,6 +360,8 @@ class BaseGTATool:
         ui.Text("重新获取雷达上标记的目标: alt+'")
         ui.Text("瞬移到下一个标记目标处: alt+/")
         ui.Text("把获取到的标记目标移到眼前: alt+shift+/")
+        ui.Text("上一辆车锁门: alt+l")
+        ui.Text("上一辆车解锁: alt+shift+l")
 
     def get_common_hotkeys(self):
         return (
@@ -374,4 +386,6 @@ class BaseGTATool:
             ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
             ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
             ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
+            ('lock_door', MOD_ALT, getVK('l'), self.lock_door),
+            ('unlock_door', MOD_ALT | MOD_SHIFT, getVK('l'), self.unlock_door),
         )

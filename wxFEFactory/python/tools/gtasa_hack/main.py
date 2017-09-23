@@ -302,7 +302,7 @@ class Tool(BaseGTATool):
 
     def setVehicleSpecial(self, checkbox, bitindex):
         """设置当前汽车特殊属性"""
-        self.player.lastCar.setSpecial(checkbox.checked, bitindex)
+        self.player.vehicle.setSpecial(checkbox.checked, bitindex)
 
     def player_special_all(self, _=None):
         for cb in self.player_special_views:
@@ -392,7 +392,7 @@ class Tool(BaseGTATool):
             self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
 
     def vehicle_lock_door(self, _=None, lock=True):
-        car = self.player.lastCar
+        car = self.player.vehicle
         if car:
             if lock:
                 car.lock_door()

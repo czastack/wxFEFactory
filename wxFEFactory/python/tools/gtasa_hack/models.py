@@ -57,7 +57,7 @@ class Player(Entity):
     _isInVehicle = Field(0x530, int, 1)
 
     @property
-    def lastCar(self):
+    def vehicle(self):
         ptr = self.handler.read32(self.addr + 0x58c)
         return Vehicle(ptr, self.handler) if ptr else None
 

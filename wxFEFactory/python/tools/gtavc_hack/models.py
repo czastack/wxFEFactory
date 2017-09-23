@@ -37,7 +37,7 @@ class Player(Entity):
         return weaponset
 
     @property
-    def lastCar(self):
+    def vehicle(self):
         ptr = self.handler.read32(self.addr + 0x3a8)
         return Vehicle(ptr, self.handler) if ptr else None
 

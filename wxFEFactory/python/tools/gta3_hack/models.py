@@ -69,7 +69,7 @@ class Player(Entity):
     # stamina = Field(0x600, float)
     isInVehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
-    lastCar = ModelField(0x310, Vehicle)
+    vehicle = ModelField(0x310, Vehicle)
     collidingCar = ModelField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
