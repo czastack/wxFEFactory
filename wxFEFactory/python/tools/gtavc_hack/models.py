@@ -6,7 +6,9 @@ import math
 
 
 class Entity(Physicle):
-    pass
+    coord = CoordsField(0x34)
+    speed = CoordsField(0x70)
+    weight = Field(0xB8, float)
 
 
 class Player(Entity):
@@ -15,15 +17,12 @@ class Player(Entity):
     hp = Field(0x354, float)
     ap = Field(0x358, float)
     rotation = Field(0x378, float)
-    coord = CoordsField(0x34)
-    speed = CoordsField(0x70)
-    weight = Field(0xB8, float)
     stamina = Field(0x600, float)
     isInVehicle = Field(0x3AC, bool, 1)
     cur_weapon = Field(0x504, int)
     crouch = Field(0x150, bool)
     isOnGround = Field(0x150, bool)
-    modelid = Field(0xe8, int, 1)
+    model_id = Field(0xe8, int, 1)
     fastShoot = Field(0x141, int, 1)
     wanted_level = OffsetsField((0x5f4, 0x20), int, 1)
 
@@ -55,13 +54,10 @@ class Vehicle(Entity):
     hp = Field(0x204, float)
     roll = CoordsField(0x04)
     dir = CoordsField(0x14)
-    coord = CoordsField(0x34)
-    speed = CoordsField(0x70)
     turn = CoordsField(0x7C)
-    weight = Field(0xB8, float)
     color1 = Field(0x30, int, 1)
     color2 = Field(0x31, int, 1)
-    modelid = Field(0x5c, int, 1)
+    model_id = Field(0x5c, int, 1)
     primaryColor = Field(0x1a0, int, 1)
     secondaryColor = Field(0x1a1, int, 1)
     numPassengers = Field(0x1cc, int, 1)
@@ -98,9 +94,12 @@ class Vehicle(Entity):
 class Marker(Model):
     SIZE = 56
 
+    MARKER_TYPE_COORD = 0
     MARKER_TYPE_CAR = 1
     MARKER_TYPE_PED = 2
     MARKER_TYPE_OBJECT = 3
+
+    AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED, MARKER_TYPE_OBJECT)
 
     color = Field(0)
     blipType = Field(4)
@@ -115,10 +114,14 @@ class Marker(Model):
         elif blipType is __class__.MARKER_TYPE_PED:
             return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
-            pass
+            return Pool(address.OBJECT_POOL, self.handler, Object)[self.poolIndex >> 8]
 
 
 class Sphere(Model):
     SIZE = 24
 
     coord = CoordsField(8)
+
+
+class Object(Entity):
+    SIZE = 416

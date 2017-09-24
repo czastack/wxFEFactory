@@ -88,6 +88,7 @@ class Marker(Model):
     MARKER_TYPE_CAR = 1
     MARKER_TYPE_PED = 2
     MARKER_TYPE_OBJECT = 3
+    AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED)
 
     color = Field(0)
     blipType = Field(4)

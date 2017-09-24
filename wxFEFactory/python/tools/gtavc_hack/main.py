@@ -127,6 +127,8 @@ class Tool(BaseGTATool):
                 ui.Button("附近的人上天", onclick=self.near_persons_fly)
                 ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
                 ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
+                ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
+                ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)

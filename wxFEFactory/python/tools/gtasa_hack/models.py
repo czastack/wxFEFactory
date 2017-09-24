@@ -158,6 +158,7 @@ class Marker(Model):
     MARKER_TYPE_OBJECT = 3
     MARKER_TYPE_COORDS = 4
     MARKER_TYPE_CONTACT = 5
+    AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED)
 
     color = Field(0)
     poolIndex = Field(4, int)

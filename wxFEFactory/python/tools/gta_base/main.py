@@ -254,7 +254,7 @@ class BaseGTATool:
 
         for i in range(self.MARKER_RANGE):
             blipType = it.blipType
-            if blipType is Marker.MARKER_TYPE_CAR or blipType is Marker.MARKER_TYPE_PED:
+            if blipType in Marker.AVAILABLE_TYPE:
                 self._markers.append(Marker(it.addr, self.handler))
 
             it.next()
@@ -298,12 +298,12 @@ class BaseGTATool:
             elif isinstance(entity, self.Vehicle):
                 entity.coord = front_coord
 
-    def lock_door(self):
+    def lock_door(self, _=None):
         car = self.player.vehicle
         if car:
             car.lock_door()
 
-    def unlock_door(self):
+    def unlock_door(self, _=None):
         car = self.player.vehicle
         if car:
             car.unlock_door()
