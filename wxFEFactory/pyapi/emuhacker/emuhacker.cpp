@@ -39,13 +39,13 @@ public:
 		else if (type == builtin.attr("int"))
 		{
 			UINT data = 0;
-			if (read(addr, &data, size))
+			if (read(addr, &data, size ? size : 4))
 			{
 				return py::cast(data);
 			}
 			return py::cast(0);
 		}
-		else
+		else if (size)
 		{
 			char *buf = new char[size];
 			read(addr, buf, size);
@@ -69,7 +69,7 @@ public:
 		else if (PY_IS_TYPE(data, PyLong))
 		{
 			UINT tmp = data.cast<UINT64>();
-			return write(addr, &tmp, size);
+			return write(addr, &tmp, size ? size: 4);
 		}
 		else if (PY_IS_TYPE(data, PyBytes))
 		{
@@ -160,8 +160,8 @@ void init_emuhacker(pybind11::module & m)
 		.def("write16", &PyProcessHandler::write16)
 		.def("write32", &PyProcessHandler::write32)
 		.def("write64", &PyProcessHandler::write64)
-		.def("read", &PyProcessHandler::process_read, addr_a, size_a, type_a)
-		.def("write", &PyProcessHandler::process_write, addr_a, size_a, data_a)
+		.def("read", &PyProcessHandler::process_read, addr_a, type_a, "size"_a=0)
+		.def("write", &PyProcessHandler::process_write, addr_a, data_a, "size"_a=0)
 		.def("add", &ProcessHandler::add)
 		.def("readAddr", &ProcessHandler::readAddr)
 		.def("readFloat", &PyProcessHandler::readFloat)
@@ -175,6 +175,7 @@ void init_emuhacker(pybind11::module & m)
 		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a)
 		.def("free_memory", &ProcessHandler::free_memory)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
+		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)
 		.def_readwrite("addr_is32", &ProcessHandler::m_addr_is32);
 
