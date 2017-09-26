@@ -40,6 +40,14 @@ class BaseGTATool:
     def entity(self):
         return self.vehicle if self.isInVehicle else self.player
 
+    @property
+    def ped_tool(self):
+        return self.models.Pool(self.address.PED_POOL, self.handler, self.Player)
+
+    @property
+    def vehicle_tool(self):
+        return self.models.Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
+
     def get_rotz(self):
         PI = math.pi
         HALF_PI = PI / 2

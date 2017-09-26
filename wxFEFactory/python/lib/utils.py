@@ -1,5 +1,7 @@
 import os
 import json
+import struct
+
 
 class Configurable:
     """
@@ -62,3 +64,10 @@ class HistoryList(list):
 
 def normalFloat(f):
     return round(f, 6)
+
+def u32bytes(n):
+    """32位整型转bytes"""
+    try:
+        return n.to_bytes(4, 'little')
+    except:
+        return struct.pack('L', n)

@@ -151,6 +151,10 @@ class Tool(BaseGTATool):
     def checkAttach(self, _=None):
         className = 'Grand theft auto 3'
         windowName = 'GTA: Vice City'
+
+        if self.handler.active:
+            self.free_remote_function()
+
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
 
@@ -165,8 +169,6 @@ class Tool(BaseGTATool):
                         ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere),
                     ) + self.get_common_hotkeys()
                 )
-            else:
-                self.free_remote_function()
             self.init_remote_function()
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName

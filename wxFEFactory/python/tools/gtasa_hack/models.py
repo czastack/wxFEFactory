@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordsField
+from lib.hack.model import Model, Field, CoordField
 from lib.lazy import lazy
 from .data import VEHICLE_LIST
 from ..gta_base.models import Physicle, WeaponSet, Pool
@@ -7,9 +7,9 @@ import math
 
 
 class Pos(Model):
-    grad = CoordsField(0)
-    looking = CoordsField(0x10)
-    coord = CoordsField(0x30)
+    grad = CoordField(0)
+    looking = CoordField(0x10)
+    coord = CoordField(0x30)
 
 
 class Entity(Physicle):
@@ -19,7 +19,7 @@ class Entity(Physicle):
     SPECIAL_EP = 7
 
     special = Field(0x42, int, 1) # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
-    speed = CoordsField(0x44)
+    speed = CoordField(0x44)
     model_id = Field(0x22, int, 2)
     weight = Field(0x8c, float)
 
@@ -162,7 +162,7 @@ class Marker(Model):
 
     color = Field(0)
     poolIndex = Field(4, int)
-    coord = CoordsField(8)
+    coord = CoordField(8)
     _blip = Field(38, int, 1)
 
     @property

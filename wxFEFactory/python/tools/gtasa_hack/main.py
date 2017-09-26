@@ -57,6 +57,8 @@ class Tool(BaseGTATool):
                     ui.CheckBox("保持最前", onchange=self.swithKeeptop)
                 with ui.Notebook(className="fill"):
                     self.render_main()
+
+        win.setOnClose(self.onClose)
         self.win = win
 
     def render_main(self):
@@ -108,7 +110,7 @@ class Tool(BaseGTATool):
                         ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_BP)),
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_FP)),
                     ]
-                    ui.Button("全部", onclick=self.player_special_all)
+                    ui.Button("全部", onclick=self.vehicle_special_all)
                     ui.Button("再次应用", onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
@@ -218,6 +220,10 @@ class Tool(BaseGTATool):
     def checkAttach(self, _=None):
         className = 'Grand theft auto San Andreas'
         windowName = 'GTA: San Andreas'
+
+        if self.handler.active:
+            self.free_remote_function()
+
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
 
@@ -234,8 +240,6 @@ class Tool(BaseGTATool):
                     )
                     + self.get_common_hotkeys()
                 )
-            else:
-                self.free_remote_function()
             self.init_remote_function()
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName

@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordsField, ModelField
+from lib.hack.model import Model, Field, CoordField, ModelField
 from lib.lazy import lazy
 from ..gta_base.models import Physicle, WeaponSet, Pool
 from . import address
@@ -6,8 +6,8 @@ import math
 
 
 class Entity(Physicle):
-    coord = CoordsField(0x34)
-    speed = CoordsField(0x78)
+    coord = CoordField(0x34)
+    speed = CoordField(0x78)
     weight = Field(0xc0, float)
     modelid = Field(0x5c, int, 1)
 
@@ -16,8 +16,8 @@ class Vehicle(Entity):
     SIZE = 0x5a8
 
     hp = Field(0x200, float)
-    roll = CoordsField(0x04)
-    dir = CoordsField(0x14)
+    roll = CoordField(0x04)
+    dir = CoordField(0x14)
     numPassengers = Field(0x1c8, int, 1)
     maxPassengers = Field(0x1cc, int, 1)
     door_status = Field(0x224, int, 1)
@@ -93,7 +93,7 @@ class Marker(Model):
     color = Field(0)
     blipType = Field(4)
     poolIndex = Field(8)
-    coord = CoordsField(12)
+    coord = CoordField(12)
 
     @property
     def entity(self):
