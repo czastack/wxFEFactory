@@ -61,6 +61,7 @@ class Tool(BaseGTATool):
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.weight_view = ModelInputWidget("gravity", "重量")
             self.wanted_level = ModelInputWidget("wanted_level", "通缉等级")
+            self.money = ModelInputWidget("money", "金钱")
             ui.Text("")
             with ui.Horizontal(className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
@@ -120,11 +121,8 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def closeWindow(self, m=None):
-        self.onClose()
-        self.win.close()
-
     def onClose(self, _=None):
+        super().onClose()
         self.free_remote_function()
 
     def checkAttach(self, _=None):
@@ -227,13 +225,13 @@ class Tool(BaseGTATool):
         # if player_addr is 0:
         #     return None
         player = getattr(self, '_playerins', None)
-
-        index_of_pool = 0
+        player_index = self.get_player_id()
 
         if not player:
-            player = self._playerins = self.Player(self.get_player_index(), self.native_call, self.native_context)
+            player = self._playerins = self.Player(player_index, self.get_ped_index(player_index), self.native_call, self.native_context)
         else:
-            player.index = self.get_player_index()
+            player.index = player_index
+            player.ped_index = self.get_ped_index(player_index)
         return player
 
     def _vehicle(self):
@@ -243,22 +241,31 @@ class Tool(BaseGTATool):
     player = property(_player)
     vehicle = property(_vehicle)
 
-    def get_player_index(self, index=0):
-        player_id = (index or self.get_player_index_of_pool()) << 8
-        return player_id | self.handler.read8(
-            self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + (player_id >> 8)
-        )
-
     def get_ped_addr(self):
         return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
 
-    def get_player_index_of_pool(self):
-        """获取当前ped在ped_pool中的index"""
-        ped_addr = self.get_ped_addr()
-        pool = self.ped_pool
-        for i in range(pool.size):
-            if pool.addr_at(i) == ped_addr:
-                return i
+    # def get_player_index_of_pool(self):
+    #     """获取当前ped在ped_pool中的index"""
+    #     ped_addr = self.get_ped_addr()
+    #     pool = self.ped_pool
+    #     for i in range(pool.size):
+    #         if pool.addr_at(i) == ped_addr:
+    #             return i
+
+    def get_player_id(self):
+        # return self.native_call('GET_PLAYER_ID', None)
+        return self.handler.read32(address.LOCAL_PLAYER_ID)
+
+    def get_ped_index(self, player_index=0):
+        # 方法一
+        # player_id = (index or self.get_player_index_of_pool()) << 8
+        # return player_id | self.handler.read8(
+        #     self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + (player_id >> 8)
+        # )
+
+        # 方法二
+        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_id(), self.native_context.get_temp_addr())
+        return self.native_context.get_temp_value()
 
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
@@ -294,6 +301,3 @@ class Tool(BaseGTATool):
 
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
-
-    def get_player_id(self):
-        return self.native_call('GET_PLAYER_ID', None)

@@ -3,6 +3,7 @@ from lib.lazy import lazyclassmethod
 from . import tools
 import fefactory_api
 ui = fefactory_api.ui
+import __main__
 
 
 class BaseTool(BaseScene):
@@ -53,3 +54,11 @@ class BaseTool(BaseScene):
             frame.openToolByName(name)
 
         frame.restart(callback=callback)
+
+    def closeWindow(self, _=None):
+        self.onClose()
+        self.win.close()
+
+    def onClose(self):
+        if getattr(__main__, 'tool', None) == self:
+            del __main__.tool

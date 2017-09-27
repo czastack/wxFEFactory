@@ -139,14 +139,42 @@ class CoordData:
 class Player(IVEntity):
     SIZE = 0xf00
 
-    def getter(name, ret_type=int, ret_size=4):
+    def __init__(self, index, ped_index, native_call, native_context):
+        super().__init__(index, native_call, native_context)
+        self.ped_index = ped_index
+
+    def player_getter(name, ret_type=int, ret_size=4):
         def getter(self):
             return self.native_call(name, 'L', self.index, ret_type=ret_type, ret_size=ret_size)
         return getter
 
-    def getter_ptr(name, ret_type=int, ret_size=4):
+    def player_getter_ptr(name, ret_type=int, ret_size=4):
         def getter(self):
             self.native_call(name, 'LL', self.index, self.native_context.get_temp_addr())
+            return self.native_context.get_temp_value(type=ret_type, size=ret_size)
+        return getter
+
+    def player_setter(name, type_=int):
+        if type_ is int:
+            s = 'L'
+        elif type_ is float:
+            s = 'f'
+        elif type_ is bool:
+            s = '?'
+        else:
+            raise ValueError('not support type: ' + type_.__name__)
+        def setter(self, value):
+            self.native_call(name, 'L' + s, self.index, value)
+        return setter
+
+    def getter(name, ret_type=int, ret_size=4):
+        def getter(self):
+            return self.native_call(name, 'L', self.ped_index, ret_type=ret_type, ret_size=ret_size)
+        return getter
+
+    def getter_ptr(name, ret_type=int, ret_size=4):
+        def getter(self):
+            self.native_call(name, 'LL', self.ped_index, self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
@@ -160,16 +188,17 @@ class Player(IVEntity):
         else:
             raise ValueError('not support type: ' + type_.__name__)
         def setter(self, value):
-            self.native_call(name, 'L' + s, self.index, value)
+            self.native_call(name, 'L' + s, self.ped_index, value)
         return setter
 
     hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
     set_max_health = setter('SET_CHAR_MAX_HEALTH')
     ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('SET_CHAR_ARMOUR'))
-    money = property(getter('STORE_SCORE'))
+    money = property(player_getter_ptr('STORE_SCORE'))
 
     @money.setter
-    def set_money(self, value):
+    def money(self, value):
+        value = int(value)
         if value < 0:
             value = 0
         else:
@@ -179,14 +208,16 @@ class Player(IVEntity):
     gravity = property(getter('GET_CHAR_GRAVITY', float), setter('SET_CHAR_GRAVITY', float))
     set_invincible = setter('SET_CHAR_INVINCIBLE', bool)
 
-    def set_wanted_level(self, level):
+    wanted_level = property(player_getter_ptr('STORE_WANTED_LEVEL'))
+
+    @wanted_level.setter
+    def wanted_level(self, level):
+        level = int(level)
         if level > 0:
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
         self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
-
-    wanted_level = property(getter_ptr('STORE_WANTED_LEVEL'), set_wanted_level)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 不会从摩托车上摔下来
@@ -198,7 +229,7 @@ class Player(IVEntity):
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.index, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
+        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.ped_index, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
         values = (
             normalFloat(ctx.get_temp_value(1, float)),
             normalFloat(ctx.get_temp_value(2, float)),
@@ -208,7 +239,7 @@ class Player(IVEntity):
 
     @coord.setter
     def coord(self, value):
-        self.native_call('SET_CHAR_COORDINATES', 'L3f', self.index, *value)
+        self.native_call('SET_CHAR_COORDINATES', 'L3f', self.ped_index, *value)
 
     get_vehicle_addr = getter_ptr('GET_CAR_CHAR_IS_USING')
 
@@ -284,7 +315,7 @@ class Player(IVEntity):
         # WEAPON_UNIDENTIFIED = 55
         # WEAPON_ANYMELEE = 56
         # WEAPON_ANYWEAPON = 57
-        self.native_call('GIVE_WEAPON_TO_CHAR', 'L3L', self.index, weapon, ammo, 0)
+        self.native_call('GIVE_WEAPON_TO_CHAR', 'L3L', self.ped_index, weapon, ammo, 0)
 
     def get_weapon_in_slot(self, slot):
         """
@@ -303,7 +334,7 @@ class Player(IVEntity):
         WEAPON_SLOT_DETONATORUNKNOWN = 12
         """
         ctx = self.native_context
-        self.native_call('GET_CHAR_WEAPON_IN_SLOT', 'L4L', self.index, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
+        self.native_call('GET_CHAR_WEAPON_IN_SLOT', 'L4L', self.ped_index, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
         return (
             ctx.get_temp_value(1), # weapon_type
             ctx.get_temp_value(2), # ammo
@@ -314,15 +345,15 @@ class Player(IVEntity):
         
     def get_char_ammo(self, weapon):
         ctx = self.native_context
-        self.native_call('GET_AMMO_IN_CHAR_WEAPON', 'L2L', self.index, weapon, ctx.get_temp_addr())
+        self.native_call('GET_AMMO_IN_CHAR_WEAPON', 'L2L', self.ped_index, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
         
     def set_char_ammo(self, weapon, ammo):
-        self.native_call('SET_CHAR_AMMO', 'L2L', self.index, weapon, ammo)
+        self.native_call('SET_CHAR_AMMO', 'L2L', self.ped_index, weapon, ammo)
 
     def get_max_ammo(self, weapon):
         ctx = self.native_context
-        self.native_call('GET_MAX_AMMO', 'L2L', self.index, weapon, ctx.get_temp_addr())
+        self.native_call('GET_MAX_AMMO', 'L2L', self.ped_index, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
 
     def max_ammo(self):
@@ -335,7 +366,7 @@ class Player(IVEntity):
 
     @weapon.setter
     def weapon(self, weapon):
-        self.native_call('SET_CURRENT_CHAR_WEAPON', 'L2L', self.index, weapon, 1)
+        self.native_call('SET_CURRENT_CHAR_WEAPON', 'L2L', self.ped_index, weapon, 1)
 
     @lazy
     def weapons(self):

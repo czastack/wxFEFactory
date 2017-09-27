@@ -95,9 +95,6 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def closeWindow(self, m=None):
-        self.win.close()
-
     def checkAttach(self, _=None):
         className = 'Grand theft auto 3'
         windowName = 'GTA3'

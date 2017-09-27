@@ -189,10 +189,6 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def closeWindow(self, m=None):
-        self.onClose()
-        self.win.close()
-
     def onClose(self, _=None):
         self.free_remote_function()
 
