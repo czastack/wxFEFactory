@@ -62,7 +62,7 @@ class Pool(Model):
 
     def __getitem__(self, i):
         if self.item_class:
-            return self.item_class(self.addr_at(addr_at), self.handler)
+            return self.item_class(self.addr_at(i), self.handler)
 
     def addr_at(self, i):
         return self.start + i * self.item_class.SIZE

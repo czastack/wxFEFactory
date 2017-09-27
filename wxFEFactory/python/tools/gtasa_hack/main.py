@@ -34,6 +34,8 @@ class Tool(BaseGTATool):
         b'\x89\x45\xFC\x58\x8B\x45\xFC\x8B\xE5\x5D\xC3'
     )
 
+    jetPackSpeed = 2.0
+
     def __init__(self):
         super().__init__()
         self.spawn_code_injected = False
