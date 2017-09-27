@@ -21,10 +21,8 @@ styles = {
             'showPadding': '1 1 0 1',
             'textAlign': 'right',
         },
-        'top_padding': {
-            'padding': 10,
-            'showPadding': '1 0 0 0',
-        },
+        'top_padding': {'padding': 10, 'showPadding': '1 0 0 0'},
+        'left_padding': {'padding': 10, 'showPadding': '0 0 0 1'},
     }
 }
 

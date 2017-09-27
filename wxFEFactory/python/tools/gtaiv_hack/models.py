@@ -1,6 +1,7 @@
 # from lib.hack.model import Model, Field, CoordField, ModelField
 # from lib.lazy import lazy
 from lib.utils import normalFloat
+from lib.lazy import lazy
 from ..gta_base.models import Physicle, Pool
 import math
 
@@ -99,7 +100,10 @@ import math
 
 
 class IVEntity(Physicle):
-    pass
+    def __init__(self, index, native_call, native_context):
+        self.index = index
+        self.native_call = native_call
+        self.native_context = native_context
 
 
 class CoordData:
@@ -133,14 +137,11 @@ class CoordData:
 
 
 class Player(IVEntity):
-    def __init__(self, index, native_call, native_context):
-        self.index = index
-        self.native_call = native_call
-        self.native_context = native_context
+    SIZE = 0xf00
 
     def getter(name, ret_type=int, ret_size=4):
         def getter(self):
-            return self.native_call(name, 'L', self.index, ret_type=ret_type, ret_size=4)
+            return self.native_call(name, 'L', self.index, ret_type=ret_type, ret_size=ret_size)
         return getter
 
     def getter_ptr(name, ret_type=int, ret_size=4):
@@ -149,15 +150,15 @@ class Player(IVEntity):
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
-    def setter(name, ret_type=int):
-        if ret_type is int:
+    def setter(name, type_=int):
+        if type_ is int:
             s = 'L'
-        elif ret_type is float:
+        elif type_ is float:
             s = 'f'
-        elif ret_type is bool:
+        elif type_ is bool:
             s = '?'
         else:
-            raise ValueError('ret_type not support')
+            raise ValueError('not support type: ' + type_.__name__)
         def setter(self, value):
             self.native_call(name, 'L' + s, self.index, value)
         return setter
@@ -165,10 +166,28 @@ class Player(IVEntity):
     hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
     set_max_health = setter('SET_CHAR_MAX_HEALTH')
     ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('SET_CHAR_ARMOUR'))
-    money = property(getter('GET_CHAR_MONEY'), setter('SET_CHAR_MONEY'))
+    money = property(getter('STORE_SCORE'))
+
+    @money.setter
+    def set_money(self, value):
+        if value < 0:
+            value = 0
+        else:
+            value -= self.money
+        self.native_call('ADD_SCORE', 'LL', self.index, value)
+
     gravity = property(getter('GET_CHAR_GRAVITY', float), setter('SET_CHAR_GRAVITY', float))
     set_invincible = setter('SET_CHAR_INVINCIBLE', bool)
-    wanted_level = property(getter_ptr('STORE_WANTED_LEVEL'), setter('ALTER_WANTED_LEVEL'))
+
+    def set_wanted_level(self, level):
+        if level > 0:
+            self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
+        else:
+            self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
+        self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
+
+    wanted_level = property(getter_ptr('STORE_WANTED_LEVEL'), set_wanted_level)
+
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 不会从摩托车上摔下来
     keep_bike = property(
@@ -199,16 +218,92 @@ class Player(IVEntity):
         if addr:
             return Vehicle(addr, self.native_call, self.native_context)
 
+    # ----------------------------------------------------------------------
+    # 武器相关
+    # ----------------------------------------------------------------------
     def give_weapon(self, weapon, ammo):
         # M4 15
         # 狙击步枪 16
         # 火箭发射器 18
         # 机枪 20
+        # WEAPON_UNARMED = 0
+        # WEAPON_BASEBALLBAT = 1
+        # WEAPON_POOLCUE = 2
+        # WEAPON_KNIFE = 3
+        # WEAPON_GRENADE = 4
+        # WEAPON_MOLOTOV = 5
+        # WEAPON_ROCKET = 6
+        # WEAPON_PISTOL = 7
+        # WEAPON_UNUSED0 = 8
+        # WEAPON_DEAGLE = 9
+        # WEAPON_SHOTGUN = 10
+        # WEAPON_BARETTA = 11
+        # WEAPON_MICRO_UZI = 12
+        # WEAPON_MP5 = 13
+        # WEAPON_AK47 = 14
+        # WEAPON_M4 = 15
+        # WEAPON_SNIPERRIFLE = 16
+        # WEAPON_M40A1 = 17
+        # WEAPON_RLAUNCHER = 18
+        # WEAPON_FTHROWER = 19
+        # WEAPON_MINIGUN = 20
+        # WEAPON_EPISODIC_1 = 21
+        # WEAPON_EPISODIC_2 = 22
+        # WEAPON_EPISODIC_3 = 23
+        # WEAPON_EPISODIC_4 = 24
+        # WEAPON_EPISODIC_5 = 25
+        # WEAPON_EPISODIC_6 = 26
+        # WEAPON_EPISODIC_7 = 27
+        # WEAPON_EPISODIC_8 = 28
+        # WEAPON_EPISODIC_9 = 29
+        # WEAPON_EPISODIC_10 = 30
+        # WEAPON_EPISODIC_11 = 31
+        # WEAPON_EPISODIC_12 = 32
+        # WEAPON_EPISODIC_13 = 33
+        # WEAPON_EPISODIC_14 = 34
+        # WEAPON_EPISODIC_15 = 35
+        # WEAPON_EPISODIC_16 = 36
+        # WEAPON_EPISODIC_17 = 37
+        # WEAPON_EPISODIC_18 = 38
+        # WEAPON_EPISODIC_19 = 39
+        # WEAPON_EPISODIC_20 = 40
+        # WEAPON_EPISODIC_21 = 41
+        # WEAPON_EPISODIC_22 = 42
+        # WEAPON_EPISODIC_23 = 43
+        # WEAPON_EPISODIC_24 = 44
+        # WEAPON_CAMERA = 45
+        # WEAPON_OBJECT = 46
+        # WEAPON_WEAPONTYPE_LAST_WEAPONTYPE = 47
+        # WEAPON_ARMOUR = 48
+        # WEAPON_RAMMEDBYCAR = 49
+        # WEAPON_RUNOVERBYCAR = 50
+        # WEAPON_EXPLOSION = 51
+        # WEAPON_UZI_DRIVEBY = 52
+        # WEAPON_DROWNING = 53
+        # WEAPON_FALL = 54
+        # WEAPON_UNIDENTIFIED = 55
+        # WEAPON_ANYMELEE = 56
+        # WEAPON_ANYWEAPON = 57
         self.native_call('GIVE_WEAPON_TO_CHAR', 'L3L', self.index, weapon, ammo, 0)
 
     def get_weapon_in_slot(self, slot):
+        """
+        WEAPON_SLOT_UNARMED = 0
+        WEAPON_SLOT_MELEE = 1
+        WEAPON_SLOT_HANDGUN = 2
+        WEAPON_SLOT_SHOTGUN = 3
+        WEAPON_SLOT_SMG = 4
+        WEAPON_SLOT_RIFLE = 5
+        WEAPON_SLOT_SNIPER = 6
+        WEAPON_SLOT_HEAVY = 7
+        WEAPON_SLOT_THROWN = 8
+        WEAPON_SLOT_SPECIAL = 9
+        WEAPON_SLOT_GIFT = 10
+        WEAPON_SLOT_PARACHUTE = 11
+        WEAPON_SLOT_DETONATORUNKNOWN = 12
+        """
         ctx = self.native_context
-        self.native_call('GET_CHAR_WEAPON_IN_SLOT', 'L3L', self.index, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
+        self.native_call('GET_CHAR_WEAPON_IN_SLOT', 'L4L', self.index, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
         return (
             ctx.get_temp_value(1), # weapon_type
             ctx.get_temp_value(2), # ammo
@@ -217,9 +312,83 @@ class Player(IVEntity):
     def remove_all_weapons(self):
         self.native_call('REMOVE_ALL_CHAR_WEAPONS', None)
         
+    def get_char_ammo(self, weapon):
+        ctx = self.native_context
+        self.native_call('GET_AMMO_IN_CHAR_WEAPON', 'L2L', self.index, weapon, ctx.get_temp_addr())
+        return ctx.get_temp_value()
+        
     def set_char_ammo(self, weapon, ammo):
-         self.native_call('SET_CHAR_AMMO', 'L2L', self.index, weapon, ammo)
+        self.native_call('SET_CHAR_AMMO', 'L2L', self.index, weapon, ammo)
+
+    def get_max_ammo(self, weapon):
+        ctx = self.native_context
+        self.native_call('GET_MAX_AMMO', 'L2L', self.index, weapon, ctx.get_temp_addr())
+        return ctx.get_temp_value()
+
+    def max_ammo(self):
+        for i in range(1, 12):
+            weapon, ammo = self.get_weapon_in_slot(i)
+            if weapon:
+                self.set_char_ammo(weapon, 9999)
+
+    weapon = property(getter_ptr('GET_CURRENT_CHAR_WEAPON'))
+
+    @weapon.setter
+    def weapon(self, weapon):
+        self.native_call('SET_CURRENT_CHAR_WEAPON', 'L2L', self.index, weapon, 1)
+
+    @lazy
+    def weapons(self):
+        return WeaponSet(self)
+
+
+class WeaponSet:
+    def __init__(self, ped, size=13):
+        self.ped = ped
+        self.size = size
+
+    def __getitem__(self, i):
+        if i < 0 or i >= self.size:
+            print("not available i")
+            return
+        return WeaponItem(self.ped, i)
+
+    def __setitem__(self, i, item):
+        if i < 0 or i >= self.size:
+            print("not available i")
+            return
+        self[i].set(item)
+
+
+class WeaponItem:
+    def __init__(self, ped, slot):
+        self.ped = ped
+        self.slot = slot
+
+    @property
+    def data(self):
+        return self.ped.get_weapon_in_slot(self.slot)
+
+    @property
+    def id(self):
+        return self.data[0]
+
+    @property
+    def ammo(self):
+        return self.data[1]
+
+    @ammo.setter
+    def ammo(self, ammo):
+        self.ped.set_char_ammo(self.id, ammo)
+
+    def set(self, other):
+        if isinstance(other, WeaponItem):
+            # self.id = other.id
+            self.ammo = other.ammo
+        elif isinstance(other, (tuple, list)):
+            _, self.ammo = other
 
 
 class Vehicle(IVEntity):
+    SIZE = 0x5a8
     pass

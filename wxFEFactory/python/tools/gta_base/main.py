@@ -1,5 +1,8 @@
+from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
+from commonstyle import styles
+from ..tool import BaseTool
 from .models import Pool
 import math
 import time
@@ -7,8 +10,26 @@ import fefactory_api
 import fefactory_api
 ui = fefactory_api.ui
 
+win_style = {
+    'width': 680,
+    'height': 920,
+}
 
-class BaseGTATool:
+
+class BaseGTATool(BaseTool):
+    def __init__(self):
+        super().__init__()
+        self.handler = ProcessHandler()
+
+    def attach(self):
+        self.render()
+        self.checkAttach()
+
+    def render_win(self):
+        menubar = self.render_menu()
+        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar)
+        return self.win
+
     def swithKeeptop(self, cb):
         self.win.keeptop = cb.checked
 
@@ -41,11 +62,11 @@ class BaseGTATool:
         return self.vehicle if self.isInVehicle else self.player
 
     @property
-    def ped_tool(self):
+    def ped_pool(self):
         return self.models.Pool(self.address.PED_POOL, self.handler, self.Player)
 
     @property
-    def vehicle_tool(self):
+    def vehicle_pool(self):
         return self.models.Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
 
     def get_rotz(self):

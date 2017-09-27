@@ -110,12 +110,12 @@ class MainFrame:
             print('加载模块%s失败' % name)
             traceback.print_exc()
 
-    def closeWindow(self, m=None):
+    def closeWindow(self, _=None):
         self.win.close()
 
-    def restart(self, m):
+    def restart(self, _=None, callback=None):
         self.closeWindow()
-        fefactory.reload({"size": self.win.size, "position": self.win.position})
+        fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
 
     def toggleConsole(self, m):
         """显示/隐藏控制台"""
@@ -236,12 +236,15 @@ class MainFrame:
 
     def onToolOpen(self, cb):
         name = tools[cb.index][1]
+        self.openToolByName(name)
+        self.dialog.endModal()
+        del self.dialog
+
+    def openToolByName(self, name):
         Tool = self.getTool(name)
         tool = Tool()
         tool.attach()
         __main__.tool = tool
-        self.dialog.endModal()
-        del self.dialog
 
     def attachEmu(self, m):
         if m.checked:

@@ -1,5 +1,4 @@
-from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget, ModelInputWidget, ModelCoordsWidget
+from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from commonstyle import dialog_style, styles
@@ -28,23 +27,10 @@ class Tool(BaseGTATool):
     FUNCTION_REQUEST_MODEL = b'\x55\x8B\xEC\x51\xC7\x45\xFC\x10\xE3\x40\x00\x6A\x16\xFF\x75\x08\xFF\x55\xFC\x83\xC4\x08\x8B\xE5\x5D\xC3'
     FUNCTION_LOAD_REQUESTED_MODELS = b'\x55\x8B\xEC\x51\xC7\x45\xFC\xF0\xB5\x40\x00\x6A\x00\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
 
-    def __init__(self):
-        self.handler = ProcessHandler()
-        self.jetPackSpeed = 2.0
-
-    def attach(self):
-        self.render()
-        self.checkAttach()
+    jetPackSpeed = 2.0
 
     def render(self):
-        with ui.MenuBar() as menubar:
-            with ui.Menu("文件"):
-                with ui.Menu("新建"):
-                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=None)
-            with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
-
-        with ui.HotkeyWindow("罪恶都市Hack", style=win_style, styles=styles, menuBar=menubar) as win:
+        with self.render_win() as win:
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.checkAttach)
@@ -54,15 +40,14 @@ class Tool(BaseGTATool):
                     self.render_main()
 
         win.setOnClose(self.onClose)
-        self.win = win
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
             self.hp_view = ModelInputWidget("hp", "生命")
             self.ap_view = ModelInputWidget("ap", "防弹衣")
             self.rot_view = ModelInputWidget("rotation", "旋转")
-            self.coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
-            self.speed_view = ModelCoordsWidget("speed", "速度")
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             self.stamina_view = ModelInputWidget("stamina", "体力")
             self.wanted_view = ModelInputWidget("wanted_level", "通缉等级")
@@ -70,11 +55,11 @@ class Tool(BaseGTATool):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
-            self.vehicle_roll_view = ModelCoordsWidget("roll", "滚动")
-            self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
-            self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
-            self.vehicle_turn_view = ModelCoordsWidget("turn", "Turn")
+            self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
+            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
+            self.vehicle_turn_view = ModelCoordWidget("turn", "Turn")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
@@ -88,7 +73,7 @@ class Tool(BaseGTATool):
 
         with Group("global", "全局", 0, handler=self.handler):
             self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
-            self.camera_view = CoordsWidget("camera", "摄像机", 0x7E46B8, ())
+            self.camera_view = CoordWidget("camera", "摄像机", 0x7E46B8, ())
             self.camera_z_rot_view = InputWidget("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
             self.camera_x_rot_view = InputWidget("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
 
@@ -254,9 +239,3 @@ class Tool(BaseGTATool):
                 self.entity.coord = item.coord
                 break
             self._sphere_index += 1
-
-
-win_style = {
-    'width': 640,
-    'height': 860,
-}

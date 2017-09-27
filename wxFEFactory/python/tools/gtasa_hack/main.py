@@ -1,7 +1,6 @@
 from functools import partial
-from fefactory_api.emuhacker import ProcessHandler
 from lib.hack.form import (
-    Group, InputWidget, ProxyInputWidget, SelectWidget, ModelInputWidget, ModelCoordsWidget
+    Group, InputWidget, ProxyInputWidget, SelectWidget, ModelInputWidget, ModelCoordWidget
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -36,20 +35,11 @@ class Tool(BaseGTATool):
     )
 
     def __init__(self):
-        self.handler = ProcessHandler()
-        self.jetPackSpeed = 2.0
+        super().__init__()
         self.spawn_code_injected = False
 
-    def attach(self):
-        self.render()
-        self.checkAttach()
-
     def render(self):
-        with ui.MenuBar() as menubar:
-            with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
-
-        with ui.HotkeyWindow("圣安地列斯Hack", style=win_style, styles=styles, menuBar=menubar) as win:
+        with self.render_win() as win:
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.checkAttach)
@@ -59,7 +49,6 @@ class Tool(BaseGTATool):
                     self.render_main()
 
         win.setOnClose(self.onClose)
-        self.win = win
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -67,8 +56,8 @@ class Tool(BaseGTATool):
             self.maxhp_view = ModelInputWidget("maxhp", "最大生命")
             self.ap_view = ModelInputWidget("ap", "防弹衣")
             self.rot_view = ModelInputWidget("rotation", "旋转")
-            self.coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
-            self.speed_view = ModelCoordsWidget("speed", "速度")
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.getWantedLevel, self.setWantedLevel)
             ui.Text("")
@@ -89,10 +78,10 @@ class Tool(BaseGTATool):
                     ui.Button("再次应用", onclick=self.player_special_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
-            self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
-            self.vehicle_grad_view = ModelCoordsWidget("grad", "旋转")
-            self.vehicle_coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
-            self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
+            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             with ui.Vertical(className="fill"):
@@ -432,10 +421,3 @@ class Tool(BaseGTATool):
         coord = self.get_front_coord()
         for o in self.get_near_objects():
             o.coord = coord
-
-
-ins = None
-win_style = {
-    'width': 680,
-    'height': 920,
-}

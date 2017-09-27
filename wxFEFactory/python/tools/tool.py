@@ -1,8 +1,14 @@
 from lib.basescene import BaseScene
 from lib.lazy import lazyclassmethod
 from . import tools
+import fefactory_api
+ui = fefactory_api.ui
+
 
 class BaseTool(BaseScene):
+    """
+    self.win 窗口对象
+    """
 
     def render(self):
         """
@@ -10,6 +16,17 @@ class BaseTool(BaseScene):
         :return: 返回根元素
         """
         pass
+
+    def render_menu(self):
+        """ 渲染基本菜单
+        :return: menubar
+        """
+        with ui.MenuBar() as menubar:
+            with ui.Menu("窗口"):
+                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
+                ui.MenuItem("重载\tCtrl+R", onselect=self.reload)
+
+        return menubar
 
     @lazyclassmethod
     def doGetTitle(class_):
@@ -24,3 +41,15 @@ class BaseTool(BaseScene):
     def getName(class_):
         """模块名称，即模块文件夹名"""
         return class_.__module__.split('.')[1]
+
+    def reload(self, _=None):
+        from mainframe import frame
+
+        name = self.getName()
+        self.closeWindow()
+
+        def callback():
+            from mainframe import frame
+            frame.openToolByName(name)
+
+        frame.restart(callback=callback)

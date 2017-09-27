@@ -213,7 +213,7 @@ class CheckBoxWidget(Widget):
         self._handler.ptrsWrite(self.addr, self.offsets, data, len(data))
 
 
-class CoordsWidget(TwoWayWidget):
+class CoordWidget(TwoWayWidget):
     def __init__(self, name, label, addr, offsets=(), savable=False):
         self.savable = savable
         super().__init__(name, label, addr, offsets)
@@ -232,10 +232,10 @@ class CoordsWidget(TwoWayWidget):
                 self.render_btn()
 
         else:
-            with ui.Vertical(className="fill"):
+            with ui.Vertical(className="fill") as root:
                 with ui.Horizontal(className="fill"):
                     with ui.Vertical(className="fill"):
-                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as grid:
+                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
                             ui.Text("X坐标", className="label_left expand")
                             self.x_view = ui.TextInput(className="fill")
@@ -252,8 +252,13 @@ class CoordsWidget(TwoWayWidget):
                             ui.Button(label="删除", className="button", onclick=self.onDel)
                             ui.Button(label="保存", className="button", onclick=self.onSave)
                             ui.Button(label="载入", className="button", onclick=self.onLoad)
-                    self.listbox = ui.ListBox(className="expand", onselect=self.onListBoxSel)
+                    self.listbox = ui.ListBox(className="expand left_padding", onselect=self.onListBoxSel)
                     self.listbox.setOnKeyDown(self.onListBoxKey)
+
+                with ui.ContextMenu() as contextmenu:
+                    ui.MenuItem("复制(&C)", onselect=self.onCopy)
+                    ui.MenuItem("粘贴(&V)", onselect=self.onPaste)
+                root.setContextMenu(contextmenu)
 
         self.views = (self.x_view, self.y_view, self.z_view)
 
@@ -366,8 +371,14 @@ class CoordsWidget(TwoWayWidget):
             self.listbox.setText(self.data_list[index]['name'], index)
             self.listbox.setText(self.data_list[index + 1]['name'], index + 1)
 
+    def onCopy(self, _=None):
+        fefactory_api.set_clipboard(str(tuple(self.input_value)))
 
-class ModelCoordsWidget(ModelWidget, CoordsWidget):
+    def onPaste(self, _=None):
+        values = eval(fefactory_api.get_clipboard())
+        self.input_value = values
+
+class ModelCoordWidget(ModelWidget, CoordWidget):
     pass
 
 

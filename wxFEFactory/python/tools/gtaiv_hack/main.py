@@ -1,6 +1,5 @@
 from functools import partial
-from fefactory_api.emuhacker import ProcessHandler
-from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordsWidget, ModelInputWidget, ModelCoordsWidget
+from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib import utils
@@ -43,20 +42,8 @@ class Tool(BaseGTATool):
 
     SAFE_SPEED_RATE = 0.3
 
-    def __init__(self):
-        self.handler = ProcessHandler()
-        self.jetPackSpeed = 2.0
-
-    def attach(self):
-        self.render()
-        self.checkAttach()
-
     def render(self):
-        with ui.MenuBar() as menubar:
-            with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
-
-        with ui.HotkeyWindow("GTAIV Hack", style=win_style, styles=styles, menuBar=menubar) as win:
+        with self.render_win() as win:
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.checkAttach)
@@ -66,24 +53,24 @@ class Tool(BaseGTATool):
                     self.render_main()
 
         win.setOnClose(self.onClose)
-        self.win = win
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
             self.hp_view = ModelInputWidget("hp", "生命")
             self.ap_view = ModelInputWidget("ap", "防弹衣")
-            self.coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.weight_view = ModelInputWidget("gravity", "重量")
             self.wanted_level = ModelInputWidget("wanted_level", "通缉等级")
             ui.Text("")
-            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-            ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
+            with ui.Horizontal(className="expand"):
+                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+                ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
-            self.vehicle_roll_view = ModelCoordsWidget("roll", "滚动")
-            self.vehicle_dir_view = ModelCoordsWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordsWidget("coord", "坐标", savable=True)
-            self.vehicle_speed_view = ModelCoordsWidget("speed", "速度")
+            self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
+            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             with ui.Horizontal(className="expand"):
@@ -240,10 +227,13 @@ class Tool(BaseGTATool):
         # if player_addr is 0:
         #     return None
         player = getattr(self, '_playerins', None)
+
+        index_of_pool = 0
+
         if not player:
-            player = self._playerins = self.Player(2, self.native_call, self.native_context)
-        # elif player.addr != player_addr:
-        #     player.addr = player_addr
+            player = self._playerins = self.Player(self.get_player_index(), self.native_call, self.native_context)
+        else:
+            player.index = self.get_player_index()
         return player
 
     def _vehicle(self):
@@ -252,6 +242,23 @@ class Tool(BaseGTATool):
 
     player = property(_player)
     vehicle = property(_vehicle)
+
+    def get_player_index(self, index=0):
+        player_id = (index or self.get_player_index_of_pool()) << 8
+        return player_id | self.handler.read8(
+            self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + (player_id >> 8)
+        )
+
+    def get_ped_addr(self):
+        return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
+
+    def get_player_index_of_pool(self):
+        """获取当前ped在ped_pool中的index"""
+        ped_addr = self.get_ped_addr()
+        pool = self.ped_pool
+        for i in range(pool.size):
+            if pool.addr_at(i) == ped_addr:
+                return i
 
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
@@ -290,9 +297,3 @@ class Tool(BaseGTATool):
 
     def get_player_id(self):
         return self.native_call('GET_PLAYER_ID', None)
-
-
-win_style = {
-    'width': 640,
-    'height': 820,
-}
