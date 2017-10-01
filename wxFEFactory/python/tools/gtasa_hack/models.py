@@ -62,7 +62,8 @@ class Player(Entity):
         return Vehicle(ptr, self.handler) if ptr else None
 
     @property
-    def carStandOn(self):
+    def vehicle_on(self):
+        """当前玩家站在其上的载具"""
         ptr = self.handler.read32(self.addr + 0x584)
         return Vehicle(ptr, self.handler) if ptr else None
 
@@ -88,8 +89,8 @@ class Vehicle(Entity):
     SIZE = 0xa18
 
     hp = Field(0x4c0, float)
-    numPassengers = Field(0x484, int, 1)
-    maxPassengers = Field(0x488, int, 1)
+    num_passengers = Field(0x484, int, 1)
+    max_passengers = Field(0x488, int, 1)
     dirt = Field(0x4b0, float) # 0.0~15.0
     _tranler = Field(0x4c8, int)
     door_status = Field(0x4f8, int)

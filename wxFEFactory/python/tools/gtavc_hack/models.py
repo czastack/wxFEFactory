@@ -60,8 +60,8 @@ class Vehicle(Entity):
     model_id = Field(0x5c, int, 1)
     primaryColor = Field(0x1a0, int, 1)
     secondaryColor = Field(0x1a1, int, 1)
-    numPassengers = Field(0x1cc, int, 1)
-    maxPassengers = Field(0x1d0, int, 1)
+    num_passengers = Field(0x1cc, int, 1)
+    max_passengers = Field(0x1d0, int, 1)
     door_status = Field(0x230, int, 1)
 
     @property

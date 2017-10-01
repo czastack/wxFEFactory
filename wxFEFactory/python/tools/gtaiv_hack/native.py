@@ -25,6 +25,15 @@ class NativeContext(Model):
         self.handler.write(addr, struct.pack(signature, *args))
         self.m_nArgCount += length
 
+    def get_stack_addr(self, i=0):
+        """ 栈从前往后取地址，传递指针参数时可以用
+        :param i: 从1开始
+        """
+        return self.m_TempStack.addr_at(i)
+
+    def get_stack_value(self, i=0, type=int, size=0):
+        return self.handler.read(self.get_stack_addr(i), type, size)
+
     def get_temp_addr(self, i=1):
         """ 从栈的最后开始往前取地址，传递指针参数时可以用
         :param i: 从1开始

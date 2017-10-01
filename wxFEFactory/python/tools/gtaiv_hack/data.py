@@ -1,62 +1,56 @@
 
 # 有弹药数的武器分组
-SLOT_NO_AMMO = [0, 1, 12]
+SLOT_NO_AMMO = [0, 1]
 
-WEAPON_NONE = ( 0, -1, "无" )
+WEAPON_NONE = ( 0, 0, "无" )
 
 WEAPON_LIST = [
     [
         # (id, model, name)
         WEAPON_NONE,
-        (13, 0, "HELICANNON"),
     ],
     [
+        # MELEE = 1
         WEAPON_NONE,
         (1, 0, "棒球棍"),
+        (2, 0, "桌球杆"),
+        (3, 0, "小刀"),
     ],
     [
+        # HANDGUN = 2
         WEAPON_NONE,
-        (2, 173, "手枪"),
+        (7, 0, "手枪"),
+        (9, 0, "沙漠之鹰"),
     ],
     [
+        # SHOTGUN = 3
         WEAPON_NONE,
-        (3, 178, "UZI"),
+        (10, 0, "短管猎枪"),
+        (11, 0, "贝雷塔猎枪"),
     ],
     [
+        # SMG = 4
         WEAPON_NONE,
-        (4, 176, "短管猎枪"),
+        (12, 0, "乌兹微冲"),
+        (13, 0, "MP5"),
     ],
     [
+        # RIFLE = 5
         WEAPON_NONE,
-        (5, 171, "AK47"),
+        (14, 0, "AK47"),
+        (15, 0, "M4"),
     ],
     [
+        # SNIPER = 6
         WEAPON_NONE,
-        (6, 180, "M16"),
+        (16, 0, "狙击步枪"),
+        (17, 0, "M40A1"),
     ],
     [
+        # HEAVY = 7
         WEAPON_NONE,
-        (7, 0, "狙击步枪"),
-    ],
-    [
-        WEAPON_NONE,
-        (8, 175, "火箭发射器"),
-    ],
-    [
-        WEAPON_NONE,
-        (9, 0, "火焰发射器"),
-    ],
-    [
-        WEAPON_NONE,
-        (10, 174, "燃烧瓶"),
-    ],
-    [
-        WEAPON_NONE,
-        (11, 170, "手榴弹"),
-    ],
-    [
-        WEAPON_NONE,
-        (12, 0, "遥控炸药包"),
+        (18, 0, "火箭发射器"),
+        (20, 0, "机枪"),
     ],
 ]
 
@@ -170,3 +164,45 @@ VEHICLE_LIST = (
     ("Yankee", 186),
     ("Zebra", 188)
 )
+
+COLOR_LIST = [
+    0x0A0A0A, 0x252527, 0x656A79, 0x58595A, 0x9CA1A3, 0x96918C, 0x515459, 0x3F3E45,
+    0xA5A9A7, 0x979592, 0x767B7C, 0x5A5752, 0xADB0B0, 0x848988, 0x949D9F, 0xA4A7A5, 0x585853, 0xA4A096, 
+    0xAFB1B1, 0x6D6C6E, 0x64686A, 0x525661, 0x8C929A, 0x5B5D5E, 0xBDBEC6, 0xB6B6B6, 0x646464, 0xE20606, 
+    0x960800, 0x6B0000, 0x611009, 0x4A0A0A, 0x730B0B, 0x570707, 0x260306, 0x9E0000, 0x140002, 0x0F0404, 
+    0x0F080A, 0x39191D, 0x552725, 0x4C2929, 0x741D28, 0x6D2837, 0x730A27, 0x640D1B, 0x620B1C, 0x731827, 
+    0xAB988F, 0x20202C, 0x44624F, 0x2E5B20, 0x1E2E32, 0x304F45, 0x4D6268, 0x5E7072, 0x193826, 0x2D3A35, 
+    0x335F3F, 0x47783C, 0x93A396, 0x9AA790, 0x263739, 0x4C75B7, 0x46597A, 0x5D7E8D, 0x3B4E78, 0x3D4A68, 
+    0x6D7A88, 0x162248, 0x272F4B, 0x4E6881, 0x6A7A8C, 0x6F8297, 0x0E316D, 0x395A83, 0x204B6B, 0x2B3E57, 
+    0x364155, 0x6C8495, 0x4D5D60, 0x406C8F, 0x134573, 0x105082, 0x385694, 0x001C32, 0x596E87, 0x223457, 
+    0x20202C, 0xF5890F, 0x917347, 0x8E8C46, 0xAAAD8E, 0xAE9B7F, 0x96816C, 0x7A7560, 0x9D9872, 0x989586, 
+    0x9C8D71, 0x691E3B, 0x722A3F, 0x7C1B44, 0x221918, 0x7F6956, 0x473532, 0x695853, 0x624428, 0x7D6256, 
+    0xAA9D84, 0x7B715E, 0xAB9276, 0x635C5A, 0xC9C9C9, 0xD6DAD6, 0x9F9D94, 0x93A396, 0x9C9C98, 0xA7A28F, 
+    0x0F6A89, 0xA19983, 0xA3ADC6, 0x9B8B80, 0x8494AB, 0x9EA4AB, 0x86446E, 0xE20606, 0x47783C, 0xD78E10, 
+    0x2A77A1, 0x421F21, 0x6F675F, 0xFC2600, 0xFC6D00, 0xFFFFFF
+]
+
+COLOR_NAME_LIST = [
+    "Black", "BlackPoly", "ConcordBluePoly", "PewterGrayPoly", "SilverStonePoly",
+    "WinningSilverPoly", "SteelGrayPoly", "ShadowSilverPoly", "SilverStonePoly2", "PorcelainSilverPoly", "GrayPoly",
+    "AnthraciteGrayPoly", "AstraSilverPoly", "AscotGray", "ClearCrystalBlueFrostPoly", "SilverPoly", "DarkTitaniumPoly", 
+    "TitaniumFrostPoly", "PoliceWhite", "MediumGrayPoly", "MediumGrayPoly2", "SteelGrayPoly2", "SlateGray",
+    "GunMetalPoly", "LightBlueGrey", "SecuricorLightGray", "ArcticWhite", "VeryRed", "TorinoRedPearl", "FormulaRed",
+    "BlazeRed", "GracefulRedMica", "GarnetRedPoly", "DesertRed", "CabernetRedPoly", "TurismoRed", "DesertRed2",
+    "CurrantRedSolid", "CurrantRedPoly", "ElectricCurrantRedPoly", "MediumCabernetSolid", "WildStrawberryPoly",
+    "MediumRedSolid", "BrightRed", "BrightRed2", "MediumGarnetRedPoly", "BrilliantRedPoly", "BrilliantRedPoly2",
+    "AlabasterSolid", "TwilightBluePoly", "TorchRed", "Green", "DeepJewelGreen", "AgateGreen", "PetrolBlueGreenPoly",
+    "Hoods", "Green2", "DarkGreenPoly", "RioRed", "SecuricorDarkGreen", "SeafoamPoly", "PastelAlabasterSolid",
+    "MidnightBlue", "StrikingBlue", "SaxonyBluePoly", "JasperGreenPoly", "MarinerBlue", "HarborBluePoly",
+    "DiamondBluePoly", "SurfBlue", "NauticalBluePoly", "LightCrystalBluePoly", "MedRegattaBluePoly", "SpinnakerBlueSolid",
+    "UltraBluePoly", "BrightBluePoly", "NassauBluePoly", "MediumSapphireBluePoly", "SteelBluePoly",
+    "LightSapphireBluePoly", "MalachitePoly", "MediumMauiBluePoly", "BrightBluePoly2", "BrightBluePoly3", "Blue",
+    "DarkSapphireBluePoly", "LightSapphireBluePoly2", "MediumSapphireBlueFiremist", "TwilightBluePoly2", "TaxiYellow",
+    "RaceYellowSolid", "PastelAlabaster", "OxfordWhiteSolid", "Flax", "MediumFlax", "PuebloBeige", "LightIvory",
+    "SmokeSilverPoly", "BisqueFrostPoly", "ClassicRed", "VermilionSolid", "VermillionSolid", "BistonBrownPoly",
+    "LightBeechwoodPoly", "DarkBeechwoodPoly", "DarkSablePoly", "MediumBeechwoodPoly", "WoodrosePoly", "SandalwoodFrostPoly",
+    "MediumSandalwoodPoly", "CopperBeige", "WarmGreyMica", "White", "FrostWhite", "HoneyBeigePoly", "SeafoamPoly2",
+    "LightTitaniumPoly", "LightChampagnePoly", "ArcticPearl", "LightDriftwoodPoly", "WhiteDiamondPearl", "AntelopeBeige",
+    "CurrantBluePoly", "CrystalBluePoly", "TempleCurtainPurple", "CherryRed", "SecuricorDarkGreen2", "TaxiYellow2",
+    "PoliceCarBlue", "MellowBurgundy", "DesertTaupePoly", "LammyOrange", "LammyYellow", "VeryWhite"
+]

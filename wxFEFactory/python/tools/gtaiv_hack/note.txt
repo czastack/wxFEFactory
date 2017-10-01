@@ -1,3 +1,12 @@
+player = tool.player
+for w in range(1, 21):
+    player.give_weapon(w, 10)
+    for i in range(1, 12):
+        weapon, ammo = player.get_weapon_in_slot(i)
+        if weapon == w:
+            print(i, w)
+            break
+
 
 void COffsets::Init(unsigned int uiBase)
 {

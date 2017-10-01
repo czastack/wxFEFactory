@@ -59,13 +59,16 @@ class Tool(BaseGTATool):
             self.hp_view = ModelInputWidget("hp", "生命")
             self.ap_view = ModelInputWidget("ap", "防弹衣")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
-            self.weight_view = ModelInputWidget("gravity", "重量")
+            # self.weight_view = ModelInputWidget("gravity", "重量")
+            self.speed_view = ModelInputWidget("speed", "速度")
             self.wanted_level = ModelInputWidget("wanted_level", "通缉等级")
             self.money = ModelInputWidget("money", "金钱")
             ui.Text("")
-            with ui.Horizontal(className="expand"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
+                ui.Button(label="可以切换武器", onclick=self.set_ped_block_switch_weapons)
+                ui.Button(label="不会被拽出车", onclick=self.set_ped_can_be_dragged_out_of_vehicle)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
@@ -81,7 +84,7 @@ class Tool(BaseGTATool):
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
-            for i in range(1, 13):
+            for i in range(1, Player.WEAPON_SLOT):
                 self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
@@ -123,7 +126,8 @@ class Tool(BaseGTATool):
 
     def onClose(self, _=None):
         super().onClose()
-        self.free_remote_function()
+        if self.handler.active:
+            self.free_remote_function()
 
     def checkAttach(self, _=None):
         className = 'grcWindow'
@@ -131,6 +135,9 @@ class Tool(BaseGTATool):
 
         if self.handler.active:
             self.free_remote_function()
+        else:
+            # 确保重新生成 native_context
+            self._playerins = None
             
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
@@ -140,8 +147,8 @@ class Tool(BaseGTATool):
                 self.win.RegisterHotKeys((
                     # ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
                     # ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-                    # ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
-                    # ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
+                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
                     ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
                     ('to_up', MOD_ALT, getVK('.'), self.to_up),
                     ('stop', MOD_ALT, getVK('x'), self.stop),
@@ -159,6 +166,7 @@ class Tool(BaseGTATool):
                     ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
                     ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
                     ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
+                    ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
                 ))
             self.init_addr()
             self.init_remote_function()
@@ -182,28 +190,49 @@ class Tool(BaseGTATool):
             address.OBJECT_POOL  = self.get_addr(0x011FADD8)
             address.LOCAL_PLAYER_ID  = self.get_addr(0xEA68A8)
             address.PLAYER_INFO_ARRAY  = self.get_addr(0x1033058)
-            address.FindNativeAddress = 0x617280
+            # address.FindNativeAddress = self.get_addr(0x617280)
+            address.SetMoveSpeed = 0 # TODO
         elif version == VERSION_107:
             address.PED_POOL     = self.get_addr(0x18A82AC)
             address.VEHICLE_POOL = self.get_addr(0x1619240)
             address.OBJECT_POOL  = self.get_addr(0x1350CE0)
             address.LOCAL_PLAYER_ID  = self.get_addr(0xF1CC68)
             address.PLAYER_INFO_ARRAY  = self.get_addr(0x11A7008)
-            address.FindNativeAddress = 0x5A76D0
+            # address.FindNativeAddress = self.get_addr(0x5A76D0)
+            address.SetMoveSpeed = self.get_addr(0xA47750)
+            address.GetMoveSpeed = self.get_addr(0xA477F0)
 
-        self.FUNCTION_FIND_NATIVE_ADDRESS = (
-            b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) + 
-            b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
-        )
+            SPEED_FUNC = (
+                b'\x55\x8B\xEC\x83\xEC\x08\x8B\x4D\x08\xC7\x45\xF8',
+                b'\x8B\x41\x60\x89\x45\xFC\x8D\x41\x64\x89\x45\x08\xFF\x75\x08\x8B\x4D\xFC\xFF\x55\xF8\x8B\xE5\x5D\xC3'
+            )
+            self.FUNCTION_SET_SPEED = utils.u32bytes(address.SetMoveSpeed).join(SPEED_FUNC)
+            self.FUNCTION_GET_SPEED = utils.u32bytes(address.GetMoveSpeed).join(SPEED_FUNC)
+
+        # self.FUNCTION_FIND_NATIVE_ADDRESS = (
+        #     b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) + 
+        #     b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
+        # )
 
     def init_remote_function(self):
-        self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
+        # 现在Native方法对应的地址直接写在address.NATIVE_ADDRS中了
+        # self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
+        
+        # TODO
+        if address.SetMoveSpeed:
+            self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
+            self.GetMoveSpeed = self.handler.write_function(self.FUNCTION_GET_SPEED)
+
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(NativeContext.SIZE)
         self.native_context = NativeContext(context_addr, self.handler)
 
     def free_remote_function(self):
-        self.handler.free_memory(self.FindNativeAddress)
+        # self.handler.free_memory(self.FindNativeAddress)
+        if address.SetMoveSpeed:
+            self.handler.free_memory(self.SetMoveSpeed)
+            self.handler.free_memory(self.GetMoveSpeed)
+
         self.handler.free_memory(self.native_context.addr)
         self._playerins = None
 
@@ -231,11 +260,11 @@ class Tool(BaseGTATool):
             player = self._playerins = self.Player(player_index, self.get_ped_index(player_index), self.native_call, self.native_context)
         else:
             player.index = player_index
-            player.ped_index = self.get_ped_index(player_index)
+            player.handle = self.get_ped_index(player_index)
         return player
 
     def _vehicle(self):
-        pass
+        return self.player.last_vehicle
         # return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
     player = property(_player)
@@ -267,6 +296,85 @@ class Tool(BaseGTATool):
         self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_id(), self.native_context.get_temp_addr())
         return self.native_context.get_temp_value()
 
+    def ped_index_to_handle(self, index):
+        handle = index << 8
+        return handle | self.handler.read8(
+            self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + index
+        )
+
+    def vehicle_index_to_handle(self, index):
+        handle = index << 8
+        return handle | self.handler.read8(
+            self.handler.read32(self.handler.read32(address.VEHICLE_POOL) + 4) + index
+        )
+
+    def player_has_ped(self, player_index):
+        return self.native_call('PLAYER_HAS_CHAR', 'L', player_index, ret_type=bool)
+
+    @property
+    def ped_pool(self):
+        return models.Pool(self.address.PED_POOL, self.handler, models.MemPlayer)
+
+    @property
+    def vehicle_pool(self):
+        return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
+
+    def get_persons(self):
+        pool = self.ped_pool
+        for i in range(pool.size):
+            ped = pool[i]
+            if ped.hp > 1:
+                ped.index = i
+                yield ped
+
+    def get_near_persons(self, distance=100):
+        """获取附近的人"""
+        for ped in super().get_near_persons(distance):
+            yield Player(0, self.ped_index_to_handle(ped.index), self.native_call, self.native_context)
+
+    def get_vehicles(self):
+        pool = self.vehicle_pool
+        for i in range(pool.size):
+            vehicle = pool[i]
+            if vehicle.hp > 1:
+                vehicle.index = i
+                yield vehicle
+
+    def get_near_vehicles(self, distance=200):
+        """获取附近的载具"""
+        for vehicle in super().get_near_vehicles(distance):
+            yield Vehicle(self.vehicle_index_to_handle(vehicle.index), self.native_call, self.native_context)
+
+    def set_move_speed(self, entity_addr, value):
+        ctx = self.native_context
+        with ctx:
+            ctx.push('L3f', entity_addr, *value)
+            self.handler.remote_call(self.SetMoveSpeed, ctx.addr)
+
+    def get_move_speed(self, entity_addr):
+        ctx = self.native_context
+        with ctx:
+            ctx.push('L', entity_addr)
+            self.handler.remote_call(self.GetMoveSpeed, ctx.addr)
+            return (
+                utils.normalFloat(ctx.get_stack_value(1, float)),
+                utils.normalFloat(ctx.get_stack_value(2, float)),
+                utils.normalFloat(ctx.get_stack_value(3, float))
+            )
+
+    def jetPackTick(self, _=None, useSpeed=False, detal=0):
+        if self.isInVehicle:
+            self.vehicle.speed = 40
+
+    def raise_up(self, _=None, speed=15):
+        self.entity.speed[2] = speed
+
+    def to_up(self, _=None):
+        if self.isInVehicle:
+            self.vehicle.coord[2] += 10
+        else:
+            self.player.coord[2] += 3
+
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
 
@@ -296,8 +404,18 @@ class Tool(BaseGTATool):
             if v.has_ammo:
                 v.ammo_view.value = 9999
 
-    def set_ped_invincible(self):
-        self.player.set_invincible(True)
+    def set_ped_invincible(self, _=None):
+        self.player.invincible = True
+
+    def set_ped_block_switch_weapons(self, _=None):
+        self.player.block_switch_weapons = False
+
+    def set_ped_can_be_dragged_out_of_vehicle(self, _=None):
+        self.player.can_be_dragged_out_of_vehicle = False
+
+    def max_cur_weapon(self, _=None):
+        """当前武器子弹全满"""
+        self.player.max_cur_ammo()
 
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)

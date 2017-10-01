@@ -271,8 +271,10 @@ class MainFrame:
 
 
 winstyle = {
-    'width': 1200,
-    'height': 960,
+    # 'width': 1200,
+    # 'height': 960,
+    'width': 800,
+    'height': 600,
 }
 
 styles = {

@@ -11,8 +11,10 @@ import fefactory_api
 ui = fefactory_api.ui
 
 win_style = {
-    'width': 680,
-    'height': 920,
+    # 'width': 680,
+    # 'height': 920,
+    'width': 640,
+    'height': 700,
 }
 
 
@@ -28,6 +30,7 @@ class BaseGTATool(BaseTool):
     def render_win(self):
         menubar = self.render_menu()
         self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar)
+        self.win.position = (70, 4)
         return self.win
 
     def swithKeeptop(self, cb):
@@ -176,11 +179,10 @@ class BaseGTATool(BaseTool):
     def get_near_persons(self, distance=100):
         """获取附近的人"""
         coord = self.player.coord.values()
-        myaddr = self.handler.read32(self.address.PLAYER_PTR)
+        myaddr = self.player.addr
         for p in self.get_persons():
-            if p.hp > 0 and p.coord[2] > 0 and p.distance(coord) <= distance:
-                if p.addr != myaddr:
-                    yield p
+            if p.hp > 0 and p.coord[2] > 0 and p.distance(coord) <= distance and p.addr != myaddr:
+                yield p
 
     def get_vehicles(self):
         pool = Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
@@ -189,11 +191,11 @@ class BaseGTATool(BaseTool):
     def get_near_vehicles(self, distance=100):
         """获取附近的载具"""
         coord = self.player.coord.values()
-        mycarAddr = self.handler.read32(self.address.VEHICLE_PTR)
+        mycar = self.vehicle
+        myaddr = mycar.addr if mycar else 0
         for v in self.get_vehicles():
-            if v.coord[2] > 0 and v.distance(coord) <= distance:
-                if v.addr != mycarAddr:
-                    yield v
+            if v.coord[2] > 0 and v.distance(coord) <= distance and v.addr != myaddr:
+                yield v
 
     def kill_near_persons(self, _=None):
         """杀死附近的人"""
@@ -229,7 +231,7 @@ class BaseGTATool(BaseTool):
                 v.stop()
                 coord = v.coord.values()
                 coord[2] += 1
-                self.player.coord = coord
+                self.entity.coord = coord
                 break
 
     def near_vehicles_flip(self, _=None):
