@@ -77,6 +77,12 @@ public:
 				size = py::len(data);
 			return write(addr, bytesGetBuff(data), size);
 		}
+		else if (PY_IS_TYPE(data, PyByteArray))
+		{
+			if (size == 0)
+				size = py::len(data);
+			return write(addr, PyByteArray_AsString(data.ptr()), size);
+		}
 
 		return false;
 	}

@@ -2,6 +2,7 @@ from ..module import BaseListBoxModuel
 from mainframe import ui
 from commonstyle import dialog_style
 from lib import exui
+import fefactory_api
 
 
 class Module(BaseListBoxModuel):
@@ -33,6 +34,7 @@ class Module(BaseListBoxModuel):
             ui.ComboBox(type="readonly", className="fill")
             ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
             ui.Button(label="保存文件", className="button", onclick=self.onSave)
+            ui.Button(label="另存为", className="button", onclick=self.onSaveAs)
 
     def onAdd(self, btn):
         text = self.longtext_dialog("输入内容")
@@ -40,9 +42,7 @@ class Module(BaseListBoxModuel):
             self.doAdd(text)
 
     def doAdd(self, text, unique=True):
-        """
-        添加列表项
-        """
+        """ 添加列表项 """
         if not unique or text not in self.data_list:
             count = self.listbox.count
             name = "%04X" % count
@@ -64,10 +64,24 @@ class Module(BaseListBoxModuel):
         pass
 
     def onSaveIt(self, btn):
+        """保存当前项"""
         self.data_list[self.listbox.index]['text'] = self.textarea.value
 
     def onSave(self, btn):
         self.dumpJson('strings', self.data_list, indent=0)
+
+    def onSaveAs(self, btn):
+        tpl = self.longtext_dialog("输入模板", "{i:04X} {addr:08X}\n{text}\n")
+        path = fefactory_api.choose_file("选择保存文件", wildcard='*.txt')
+        if path:
+            result = []
+            i = 0
+            for item in self.data_list:
+                result.append(tpl.format(i=i, **item))
+                i += 1
+            with open(path, 'w', encoding="utf-8") as file:
+                file.write('\n'.join(result))
+            print("保存成功: " + path)
 
     def getCurData(self):
         return self.data_list[self.listbox.index]
@@ -116,13 +130,15 @@ class Module(BaseListBoxModuel):
         if not choice.showModal():
             print("取消操作")
             return
-
+        
         ptr = reader.text_table_start
+        i = 0
+        names = [] # ListBox中显示的列表项文本
+        codes = None
+        cur_count = self.listbox.count
+
         if choice.unique:
             added = {item['text'] for item in self.data_list}
-        i = 0
-
-        codes = None
 
         if choice.show_code:
             # 未压缩的代码缓冲区
@@ -130,9 +146,9 @@ class Module(BaseListBoxModuel):
 
         while True:
             addr = reader.read32(ptr)
-            high = addr >> 24
+            high = (addr >> 24) & 0xF
             
-            if not (high is 8 or high is 9) or i > 0xF:
+            if not (high is 8 or high is 9):
                 # 读取结束
                 break
 
@@ -147,8 +163,10 @@ class Module(BaseListBoxModuel):
                     item['code'] = codes.hex().upper()
 
                 self.data_list.append(item)
+                names.append("%04X %08X" % (cur_count, addr))
+                cur_count += 1
+
             ptr += 4
             i += 1
 
-        count = self.listbox.count
-        super().doAdd("%04X" % count for count in range(count, count + i))
+        super().doAdd(names)

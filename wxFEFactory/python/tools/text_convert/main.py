@@ -64,9 +64,9 @@ class Tool(BaseTool):
             return
         di = self.reader._dict
         text = tv.value
-        codebytes = di.encode(text)
+        codebytes = di.encodeText(text)
         haffbytes = di.encodeHaffuman(text)
-        self.code_view.value = codebytes.hex().upper()
+        self.code_view.value = ''.join(['%04X' % item for item in codebytes])
         self.haff_view.value = haffbytes.hex().upper()
 
     def onConvertCode(self, tv):
@@ -75,14 +75,15 @@ class Tool(BaseTool):
             return
         di = self.reader._dict
         codebytes = bytes.fromhex(tv.value)
+        codes = di.bytes_to_codes(codebytes)
         try:
-            text = di.decode(codebytes, True)
+            text = di.decodeText(codes)
         except KeyError as e:
             print("%04X" % e.args[0] + '不在码表中', '忽略文本转换')
             text = ''
 
         try:
-            haffbytes = di.encodeHaffumanCode(di.bytes_to_code_list(codebytes))
+            haffbytes = di.encodeHaffumanCode(codes)
         except ValueError as e:
             print(e.args[0], '忽略哈夫曼编码转换')
             haffbytes = b''

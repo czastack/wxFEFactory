@@ -172,7 +172,10 @@ class MainFrame:
         self.console.reLayout()
 
     def consolInputMultiRun(self, _=None):
-        exec(self.console_input_multi.value, vars(__main__))
+        try:
+            exec(self.console_input_multi.value, vars(__main__))
+        except:
+            traceback.print_exc()
 
     def onConsoleFileDrop(self, files):
         # scope = __main__.__dict__

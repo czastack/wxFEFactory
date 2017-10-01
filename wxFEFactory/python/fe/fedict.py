@@ -28,13 +28,12 @@ class FeDict(Dictionary):
     """
     __slots__ = ('tree', 'leafmap')
 
-    def __init__(self, huffmandata, codetable, lowrange=None, ctrltable=None):
+    def __init__(self, huffmandata, codetable, low_range=None, ctrltable=None, ctrl_low_range=None):
         """
         :param huffmandata: 包含哈夫曼树的顺序存储数据 (file, start, size)
         """
-        super().__init__(codetable, lowrange, ctrltable)
+        super().__init__(codetable, low_range, ctrltable, ctrl_low_range)
         self.buildtree(huffmandata)
-        
 
     def buildtree(self, huffmandata):
         # 生成哈夫曼树
@@ -79,7 +78,7 @@ class FeDict(Dictionary):
         self.leafmap = leafmap
 
     def decodeHaffuman(self, data, result=None):
-        """
+        """ 哈夫曼字节流转字码列表
         :param result: 返回解码后的code列表
         """
         curbyte = 0
@@ -108,6 +107,7 @@ class FeDict(Dictionary):
                 if node.isLeaf():
                     code = node.value
                     if (code & 0xFF00) is not 0:
+                        # 读到叶子结点
                         result.append(code)
                         break_continue = True
                     break
@@ -115,43 +115,108 @@ class FeDict(Dictionary):
             if not break_continue and (code & 0xFF) is 0:
                 break
 
-        text = []
-        i = 0
-        for code in result:
-            word = self.getChar(code)
-            if word is not None:
-                text.append(word)
-            elif self.ctrltable and code in self.ctrltable:
-                word, i = self.ctrltable[code].decode(data, i)
-                text.append(word)
-            else:
-                print("Error: %04X can't decode" % code)
-            i += 1
+        return result
 
+    def decodeText(self, codes, codebytes=None):
+        """字码列表转文本"""
+        if codebytes is not None:
+            codebytes.extend(self.codes_to_bytes(codes))
+
+        it = iter(codes)
+        text = []
+
+        while True:
+            try:
+                code = next(it)
+            except StopIteration:
+                break
+            if self.low_range[0] <= code < self.low_range[1]:
+                word = self.getChar(code)
+                if word is not None:
+                    text.append(word)
+                else:
+                    print("Error: %04X can't decode" % code)
+            else:
+                if code == 0x8000:
+                    code = code << 16 | next(it)
+
+                if self.ctrltable and code in self.ctrltable:
+                    word = self.ctrltable[code].decode_it(None)
+                    text.append(word)
+
+                    if code == 0x1000:
+                        # 载入头像
+                        try:
+                            faceid = next(it) >> 8
+                            # 这里没有判断范围，GBA三作都是2开始，后面几个id是离散的，每一作不一样
+                            text.append('{Face%d}' % faceid)
+                        except:
+                            pass
+                else:
+                    print("Error: %04X can't decode" % code)
         return ''.join(text)
 
-        # return ''.join(self.getChar(code) for code in result)
+    def decodeHaffumanText(self, data, codebytes=None):
+        """ 哈夫曼字节流转文本
+        :param data: 哈夫曼字节流可迭代变量
+        """
+        codes = self.decodeHaffuman(data)
+        return self.decodeText(codes, codebytes)
+
+    def encodeText(self, text):
+        """文本转字码列表，支持控制码"""
+        codes = []
+        length = len(text) - 1
+        i = -1
+
+        while i < length:
+            i += 1
+            ch = text[i]
+            code = self.getCode(ch)
+            if code is 0:
+                if self.ctrltable and CtrlCode.FMT_START.startswith(ch):
+                    con = False
+                    for ctrlcode in self.ctrltable.values():
+                        match = ctrlcode.encode_args(text, i)
+                        if match:
+                            code, args, i = match
+                            i -= 1
+
+                            if code == 0xF000 and args:
+                                # 处理头像
+                                code = args[0] << 8 | 1
+
+                            elif code > 0xffff:
+                                codes.append(code >> 16)
+                                code &= 0xffff
+
+                            codes.append(code)
+                            con = True
+                            break
+                    if con:
+                        continue
+                print("warning: %s不在码表中" % ch)
+                
+            codes.append(code)
+
+        return codes
 
     def encodeHaffuman(self, text, buf=None, null=True):
-        """
+        """ 文本转哈夫曼字节数组
         :param null: 把\0添加到结尾
+        :param buf: 可选的缓冲区（存放哈夫曼字节数据）
         """
-        codes = []
-        for ch in text:
-            code = self.getCode(ch)
-            if code is 0x00:
-                raise ValueError("码表中没有这个字：" + ch)
-            codes.append(code)
+        codes = self.encodeText(text)
 
         if null:
             codes.append(0x00)
 
         return self.encodeHaffumanCode(codes, buf)
             
-
     def encodeHaffumanCode(self, codes, buf=None):
-        """
-        codes 字码数组
+        """ 文本转哈夫曼字节数组
+        :param codes: 字码数组
+        :param buf: 可选的缓冲区（存放哈夫曼字节数据）
         """
         result = bytearray() if buf is None else buf
         byte = 0
@@ -190,7 +255,8 @@ class FeDict(Dictionary):
         return result
 
     @staticmethod
-    def code_list_to_bytes(codes):
+    def codes_to_bytes(codes):
+        """字码列表转bytes"""
         result = bytearray(len(codes) * 2)
         i = 0
         for code in codes:
@@ -201,11 +267,11 @@ class FeDict(Dictionary):
         return result
 
     @staticmethod
-    def bytes_to_code_list(codebytes):
+    def bytes_to_codes(codebytes):
+        """bytes转字码列表"""
         codes = []
         for i in range(0, len(codebytes), 2):
             codes.append((codebytes[i] << 8) | codebytes[i + 1])
-            i += 2
         return codes
 
 
