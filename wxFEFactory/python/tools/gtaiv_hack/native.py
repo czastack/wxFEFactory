@@ -75,13 +75,14 @@ class NativeContext(Model):
 
         return self.handler.read(self.m_TempStack.addr, type, size)
 
-    @lazy
-    def zero_bytes(self):
-        return b'\x00' * self.m_TempStack.size
+    # @lazy
+    # def zero_bytes(self):
+    #     return b'\x00' * self.m_TempStack.size
 
     def __enter__(self):
         self.m_nArgCount = 0
-        self.handler.write(self.m_TempStack.addr, self.zero_bytes)
+        self.m_nDataCount = 0
+        # self.handler.write(self.m_TempStack.addr, self.zero_bytes)
 
     def __exit__(self, *args):
         pass

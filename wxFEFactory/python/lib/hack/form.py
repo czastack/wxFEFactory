@@ -148,6 +148,8 @@ class BaseInputWidget(TwoWayWidget):
             self.view = ui.TextInput(className="fill", exstyle=0x0400)
             self.render_btn()
 
+            self.view.setOnKeyDown(self.onKey)
+
     @property
     def input_value(self):
         return self.view.value
@@ -156,6 +158,17 @@ class BaseInputWidget(TwoWayWidget):
     def input_value(self, value):
         self.view.value = str(value)
 
+    def onKey(self, v, event):
+        mod = event.GetModifiers()
+        code = event.GetKeyCode()
+        if mod == 0:
+            if code == event.getWXK('r'):
+                self.read()
+                return True
+            elif code == event.getWXK('w'):
+                self.write()
+                return True
+        event.Skip()
 
 
 class InputWidget(BaseInputWidget):

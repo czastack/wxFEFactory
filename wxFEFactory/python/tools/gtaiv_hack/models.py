@@ -1,7 +1,7 @@
+from functools import reduce
 from lib.hack.model import Model, Field, CoordField, ModelField
-# from lib.lazy import lazy
-from lib.utils import normalFloat
 from lib.lazy import lazy
+from lib.utils import normalFloat
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
 from .data import COLOR_LIST
@@ -134,7 +134,7 @@ class NativeModel:
         else:
             raise ValueError('not support type: ' + type_.__name__)
         def setter(self, value):
-            self.native_call(name, 'L' + s, self.handle, value)
+            self.native_call(name, 'L' + s, self.handle, type_(value))
         return setter
 
     builders = (getter, getter_ptr, setter)
@@ -221,7 +221,7 @@ class Player(NativeEntity):
         return MemPlayer(self.addr, self.mgr.handler)
 
     hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
-    ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('SET_CHAR_ARMOUR'))
+    ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('ADD_ARMOUR_TO_CHAR'))
     max_health = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_HEALTH'))
     max_armor = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_ARMOUR'))
 
@@ -255,7 +255,7 @@ class Player(NativeEntity):
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
-        # self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
+        self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略
@@ -613,10 +613,10 @@ class IVModel(NativeModel):
     is_train = property(getter("IS_THIS_MODEL_A_TRAIN", bool))
     is_vehicle = property(getter("IS_THIS_MODEL_A_VEHICLE", bool))
 
+    request = getter('REQUEST_MODEL', ret_type=None)
+    loaded = property(getter('HAS_MODEL_LOADED', bool))
+
     del getter, getter_ptr, setter
-
-
-from functools import reduce
 
 
 class Vector:

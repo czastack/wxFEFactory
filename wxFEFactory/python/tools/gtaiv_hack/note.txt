@@ -1,3 +1,4 @@
+m=tool.models.IVModel(0xED7EADA4, tool.native_call, tool.native_context)
 tool.native_call('CREATE_CAR', 'L3fLL', 0xED7EADA4, 913.8628, -429.926, 16.031, tool.native_context.get_temp_addr(), 1)
 
 player = tool.player
@@ -292,3 +293,44 @@ void COffsets::Init(unsigned int uiBase)
 					ADDRESS_OBJECTPOOL			= BaseAddress + 0x118A660;
 					ADDRESS_PEDPOOL				= BaseAddress + 0x18219EC;
 					ADDRESS_VEHICLEPOOL			= BaseAddress + 0x15C17B0;
+
+
+
+
+float teleport[300] = {766.169312, -569.311584, 10.298987, 891.4139, -499.3775, 19.4210, 601.4458, 1409.8357, 17.4763
+        , -967.6061, 888.6968, 19.0440, -336.0000, 177.0000, 19.0797, -275.4792, -85.1938, 334.7692
+        , 21.7521, 60.5495, 223.1774, -182.7256, 597.1370, 119.2988, 332.5396, -719.8954, 4.6907
+        , -15.4019, -468.4341, 15.4122, -118.7440, -1036.5500, 5.1227, -327.4691, 1422.7618, 13.0601
+        , -230.9540, 267.2493, 14.8868, -1157.1395, 1386.4534, 24.3507, -1247.3695, 804.2703, 19.7040
+        , -1686.8047, -326.9265, 2.9017, 697.1852, 1479.4991, 14.7112, 1131.4844, -78.7506, 36.1885
+        , -1245.5000, 1676.5734, 34.4385, -1065.3115, 1458.3964, 24.5505, 1596.3580, 24.0703, 10.0506 // 21
+        , -107.3157, 760.0825, 15.2955, 1229.2278, 610.1171, 38.0867, -280.6283, 327.4868, 162.5574
+        , 642.1340, 1090.8789, 2.7300, 410.3757, 214.1046, 8.7612, -610.0849, -995.2992, 5.2713
+        , 2428.0000, 569.4791, 5.8129, 2406.1406, 372.1392, 6.0862, -606.5956, -753.5831, 65.9908
+        , -606.0968, -749.4219, 93.6582, -845.0363, 776.8615, 93.6582, 97.1126, -682.9540, 14.7717
+        , -1314.1997, 1281.0931, 22.3704, -1136.1410, -373.7700, 3.2092, -283.0240, -96.9614, 390.6313
+        , -1398.0913, 1460.1091, 25.2021, 549.9185, 738.4665, 20.9232, 51.6838, 809.4344, 14.6622
+        , -284.0329, -100.3265, 455.9929, -224.4060, 945.4450, 10.9129, -224.4060, 945.4450, 500.0000 // 42
+        , 734.6112, 1390.6750, 14.2521, 259.0903, 4070.9971, 2.0000, 975.5718, 1865.4789, 23.0803
+        , 1209.1001, 1713.2784, 16.6666, 1194.9547, 196.1794, 32.5804, -425.9751, 1462.1202, 38.9715 // 48
+        , 98.4826, 852.1058, 45.0510, 1351.219238, -245.596237, 23.232389 // 766.169312, -569.311584, 10.298987
+        , 2726.965332, 403.454376, 5.838003, -1164.930298, 1868.392090, 6.672832
+        ,878, -17, 29, 854, -514, 16, -546, 1230, 97.6, -134, 1493, 22.8, 1376, 196, 35.7
+        ,-1004, 1223, 28.5, 1369, 526, 33.1, -129, 1525, 23, 566, 1392, 31
+        ,932, -493, 16, -438, 453, 10.5, -39.588978, 76.312485, 60.977112, 875, -115, 6};
+
+// Here is the list of teleported locations. The player can scroll through and select one.
+
+char* TelName[] = {"Shoreline of Algonquin","Broker Safehouse","Bohan Safehouse","Alderney City Safehouse"  
+        ,"Comedy Club","Rotterdam tower","Getalife Building","Majestic Hotel","Helitours","Bank of liberty"
+        ,"Poopdeck restaurant","Algonquin Northwood","Algonquin Starjunction","Alderney Leftwood","Alderney City" // 0-44
+        ,"Industrial Park","Bohan Chase point","Broker outlook","Helipad mansion","Bikeshop","Honkers","Museum"
+        ,"Dukes East island city","Roof of Marriot Marquis","Charge Island","Colony Island","Happiness Island" // 80 64*3
+        ,"Airport","Airport Glitch","Statue of Happiness heart","Top of Statue of happiness","Alderney Helipad"
+        ,"Lawyer's office","North Alderney Hospital","Prison","Top of Rotterdam tower","Jimmy Pegorino's house"
+        ,"Toll Booth (Charge Island)","Turismo Store","On top of the world","Middle Park","Have a nice fall"
+        ,"Chase Wrecking & Salvage","Have a nice Swim","LCPD Police Station","The Triangle","Hospital (Broker)" // 54 (140) 64*3
+        ,"Northwood Safehouse","Algonquin Middle park safehouse","Swingset Glitch","Airport - Northwest","Alderney Party Mode"
+        ,"Run down apartment","Nice apartment","High rise apartment","Gangster's apartment","Abandoned apartment","Trashed apartment"
+        ,"Drug Dealer's apartment","Roach infested apartment","One room run down apartment","Broker Bar","Lucky Winkle's Restaurant"
+        ,"Top of Algonquin crane","Inside a Body Shop"};  // 194 (64*3)
