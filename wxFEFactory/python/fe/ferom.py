@@ -88,6 +88,8 @@ ctrltable = (
     CtrlCode(0x80002300, "SetName"),            # 用于CG画面时的对话，显示说话者姓名
     CtrlCode(0x80002500, "ToggleColorInvert"),  # 开始/结束语言框反色
 
+    CtrlCode(0x80001700, "Unknow80001700"),     # 似乎是fe8特有
+
     # 最低位为1的一般都会带有换行行为，名称以Br结尾区分
     CtrlCode(0x80000401, "LoadOverworldFacesBr"), # 在世界地图载入XX号头像
     CtrlCode(0x80000501, "GBr"),                  # 显示玩家持有金钱数额后换行
