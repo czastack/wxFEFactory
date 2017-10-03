@@ -107,11 +107,12 @@ class BaseGTATool(BaseTool):
             target = speed_view
             values = target.mem_value.values()
             speed_rate = getattr(self, 'SAFE_SPEED_RATE', 0.5)
+            safe_speed_up = getattr(self, 'SAFE_SPEED_UP', 0.2)
             values[0] += xVal * speed_rate
             values[1] += yVal * speed_rate
             if not isInVehicle:
-                values[2] = 0.2
-                self.raise_up(speed=0.2)
+                values[2] = safe_speed_up
+                self.raise_up(speed=safe_speed_up)
                 time.sleep(0.1)
         
         target.mem_value = values
@@ -212,17 +213,23 @@ class BaseGTATool(BaseTool):
         for v in self.get_near_vehicles():
             v.coord[2] -= 0.7
 
-    def near_vehicles_to_front(self, _=None):
-        """获取附近的载具移到眼前"""
+    def near_vehicles_to_front(self, _=None, zinc=0):
+        """ 获取附近的载具移到眼前
+        :param zinc: 下一个目标的z坐标增加
+        """
         coord = self.get_front_coord()
         for p in self.get_near_vehicles():
             p.coord = coord
+            if zinc:
+                coord[2] += zinc
 
-    def near_persons_to_front(self, _=None):
+    def near_persons_to_front(self, _=None, zinc=0):
         """附近的人移到眼前"""
         coord = self.get_front_coord()
         for p in self.get_near_persons():
             p.coord = coord
+            if zinc:
+                coord[2] += zinc
 
     def jump_on_vehicle(self, _=None):
         """跳上附近的一辆行驶中的车"""
@@ -241,14 +248,16 @@ class BaseGTATool(BaseTool):
 
     def near_persons_fly(self, _=None):
         """附近的人上天"""
+        fly_speed = getattr(self, 'FLY_SPEED', 1)
         for p in self.get_near_persons():
-            p.speed[2] = 1
+            p.speed[2] = fly_speed
 
     def near_vehicles_fly(self, _=None):
         """获取附近的载具上天"""
+        fly_speed = getattr(self, 'FLY_SPEED', 1)
         for v in self.get_near_vehicles():
-            v.coord[2] += 1
-            v.speed[2] = 1
+            v.coord[2] += fly_speed
+            v.speed[2] = fly_speed
 
     def near_fly(self, _=None):
         """获取附近的人/载具上天"""
@@ -308,7 +317,7 @@ class BaseGTATool(BaseTool):
                 break
             self._marker_index += 1
 
-    def move_marker_to_front(self, _=None):
+    def move_marker_to_front(self, _=None, zinc=0):
         """人/车标记点目标移到眼前"""
         if not hasattr(self, '_markers'):
             self.re_cal_markers()
@@ -328,6 +337,8 @@ class BaseGTATool(BaseTool):
                     entity.coord = front_coord
             elif isinstance(entity, self.Vehicle):
                 entity.coord = front_coord
+            if zinc:
+                coord[2] += zinc
 
     def lock_door(self, _=None):
         car = self.player.vehicle
@@ -369,6 +380,19 @@ class BaseGTATool(BaseTool):
                 json.dump(datas, file, ensure_ascii=False)
 
             fefactory_api.alert('转换成功: ' + jsonpath)
+
+    def render_common_button(self):
+        ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
+        ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
+        ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
+        ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
+        ui.Button("附近的人移到眼前", onclick=self.near_persons_to_front)
+        ui.Button("附近的车上天", onclick=self.near_vehicles_fly)
+        ui.Button("附近的人上天", onclick=self.near_persons_fly)
+        ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
+        ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
+        ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
+        ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
 
     def render_common_text(self):
         ui.Text("向前穿墙: alt+w")
