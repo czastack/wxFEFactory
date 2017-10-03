@@ -1,3 +1,5 @@
+tool.native_call('CREATE_CAR', 'L3fLL', 0xED7EADA4, 913.8628, -429.926, 16.031, tool.native_context.get_temp_addr(), 1)
+
 player = tool.player
 for w in range(1, 21):
     player.give_weapon(w, 10)

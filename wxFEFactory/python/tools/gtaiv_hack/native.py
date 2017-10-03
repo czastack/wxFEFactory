@@ -40,8 +40,22 @@ class NativeContext(Model):
         """
         return self.m_TempStack.addr_at(-i)
 
+    def get_temp_addrs(self, start, end):
+        """ 从栈的最后开始往前取地址，传递指针参数时可以用
+        :param start: 其实序号
+        :param end: 其实序号
+        :return: 地址序列
+        """
+        return (self.get_temp_addr(i) for i in range(start, end + 1))
+
     def get_temp_value(self, i=1, type=int, size=0):
         return self.handler.read(self.get_temp_addr(i), type, size)
+
+    def get_temp_values(self, start, end, type=int, size=0, mapfn=None):
+        result = (self.get_temp_value(i, type, size) for i in range(start, end + 1))
+        if mapfn:
+            result = map(mapfn, result)
+        return result
 
     def get_result(self, type, size=0):
         """获取调用结果"""

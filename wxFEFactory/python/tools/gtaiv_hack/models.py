@@ -146,7 +146,7 @@ class NativeEntity(NativeModel):
     @property
     def speed(self):
         values = self.mgr.get_move_speed(self.addr)
-        return CoordData(self, values, 'speed')
+        return VectorField(self, values, 'speed')
 
     @speed.setter
     def speed(self, value):
@@ -162,37 +162,16 @@ class NativeEntity(NativeModel):
         if hasattr(self, '_fire'):
             self.native_call('REMOVE_SCRIPT_FIRE', 'L', self._fire)
 
+    @property
+    def rotation(self):
+        return utils.degreeToRadian(self.heading)
 
-class CoordData:
-    """坐标数据"""
-    def __init__(self, obj, values, name="coord"):
-        self.obj = obj
-        self._values = list(values)
-        self.name = name
+    @property
+    def direction(self):
+        return utils.headingToDirection(self.heading)
 
-    def values(self):
-        return list(self._values)
-
-    def __getitem__(self, i):
-        return self._values[i]
-
-    def __setitem__(self, i, value):
-        self._values[i] = value
-        setattr(self.obj, self.name, self._values)
-
-    def __iter__(self):
-        self._pos = 0
-        return self
-
-    def __next__(self):
-        if self._pos < 3:
-            ret = self[self._pos]
-            self._pos += 1
-            return ret
-        raise StopIteration
-
-    def __str__(self):
-        return __class__.name + str(self._values)
+    def stop(self):
+        self.speed = (0, 0, 0)
 
 
 class Player(NativeEntity):
@@ -289,17 +268,15 @@ class Player(NativeEntity):
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
-        values = (
-            normalFloat(ctx.get_temp_value(1, float)),
-            normalFloat(ctx.get_temp_value(2, float)),
-            normalFloat(ctx.get_temp_value(3, float))
-        )
+        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
+        values = ctx.get_temp_values(1, 3, float, mapfn=normalFloat)
         return CoordData(self, values)
 
     @coord.setter
     def coord(self, value):
-        self.native_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *value)
+        pos = tuple(value)
+        self.native_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
+        # self.mgr.LoadEnvironmentNow(pos)
 
     get_vehicle_handle = getter_ptr('GET_CAR_CHAR_IS_USING')
 
@@ -308,13 +285,13 @@ class Player(NativeEntity):
         return self.native_context.get_temp_value()
 
     @property
-    def vehicle(self):
+    def cur_vehicle(self):
         handle = self.get_vehicle_handle()
         if handle:
             return Vehicle(handle, self.native_call, self.native_context)
 
     @property
-    def last_vehicle(self):
+    def vehicle(self):
         handle = self.get_last_vehicle_handle()
         if handle:
             return Vehicle(handle, self.native_call, self.native_context)
@@ -458,10 +435,6 @@ class Vehicle(NativeEntity):
     def model(self):
         return IVModel(self.model_hash, self.native_call, self.native_context)
 
-    @property
-    def direction(self):
-        return utils.headingToDirection(self.heading)
-
     is_freeze = property(None, setter('FREEZE_CAR_POSITION', bool))
     can_be_damaged = property(None, setter('SET_CAR_CAN_BE_DAMAGED', bool))
     # 损坏等级？
@@ -479,26 +452,51 @@ class Vehicle(NativeEntity):
             self.native_call('SET_TRAIN_CRUISE_SPEED', 'Lf', self.handle, value)
         else:
             self.native_call('SET_CAR_FORWARD_SPEED', 'Lf', self.handle, value)
-
-    def stop(self):
-        self.speed = 0
     
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CAR_COORDINATES', 'L3L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
-        values = (
-            normalFloat(ctx.get_temp_value(1, float)),
-            normalFloat(ctx.get_temp_value(2, float)),
-            normalFloat(ctx.get_temp_value(3, float))
-        )
+        self.native_call('GET_CAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
+        values = ctx.get_temp_values(1, 3, float, mapfn=normalFloat)
         return CoordData(self, values)
 
     @coord.setter
     def coord(self, value):
-        self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *value)
+        pos = tuple(value)
+        self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
+        # self.mgr.LoadEnvironmentNow(pos)
 
-    is_dead = property(getter('IS_CHAR_DEAD', bool))
+    @property
+    def quaternion(self):
+        ctx = self.native_context
+        self.native_call('GET_VEHICLE_QUATERNION', 'L4L', self.handle, *ctx.get_temp_addrs(1, 4))
+        values = ctx.get_temp_values(1, 4, float, mapfn=normalFloat)
+        return VectorField(self, values, 'quaternion')
+
+    @quaternion.setter
+    def quaternion(self, value):
+        self.native_call('SET_VEHICLE_QUATERNION', 'L4f', self.handle, *value)
+
+    @property
+    def rotation3f(self):
+        x, y, z, w = self.quaternion
+        pitch = math.atan2(2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
+        yaw   = math.atan2(2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
+        roll  = math.asin(-2.0 * (x*z - w*y))
+
+        return VectorField(self, (pitch, roll, yaw), 'rotation3f')
+
+    @rotation3f.setter
+    def rotation3f(self, value):
+        self.quaternion = Quaternion.from_rotation(Vector3(value))
+    
+    def flip(self):
+        """翻转"""
+        x, y, z = self.rotation3f
+        x = -x
+        y = -y
+        self.rotation3f = (x, y, z)
+
     is_on_fire = property(getter('IS_CAR_ON_FIRE', bool))
 
     # @is_on_fire.setter
@@ -616,3 +614,150 @@ class IVModel(NativeModel):
     is_vehicle = property(getter("IS_THIS_MODEL_A_VEHICLE", bool))
 
     del getter, getter_ptr, setter
+
+
+from functools import reduce
+
+
+class Vector:
+    def __init__(self, values):
+        self._values = list(values)
+
+    def values(self):
+        return list(self._values)
+
+    def __getitem__(self, i):
+        return self._values[i]
+
+    def __setitem__(self, i, value):
+        self._values[i] = value
+
+    def __iter__(self):
+        return iter(self._values)
+
+    @property
+    def len(self):
+        """向量纬度"""
+        return len(self._values)
+
+    @property
+    def length(self):
+        return math.sqrt(reduce(lambda a, b: a + b*b, self, 0))
+
+    def normalize(self):
+        length = self.length
+        
+        if length == 0 or length == 1:
+            return
+
+        for i in range(self.len):
+            self[i] /= length
+
+
+    class Item:
+        def __init__(self, i):
+            self.i = i
+
+        def __get__(self, obj, type):
+            return obj[self.i]
+
+        def __set__(self, obj, value):
+            obj[self.i] = value
+
+
+class Vector3(Vector):
+    def __init__(self, values=(0.0, 0.0, 0.0)):
+        if len(values) is not 3:
+            raise ValueError('Vector3 need 3 element values')
+        Vector.__init__(self, values)
+
+    x = Vector.Item(0)
+    y = Vector.Item(1)
+    z = Vector.Item(2)
+
+
+class Quaternion(Vector3):
+    def __init__(self, values=(0.0, 0.0, 0.0, 0.0)):
+        if len(values) is not 4:
+            raise ValueError('Quaternion need 4 element values')
+        Vector.__init__(self, values)
+
+    w = Vector.Item(3)
+
+    def to_rotation(self):
+        x, y, z, w = self
+        pitch = math.atan2(2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
+        yaw   = math.atan2(2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
+        roll  = math.asin(-2.0 * (x*z - w*y))
+        return Vector3((pitch, roll, yaw))
+
+    @classmethod
+    def from_rotation(cls, rotation):
+        """
+        :param rotation: Vector3 object
+        """
+        WorldUp    = Vector3((0.0, 0.0, 1.0))
+        WorldEast  = Vector3((1.0, 0.0, 0.0))
+        WorldNorth = Vector3((0.0, 1.0, 0.0))
+
+        qyaw  = cls.rotation_axis(WorldUp, rotation.x)
+        qyaw.normalize()
+        qpitch = cls.rotation_axis(WorldEast, rotation.y)
+        qpitch.normalize()
+        qroll = cls.rotation_axis(WorldNorth, rotation.z)
+        qroll.normalize()
+        yawpitch = qyaw * qpitch * qroll
+        yawpitch.normalize()
+        return yawpitch
+    
+    @classmethod
+    def rotation_axis(cls, axis, angle):
+        """
+        :param axis: Vector3 object
+        """
+        # axis.normalize()
+        half = angle * 0.5
+        sin = math.sin(half)
+        cos = math.cos(half)
+
+        return Quaternion((
+            axis.x * sin,
+            axis.y * sin,
+            axis.z * sin,
+            cos
+        ))
+
+        return result
+
+    def __mul__(self, right):
+
+        lx, ly, lz, lw = self
+        rx, ry, rz, rw = right
+
+        return Quaternion((
+            (lx * rw + rx * lw) + (ly * rz) - (lz * ry),
+            (ly * rw + ry * lw) + (lz * rx) - (lx * rz),
+            (lz * rw + rz * lw) + (lx * ry) - (ly * rx),
+            (lw * rw) - (lx * rx + ly * ry + lz * rz)
+        ))
+
+
+class VectorField(Vector):
+    def __init__(self, obj, values, name):
+        super().__init__(values)
+        self.obj = obj
+        self.name = name
+
+    def __setitem__(self, i, value):
+        super().__setitem__(i, value)
+        setattr(self.obj, self.name, self._values)
+
+    x = Vector.Item(0)
+    y = Vector.Item(1)
+    z = Vector.Item(2)
+
+
+class CoordData(VectorField):
+    """坐标数据"""
+    def __init__(self, obj, values, name="coord"):
+        super().__init__(obj, values, name)

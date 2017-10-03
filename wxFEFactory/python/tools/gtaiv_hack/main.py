@@ -40,7 +40,10 @@ class Tool(BaseGTATool):
     Player = Player
     Vehicle = Vehicle
 
-    SAFE_SPEED_RATE = 0.3
+    SAFE_SPEED_RATE = 15
+    SAFE_SPEED_UP = 6
+    jetPackSpeed = 3
+    FLY_SPEED = 15
 
     def render(self):
         with self.render_win() as win:
@@ -60,7 +63,8 @@ class Tool(BaseGTATool):
             self.ap_view = ModelInputWidget("ap", "防弹衣")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             # self.weight_view = ModelInputWidget("gravity", "重量")
-            self.speed_view = ModelInputWidget("speed", "速度")
+            self.speed_view = ModelCoordWidget("speed", "速度")
+            self.rot_view = ModelInputWidget("rotation", "旋转")
             self.wanted_level = ModelInputWidget("wanted_level", "通缉等级")
             self.money = ModelInputWidget("money", "金钱")
             ui.Text("")
@@ -110,16 +114,9 @@ class Tool(BaseGTATool):
                     ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.GridLayout(cols=3, vgap=10, className="fill container"):
-                ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
-                ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
-                ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
-                ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
-                ui.Button("附近的人移到眼前", onclick=self.near_persons_to_front)
-                ui.Button("附近的车上天", onclick=self.near_vehicles_fly)
-                ui.Button("附近的人上天", onclick=self.near_persons_fly)
-                ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
-                ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
+            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+                self.render_common_button()
+
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
@@ -145,9 +142,9 @@ class Tool(BaseGTATool):
 
             if not self.win.hotkeys:
                 self.win.RegisterHotKeys((
-                    # ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-                    # ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+                    ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
+                    ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), partial(self.jetPackTick, detal=4)),
+                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), partial(self.jetPackTick, useSpeed=True)),
                     ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
                     ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
                     ('to_up', MOD_ALT, getVK('.'), self.to_up),
@@ -162,8 +159,8 @@ class Tool(BaseGTATool):
                     ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
                     ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
                     ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
+                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), partial(self.near_vehicles_to_front, zinc=2)),
+                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), partial(self.near_persons_to_front, zinc=2.5)),
                     ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
                     ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
                     ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
@@ -264,7 +261,7 @@ class Tool(BaseGTATool):
         return player
 
     def _vehicle(self):
-        return self.player.last_vehicle
+        return self.player.vehicle
         # return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
     player = property(_player)
@@ -340,7 +337,7 @@ class Tool(BaseGTATool):
                 vehicle.index = i
                 yield vehicle
 
-    def get_near_vehicles(self, distance=200):
+    def get_near_vehicles(self, distance=100):
         """获取附近的载具"""
         for vehicle in super().get_near_vehicles(distance):
             yield Vehicle(self.vehicle_index_to_handle(vehicle.index), self.native_call, self.native_context)
@@ -357,14 +354,10 @@ class Tool(BaseGTATool):
             ctx.push('L', entity_addr)
             self.handler.remote_call(self.GetMoveSpeed, ctx.addr)
             return (
-                utils.normalFloat(ctx.get_stack_value(1, float)),
-                utils.normalFloat(ctx.get_stack_value(2, float)),
-                utils.normalFloat(ctx.get_stack_value(3, float))
+                round(ctx.get_stack_value(1, float), 3),
+                round(ctx.get_stack_value(2, float), 3),
+                round(ctx.get_stack_value(3, float), 3)
             )
-
-    def jetPackTick(self, _=None, useSpeed=False, detal=0):
-        if self.isInVehicle:
-            self.vehicle.speed = 40
 
     def raise_up(self, _=None, speed=15):
         self.entity.speed[2] = speed
@@ -413,9 +406,30 @@ class Tool(BaseGTATool):
     def set_ped_can_be_dragged_out_of_vehicle(self, _=None):
         self.player.can_be_dragged_out_of_vehicle = False
 
+    def restore_hp(self, _=None):
+        super().restore_hp()
+        if self.isInVehicle:
+            self.vehicle.engine_hp = 1000
+
     def max_cur_weapon(self, _=None):
         """当前武器子弹全满"""
         self.player.max_cur_ammo()
 
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
+
+    def LoadEnvironmentNow(self, pos):
+        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+        self.native_call('LOAD_SCENE', '3f', *pos)
+        self.native_call('POPULATE_NOW', None)
+
+    def GetGroundZ(self, pos, type=None):
+        if type == 'highest' or type is None:
+            self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', pos[0], pos[1], 1024.0, 
+                self.native_context.get_temp_addr())
+            return self.native_context.get_temp_value(float)
+        elif type == 'nextBelowCurrent':
+            self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, 
+                self.native_context.get_temp_addr())
+            return self.native_context.get_temp_value(float)
