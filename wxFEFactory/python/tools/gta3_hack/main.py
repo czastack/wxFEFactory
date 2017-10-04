@@ -25,7 +25,7 @@ class Tool(BaseGTATool):
     MARKER_RANGE = 32
 
     SAFE_SPEED_RATE = 0.3
-    jetPackSpeed = 2.0
+    GO_FORWARD_COORD_RATE = 2.0
 
     def render(self):
         with self.render_win() as win:

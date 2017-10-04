@@ -19,7 +19,7 @@ class Player(Entity):
     rotation = Field(0x378, float)
     stamina = Field(0x600, float)
     isInVehicle = Field(0x3AC, bool, 1)
-    cur_weapon = Field(0x504, int)
+    cur_weapon = Field(0x504, int, 1)
     crouch = Field(0x150, bool)
     isOnGround = Field(0x150, bool)
     model_id = Field(0xe8, int, 1)

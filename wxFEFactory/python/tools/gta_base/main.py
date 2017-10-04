@@ -1,3 +1,4 @@
+from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -81,41 +82,39 @@ class BaseGTATool(BaseTool):
             rotz += PI * 2
         return rotz
 
-    def jetPackTick(self, _=None, useSpeed=False, detal=0):
-        """弹射起步"""
-        jetPackSpeed = detal or self.jetPackSpeed
-        isInVehicle = self.isInVehicle
-
-        if isInVehicle:
-            coord_view = self.vehicle_coord_view
-            speed_view = self.vehicle_speed_view
-        else:
-            coord_view = self.coord_view
-            speed_view = self.speed_view
+    def go_forward(self, _=None, rate=0):
+        rate = rate or self.GO_FORWARD_COORD_RATE
         
         rotz = self.get_rotz()
         xVal = math.cos(rotz)
         yVal = math.sin(rotz)
 
-        if not useSpeed:
-            target = coord_view
-            values = target.mem_value.values()
-            values[0] += xVal * jetPackSpeed
-            values[1] += yVal * jetPackSpeed
-        else:
-            # speed up
-            target = speed_view
-            values = target.mem_value.values()
-            speed_rate = getattr(self, 'SAFE_SPEED_RATE', 0.5)
-            safe_speed_up = getattr(self, 'SAFE_SPEED_UP', 0.2)
-            values[0] += xVal * speed_rate
-            values[1] += yVal * speed_rate
-            if not isInVehicle:
-                values[2] = safe_speed_up
-                self.raise_up(speed=safe_speed_up)
-                time.sleep(0.1)
+        entity = self.entity
+        coord = entity.coord.values()
+        coord[0] += xVal * rate
+        coord[1] += yVal * rate
         
-        target.mem_value = values
+        entity.coord = coord
+
+    def speed_up(self, _=None, rate=0):
+        """弹射起步"""
+        speed_rate = rate or getattr(self, 'SAFE_SPEED_RATE', 0.5)
+
+        rotz = self.get_rotz()
+        xVal = math.cos(rotz)
+        yVal = math.sin(rotz)
+
+        entity = self.entity
+        speed = entity.speed.values()
+        speed[0] += xVal * speed_rate
+        speed[1] += yVal * speed_rate
+
+        if not self.isInVehicle:
+            safe_speed_up = getattr(self, 'SAFE_SPEED_UP', 0.2)
+            speed[2] = safe_speed_up
+            self.raise_up(speed=safe_speed_up)
+            time.sleep(0.1)
+        entity.speed = speed
 
     def raise_up(self, _=None, speed=1.0):
         self.entity.speed[2] = speed
@@ -350,6 +349,43 @@ class BaseGTATool(BaseTool):
         if car:
             car.unlock_door()
 
+    def get_camera_rot(self):
+        rotz = self.get_rotz()
+        return (math.cos(rotz), math.sin(rotz), 0.1)
+
+    def collect_sling_balls(self):
+        self._sling_balls = self.get_near_vehicles(distance=60)
+
+    def sling(self, _=None, is_retry=False, force_recollect=False):
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+
+        sling_balls = None if force_recollect else getattr(self, '_sling_balls', None)
+        flag = False
+        if sling_balls:
+            try:
+                ball = next(sling_balls)
+                flag = True
+            except StopIteration:
+                if is_retry:
+                    # 大概是附近没有车了
+                    return
+
+        if not flag:
+            self.collect_sling_balls()
+            self.sling(is_retry=True)
+            return
+
+        coord_up = getattr(self, 'SLING_COORD_UP', 1)
+        coord = self.player.coord.values()
+        coord[0] += cam_x * 5
+        coord[1] += cam_y * 5
+        coord[2] += cam_z * 5 + coord_up
+        speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
+        speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
+        ball.stop()
+        ball.coord = coord
+        ball.speed = speed
+
     def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
@@ -420,9 +456,9 @@ class BaseGTATool(BaseTool):
 
     def get_common_hotkeys(self):
         return (
-            ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-            ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), lambda hotkeyId:self.jetPackTick(hotkeyId, detal=10)),
-            ('jetPackTickSpeed', MOD_ALT, getVK('m'), lambda hotkeyId:self.jetPackTick(hotkeyId, useSpeed=True)),
+            ('go_forward', MOD_ALT, getVK('w'), self.go_forward),
+            ('go_forward_large', MOD_ALT | MOD_SHIFT, getVK('w'), partial(self.go_forward, rate=10)),
+            ('speed_up', MOD_ALT, getVK('m'), self.speed_up),
             ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
             ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
             ('to_up', MOD_ALT, getVK('.'), self.to_up),
@@ -443,4 +479,6 @@ class BaseGTATool(BaseTool):
             ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
             ('lock_door', MOD_ALT, getVK('l'), self.lock_door),
             ('unlock_door', MOD_ALT | MOD_SHIFT, getVK('l'), self.unlock_door),
+            ('sling', MOD_ALT, getVK('d'), self.sling),
+            ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, force_recollect=True)),
         )

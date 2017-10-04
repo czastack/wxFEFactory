@@ -6,6 +6,7 @@ from lib import utils
 from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
+from ..gta_base.utils import degreeToRadian
 from . import address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from .models import Player, Vehicle
@@ -42,8 +43,10 @@ class Tool(BaseGTATool):
 
     SAFE_SPEED_RATE = 15
     SAFE_SPEED_UP = 6
-    jetPackSpeed = 3
+    GO_FORWARD_COORD_RATE = 3
     FLY_SPEED = 15
+    SLING_SPEED_RATE = 60
+    SLING_COORD_UP = 3
 
     def render(self):
         with self.render_win() as win:
@@ -88,7 +91,7 @@ class Tool(BaseGTATool):
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
-            for i in range(1, Player.WEAPON_SLOT):
+            for i in range(1, len(WEAPON_LIST)):
                 self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
@@ -141,30 +144,15 @@ class Tool(BaseGTATool):
             self.MODULE_BASE = self.handler.base - 0x400000
 
             if not self.win.hotkeys:
-                self.win.RegisterHotKeys((
-                    ('jetPackTick', MOD_ALT, getVK('w'), self.jetPackTick),
-                    ('jetPackTickLarge', MOD_ALT | MOD_SHIFT, getVK('w'), partial(self.jetPackTick, detal=4)),
-                    ('jetPackTickSpeed', MOD_ALT, getVK('m'), partial(self.jetPackTick, useSpeed=True)),
-                    ('raise_up', MOD_ALT, getVK(' '), self.raise_up),
-                    ('go_down', MOD_ALT | MOD_SHIFT, getVK(' '), self.go_down),
-                    ('to_up', MOD_ALT, getVK('.'), self.to_up),
-                    ('stop', MOD_ALT, getVK('x'), self.stop),
-                    ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
-                    ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
-                    # ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                    # ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                    # ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                    ('jump_on_vehicle', MOD_ALT, getVK('j'), self.jump_on_vehicle),
-                    ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
-                    ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
-                    ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
-                    ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
-                    ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), partial(self.near_vehicles_to_front, zinc=2)),
-                    ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), partial(self.near_persons_to_front, zinc=2.5)),
-                    ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
-                    ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
-                    ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
-                ))
+                self.win.RegisterHotKeys(
+                    (
+                        # ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+                        # ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                        ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
+                        ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
+                        ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
+                    ) + self.get_common_hotkeys()
+                )
             self.init_addr()
             self.init_remote_function()
         else:
@@ -433,3 +421,27 @@ class Tool(BaseGTATool):
             self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, 
                 self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(float)
+
+    def get_camera_rot_raw(self):
+        ctx = self.native_context
+        self.native_call('GET_ROOT_CAM', 'L', ctx.get_temp_addr())
+        cam = ctx.get_temp_value()
+        self.native_call('GET_CAM_ROT', 'L3L', cam, *ctx.get_temp_addrs(1, 3))
+        return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.normalFloat))
+
+    def get_camera_rot(self):
+        data = self.get_camera_rot_raw()
+        rotz = degreeToRadian(data[2]) + math.pi / 2
+        return (math.cos(rotz), math.sin(rotz), degreeToRadian(data[0]))
+
+    def get_camera_rotz(self):
+        data = self.get_camera_rot_raw()
+        return degreeToRadian(data[2])
+
+    def dir_correct(self, _=None):
+        rotz = self.get_camera_rotz()
+        if rotz < 0:
+            rotz += math.pi * 2
+        entity = self.entity
+        entity.coord[2] += 2
+        entity.rotation = rotz

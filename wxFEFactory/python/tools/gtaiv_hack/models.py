@@ -166,6 +166,10 @@ class NativeEntity(NativeModel):
     def rotation(self):
         return utils.degreeToRadian(self.heading)
 
+    @rotation.setter
+    def rotation(self, value):
+        self.heading = utils.radianToDegree(value)
+
     @property
     def direction(self):
         return utils.headingToDirection(self.heading)
@@ -176,7 +180,7 @@ class NativeEntity(NativeModel):
 
 class Player(NativeEntity):
     SIZE = 0xf00
-    WEAPON_SLOT = 8
+    WEAPON_SLOT = 13
 
     getter, getter_ptr, setter = NativeEntity.builders
 

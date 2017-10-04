@@ -1,3 +1,4 @@
+from functools import partial
 from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -27,7 +28,7 @@ class Tool(BaseGTATool):
     FUNCTION_REQUEST_MODEL = b'\x55\x8B\xEC\x51\xC7\x45\xFC\x10\xE3\x40\x00\x6A\x16\xFF\x75\x08\xFF\x55\xFC\x83\xC4\x08\x8B\xE5\x5D\xC3'
     FUNCTION_LOAD_REQUESTED_MODELS = b'\x55\x8B\xEC\x51\xC7\x45\xFC\xF0\xB5\x40\x00\x6A\x00\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
 
-    jetPackSpeed = 2.0
+    GO_FORWARD_COORD_RATE = 2.0
 
     def render(self):
         with self.render_win() as win:
@@ -139,7 +140,7 @@ class Tool(BaseGTATool):
                         ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                         ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                         ('re_cal_spheres', MOD_ALT, getVK(";"), self.re_cal_spheres),
-                        ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere),
+                        ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere)
                     ) + self.get_common_hotkeys()
                 )
             self.init_remote_function()
@@ -227,3 +228,11 @@ class Tool(BaseGTATool):
                 self.entity.coord = item.coord
                 break
             self._sphere_index += 1
+
+    def get_camera_rot(self):
+        rotz = self.camera_z_rot_view.mem_value
+        return (
+            -math.cos(rotz),
+            -math.sin(rotz),
+            self.camera_x_rot_view.mem_value
+        )

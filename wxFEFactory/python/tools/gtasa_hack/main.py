@@ -34,7 +34,8 @@ class Tool(BaseGTATool):
         b'\x89\x45\xFC\x58\x8B\x45\xFC\x8B\xE5\x5D\xC3'
     )
 
-    jetPackSpeed = 2.0
+    GO_FORWARD_COORD_RATE = 2.0
+    SLING_SPEED_RATE = 4
 
     def __init__(self):
         super().__init__()
@@ -240,13 +241,13 @@ class Tool(BaseGTATool):
         if self.isInVehicle:
             mycar = self.vehicle
             mycar.coord[2] += 0.05
-            self.handler.write(mycar.pos.addr, self.handler.read(address.CAM_Z_ADDR, bytes, 28), 0)
+            self.handler.write(mycar.pos.addr, self.handler.read(address.CAMERA, bytes, 28), 0)
             mycar.flip()
         else:
             PI = math.pi
             HALF_PI = PI / 2
-            cam_x = self.handler.readFloat(address.CAM_Z_ADDR)
-            cam_y = self.handler.readFloat(address.CAM_Z_ADDR + 4)
+            cam_x = self.handler.readFloat(address.CAMERA)
+            cam_y = self.handler.readFloat(address.CAMERA + 4)
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
             self.rot_view.mem_value = rot
 
@@ -324,7 +325,7 @@ class Tool(BaseGTATool):
 
     def turnAndJetPackTickSpeed(self, _=None):
         self.dir_correct()
-        self.jetPackTick(useSpeed=True)
+        self.speed_up()
 
     def get_weapon_prop(self, index):
         """武器熟练度"""
@@ -416,3 +417,10 @@ class Tool(BaseGTATool):
     @property
     def system_time(self):
         return self.handler.read32(address.SYSTEM_TIME)
+
+    def get_camera_rot(self):
+        return (
+            self.handler.readFloat(address.CAMERA + 0x10),
+            self.handler.readFloat(address.CAMERA + 0x14),
+            self.handler.readFloat(address.CAMERA + 0x18)
+        )
