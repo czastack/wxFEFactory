@@ -354,7 +354,7 @@ class BaseGTATool(BaseTool):
         return (math.cos(rotz), math.sin(rotz), 0.1)
 
     def collect_sling_balls(self):
-        self._sling_balls = self.get_near_vehicles(distance=60)
+        self._sling_balls = self.get_near_vehicles(distance=100)
 
     def sling(self, _=None, is_retry=False, force_recollect=False):
         cam_x, cam_y, cam_z = self.get_camera_rot()

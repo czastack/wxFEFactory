@@ -36,6 +36,7 @@ class MemVehicle(Entity):
     SIZE = 0x20d0
 
     hp = Field(0x200, float)
+    engine_hp = Field(0x10FC, float)
     roll = CoordField(0x04)
     dir = CoordField(0x14)
     numPassengers = Field(0x1c8, int, 1)

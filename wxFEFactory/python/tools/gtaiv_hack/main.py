@@ -161,7 +161,7 @@ class Tool(BaseGTATool):
     def get_addr(self, addr):
         return self.MODULE_BASE + addr
 
-    def rel_addr(self, addr):
+    def orig_addr(self, addr):
         return addr - self.MODULE_BASE
 
     def get_version(self):
@@ -321,7 +321,7 @@ class Tool(BaseGTATool):
         pool = self.vehicle_pool
         for i in range(pool.size):
             vehicle = pool[i]
-            if vehicle.hp > 1:
+            if vehicle.engine_hp > 1:
                 vehicle.index = i
                 yield vehicle
 
@@ -409,8 +409,8 @@ class Tool(BaseGTATool):
     def LoadEnvironmentNow(self, pos):
         self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
         self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-        self.native_call('LOAD_SCENE', '3f', *pos)
-        self.native_call('POPULATE_NOW', None)
+        # self.native_call('LOAD_SCENE', '3f', *pos)
+        # self.native_call('POPULATE_NOW', None)
 
     def GetGroundZ(self, pos, type=None):
         if type == 'highest' or type is None:
