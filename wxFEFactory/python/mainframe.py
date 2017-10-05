@@ -47,6 +47,7 @@ class MainFrame:
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
             with ui.Menu("视图"):
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
+                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggleConsolInputMulti)
             with ui.Menu("工具"):
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.openTool)
                 ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attachEmu, kind="check")
@@ -58,17 +59,18 @@ class MainFrame:
                 ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
-                with ui.Vertical(style=consoleStyle) as console:
-                    self.console_output = ui.TextInput(readonly=True, multiline=True, style=consoleOutputStyle)
-                    with ui.Horizontal(className="expand"):
+                with ui.Vertical(className="console-bar") as console:
+                    self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
+                    with ui.Horizontal(className="expand console-input-bar"):
                         self.console_input = ui.TextInput(exstyle=0x0400, className="expand console-input")
                         ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
-                    with ui.Horizontal(className="expand").show(False):
-                        self.console_input_multi = ui.TextInput(className="console-input console-input-multi", multiline=True)
-                        with ui.Vertical(className="expand"):
-                            ui.Button(label="∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
-                            ui.Button(label=">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码")
-                ui.AuiItem(console, name="console", direction="bottom", caption="控制台", maximizeButton=True)
+                with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
+                    self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
+                    with ui.Vertical(className="expand"):
+                        ui.Button(label="∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                        ui.Button(label=">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码 Ctrl+Enter")
+                ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
+                ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
             ui.StatusBar()
 
         with ui.ContextMenu(onselect=self.onselect) as cm:
@@ -164,11 +166,11 @@ class MainFrame:
     def clearRecentProject(self, m):
         pass
 
-    def toggleConsolInputMulti(self, btn):
+    def toggleConsolInputMulti(self, _=None):
         p1 = self.console_input.parent
-        p2 = self.console_input_multi.parent
-        p1.show(not p1.isShow())
-        p2.show(not p2.isShow())
+        isShow = not p1.isShow()
+        p1.show(isShow)
+        self.win.aui.showPane("multiline_console", not isShow)
         self.console.reLayout()
 
     def consolInputMultiRun(self, _=None):
@@ -281,28 +283,16 @@ winstyle = {
 }
 
 styles = {
-    'type': {
-
-    },
     'class': {
         'fill': {'flex': 1},
         'expand': {'expand': True},
-        'console-input': {
-            'expand': True,
-            'flex': 1,
-        },
-        'console-input-multi': {'height': 70},
-        'btn-sm': {'width': 30,}
+        'console-bar': {'height': 150},
+        'console-output': {'expand': True, 'flex': 1},
+        'console-input': {'expand': True, 'flex': 1},
+        'console-input-bar': {'showPadding': '1 0 0 0'},
+        'console-input-multi': {'height': 60},
+        'btn-sm': {'width': 30},
     }
-}
-
-consoleStyle = {
-    'height': 150,
-}
-consoleOutputStyle = {
-    'expand': True,
-    'flex': 1,
-    'showPadding': '0 0 1 0',
 }
 
 if __name__ == 'mainframe':
