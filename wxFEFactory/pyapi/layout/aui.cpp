@@ -65,6 +65,17 @@ void AuiManager::doAdd(View & child)
 			info.CaptionVisible(data.cast<bool>());
 		}
 
+		data = pyDictGet(item->m_kwargs, wxT("row"));
+		if (data != None)
+		{
+			info.Row(data.cast<int>());
+		}
+
+		if (pyDictGet(item->m_kwargs, wxT("hide"), false))
+		{
+			info.Hide();
+		}
+
 		m_mgr->AddPane(child, info);
 
 		py::cast(item).dec_ref();

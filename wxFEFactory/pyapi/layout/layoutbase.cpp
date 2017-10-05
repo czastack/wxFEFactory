@@ -303,8 +303,18 @@ void View::_handleEvent(wxEvent & event)
 pyobj Layout::__enter__() {
 	LAYOUTS.push_back(this);
 
-	Layout *parent = getParent();
 	tmp_styles_list = new wxVector<PyObject*>;
+	Layout *parent = getParent();
+
+	if (!parent)
+	{
+		void *data = m_elem->GetClientData();
+		if (data != this)
+		{
+			// 大概率当前是AuiManager
+			parent = (Layout *)data;
+		}
+	}
 
 	bool only_self = false; // 父元素的临时列表还没释放，本次只要检查自己的
 	if (parent && parent->tmp_styles_list)

@@ -53,9 +53,9 @@ public:
 		layout();
 	}
 
-	void showPane(wxcstr name)
+	void showPane(wxcstr name, bool show)
 	{
-		m_mgr->GetPane(name).Show();
+		m_mgr->GetPane(name).Show(show);
 		layout();
 	}
 

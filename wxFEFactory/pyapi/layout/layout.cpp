@@ -305,7 +305,7 @@ void init_layout(py::module &m)
 	// aui
 	py::class_t<AuiManager, Layout>(layout, "AuiManager")
 		.def(py::init<pyobj>(), key)
-		.def("showPane", &AuiManager::showPane)
+		.def("showPane", &AuiManager::showPane, "name"_a, "show"_a=true)
 		.def("hidePane", &AuiManager::hidePane)
 		.def("togglePane", &AuiManager::togglePane);
 
