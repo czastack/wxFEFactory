@@ -86,6 +86,11 @@ public:
 		
 	}
 
+	wxAuiNotebook& ctrl() const
+	{
+		return *(wxAuiNotebook*)m_elem;
+	}
+
 	void doAdd(View &child) override;
 
 	void closePage()
@@ -110,11 +115,6 @@ public:
 		else {
 			pyCall(m_children.attr("remove"), py::cast(getPage(event.GetSelection())));
 		}
-	}
-
-	wxAuiNotebook& ctrl()
-	{
-		return *(wxAuiNotebook*)m_elem;
 	}
 
 protected:

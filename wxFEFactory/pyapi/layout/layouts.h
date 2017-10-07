@@ -103,6 +103,11 @@ public:
 		m_onclose = None;
 	}
 
+	wxFrame& win() const
+	{
+		return *(wxFrame*)m_elem;
+	}
+
 	void setMenu(MenuBar &menubar)
 	{
 		win().SetMenuBar(menubar);
@@ -154,11 +159,6 @@ public:
 		}
 		m_elem->SetWindowStyle(style);
 	}
-protected:
-	wxFrame& win()
-	{
-		return *(wxFrame*)m_elem;
-	}
 };
 
 
@@ -194,8 +194,8 @@ public:
 
 		Window::onClose(event);
 	}
-protected:
 
+protected:
 	py::dict m_hotkey_map;
 };
 
@@ -210,6 +210,11 @@ public:
 			wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
 		m_onclose = None;
+	}
+
+	wxDialog& win() const
+	{
+		return *(wxDialog*)m_elem;
 	}
 
 	virtual ~Dialog()
@@ -227,11 +232,6 @@ public:
 		win().EndModal(wxID_OK);
 	}
 
-protected:
-	wxDialog& win()
-	{
-		return *(wxDialog*)m_elem;
-	}
 };
 
 
@@ -378,14 +378,15 @@ public:
 		ctrl().SetScrollRate(5, 5);
 	}
 
+	wxScrolledWindow& ctrl() const
+	{
+		return *(wxScrolledWindow*)m_elem;
+	}
+
 	void layout() override
 	{
 		m_elem->GetSizer()->FitInside(m_elem);
 		m_elem->Layout();
-	}
-	wxScrolledWindow& ctrl()
-	{
-		return *(wxScrolledWindow*)m_elem;
 	}
 };
 
@@ -399,16 +400,16 @@ public:
 		bindElem(new wxSplitterWindow(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
 
+	wxSplitterWindow& ctrl() const
+	{
+		return *(wxSplitterWindow*)m_elem;
+	}
+
 	void __exit__(py::args &args) override;
 
 	bool isHorizontal()
 	{
 		return m_horizontal;
-	}
-
-	wxSplitterWindow& ctrl()
-	{
-		return *(wxSplitterWindow*)m_elem;
 	}
 
 protected:
@@ -440,6 +441,11 @@ public:
 		bindElem(new wxNotebook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
 
+	wxNotebook& ctrl() const
+	{
+		return *(wxNotebook*)m_elem;
+	}
+
 	void doAdd(View &child) override;
 
 	size_t getPageCount() const {
@@ -467,11 +473,6 @@ public:
 	View* getPage(int n)
 	{
 		return (View*)ctrl().GetPage(n)->GetClientData();
-	}
-
-	wxNotebook& ctrl() const
-	{
-		return *(wxNotebook*)m_elem;
 	}
 };
 

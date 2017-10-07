@@ -3,14 +3,19 @@
 #include <wx/artprov.h>
 #include "layoutbase.h"
 
-class ToolBar : public Control
+class ToolBar : public Layout
 {
 public:
 	template <class... Args>
-	ToolBar(long direction, long exstyle/*=wxTB_TEXT*/, Args ...args) : Control(args...)
+	ToolBar(long direction, long exstyle/*=wxTB_TEXT*/, Args ...args) : Layout(args...)
 	{
 		bindElem(new wxToolBar(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), direction | exstyle));
 		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBar::onClick, this);
+	}
+
+	wxToolBar& ctrl() const
+	{
+		return *(wxToolBar*)m_elem;
 	}
 
 	ToolBar& addTool(wxcstr label, wxcstr shortHelp, wxcstr bitmap, pycref onclick, int toolid, wxcstr kind)
@@ -26,7 +31,20 @@ public:
 			bp.LoadFile(bitmap/*, wxBITMAP_TYPE_PNG*/);
 		}
 		wxToolBarToolBase *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
-		m_listeners[py::cast(tool->GetId())] = onclick;
+		if (onclick != None)
+		{
+			m_listeners[py::cast(tool->GetId())] = onclick;
+		}
+		return *this;
+	}
+
+	ToolBar& addControl(const View &view, wxcstr label, pycref onclick)
+	{
+		wxToolBarToolBase *tool = ctrl().AddControl((wxControl*)view.ptr(), label);
+		if (onclick != None)
+		{
+			m_listeners[py::cast(tool->GetId())] = onclick;
+		}
 		return *this;
 	}
 
@@ -60,9 +78,9 @@ public:
 		tool->SetLabel(label);
 	}
 
-	wxToolBar& ctrl()
+	void doAdd(View &child) override
 	{
-		return *(wxToolBar*)m_elem;
+		addControl(child, wxNoneString, None);
 	}
 
 protected:
@@ -86,6 +104,11 @@ public:
 		{
 			log_message("StatusBar must be child of Window");
 		}
+	}
+
+	wxStatusBar& ctrl() const
+	{
+		return *(wxStatusBar*)m_elem;
 	}
 
 	wxString getText(int n) const
@@ -128,9 +151,5 @@ public:
 	void pushStatusText(wxcstr text, int n)
 	{
 		ctrl().PushStatusText(text, n);
-	}
-	wxStatusBar& ctrl() const
-	{
-		return *(wxStatusBar*)m_elem;
 	}
 };

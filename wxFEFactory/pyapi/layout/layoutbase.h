@@ -67,6 +67,11 @@ public:
 		
 	}
 
+	wxWindow *ptr() const
+	{
+		return m_elem;
+	}
+
 	virtual void bindElem(wxWindow *pElem)
 	{
 		m_elem = pElem;
@@ -334,11 +339,6 @@ public:
 	void applyStyleSize()
 	{
 		m_elem->SetSize(getStyleSize());
-	}
-
-	wxWindow *ptr()
-	{
-		return m_elem;
 	}
 
 	friend void init_layout(py::module &m);

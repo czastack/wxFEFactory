@@ -20,6 +20,11 @@ public:
 		pg.Bind(wxEVT_PG_CHANGING, &PropertyGrid::OnChange, this);
 	}
 
+	wxPropertyGrid& ctrl() const
+	{
+		return *(wxPropertyGrid*)m_elem;
+	}
+
 	void OnChange(wxPropertyGridEvent &event);
 
 	template <typename EventTag>
@@ -170,11 +175,6 @@ public:
 		return wxNoneString;
 	}
 
-	wxPropertyGrid& ctrl()
-	{
-		return *(wxPropertyGrid*)m_elem;
-	}
-
 	friend void init_layout(py::module &m);
 
 protected:
@@ -195,6 +195,11 @@ public:
 		bindElem(new wxListView(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
 
+	wxListView& ctrl() const
+	{
+		return *(wxListView*)m_elem;
+	}
+
 	void appendColumns(py::iterable columns)
 	{
 		wxString text;
@@ -204,9 +209,4 @@ public:
 	}
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true);
-
-	wxListView& ctrl()
-	{
-		return *(wxListView*)m_elem;
-	}
 };

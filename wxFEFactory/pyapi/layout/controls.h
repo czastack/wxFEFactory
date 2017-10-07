@@ -19,14 +19,14 @@ public:
 		setOnClick(onclick);
 	}
 
+	wxButton& ctrl() const
+	{
+		return *(wxButton*)m_elem;
+	}
+
 	void setOnClick(pyobj &fn)
 	{
 		bindEvt(wxEVT_BUTTON, fn);
-	}
-
-	wxButton& ctrl()
-	{
-		return *(wxButton*)m_elem;
 	}
 };
 
@@ -50,6 +50,11 @@ public:
 			setChecked(true);
 		}
 		m_elem->Bind(wxEVT_CHECKBOX, &CheckBox::onChange, this);
+	}
+
+	wxCheckBox& ctrl() const
+	{
+		return *(wxCheckBox*)m_elem;
 	}
 
 	void trigger()
@@ -76,11 +81,6 @@ public:
 		}
 	}
 
-	wxCheckBox& ctrl()
-	{
-		return *(wxCheckBox*)m_elem;
-	}
-
 	friend void init_layout(py::module &m);
 
 protected:
@@ -97,12 +97,12 @@ public:
 		bindElem(new wxStaticText(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), getAlignStyle()));
 	}
 
-	long getAlignStyle();
-
-	wxStaticText& ctrl()
+	wxStaticText& ctrl() const
 	{
 		return *(wxStaticText*)m_elem;
 	}
+
+	long getAlignStyle();
 };
 
 
@@ -135,6 +135,11 @@ public:
 		}
 		style |= ((Text*)this)->getAlignStyle();
 		bindElem(new wxTextCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), style));
+	}
+
+	wxTextCtrl& ctrl() const
+	{
+		return *(wxTextCtrl*)m_elem;
 	}
 
 	void setValue(wxcstr value)
@@ -185,13 +190,6 @@ public:
 	{
 		ctrl().SelectAll();
 	}
-
-protected:
-
-	wxTextCtrl& ctrl()
-	{
-		return *(wxTextCtrl*)m_elem;
-	}
 };
 
 
@@ -213,6 +211,11 @@ public:
 		}
 	}
 
+	wxSearchCtrl& ctrl() const
+	{
+		return *(wxSearchCtrl*)m_elem;
+	}
+
 	void setValue(wxcstr value)
 	{
 		ctrl().SetValue(value);
@@ -232,11 +235,6 @@ public:
 	{
 		bindEvt(wxEVT_SEARCHCTRL_CANCEL_BTN, fn);
 	}
-
-	wxSearchCtrl& ctrl()
-	{
-		return *(wxSearchCtrl*)m_elem;
-	}
 };
 
 
@@ -248,6 +246,11 @@ public:
 	{
 		bindElem(new wxSpinCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), 
 			wxSP_ARROW_KEYS | wxALIGN_RIGHT, min, max, initial));
+	}
+
+	wxSpinCtrl& ctrl() const
+	{
+		return *(wxSpinCtrl*)m_elem;
 	}
 
 	void setValue(int value)
@@ -279,10 +282,6 @@ public:
 	{
 		return ctrl().GetMax();
 	}
-	wxSpinCtrl& ctrl() const
-	{
-		return *(wxSpinCtrl*)m_elem;
-	}
 };
 
 
@@ -293,6 +292,11 @@ public:
 		Control(className, style), m_onselect(onselect)
 	{
 
+	}
+
+	wxControlWithItems& ctrl() const
+	{
+		return *(wxControlWithItems*)m_elem;
 	}
 
 	void onSelect(wxCommandEvent & event)
@@ -434,11 +438,6 @@ public:
 		setSelection(pos + 1, handle);
 	}
 
-	wxControlWithItems& ctrl()
-	{
-		return *(wxControlWithItems*)m_elem;
-	}
-
 	friend void init_layout(py::module &m);
 
 protected:
@@ -501,13 +500,14 @@ public:
 		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
 	}
 
+	wxListBox& ctrl() const
+	{
+		return *(wxListBox*)m_elem;
+	}
+
 	void triggerSelectEvent() override
 	{
 		addPendingEvent(wxEVT_LISTBOX);
-	}
-	wxListBox& ctrl()
-	{
-		return *(wxListBox*)m_elem;
 	}
 };
 
@@ -522,6 +522,11 @@ public:
 	{
 		bindElem(new wxCheckListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
 		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+	}
+
+	wxCheckListBox& ctrl() const
+	{
+		return *(wxCheckListBox*)m_elem;
 	}
 
 	pyobj getCheckedItems()
@@ -560,11 +565,6 @@ public:
 			el.Check(i, !el.IsChecked(i));
 		}
 	}
-
-	wxCheckListBox& ctrl()
-	{
-		return *(wxCheckListBox*)m_elem;
-	}
 };
 
 
@@ -580,6 +580,11 @@ public:
 		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
 	}
 
+	wxRearrangeList& ctrl() const
+	{
+		return *(wxRearrangeList*)m_elem;
+	}
+
 	void moveUp()
 	{
 		ctrl().MoveCurrentUp();
@@ -588,10 +593,6 @@ public:
 	void moveDown()
 	{
 		ctrl().MoveCurrentDown();
-	}
-	wxRearrangeList& ctrl()
-	{
-		return *(wxRearrangeList*)m_elem;
 	}
 };
 
@@ -642,6 +643,11 @@ public:
 		}
 	}
 
+	wxComboBox& ctrl() const
+	{
+		return *(wxComboBox*)m_elem;
+	}
+
 	void triggerSelectEvent() override
 	{
 		addPendingEvent(wxEVT_COMBOBOX);
@@ -667,11 +673,6 @@ public:
 	{
 		bindEvt(wxEVT_TEXT, fn);
 	}*/
-
-	wxComboBox& ctrl()
-	{
-		return *(wxComboBox*)m_elem;
-	}
 };
 
 
@@ -684,6 +685,11 @@ public:
 	{
 		bindElem(new wxRadioBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
 		m_elem->Bind(wxEVT_RADIOBOX, &ComboBox::onSelect, this);
+	}
+
+	wxRadioBox& ctrl() const
+	{
+		return *(wxRadioBox*)m_elem;
 	}
 
 	int getCount() override
@@ -716,11 +722,6 @@ public:
 		addPendingEvent(wxEVT_RADIOBOX);
 	}
 
-	wxRadioBox& ctrl()
-	{
-		return *(wxRadioBox*)m_elem;
-	}
-
 protected:
 
 	void applyStyle() override;
@@ -748,6 +749,11 @@ public:
 		bindElem(new wxFilePickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wildcard, wxDefaultPosition, getStyleSize(), exstyle));
 	}
 
+	wxFilePickerCtrl& ctrl() const
+	{
+		return *(wxFilePickerCtrl*)m_elem;
+	}
+
 	wxString getPath()
 	{
 		return ctrl().GetPath();
@@ -762,11 +768,6 @@ public:
 	{
 		bindEvt(wxEVT_FILEPICKER_CHANGED, fn);
 	}
-
-	wxFilePickerCtrl& ctrl()
-	{
-		return *(wxFilePickerCtrl*)m_elem;
-	}
 };
 
 
@@ -777,6 +778,11 @@ public:
 	DirPickerCtrl(wxcstr path, wxcstr msg, long exstyle, Args ...args) : Control(args...)
 	{
 		bindElem(new wxDirPickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wxDefaultPosition, getStyleSize(), exstyle));
+	}
+
+	wxDirPickerCtrl& ctrl() const
+	{
+		return *(wxDirPickerCtrl*)m_elem;
 	}
 
 	wxString getPath()
@@ -792,10 +798,5 @@ public:
 	void setOnChange(pycref fn)
 	{
 		bindEvt(wxEVT_DIRPICKER_CHANGED, fn);
-	}
-
-	wxDirPickerCtrl& ctrl()
-	{
-		return *(wxDirPickerCtrl*)m_elem;
 	}
 };

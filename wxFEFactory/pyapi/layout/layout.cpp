@@ -318,10 +318,11 @@ void init_layout(py::module &m)
 
 	// bars
 
-	py::class_t<ToolBar, Control>(layout, "ToolBar")
-		.def_init(py::init<long, long, pyobj, pyobj>(), "direction"_a=(long)wxHORIZONTAL, "exstyle"_a=(long)wxTB_TEXT, className, style)
+	py::class_t<ToolBar, Layout>(layout, "ToolBar")
+		.def_init(py::init<long, long, pyobj, pyobj, pyobj>(), "direction"_a=(long)wxHORIZONTAL, "exstyle"_a=(long)wxTB_TEXT, styles, className, style)
 		.def("addTool", &ToolBar::addTool, 
-			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=wxEmptyString, "onclick"_a, "toolid"_a=-1, "kind"_a=wxEmptyString)
+			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=wxEmptyString, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
+		.def("addControl", &ToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
 		.def("addSeparator", &ToolBar::addSeparator)
 		.def("realize", &ToolBar::realize);
 

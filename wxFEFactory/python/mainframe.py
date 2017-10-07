@@ -57,8 +57,12 @@ class MainFrame:
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager() as aui:
                 # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
+                # with ui.ToolBar() as toolbar:
+                #     ui.Text("测试")
+                # ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
-                ui.AuiItem(ui.AuiNotebook(), direction="center", maximizeButton=True, captionVisible=False)
+                self.book = ui.AuiNotebook()
+                ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(className="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):

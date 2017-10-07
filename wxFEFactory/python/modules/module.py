@@ -1,4 +1,4 @@
-from mainframe import win, ui
+from mainframe import frame, win, ui
 from application import app
 from lib.lazy import lazyclassmethod
 from lib.basescene import BaseScene
@@ -15,7 +15,7 @@ class BaseModule(BaseScene):
 
     def attach(self):
         """模块加载完毕后调用，用于添加视图到主窗口"""
-        with win.book:
+        with frame.book:
             self.view = self.render()
         with win.menubar:
             self.menu = self.getMenu()
