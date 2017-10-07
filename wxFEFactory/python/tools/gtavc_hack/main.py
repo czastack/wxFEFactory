@@ -30,18 +30,6 @@ class Tool(BaseGTATool):
 
     GO_FORWARD_COORD_RATE = 2.0
 
-    def render(self):
-        with self.render_win() as win:
-            with ui.Vertical():
-                with ui.Horizontal(className="expand container"):
-                    ui.Button("检测", className="vcenter", onclick=self.checkAttach)
-                    self.attach_status_view = ui.Text("", className="label_left grow")
-                    ui.CheckBox("保持最前", onchange=self.swithKeeptop)
-                with ui.Notebook(className="fill"):
-                    self.render_main()
-
-        win.setOnClose(self.onClose)
-
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
             self.hp_view = ModelInputWidget("hp", "生命")

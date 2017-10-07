@@ -1,4 +1,52 @@
+VERSION_101 = 0x831F7518
+VERSION_102 = 0xC483FFE4
+VERSION_103 = 0x280F0000
+VERSION_104 = 0x110FF300
+VERSION_105 = 0xf3385058
+VERSION_106 = 0x00a42494
+VERSION_106J = 0xda280f30
+VERSION_107 = 0x1006e857
+VERSION_EFLC1 = 0x0f14247c
+VERSION_EFLC2 = 0x0d5c0ff3
+VERSION_EFLC1R = 0x41110ff3
+VERSION_RFG = 0x108b1874
+VERSION_DR2 = 0x1B10044
+
 VERSION = 0x608C34
+
+VERSION_DEPEND = {
+    VERSION_104: {
+        'PED_POOL'             : 0x0175B77C,
+        'VEHICLE_POOL'         : 0x011F4F30,
+        'OBJECT_POOL'          : 0x011FADD8,
+        'LOCAL_PLAYER_ID'      : 0x00EA68A8,
+        'PLAYER_INFO_ARRAY'    : 0x01033058,
+        'FindNativeAddress'    : 0x00617280,
+        'SetMoveSpeed'         : 0, # TODO
+        'LoadWorldAtPosition'  : 0, # TODO
+        'CurrentWantedLevel'   : 0, # TODO
+        'CClock__Hour'         : 0, # TODO
+    },
+    VERSION_107: {
+        'PED_POOL'             : 0x18A82AC,
+        'VEHICLE_POOL'         : 0x1619240,
+        'OBJECT_POOL'          : 0x1350CE0,
+        'LOCAL_PLAYER_ID'      : 0xF1CC68,
+        'PLAYER_INFO_ARRAY'    : 0x11A7008,
+        'FindNativeAddress'    : 0x5A76D0,
+        'SetMoveSpeed'         : 0xA47750,
+        'GetMoveSpeed'         : 0xA477F0,
+        'LoadWorldAtPosition'  : 0xB2BBA0,
+        'CurrentWantedLevel'   : 0x118F0DC,
+        'SetTimeOfDay'         : 0x821200,
+        'TimeOfDay'            : 0x11E8F0C,
+        'CClock__Hour'         : 0x11D5300,
+        'CClock__Minute'       : 0x11D52FC,
+        'CClock__LockedHour'   : 0x11D5308,
+        'CClock__LockedMinute' : 0x11D52F0,
+        'CClock__DayOfWeek'    : 0x11D5310,
+    }
+}
 
 NATIVE_ADDRS = {
     'GET_CAR_LIVERY': 0xb82010,

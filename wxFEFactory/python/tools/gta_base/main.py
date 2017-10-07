@@ -12,10 +12,10 @@ import fefactory_api
 ui = fefactory_api.ui
 
 win_style = {
-    # 'width': 680,
-    # 'height': 920,
-    'width': 640,
-    'height': 700,
+    'width': 680,
+    'height': 800,
+    # 'width': 640,
+    # 'height': 700,
 }
 
 
@@ -27,6 +27,18 @@ class BaseGTATool(BaseTool):
     def attach(self):
         self.render()
         self.checkAttach()
+
+    def render(self):
+        with self.render_win() as win:
+            with ui.Vertical():
+                with ui.Horizontal(className="expand container"):
+                    ui.Button("检测", className="vcenter", onclick=self.checkAttach)
+                    self.attach_status_view = ui.Text("", className="label_left grow")
+                    ui.CheckBox("保持最前", onchange=self.swithKeeptop)
+                with ui.Notebook(className="fill"):
+                    self.render_main()
+
+        win.setOnClose(self.onClose)
 
     def render_win(self):
         menubar = self.render_menu()
@@ -137,6 +149,7 @@ class BaseGTATool(BaseTool):
             self.vehicle_hp_view.mem_value = 2000
         else:
             self.hp_view.mem_value = 200
+            self.ap_view.mem_value = 200
 
     def restore_hp_large(self, _=None):
         if self.isInVehicle:
@@ -172,6 +185,10 @@ class BaseGTATool(BaseTool):
         coord[1] += yVal * 5
         return coord
 
+    def get_camera_rot(self):
+        rotz = self.get_rotz()
+        return (math.cos(rotz), math.sin(rotz), 0.1)
+
     def get_persons(self):
         pool = Pool(self.address.PED_POOL, self.handler, self.Player)
         return iter(pool)
@@ -196,6 +213,27 @@ class BaseGTATool(BaseTool):
         for v in self.get_vehicles():
             if v.coord[2] > 0 and v.distance(coord) <= distance and v.addr != myaddr:
                 yield v
+
+    def collect_vehicles(self):
+        self._vehicles = self.get_near_vehicles(distance=100)
+
+    def next_collected_vehicle(self, is_retry=False, recollect=False):
+        vehicles = None if recollect else getattr(self, '_vehicles', None)
+        flag = False
+        if vehicles:
+            try:
+                vehicle = next(vehicles)
+                flag = True
+            except StopIteration:
+                if is_retry:
+                    # 大概是附近没有车了
+                    return
+
+        if not flag:
+            self.collect_vehicles()
+            return self.next_collected_vehicle(is_retry=True)
+
+        return vehicle
 
     def kill_near_persons(self, _=None):
         """杀死附近的人"""
@@ -245,6 +283,11 @@ class BaseGTATool(BaseTool):
         for v in self.get_near_vehicles():
             v.flip()
 
+    def near_vehicle_unlock(self, _=None):
+        """附近的载具解锁"""
+        for v in self.get_near_vehicles():
+            v.unlock_door()
+
     def near_persons_fly(self, _=None):
         """附近的人上天"""
         fly_speed = getattr(self, 'FLY_SPEED', 1)
@@ -280,6 +323,21 @@ class BaseGTATool(BaseTool):
             coord = car.coord.values()
             coord[2] += 5
             self.player.coord = coord
+
+    def bring_one_vehicle(self, _=None):
+        """ 把一辆车移到眼前 """
+        vehicle = self.next_collected_vehicle()
+        
+        if not vehicle:
+            return
+
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        coord = self.player.coord.values()
+        coord[0] += cam_x * 5
+        coord[1] += cam_y * 5
+        coord[2] += cam_z * 5
+        vehicle.stop()
+        vehicle.coord = coord
 
     #----------------------------------------------------------------------
     # MARKER
@@ -349,32 +407,14 @@ class BaseGTATool(BaseTool):
         if car:
             car.unlock_door()
 
-    def get_camera_rot(self):
-        rotz = self.get_rotz()
-        return (math.cos(rotz), math.sin(rotz), 0.1)
-
-    def collect_sling_balls(self):
-        self._sling_balls = self.get_near_vehicles(distance=100)
-
-    def sling(self, _=None, is_retry=False, force_recollect=False):
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-
-        sling_balls = None if force_recollect else getattr(self, '_sling_balls', None)
-        flag = False
-        if sling_balls:
-            try:
-                ball = next(sling_balls)
-                flag = True
-            except StopIteration:
-                if is_retry:
-                    # 大概是附近没有车了
-                    return
-
-        if not flag:
-            self.collect_sling_balls()
-            self.sling(is_retry=True)
+    def sling(self, _=None, recollect=False):
+        """投石器"""
+        vehicle = self.next_collected_vehicle(recollect=recollect)
+        
+        if not vehicle:
             return
 
+        cam_x, cam_y, cam_z = self.get_camera_rot()
         coord_up = getattr(self, 'SLING_COORD_UP', 1)
         coord = self.player.coord.values()
         coord[0] += cam_x * 5
@@ -382,9 +422,9 @@ class BaseGTATool(BaseTool):
         coord[2] += cam_z * 5 + coord_up
         speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
         speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
-        ball.stop()
-        ball.coord = coord
-        ball.speed = speed
+        vehicle.stop()
+        vehicle.coord = coord
+        vehicle.speed = speed
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
@@ -429,6 +469,7 @@ class BaseGTATool(BaseTool):
         ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
         ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
         ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
+        ui.Button("附近的载具解锁", onclick=self.near_vehicle_unlock)
 
     def render_common_text(self):
         ui.Text("向前穿墙: alt+w")
@@ -480,5 +521,6 @@ class BaseGTATool(BaseTool):
             ('lock_door', MOD_ALT, getVK('l'), self.lock_door),
             ('unlock_door', MOD_ALT | MOD_SHIFT, getVK('l'), self.unlock_door),
             ('sling', MOD_ALT, getVK('d'), self.sling),
-            ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, force_recollect=True)),
+            ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, recollect=True)),
+            ('bring_one_vehicle', MOD_ALT, getVK('b'), self.bring_one_vehicle),
         )

@@ -20,21 +20,6 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-VERSION_101 = 0x831F7518
-VERSION_102 = 0xC483FFE4
-VERSION_103 = 0x280F0000
-VERSION_104 = 0x110FF300
-VERSION_105 = 0xf3385058
-VERSION_106 = 0x00a42494
-VERSION_106J = 0xda280f30
-VERSION_107 = 0x1006e857
-VERSION_EFLC1 = 0x0f14247c
-VERSION_EFLC2 = 0x0d5c0ff3
-VERSION_EFLC1R = 0x41110ff3
-VERSION_RFG = 0x108b1874
-VERSION_DR2 = 0x1B10044
-
-
 class Tool(BaseGTATool):
     address = address
     models = models
@@ -47,18 +32,6 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_SPEED_RATE = 60
     SLING_COORD_UP = 3
-
-    def render(self):
-        with self.render_win() as win:
-            with ui.Vertical():
-                with ui.Horizontal(className="expand container"):
-                    ui.Button("检测", className="vcenter", onclick=self.checkAttach)
-                    self.attach_status_view = ui.Text("", className="label_left grow")
-                    ui.CheckBox("保持最前", onchange=self.swithKeeptop)
-                with ui.Notebook(className="fill"):
-                    self.render_main()
-
-        win.setOnClose(self.onClose)
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -76,6 +49,7 @@ class Tool(BaseGTATool):
                 ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
                 ui.Button(label="可以切换武器", onclick=self.set_ped_block_switch_weapons)
                 ui.Button(label="不会被拽出车", onclick=self.set_ped_can_be_dragged_out_of_vehicle)
+                ui.Button(label="摩托车老司机", onclick=self.set_ped_keep_bike)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
@@ -96,8 +70,11 @@ class Tool(BaseGTATool):
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        # with Group("global", "全局", 0, handler=self.handler):
-        #     self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
+        with Group("global", "全局", self, handler=self.handler):
+            ModelInputWidget("game_hour", "当前小时")
+            ModelInputWidget("game_minute", "当前分钟")
+            ModelInputWidget("game_week", "当前星期")
+            # self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
             
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
@@ -116,6 +93,7 @@ class Tool(BaseGTATool):
                     ui.Text("恢复HP: alt+h")
                     ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
+
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
@@ -155,6 +133,8 @@ class Tool(BaseGTATool):
                 )
             self.init_addr()
             self.init_remote_function()
+
+            self.patch()
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
@@ -169,30 +149,25 @@ class Tool(BaseGTATool):
 
     def init_addr(self):
         version = self.get_version()
-        if version == VERSION_104:
-            address.PED_POOL     = self.get_addr(0x0175B77C)
-            address.VEHICLE_POOL = self.get_addr(0x011F4F30)
-            address.OBJECT_POOL  = self.get_addr(0x011FADD8)
-            address.LOCAL_PLAYER_ID  = self.get_addr(0xEA68A8)
-            address.PLAYER_INFO_ARRAY  = self.get_addr(0x1033058)
-            # address.FindNativeAddress = self.get_addr(0x617280)
-            address.SetMoveSpeed = 0 # TODO
-        elif version == VERSION_107:
-            address.PED_POOL     = self.get_addr(0x18A82AC)
-            address.VEHICLE_POOL = self.get_addr(0x1619240)
-            address.OBJECT_POOL  = self.get_addr(0x1350CE0)
-            address.LOCAL_PLAYER_ID  = self.get_addr(0xF1CC68)
-            address.PLAYER_INFO_ARRAY  = self.get_addr(0x11A7008)
-            # address.FindNativeAddress = self.get_addr(0x5A76D0)
-            address.SetMoveSpeed = self.get_addr(0xA47750)
-            address.GetMoveSpeed = self.get_addr(0xA477F0)
-
+        version_depend = address.VERSION_DEPEND.get(version, None)
+        if version_depend:
+            for name in version_depend:
+                addr = version_depend[name]
+                setattr(address, name, self.get_addr(addr) if addr else 0)
+        
+        if address.SetMoveSpeed:
             SPEED_FUNC = (
                 b'\x55\x8B\xEC\x83\xEC\x08\x8B\x4D\x08\xC7\x45\xF8',
                 b'\x8B\x41\x60\x89\x45\xFC\x8D\x41\x64\x89\x45\x08\xFF\x75\x08\x8B\x4D\xFC\xFF\x55\xF8\x8B\xE5\x5D\xC3'
             )
             self.FUNCTION_SET_SPEED = utils.u32bytes(address.SetMoveSpeed).join(SPEED_FUNC)
             self.FUNCTION_GET_SPEED = utils.u32bytes(address.GetMoveSpeed).join(SPEED_FUNC)
+
+        # if address.LoadWorldAtPosition:
+        #     self.FUNC_LOAD_WORLD_AT_POSITION = (
+        #         b'\x55\x8B\xEC\x51\x83\x45\x08\x60\xC7\x45\xFC' + utils.u32bytes(address.LoadWorldAtPosition) +
+        #         b'\xFF\x75\x08\xB9' + utils.u32bytes(0x11DC444) + b'\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
+        #     )
 
         # self.FUNCTION_FIND_NATIVE_ADDRESS = (
         #     b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) + 
@@ -207,6 +182,9 @@ class Tool(BaseGTATool):
         if address.SetMoveSpeed:
             self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
             self.GetMoveSpeed = self.handler.write_function(self.FUNCTION_GET_SPEED)
+
+        # if address.LoadWorldAtPosition:
+        #     self.LoadWorldAtPosition = self.handler.write_function(self.FUNC_LOAD_WORLD_AT_POSITION)
 
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(NativeContext.SIZE)
@@ -385,14 +363,17 @@ class Tool(BaseGTATool):
             if v.has_ammo:
                 v.ammo_view.value = 9999
 
-    def set_ped_invincible(self, _=None):
-        self.player.invincible = True
+    def set_ped_invincible(self, _=None, value=True):
+        self.player.invincible = value
 
     def set_ped_block_switch_weapons(self, _=None):
         self.player.block_switch_weapons = False
 
     def set_ped_can_be_dragged_out_of_vehicle(self, _=None):
         self.player.can_be_dragged_out_of_vehicle = False
+
+    def set_ped_keep_bike(self, _=None, value=True):
+        self.player.keep_bike = value
 
     def restore_hp(self, _=None):
         super().restore_hp()
@@ -407,10 +388,15 @@ class Tool(BaseGTATool):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
     def LoadEnvironmentNow(self, pos):
-        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+        # self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+        # self.native_call('LOAD_ALL_OBJECTS_NOW', None)
         # self.native_call('LOAD_SCENE', '3f', *pos)
         # self.native_call('POPULATE_NOW', None)
+        # ctx = self.native_context
+        # with ctx:
+        #     ctx.push('3f', *pos)
+        #     self.handler.remote_call(self.LoadWorldAtPosition, ctx.addr)
+        pass
 
     def GetGroundZ(self, pos, type=None):
         if type == 'highest' or type is None:
@@ -445,3 +431,101 @@ class Tool(BaseGTATool):
         entity = self.entity
         entity.coord[2] += 2
         entity.rotation = rotz
+
+    @property
+    def game_hour(self):
+        """当前小时"""
+        return self.handler.read32(address.CClock__Hour)
+
+    @game_hour.setter
+    def game_hour(self, value):
+        return self.handler.write32(address.CClock__Hour, int(value))
+
+    @property
+    def game_minute(self):
+        """当前分钟"""
+        return self.handler.read32(address.CClock__Minute)
+
+    @game_minute.setter
+    def game_minute(self, value):
+        return self.handler.write32(address.CClock__Minute, int(value))
+
+    @property
+    def game_week(self):
+        """当前星期"""
+        return self.handler.read32(address.CClock__DayOfWeek)
+
+    @game_week.setter
+    def game_week(self, value):
+        return self.handler.write32(address.CClock__DayOfWeek, int(value))
+
+    def patch(self):
+        pass
+        # X86_RETN = 0xC3
+        # X86_JMP  = 0xE9
+        # X86_CALL = 0xE8
+        # X86_NOP  = b'\x90'
+
+        # h = self.handler
+        # # Don't initialize error reporting
+        # h.write8(self.get_addr(0xD356D0), X86_RETN)
+        # # Certificates check (RETN 8)
+        # h.write32(self.get_addr(0x403F10), 0x900008C2)
+
+        # # xor eax, eax - address of the RGSC object
+        # # h.write32(self.get_addr(0x40262D), 0x4AE9C033)
+
+        # # Skip RGSC connect and EFC checks (jmp 40289E)
+        # # h.write32(self.get_addr(0x402631), 0x90000002)
+
+        # # NOP; MOV [g_rgsc], eax
+        # # h.write16(self.get_addr(0x402883), 0xA390)
+
+        # # Disable VDS102 error
+        # # h.write(self.get_addr(0x4028ED), X86_NOP * 42)
+
+        # # Last RGSC init check (NOP*6)
+        # # h.write(self.get_addr(0x40291D), X86_NOP * 6)
+
+        # # Skip missing tests
+        # h.write(self.get_addr(0x402B12), X86_NOP * 14)
+        # h.write(self.get_addr(0x402D17), X86_NOP * 14)
+
+        # h.write32(self.get_addr(0x403870), 0x090CC033) # xor eax, eax; retn
+        # h.write32(self.get_addr(0x404250), 0x090CC033) # xor eax, eax; retn
+
+        # # Disable securom spot checks (mov al, 1; retn)
+        # h.write32(self.get_addr(0xBAC160), 0x90C301B0)
+        # h.write32(self.get_addr(0xBAC180), 0x90C301B0)
+        # h.write32(self.get_addr(0xBAC190), 0x90C301B0)
+        # h.write32(self.get_addr(0xBAC1C0), 0x90C301B0)
+
+        # def installDetour(dwAddress, dwDetourAddress, byteType, iSize=5):
+        #     pbyteTrampoline = h.alloc_memory(iSize + 5)
+        #     h.write(pbyteTrampoline, h.read(dwAddress, bytes, iSize))
+        #     dwTrampoline = pbyteTrampoline
+        #     h.write8(pbyteTrampoline, byteType)
+        #     h.write32(pbyteTrampoline + 1, dwAddress + iSize - dwTrampoline - 5)
+
+        #     h.write8(dwAddress, byteType)
+        #     h.write32(dwAddress + 1, dwDetourAddress - dwAddress - 5)
+        #     return pbyteTrampoline
+
+        # # This disables some calculate for modelinfo but it seems this is not necessary
+        # # Maybe we can disable this patch
+        # # installDetour(self.get_addr(0xCBA1F0), self.get_addr(0xCBA230), X86_JMP)
+
+        # # This needs to be disabled due to some crashes and to enable the blocked vehicles such as uranus, hellfury, etc.
+        # # INFO: crash occure exactly when accessing dword_13BEEE0 this is related to ZonesNames, but disabling this function dont destroy anything
+        # # TODO: find what this function does
+        # # this function checks some flags in modelInfos and loading some models they seems to be not needed
+        # # This seems to be associated to loading models but they are not used!?
+        # h.write8(self.get_addr(0x8F2F40), X86_RETN)
+            
+        # pScriptThread = h.alloc_memory(176)
+        # ScrVM__ThreadPool = self.get_addr(0x1983310)
+        # h.write16(ScrVM__ThreadPool + 4, 0) # usCount
+        # h.write16(ScrVM__ThreadPool + 6, 0) # usSize
+
+        # ScrVM__ActiveThread = self.get_addr(0x1849AE0)
+        # h.write32(ScrVM__ActiveThread, pScriptThread)
