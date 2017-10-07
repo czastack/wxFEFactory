@@ -55,10 +55,10 @@ class MainFrame:
                 pass
 
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
-            with ui.AuiManager(key="aui"):
-                ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
+            with ui.AuiManager() as aui:
+                # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
-                ui.AuiItem(ui.AuiNotebook(key="book"), direction="center", maximizeButton=True, captionVisible=False)
+                ui.AuiItem(ui.AuiNotebook(), direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(className="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
@@ -72,13 +72,10 @@ class MainFrame:
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
                 ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
             ui.StatusBar()
-
-        with ui.ContextMenu(onselect=self.onselect) as cm:
-            ui.MenuItem("测试")
         
         self.win = win
+        self.aui = aui
         self.console = console
-        win.book.setContextMenu(cm)
         fefactory_api.setConsoleElem(self.console_input, self.console_output)
         self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
@@ -121,7 +118,7 @@ class MainFrame:
 
     def toggleConsole(self, m):
         """显示/隐藏控制台"""
-        self.win.aui.togglePane("console")
+        self.aui.togglePane("console")
 
     def onselect(self, *args):
         print(args)
@@ -170,14 +167,17 @@ class MainFrame:
         p1 = self.console_input.parent
         isShow = not p1.isShow()
         p1.show(isShow)
-        self.win.aui.showPane("multiline_console", not isShow)
+        self.aui.showPane("multiline_console", not isShow)
         self.console.reLayout()
 
     def consolInputMultiRun(self, _=None):
         try:
             exec(self.console_input_multi.value, vars(__main__))
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            if isinstance(e, SystemExit):
+                raise
+            else:
+                traceback.print_exc()
 
     def onConsoleFileDrop(self, files):
         # scope = __main__.__dict__

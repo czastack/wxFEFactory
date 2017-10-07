@@ -289,8 +289,8 @@ public:
 class BaseControlWithItems : public Control
 {
 public:
-	BaseControlWithItems(pycref onselect, pycref key, pycref className, pycref style) :
-		Control(key, className, style), m_onselect(onselect)
+	BaseControlWithItems(pycref onselect, pycref className, pycref style) :
+		Control(className, style), m_onselect(onselect)
 	{
 
 	}

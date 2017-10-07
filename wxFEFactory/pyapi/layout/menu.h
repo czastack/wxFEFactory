@@ -34,11 +34,6 @@ public:
 		MENUS.pop_back();
 	}
 
-	/*pyobj __getattr__(pyobj key)
-	{
-	return pyDictGet(m_named_children, key);
-	}*/
-
 	pyobj getMenu(int id)
 	{
 		return pyDictGet(*getHandlers(), py::cast(id));
@@ -126,14 +121,14 @@ private:
 class MenuBar : public MenuHolder
 {
 public:
-	MenuBar(pycref onselect) : m_ptr(new wxMenuBar(0)), m_onselect(onselect)
+	MenuBar(pycref onselect) : m_elem(new wxMenuBar(0)), m_onselect(onselect)
 	{
-		m_ptr->SetClientData(this);
+		m_elem->SetClientData(this);
 	}
 
 	void append(wxMenu *menu, wxcstr text, wxcstr helpStr) override
 	{
-		m_ptr->Append(menu, text);
+		m_elem->Append(menu, text);
 	}
 
 	wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kind) override
@@ -151,13 +146,33 @@ public:
 
 	bool onSelect(int id);
 
+	void setForeground(uint rgb)
+	{
+		m_elem->SetForegroundColour(wxColor(rgb));
+	}
+
+	uint getForeground()
+	{
+		return m_elem->GetForegroundColour().GetRGB();
+	}
+
+	void setBackground(uint rgb)
+	{
+		m_elem->SetBackgroundColour(wxColor(rgb));
+	}
+
+	uint getBackground()
+	{
+		return m_elem->GetBackgroundColour().GetRGB();
+	}
+
 	operator wxMenuBar*()
 	{
-		return m_ptr;
+		return m_elem;
 	}
 
 protected:
-	wxMenuBar *m_ptr;
+	wxMenuBar *m_elem;
 	py::dict m_handlers;
 	pyobj m_onselect;
 };

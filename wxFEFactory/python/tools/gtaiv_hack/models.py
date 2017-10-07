@@ -404,7 +404,7 @@ class Player(NativeEntity):
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
-        self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
+        # self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略

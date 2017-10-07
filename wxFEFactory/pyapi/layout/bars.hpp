@@ -7,19 +7,23 @@ class ToolBar : public Control
 {
 public:
 	template <class... Args>
-	ToolBar(Args ...args) : Control(args...)
+	ToolBar(long direction, long exstyle/*=wxTB_TEXT*/, Args ...args) : Control(args...)
 	{
-		bindElem(new wxToolBar(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxTB_DEFAULT_STYLE | wxTB_TEXT));
+		bindElem(new wxToolBar(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), direction | exstyle));
 		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBar::onClick, this);
 	}
 
 	ToolBar& addTool(wxcstr label, wxcstr shortHelp, wxcstr bitmap, pycref onclick, int toolid, wxcstr kind)
 	{
-		wxBitmap bp = wxArtProvider::GetBitmap(wxART_GO_BACK, wxART_TOOLBAR);
+		wxBitmap bp;
 
-		if (!bitmap.IsEmpty())
+		if (bitmap.IsEmpty())
 		{
-			bp.LoadFile(bitmap, wxBITMAP_TYPE_PNG);
+			bp = wxNullBitmap;
+		}
+		else
+		{
+			bp.LoadFile(bitmap/*, wxBITMAP_TYPE_PNG*/);
 		}
 		wxToolBarToolBase *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
 		m_listeners[py::cast(tool->GetId())] = onclick;

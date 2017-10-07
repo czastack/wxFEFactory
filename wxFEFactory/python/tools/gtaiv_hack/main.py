@@ -388,15 +388,15 @@ class Tool(BaseGTATool):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
     def LoadEnvironmentNow(self, pos):
-        # self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-        # self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-        # self.native_call('LOAD_SCENE', '3f', *pos)
-        # self.native_call('POPULATE_NOW', None)
+        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+        self.native_call('LOAD_SCENE', '3f', *pos)
+        self.native_call('POPULATE_NOW', None)
         # ctx = self.native_context
         # with ctx:
         #     ctx.push('3f', *pos)
         #     self.handler.remote_call(self.LoadWorldAtPosition, ctx.addr)
-        pass
+        # pass
 
     def GetGroundZ(self, pos, type=None):
         if type == 'highest' or type is None:

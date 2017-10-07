@@ -89,18 +89,11 @@ void AuiManager::doAdd(View & child)
 void AuiManager::__exit__(py::args & args)
 {
 	Layout::__exit__(args);
-
 	layout();
 
+	// 引用加一，避免被析构
 	pyobj &self = py::cast(this);
-	if (m_key != None)
-	{
-		getActiveLayout()->addNamed(m_key, self);
-		// 引用加一，避免被析构
-	}
-	else {
-		self.inc_ref();
-	}
+	self.inc_ref();
 }
 
 void AuiNotebook::doAdd(View & child)

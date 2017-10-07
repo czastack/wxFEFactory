@@ -4,8 +4,8 @@
 
 wxVector<Layout*> View::LAYOUTS;
 
-View::View(pycref key, pycref className, pycref style)
-	:m_key(key), m_class(className), m_style(style)
+View::View(pycref className, pycref style)
+	:m_class(className), m_style(style)
 {
 	if (py::isinstance<py::str>(m_class) && m_class.contains(" "))
 	{
@@ -364,10 +364,6 @@ void Layout::__exit__(py::args & args) {
 			continue;
 		}
 
-		if (!child.getKey().is_none())
-		{
-			m_named_children[child.getKey()] = py::cast(&child);
-		}
 		child.applyStyle();
 		doAdd(child);
 	}

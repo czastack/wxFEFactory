@@ -8,14 +8,10 @@ using AuiItem = Item;
 class AuiManager : public Layout
 {
 public:
-	AuiManager(pycref key) : Layout(*safeActiveLayout())
+	AuiManager() : Layout(*safeActiveLayout())
 	{
 		m_mgr = new wxAuiManager(m_elem);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this);
-		if (key != None)
-		{
-			m_key = key;
-		}
 	}
 
 	~AuiManager()

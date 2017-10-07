@@ -55,16 +55,16 @@ class Layout;
 class View
 {
 public:
-	View(pycref key, pycref className, pycref style);
+	View(pycref className, pycref style);
 
 	View(wxWindow* elem)
-		:View(None, None, None)
+		:View(None, None)
 	{
 		m_elem = elem;
 	}
 
 	virtual ~View() {
-		// py::print(m_key);
+		
 	}
 
 	virtual void bindElem(wxWindow *pElem)
@@ -186,11 +186,6 @@ public:
 	pycref getClassName()
 	{
 		return m_class;
-	}
-
-	pycref getKey()
-	{
-		return m_key;
 	}
 
 	Layout* getParent();
@@ -351,7 +346,6 @@ public:
 protected:
 	wxWindow *m_elem;
 	pyobj m_style;
-	pyobj m_key;
 	pyobj m_class;
 	pyobj m_contextmenu;
 	py::dict m_event_table;
@@ -381,7 +375,7 @@ public:
 
 	Layout(Layout &proxyed) :
 		View(proxyed.m_elem),
-		m_children(proxyed.m_children), m_named_children(proxyed.m_named_children), m_styles(None)
+		m_children(proxyed.m_children), m_styles(None)
 	{
 
 	}
@@ -396,11 +390,6 @@ public:
 
 	virtual void __exit__(py::args &args);
 
-	pyobj __getattr__(pyobj key)
-	{
-		return pyDictGet(m_named_children, key);
-	}
-
 	void setStyles(pycref styles);
 
 	auto getStylesList()
@@ -409,11 +398,6 @@ public:
 	}
 
 	virtual void reLayout() {}
-
-	void addNamed(pycref key, pycref child)
-	{
-		m_named_children[key] = child;
-	}
 
 	void removeChild(View &child)
 	{
@@ -430,7 +414,6 @@ public:
 	friend void init_layout(py::module &m);
 protected:
 	py::list m_children;
-	py::dict m_named_children;
 	pyobj m_styles;
 	wxVector<PyObject*> *tmp_styles_list;
 };
