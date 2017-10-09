@@ -56,7 +56,7 @@ class MainFrame:
 
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager() as aui:
-                # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "", self.onselect).realize(), direction="top", captionVisible=False)
+                # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "img/icon1.png", self.onselect).realize(), direction="top", captionVisible=False)
                 # with ui.ToolBar() as toolbar:
                 #     ui.Text("测试")
                 # ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)

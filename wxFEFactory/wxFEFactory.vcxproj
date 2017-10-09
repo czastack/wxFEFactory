@@ -149,6 +149,7 @@
     <ClCompile Include="pyapi\fe\fe.cpp" />
     <ClCompile Include="pyapi\fe\graph.cpp" />
     <ClCompile Include="pyapi\layout\aui.cpp" />
+    <ClCompile Include="pyapi\layout\bitmap.cpp" />
     <ClCompile Include="pyapi\layout\console.cpp" />
     <ClCompile Include="pyapi\layout\controls.cpp" />
     <ClCompile Include="pyapi\layout\datacontrols.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="pyapi\fe\feimg.hpp" />
     <ClInclude Include="pyapi\fe\graph.h" />
     <ClInclude Include="pyapi\layout\aui.h" />
+    <ClInclude Include="pyapi\layout\bitmap.h" />
     <ClInclude Include="pyapi\layout\console.h" />
     <ClInclude Include="pyapi\layout\controls.h" />
     <ClInclude Include="pyapi\layout\datacontrols.h" />

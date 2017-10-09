@@ -71,7 +71,7 @@ class CoordField:
             print('The value is a copy of this CoordData')
         else:
             it = iter(value)
-            for i in range(3):
+            for i in range(self.length):
                 item = next(it)
                 if item is None or item == '':
                     continue
@@ -87,6 +87,14 @@ class CoordData:
 
     def values(self):
         return [self.handler.readFloat(self.addr + i * 4) for i in range(self.length)]
+
+    def set(self, value):
+        it = iter(value)
+        for i in range(self.length):
+            item = next(it)
+            if item is None or item == '':
+                continue
+            self[i] = item
 
     def __getitem__(self, i):
         return self.handler.readFloat(self.addr + i * 4)

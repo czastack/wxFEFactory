@@ -28,7 +28,7 @@ public:
 		}
 		else
 		{
-			bp.LoadFile(bitmap/*, wxBITMAP_TYPE_PNG*/);
+			bp.LoadFile(bitmap, wxBITMAP_TYPE_PNG);
 		}
 		wxToolBarToolBase *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
 		if (onclick != None)

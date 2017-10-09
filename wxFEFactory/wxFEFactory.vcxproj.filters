@@ -80,6 +80,9 @@
     <ClCompile Include="pyapi\auto\auto.cpp">
       <Filter>pyapi\auto</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\layout\bitmap.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -185,6 +188,9 @@
     </ClInclude>
     <ClInclude Include="pyapi\auto\auto.h">
       <Filter>pyapi\auto</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\bitmap.h">
+      <Filter>pyapi\layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
