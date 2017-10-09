@@ -19,6 +19,7 @@ VERSION_DEPEND = {
         'PED_POOL'             : 0x0175B77C,
         'VEHICLE_POOL'         : 0x011F4F30,
         'OBJECT_POOL'          : 0x011FADD8,
+        'BLIP_LIST'            : 0x00FCFC70,
         'LOCAL_PLAYER_ID'      : 0x00EA68A8,
         'PLAYER_INFO_ARRAY'    : 0x01033058,
         'FindNativeAddress'    : 0x00617280,
@@ -31,6 +32,7 @@ VERSION_DEPEND = {
         'PED_POOL'             : 0x18A82AC,
         'VEHICLE_POOL'         : 0x1619240,
         'OBJECT_POOL'          : 0x1350CE0,
+        'BLIP_LIST'            : 0x119ED50,
         'LOCAL_PLAYER_ID'      : 0xF1CC68,
         'PLAYER_INFO_ARRAY'    : 0x11A7008,
         'FindNativeAddress'    : 0x5A76D0,
@@ -2891,4 +2893,14 @@ NATIVE_ADDRS = {
     'SET_THIS_SCRIPT_CAN_REMOVE_BLIPS_CREATED_BY_ANY_SCRIPT': 0xbad890,
     'SET_DONT_ACTIVATE_RAGDOLL_FROM_PLAYER_IMPACT': 0xba34d0,
     'TASK_HOLD_OBJECT': 0xb8ef80
+}
+
+
+SCRIPT_HOOK_HASH = {
+    'CREATE_CAR': 0x8b3fed78,
+    'SET_CHAR_COORDINATES': 0x49727e0,
+    'SET_CAR_COORDINATES': 0x98ee9042,
+    'EXPLODE_CAR': 0x4399d3e5,
+    'APPLY_WANTED_LEVEL_CHANGE_NOW': 0x2bcb3b77,
+    'GET_BLIP_COORDS': 0xef6ff47b,
 }

@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ArrayField, ModelField, CoordField
+from lib.hack.model import Model, Field, ArrayField, ModelField, CoordField, CoordData
 from lib.lazy import lazy
 import struct
 
@@ -10,7 +10,7 @@ class NativeContext(Model):
     m_nArgCount = Field(4)                                             # unsigned int m_nArgCount;      // 04-08
     m_pArgs = Field(8)                                                 # void * m_pArgs;                // 08-0C
     m_nDataCount = Field(12)                                           # unsigned int m_nDataCount;     // 0C-10
-    m_pOriginalData = ArrayField(16, 4, ModelField(0, CoordField))    # CVector3 * m_pOriginalData[4]; // 10-20
+    m_pOriginalData = ArrayField(16, 4, ModelField(0, CoordData))    # CVector3 * m_pOriginalData[4]; // 10-20
     m_TemporaryData = ArrayField(32, 4, CoordField(0, 4))             # Vector4 m_TemporaryData[4];    // 20-60
     m_TempStack = ArrayField(0x60, 16, Field(0))
 
@@ -46,13 +46,15 @@ class NativeContext(Model):
         :param end: 其实序号
         :return: 地址序列
         """
-        return (self.get_temp_addr(i) for i in range(start, end + 1))
+        span = range(start, end + 1) if start < end else range(start, end - 1, -1)
+        return (self.get_temp_addr(i) for i in span)
 
     def get_temp_value(self, i=1, type=int, size=0):
         return self.handler.read(self.get_temp_addr(i), type, size)
 
     def get_temp_values(self, start, end, type=int, size=0, mapfn=None):
-        result = (self.get_temp_value(i, type, size) for i in range(start, end + 1))
+        span = range(start, end + 1) if start < end else range(start, end - 1, -1)
+        result = (self.get_temp_value(i, type, size) for i in span)
         if mapfn:
             result = map(mapfn, result)
         return result
@@ -69,7 +71,7 @@ class NativeContext(Model):
         #     pVec3->fZ = pVec4->fZ;
         # }
         for i in range(self.m_nDataCount):
-            self.m_pOriginalData[i] = self.m_TemporaryData[i]
+            self.m_pOriginalData[i].set(self.m_TemporaryData[i])
 
         self.m_nDataCount = 0
 

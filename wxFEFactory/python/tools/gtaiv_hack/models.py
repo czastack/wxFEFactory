@@ -121,7 +121,7 @@ class Vector:
 
     @property
     def len(self):
-        """向量纬度"""
+        """向量维度"""
         return len(self._values)
 
     @property
@@ -248,15 +248,21 @@ class CoordData(VectorField):
 
 
 class NativeModel:
-    def __init__(self, handle, native_call, native_context):
+    def __init__(self, handle, mgr):
         self.handle = handle
-        self.native_call = native_call
-        self.native_context = native_context
+        self.mgr = mgr
 
     @property
-    def mgr(self):
-        """所属Tool实例"""
-        return self.native_call.__self__
+    def native_context(self):
+        return self.mgr.native_context
+
+    @property
+    def native_call(self):
+        return self.mgr.native_call
+
+    @property
+    def script_hook_call(self):
+        return self.mgr.script_hook_call
 
     def getter(name, ret_type=int, ret_size=4):
         def getter(self):
@@ -329,8 +335,8 @@ class Player(NativeEntity):
 
     getter, getter_ptr, setter = NativeEntity.builders
 
-    def __init__(self, index, handle, native_call, native_context):
-        super().__init__(handle, native_call, native_context)
+    def __init__(self, index, handle, mgr):
+        super().__init__(handle, mgr)
         self.index = index
 
     def player_getter(name, ret_type=int, ret_size=4):
@@ -369,6 +375,7 @@ class Player(NativeEntity):
     def memobj(self):
         return MemPlayer(self.addr, self.mgr.handler)
 
+    existed = property(getter('DOES_CHAR_EXIST', bool))
     hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
     ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('ADD_ARMOUR_TO_CHAR'))
     max_health = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_HEALTH'))
@@ -402,9 +409,9 @@ class Player(NativeEntity):
         level = int(level)
         if level > 0:
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
+            self.script_hook_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
-        # self.native_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略
@@ -424,8 +431,11 @@ class Player(NativeEntity):
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        self.native_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
-        # self.mgr.LoadEnvironmentNow(pos)
+        self.script_hook_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
+
+    def get_offset_coord(self, offset):
+        self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
+        return self.native_context.get_temp_values(1, 3, float, mapfn=normalFloat)
 
     get_vehicle_handle = getter_ptr('GET_CAR_CHAR_IS_USING')
 
@@ -437,13 +447,13 @@ class Player(NativeEntity):
     def cur_vehicle(self):
         handle = self.get_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.native_call, self.native_context)
+            return Vehicle(handle, self.mgr)
 
     @property
     def vehicle(self):
         handle = self.get_last_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.native_call, self.native_context)
+            return Vehicle(handle, self.mgr)
 
     # ----------------------------------------------------------------------
     # 武器相关
@@ -582,7 +592,9 @@ class Vehicle(NativeEntity):
 
     @property
     def model(self):
-        return IVModel(self.model_hash, self.native_call, self.native_context)
+        return IVModel(self.model_hash, self.mgr)
+
+    existed = property(getter('DOES_VEHICLE_EXIST', bool))
 
     is_freeze = property(None, setter('FREEZE_CAR_POSITION', bool))
     can_be_damaged = property(None, setter('SET_CAR_CAN_BE_DAMAGED', bool))
@@ -612,8 +624,11 @@ class Vehicle(NativeEntity):
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
-        # self.mgr.LoadEnvironmentNow(pos)
+        mycar = self.mgr.player.get_last_vehicle_handle()
+        if self.handle == mycar:
+            self.script_hook_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
+        else:
+            self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
 
     @property
     def quaternion(self):
@@ -665,10 +680,7 @@ class Vehicle(NativeEntity):
     def driver(self):
         self.native_call('GET_DRIVER_OF_CAR', 'LL', self.handle, self.native_context.get_temp_addr())
         ped_handle = self.native_context.get_temp_value()
-        return Player(0, ped_handle, self.native_call, self.native_context)
-
-    def passengers(self):
-        pass
+        return Player(0, ped_handle, self.mgr) if ped_handle else None
 
     @property
     def name(self):
@@ -745,7 +757,10 @@ class Vehicle(NativeEntity):
         self.native_call('WASH_VEHICLE_TEXTURES', 'LL', self.handle, 255)
 
     def fix(self):
-        self.native_call('FIX_CAR', 'L')
+        self.native_call('FIX_CAR', 'L', self.handle)
+
+    def explode(self):
+        self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0)
 
     del getter, getter_ptr, setter
 
@@ -766,3 +781,52 @@ class IVModel(NativeModel):
     loaded = property(getter('HAS_MODEL_LOADED', bool))
 
     del getter, getter_ptr, setter
+
+
+class Blip(NativeModel):
+    BLIP_WAYPOINT = 8
+    BLIP_BOSS = 93
+
+    BLIP_TYPE_CAR = 1
+    BLIP_TYPE_CHAR = 2             # ENEMY
+    BLIP_TYPE_OBJECT = 3
+    BLIP_TYPE_COORD = 4
+    BLIP_TYPE_CONTACT = 5          # FRIEND
+    BLIP_TYPE_PICKUP = 6
+
+    color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'))
+    blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
+    blipSprite = property(NativeModel.getter('GET_BLIP_SPRITE'))
+    existed = property(NativeModel.getter('DOES_BLIP_EXIST', bool))
+    car_index = property(NativeModel.getter('GET_BLIP_INFO_ID_CAR_INDEX'))
+    ped_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PED_INDEX'))
+    object_index = property(NativeModel.getter('GET_BLIP_INFO_ID_OBJECT_INDEX'))
+    pickup_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PICKUP_INDEX'))
+    
+    remove = NativeModel.getter('REMOVE_BLIP')
+
+    @property
+    def coord(self):
+        ctx = self.native_context
+        self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3))
+        import time
+        time.sleep(2)
+        return ctx.get_temp_values(3, 1, float, mapfn=normalFloat)
+
+    @property
+    def entity(self):
+        blipType = self.blipType
+        if blipType is self.BLIP_TYPE_CAR:
+            return Vehicle(self.car_index, self.mgr)
+        elif blipType is self.BLIP_TYPE_CHAR:
+            return Player(self.ped_index, self.mgr)
+
+    @classmethod
+    def addBlipForCar(cls, vehicle):
+        self.native_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, self.native_context.get_temp_addr())
+        return cls(self.native_context.get_temp_value(), vehicle.mgr)
+
+    @classmethod
+    def addBlipForChar(cls, ped):
+        self.native_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, self.native_context.get_temp_addr())
+        return cls(self.native_context.get_temp_value(), ped.mgr)

@@ -81,18 +81,7 @@ class Tool(BaseGTATool):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
-                    ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: alt+[")
-                    ui.Text("切换下一辆: alt+]")
-                    ui.Text("向前穿墙: alt+w")
-                    ui.Text("向前穿墙大: alt+shift+w")
-                    ui.Text("弹射起步: alt+m")
-                    ui.Text("上天（有速度）: alt+空格")
-                    ui.Text("往上（无速度）: alt+.")
-                    ui.Text("下坠: alt+shift+空格")
-                    ui.Text("恢复HP: alt+h")
-                    ui.Text("恢复大量HP(999生命，999护甲): alt+shift+h")
-                    ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
+                    self.render_common_text()
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -124,17 +113,17 @@ class Tool(BaseGTATool):
             if not self.win.hotkeys:
                 self.win.RegisterHotKeys(
                     (
-                        # ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                        # ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                        ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+                        ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                        ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
                         ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
+                        ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
                         ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                         ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
                     ) + self.get_common_hotkeys()
                 )
             self.init_addr()
             self.init_remote_function()
-
-            self.patch()
         else:
             self.attach_status_view.label = '没有检测到 ' + windowName
 
@@ -174,6 +163,10 @@ class Tool(BaseGTATool):
         #     b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
         # )
 
+        self.ScriptHookHelper = self.handler.get_module(r'Test.asi')
+        if self.ScriptHookHelper:
+            self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
+
     def init_remote_function(self):
         # 现在Native方法对应的地址直接写在address.NATIVE_ADDRS中了
         # self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
@@ -212,6 +205,15 @@ class Tool(BaseGTATool):
             if ret_type:
                 return self.native_context.get_result(ret_type, ret_size)
 
+    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
+        if self.ScriptHookHelper:
+            with self.native_context:
+                hash = address.SCRIPT_HOOK_HASH[name]
+                if arg_sign:
+                    self.native_context.push(arg_sign, *args)
+                self.native_context.push('L', hash)
+                self.handler.write32(self.ScriptHookHelperCtxPtr, self.native_context.addr)
+
     def _player(self):
         # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
         # if player_addr is 0:
@@ -220,7 +222,7 @@ class Tool(BaseGTATool):
         player_index = self.get_player_id()
 
         if not player:
-            player = self._playerins = self.Player(player_index, self.get_ped_index(player_index), self.native_call, self.native_context)
+            player = self._playerins = self.Player(player_index, self.get_ped_index(player_index), self)
         else:
             player.index = player_index
             player.handle = self.get_ped_index(player_index)
@@ -235,14 +237,6 @@ class Tool(BaseGTATool):
 
     def get_ped_addr(self):
         return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
-
-    # def get_player_index_of_pool(self):
-    #     """获取当前ped在ped_pool中的index"""
-    #     ped_addr = self.get_ped_addr()
-    #     pool = self.ped_pool
-    #     for i in range(pool.size):
-    #         if pool.addr_at(i) == ped_addr:
-    #             return i
 
     def get_player_id(self):
         # return self.native_call('GET_PLAYER_ID', None)
@@ -282,7 +276,7 @@ class Tool(BaseGTATool):
     def vehicle_pool(self):
         return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
 
-    def get_persons(self):
+    def get_peds(self):
         pool = self.ped_pool
         for i in range(pool.size):
             ped = pool[i]
@@ -290,10 +284,10 @@ class Tool(BaseGTATool):
                 ped.index = i
                 yield ped
 
-    def get_near_persons(self, distance=100):
+    def get_near_peds(self, distance=100):
         """获取附近的人"""
-        for ped in super().get_near_persons(distance):
-            yield Player(0, self.ped_index_to_handle(ped.index), self.native_call, self.native_context)
+        for ped in super().get_near_peds(distance):
+            yield Player(0, self.ped_index_to_handle(ped.index), self)
 
     def get_vehicles(self):
         pool = self.vehicle_pool
@@ -306,7 +300,20 @@ class Tool(BaseGTATool):
     def get_near_vehicles(self, distance=100):
         """获取附近的载具"""
         for vehicle in super().get_near_vehicles(distance):
-            yield Vehicle(self.vehicle_index_to_handle(vehicle.index), self.native_call, self.native_context)
+            yield Vehicle(self.vehicle_index_to_handle(vehicle.index), self)
+
+    def get_nearest_ped(self, distance=50):
+        self.native_call('GET_CLOSEST_CHAR', '4f3L', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
+        ped = self.native_context.get_temp_value()
+        if ped:
+            return Player(0, ped, self)
+
+    def get_nearest_vehicle(self, distance=50):
+        handle = self.native_call('GET_CLOSEST_CAR', '4f2L', *self.entity.coord, distance, 0, 70)
+        if handle:
+            vehicle = Vehicle(handle, self)
+            if vehicle.existed:
+                return vehicle
 
     def set_move_speed(self, entity_addr, value):
         ctx = self.native_context
@@ -335,7 +342,7 @@ class Tool(BaseGTATool):
             self.player.coord[2] += 3
 
     def onSpawnVehicleIdChange(self, lb):
-        self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
+        self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
 
     def onSpawnVehicleIdPrev(self, _=None):
         pos = self.spawn_vehicle_id_view.index
@@ -387,26 +394,40 @@ class Tool(BaseGTATool):
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
-    def LoadEnvironmentNow(self, pos):
-        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-        self.native_call('LOAD_SCENE', '3f', *pos)
-        self.native_call('POPULATE_NOW', None)
-        # ctx = self.native_context
-        # with ctx:
-        #     ctx.push('3f', *pos)
-        #     self.handler.remote_call(self.LoadWorldAtPosition, ctx.addr)
-        # pass
+    # def LoadEnvironmentNow(self, pos):
+    #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+    #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+    #     self.native_call('LOAD_SCENE', '3f', *pos)
+    #     self.native_call('POPULATE_NOW', None)
 
-    def GetGroundZ(self, pos, type=None):
-        if type == 'highest' or type is None:
-            self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', pos[0], pos[1], 1024.0, 
-                self.native_context.get_temp_addr())
-            return self.native_context.get_temp_value(float)
-        elif type == 'nextBelowCurrent':
-            self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, 
-                self.native_context.get_temp_addr())
-            return self.native_context.get_temp_value(float)
+    def GetGroundZ(self, pos):
+        """获取指定位置地面的z值"""
+        self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, self.native_context.get_temp_addr())
+        return self.native_context.get_temp_value(type=float)
+
+    def GetFirstBlip(self, blipType):
+        blip_id = self.native_call('GET_FIRST_BLIP_INFO_ID', 'L', blipType)
+        if blip_id:
+            return models.Blip(blip_id, self)
+
+    def NextBlipInfo(self, blipType):
+        blip_id = self.native_call('GET_NEXT_BLIP_INFO_ID', 'L', blipType)
+        if blip_id:
+            return models.Blip(blip_id, self)
+
+    def teleport_to_waypoint(self, _=None):
+        """瞬移到标记点"""
+        blip = self.GetFirstBlip(models.Blip.BLIP_WAYPOINT)
+        if blip:
+            coord = list(blip.coord)
+
+            if coord[0] != 0 or coord[1] != 0:
+                if coord[2] == 0.0:
+                    coord[2] = self.GetGroundZ(coord)                        
+                self.player.coord = coord
+                return
+        
+        print('无法获取标记坐标')
 
     def get_camera_rot_raw(self):
         ctx = self.native_context
@@ -459,73 +480,11 @@ class Tool(BaseGTATool):
     def game_week(self, value):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
-    def patch(self):
-        pass
-        # X86_RETN = 0xC3
-        # X86_JMP  = 0xE9
-        # X86_CALL = 0xE8
-        # X86_NOP  = b'\x90'
+    def spawn_vehicle(self, model):
+        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.get_front_coord(), self.native_context.get_temp_addr(), 1)
+        # return
 
-        # h = self.handler
-        # # Don't initialize error reporting
-        # h.write8(self.get_addr(0xD356D0), X86_RETN)
-        # # Certificates check (RETN 8)
-        # h.write32(self.get_addr(0x403F10), 0x900008C2)
-
-        # # xor eax, eax - address of the RGSC object
-        # # h.write32(self.get_addr(0x40262D), 0x4AE9C033)
-
-        # # Skip RGSC connect and EFC checks (jmp 40289E)
-        # # h.write32(self.get_addr(0x402631), 0x90000002)
-
-        # # NOP; MOV [g_rgsc], eax
-        # # h.write16(self.get_addr(0x402883), 0xA390)
-
-        # # Disable VDS102 error
-        # # h.write(self.get_addr(0x4028ED), X86_NOP * 42)
-
-        # # Last RGSC init check (NOP*6)
-        # # h.write(self.get_addr(0x40291D), X86_NOP * 6)
-
-        # # Skip missing tests
-        # h.write(self.get_addr(0x402B12), X86_NOP * 14)
-        # h.write(self.get_addr(0x402D17), X86_NOP * 14)
-
-        # h.write32(self.get_addr(0x403870), 0x090CC033) # xor eax, eax; retn
-        # h.write32(self.get_addr(0x404250), 0x090CC033) # xor eax, eax; retn
-
-        # # Disable securom spot checks (mov al, 1; retn)
-        # h.write32(self.get_addr(0xBAC160), 0x90C301B0)
-        # h.write32(self.get_addr(0xBAC180), 0x90C301B0)
-        # h.write32(self.get_addr(0xBAC190), 0x90C301B0)
-        # h.write32(self.get_addr(0xBAC1C0), 0x90C301B0)
-
-        # def installDetour(dwAddress, dwDetourAddress, byteType, iSize=5):
-        #     pbyteTrampoline = h.alloc_memory(iSize + 5)
-        #     h.write(pbyteTrampoline, h.read(dwAddress, bytes, iSize))
-        #     dwTrampoline = pbyteTrampoline
-        #     h.write8(pbyteTrampoline, byteType)
-        #     h.write32(pbyteTrampoline + 1, dwAddress + iSize - dwTrampoline - 5)
-
-        #     h.write8(dwAddress, byteType)
-        #     h.write32(dwAddress + 1, dwDetourAddress - dwAddress - 5)
-        #     return pbyteTrampoline
-
-        # # This disables some calculate for modelinfo but it seems this is not necessary
-        # # Maybe we can disable this patch
-        # # installDetour(self.get_addr(0xCBA1F0), self.get_addr(0xCBA230), X86_JMP)
-
-        # # This needs to be disabled due to some crashes and to enable the blocked vehicles such as uranus, hellfury, etc.
-        # # INFO: crash occure exactly when accessing dword_13BEEE0 this is related to ZonesNames, but disabling this function dont destroy anything
-        # # TODO: find what this function does
-        # # this function checks some flags in modelInfos and loading some models they seems to be not needed
-        # # This seems to be associated to loading models but they are not used!?
-        # h.write8(self.get_addr(0x8F2F40), X86_RETN)
-            
-        # pScriptThread = h.alloc_memory(176)
-        # ScrVM__ThreadPool = self.get_addr(0x1983310)
-        # h.write16(ScrVM__ThreadPool + 4, 0) # usCount
-        # h.write16(ScrVM__ThreadPool + 6, 0) # usSize
-
-        # ScrVM__ActiveThread = self.get_addr(0x1849AE0)
-        # h.write32(ScrVM__ActiveThread, pScriptThread)
+    def spawn_choosed_vehicle(self, _=None):
+        carid = getattr(self, 'spwan_vehicle_id', None)
+        if carid:
+            self.spawn_vehicle(carid)

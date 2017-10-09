@@ -12,8 +12,8 @@ import fefactory_api
 ui = fefactory_api.ui
 
 win_style = {
-    'width': 680,
-    'height': 800,
+    'width': 700,
+    'height': 820,
     # 'width': 640,
     # 'height': 700,
 }
@@ -189,15 +189,15 @@ class BaseGTATool(BaseTool):
         rotz = self.get_rotz()
         return (math.cos(rotz), math.sin(rotz), 0.1)
 
-    def get_persons(self):
+    def get_peds(self):
         pool = Pool(self.address.PED_POOL, self.handler, self.Player)
         return iter(pool)
 
-    def get_near_persons(self, distance=100):
+    def get_near_peds(self, distance=100):
         """获取附近的人"""
         coord = self.player.coord.values()
         myaddr = self.player.addr
-        for p in self.get_persons():
+        for p in self.get_peds():
             if p.hp > 0 and p.coord[2] > 0 and p.distance(coord) <= distance and p.addr != myaddr:
                 yield p
 
@@ -235,9 +235,9 @@ class BaseGTATool(BaseTool):
 
         return vehicle
 
-    def kill_near_persons(self, _=None):
+    def kill_near_peds(self, _=None):
         """杀死附近的人"""
-        for p in self.get_near_persons():
+        for p in self.get_near_peds():
             p.hp = 0
 
     def near_vehicles_boom(self, _=None):
@@ -260,10 +260,10 @@ class BaseGTATool(BaseTool):
             if zinc:
                 coord[2] += zinc
 
-    def near_persons_to_front(self, _=None, zinc=0):
+    def near_peds_to_front(self, _=None, zinc=0):
         """附近的人移到眼前"""
         coord = self.get_front_coord()
-        for p in self.get_near_persons():
+        for p in self.get_near_peds():
             p.coord = coord
             if zinc:
                 coord[2] += zinc
@@ -288,10 +288,10 @@ class BaseGTATool(BaseTool):
         for v in self.get_near_vehicles():
             v.unlock_door()
 
-    def near_persons_fly(self, _=None):
+    def near_peds_fly(self, _=None):
         """附近的人上天"""
         fly_speed = getattr(self, 'FLY_SPEED', 1)
-        for p in self.get_near_persons():
+        for p in self.get_near_peds():
             p.speed[2] = fly_speed
 
     def near_vehicles_fly(self, _=None):
@@ -303,7 +303,7 @@ class BaseGTATool(BaseTool):
 
     def near_fly(self, _=None):
         """获取附近的人/载具上天"""
-        self.near_persons_fly()
+        self.near_peds_fly()
         self.near_vehicles_fly()
 
     def vehicle_flip(self, _=None):
@@ -458,13 +458,13 @@ class BaseGTATool(BaseTool):
             fefactory_api.alert('转换成功: ' + jsonpath)
 
     def render_common_button(self):
-        ui.Button("杀掉附近的人", onclick=self.kill_near_persons)
+        ui.Button("杀掉附近的人", onclick=self.kill_near_peds)
         ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
         ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
         ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
-        ui.Button("附近的人移到眼前", onclick=self.near_persons_to_front)
+        ui.Button("附近的人移到眼前", onclick=self.near_peds_to_front)
         ui.Button("附近的车上天", onclick=self.near_vehicles_fly)
-        ui.Button("附近的人上天", onclick=self.near_persons_fly)
+        ui.Button("附近的人上天", onclick=self.near_peds_fly)
         ui.Button("附近的车翻转", onclick=self.near_vehicles_flip)
         ui.Button("跳上一辆车", onclick=self.jump_on_vehicle)
         ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
@@ -507,12 +507,12 @@ class BaseGTATool(BaseTool):
             ('restore_hp', MOD_ALT, getVK('h'), self.restore_hp),
             ('restore_hp_large', MOD_ALT | MOD_SHIFT, getVK('h'), self.restore_hp_large),
             ('jump_on_vehicle', MOD_ALT, getVK('j'), self.jump_on_vehicle),
-            ('near_persons_fly', MOD_ALT, getVK('f'), self.near_persons_fly),
+            ('near_peds_fly', MOD_ALT, getVK('f'), self.near_peds_fly),
             ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
             ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
             ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
             ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
-            ('move_near_person_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_persons_to_front),
+            ('move_near_ped_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_peds_to_front),
             ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
             ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
             ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
