@@ -53,6 +53,7 @@ public:
 			delete buf;
 			return ret;
 		}
+		return None;
 	}
 
 
@@ -176,7 +177,8 @@ void init_emuhacker(pybind11::module & m)
 		.def("ptrWrite", &PyProcessHandler::ptrWrite, addr_a, offsets_a, data_a, "size"_a=4)
 		.def("readLastAddr", &PyProcessHandler::readLastAddr, addr_a, offsets_a)
 		.def("ptrsRead", &PyProcessHandler::ptrsRead, addr_a, offsets_a, type_a, "size"_a=4)
-		.def("ptrsWrite", &PyProcessHandler::ptrsWrite, addr_a, offsets_a, data_a, "size"_a=4)
+		.def("ptrsWrite", &PyProcessHandler::ptrsWrite, addr_a, offsets_a, data_a, "size"_a = 4)
+		.def("get_module", &PyProcessHandler::getModuleHandle)
 		.def("write_function", &PyProcessHandler::write_function)
 		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a)
 		.def("free_memory", &ProcessHandler::free_memory)

@@ -117,6 +117,28 @@ addr_t ProcessHandler::getProcessBaseAddress()
 	return 0;
 }
 
+addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
+{
+	DWORD cbNeeded;
+	HMODULE hMods[256];
+
+	if (EnumProcessModulesEx(mProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL))
+	{
+		for (int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+		{
+			TCHAR szModName[64];
+			if (GetModuleBaseName(mProcess, hMods[i], szModName, sizeof(szModName)))
+			{
+				if (wcscmp(name, szModName) == 0)
+				{
+					return (addr_t)hMods[i];
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
 {
 	addr_t fnAddr = alloc_memory(size);

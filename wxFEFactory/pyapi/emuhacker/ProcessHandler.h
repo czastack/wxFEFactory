@@ -186,6 +186,8 @@ public:
 
 	addr_t getProcessBaseAddress();
 
+	addr_t getModuleHandle(LPCTSTR name);
+
 	addr_t write_function(LPCVOID buf, size_t size);
 
 	addr_t alloc_memory(size_t size);
