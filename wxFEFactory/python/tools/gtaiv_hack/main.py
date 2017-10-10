@@ -75,10 +75,10 @@ class Tool(BaseGTATool):
             ModelInputWidget("game_minute", "当前分钟")
             ModelInputWidget("game_week", "当前星期")
             # self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
-            
+
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange,
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -105,7 +105,7 @@ class Tool(BaseGTATool):
         else:
             # 确保重新生成 native_context
             self._playerins = None
-            
+
         if self.handler.attachByWindowName(className, windowName):
             self.attach_status_view.label = windowName + ' 正在运行'
             self.MODULE_BASE = self.handler.base - 0x400000
@@ -118,8 +118,10 @@ class Tool(BaseGTATool):
                         ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
                         ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
                         ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
+                        ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
                         ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                         ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
+                        ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
                     ) + self.get_common_hotkeys()
                 )
             self.init_addr()
@@ -143,7 +145,7 @@ class Tool(BaseGTATool):
             for name in version_depend:
                 addr = version_depend[name]
                 setattr(address, name, self.get_addr(addr) if addr else 0)
-        
+
         if address.SetMoveSpeed:
             SPEED_FUNC = (
                 b'\x55\x8B\xEC\x83\xEC\x08\x8B\x4D\x08\xC7\x45\xF8',
@@ -159,7 +161,7 @@ class Tool(BaseGTATool):
         #     )
 
         # self.FUNCTION_FIND_NATIVE_ADDRESS = (
-        #     b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) + 
+        #     b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
         #     b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
         # )
 
@@ -170,7 +172,7 @@ class Tool(BaseGTATool):
     def init_remote_function(self):
         # 现在Native方法对应的地址直接写在address.NATIVE_ADDRS中了
         # self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
-        
+
         # TODO
         if address.SetMoveSpeed:
             self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
@@ -385,7 +387,10 @@ class Tool(BaseGTATool):
     def restore_hp(self, _=None):
         super().restore_hp()
         if self.isInVehicle:
-            self.vehicle.engine_hp = 1000
+            vehicle = self.vehicle
+            vehicle.engine_hp = 1000
+            vehicle.fix()
+            vehicle.wash()
 
     def max_cur_weapon(self, _=None):
         """当前武器子弹全满"""
@@ -394,11 +399,11 @@ class Tool(BaseGTATool):
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
-    # def LoadEnvironmentNow(self, pos):
-    #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-    #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-    #     self.native_call('LOAD_SCENE', '3f', *pos)
-    #     self.native_call('POPULATE_NOW', None)
+    def LoadEnvironmentNow(self, pos):
+        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+        self.native_call('POPULATE_NOW', None)
+        self.script_hook_call('LOAD_SCENE', '3f', *pos)
 
     def GetGroundZ(self, pos):
         """获取指定位置地面的z值"""
@@ -420,14 +425,35 @@ class Tool(BaseGTATool):
         blip = self.GetFirstBlip(models.Blip.BLIP_WAYPOINT)
         if blip:
             coord = list(blip.coord)
+            print(coord)
 
             if coord[0] != 0 or coord[1] != 0:
                 if coord[2] == 0.0:
-                    coord[2] = self.GetGroundZ(coord)                        
+                    coord[2] = self.GetGroundZ(coord)
                 self.player.coord = coord
                 return
-        
+
         print('无法获取标记坐标')
+
+    def teleport_to_destination(self, _=None):
+        """瞬移到标记点"""
+        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
+            blip = self.GetFirstBlip(i)
+            if blip:
+                coord = list(blip.coord)
+                print(coord)
+
+                if coord[0] != 0 or coord[1] != 0:
+                    entity = self.entity
+                    if coord[2] == 0.0:
+                        coord[2] = entity.coord[2]
+                    entity.coord = coord
+                    break
+        else:
+            print('无法获取目的地坐标')
+
+    def clear_wanted_level(self, _=None):
+        self.player.wanted_level = 0
 
     def get_camera_rot_raw(self):
         ctx = self.native_context
@@ -450,7 +476,7 @@ class Tool(BaseGTATool):
         if rotz < 0:
             rotz += math.pi * 2
         entity = self.entity
-        entity.coord[2] += 2
+        # entity.coord[2] += 2
         entity.rotation = rotz
 
     @property
@@ -481,7 +507,7 @@ class Tool(BaseGTATool):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
     def spawn_vehicle(self, model):
-        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.get_front_coord(), self.native_context.get_temp_addr(), 1)
+        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
         # return
 
     def spawn_choosed_vehicle(self, _=None):

@@ -409,9 +409,9 @@ class Player(NativeEntity):
         level = int(level)
         if level > 0:
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
-            self.script_hook_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
+        self.script_hook_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略
@@ -432,6 +432,7 @@ class Player(NativeEntity):
     def coord(self, value):
         pos = tuple(value)
         self.script_hook_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
+        self.mgr.LoadEnvironmentNow(pos)
 
     def get_offset_coord(self, offset):
         self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
@@ -596,6 +597,9 @@ class Vehicle(NativeEntity):
 
     existed = property(getter('DOES_VEHICLE_EXIST', bool))
 
+    def __bool__(self):
+        return self.existed and self.engine_hp > 0
+
     is_freeze = property(None, setter('FREEZE_CAR_POSITION', bool))
     can_be_damaged = property(None, setter('SET_CAR_CAN_BE_DAMAGED', bool))
     # 损坏等级？
@@ -627,6 +631,7 @@ class Vehicle(NativeEntity):
         mycar = self.mgr.player.get_last_vehicle_handle()
         if self.handle == mycar:
             self.script_hook_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
+            self.mgr.LoadEnvironmentNow(pos)
         else:
             self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
 
@@ -784,6 +789,9 @@ class IVModel(NativeModel):
 
 
 class Blip(NativeModel):
+    BLIP_DESTINATION = 0
+    BLIP_DESTINATION_1 = 1
+    BLIP_DESTINATION_2 = 2
     BLIP_WAYPOINT = 8
     BLIP_BOSS = 93
 
@@ -793,6 +801,17 @@ class Blip(NativeModel):
     BLIP_TYPE_COORD = 4
     BLIP_TYPE_CONTACT = 5          # FRIEND
     BLIP_TYPE_PICKUP = 6
+
+    BLIPCOLOR_RED = 0x1
+    BLIPCOLOR_GREEN = 0x2
+    BLIPCOLOR_BLUE = 0x3
+    BLIPCOLOR_YELLOWMISSION = 0x5
+    BLIPCOLOR_FRIENDLYVEHICLE = 0x26
+    BLIPCOLOR_REDMISSION = 0x31
+    BLIPCOLOR_MISSIONVEHICLE = 0x36
+    BLIPCOLOR_YELLOWMISSION2 = 0x3C
+    BLIPCOLOR_MISSION = 0x42
+    BLIPCOLOR_WAYPOINT = 0x53
 
     color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
@@ -808,9 +827,7 @@ class Blip(NativeModel):
     @property
     def coord(self):
         ctx = self.native_context
-        self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3))
-        import time
-        time.sleep(2)
+        self.native_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3))
         return ctx.get_temp_values(3, 1, float, mapfn=normalFloat)
 
     @property
@@ -823,10 +840,10 @@ class Blip(NativeModel):
 
     @classmethod
     def addBlipForCar(cls, vehicle):
-        self.native_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, self.native_context.get_temp_addr())
-        return cls(self.native_context.get_temp_value(), vehicle.mgr)
+        vehicle.script_hook_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr())
+        return cls(vehicle.native_context.get_temp_value(), vehicle.mgr)
 
     @classmethod
     def addBlipForChar(cls, ped):
-        self.native_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, self.native_context.get_temp_addr())
-        return cls(self.native_context.get_temp_value(), ped.mgr)
+        ped.script_hook_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr())
+        return cls(ped.native_context.get_temp_value(), ped.mgr)

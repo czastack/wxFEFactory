@@ -222,8 +222,15 @@ class BaseGTATool(BaseTool):
         flag = False
         if vehicles:
             try:
-                vehicle = next(vehicles)
-                flag = True
+                if getattr(self, 'iter_vehicle_locked', False):
+                    vehicle = getattr(self, 'last_iter_vehicle', None)
+                    if vehicle:
+                        flag = True
+                
+                if not flag:
+                    vehicle = next(vehicles)
+                    self.last_iter_vehicle = vehicle
+                    flag = True
             except StopIteration:
                 if is_retry:
                     # 大概是附近没有车了
@@ -234,6 +241,9 @@ class BaseGTATool(BaseTool):
             return self.next_collected_vehicle(is_retry=True)
 
         return vehicle
+
+    def iter_vehicle_lock(self, _=None):
+        self.iter_vehicle_locked = not getattr(self, 'iter_vehicle_locked', False)
 
     def kill_near_peds(self, _=None):
         """杀死附近的人"""
@@ -470,6 +480,7 @@ class BaseGTATool(BaseTool):
         ui.Button("召唤上一辆车回来", onclick=self.call_vehicle)
         ui.Button("回到上一辆车旁边", onclick=self.go_vehicle)
         ui.Button("附近的载具解锁", onclick=self.near_vehicle_unlock)
+        ui.Button("锁定载具迭代", onclick=self.iter_vehicle_lock)
 
     def render_common_text(self):
         ui.Text("向前穿墙: alt+w")
