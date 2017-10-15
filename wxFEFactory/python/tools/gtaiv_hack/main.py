@@ -50,6 +50,7 @@ class Tool(BaseGTATool):
                 ui.Button(label="可以切换武器", onclick=self.set_ped_block_switch_weapons)
                 ui.Button(label="不会被拽出车", onclick=self.set_ped_can_be_dragged_out_of_vehicle)
                 ui.Button(label="摩托车老司机", onclick=self.set_ped_keep_bike)
+
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
@@ -86,6 +87,7 @@ class Tool(BaseGTATool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
+                ui.Button("缴械", onclick=self.remove_near_peds_weapon)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -116,12 +118,14 @@ class Tool(BaseGTATool):
                         ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                         ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
                         ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
+                        ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
                         ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
                         ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
                         ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
                         ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                         ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
                         ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
+                        ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
                     ) + self.get_common_hotkeys()
                 )
             self.init_addr()
@@ -207,14 +211,27 @@ class Tool(BaseGTATool):
             if ret_type:
                 return self.native_context.get_result(ret_type, ret_size)
 
-    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
+    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=False):
         if self.ScriptHookHelper:
             with self.native_context:
-                hash = address.SCRIPT_HOOK_HASH[name]
+                fn_addr = self.get_addr(address.NATIVE_ADDRS[name])
                 if arg_sign:
                     self.native_context.push(arg_sign, *args)
-                self.native_context.push('L', hash)
+                self.native_context.push('L', fn_addr)
                 self.handler.write32(self.ScriptHookHelperCtxPtr, self.native_context.addr)
+
+                if sync:
+                    try_count = 20
+                    while try_count:
+                        time.sleep(0.1)
+                        if self.handler.read32(self.ScriptHookHelperCtxPtr) == 0:
+                            if ret_type:
+                                return self.native_context.get_result(ret_type, ret_size)
+                            return
+
+                        try_count -= 1
+
+                    print('获取script_hook_call返回失败，超过尝试次数')
 
     def _player(self):
         # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
@@ -396,14 +413,25 @@ class Tool(BaseGTATool):
         """当前武器子弹全满"""
         self.player.max_cur_ammo()
 
+    def explode_nearest_vehicle(self, _=None):
+        """爆破最近的车"""
+        vehicle = self.get_nearest_vehicle()
+        if vehicle:
+            vehicle.explode()
+
+    def remove_near_peds_weapon(self, _=None):
+        """缴械"""
+        for p in self.get_near_peds():
+            p.remove_all_weapons()
+
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
-    def LoadEnvironmentNow(self, pos):
-        self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-        self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-        self.native_call('POPULATE_NOW', None)
-        self.script_hook_call('LOAD_SCENE', '3f', *pos)
+    # def LoadEnvironmentNow(self, pos):
+    #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
+    #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
+    #     self.native_call('POPULATE_NOW', None)
+    #     self.script_hook_call('LOAD_SCENE', '3f', *pos)
 
     def GetGroundZ(self, pos):
         """获取指定位置地面的z值"""
@@ -422,35 +450,27 @@ class Tool(BaseGTATool):
 
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
-        blip = self.GetFirstBlip(models.Blip.BLIP_WAYPOINT)
+        if not self.teleport_to_blip(self.GetFirstBlip(models.Blip.BLIP_WAYPOINT)):
+            print('无法获取标记坐标')
+
+    def teleport_to_destination(self, _=None):
+        """瞬移到目的地"""
+        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
+            if self.teleport_to_blip(self.GetFirstBlip(i)):
+                break
+        else:
+            print('无法获取目的地坐标')
+
+    def teleport_to_blip(self, blip):
         if blip:
             coord = list(blip.coord)
             print(coord)
 
             if coord[0] != 0 or coord[1] != 0:
                 if coord[2] == 0.0:
-                    coord[2] = self.GetGroundZ(coord)
+                    coord[2] = self.GetGroundZ(coord) or 16
                 self.player.coord = coord
-                return
-
-        print('无法获取标记坐标')
-
-    def teleport_to_destination(self, _=None):
-        """瞬移到标记点"""
-        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
-            blip = self.GetFirstBlip(i)
-            if blip:
-                coord = list(blip.coord)
-                print(coord)
-
-                if coord[0] != 0 or coord[1] != 0:
-                    entity = self.entity
-                    if coord[2] == 0.0:
-                        coord[2] = entity.coord[2]
-                    entity.coord = coord
-                    break
-        else:
-            print('无法获取目的地坐标')
+                return True
 
     def clear_wanted_level(self, _=None):
         self.player.wanted_level = 0
@@ -507,10 +527,15 @@ class Tool(BaseGTATool):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
     def spawn_vehicle(self, model):
-        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
-        # return
+        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1, sync=True)
+        return Vehicle(self.native_context.get_temp_value(), self)
 
     def spawn_choosed_vehicle(self, _=None):
-        carid = getattr(self, 'spwan_vehicle_id', None)
-        if carid:
-            self.spawn_vehicle(carid)
+        model = getattr(self, 'spwan_vehicle_id', None)
+        if model:
+            return self.spawn_vehicle(model)
+
+    def spawn_choosed_vehicle_and_enter(self, _=None):
+        car = self.spawn_choosed_vehicle()
+        if car:
+            self.script_hook_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0)

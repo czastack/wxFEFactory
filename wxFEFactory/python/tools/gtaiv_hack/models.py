@@ -6,6 +6,7 @@ from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
 from .data import COLOR_LIST
 import math
+import time
 
 
 class Pos(Model):
@@ -432,7 +433,7 @@ class Player(NativeEntity):
     def coord(self, value):
         pos = tuple(value)
         self.script_hook_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
-        self.mgr.LoadEnvironmentNow(pos)
+        # self.mgr.LoadEnvironmentNow(pos)
 
     def get_offset_coord(self, offset):
         self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
@@ -628,10 +629,10 @@ class Vehicle(NativeEntity):
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        mycar = self.mgr.player.get_last_vehicle_handle()
+        mycar = self.mgr.player.get_vehicle_handle()
         if self.handle == mycar:
             self.script_hook_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
-            self.mgr.LoadEnvironmentNow(pos)
+            # self.mgr.LoadEnvironmentNow(pos)
         else:
             self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
 
@@ -827,7 +828,7 @@ class Blip(NativeModel):
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3))
+        self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3), ret_type=None, sync=True)
         return ctx.get_temp_values(3, 1, float, mapfn=normalFloat)
 
     @property
@@ -836,7 +837,7 @@ class Blip(NativeModel):
         if blipType is self.BLIP_TYPE_CAR:
             return Vehicle(self.car_index, self.mgr)
         elif blipType is self.BLIP_TYPE_CHAR:
-            return Player(self.ped_index, self.mgr)
+            return Player(0, self.ped_index, self.mgr)
 
     @classmethod
     def addBlipForCar(cls, vehicle):
