@@ -88,6 +88,10 @@ class Tool(BaseGTATool):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 ui.Button("缴械", onclick=self.remove_near_peds_weapon)
+                ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
+                ui.Button("敌人着火", onclick=self.enemys_make_fire)
+                ui.Button("敌人爆头", onclick=self.enemys_explode_head)
+                ui.Button("敌人爆炸", onclick=self.enemys_explode)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -424,6 +428,29 @@ class Tool(BaseGTATool):
         for p in self.get_near_peds():
             p.remove_all_weapons()
 
+    def near_peds_make_fire(self, _=None):
+        """附近的人着火"""
+        for p in self.get_near_peds():
+            p.create_fire()
+
+    def enemys_make_fire(self, _=None):
+        """敌人着火"""
+        for p in self.get_near_peds():
+            p.make_fire()
+
+    def enemys_explode_head(self, _=None):
+        """敌人爆头"""
+        for p in self.get_near_peds():
+            try:
+                p.explode_head()
+            except:
+                pass
+
+    def enemys_explode(self, _=None):
+        """敌人爆炸"""
+        for p in self.get_near_peds():
+            p.create_explosion()
+
     def flash_weapon_icon(self):
         self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
 
@@ -438,25 +465,47 @@ class Tool(BaseGTATool):
         self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, self.native_context.get_temp_addr())
         return self.native_context.get_temp_value(type=float)
 
-    def GetFirstBlip(self, blipType):
+    def get_first_blip(self, blipType):
         blip_id = self.native_call('GET_FIRST_BLIP_INFO_ID', 'L', blipType)
         if blip_id:
             return models.Blip(blip_id, self)
 
-    def NextBlipInfo(self, blipType):
+    def get_next_blip(self, blipType):
         blip_id = self.native_call('GET_NEXT_BLIP_INFO_ID', 'L', blipType)
         if blip_id:
             return models.Blip(blip_id, self)
 
+    def get_target_blips(self, color=0):
+        blip = self.get_first_blip(models.Blip.BLIP_DESTINATION_1)
+        if blip:
+            if color is 0 or blip.color == color:
+                yield blip
+
+            while True:
+                blip = self.get_next_blip(models.Blip.BLIP_DESTINATION_1)
+                if blip:
+                    if color is 0 or blip.color == color:
+                        yield blip
+                else:
+                    break
+
+    def get_friends(self):
+        """获取蓝色标记的peds"""
+        return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_FRIEND)]
+
+    def get_enemys(self):
+        """获取红色标记的peds"""
+        return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY)]
+
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
-        if not self.teleport_to_blip(self.GetFirstBlip(models.Blip.BLIP_WAYPOINT)):
+        if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
             print('无法获取标记坐标')
 
     def teleport_to_destination(self, _=None):
         """瞬移到目的地"""
         for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
-            if self.teleport_to_blip(self.GetFirstBlip(i)):
+            if self.teleport_to_blip(self.get_first_blip(i)):
                 break
         else:
             print('无法获取目的地坐标')
@@ -527,6 +576,8 @@ class Tool(BaseGTATool):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
     def spawn_vehicle(self, model):
+        m = models.IVModel(model, self)
+        m.request()
         self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1, sync=True)
         return Vehicle(self.native_context.get_temp_value(), self)
 

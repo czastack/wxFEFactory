@@ -295,6 +295,13 @@ class NativeModel:
 class NativeEntity(NativeModel):
     distance = Physicle.distance
 
+    EXPLOSION_TYPE_GRENADE = 0
+    EXPLOSION_TYPE_MOLOTOV = 1
+    EXPLOSION_TYPE_ROCKET = 2
+    EXPLOSION_TYPE_HI_OCTANE = 3
+    EXPLOSION_TYPE_CAR = 4
+    EXPLOSION_TYPE_PLANE = 5
+
     @property
     def speed(self):
         values = self.mgr.get_move_speed(self.addr)
@@ -313,6 +320,10 @@ class NativeEntity(NativeModel):
     def delete_fire(self):
         if hasattr(self, '_fire'):
             self.native_call('REMOVE_SCRIPT_FIRE', 'L', self._fire)
+
+    def create_explosion(self, uiExplosionType=EXPLOSION_TYPE_ROCKET, fRadius=3, bSound=True, bInvisible=True, fCameraShake=0.1):
+        pos = self.coord.values()
+        self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *pos, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake, sync=True)
 
     @property
     def rotation(self):
@@ -514,6 +525,16 @@ class Player(NativeEntity):
     @lazy
     def weapons(self):
         return WeaponSet(self, self.WEAPON_SLOT)
+
+    def explode_head(self):
+        """爆头"""
+        self.script_hook_call('EXPLODE_CHAR_HEAD', 'L', self.handle, sync=True)
+
+    def explode(self):
+        self.create_explosion()
+
+    def addr_marker(self):
+        return Blip.add_blip_for_char(self)
 
     del getter, getter_ptr, setter
 
@@ -766,7 +787,10 @@ class Vehicle(NativeEntity):
         self.native_call('FIX_CAR', 'L', self.handle)
 
     def explode(self):
-        self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0)
+        self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0, sync=True)
+
+    def addr_marker(self):
+        return Blip.add_blip_for_car(self)
 
     del getter, getter_ptr, setter
 
@@ -782,9 +806,23 @@ class IVModel(NativeModel):
     is_plane = property(getter("IS_THIS_MODEL_A_PLANE", bool))
     is_train = property(getter("IS_THIS_MODEL_A_TRAIN", bool))
     is_vehicle = property(getter("IS_THIS_MODEL_A_VEHICLE", bool))
-
-    request = getter('REQUEST_MODEL', ret_type=None)
     loaded = property(getter('HAS_MODEL_LOADED', bool))
+
+    def request(self):
+        if self.loaded:
+            return True
+
+        self.script_hook_call('REQUEST_MODEL', 'L', self.handle, sync=True)
+        try_count = 20
+        while try_count:
+            time.sleep(0.1)
+            if self.loaded:
+                return True
+
+            try_count -= 1
+
+    def release(self):
+        self.script_hook_call('MARK_MODEL_AS_NO_LONGER_NEEDED', 'L', self.handle, sync=True)
 
     del getter, getter_ptr, setter
 
@@ -803,16 +841,8 @@ class Blip(NativeModel):
     BLIP_TYPE_CONTACT = 5          # FRIEND
     BLIP_TYPE_PICKUP = 6
 
-    BLIPCOLOR_RED = 0x1
-    BLIPCOLOR_GREEN = 0x2
-    BLIPCOLOR_BLUE = 0x3
-    BLIPCOLOR_YELLOWMISSION = 0x5
-    BLIPCOLOR_FRIENDLYVEHICLE = 0x26
-    BLIPCOLOR_REDMISSION = 0x31
-    BLIPCOLOR_MISSIONVEHICLE = 0x36
-    BLIPCOLOR_YELLOWMISSION2 = 0x3C
-    BLIPCOLOR_MISSION = 0x42
-    BLIPCOLOR_WAYPOINT = 0x53
+    BLIP_COLOR_ENEMY = 0x4
+    BLIP_COLOR_FRIEND = 0x9
 
     color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
@@ -840,11 +870,11 @@ class Blip(NativeModel):
             return Player(0, self.ped_index, self.mgr)
 
     @classmethod
-    def addBlipForCar(cls, vehicle):
-        vehicle.script_hook_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr())
+    def add_blip_for_car(cls, vehicle):
+        vehicle.script_hook_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr(), sync=True)
         return cls(vehicle.native_context.get_temp_value(), vehicle.mgr)
 
     @classmethod
-    def addBlipForChar(cls, ped):
-        ped.script_hook_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr())
+    def add_blip_for_char(cls, ped):
+        ped.script_hook_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr(), sync=True)
         return cls(ped.native_context.get_temp_value(), ped.mgr)
