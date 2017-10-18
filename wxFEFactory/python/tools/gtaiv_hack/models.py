@@ -311,19 +311,16 @@ class NativeEntity(NativeModel):
     def speed(self, value):
         self.mgr.set_move_speed(self.addr, value)
 
-    def create_fire(self, numGenerationsAllowed=0, strength=1):
-        args = self.coord.values()
-        args.append(numGenerationsAllowed)
-        args.append(strength)
-        self._fire = self.native_call('START_SCRIPT_FIRE', '3f2L', *args)
+    def create_fire(self):
+        self._fire = self.mgr.create_fire(self.coord)
+        return self._fire
 
     def delete_fire(self):
         if hasattr(self, '_fire'):
-            self.native_call('REMOVE_SCRIPT_FIRE', 'L', self._fire)
+            self.mgr.delete_fire(self._fire)
 
-    def create_explosion(self, uiExplosionType=EXPLOSION_TYPE_ROCKET, fRadius=3, bSound=True, bInvisible=True, fCameraShake=0.1):
-        pos = self.coord.values()
-        self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *pos, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake, sync=True)
+    def create_explosion(self, *args, **kwargs):
+        self.mgr.create_explosion(self.coord, *args, **kwargs)
 
     @property
     def rotation(self):
@@ -339,6 +336,16 @@ class NativeEntity(NativeModel):
 
     def stop(self):
         self.speed = (0, 0, 0)
+
+    def get_offset_coord_m(self, offset):
+        """手动获取偏移后的坐标"""
+        coord = self.coord.values()
+        coord[0] += offset[0]
+        coord[1] += offset[1]
+        coord[2] += offset[2]
+        return coord
+
+    get_offset_coord = get_offset_coord_m
 
 
 class Player(NativeEntity):
@@ -423,7 +430,7 @@ class Player(NativeEntity):
             self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
-        self.script_hook_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index)
+        self.script_hook_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index, sync=False)
 
     isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略
@@ -443,7 +450,7 @@ class Player(NativeEntity):
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        self.script_hook_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos)
+        self.script_hook_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
         # self.mgr.LoadEnvironmentNow(pos)
 
     def get_offset_coord(self, offset):
@@ -528,10 +535,10 @@ class Player(NativeEntity):
 
     def explode_head(self):
         """爆头"""
-        self.script_hook_call('EXPLODE_CHAR_HEAD', 'L', self.handle, sync=True)
+        self.script_hook_call('EXPLODE_CHAR_HEAD', 'L', self.handle)
 
-    def explode(self):
-        self.create_explosion()
+    def explode(self, *args, **kwargs):
+        self.create_explosion(*args, **kwargs)
 
     def addr_marker(self):
         return Blip.add_blip_for_char(self)
@@ -652,7 +659,7 @@ class Vehicle(NativeEntity):
         pos = tuple(value)
         mycar = self.mgr.player.get_vehicle_handle()
         if self.handle == mycar:
-            self.script_hook_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
+            self.script_hook_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
             # self.mgr.LoadEnvironmentNow(pos)
         else:
             self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
@@ -787,7 +794,7 @@ class Vehicle(NativeEntity):
         self.native_call('FIX_CAR', 'L', self.handle)
 
     def explode(self):
-        self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0, sync=True)
+        self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0)
 
     def addr_marker(self):
         return Blip.add_blip_for_car(self)
@@ -812,7 +819,7 @@ class IVModel(NativeModel):
         if self.loaded:
             return True
 
-        self.script_hook_call('REQUEST_MODEL', 'L', self.handle, sync=True)
+        self.script_hook_call('REQUEST_MODEL', 'L', self.handle)
         try_count = 20
         while try_count:
             time.sleep(0.1)
@@ -822,7 +829,7 @@ class IVModel(NativeModel):
             try_count -= 1
 
     def release(self):
-        self.script_hook_call('MARK_MODEL_AS_NO_LONGER_NEEDED', 'L', self.handle, sync=True)
+        self.script_hook_call('MARK_MODEL_AS_NO_LONGER_NEEDED', 'L', self.handle)
 
     del getter, getter_ptr, setter
 
@@ -844,7 +851,7 @@ class Blip(NativeModel):
     BLIP_COLOR_ENEMY = 0x4
     BLIP_COLOR_FRIEND = 0x9
 
-    color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'))
+    color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'), NativeModel.setter('CHANGE_BLIP_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
     blipSprite = property(NativeModel.getter('GET_BLIP_SPRITE'))
     existed = property(NativeModel.getter('DOES_BLIP_EXIST', bool))
@@ -853,12 +860,13 @@ class Blip(NativeModel):
     object_index = property(NativeModel.getter('GET_BLIP_INFO_ID_OBJECT_INDEX'))
     pickup_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PICKUP_INDEX'))
     
-    remove = NativeModel.getter('REMOVE_BLIP')
+    def remove(self):
+        self.script_hook_call('REMOVE_BLIP', 'L', self.handle, ret_type=None)
 
     @property
     def coord(self):
         ctx = self.native_context
-        self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3), ret_type=None, sync=True)
+        self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3), ret_type=None)
         return ctx.get_temp_values(3, 1, float, mapfn=normalFloat)
 
     @property
@@ -871,10 +879,10 @@ class Blip(NativeModel):
 
     @classmethod
     def add_blip_for_car(cls, vehicle):
-        vehicle.script_hook_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr(), sync=True)
+        vehicle.script_hook_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr())
         return cls(vehicle.native_context.get_temp_value(), vehicle.mgr)
 
     @classmethod
     def add_blip_for_char(cls, ped):
-        ped.script_hook_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr(), sync=True)
+        ped.script_hook_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr())
         return cls(ped.native_context.get_temp_value(), ped.mgr)

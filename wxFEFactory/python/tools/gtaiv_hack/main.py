@@ -89,9 +89,12 @@ class Tool(BaseGTATool):
                 self.render_common_button()
                 ui.Button("缴械", onclick=self.remove_near_peds_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
+                ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)
                 ui.Button("敌人爆头", onclick=self.enemys_explode_head)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
+                ui.Button("爆炸就是艺术", onclick=self.explode_art)
+                ui.Button("保存菜单", onclick=self.activate_save_menu)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -104,7 +107,7 @@ class Tool(BaseGTATool):
 
     def checkAttach(self, _=None):
         className = 'grcWindow'
-        windowName = 'GTAIV'
+        windowName = getattr(self, 'WINDOW_NAME', 'GTAIV')
 
         if self.handler.active:
             self.free_remote_function()
@@ -130,6 +133,7 @@ class Tool(BaseGTATool):
                         ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
                         ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
                         ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
+                        ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
                     ) + self.get_common_hotkeys()
                 )
             self.init_addr()
@@ -168,33 +172,32 @@ class Tool(BaseGTATool):
         #         b'\xFF\x75\x08\xB9' + utils.u32bytes(0x11DC444) + b'\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
         #     )
 
-        # self.FUNCTION_FIND_NATIVE_ADDRESS = (
-        #     b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
-        #     b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
-        # )
+        self.FUNCTION_FIND_NATIVE_ADDRESS = (
+            b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
+            b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
+        )
 
         self.ScriptHookHelper = self.handler.get_module(r'Test.asi')
         if self.ScriptHookHelper:
             self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
 
+        # 使用新的地址表
+        address.NATIVE_ADDRS = {}
+
     def init_remote_function(self):
-        # 现在Native方法对应的地址直接写在address.NATIVE_ADDRS中了
-        # self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
+        self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
 
         # TODO
         if address.SetMoveSpeed:
             self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
             self.GetMoveSpeed = self.handler.write_function(self.FUNCTION_GET_SPEED)
 
-        # if address.LoadWorldAtPosition:
-        #     self.LoadWorldAtPosition = self.handler.write_function(self.FUNC_LOAD_WORLD_AT_POSITION)
-
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(NativeContext.SIZE)
         self.native_context = NativeContext(context_addr, self.handler)
 
     def free_remote_function(self):
-        # self.handler.free_memory(self.FindNativeAddress)
+        self.handler.free_memory(self.FindNativeAddress)
         if address.SetMoveSpeed:
             self.handler.free_memory(self.SetMoveSpeed)
             self.handler.free_memory(self.GetMoveSpeed)
@@ -202,23 +205,30 @@ class Tool(BaseGTATool):
         self.handler.free_memory(self.native_context.addr)
         self._playerins = None
 
+    def get_native_addr(self, name):
+        addr = address.NATIVE_ADDRS.get(name, 0)
+        if addr is 0:
+            # 获取原生函数地址
+            addr = address.NATIVE_ADDRS[name] = self.handler.remote_call(self.FindNativeAddress, address.NATIVE_HASH[name])
+        return addr
+
     def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
         """ 远程调用GTAIV中的方法
-        :param name: 方法名称，见address.NATIVE_ADDRS
+        :param name: 方法名称，见address.NATIVE_HASH
         :param arg_sign: 函数签名
         """
         with self.native_context:
-            fn_addr = self.get_addr(address.NATIVE_ADDRS[name])
+            fn_addr = self.get_native_addr(name)
             if arg_sign:
                 self.native_context.push(arg_sign, *args)
             self.handler.remote_call(fn_addr, self.native_context.addr)
             if ret_type:
                 return self.native_context.get_result(ret_type, ret_size)
 
-    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=False):
+    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         if self.ScriptHookHelper:
             with self.native_context:
-                fn_addr = self.get_addr(address.NATIVE_ADDRS[name])
+                fn_addr = self.get_native_addr(name)
                 if arg_sign:
                     self.native_context.push(arg_sign, *args)
                 self.native_context.push('L', fn_addr)
@@ -433,6 +443,11 @@ class Tool(BaseGTATool):
         for p in self.get_near_peds():
             p.create_fire()
 
+    def near_peds_explode(self, _=None):
+        """附近的人爆炸"""
+        for p in self.get_near_peds():
+            p.explode()
+
     def enemys_make_fire(self, _=None):
         """敌人着火"""
         for p in self.get_near_peds():
@@ -476,18 +491,19 @@ class Tool(BaseGTATool):
             return models.Blip(blip_id, self)
 
     def get_target_blips(self, color=0):
-        blip = self.get_first_blip(models.Blip.BLIP_DESTINATION_1)
-        if blip:
-            if color is 0 or blip.color == color:
-                yield blip
+        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
+            blip = self.get_first_blip(i)
+            if blip:
+                if color is 0 or blip.color == color:
+                    yield blip
 
-            while True:
-                blip = self.get_next_blip(models.Blip.BLIP_DESTINATION_1)
-                if blip:
-                    if color is 0 or blip.color == color:
-                        yield blip
-                else:
-                    break
+                while True:
+                    blip = self.get_next_blip(models.Blip.BLIP_DESTINATION_1)
+                    if blip:
+                        if color is 0 or blip.color == color:
+                            yield blip
+                    else:
+                        break
 
     def get_friends(self):
         """获取蓝色标记的peds"""
@@ -516,6 +532,7 @@ class Tool(BaseGTATool):
             print(coord)
 
             if coord[0] != 0 or coord[1] != 0:
+                self.player.coord = coord
                 if coord[2] == 0.0:
                     coord[2] = self.GetGroundZ(coord) or 16
                 self.player.coord = coord
@@ -576,17 +593,55 @@ class Tool(BaseGTATool):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
     def spawn_vehicle(self, model):
+        """生成载具"""
         m = models.IVModel(model, self)
         m.request()
-        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1, sync=True)
+        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
         return Vehicle(self.native_context.get_temp_value(), self)
 
     def spawn_choosed_vehicle(self, _=None):
+        """生成选中的载具"""
         model = getattr(self, 'spwan_vehicle_id', None)
         if model:
             return self.spawn_vehicle(model)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
+        """生成选中的载具并进入"""
         car = self.spawn_choosed_vehicle()
         if car:
-            self.script_hook_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0)
+            self.script_hook_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0, sync=False)
+
+    def create_fire(self, coord, numGenerationsAllowed=0, strength=1):
+        """生成火焰"""
+        return self.native_call('START_SCRIPT_FIRE', '3f2L', *coord, numGenerationsAllowed, strength)
+
+    def delete_fire(self, fire):
+        """熄灭生成的火焰"""
+        self.native_call('REMOVE_SCRIPT_FIRE', 'L', fire)
+
+    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=True, fCameraShake=0):
+        """产生爆炸"""
+        self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
+
+    def explode_art(self, _=None, count=10):
+        """爆炸就是艺术"""
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        offset = (cam_x * 5, cam_y * 5, cam_z * 5)
+        coord = self.player.get_offset_coord_m(offset)
+
+        # fires = []
+
+        for i in range(count):
+            coord[0] += offset[0]
+            coord[1] += offset[1]
+            coord[2] += offset[2]
+            self.create_explosion(coord)
+            # fires.append(self.create_fire(coord))
+
+        # 5秒后移除火焰
+        # time.sleep(5)
+        # for fire in fires:
+        #     self.delete_fire(fire)
+
+    def activate_save_menu(self, _=None):
+        self.native_call('ACTIVATE_SAVE_MENU', None)
