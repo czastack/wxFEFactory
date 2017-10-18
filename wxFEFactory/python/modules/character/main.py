@@ -12,8 +12,8 @@ class Module(BaseListBoxModuel):
         self._pg_inited = False
         self.data_map = {}
 
-    def attach(self):
-        super().attach()
+    def attach(self, frame):
+        super().attach(frame)
 
         data_list = self.loadJson('characters', [])
         for item in data_list:
@@ -50,14 +50,14 @@ class Module(BaseListBoxModuel):
         else:
             self.addr_view.value = ""
 
-    def onclose(self):
+    def onClose(self):
         if self.pg.changed:
             choice = self.confirm('保存修改', '有修改，是否保存？', self.CANCEL)
             if choice is self.CANCEL:
                 return False
             elif choice is self.YES:
                 self.onSave(None)
-        return super().onclose()
+        return super().onClose()
 
     def onAdd(self, btn):
         name = input("角色名称")

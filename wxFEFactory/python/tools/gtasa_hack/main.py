@@ -174,6 +174,7 @@ class Tool(BaseGTATool):
     def onClose(self, _=None):
         if self.handler.active:
             self.free_remote_function()
+        return super().onClose()
 
     def init_remote_function(self):
         self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)

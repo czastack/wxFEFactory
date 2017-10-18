@@ -79,29 +79,29 @@ void init_layout(py::module &m)
 		.def_property("position", &BaseFrame::getPosition, &BaseFrame::setPosition);
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
-		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj>(),
-			label, "menuBar"_a=nullptr, styles, className, style)
+		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(),
+			label, "menuBar"_a=nullptr, "exstyle"_a=(long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), styles, className, style)
 		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
 		.def_property_readonly("menubar", &Window::getMenuBar)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
 
 	py::class_t<HotkeyWindow, Window>(layout, "HotkeyWindow")
-		.def_init(py::init<wxcstr, MenuBar*, pyobj, pyobj, pyobj>(),
-			label, "menuBar"_a = nullptr, styles, className, style)
+		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(),
+			label, "menuBar"_a=nullptr, "exstyle"_a=(long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), styles, className, style)
 		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
 		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
 		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
 
 	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
-			label, styles, className, style)
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+			label, "exstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
 		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal);
 
 	py::class_t<StdModalDialog, Dialog>(layout, "StdModalDialog")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
-			label, styles, className, style);
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+			label, "exstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
 
 	py::class_t<Vertical, Layout>(layout, "Vertical")
 		.def_init(layout_init, styles, className, style);
@@ -313,7 +313,8 @@ void init_layout(py::module &m)
 
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
 		.def_init(layout_init, styles, className, style)
-		.def("getPage", &AuiNotebook::getPage);
+		.def("getPage", &AuiNotebook::getPage)
+		.def("closePage", &AuiNotebook::closePage);
 
 
 	// bars

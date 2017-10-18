@@ -4,10 +4,6 @@ from commonstyle import styles, dialog_style
 from fe.ferom import FeRomRW
 
 class Tool(BaseTool):
-
-    def attach(self):
-        self.render()
-    
     def render(self):
         input_style = {
             'height': 60,
@@ -15,7 +11,7 @@ class Tool(BaseTool):
 
         with ui.MenuBar() as menubar:
             with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.onclose)
+                ui.MenuItem("关闭\tCtrl+W", onselect=self.onClose)
 
         with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menuBar=menubar) as win:
             with ui.Vertical():
@@ -34,16 +30,16 @@ class Tool(BaseTool):
                     for i in (2, 3, 4):
                         container.AddGrowableRow(i)
 
-        self.win = win
         self.rom_picker.setOnChange(self.onRomChange)
         self.dict_picker.setOnChange(self.onDictChange)
         self.text_view.setOnEnter(self.onConvertText)
         self.code_view.setOnEnter(self.onConvertCode)
         self.dict_picker.enabled = False
         self.reader = None
+        return win
 
-    def onclose(self, m=None):
-        super().onclose()
+    def onClose(self, m=None):
+        super().onClose()
         self.win.close()
 
     def onRomChange(self, picker):

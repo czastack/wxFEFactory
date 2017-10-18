@@ -20,12 +20,14 @@ win_style = {
 
 
 class BaseGTATool(BaseTool):
+    nested = True
+
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
 
-    def attach(self):
-        self.render()
+    def attach(self, frame):
+        super().attach(frame)
         self.checkAttach()
 
     def render(self):
@@ -39,10 +41,11 @@ class BaseGTATool(BaseTool):
                     self.render_main()
 
         win.setOnClose(self.onClose)
+        return win
 
     def render_win(self):
         menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar)
+        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar, exstyle=0x80804)
         self.win.position = (70, 4)
         return self.win
 

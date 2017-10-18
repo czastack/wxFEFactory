@@ -10,8 +10,8 @@ class Module(BaseListBoxModuel):
     def __init__(self):
         super().__init__()
 
-    def attach(self):
-        super().attach()
+    def attach(self, frame):
+        super().attach(frame)
         self.data_list = self.loadJson('strings', [])
         count = self.listbox.count
         for item in self.data_list:

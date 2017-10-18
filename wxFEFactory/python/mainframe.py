@@ -57,8 +57,12 @@ class MainFrame:
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager() as aui:
                 # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "img/icon1.png", self.onselect).realize(), direction="top", captionVisible=False)
-                # with ui.ToolBar() as toolbar:
-                #     ui.Text("测试")
+                # toolbar = (
+                #     ui.ToolBar(direction=ui.VERTICAL, exstyle=0x0900)
+                #     .addTool("123", "1234", "img/icon1.png", self.onselect)
+                #     .addTool("123", "1234", "img/icon1.png", self.onselect)
+                #     .realize()
+                # )
                 # ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 self.book = ui.AuiNotebook()
@@ -106,7 +110,7 @@ class MainFrame:
         try:
             Module = self.getModule(name)
             m = Module()
-            m.attach()
+            m.attach(self)
             __main__.m = m
 
         except Exception as e:
@@ -252,7 +256,8 @@ class MainFrame:
     def openToolByName(self, name):
         Tool = self.getTool(name)
         tool = Tool()
-        tool.attach()
+        tool.attach(self)
+
         __main__.tool = tool
 
     def attachEmu(self, m):

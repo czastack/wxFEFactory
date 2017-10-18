@@ -7,13 +7,23 @@ import __main__
 
 
 class BaseTool(BaseScene):
-    """
-    self.win 窗口对象
-    """
+    # 窗口嵌套
+    nested = False
+
+    def attach(self, frame):
+        if self.nested:
+            with frame.book:
+                win = self.render()
+                if win:
+                    ui.AuiItem(win, caption=self.getTitle(), onclose=self.onClose)
+        else:
+            win = self.render()
+        
+        if win:
+            self.win = win
 
     def render(self):
-        """
-        渲染视图，供attach调用
+        """ 渲染视图，供attach调用
         :return: 返回根元素
         """
         pass
@@ -57,8 +67,15 @@ class BaseTool(BaseScene):
 
     def closeWindow(self, _=None):
         self.onClose()
-        self.win.close()
+        if self.nested:
+            self.win.parent.closePage()
+        else:
+            self.win.close()
 
     def onClose(self):
+        super().onClose()
+        
         if getattr(__main__, 'tool', None) == self:
             del __main__.tool
+        
+        return True

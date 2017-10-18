@@ -100,7 +100,9 @@ class Tool(BaseGTATool):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def onClose(self, _=None):
-        self.free_remote_function()
+        if self.handler.active:
+            self.free_remote_function()
+        return super().onClose()
 
     def init_remote_function(self):
         self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)

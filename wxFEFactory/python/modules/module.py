@@ -1,4 +1,3 @@
-from mainframe import frame, win, ui
 from application import app
 from lib.lazy import lazyclassmethod
 from lib.basescene import BaseScene
@@ -7,31 +6,30 @@ from . import modules
 import os
 import json
 import types
+import __main__
+import fefactory_api
+ui = fefactory_api.ui
 
 DUMP_INDENT = app.getConfig('json_indent', 4)
 
 class BaseModule(BaseScene):
     menu = None
 
-    def attach(self):
+    def attach(self, frame):
         """模块加载完毕后调用，用于添加视图到主窗口"""
         with frame.book:
             self.view = self.render()
-        with win.menubar:
+        with frame.win.menubar:
             self.menu = self.getMenu()
 
-    def onclose(self):
+    def onClose(self):
         """标签页关闭回调，返回False会取消关闭"""
-        super().onclose()
+        super().onClose()
 
         if self.menu:
-            win.menubar.remove(self.menu)
+            __main__.win.menubar.remove(self.menu)
 
         return True
-
-    def readFrom(self, reader):
-        """从rom等数据源读取数据"""
-        pass
 
     def render(self):
         """
@@ -86,6 +84,10 @@ class BaseModule(BaseScene):
             json.dump(data, file, ensure_ascii=False, indent=indent)
         print("保存成功: " + file.name)
 
+    def readFrom(self, reader):
+        """从rom等数据源读取数据"""
+        pass
+
 
 class BaseListBoxModuel(BaseModule):
     """
@@ -103,7 +105,7 @@ class BaseListBoxModuel(BaseModule):
                     ui.Button(label="删除", className="button", onclick=self.onDel)
             with ui.Vertical():
                 self.render_right()
-        ui.AuiItem(panel, caption=self.getTitle(), onclose=self.onclose)
+        ui.AuiItem(panel, caption=self.getTitle(), onclose=self.onClose)
 
         with ui.ContextMenu() as listmenu:
             ui.MenuItem("重命名", onselect=self.onRename)

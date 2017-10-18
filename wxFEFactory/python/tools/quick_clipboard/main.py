@@ -13,7 +13,7 @@ class Tool(BaseTool):
     def __init__(self):
         pass
 
-    def attach(self):
+    def attach(self, frame):
         self.render()
         self.win.RegisterHotKeys((
             ('item_prev', MOD_ALT, getVK('['), self.item_prev),

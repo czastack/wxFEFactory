@@ -101,9 +101,9 @@ class Tool(BaseGTATool):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def onClose(self, _=None):
-        super().onClose()
         if self.handler.active:
             self.free_remote_function()
+        return super().onClose()
 
     def checkAttach(self, _=None):
         className = 'grcWindow'

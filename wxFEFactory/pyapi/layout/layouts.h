@@ -92,9 +92,9 @@ class Window : public BaseFrame
 {
 public:
 	template <class... Args>
-	Window(wxcstr title, MenuBar *menuBar, Args ...args) : BaseFrame(args...)
+	Window(wxcstr title, MenuBar *menuBar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL));
+		bindElem(new wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
 		if (menuBar)
 		{
 			setMenu(*menuBar);
@@ -204,10 +204,9 @@ class Dialog : public BaseFrame
 {
 public:
 	template <class... Args>
-	Dialog(wxcstr title, Args ...args) : BaseFrame(args...)
+	Dialog(wxcstr title, long exstyle/*=wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX*/, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(),
-			wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX));
+		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
 		m_onclose = None;
 	}
