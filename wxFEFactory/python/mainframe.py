@@ -57,13 +57,14 @@ class MainFrame:
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager() as aui:
                 # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "img/icon1.png", self.onselect).realize(), direction="top", captionVisible=False)
-                # toolbar = (
-                #     ui.ToolBar(direction=ui.VERTICAL, exstyle=0x0900)
-                #     .addTool("123", "1234", "img/icon1.png", self.onselect)
-                #     .addTool("123", "1234", "img/icon1.png", self.onselect)
-                #     .realize()
-                # )
-                # ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
+                bitmap = ui.Bitmap().loadIcon('F:/temp/gtaiv.ico')
+                toolbar = (
+                    ui.AuiToolBar()
+                    .addTool("123", "", bitmap, self.onselect)
+                    .addTool("123", "", bitmap, self.onselect)
+                    .realize()
+                )
+                ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
                 ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 self.book = ui.AuiNotebook()
                 ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)

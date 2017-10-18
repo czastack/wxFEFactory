@@ -3,6 +3,7 @@
 #include "../functions.h"
 #include "layout.h"
 #include "menu.h"
+#include "bitmap.h"
 #include "layouts.h"
 #include "controls.h"
 #include "datacontrols.h"
@@ -33,6 +34,7 @@ void init_layout(py::module &m)
 
 	py::module layout = m.def_submodule("layout");
 	init_menu(layout);
+	init_bitmap(layout);
 	setattr(m, "ui", layout);
 
 	// wx const
@@ -320,12 +322,20 @@ void init_layout(py::module &m)
 	// bars
 
 	py::class_t<ToolBar, Layout>(layout, "ToolBar")
-		.def_init(py::init<long, long, pyobj, pyobj, pyobj>(), "direction"_a=(long)wxHORIZONTAL, "exstyle"_a=(long)wxTB_TEXT, styles, className, style)
+		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "exstyle"_a=(long)wxHORIZONTAL|wxTB_TEXT, styles, className, style)
 		.def("addTool", &ToolBar::addTool, 
-			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=wxEmptyString, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
+			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
 		.def("addControl", &ToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
 		.def("addSeparator", &ToolBar::addSeparator)
 		.def("realize", &ToolBar::realize);
+
+	py::class_t<AuiToolBar, Layout>(layout, "AuiToolBar")
+		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "exstyle"_a=(long)wxAUI_TB_HORIZONTAL|wxAUI_TB_TEXT, styles, className, style)
+		.def("addTool", &AuiToolBar::addTool, 
+			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
+		.def("addControl", &AuiToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
+		.def("addSeparator", &AuiToolBar::addSeparator)
+		.def("realize", &AuiToolBar::realize);
 
 	py::class_t<StatusBar, Control>(layout, "StatusBar")
 		.def_init(view_init, className, style)

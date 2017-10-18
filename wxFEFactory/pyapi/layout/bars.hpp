@@ -2,35 +2,41 @@
 #include <wx/sharedptr.h>
 #include <wx/artprov.h>
 #include "layoutbase.h"
+#include "wx/aui/auibar.h"
 
-class ToolBar : public Layout
+template <class T>
+class ToolBarBase : public Layout
 {
 public:
 	template <class... Args>
-	ToolBar(long direction, long exstyle/*=wxTB_TEXT*/, Args ...args) : Layout(args...)
+	ToolBarBase(long exstyle/*=wxHORIZONTAL|wxTB_TEXT*/, Args ...args) : Layout(args...)
 	{
-		bindElem(new wxToolBar(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), direction | exstyle));
-		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBar::onClick, this);
+		bindElem(new T(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), exstyle));
+		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBarBase::onClick, this);
 	}
 
-	wxToolBar& ctrl() const
+	T& ctrl() const
 	{
-		return *(wxToolBar*)m_elem;
+		return *(T*)m_elem;
 	}
 
-	ToolBar& addTool(wxcstr label, wxcstr shortHelp, wxcstr bitmap, pycref onclick, int toolid, wxcstr kind)
+	ToolBarBase& addTool(wxcstr label, wxcstr shortHelp, pycref bitmap, pycref onclick, int toolid, wxcstr kind)
 	{
 		wxBitmap bp;
 
-		if (bitmap.IsEmpty())
+		if (py::isinstance<wxBitmap>(bitmap))
 		{
-			bp = wxNullBitmap;
+			bp = bitmap.cast<wxBitmap>();
+		}
+		else if (PY_IS_TYPE(bitmap, PyUnicode))
+		{
+			bp.LoadFile(bitmap.cast<wxString>(), wxBITMAP_TYPE_PNG);
 		}
 		else
 		{
-			bp.LoadFile(bitmap, wxBITMAP_TYPE_PNG);
+			bp.Create({ 1, 1 });
 		}
-		wxToolBarToolBase *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
+		auto *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
 		if (onclick != None)
 		{
 			m_listeners[py::cast(tool->GetId())] = onclick;
@@ -38,9 +44,9 @@ public:
 		return *this;
 	}
 
-	ToolBar& addControl(const View &view, wxcstr label, pycref onclick)
+	ToolBarBase& addControl(const View &view, wxcstr label, pycref onclick)
 	{
-		wxToolBarToolBase *tool = ctrl().AddControl((wxControl*)view.ptr(), label);
+		auto *tool = ctrl().AddControl((wxControl*)view.ptr(), label);
 		if (onclick != None)
 		{
 			m_listeners[py::cast(tool->GetId())] = onclick;
@@ -48,12 +54,12 @@ public:
 		return *this;
 	}
 
-	ToolBar& addSeparator() {
+	ToolBarBase& addSeparator() {
 		ctrl().AddSeparator();
 		return *this;
 	}
 
-	ToolBar& realize() {
+	ToolBarBase& realize() {
 		ctrl().Realize();
 		return *this;
 	}
@@ -74,7 +80,7 @@ public:
 
 	void setToolText(int id, wxcstr label)
 	{
-		wxToolBarToolBase *tool = ctrl().FindById(id);
+		auto *tool = ctrl().FindById(id);
 		tool->SetLabel(label);
 	}
 
@@ -86,6 +92,10 @@ public:
 protected:
 	py::dict m_listeners;
 };
+
+
+using ToolBar = ToolBarBase<wxToolBar>;
+using AuiToolBar = ToolBarBase<wxAuiToolBar>;
 
 
 class StatusBar : public Control
