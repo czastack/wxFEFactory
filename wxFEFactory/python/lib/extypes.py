@@ -130,3 +130,21 @@ class Dicts:
         for item in self.data:
             self.__ref.__init__(item)
             yield self.__ref
+
+
+class INum:
+    def __init__(self, i):
+        self.i = i
+
+    def __pos__(self):
+        self.i += 1
+        return self.i
+
+    def __neg__(self):
+        self.i -= 1
+        return self.i
+
+    def __int__(self):
+        return self.i
+
+    __index__ = __int__

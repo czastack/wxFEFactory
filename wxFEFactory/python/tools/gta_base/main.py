@@ -40,7 +40,6 @@ class BaseGTATool(BaseTool):
                 with ui.Notebook(className="fill"):
                     self.render_main()
 
-        win.setOnClose(self.onClose)
         return win
 
     def render_win(self):

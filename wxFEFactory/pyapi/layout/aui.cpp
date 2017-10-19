@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include "aui.h"
+#include "layouts.h"
 
 void AuiManager::doAdd(View & child)
 {
@@ -126,6 +127,8 @@ bool AuiNotebook::canPageClose(int n)
 	if (ctrl().GetPageCount() == 0)
 		return false;
 
+	bool ret = true;
+
 	if (n == -1)
 		n = ctrl().GetSelection();
 
@@ -134,14 +137,21 @@ bool AuiNotebook::canPageClose(int n)
 
 	if (onclose != None)
 	{
-		bool ret = PyObject_IsTrue(pyCall(onclose).ptr()) != 0;
+		ret = PyObject_IsTrue(pyCall(onclose).ptr()) != 0;
 		if (ret)
 		{
 			m_close_listeners.attr("pop")(page);
 		}
-		return ret;
 	}
 
-	return true;
+	if (ret) {
+		// 手动调用子窗口的onClose
+		if (py::isinstance<BaseFrame>(page))
+		{
+			page.cast<BaseFrame*>()->onClose(wxCloseEvent());
+		}
+	}
+
+	return ret;
 }
 

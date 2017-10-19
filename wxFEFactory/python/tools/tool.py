@@ -15,11 +15,12 @@ class BaseTool(BaseScene):
             with frame.book:
                 win = self.render()
                 if win:
-                    ui.AuiItem(win, caption=self.getTitle(), onclose=self.onClose)
+                    ui.AuiItem(win, caption=self.getTitle())
         else:
             win = self.render()
         
         if win:
+            win.setOnClose(self.onClose)
             self.win = win
 
     def render(self):
@@ -55,22 +56,29 @@ class BaseTool(BaseScene):
 
     def reload(self, _=None):
         from mainframe import frame
-
         name = self.getName()
-        self.closeWindow()
 
-        def callback():
-            from mainframe import frame
-            frame.openToolByName(name)
+        def close_callback():
+            def callback():
+                from mainframe import frame
+                frame.openToolByName(name)
+            frame.restart(callback=callback)
 
-        frame.restart(callback=callback)
+        if self.nested:
+            # 因为nested模式下，onClose在book的closePage后调用onClose（异步）
+            # 故使用回调的方式
+            self.close_callback = close_callback
+            self.closeWindow()
+        else:
+            self.closeWindow()
+            close_callback()
 
     def closeWindow(self, _=None):
         if self.nested:
             self.win.parent.closePage()
             # closePage会自动调用onClose
         else:
-            self.onClose()
+            # win应该设置close回调为self.onClose
             self.win.close()
 
     def onClose(self):
@@ -78,5 +86,9 @@ class BaseTool(BaseScene):
         
         if getattr(__main__, 'tool', None) == self:
             del __main__.tool
+
+        callback = getattr(self, 'close_callback', None)
+        if callback:
+            callback()
         
         return True

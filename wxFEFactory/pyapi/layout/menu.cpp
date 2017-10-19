@@ -8,7 +8,7 @@ bool MenuHolder::onSelect(int id)
 	pycref item = getMenu(id);
 	if (py::isinstance<MenuItem>(item))
 	{
-		return item.cast<MenuItem>().onSelect();
+		return item.cast<MenuItem*>()->onSelect();
 	}
 	return false;
 }
