@@ -20,7 +20,7 @@ public:
 		return *(T*)m_elem;
 	}
 
-	ToolBarBase& addTool(wxcstr label, wxcstr shortHelp, pycref bitmap, pycref onclick, int toolid, wxcstr kind)
+	int addTool(wxcstr label, wxcstr shortHelp, pycref bitmap, pycref onclick, int toolid, wxcstr kind)
 	{
 		wxBitmap bp;
 
@@ -37,21 +37,23 @@ public:
 			bp.Create({ 1, 1 });
 		}
 		auto *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
+		toolid = tool->GetId();
 		if (onclick != None)
 		{
-			m_listeners[py::cast(tool->GetId())] = onclick;
+			m_listeners[py::cast(toolid)] = onclick;
 		}
-		return *this;
+		return toolid;
 	}
 
-	ToolBarBase& addControl(const View &view, wxcstr label, pycref onclick)
+	int addControl(const View &view, wxcstr label, pycref onclick)
 	{
 		auto *tool = ctrl().AddControl((wxControl*)view.ptr(), label);
+		int toolid = tool->GetId();
 		if (onclick != None)
 		{
 			m_listeners[py::cast(tool->GetId())] = onclick;
 		}
-		return *this;
+		return toolid;
 	}
 
 	ToolBarBase& addSeparator() {
@@ -78,10 +80,20 @@ public:
 		}
 	}
 
-	void setToolText(int id, wxcstr label)
+	void setToolText(int toolid, wxcstr label)
 	{
-		auto *tool = ctrl().FindById(id);
+		auto *tool = ctrl().FindById(toolid);
 		tool->SetLabel(label);
+	}
+
+	int getToolPos(int toolid)
+	{
+		return ctrl().GetToolPos(toolid);
+	}
+
+	void setToolBitmapSize(int w, int h)
+	{
+		ctrl().SetToolBitmapSize({w, h});
 	}
 
 	void doAdd(View &child) override

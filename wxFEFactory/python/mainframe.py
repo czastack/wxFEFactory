@@ -1,7 +1,6 @@
 from application import app
 from project import Project
 from modules import modules
-from tools import tools
 from fe.ferom import FeRomRW
 from lib import exui
 from commonstyle import dialog_style
@@ -10,6 +9,7 @@ import traceback
 import __main__
 import fefactory_api
 import fefactory
+import tools
 Path = os.path
 ui = fefactory_api.ui
 
@@ -56,16 +56,9 @@ class MainFrame:
 
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
             with ui.AuiManager() as aui:
-                # ui.AuiItem(ui.ToolBar().addTool("123", "1234", "img/icon1.png", self.onselect).realize(), direction="top", captionVisible=False)
-                bitmap = ui.Bitmap().loadIcon('F:/temp/gtaiv.ico')
-                toolbar = (
-                    ui.AuiToolBar()
-                    .addTool("123", "", bitmap, self.onselect)
-                    .addTool("123", "", bitmap, self.onselect)
-                    .realize()
-                )
+                toolbar = self.render_toolbar()
                 ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
-                ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
+                # ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 self.book = ui.AuiNotebook()
                 ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(className="console-bar") as console:
@@ -95,7 +88,7 @@ class MainFrame:
 
     @property
     def tool_names(self):
-        return (f'{t[1]}: {t[0]}' for t in tools)
+        return (f'{t[1]}: {t[0]}' for t in tools.tools)
 
     def getModule(self, name):
         module = __import__('modules.' + name, fromlist=['main']).main
@@ -124,6 +117,18 @@ class MainFrame:
     def restart(self, _=None, callback=None):
         self.closeWindow()
         fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
+
+    def render_toolbar(self):
+        bitmap = ui.Bitmap()
+        toolbar = ui.AuiToolBar()
+        for item in tools.toolbar_tools:
+            bitmap.loadIcon('python/tools/%s/icon.ico' % item[1])
+            toolbar.addTool(item[0], "", bitmap, self.onToolbarToolClick)
+
+        return toolbar.realize()
+
+    def onToolbarToolClick(self, toolbar, toolid):
+        self.openToolByName(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
 
     def toggleConsole(self, m):
         """显示/隐藏控制台"""
@@ -249,7 +254,7 @@ class MainFrame:
         print(cb)
 
     def onToolOpen(self, cb):
-        name = tools[cb.index][1]
+        name = tools.tools[cb.index][1]
         self.openToolByName(name)
         self.dialog.endModal()
         del self.dialog
@@ -286,10 +291,10 @@ class MainFrame:
 
 
 winstyle = {
-    # 'width': 1200,
-    # 'height': 960,
-    'width': 800,
-    'height': 600,
+    'width': 1200,
+    'height': 960,
+    'width': 900,
+    'height': 1200,
 }
 
 styles = {

@@ -327,7 +327,9 @@ void init_layout(py::module &m)
 			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
 		.def("addControl", &ToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
 		.def("addSeparator", &ToolBar::addSeparator)
-		.def("realize", &ToolBar::realize);
+		.def("realize", &ToolBar::realize)
+		.def("getToolPos", &ToolBar::getToolPos)
+		.def("setToolBitmapSize", &ToolBar::setToolBitmapSize);
 
 	py::class_t<AuiToolBar, Layout>(layout, "AuiToolBar")
 		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "exstyle"_a=(long)wxAUI_TB_HORIZONTAL|wxAUI_TB_TEXT, styles, className, style)
@@ -335,7 +337,9 @@ void init_layout(py::module &m)
 			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
 		.def("addControl", &AuiToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
 		.def("addSeparator", &AuiToolBar::addSeparator)
-		.def("realize", &AuiToolBar::realize);
+		.def("realize", &AuiToolBar::realize)
+		.def("getToolPos", &AuiToolBar::getToolPos)
+		.def("setToolBitmapSize", &AuiToolBar::setToolBitmapSize);
 
 	py::class_t<StatusBar, Control>(layout, "StatusBar")
 		.def_init(view_init, className, style)

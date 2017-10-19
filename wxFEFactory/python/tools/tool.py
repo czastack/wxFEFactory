@@ -66,10 +66,11 @@ class BaseTool(BaseScene):
         frame.restart(callback=callback)
 
     def closeWindow(self, _=None):
-        self.onClose()
         if self.nested:
             self.win.parent.closePage()
+            # closePage会自动调用onClose
         else:
+            self.onClose()
             self.win.close()
 
     def onClose(self):
