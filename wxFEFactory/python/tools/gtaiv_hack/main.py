@@ -8,7 +8,7 @@ from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
 from . import address, models
-from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
+from .data import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 import math
@@ -32,6 +32,7 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_SPEED_RATE = 60
     SLING_COORD_UP = 3
+    from .data import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -66,8 +67,8 @@ class Tool(BaseGTATool):
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
-            for i in range(1, len(WEAPON_LIST)):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
+            for i in range(1, len(self.WEAPON_LIST)):
+                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST, self._player))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
