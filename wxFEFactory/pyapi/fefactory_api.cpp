@@ -72,7 +72,7 @@ PyObject *fefactory_api() {
 
 	init_layout(m);
 	init_fe(m);
-#ifdef __WXMSW__
+#ifdef _WIN32
 	init_auto(m);
 	init_emuhacker(m);
 #endif

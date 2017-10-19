@@ -26,7 +26,7 @@ class MainFrame:
             if position:
                 self.win.position = position
 
-        if hasattr(app, 'project'):
+        if getattr(app, 'project', None):
             self.onOpenProject(app.project)
 
     def render(self):
@@ -168,7 +168,8 @@ class MainFrame:
             self.onOpenProject(project)
 
     def onOpenProject(self, project):
-        self.win.title = "%s - %s" % (self.win.title, project.title)
+        if project:
+            self.win.title = "%s - %s" % (self.win.title, project.title)
 
     def openProjectDir(self, m):
         if app.project_confirm():

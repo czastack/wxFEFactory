@@ -1,4 +1,4 @@
-#ifdef __WXMSW__
+#ifdef _WIN32
 
 #include "NdsEmuHandler.h"
 #include "utils/utils.h"

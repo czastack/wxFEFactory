@@ -1,4 +1,4 @@
-#ifdef __WXMSW__
+#ifdef _WIN32
 
 #include <wx/wx.h>
 #include "emuhacker.h"

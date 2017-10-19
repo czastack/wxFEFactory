@@ -8,12 +8,6 @@ HISTORY_SIZE = 10
 
 class Application((Configurable)):
     """保存一些全局数据"""
-
-    def project_confirm(self):
-        if not self.project:
-            fefactory_api.alert('未打开工程')
-            return False
-        return True
     
     def __init__(self):
         super().__init__()
@@ -25,6 +19,12 @@ class Application((Configurable)):
         else:
             config['recent_project'] = HistoryList(maxsize=HISTORY_SIZE)
             self.project = None
+
+    def project_confirm(self):
+        if not self.project:
+            fefactory_api.alert('未打开工程')
+            return False
+        return True
 
     def getConfigFile(self):
         return CONFIG_FILE
@@ -42,7 +42,8 @@ class Application((Configurable)):
 
     def onExit(self):
         self.writeConfig()
-        self.project.writeConfig()
+        if self.project:
+            self.project.writeConfig()
 
 
 app = Application()

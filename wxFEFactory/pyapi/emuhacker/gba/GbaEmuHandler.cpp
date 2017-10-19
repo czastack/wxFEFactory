@@ -1,4 +1,4 @@
-#ifdef __WXMSW__
+#ifdef _WIN32
 
 #include "GbaEmuHandler.h"
 #include "utils/utils.h"
