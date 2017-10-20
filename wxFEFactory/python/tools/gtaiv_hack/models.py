@@ -464,13 +464,13 @@ class Player(NativeEntity):
         return self.native_context.get_temp_value()
 
     @property
-    def cur_vehicle(self):
+    def vehicle(self):
         handle = self.get_vehicle_handle()
         if handle:
             return Vehicle(handle, self.mgr)
 
     @property
-    def vehicle(self):
+    def last_vehicle(self):
         handle = self.get_last_vehicle_handle()
         if handle:
             return Vehicle(handle, self.mgr)

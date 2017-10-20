@@ -392,7 +392,7 @@ class BaseGTATool(BaseTool):
             self.re_cal_markers()
 
         moved_car_addr = []
-        front_coord = self.get_front_coord()
+        coord = self.get_front_coord()
 
         for marker in self._markers:
             entity = marker.entity
@@ -401,11 +401,11 @@ class BaseGTATool(BaseTool):
                 if car and car.hp > 1: 
                     if car.addr not in moved_car_addr:
                         moved_car_addr.append(car.addr)
-                        car.coord = front_coord
+                        car.coord = coord
                 else:
-                    entity.coord = front_coord
+                    entity.coord = coord
             elif isinstance(entity, self.Vehicle):
-                entity.coord = front_coord
+                entity.coord = coord
             if zinc:
                 coord[2] += zinc
 

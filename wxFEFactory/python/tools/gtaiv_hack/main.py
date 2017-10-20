@@ -92,7 +92,8 @@ class Tool(BaseGTATool):
                     ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
                     ui.Text("清空通缉等级: alt+0")
                     ui.Text("爆破最近的车: alt+o")
-                    ui.Text("爆炸就是艺术 (向前生成数个爆炸): alt+`")
+                    ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
+                    ui.Text("红莲之炼金术 (长): alt+shift+`")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -103,7 +104,8 @@ class Tool(BaseGTATool):
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)
                 ui.Button("敌人爆头", onclick=self.enemys_explode_head)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
-                ui.Button("爆炸就是艺术", onclick=self.explode_art)
+                ui.Button("红莲之炼金术", onclick=self.explode_art)
+                ui.Button("红莲之炼金术(长)", onclick=partial(self.explode_art, count=24))
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
@@ -144,6 +146,7 @@ class Tool(BaseGTATool):
                         ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
                         ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
                         ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
+                        ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
                     ) + self.get_common_hotkeys()
                 )
             self.init_addr()
@@ -286,8 +289,8 @@ class Tool(BaseGTATool):
         return player
 
     def _vehicle(self):
-        """获取当前载具"""
-        return self.player.vehicle
+        """获取当前角色的上次使用的载具"""
+        return self.player.last_vehicle
         # return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
     player = property(_player)
@@ -435,7 +438,7 @@ class Tool(BaseGTATool):
 
     def vehicle_lock_door(self, _=None, lock=True):
         """锁车门"""
-        car = self.player.vehicle
+        car = self.vehicle
         if car:
             if lock:
                 car.lock_door()
@@ -684,7 +687,7 @@ class Tool(BaseGTATool):
         self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def explode_art(self, _=None, count=10):
-        """爆炸就是艺术 (向前生成数个爆炸)"""
+        """红莲之炼金术 (向前生成数个爆炸)"""
         cam_x, cam_y, cam_z = self.get_camera_rot()
         offset = (cam_x * 5, cam_y * 5, cam_z * 5)
         coord = self.player.get_offset_coord_m(offset)
@@ -706,3 +709,16 @@ class Tool(BaseGTATool):
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
         self.native_call('ACTIVATE_SAVE_MENU', None)
+
+    def near_peds_to_front(self, _=None):
+        super().near_peds_to_front(zinc=6)
+
+    def near_vehicles_to_front(self, _=None):
+        super().near_vehicles_to_front(zinc=5)
+
+    def re_cal_markers(self, _=None):
+        self._markers = list(self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY))
+        self._marker_index = 0
+
+    def move_marker_to_front(self, _=None):
+        super().move_marker_to_front(5)
