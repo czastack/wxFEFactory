@@ -22,6 +22,13 @@ win_style = {
 class BaseGTATool(BaseTool):
     nested = True
 
+    FUNCTION_NATIVE_CALL = (
+        b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x83\x46\x04\xFE\x8B\x56\x04\x8B\x46\x60\x42\x8B\x7E\x64\x89\x45\xF4\x89'
+        b'\x7D\xF8\x83\xFA\x01\x7E\x1C\x8D\x4E\x60\x8D\x0C\x91\x4A\x0F\x1F\x44\x00\x00\x8B\x01\x89\x45\xFC\xFF\x75\xFC\x8D\x49'
+        b'\xFC\x83\xEA\x01\x75\xF0\x85\xFF\x74\x03\x8B\x4D\xF8\xFF\x55\xF4\x89\x45\x08\x85\xFF\x75\x0C\x8B\x46\x04\xC1\xE0\x02'
+        b'\x89\x45\xF4\x03\x65\xF4\x8B\x0E\x8B\x45\x08\x5F\x5E\x89\x01\x8B\xE5\x5D\xC3'
+    )
+
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
@@ -51,6 +58,26 @@ class BaseGTATool(BaseTool):
     def swithKeeptop(self, cb):
         self.win.keeptop = cb.checked
 
+    def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
+        """ 远程调用参数为NativeContext*的函数
+        :param arg_sign: 函数签名
+        """
+        with self.native_context:
+            if arg_sign:
+                self.native_context.push(arg_sign, *args)
+            self.handler.remote_call(addr, self.native_context.addr)
+            if ret_type:
+                return self.native_context.get_result(ret_type, ret_size)
+
+    def native_auto_call(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
+        """ 以cdcel或thiscall形式调用远程函数
+        :param addr: 目标函数地址
+        :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
+        :param arg_sign: 参数签名
+        """
+        self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), addr, this, *args, ret_type=ret_type, ret_size=ret_size)
+        return self.native_context.get_temp_addr()
+
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)
 
@@ -73,21 +100,26 @@ class BaseGTATool(BaseTool):
 
     @property
     def isInVehicle(self):
+        """当前是否在乘车"""
         return self.player.isInVehicle
 
     @property
     def entity(self):
+        """在车中则返回载具对象，否则返回角色对象"""
         return self.vehicle if self.isInVehicle else self.player
 
     @property
     def ped_pool(self):
+        """角色池"""
         return self.models.Pool(self.address.PED_POOL, self.handler, self.Player)
 
     @property
     def vehicle_pool(self):
+        """载具池"""
         return self.models.Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
 
     def get_rotz(self):
+        """获取xy面旋转量"""
         PI = math.pi
         HALF_PI = PI / 2
         rotz = self.rot_view.mem_value
@@ -97,6 +129,7 @@ class BaseGTATool(BaseTool):
         return rotz
 
     def go_forward(self, _=None, rate=0):
+        """前进"""
         rate = rate or self.GO_FORWARD_COORD_RATE
         
         rotz = self.get_rotz()
@@ -131,22 +164,28 @@ class BaseGTATool(BaseTool):
         entity.speed = speed
 
     def raise_up(self, _=None, speed=1.0):
+        """上天（有速度）"""
         self.entity.speed[2] = speed
 
     def go_down(self, _=None, speed=0.5):
+        """向下（有速度）"""
         self.entity.speed[2] = -speed
 
     def to_up(self, _=None):
+        """往上（无速度）"""
         self.entity.coord[2] += 10
 
     def to_down(self, _=None):
+        """向下（无速度）"""
         self.entity.coord[2] -= 6
 
     def stop(self, _=None):
+        """停止移动"""
         speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
         speed_view.mem_value = (0, 0, 0)
 
     def restore_hp(self, _=None):
+        """恢复HP"""
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
@@ -154,6 +193,7 @@ class BaseGTATool(BaseTool):
             self.ap_view.mem_value = 200
 
     def restore_hp_large(self, _=None):
+        """恢复大量HP"""
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
         else:
@@ -161,17 +201,21 @@ class BaseGTATool(BaseTool):
             self.ap_view.mem_value = 999
 
     def from_player_coord(self, btn):
+        """车坐标从人坐标取值"""
         self.vehicle_coord_view.input_value = self.coord_view.input_value
 
     def from_vehicle_coord(self, btn):
+        """人坐标从车坐标取值"""
         self.coord_view.input_value = self.vehicle_coord_view.input_value
 
     def go_prev_pos(self, _=None):
+        """瞬移到上一处地点"""
         view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
         view.listbox.prev()
         view.write()
 
     def go_next_pos(self, _=None):
+        """瞬移到下一处地点"""
         view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
         view.listbox.next()
         view.write()
@@ -188,10 +232,15 @@ class BaseGTATool(BaseTool):
         return coord
 
     def get_camera_rot(self):
+        """ 获取摄像机参数
+        :return: (x分量, y分量, z方位角)
+        z: 平视为0
+        """
         rotz = self.get_rotz()
         return (math.cos(rotz), math.sin(rotz), 0.1)
 
     def get_peds(self):
+        """获取角色池中的角色列表"""
         pool = Pool(self.address.PED_POOL, self.handler, self.Player)
         return iter(pool)
 
@@ -204,6 +253,7 @@ class BaseGTATool(BaseTool):
                 yield p
 
     def get_vehicles(self):
+        """载具池中的载具列表"""
         pool = Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
         return iter(pool)
 
@@ -217,9 +267,11 @@ class BaseGTATool(BaseTool):
                 yield v
 
     def collect_vehicles(self):
+        """暂存附近的载具"""
         self._vehicles = self.get_near_vehicles(distance=100)
 
     def next_collected_vehicle(self, is_retry=False, recollect=False):
+        """获取下一辆暂存的载具"""
         vehicles = None if recollect else getattr(self, '_vehicles', None)
         flag = False
         if vehicles:
@@ -245,6 +297,7 @@ class BaseGTATool(BaseTool):
         return vehicle
 
     def iter_vehicle_lock(self, _=None):
+        """锁住载具迭代（接下来只操作上一个返回的已收集载具）"""
         self.iter_vehicle_locked = not getattr(self, 'iter_vehicle_locked', False)
 
     def kill_near_peds(self, _=None):
@@ -410,17 +463,19 @@ class BaseGTATool(BaseTool):
                 coord[2] += zinc
 
     def lock_door(self, _=None):
+        """锁最近使用的载具的车门"""
         car = self.player.vehicle
         if car:
             car.lock_door()
 
     def unlock_door(self, _=None):
+        """解锁最近使用的载具的车门"""
         car = self.player.vehicle
         if car:
             car.unlock_door()
 
     def sling(self, _=None, recollect=False):
-        """投石器"""
+        """载具发射台"""
         vehicle = self.next_collected_vehicle(recollect=recollect)
         
         if not vehicle:

@@ -45,3 +45,19 @@ MODEL_INFO = 0xA9B0C8
 
 POLICE_TIME_ADDR = 0x00A48A40
 SYSTEM_TIME = 0xB7CB84
+
+
+FUNC_AddExplosion = 0x736A50
+
+FUNC_IsBoatModel         = 0x4c5a70
+FUNC_IsCarModel          = 0x4c5aa0
+FUNC_IsPlaneModel        = 0x4c5b30
+FUNC_IsBikeModel         = 0x4c5b60
+FUNC_IsMonsterTruckModel = 0x4c5bc0
+FUNC_IsTrailerModel      = 0x4c5c50
+FUNC_IsHeliModel         = 0x4c5b00
+
+FUNC_CAutomobile__Fix    = 0x6A3440
+FUNC_CPlane__Fix         = 0x6CABB0
+FUNC_CHeli__Fix          = 0x6C4530
+FUNC_CBike_Fix           = 0x6B7050

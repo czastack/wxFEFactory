@@ -193,7 +193,7 @@ class Tool(BaseGTATool):
         self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)
         self.LoadRequestedModels = self.handler.write_function(self.FUNCTION_LOAD_REQUESTED_MODELS)
         self.IsModelLoaded = self.handler.write_function(self.FUNCTION_IS_MODEL_LOADED)
-        self.AddExplosion = self.handler.write_function(self.FUNCTION_ADD_EXPLOSION)
+        self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
 
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(NativeContext.SIZE)
@@ -205,7 +205,7 @@ class Tool(BaseGTATool):
         self.handler.free_memory(self.RequestModel)
         self.handler.free_memory(self.LoadRequestedModels)
         self.handler.free_memory(self.IsModelLoaded)
-        self.handler.free_memory(self.AddExplosion)
+        self.handler.free_memory(self.NativeCall)
 
         self.handler.free_memory(self.native_context.addr)
 
@@ -248,6 +248,13 @@ class Tool(BaseGTATool):
 
     def on_weapon_change(self, weapon_view):
         self.load_model(weapon_view.selected_item[1])
+
+    def restore_hp(self, _=None):
+        """恢复hp，所乘载具会复原"""
+        super().restore_hp()
+        if self.isInVehicle:
+            vehicle = self.vehicle
+            self.fix_vehicle(vehicle)
 
     def dir_correct(self, _=None):
         # 按当前视角方向旋转
@@ -452,17 +459,6 @@ class Tool(BaseGTATool):
             self.handler.readFloat(address.CAMERA + 0x18)
         )
 
-    def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
-        """ 远程调用参数为NativeContext*的函数
-        :param arg_sign: 函数签名
-        """
-        with self.native_context:
-            if arg_sign:
-                self.native_context.push(arg_sign, *args)
-            self.handler.remote_call(addr, self.native_context.addr)
-            if ret_type:
-                return self.native_context.get_result(ret_type, ret_size)
-
     EXPLOSION_TYPE_GRENADE = 0
     EXPLOSION_TYPE_MOLOTOV = 1
     EXPLOSION_TYPE_ROCKET = 2
@@ -478,7 +474,8 @@ class Tool(BaseGTATool):
     EXPLOSION_TYPE_TINY = 12
     def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, fCameraShake=0.3):
         """产生爆炸"""
-        self.native_call(self.AddExplosion, '3fLf', *coord, explosionType, fCameraShake)
+        # (pExplodingEntity, pOwner, explosionType, vecPosition, uiActivationDelay, bMakeSound, fCamShake, bNoDamage)
+        self.native_auto_call(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
 
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
@@ -491,3 +488,23 @@ class Tool(BaseGTATool):
             coord[1] += offset[1]
             coord[2] += offset[2]
             self.create_explosion(coord)
+
+    def fix_vehicle(self, vehicle):
+        """修车"""
+        vehicle.hp = 1000
+        model_id = vehicle.model_id
+
+        is_type = lambda addr: self.native_auto_call(addr, 'L', model_id)
+        fix_addr = None
+
+        if is_type(address.FUNC_IsCarModel) or is_type(address.FUNC_IsMonsterTruckModel) or is_type(address.FUNC_IsTrailerModel):
+            fix_addr = address.FUNC_CAutomobile__Fix
+        elif is_type(address.FUNC_IsPlaneModel):
+            fix_addr = address.FUNC_CPlane__Fix
+        elif is_type(address.FUNC_IsHeliModel):
+            fix_addr = address.FUNC_CHeli__Fix
+        elif is_type(address.FUNC_IsBikeModel):
+            fix_addr = address.FUNC_CBike_Fix
+
+        if fix_addr:
+            self.native_auto_call(fix_addr, None, this=vehicle.addr)
