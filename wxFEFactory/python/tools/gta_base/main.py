@@ -440,7 +440,7 @@ class BaseGTATool(BaseTool):
 
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
-        self.player.wanted_level = 0
+        self.wanted_level_view.mem_value = 0
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
