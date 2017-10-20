@@ -9,11 +9,7 @@ class Tool(BaseTool):
             'height': 60,
         }
 
-        with ui.MenuBar() as menubar:
-            with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.onClose)
-
-        with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menuBar=menubar) as win:
+        with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menuBar=self.render_menu()) as win:
             with ui.Vertical():
                 with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as container:
                     ui.Text("Rom", className="vcenter")
@@ -37,10 +33,6 @@ class Tool(BaseTool):
         self.dict_picker.enabled = False
         self.reader = None
         return win
-
-    def onClose(self, m=None):
-        super().onClose()
-        self.win.close()
 
     def onRomChange(self, picker):
         self.reader = FeRomRW(picker.path)

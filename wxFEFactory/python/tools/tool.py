@@ -81,7 +81,7 @@ class BaseTool(BaseScene):
             # win应该设置close回调为self.onClose
             self.win.close()
 
-    def onClose(self):
+    def onClose(self, _=None):
         super().onClose()
         
         if getattr(__main__, 'tool', None) == self:

@@ -84,6 +84,15 @@ class Tool(BaseGTATool):
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
+                    ui.Text("大加速: alt+shift+m")
+                    ui.Text("生成选中的载具并进入: alt+shift+v")
+                    ui.Text("当前武器子弹全满: alt+g")
+                    ui.Text("瞬移到标记点: alt+shift+g")
+                    ui.Text("瞬移到目的地: alt+1")
+                    ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
+                    ui.Text("清空通缉等级: alt+0")
+                    ui.Text("爆破最近的车: alt+o")
+                    ui.Text("爆炸就是艺术 (向前生成数个爆炸): alt+`")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):

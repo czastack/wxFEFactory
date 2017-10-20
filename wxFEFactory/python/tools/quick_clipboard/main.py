@@ -10,9 +10,6 @@ ui = fefactory_api.ui
 
 class Tool(BaseTool):
 
-    def __init__(self):
-        pass
-
     def attach(self, frame):
         self.render()
         self.win.RegisterHotKeys((
@@ -22,13 +19,8 @@ class Tool(BaseTool):
             ('item_next_input', MOD_ALT | MOD_SHIFT, getVK(']'), self.item_next_input),
         ))
 
-
     def render(self):
-        with ui.MenuBar() as menubar:
-            with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
-
-        with ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar) as win:
+        with ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=self.render_menu()) as win:
             with ui.Vertical(className="container"):
                 with ui.Vertical(className="container fill"):
                     self.textinput = ui.TextInput(className="expand", multiline=True, style={'height': 200})

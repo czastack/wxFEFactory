@@ -491,6 +491,7 @@ class BaseGTATool(BaseTool):
         ui.Text("上天（有速度）: alt+空格")
         ui.Text("往上（无速度）: alt+.")
         ui.Text("下坠: alt+shift+空格")
+        ui.Text("停止移动: alt+x")
         ui.Text("恢复HP: alt+h")
         ui.Text("恢复大量HP: alt+shift+h")
         ui.Text("跳上一辆车: alt+j")
@@ -507,6 +508,9 @@ class BaseGTATool(BaseTool):
         ui.Text("把获取到的标记目标移到眼前: alt+shift+/")
         ui.Text("上一辆车锁门: alt+l")
         ui.Text("上一辆车解锁: alt+shift+l")
+        ui.Text("载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d")
+        ui.Text("载具发射台(重新扫描): alt+shift+d")
+        ui.Text("把一辆车移到眼前: alt+b")
 
     def get_common_hotkeys(self):
         return (
@@ -524,8 +528,8 @@ class BaseGTATool(BaseTool):
             ('near_fly', MOD_ALT | MOD_SHIFT, getVK('f'), self.near_fly),
             ('vehicle_flip', MOD_ALT, getVK('k'), self.vehicle_flip),
             ('near_vehicles_flip', MOD_ALT | MOD_SHIFT, getVK('k'), self.near_vehicles_flip),
-            ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
             ('move_near_ped_to_front', MOD_ALT | MOD_SHIFT, getVK('p'), self.near_peds_to_front),
+            ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
             ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
             ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
             ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),

@@ -50,7 +50,7 @@ class Module(BaseListBoxModuel):
         else:
             self.addr_view.value = ""
 
-    def onClose(self):
+    def onClose(self, _=None):
         if self.pg.changed:
             choice = self.confirm('保存修改', '有修改，是否保存？', self.CANCEL)
             if choice is self.CANCEL:

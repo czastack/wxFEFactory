@@ -22,7 +22,7 @@ class BaseModule(BaseScene):
         with frame.win.menubar:
             self.menu = self.getMenu()
 
-    def onClose(self):
+    def onClose(self, _=None):
         """标签页关闭回调，返回False会取消关闭"""
         super().onClose()
 

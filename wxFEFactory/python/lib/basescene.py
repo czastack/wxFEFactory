@@ -23,7 +23,7 @@ class BaseScene:
             self.index = len(ins)
             ins.append(self)
 
-    def onClose(self):
+    def onClose(self, _=None):
         ins = self.__class__.INS
         ins[ins.index(self)] = None
 
