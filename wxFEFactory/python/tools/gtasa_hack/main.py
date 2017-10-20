@@ -11,6 +11,7 @@ from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_L
 from .models import Player, Vehicle
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
+from ..gtaiv_hack.native import NativeContext
 import math
 import os
 import json
@@ -32,6 +33,12 @@ class Tool(BaseGTATool):
     FUNCTION_IS_MODEL_LOADED = (
         b'\x55\x8B\xEC\x83\xEC\x08\xC7\x45\xF8\xC0\x44\x40\x00\xC7\x45\xFC\x00\x00\x00\x00\xFF\x75\x08\xFF\x55\xF8\x0F\xB6\xC0'
         b'\x89\x45\xFC\x58\x8B\x45\xFC\x8B\xE5\x5D\xC3'
+    )
+    FUNCTION_ADD_EXPLOSION = (
+        b'\x55\x8B\xEC\x83\xEC\x14\x8B\x4D\x08\xC7\x45\xEC\x50\x6A\x73\x00\xF3\x0F\x10\x41\x60\x8B\x41\x6C\xF3\x0F\x11\x45\xF4'
+        b'\xF3\x0F\x10\x41\x64\xF3\x0F\x11\x45\xF8\xF3\x0F\x10\x41\x68\xF3\x0F\x11\x45\xFC\xF3\x0F\x10\x41\x70\x89\x45\xF0\xF3'
+        b'\x0F\x11\x45\x08\x6A\x00\xFF\x75\x08\x6A\x01\x6A\x00\xFF\x75\xFC\xFF\x75\xF8\xFF\x75\xF4\xFF\x75\xF0\x6A\x00\x6A\x00'
+        b'\xFF\x55\xEC\x83\xC4\x28\x33\xC0\x8B\xE5\x5D\xC3'
     )
 
     GO_FORWARD_COORD_RATE = 2.0
@@ -133,6 +140,7 @@ class Tool(BaseGTATool):
             InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
             SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), WEATHER_LIST)
             InputWidget("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
+
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -148,11 +156,13 @@ class Tool(BaseGTATool):
                     ui.Button("同步", onclick=self.cheat_sync)
                     ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
                     self.spawn_code_injected_view = ui.Text("", className="vcenter")
+
         with Group(None, "女友进度", 0, handler=self.handler):
             # TODO
             address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
             for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
                 InputWidget(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
+
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
@@ -163,6 +173,9 @@ class Tool(BaseGTATool):
                     ui.Text("切换上一辆: alt+[")
                     ui.Text("切换下一辆: alt+]")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
+                    ui.Text("焰之炼金术 (向前生成数个爆炸): alt+`")
+                    ui.Text("焰之炼金术 (长): alt+shift+`")
+
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=3, vgap=10, className="fill container"):
                 self.render_common_button()
@@ -180,11 +193,21 @@ class Tool(BaseGTATool):
         self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)
         self.LoadRequestedModels = self.handler.write_function(self.FUNCTION_LOAD_REQUESTED_MODELS)
         self.IsModelLoaded = self.handler.write_function(self.FUNCTION_IS_MODEL_LOADED)
+        self.AddExplosion = self.handler.write_function(self.FUNCTION_ADD_EXPLOSION)
+
+        # 初始化Native调用的参数环境
+        context_addr = self.handler.alloc_memory(NativeContext.SIZE)
+        self.native_context = NativeContext(context_addr, self.handler)
+
+        self.inject_spawn_code()
 
     def free_remote_function(self):
         self.handler.free_memory(self.RequestModel)
         self.handler.free_memory(self.LoadRequestedModels)
         self.handler.free_memory(self.IsModelLoaded)
+        self.handler.free_memory(self.AddExplosion)
+
+        self.handler.free_memory(self.native_context.addr)
 
     def checkAttach(self, _=None):
         className = 'Grand theft auto San Andreas'
@@ -206,6 +229,8 @@ class Tool(BaseGTATool):
                         ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
                         ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
                         ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+                        ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
+                        ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
                     )
                     + self.get_common_hotkeys()
                 )
@@ -298,6 +323,20 @@ class Tool(BaseGTATool):
             if not cb.checked:
                 cb.checked = True
             cb.onchange(cb)
+
+    def raise_up(self, _=None, speed=15):
+        """升高(有速度)"""
+        if self.isInVehicle:
+            self.vehicle.speed[2] = 0.5
+        else:
+            self.player.speed[2] = 1
+
+    def to_up(self, _=None):
+        """升高(无速度)"""
+        if self.isInVehicle:
+            self.vehicle.coord[2] += 10
+        else:
+            self.player.coord[2] += 3
 
     def get_cheat_config(self):
         return cheat.version_config['V1.0']
@@ -412,3 +451,43 @@ class Tool(BaseGTATool):
             self.handler.readFloat(address.CAMERA + 0x14),
             self.handler.readFloat(address.CAMERA + 0x18)
         )
+
+    def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
+        """ 远程调用参数为NativeContext*的函数
+        :param arg_sign: 函数签名
+        """
+        with self.native_context:
+            if arg_sign:
+                self.native_context.push(arg_sign, *args)
+            self.handler.remote_call(addr, self.native_context.addr)
+            if ret_type:
+                return self.native_context.get_result(ret_type, ret_size)
+
+    EXPLOSION_TYPE_GRENADE = 0
+    EXPLOSION_TYPE_MOLOTOV = 1
+    EXPLOSION_TYPE_ROCKET = 2
+    EXPLOSION_TYPE_ROCKET_WEAK = 3
+    EXPLOSION_TYPE_CAR = 4
+    EXPLOSION_TYPE_CAR_QUICK = 5
+    EXPLOSION_TYPE_BOAT = 6
+    EXPLOSION_TYPE_HELI = 7
+    EXPLOSION_TYPE_MINE = 8
+    EXPLOSION_TYPE_OBJECT = 9
+    EXPLOSION_TYPE_TANK_GRENADE = 10
+    EXPLOSION_TYPE_SMALL = 11
+    EXPLOSION_TYPE_TINY = 12
+    def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, fCameraShake=0.3):
+        """产生爆炸"""
+        self.native_call(self.AddExplosion, '3fLf', *coord, explosionType, fCameraShake)
+
+    def explode_art(self, _=None, count=10):
+        """焰之炼金术 (向前生成数个爆炸)"""
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        offset = (cam_x * 10, cam_y * 10, cam_z * 5)
+        coord = self.player.get_offset_coord_m(offset)
+
+        for i in range(count):
+            coord[0] += offset[0]
+            coord[1] += offset[1]
+            coord[2] += offset[2]
+            self.create_explosion(coord)

@@ -15,6 +15,19 @@ class Physicle(Model):
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
+    def stop(self):
+        self.speed = (0, 0, 0)
+
+    def get_offset_coord_m(self, offset):
+        """手动获取偏移后的坐标"""
+        coord = self.coord.values()
+        coord[0] += offset[0]
+        coord[1] += offset[1]
+        coord[2] += offset[2]
+        return coord
+
+    get_offset_coord = get_offset_coord_m
+
 
 class WeaponSet(Model):
     def __init__(self, addr, handler, size=13, item_size=24):

@@ -438,6 +438,10 @@ class BaseGTATool(BaseTool):
         vehicle.coord = coord
         vehicle.speed = speed
 
+    def clear_wanted_level(self, _=None):
+        """清除通缉等级"""
+        self.player.wanted_level = 0
+
     def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
@@ -511,6 +515,7 @@ class BaseGTATool(BaseTool):
         ui.Text("载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d")
         ui.Text("载具发射台(重新扫描): alt+shift+d")
         ui.Text("把一辆车移到眼前: alt+b")
+        ui.Text("清除通缉等级: alt+0")        
 
     def get_common_hotkeys(self):
         return (
@@ -540,4 +545,5 @@ class BaseGTATool(BaseTool):
             ('sling', MOD_ALT, getVK('d'), self.sling),
             ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, recollect=True)),
             ('bring_one_vehicle', MOD_ALT, getVK('b'), self.bring_one_vehicle),
+            ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
         )

@@ -90,7 +90,6 @@ class Tool(BaseGTATool):
                     ui.Text("瞬移到标记点: alt+shift+g")
                     ui.Text("瞬移到目的地: alt+1")
                     ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
-                    ui.Text("清空通缉等级: alt+0")
                     ui.Text("爆破最近的车: alt+o")
                     ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
                     ui.Text("红莲之炼金术 (长): alt+shift+`")
@@ -143,7 +142,6 @@ class Tool(BaseGTATool):
                         ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
                         ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
                         ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
-                        ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
                         ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
                         ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
                         ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
@@ -592,10 +590,6 @@ class Tool(BaseGTATool):
                     coord[2] = self.GetGroundZ(coord) or 16
                 self.player.coord = coord
                 return True
-
-    def clear_wanted_level(self, _=None):
-        """清空通缉等级"""
-        self.player.wanted_level = 0
 
     def get_camera_rot_raw(self):
         """获取摄像机原始参数"""
