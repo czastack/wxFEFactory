@@ -36,7 +36,7 @@ class Tool(BaseGTATool):
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             # self.stamina_view = InputWidget("stamina", "体力", None, (0x600,), float)
-            self.star_view = InputWidget("star", "通缉等级", address.WANTED_BASE, (0x53c, 0x18), int)
+            self.wanted_level_view = InputWidget("wanted_level", "通缉等级", address.WANTED_BASE, (0x53c, 0x18), int)
             ui.Text("")
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):

@@ -75,7 +75,7 @@ WEAPON_LIST = [
         (25, 0, "EPISODIC_5"),
         (28, 0, "EPISODIC_8"),
         (25, 0, "EPISODIC_5"),
-        (36, 0, "EPISODIC_16 遥控炸弹"),
+        (36, 0, "EPISODIC_16 粘性炸弹"),
         (38, 0, "EPISODIC_18"),
     ],
 

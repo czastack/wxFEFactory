@@ -52,7 +52,7 @@ bool ProcessHandler::attachByWindowHandle(HWND hWnd){
 		DWORD	dwProcessId;
 		close();
 		GetWindowThreadProcessId(hWnd, &dwProcessId);
-		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD, FALSE, dwProcessId);
+		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 		return mProcess != nullptr;
 	}
 	return false;

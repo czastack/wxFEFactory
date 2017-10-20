@@ -42,7 +42,7 @@ class Tool(BaseGTATool):
             # self.weight_view = ModelInputWidget("gravity", "重量")
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.rot_view = ModelInputWidget("rotation", "旋转")
-            self.wanted_level = ModelInputWidget("wanted_level", "通缉等级")
+            self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
             self.money = ModelInputWidget("money", "金钱")
             ui.Text("")
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
@@ -143,22 +143,28 @@ class Tool(BaseGTATool):
             self.attach_status_view.label = '没有检测到 ' + windowName
 
     def get_addr(self, addr):
+        """原始地址转模块装载后的真实地址"""
         return self.MODULE_BASE + addr
 
     def orig_addr(self, addr):
+        """模块装载后的真实地址转原始地址"""
         return addr - self.MODULE_BASE
 
     def get_version(self):
+        """获取版本码"""
         return self.handler.read32(self.get_addr(address.VERSION))
 
     def init_addr(self):
+        """初始化地址信息"""
         version = self.get_version()
         version_depend = address.VERSION_DEPEND.get(version, None)
         if version_depend:
+            # 装载针对当前版本的地址列表
             for name in version_depend:
                 addr = version_depend[name]
                 setattr(address, name, self.get_addr(addr) if addr else 0)
 
+        # 设置移速的机器码
         if address.SetMoveSpeed:
             SPEED_FUNC = (
                 b'\x55\x8B\xEC\x83\xEC\x08\x8B\x4D\x08\xC7\x45\xF8',
@@ -173,22 +179,25 @@ class Tool(BaseGTATool):
         #         b'\xFF\x75\x08\xB9' + utils.u32bytes(0x11DC444) + b'\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
         #     )
 
+        # script hash获取native函数地址的机器码
         self.FUNCTION_FIND_NATIVE_ADDRESS = (
             b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
             b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
         )
 
+        # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
+        # 要在ScriptHook的线程中才能安全运行
         self.ScriptHookHelper = self.handler.get_module(r'Test.asi')
         if self.ScriptHookHelper:
             self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
 
-        # 使用新的地址表
+        # 此次运行的Native Script地址缓存
         address.NATIVE_ADDRS = {}
 
     def init_remote_function(self):
+        """初始化远程函数"""
         self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
 
-        # TODO
         if address.SetMoveSpeed:
             self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
             self.GetMoveSpeed = self.handler.write_function(self.FUNCTION_GET_SPEED)
@@ -198,6 +207,7 @@ class Tool(BaseGTATool):
         self.native_context = NativeContext(context_addr, self.handler)
 
     def free_remote_function(self):
+        """释放远程函数"""
         self.handler.free_memory(self.FindNativeAddress)
         if address.SetMoveSpeed:
             self.handler.free_memory(self.SetMoveSpeed)
@@ -207,6 +217,7 @@ class Tool(BaseGTATool):
         self._playerins = None
 
     def get_native_addr(self, name):
+        """根据脚本名称获取装载后原生函数地址"""
         addr = address.NATIVE_ADDRS.get(name, 0)
         if addr is 0:
             # 获取原生函数地址
@@ -227,6 +238,7 @@ class Tool(BaseGTATool):
                 return self.native_context.get_result(ret_type, ret_size)
 
     def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
+        """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
         if self.ScriptHookHelper:
             with self.native_context:
                 fn_addr = self.get_native_addr(name)
@@ -236,6 +248,7 @@ class Tool(BaseGTATool):
                 self.handler.write32(self.ScriptHookHelperCtxPtr, self.native_context.addr)
 
                 if sync:
+                    # 在两秒内尝试同步
                     try_count = 20
                     while try_count:
                         time.sleep(0.1)
@@ -249,20 +262,22 @@ class Tool(BaseGTATool):
                     print('获取script_hook_call返回失败，超过尝试次数')
 
     def _player(self):
+        """获取当前角色"""
         # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
         # if player_addr is 0:
         #     return None
         player = getattr(self, '_playerins', None)
-        player_index = self.get_player_id()
+        player_index = self.get_player_index()
 
         if not player:
-            player = self._playerins = self.Player(player_index, self.get_ped_index(player_index), self)
+            player = self._playerins = self.Player(player_index, self.get_ped_handle(player_index), self)
         else:
             player.index = player_index
-            player.handle = self.get_ped_index(player_index)
+            player.handle = self.get_ped_handle(player_index)
         return player
 
     def _vehicle(self):
+        """获取当前载具"""
         return self.player.vehicle
         # return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
@@ -270,13 +285,16 @@ class Tool(BaseGTATool):
     vehicle = property(_vehicle)
 
     def get_ped_addr(self):
+        """获取当前角色的Ped结构地址"""
         return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
 
-    def get_player_id(self):
+    def get_player_index(self):
+        """获取当前角色的序号"""
         # return self.native_call('GET_PLAYER_ID', None)
         return self.handler.read32(address.LOCAL_PLAYER_ID)
 
-    def get_ped_index(self, player_index=0):
+    def get_ped_handle(self, player_index=0):
+        """获取当前角色的句柄"""
         # 方法一
         # player_id = (index or self.get_player_index_of_pool()) << 8
         # return player_id | self.handler.read8(
@@ -284,33 +302,39 @@ class Tool(BaseGTATool):
         # )
 
         # 方法二
-        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_id(), self.native_context.get_temp_addr())
+        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_index(), self.native_context.get_temp_addr())
         return self.native_context.get_temp_value()
 
     def ped_index_to_handle(self, index):
+        """角色序号转角色句柄"""
         handle = index << 8
         return handle | self.handler.read8(
             self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + index
         )
 
     def vehicle_index_to_handle(self, index):
+        """载具序号转载具句柄"""
         handle = index << 8
         return handle | self.handler.read8(
             self.handler.read32(self.handler.read32(address.VEHICLE_POOL) + 4) + index
         )
 
     def player_has_ped(self, player_index):
+        """指定序号是否有对应的角色句柄"""
         return self.native_call('PLAYER_HAS_CHAR', 'L', player_index, ret_type=bool)
 
     @property
     def ped_pool(self):
+        """角色池"""
         return models.Pool(self.address.PED_POOL, self.handler, models.MemPlayer)
 
     @property
     def vehicle_pool(self):
+        """载具池"""
         return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
 
     def get_peds(self):
+        """获取角色池中的角色列表"""
         pool = self.ped_pool
         for i in range(pool.size):
             ped = pool[i]
@@ -324,6 +348,7 @@ class Tool(BaseGTATool):
             yield Player(0, self.ped_index_to_handle(ped.index), self)
 
     def get_vehicles(self):
+        """载具池中的载具列表"""
         pool = self.vehicle_pool
         for i in range(pool.size):
             vehicle = pool[i]
@@ -337,12 +362,14 @@ class Tool(BaseGTATool):
             yield Vehicle(self.vehicle_index_to_handle(vehicle.index), self)
 
     def get_nearest_ped(self, distance=50):
+        """获取最近的人"""
         self.native_call('GET_CLOSEST_CHAR', '4f3L', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
         ped = self.native_context.get_temp_value()
         if ped:
             return Player(0, ped, self)
 
     def get_nearest_vehicle(self, distance=50):
+        """获取最近的载具"""
         handle = self.native_call('GET_CLOSEST_CAR', '4f2L', *self.entity.coord, distance, 0, 70)
         if handle:
             vehicle = Vehicle(handle, self)
@@ -350,12 +377,14 @@ class Tool(BaseGTATool):
                 return vehicle
 
     def set_move_speed(self, entity_addr, value):
+        """设置实体的移动速度"""
         ctx = self.native_context
         with ctx:
             ctx.push('L3f', entity_addr, *value)
             self.handler.remote_call(self.SetMoveSpeed, ctx.addr)
 
     def get_move_speed(self, entity_addr):
+        """获取实体的移动速度"""
         ctx = self.native_context
         with ctx:
             ctx.push('L', entity_addr)
@@ -367,30 +396,36 @@ class Tool(BaseGTATool):
             )
 
     def raise_up(self, _=None, speed=15):
+        """升高(有速度)"""
         self.entity.speed[2] = speed
 
     def to_up(self, _=None):
+        """升高(无速度)"""
         if self.isInVehicle:
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3
 
     def onSpawnVehicleIdChange(self, lb):
+        """切换所选载具回调"""
         self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
 
     def onSpawnVehicleIdPrev(self, _=None):
+        """选中上一个载具"""
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
             pos = len(VEHICLE_LIST)
         self.spawn_vehicle_id_view.setSelection(pos - 1, True)
 
     def onSpawnVehicleIdNext(self, _=None):
+        """选中下一个载具"""
         pos = self.spawn_vehicle_id_view.index
         if pos == len(VEHICLE_LIST) - 1:
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def vehicle_lock_door(self, _=None, lock=True):
+        """锁车门"""
         car = self.player.vehicle
         if car:
             if lock:
@@ -399,24 +434,30 @@ class Tool(BaseGTATool):
                 car.unlock_door()
 
     def weapon_max(self, _=None):
+        """武器子弹数最大"""
         for v in self.weapon_views:
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
 
     def set_ped_invincible(self, _=None, value=True):
+        """当前角色无伤"""
         self.player.invincible = value
 
     def set_ped_block_switch_weapons(self, _=None):
+        """解除当前角色武器切换限制"""
         self.player.block_switch_weapons = False
 
     def set_ped_can_be_dragged_out_of_vehicle(self, _=None):
+        """当前角色不会被拖出载具"""
         self.player.can_be_dragged_out_of_vehicle = False
 
     def set_ped_keep_bike(self, _=None, value=True):
+        """当前角色不会从摩托车上甩出去"""
         self.player.keep_bike = value
 
     def restore_hp(self, _=None):
+        """恢复hp，所乘载具会复原"""
         super().restore_hp()
         if self.isInVehicle:
             vehicle = self.vehicle
@@ -435,7 +476,7 @@ class Tool(BaseGTATool):
             vehicle.explode()
 
     def remove_near_peds_weapon(self, _=None):
-        """缴械"""
+        """附近的人缴械"""
         for p in self.get_near_peds():
             p.remove_all_weapons()
 
@@ -467,9 +508,6 @@ class Tool(BaseGTATool):
         for p in self.get_near_peds():
             p.create_explosion()
 
-    def flash_weapon_icon(self):
-        self.native_call('FLASH_WEAPON_ICON', 'L', 1, ret_type=None)
-
     # def LoadEnvironmentNow(self, pos):
     #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
     #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
@@ -482,16 +520,19 @@ class Tool(BaseGTATool):
         return self.native_context.get_temp_value(type=float)
 
     def get_first_blip(self, blipType):
+        """获取指定类型的第一个标记"""
         blip_id = self.native_call('GET_FIRST_BLIP_INFO_ID', 'L', blipType)
         if blip_id:
             return models.Blip(blip_id, self)
 
     def get_next_blip(self, blipType):
+        """获取指定类型的下一个标记"""
         blip_id = self.native_call('GET_NEXT_BLIP_INFO_ID', 'L', blipType)
         if blip_id:
             return models.Blip(blip_id, self)
 
     def get_target_blips(self, color=0):
+        """获取目标的所有标记"""
         for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
             blip = self.get_first_blip(i)
             if blip:
@@ -528,6 +569,7 @@ class Tool(BaseGTATool):
             print('无法获取目的地坐标')
 
     def teleport_to_blip(self, blip):
+        """瞬移到指定标记"""
         if blip:
             coord = list(blip.coord)
             print(coord)
@@ -540,9 +582,11 @@ class Tool(BaseGTATool):
                 return True
 
     def clear_wanted_level(self, _=None):
+        """清空通缉等级"""
         self.player.wanted_level = 0
 
     def get_camera_rot_raw(self):
+        """获取摄像机原始参数"""
         ctx = self.native_context
         self.native_call('GET_ROOT_CAM', 'L', ctx.get_temp_addr())
         cam = ctx.get_temp_value()
@@ -550,15 +594,21 @@ class Tool(BaseGTATool):
         return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.normalFloat))
 
     def get_camera_rot(self):
+        """ 获取摄像机参数
+        :return: (x分量, y分量, z方位角)
+        z: 平视为0
+        """
         data = self.get_camera_rot_raw()
         rotz = degreeToRadian(data[2]) + math.pi / 2
         return (math.cos(rotz), math.sin(rotz), degreeToRadian(data[0]))
 
     def get_camera_rotz(self):
+        """获取xy面上的旋转量"""
         data = self.get_camera_rot_raw()
         return degreeToRadian(data[2])
 
     def dir_correct(self, _=None):
+        """根据摄像机朝向设置当前实体的朝向"""
         rotz = self.get_camera_rotz()
         if rotz < 0:
             rotz += math.pi * 2
@@ -625,7 +675,7 @@ class Tool(BaseGTATool):
         self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def explode_art(self, _=None, count=10):
-        """爆炸就是艺术"""
+        """爆炸就是艺术 (向前生成数个爆炸)"""
         cam_x, cam_y, cam_z = self.get_camera_rot()
         offset = (cam_x * 5, cam_y * 5, cam_z * 5)
         coord = self.player.get_offset_coord_m(offset)
@@ -645,4 +695,5 @@ class Tool(BaseGTATool):
         #     self.delete_fire(fire)
 
     def activate_save_menu(self, _=None):
+        """激活保存菜单"""
         self.native_call('ACTIVATE_SAVE_MENU', None)
