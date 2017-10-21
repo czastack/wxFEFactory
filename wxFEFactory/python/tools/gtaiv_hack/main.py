@@ -95,8 +95,6 @@ class Tool(BaseGTATool):
                     ui.Text("瞬移到目的地: alt+1")
                     ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
                     ui.Text("爆破最近的车: alt+o")
-                    ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
-                    ui.Text("红莲之炼金术 (长): alt+shift+`")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -107,8 +105,6 @@ class Tool(BaseGTATool):
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)
                 ui.Button("敌人爆头", onclick=self.enemys_explode_head)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
-                ui.Button("红莲之炼金术", onclick=self.explode_art)
-                ui.Button("红莲之炼金术(长)", onclick=partial(self.explode_art, count=24))
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
@@ -145,8 +141,6 @@ class Tool(BaseGTATool):
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
-            ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):
@@ -461,12 +455,12 @@ class Tool(BaseGTATool):
 
     def enemys_make_fire(self, _=None):
         """敌人着火"""
-        for p in self.get_near_peds():
+        for p in self.get_enemys():
             p.make_fire()
 
     def enemys_explode_head(self, _=None):
         """敌人爆头"""
-        for p in self.get_near_peds():
+        for p in self.get_enemys():
             try:
                 p.explode_head()
             except:
@@ -474,7 +468,7 @@ class Tool(BaseGTATool):
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""
-        for p in self.get_near_peds():
+        for p in self.get_enemys():
             p.create_explosion()
 
     # def LoadEnvironmentNow(self, pos):
@@ -500,12 +494,12 @@ class Tool(BaseGTATool):
         if blip_id:
             return models.Blip(blip_id, self)
 
-    def get_target_blips(self, color=0):
+    def get_target_blips(self, color=None):
         """获取目标的所有标记"""
         for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
             blip = self.get_first_blip(i)
             if blip:
-                if color is 0 or blip.color == color:
+                if color is None or blip.color == color:
                     yield blip
 
                 while True:
@@ -639,26 +633,6 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
-    def explode_art(self, _=None, count=10):
-        """红莲之炼金术 (向前生成数个爆炸)"""
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-        offset = (cam_x * 5, cam_y * 5, cam_z * 5)
-        coord = self.player.get_offset_coord_m(offset)
-
-        # fires = []
-
-        for i in range(count):
-            coord[0] += offset[0]
-            coord[1] += offset[1]
-            coord[2] += offset[2]
-            self.create_explosion(coord)
-            # fires.append(self.create_fire(coord))
-
-        # 5秒后移除火焰
-        # time.sleep(5)
-        # for fire in fires:
-        #     self.delete_fire(fire)
-
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
         self.native_call('ACTIVATE_SAVE_MENU', None)
@@ -669,8 +643,8 @@ class Tool(BaseGTATool):
     def near_vehicles_to_front(self, _=None):
         super().near_vehicles_to_front(zinc=5)
 
-    def re_cal_markers(self, _=None):
-        self._markers = list(self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY))
+    def recal_markers(self, _=None):
+        self._markers = tuple(self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY))
         self._marker_index = 0
 
     def move_marker_to_front(self, _=None):

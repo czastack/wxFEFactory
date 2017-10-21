@@ -445,32 +445,37 @@ class BaseGTATool(BaseTool):
     #----------------------------------------------------------------------
     # MARKER
     #----------------------------------------------------------------------
-    def re_cal_markers(self, _=None):
-        """重新获取人/车标记点"""
+    def get_blips(self, color=None, types=None):
+        """获取所有标记"""
         Marker = self.models.Marker
         addr = self.address.MARKER_ARRAY
         it = Marker(addr, self.handler)
-        self._markers = []
 
         for i in range(self.MARKER_RANGE):
             blipType = it.blipType
-            if blipType in Marker.AVAILABLE_TYPE:
-                self._markers.append(Marker(it.addr, self.handler))
-
+            if it.blipType and (types is None or blipType in types) and (color is None or it.color is color):
+                yield Marker(it.addr, self.handler)
             it.next()
 
+    def get_target_blips(self, color=None, types=None):
+        """获取目标的所有标记"""
+        return self.get_blips(color, self.models.Marker.AVAILABLE_TYPE)
+
+    def recal_markers(self, _=None):
+        """重新获取人/车标记点"""
+        self._markers = tuple(self.get_target_blips())
         self._marker_index = 0
 
     def go_next_marker(self, _=None):
         """到下一处 人/车标记点"""
         if not hasattr(self, '_markers'):
-            self.re_cal_markers()
+            self.recal_markers()
 
         while True:
             try:
                 entity = self._markers[self._marker_index].entity
             except IndexError:
-                self.re_cal_markers()
+                self.recal_markers()
                 return
             if entity:
                 self.entity.coord = entity.coord
@@ -480,7 +485,7 @@ class BaseGTATool(BaseTool):
     def move_marker_to_front(self, _=None, zinc=0):
         """人/车标记点目标移到眼前"""
         if not hasattr(self, '_markers'):
-            self.re_cal_markers()
+            self.recal_markers()
 
         moved_car_addr = []
         coord = self.get_front_coord()
@@ -534,6 +539,18 @@ class BaseGTATool(BaseTool):
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
         self.wanted_level_view.mem_value = 0
+    
+    def explode_art(self, _=None, count=10):
+        """焰之炼金术 (向前生成数个爆炸)"""
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        offset = (cam_x * 6, cam_y * 6, cam_z * 6)
+        coord = self.player.get_offset_coord_m(offset)
+
+        for i in range(count):
+            coord[0] += offset[0]
+            coord[1] += offset[1]
+            coord[2] += offset[2]
+            self.create_explosion(coord)
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
@@ -608,7 +625,9 @@ class BaseGTATool(BaseTool):
         ui.Text("载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d")
         ui.Text("载具发射台(重新扫描): alt+shift+d")
         ui.Text("把一辆车移到眼前: alt+b")
-        ui.Text("清除通缉等级: alt+0")        
+        ui.Text("清除通缉等级: alt+0")
+        ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
+        ui.Text("红莲之炼金术 (长): alt+shift+`")
 
     def get_common_hotkeys(self):
         return (
@@ -630,7 +649,7 @@ class BaseGTATool(BaseTool):
             ('move_near_vehicle_to_front', MOD_ALT, getVK('p'), self.near_vehicles_to_front),
             ('go_prev_pos', MOD_ALT | MOD_SHIFT, getVK(','), self.go_prev_pos),
             ('go_next_pos', MOD_ALT | MOD_SHIFT, getVK('.'), self.go_next_pos),
-            ('re_cal_markers', MOD_ALT, getVK("'"), self.re_cal_markers),
+            ('recal_markers', MOD_ALT, getVK("'"), self.recal_markers),
             ('go_next_marker', MOD_ALT, getVK('/'), self.go_next_marker),
             ('move_marker_to_front', MOD_ALT | MOD_SHIFT, getVK('/'), self.move_marker_to_front),
             ('lock_door', MOD_ALT, getVK('l'), self.lock_door),
@@ -639,4 +658,6 @@ class BaseGTATool(BaseTool):
             ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, recollect=True)),
             ('bring_one_vehicle', MOD_ALT, getVK('b'), self.bring_one_vehicle),
             ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
+            ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
+            ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
         )

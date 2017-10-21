@@ -13,3 +13,5 @@ MODEL_INFO = 0x94DDD8
 FUNC_CStreaming__HasModelLoaded = 0x4044C0
 FUNC_CStreaming__RequestModel = 0x40E310
 FUNC_LoadAllRequestedModels = 0X40B5F0
+
+FUNC_AddExplosion = 0x4D82D0

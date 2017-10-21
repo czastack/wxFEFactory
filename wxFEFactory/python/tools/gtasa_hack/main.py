@@ -141,7 +141,7 @@ class Tool(BaseGTATool):
                     ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
                 with ui.Horizontal(className="container"):
                     ui.Button("同步", onclick=self.cheat_sync)
-                    ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
+                    # ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
                     self.spawn_code_injected_view = ui.Text("", className="vcenter")
 
         with Group(None, "女友进度", 0, handler=self.handler):
@@ -160,13 +160,16 @@ class Tool(BaseGTATool):
                     ui.Text("切换上一辆: alt+[")
                     ui.Text("切换下一辆: alt+]")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
-                    ui.Text("焰之炼金术 (向前生成数个爆炸): alt+`")
-                    ui.Text("焰之炼金术 (长): alt+shift+`")
+                    ui.Text("瞬移到目的地: alt+1")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
+                ui.Button("敌人爆炸", onclick=self.enemys_explode)
+                ui.Button("瞬移到目的地(红)", onclick=self.teleport_to_destination)
+                ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
+                ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=8))
                 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -185,8 +188,7 @@ class Tool(BaseGTATool):
             ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
             ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
             ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-            ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
-            ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
+            ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
@@ -330,7 +332,7 @@ class Tool(BaseGTATool):
                 and self.handler.write(cheat_config['CodeInjectCodeAddr'], cheat_config['bInjectedCode'], 0)
             ):
                 self.spawn_code_injected = True
-                self.spawn_code_injected_view.label = "已插入"
+                # self.spawn_code_injected_view.label = "已插入"
         else:
             self.handler.write(cheat_config['CodeInjectJumpAddr'], cheat_config['bNotInjectedJump'], 0)
             self.spawn_code_injected = False
@@ -428,24 +430,12 @@ class Tool(BaseGTATool):
         # (pExplodingEntity, pOwner, explosionType, vecPosition, uiActivationDelay, bMakeSound, fCamShake, bNoDamage)
         self.native_call_auto(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
 
-    def explode_art(self, _=None, count=10):
-        """焰之炼金术 (向前生成数个爆炸)"""
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-        offset = (cam_x * 6, cam_y * 6, cam_z * 6)
-        coord = self.player.get_offset_coord_m(offset)
-
-        for i in range(count):
-            coord[0] += offset[0]
-            coord[1] += offset[1]
-            coord[2] += offset[2]
-            self.create_explosion(coord)
-
     def fix_vehicle(self, vehicle):
         """修车"""
         vehicle.hp = 1000
         model_id = vehicle.model_id
 
-        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id)
+        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
         fix_addr = None
 
         if is_type(address.FUNC_IsCarModel) or is_type(address.FUNC_IsMonsterTruckModel) or is_type(address.FUNC_IsTrailerModel):
@@ -463,3 +453,32 @@ class Tool(BaseGTATool):
     def clothes_rebuild(self, _=None):
         """洗衣服"""
         self.native_call_auto(address.FUNC_CClothes__RebuildPlayer, '2L', self.player.addr, 0)
+
+    def get_enemys(self):
+        """获取红色标记的peds"""
+        return [blip.entity for blip in self.get_target_blips(0)]
+
+    def get_friends(self):
+        """获取蓝色标记的peds"""
+        return [blip.entity for blip in self.get_target_blips(7)]
+
+    def enemys_explode(self, _=None):
+        """敌人爆炸"""
+        for e in self.get_enemys():
+            self.create_explosion(e.coord)
+
+    def teleport_to_destination(self, _=None, color=0, types=(models.Marker.MARKER_TYPE_CAR, models.Marker.MARKER_TYPE_PED, models.Marker.MARKER_TYPE_COORDS)):
+        """瞬移到目的地"""
+        for blip in self.get_blips(color, types):
+            if blip.sprite is 0:
+                blipType = blip.blipType
+                if blipType is self.models.Marker.MARKER_TYPE_COORDS:
+                    coord = blip.coord
+                else:
+                    entity = blip.entity
+                    if entity:
+                        coord = entity.coord
+                    else:
+                        continue
+                self.entity.coord = coord
+                break

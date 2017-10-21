@@ -104,8 +104,6 @@ class Tool(BaseGTATool):
             ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
             ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
             ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-            ('re_cal_spheres', MOD_ALT, getVK(";"), self.re_cal_spheres),
-            ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere)
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
@@ -161,35 +159,6 @@ class Tool(BaseGTATool):
             pos = -1
         self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
-    def re_cal_spheres(self, _=None):
-        """重新获取人/车标记点"""
-        addr = self.address.SPHERE_ARRAY
-        it = self.models.Sphere(addr, self.handler)
-        self._spheres = []
-
-        for i in range(self.SPHERE_RANGE):
-            if it.coord[0]:
-                self._spheres.append(it.clone())
-            it.next()
-
-        self._sphere_index = 0
-
-    def go_next_sphere(self, _=None):
-        """到下一处 人/车标记点"""
-        if not hasattr(self, '_spheres'):
-            self.re_cal_spheres()
-
-        while True:
-            try:
-                item = self._spheres[self._sphere_index]
-            except IndexError:
-                self.re_cal_spheres()
-                return
-            if item.coord[0]:
-                self.entity.coord = item.coord
-                break
-            self._sphere_index += 1
-
     def get_camera_rot(self):
         rotz = self.camera_z_rot_view.mem_value
         return (
@@ -197,3 +166,21 @@ class Tool(BaseGTATool):
             -math.sin(rotz),
             self.camera_x_rot_view.mem_value
         )
+
+    EXPLOSION_TYPE_GRENADE = 0
+    EXPLOSION_TYPE_MOLOTOV = 1
+    EXPLOSION_TYPE_ROCKET = 2
+    EXPLOSION_TYPE_CAR = 3
+    EXPLOSION_TYPE_CAR_QUICK = 4
+    EXPLOSION_TYPE_BOAT = 5
+    EXPLOSION_TYPE_HELI = 6
+    EXPLOSION_TYPE_HELI2 = 7
+    EXPLOSION_TYPE_MINE = 8
+    EXPLOSION_TYPE_BARREL = 9
+    EXPLOSION_TYPE_TANK_GRENADE = 10
+    EXPLOSION_TYPE_HELI_BOMB = 11
+    def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, radius=5):
+        """产生爆炸"""
+        pass
+        # (X, Y, Z, iType, Radius)
+        # self.native_call_auto(address.FUNC_AddExplosion, '3fLL', *coord, explosionType, radius)

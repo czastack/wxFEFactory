@@ -105,3 +105,7 @@ class Tool(BaseGTATool):
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
+
+    def create_explosion(self, coord):
+        """TODO"""
+        pass

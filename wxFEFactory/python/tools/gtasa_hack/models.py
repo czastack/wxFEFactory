@@ -164,11 +164,17 @@ class Marker(Model):
     color = Field(0)
     poolIndex = Field(4, int)
     coord = CoordField(8)
-    _blip = Field(38, int, 1)
+    sprite = Field(36, int, 1)
+    flags1 = Field(37, int, 1)
+    flags2 = Field(38, int, 1)
+
+    @property
+    def bright(self):
+        return self.flags1 & 1
 
     @property
     def blipType(self):
-        return self._blip >> 2
+        return self.flags2 >> 2
 
     @property
     def entity(self):
