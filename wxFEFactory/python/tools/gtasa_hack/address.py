@@ -61,3 +61,9 @@ FUNC_CAutomobile__Fix    = 0x6A3440
 FUNC_CPlane__Fix         = 0x6CABB0
 FUNC_CHeli__Fix          = 0x6C4530
 FUNC_CBike_Fix           = 0x6B7050
+
+FUNC_CStreaming__HasModelLoaded = 0x4044C0
+FUNC_CStreaming__RequestModel = 0x4087E0
+FUNC_LoadAllRequestedModels = 0x40ea10
+
+FUNC_CClothes__RebuildPlayer = 0x5A82C0

@@ -24,11 +24,10 @@ class Tool(BaseGTATool):
     Vehicle = Vehicle
     MARKER_RANGE = 32
     SPHERE_RANGE = 16
-
-    FUNCTION_REQUEST_MODEL = b'\x55\x8B\xEC\x51\xC7\x45\xFC\x10\xE3\x40\x00\x6A\x16\xFF\x75\x08\xFF\x55\xFC\x83\xC4\x08\x8B\xE5\x5D\xC3'
-    FUNCTION_LOAD_REQUESTED_MODELS = b'\x55\x8B\xEC\x51\xC7\x45\xFC\xF0\xB5\x40\x00\x6A\x00\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
-
     GO_FORWARD_COORD_RATE = 2.0
+
+    CLASS_NAME = 'Grand theft auto 3'
+    WINDOW_NAME = 'GTA: Vice City'
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -99,51 +98,23 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def onClose(self, _=None):
-        if self.handler.active:
-            self.free_remote_function()
-        return super().onClose()
-
-    def init_remote_function(self):
-        self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)
-        self.LoadRequestedModels = self.handler.write_function(self.FUNCTION_LOAD_REQUESTED_MODELS)
-
-    def free_remote_function(self):
-        self.handler.free_memory(self.RequestModel)
-        self.handler.free_memory(self.LoadRequestedModels)
-
-    def checkAttach(self, _=None):
-        className = 'Grand theft auto 3'
-        windowName = 'GTA: Vice City'
-
-        if self.handler.active:
-            self.free_remote_function()
-
-        if self.handler.attachByWindowName(className, windowName):
-            self.attach_status_view.label = windowName + ' 正在运行'
-
-            if not self.win.hotkeys:
-                self.win.RegisterHotKeys(
-                    (
-                        ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
-                        ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                        ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                        ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                        ('re_cal_spheres', MOD_ALT, getVK(";"), self.re_cal_spheres),
-                        ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere)
-                    ) + self.get_common_hotkeys()
-                )
-            self.init_remote_function()
-        else:
-            self.attach_status_view.label = '没有检测到 ' + windowName
+    def get_hotkeys(self):
+        return (
+            ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
+            ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
+            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+            ('re_cal_spheres', MOD_ALT, getVK(";"), self.re_cal_spheres),
+            ('go_next_sphere', MOD_ALT | MOD_SHIFT, getVK(';'), self.go_next_sphere)
+        ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
         return self.handler.read8(address.MODEL_INFO + 20 * model_id) == 1
 
     def load_model(self, model_id):
         if model_id > 0 and not self.is_model_loaded(model_id):
-            self.handler.remote_call(self.RequestModel, model_id)
-            self.handler.remote_call(self.LoadRequestedModels, 0)
+            self.native_call_auto(address.FUNC_CStreaming__RequestModel, '2L', model_id, 0x16)
+            self.native_call_auto(address.FUNC_LoadAllRequestedModels, 'L', 0)
 
     def on_weapon_change(self, weapon_view):
         self.load_model(weapon_view.selected_item[1])

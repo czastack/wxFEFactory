@@ -5,6 +5,7 @@ from lib.win32.sendkey import auto, TextVK
 from commonstyle import styles
 from ..tool import BaseTool
 from .models import Pool
+from .native import NativeContext
 import math
 import time
 import fefactory_api
@@ -23,10 +24,10 @@ class BaseGTATool(BaseTool):
     nested = True
 
     FUNCTION_NATIVE_CALL = (
-        b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x83\x46\x04\xFE\x8B\x56\x04\x8B\x46\x60\x42\x8B\x7E\x64\x89\x45\xF4\x89'
-        b'\x7D\xF8\x83\xFA\x01\x7E\x1C\x8D\x4E\x60\x8D\x0C\x91\x4A\x0F\x1F\x44\x00\x00\x8B\x01\x89\x45\xFC\xFF\x75\xFC\x8D\x49'
-        b'\xFC\x83\xEA\x01\x75\xF0\x85\xFF\x74\x03\x8B\x4D\xF8\xFF\x55\xF4\x89\x45\x08\x85\xFF\x75\x0C\x8B\x46\x04\xC1\xE0\x02'
-        b'\x89\x45\xF4\x03\x65\xF4\x8B\x0E\x8B\x45\x08\x5F\x5E\x89\x01\x8B\xE5\x5D\xC3'
+        b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x8B\x56\x08\x8B\x02\x8B\x7A\x04\x83\x46\x04\xFE\x8B\x4E\x04\x41\x89\x45'
+        b'\xF4\x89\x7D\xF8\x83\xF9\x01\x7E\x0F\x8B\x04\x8A\x89\x45\xFC\xFF\x75\xFC\x49\x83\xF9\x01\x7F\xF1\x85\xFF\x74\x03\x8B'
+        b'\x4D\xF8\xFF\x55\xF4\x89\x45\x08\x85\xFF\x75\x0C\x8B\x46\x04\xC1\xE0\x02\x89\x45\xF4\x03\x65\xF4\x8B\x0E\x8B\x45\x08'
+        b'\x5F\x5E\x89\x01\x8B\xE5\x5D\xC3'
     )
 
     def __init__(self):
@@ -35,13 +36,13 @@ class BaseGTATool(BaseTool):
 
     def attach(self, frame):
         super().attach(frame)
-        self.checkAttach()
+        self.check_attach()
 
     def render(self):
         with self.render_win() as win:
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
-                    ui.Button("检测", className="vcenter", onclick=self.checkAttach)
+                    ui.Button("检测", className="vcenter", onclick=self.check_attach)
                     self.attach_status_view = ui.Text("", className="label_left grow")
                     ui.CheckBox("保持最前", onchange=self.swithKeeptop)
                 with ui.Notebook(className="fill"):
@@ -55,8 +56,45 @@ class BaseGTATool(BaseTool):
         self.win.position = (70, 4)
         return self.win
 
+    def check_attach(self, _=None):
+        """检查运行GTA主程序状态"""
+        if self.handler.active:
+            self.free_remote_function()
+
+        if self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
+            self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
+
+            if not self.win.hotkeys:
+                self.win.RegisterHotKeys(self.get_hotkeys())
+            self.init_remote_function()
+        else:
+            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME
+
+    def get_hotkeys(self):
+        """重写这个函数，返回要注册的热键列表"""
+        return self.get_common_hotkeys()
+
     def swithKeeptop(self, cb):
         self.win.keeptop = cb.checked
+
+    def onClose(self, _=None):
+        if self.handler.active:
+            self.free_remote_function()
+        return super().onClose()
+
+    def init_remote_function(self):
+        """初始化远程函数"""
+        self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
+
+        # 初始化Native调用的参数环境
+        context_addr = self.handler.alloc_memory(NativeContext.SIZE)
+        self.native_context = NativeContext(context_addr, self.handler)
+
+    def free_remote_function(self):
+        """释放远程函数"""
+        self.handler.free_memory(self.NativeCall)
+
+        self.handler.free_memory(self.native_context.addr)
 
     def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
         """ 远程调用参数为NativeContext*的函数
@@ -69,14 +107,14 @@ class BaseGTATool(BaseTool):
             if ret_type:
                 return self.native_context.get_result(ret_type, ret_size)
 
-    def native_auto_call(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
+    def native_call_auto(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
         """ 以cdcel或thiscall形式调用远程函数
         :param addr: 目标函数地址
         :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
         :param arg_sign: 参数签名
         """
         self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), addr, this, *args, ret_type=ret_type, ret_size=ret_size)
-        return self.native_context.get_temp_addr()
+        return self.handler.read32(self.native_context.m_pReturn)
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)

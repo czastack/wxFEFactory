@@ -9,3 +9,7 @@ MARKER_ARRAY = 0x7D7D38
 SPHERE_ARRAY = 0x811528
 MODEL_INFO = 0x94DDD8
 # 冰淇淋任务卖出数? 00828D3C
+
+FUNC_CStreaming__HasModelLoaded = 0x4044C0
+FUNC_CStreaming__RequestModel = 0x40E310
+FUNC_LoadAllRequestedModels = 0X40B5F0

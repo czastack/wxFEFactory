@@ -23,9 +23,10 @@ class Tool(BaseGTATool):
     Player = Player
     Vehicle = Vehicle
     MARKER_RANGE = 32
-
     SAFE_SPEED_RATE = 0.3
     GO_FORWARD_COORD_RATE = 2.0
+    CLASS_NAME = 'Grand theft auto 3'
+    WINDOW_NAME = 'GTA3'
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -75,19 +76,6 @@ class Tool(BaseGTATool):
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
-
-    def checkAttach(self, _=None):
-        className = 'Grand theft auto 3'
-        windowName = 'GTA3'
-        if self.handler.attachByWindowName(className, windowName):
-            self.attach_status_view.label = windowName + ' 正在运行'
-
-            if not self.win.hotkeys:
-                self.win.RegisterHotKeys(
-                    self.get_common_hotkeys()
-                )
-        else:
-            self.attach_status_view.label = '没有检测到 ' + windowName
 
     def onSpawnVehicleIdChange(self, lb):
         self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])

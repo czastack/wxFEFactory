@@ -7,10 +7,10 @@ from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
+from ..gta_base.native import NativeContext
 from . import address, models
 from .data import VEHICLE_LIST
 from .models import Player, Vehicle
-from .native import NativeContext
 import math
 import os
 import json
@@ -32,6 +32,10 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_SPEED_RATE = 60
     SLING_COORD_UP = 3
+
+    CLASS_NAME = 'grcWindow'
+    WINDOW_NAME = 'GTAIV'
+
     from .data import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
@@ -111,46 +115,39 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def onClose(self, _=None):
-        if self.handler.active:
-            self.free_remote_function()
-        return super().onClose()
-
-    def checkAttach(self, _=None):
-        className = 'grcWindow'
-        windowName = getattr(self, 'WINDOW_NAME', 'GTAIV')
-
+    def check_attach(self, _=None):
         if self.handler.active:
             self.free_remote_function()
         else:
             # 确保重新生成 native_context
             self._playerins = None
 
-        if self.handler.attachByWindowName(className, windowName):
-            self.attach_status_view.label = windowName + ' 正在运行'
+        if self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
+            self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
             self.MODULE_BASE = self.handler.base - 0x400000
 
             if not self.win.hotkeys:
-                self.win.RegisterHotKeys(
-                    (
-                        ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                        ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                        ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
-                        ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
-                        ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
-                        ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
-                        ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
-                        ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-                        ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
-                        ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-                        ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
-                        ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
-                    ) + self.get_common_hotkeys()
-                )
+                self.win.RegisterHotKeys(self.get_hotkeys())
             self.init_addr()
             self.init_remote_function()
         else:
-            self.attach_status_view.label = '没有检测到 ' + windowName
+            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME
+
+    def get_hotkeys(self):
+        return (
+            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+            ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
+            ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
+            ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
+            ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
+            ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
+            ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
+            ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
+            ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
+            ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
+            ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
+        ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):
         """原始地址转模块装载后的真实地址"""
@@ -174,21 +171,6 @@ class Tool(BaseGTATool):
                 addr = version_depend[name]
                 setattr(address, name, self.get_addr(addr) if addr else 0)
 
-        # 设置移速的机器码
-        if address.SetMoveSpeed:
-            SPEED_FUNC = (
-                b'\x55\x8B\xEC\x83\xEC\x08\x8B\x4D\x08\xC7\x45\xF8',
-                b'\x8B\x41\x60\x89\x45\xFC\x8D\x41\x64\x89\x45\x08\xFF\x75\x08\x8B\x4D\xFC\xFF\x55\xF8\x8B\xE5\x5D\xC3'
-            )
-            self.FUNCTION_SET_SPEED = utils.u32bytes(address.SetMoveSpeed).join(SPEED_FUNC)
-            self.FUNCTION_GET_SPEED = utils.u32bytes(address.GetMoveSpeed).join(SPEED_FUNC)
-
-        # if address.LoadWorldAtPosition:
-        #     self.FUNC_LOAD_WORLD_AT_POSITION = (
-        #         b'\x55\x8B\xEC\x51\x83\x45\x08\x60\xC7\x45\xFC' + utils.u32bytes(address.LoadWorldAtPosition) +
-        #         b'\xFF\x75\x08\xB9' + utils.u32bytes(0x11DC444) + b'\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
-        #     )
-
         # script hash获取native函数地址的机器码
         self.FUNCTION_FIND_NATIVE_ADDRESS = (
             b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
@@ -206,24 +188,13 @@ class Tool(BaseGTATool):
 
     def init_remote_function(self):
         """初始化远程函数"""
+        super().init_remote_function()
         self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
-
-        if address.SetMoveSpeed:
-            self.SetMoveSpeed = self.handler.write_function(self.FUNCTION_SET_SPEED)
-            self.GetMoveSpeed = self.handler.write_function(self.FUNCTION_GET_SPEED)
-
-        # 初始化Native调用的参数环境
-        context_addr = self.handler.alloc_memory(NativeContext.SIZE)
-        self.native_context = NativeContext(context_addr, self.handler)
 
     def free_remote_function(self):
         """释放远程函数"""
+        super().free_remote_function()
         self.handler.free_memory(self.FindNativeAddress)
-        if address.SetMoveSpeed:
-            self.handler.free_memory(self.SetMoveSpeed)
-            self.handler.free_memory(self.GetMoveSpeed)
-
-        self.handler.free_memory(self.native_context.addr)
         self._playerins = None
 
     def get_native_addr(self, name):
@@ -239,13 +210,8 @@ class Tool(BaseGTATool):
         :param name: 方法名称，见address.NATIVE_HASH
         :param arg_sign: 函数签名
         """
-        with self.native_context:
-            fn_addr = self.get_native_addr(name)
-            if arg_sign:
-                self.native_context.push(arg_sign, *args)
-            self.handler.remote_call(fn_addr, self.native_context.addr)
-            if ret_type:
-                return self.native_context.get_result(ret_type, ret_size)
+        addr = self.get_native_addr(name) if isinstance(name, str) else name
+        super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
     def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
@@ -389,21 +355,14 @@ class Tool(BaseGTATool):
     def set_move_speed(self, entity_addr, value):
         """设置实体的移动速度"""
         ctx = self.native_context
-        with ctx:
-            ctx.push('L3f', entity_addr, *value)
-            self.handler.remote_call(self.SetMoveSpeed, ctx.addr)
+        ctx.push_manual(-3, '3f', *value)
+        self.native_call_auto(address.SetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
 
     def get_move_speed(self, entity_addr):
         """获取实体的移动速度"""
         ctx = self.native_context
-        with ctx:
-            ctx.push('L', entity_addr)
-            self.handler.remote_call(self.GetMoveSpeed, ctx.addr)
-            return (
-                round(ctx.get_stack_value(1, float), 3),
-                round(ctx.get_stack_value(2, float), 3),
-                round(ctx.get_stack_value(3, float), 3)
-            )
+        self.native_call_auto(address.GetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
+        return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.normalFloat))
 
     def raise_up(self, _=None, speed=15):
         """升高(有速度)"""

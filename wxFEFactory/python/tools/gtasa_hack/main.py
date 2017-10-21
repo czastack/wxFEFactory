@@ -11,7 +11,6 @@ from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_L
 from .models import Player, Vehicle
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
-from ..gtaiv_hack.native import NativeContext
 import math
 import os
 import json
@@ -27,22 +26,10 @@ class Tool(BaseGTATool):
     Player = Player
     Vehicle = Vehicle
     MARKER_RANGE = 175
-
-    FUNCTION_REQUEST_MODEL = b'\x55\x8B\xEC\x51\xC7\x45\xFC\xe0\x87\x40\x00\x6A\x06\xFF\x75\x08\xFF\x55\xFC\x83\xC4\x08\x8B\xE5\x5D\xC3'
-    FUNCTION_LOAD_REQUESTED_MODELS = b'\x55\x8B\xEC\x51\xC7\x45\xFC\x10\xea\x40\x00\x6A\x00\xFF\x55\xFC\x83\xC4\x04\x8B\xE5\x5D\xC3'
-    FUNCTION_IS_MODEL_LOADED = (
-        b'\x55\x8B\xEC\x83\xEC\x08\xC7\x45\xF8\xC0\x44\x40\x00\xC7\x45\xFC\x00\x00\x00\x00\xFF\x75\x08\xFF\x55\xF8\x0F\xB6\xC0'
-        b'\x89\x45\xFC\x58\x8B\x45\xFC\x8B\xE5\x5D\xC3'
-    )
-    FUNCTION_ADD_EXPLOSION = (
-        b'\x55\x8B\xEC\x83\xEC\x14\x8B\x4D\x08\xC7\x45\xEC\x50\x6A\x73\x00\xF3\x0F\x10\x41\x60\x8B\x41\x6C\xF3\x0F\x11\x45\xF4'
-        b'\xF3\x0F\x10\x41\x64\xF3\x0F\x11\x45\xF8\xF3\x0F\x10\x41\x68\xF3\x0F\x11\x45\xFC\xF3\x0F\x10\x41\x70\x89\x45\xF0\xF3'
-        b'\x0F\x11\x45\x08\x6A\x00\xFF\x75\x08\x6A\x01\x6A\x00\xFF\x75\xFC\xFF\x75\xF8\xFF\x75\xF4\xFF\x75\xF0\x6A\x00\x6A\x00'
-        b'\xFF\x55\xEC\x83\xC4\x28\x33\xC0\x8B\xE5\x5D\xC3'
-    )
-
     GO_FORWARD_COORD_RATE = 2.0
     SLING_SPEED_RATE = 4
+    CLASS_NAME = 'Grand theft auto San Andreas'
+    WINDOW_NAME = 'GTA: San Andreas'
 
     def __init__(self):
         super().__init__()
@@ -177,74 +164,38 @@ class Tool(BaseGTATool):
                     ui.Text("焰之炼金术 (长): alt+shift+`")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.GridLayout(cols=3, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
+                ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
                 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def onClose(self, _=None):
-        if self.handler.active:
-            self.free_remote_function()
-        return super().onClose()
-
     def init_remote_function(self):
-        self.RequestModel = self.handler.write_function(self.FUNCTION_REQUEST_MODEL)
-        self.LoadRequestedModels = self.handler.write_function(self.FUNCTION_LOAD_REQUESTED_MODELS)
-        self.IsModelLoaded = self.handler.write_function(self.FUNCTION_IS_MODEL_LOADED)
-        self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
-
-        # 初始化Native调用的参数环境
-        context_addr = self.handler.alloc_memory(NativeContext.SIZE)
-        self.native_context = NativeContext(context_addr, self.handler)
-
+        super().init_remote_function()
         self.inject_spawn_code()
 
-    def free_remote_function(self):
-        self.handler.free_memory(self.RequestModel)
-        self.handler.free_memory(self.LoadRequestedModels)
-        self.handler.free_memory(self.IsModelLoaded)
-        self.handler.free_memory(self.NativeCall)
-
-        self.handler.free_memory(self.native_context.addr)
-
-    def checkAttach(self, _=None):
-        className = 'Grand theft auto San Andreas'
-        windowName = 'GTA: San Andreas'
-
-        if self.handler.active:
-            self.free_remote_function()
-
-        if self.handler.attachByWindowName(className, windowName):
-            self.attach_status_view.label = windowName + ' 正在运行'
-
-            if not self.win.hotkeys:
-                self.win.RegisterHotKeys(
-                    (
-                        ('turnAndJetPackTickSpeed', MOD_ALT | MOD_SHIFT, getVK('m'), self.turnAndJetPackTickSpeed),
-                        ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
-                        ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-                        ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-                        ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
-                        ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-                        ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-                        ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
-                        ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
-                    )
-                    + self.get_common_hotkeys()
-                )
-            self.init_remote_function()
-        else:
-            self.attach_status_view.label = '没有检测到 ' + windowName
+    def get_hotkeys(self):
+        return (
+            ('turnAndJetPackTickSpeed', MOD_ALT | MOD_SHIFT, getVK('m'), self.turnAndJetPackTickSpeed),
+            ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
+            ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
+            ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
+            ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
+            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
+            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
+            ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
+            ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
+        ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
-        return self.handler.remote_call(self.IsModelLoaded, model_id)
+        return self.native_call_auto(address.FUNC_CStreaming__HasModelLoaded, 'L', model_id) & 0xFF
 
     def load_model(self, model_id):
         if model_id > 0 and not self.is_model_loaded(model_id):
-            self.handler.remote_call(self.RequestModel, model_id)
-            self.handler.remote_call(self.LoadRequestedModels, 0)
+            self.native_call_auto(address.FUNC_CStreaming__RequestModel, '2L', model_id, 6)
+            self.native_call_auto(address.FUNC_LoadAllRequestedModels, 'L', 0)
 
     def on_weapon_change(self, weapon_view):
         self.load_model(weapon_view.selected_item[1])
@@ -475,12 +426,12 @@ class Tool(BaseGTATool):
     def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, fCameraShake=0.3):
         """产生爆炸"""
         # (pExplodingEntity, pOwner, explosionType, vecPosition, uiActivationDelay, bMakeSound, fCamShake, bNoDamage)
-        self.native_auto_call(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
+        self.native_call_auto(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
 
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
         cam_x, cam_y, cam_z = self.get_camera_rot()
-        offset = (cam_x * 10, cam_y * 10, cam_z * 5)
+        offset = (cam_x * 6, cam_y * 6, cam_z * 6)
         coord = self.player.get_offset_coord_m(offset)
 
         for i in range(count):
@@ -494,7 +445,7 @@ class Tool(BaseGTATool):
         vehicle.hp = 1000
         model_id = vehicle.model_id
 
-        is_type = lambda addr: self.native_auto_call(addr, 'L', model_id)
+        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id)
         fix_addr = None
 
         if is_type(address.FUNC_IsCarModel) or is_type(address.FUNC_IsMonsterTruckModel) or is_type(address.FUNC_IsTrailerModel):
@@ -507,4 +458,8 @@ class Tool(BaseGTATool):
             fix_addr = address.FUNC_CBike_Fix
 
         if fix_addr:
-            self.native_auto_call(fix_addr, None, this=vehicle.addr)
+            self.native_call_auto(fix_addr, None, this=vehicle.addr)
+
+    def clothes_rebuild(self, _=None):
+        """洗衣服"""
+        self.native_call_auto(address.FUNC_CClothes__RebuildPlayer, '2L', self.player.addr, 0)
