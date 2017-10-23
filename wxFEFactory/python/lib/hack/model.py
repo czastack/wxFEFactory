@@ -27,7 +27,9 @@ class Field:
         return ret
 
     def __set__(self, obj, value):
-        obj.handler.write(obj.addr + self.offset, self.type(value), self.size)
+        if not isinstance(value, self.type):
+            value = self.type(value)
+        obj.handler.write(obj.addr + self.offset, value, self.size)
 
 
 class OffsetsField(Field):
@@ -38,7 +40,9 @@ class OffsetsField(Field):
         return ret
 
     def __set__(self, obj, value):
-        obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], self.type(value), self.size)
+        if not isinstance(value, self.type):
+            value = self.type(value)
+        obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], value, self.size)
 
 
 class ModelField(Field):
@@ -177,3 +181,20 @@ class ArrayData:
     @property
     def size(self):
         return self.length * self.field.size
+
+
+class StringField(Field):
+    def __init__(self, offset, size=0, encoding='gbk'):
+        super().__init__(offset, bytes, size)
+        self.encoding = encoding
+
+    def __get__(self, obj, type=None):
+        ret = obj.handler.read(obj.addr + self.offset, self.type, self.size or 64)
+        return ret.rstrip(b'\x00').decode(self.encoding)
+
+    def __set__(self, obj, value):
+        if isinstance(value, str):
+            value = bytes(value, self.encoding)
+        if value[-1] != 0:
+            value += b'\x00'
+        super().__set__(obj, value)

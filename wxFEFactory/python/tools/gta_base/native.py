@@ -23,6 +23,25 @@ class NativeContext(Model):
 
     def push(self, signature, *args):
         """压入参数，m_nArgCount增大"""
+        # signature
+        # x: pad byte
+        # c: char
+        # b: signed char
+        # B: unsigned char
+        # ?: _Bool
+        # h: short
+        # H: unsigned short
+        # i: int
+        # I: unsigned int
+        # l: long
+        # L: unsigned long
+        # q: long long
+        # Q: unsigned long long
+        # f: float
+        # d: double
+        # s: char[]
+        # p: char[]
+        # P: void *
         # 写入栈的地址
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
         self.handler.write(addr, struct.pack(signature, *args))
@@ -86,6 +105,10 @@ class NativeContext(Model):
 
         return self.handler.read(self.m_TempStack.addr, type, size)
 
+    def reset(self):
+        self.m_nArgCount = 0
+        self.m_nDataCount = 0
+
     def __getitem__(self, index):
         return self.m_TempStack[index]
 
@@ -94,8 +117,8 @@ class NativeContext(Model):
         self.m_TempStack[index] = value
 
     def __enter__(self):
-        self.m_nArgCount = 0
-        self.m_nDataCount = 0
+        self.reset()
+        return self
 
     def __exit__(self, *args):
         pass

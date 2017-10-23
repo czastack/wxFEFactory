@@ -6,8 +6,9 @@ from commonstyle import dialog_style, styles
 from . import address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from .models import Player, Vehicle
-from ..gta_base.main import BaseGTATool
+from .script import RunningScript
 from ..gta_base.widgets import WeaponWidget
+from ..gta3_base.main import BaseGTA3Tool
 import math
 import os
 import json
@@ -17,16 +18,19 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGTATool):
+class Tool(BaseGTA3Tool):
+    CLASS_NAME = 'Grand theft auto 3'
+    WINDOW_NAME = 'GTA3'
     address = address
     models = models
     Player = Player
     Vehicle = Vehicle
+    RunningScript = RunningScript
     MARKER_RANGE = 32
     SAFE_SPEED_RATE = 0.3
     GO_FORWARD_COORD_RATE = 2.0
-    CLASS_NAME = 'Grand theft auto 3'
-    WINDOW_NAME = 'GTA3'
+    DEST_DEFAULT_COLOR = 5
+    VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -65,7 +69,7 @@ class Tool(BaseGTATool):
             
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -76,21 +80,6 @@ class Tool(BaseGTATool):
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
-
-    def onSpawnVehicleIdChange(self, lb):
-        self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
-
-    def onSpawnVehicleIdPrev(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == 0:
-            pos = len(VEHICLE_LIST)
-        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
-
-    def onSpawnVehicleIdNext(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == len(VEHICLE_LIST) - 1:
-            pos = -1
-        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def vehicle_lock_door(self, _=None, lock=True):
         car = self.player.vehicle
@@ -105,7 +94,3 @@ class Tool(BaseGTATool):
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
-
-    def create_explosion(self, coord):
-        """TODO"""
-        pass

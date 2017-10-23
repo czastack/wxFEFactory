@@ -2,6 +2,7 @@ from lib.hack.model import Model, Field, CoordField
 from lib.lazy import lazy
 from .data import VEHICLE_LIST
 from ..gta_base.models import Physicle, WeaponSet, Pool
+from ..gta_base.models import ManagedModel
 from . import address
 import math
 
@@ -151,7 +152,7 @@ class Object(Entity):
     SIZE = 0x19c
 
 
-class Marker(Model):
+class Marker(ManagedModel):
     SIZE = 40
 
     MARKER_TYPE_CAR = 1
@@ -162,7 +163,7 @@ class Marker(Model):
     AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED)
 
     color = Field(0)
-    poolIndex = Field(4, int)
+    entity_handle = Field(4, int)
     coord = CoordField(8)
     sprite = Field(36, int, 1)
     flags1 = Field(37, int, 1)
@@ -179,9 +180,10 @@ class Marker(Model):
     @property
     def entity(self):
         blipType = self.blipType
+        index = self.entity_handle >> 8
         if blipType is __class__.MARKER_TYPE_CAR:
-            return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
+            return self.mgr.vehicle_pool[index]
         elif blipType is __class__.MARKER_TYPE_PED:
-            return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
+            return self.mgr.ped_pool[index]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
-            pass
+            return self.mgr.object_pool[index]

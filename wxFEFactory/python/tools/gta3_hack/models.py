@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField, ModelField
-from lib.lazy import lazy
 from ..gta_base.models import Physicle, WeaponSet, Pool
+from ..gta3_base.models import Marker
 from . import address
 import math
 
@@ -73,34 +73,10 @@ class Player(Entity):
     collidingCar = ModelField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
-    @lazy
+    @property
     def weapons(self):
         return WeaponSet(self.addr + 0x35c, self.handler, 13)
 
     @property
     def cur_weapon(self):
         return self.weapons[self.cur_weapon_slop]
-
-
-class Marker(Model):
-    SIZE = 56
-
-    MARKER_TYPE_CAR = 1
-    MARKER_TYPE_PED = 2
-    MARKER_TYPE_OBJECT = 3
-    AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED)
-
-    color = Field(0)
-    blipType = Field(4)
-    poolIndex = Field(8)
-    coord = CoordField(12)
-
-    @property
-    def entity(self):
-        blipType = self.blipType
-        if blipType is __class__.MARKER_TYPE_CAR:
-            return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
-        elif blipType is __class__.MARKER_TYPE_PED:
-            return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
-        elif blipType is __class__.MARKER_TYPE_OBJECT:
-            pass

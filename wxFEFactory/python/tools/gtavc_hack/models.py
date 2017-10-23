@@ -1,7 +1,6 @@
-from lib.hack.model import Model, Field, OffsetsField, CoordField
-from lib.lazy import lazy
+from lib.hack.model import Model, Field, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool
-from . import address
+from ..gta3_base.models import Marker
 import math
 
 
@@ -102,39 +101,3 @@ class Vehicle(Entity):
 
     def unlock_door(self):
         self.door_status = 1
-
-
-class Marker(Model):
-    SIZE = 56
-
-    MARKER_TYPE_COORD = 0
-    MARKER_TYPE_CAR = 1
-    MARKER_TYPE_PED = 2
-    MARKER_TYPE_OBJECT = 3
-
-    AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED, MARKER_TYPE_OBJECT)
-
-    color = Field(0)
-    blipType = Field(4)
-    poolIndex = Field(8)
-    coord = CoordField(12)
-
-    @property
-    def entity(self):
-        blipType = self.blipType
-        if blipType is __class__.MARKER_TYPE_CAR:
-            return Pool(address.VEHICLE_POOL, self.handler, Vehicle)[self.poolIndex >> 8]
-        elif blipType is __class__.MARKER_TYPE_PED:
-            return Pool(address.PED_POOL, self.handler, Player)[self.poolIndex >> 8]
-        elif blipType is __class__.MARKER_TYPE_OBJECT:
-            return Pool(address.OBJECT_POOL, self.handler, Object)[self.poolIndex >> 8]
-
-
-class Sphere(Model):
-    SIZE = 24
-
-    coord = CoordField(8)
-
-
-class Object(Entity):
-    SIZE = 416

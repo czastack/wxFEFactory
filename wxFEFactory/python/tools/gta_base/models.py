@@ -11,6 +11,12 @@ def distance(p1, p2):
     )
 
 
+class ManagedModel(Model):
+    def __init__(self, addr, mgr):
+        super().__init__(addr, mgr.handler)
+        self.mgr = mgr
+
+
 class Physicle(Model):
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)

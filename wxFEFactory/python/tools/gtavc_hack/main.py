@@ -6,8 +6,9 @@ from commonstyle import dialog_style, styles
 from . import address, models
 from .models import Player, Vehicle
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
-from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
+from ..gta3_base.main import BaseGTA3Tool
+from ..gta3_base.script import RunningScript
 import math
 import os
 import json
@@ -17,17 +18,19 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGTATool):
+class Tool(BaseGTA3Tool):
+    CLASS_NAME = 'Grand theft auto 3'
+    WINDOW_NAME = 'GTA: Vice City'
     address = address
     models = models
     Player = Player
     Vehicle = Vehicle
+    RunningScript = RunningScript
     MARKER_RANGE = 32
     SPHERE_RANGE = 16
     GO_FORWARD_COORD_RATE = 2.0
-
-    CLASS_NAME = 'Grand theft auto 3'
-    WINDOW_NAME = 'GTA: Vice City'
+    DEST_DEFAULT_COLOR = 5
+    VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -81,18 +84,18 @@ class Tool(BaseGTATool):
 
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
-                    ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: alt+[")
-                    ui.Text("切换下一辆: alt+]")
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.GridLayout(cols=3, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
+                ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=5))
+                ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=4))
+                ui.Button("敌人爆炸", onclick=self.enemys_explode)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -101,9 +104,6 @@ class Tool(BaseGTATool):
     def get_hotkeys(self):
         return (
             ('bigbang', MOD_ALT, getVK('enter'), self.bigbang),
-            ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
-            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
@@ -141,46 +141,12 @@ class Tool(BaseGTATool):
     def bigbang(self, _=None):
         self.inputCheat('bigbang')
 
-    def spawnVehicle(self, _=None):
-        self.inputCheat('betterthanwalking')
-
-    def onSpawnVehicleIdChange(self, lb):
-        self.handler.write32(address.SPAWN_VEHICLE_ID_BASE, VEHICLE_LIST[lb.index][1])
-
-    def onSpawnVehicleIdPrev(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == 0:
-            pos = len(VEHICLE_LIST)
-        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
-
-    def onSpawnVehicleIdNext(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == len(VEHICLE_LIST) - 1:
-            pos = -1
-        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
-
     def get_camera_rot(self):
         rotz = self.camera_z_rot_view.mem_value
-        return (
-            -math.cos(rotz),
-            -math.sin(rotz),
-            self.camera_x_rot_view.mem_value
-        )
-
-    EXPLOSION_TYPE_GRENADE = 0
-    EXPLOSION_TYPE_MOLOTOV = 1
-    EXPLOSION_TYPE_ROCKET = 2
-    EXPLOSION_TYPE_CAR = 3
-    EXPLOSION_TYPE_CAR_QUICK = 4
-    EXPLOSION_TYPE_BOAT = 5
-    EXPLOSION_TYPE_HELI = 6
-    EXPLOSION_TYPE_HELI2 = 7
-    EXPLOSION_TYPE_MINE = 8
-    EXPLOSION_TYPE_BARREL = 9
-    EXPLOSION_TYPE_TANK_GRENADE = 10
-    EXPLOSION_TYPE_HELI_BOMB = 11
-    def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, radius=5):
-        """产生爆炸"""
-        pass
-        # (X, Y, Z, iType, Radius)
-        # self.native_call_auto(address.FUNC_AddExplosion, '3fLL', *coord, explosionType, radius)
+        cam_x = math.cos(rotz)
+        cam_y = math.sin(rotz)
+        cam_z = self.camera_x_rot_view.mem_value
+        if not self.isInVehicle:
+            cam_x = -cam_x
+            cam_y = -cam_y
+        return (cam_x, cam_y, cam_z)

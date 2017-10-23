@@ -21,6 +21,8 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGTATool):
+    CLASS_NAME = 'grcWindow'
+    WINDOW_NAME = 'GTAIV'
     address = address
     models = models
     Player = Player
@@ -32,9 +34,7 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_SPEED_RATE = 60
     SLING_COORD_UP = 3
-
-    CLASS_NAME = 'grcWindow'
-    WINDOW_NAME = 'GTAIV'
+    VEHICLE_LIST = VEHICLE_LIST
 
     from .data import WEAPON_LIST, SLOT_NO_AMMO
 
@@ -84,7 +84,7 @@ class Tool(BaseGTATool):
 
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange,
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -131,13 +131,9 @@ class Tool(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-            ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
             ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
             ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
             ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
-            ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
@@ -369,24 +365,6 @@ class Tool(BaseGTATool):
         else:
             self.player.coord[2] += 3
 
-    def onSpawnVehicleIdChange(self, lb):
-        """切换所选载具回调"""
-        self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
-
-    def onSpawnVehicleIdPrev(self, _=None):
-        """选中上一个载具"""
-        pos = self.spawn_vehicle_id_view.index
-        if pos == 0:
-            pos = len(VEHICLE_LIST)
-        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
-
-    def onSpawnVehicleIdNext(self, _=None):
-        """选中下一个载具"""
-        pos = self.spawn_vehicle_id_view.index
-        if pos == len(VEHICLE_LIST) - 1:
-            pos = -1
-        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
-
     def vehicle_lock_door(self, _=None, lock=True):
         """锁车门"""
         car = self.vehicle
@@ -608,12 +586,6 @@ class Tool(BaseGTATool):
         m.request()
         self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
         return Vehicle(self.native_context.get_temp_value(), self)
-
-    def spawn_choosed_vehicle(self, _=None):
-        """生成选中的载具"""
-        model = getattr(self, 'spwan_vehicle_id', None)
-        if model:
-            return self.spawn_vehicle(model)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""

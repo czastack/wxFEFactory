@@ -21,6 +21,8 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGTATool):
+    CLASS_NAME = 'Grand theft auto San Andreas'
+    WINDOW_NAME = 'GTA: San Andreas'
     address = address
     models = models
     Player = Player
@@ -28,8 +30,8 @@ class Tool(BaseGTATool):
     MARKER_RANGE = 175
     GO_FORWARD_COORD_RATE = 2.0
     SLING_SPEED_RATE = 4
-    CLASS_NAME = 'Grand theft auto San Andreas'
-    WINDOW_NAME = 'GTA: San Andreas'
+    DEST_DEFAULT_COLOR = 0
+    VEHICLE_LIST = VEHICLE_LIST
 
     def __init__(self):
         super().__init__()
@@ -152,15 +154,13 @@ class Tool(BaseGTATool):
 
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.onSpawnVehicleIdChange, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
                     ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("切换上一辆: alt+[")
-                    ui.Text("切换下一辆: alt+]")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
-                    ui.Text("瞬移到目的地: alt+1")
+                    ui.Text("切换转向并加速: alt+shift+m")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -181,14 +181,10 @@ class Tool(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('turnAndJetPackTickSpeed', MOD_ALT | MOD_SHIFT, getVK('m'), self.turnAndJetPackTickSpeed),
+            ('turn_and_speed_up', MOD_ALT | MOD_SHIFT, getVK('m'), self.turn_and_speed_up),
             ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
-            ('spawnVehicle', MOD_ALT, getVK('v'), self.spawnVehicle),
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
-            ('spawnVehicleIdPrev', MOD_ALT, getVK('['), self.onSpawnVehicleIdPrev),
-            ('spawnVehicleIdNext', MOD_ALT, getVK(']'), self.onSpawnVehicleIdNext),
-            ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):
@@ -233,21 +229,6 @@ class Tool(BaseGTATool):
         # 从大地图读取坐标
         self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
         self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
-
-    def onSpawnVehicleIdChange(self, lb):
-        self.spwan_vehicle_id = VEHICLE_LIST[lb.index][1]
-
-    def onSpawnVehicleIdPrev(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == 0:
-            pos = len(VEHICLE_LIST)
-        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
-
-    def onSpawnVehicleIdNext(self, _=None):
-        pos = self.spawn_vehicle_id_view.index
-        if pos == len(VEHICLE_LIST) - 1:
-            pos = -1
-        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def moveToMapPtr(self, _=None):
         coord = self.vehicle.coord
@@ -310,7 +291,7 @@ class Tool(BaseGTATool):
         for index, view in enumerate(self.cheat_views):
             view.checked = self.handler.read8(cheat_config['CHEATS_ADDR'][index]) == 1
 
-    def turnAndJetPackTickSpeed(self, _=None):
+    def turn_and_speed_up(self, _=None):
         self.dir_correct()
         self.speed_up()
 
@@ -358,10 +339,8 @@ class Tool(BaseGTATool):
         else:
             self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
-    def spawnVehicle(self, _=None):
-        carid = getattr(self, 'spwan_vehicle_id', None)
-        if carid:
-            self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, carid)
+    def spawn_vehicle(self, model_id):
+        self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, model_id)
 
     def vehicle_lock_door(self, _=None, lock=True):
         car = self.player.vehicle
@@ -456,29 +435,21 @@ class Tool(BaseGTATool):
 
     def get_enemys(self):
         """获取红色标记的peds"""
-        return [blip.entity for blip in self.get_target_blips(0)]
+        for blip in self.get_target_blips():
+            color = blip.color
+            if blip.bright:
+                color -= 7
+            if color is 0:
+                yield blip.entity
 
     def get_friends(self):
         """获取蓝色标记的peds"""
-        return [blip.entity for blip in self.get_target_blips(7)]
+        for blip in self.get_target_blips():
+            color = blip.color
+            if color is 7 and not blip.bright:
+                yield blip.entity
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""
         for e in self.get_enemys():
             self.create_explosion(e.coord)
-
-    def teleport_to_destination(self, _=None, color=0, types=(models.Marker.MARKER_TYPE_CAR, models.Marker.MARKER_TYPE_PED, models.Marker.MARKER_TYPE_COORDS)):
-        """瞬移到目的地"""
-        for blip in self.get_blips(color, types):
-            if blip.sprite is 0:
-                blipType = blip.blipType
-                if blipType is self.models.Marker.MARKER_TYPE_COORDS:
-                    coord = blip.coord
-                else:
-                    entity = blip.entity
-                    if entity:
-                        coord = entity.coord
-                    else:
-                        continue
-                self.entity.coord = coord
-                break

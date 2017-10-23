@@ -85,7 +85,6 @@ class BaseGTATool(BaseTool):
     def init_remote_function(self):
         """初始化远程函数"""
         self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
-
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(NativeContext.SIZE)
         self.native_context = NativeContext(context_addr, self.handler)
@@ -93,7 +92,6 @@ class BaseGTATool(BaseTool):
     def free_remote_function(self):
         """释放远程函数"""
         self.handler.free_memory(self.NativeCall)
-
         self.handler.free_memory(self.native_context.addr)
 
     def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
@@ -155,6 +153,11 @@ class BaseGTATool(BaseTool):
     def vehicle_pool(self):
         """载具池"""
         return self.models.Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
+
+    @property
+    def object_pool(self):
+        """物体池"""
+        return self.models.Pool(self.address.OBJECT_POOL, self.handler, self.Object)
 
     def get_rotz(self):
         """获取xy面旋转量"""
@@ -448,13 +451,13 @@ class BaseGTATool(BaseTool):
     def get_blips(self, color=None, types=None):
         """获取所有标记"""
         Marker = self.models.Marker
-        addr = self.address.MARKER_ARRAY
-        it = Marker(addr, self.handler)
+        addr = self.address.BLIP_LIST
+        it = Marker(addr, self)
 
         for i in range(self.MARKER_RANGE):
             blipType = it.blipType
             if it.blipType and (types is None or blipType in types) and (color is None or it.color is color):
-                yield Marker(it.addr, self.handler)
+                yield Marker(it.addr, self)
             it.next()
 
     def get_target_blips(self, color=None, types=None):
@@ -504,6 +507,54 @@ class BaseGTATool(BaseTool):
                 entity.coord = coord
             if zinc:
                 coord[2] += zinc
+    
+    def teleport_to_destination(self, _=None, color=None, types=None):
+        """瞬移到目的地"""
+        Marker = self.models.Marker
+
+        if color is None:
+            color = self.DEST_DEFAULT_COLOR
+
+        if types is None:
+            types = (Marker.MARKER_TYPE_CAR, Marker.MARKER_TYPE_PED, Marker.MARKER_TYPE_COORDS)
+
+        for blip in self.get_blips(color, types):
+            if blip.sprite is 0:
+                blipType = blip.blipType
+                if blipType is Marker.MARKER_TYPE_COORDS:
+                    coord = blip.coord
+                else:
+                    entity = blip.entity
+                    if entity:
+                        coord = entity.coord
+                    else:
+                        continue
+                self.entity.coord = coord
+                break
+
+    def spawn_choosed_vehicle(self, _=None):
+        """生成选中的载具"""
+        model = getattr(self, 'spwan_vehicle_id', None)
+        if model:
+            return self.spawn_vehicle(model)
+
+    def on_spawn_vehicle_id_change(self, lb):
+        """刷车器listbox回调"""
+        self.spwan_vehicle_id = self.VEHICLE_LIST[lb.index][1]
+
+    def spawn_vehicle_id_prev(self, _=None):
+        """选中上一个载具"""
+        pos = self.spawn_vehicle_id_view.index
+        if pos == 0:
+            pos = len(self.VEHICLE_LIST)
+        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
+
+    def spawn_vehicle_id_next(self, _=None):
+        """选中下一个载具"""
+        pos = self.spawn_vehicle_id_view.index
+        if pos == len(self.VEHICLE_LIST) - 1:
+            pos = -1
+        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
 
     def lock_door(self, _=None):
         """锁最近使用的载具的车门"""
@@ -552,6 +603,12 @@ class BaseGTATool(BaseTool):
             coord[2] += offset[2]
             self.create_explosion(coord)
 
+    def custom_hotkey(self, _=None):
+        """用于自定义的临时热键功能"""
+        fn = getattr(self, 'hotkey_cfn', None)
+        if fn:
+            fn()
+
     def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
@@ -599,6 +656,9 @@ class BaseGTATool(BaseTool):
         ui.Button("锁定载具迭代", onclick=self.iter_vehicle_lock)
 
     def render_common_text(self):
+        ui.Text("根据左边列表生产载具: alt+v")
+        ui.Text("选中上一个载具: alt+[")
+        ui.Text("选中下一个载具: alt+]")
         ui.Text("向前穿墙: alt+w")
         ui.Text("向前穿墙大: alt+shift+w")
         ui.Text("弹射起步: alt+m")
@@ -628,6 +688,8 @@ class BaseGTATool(BaseTool):
         ui.Text("清除通缉等级: alt+0")
         ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
         ui.Text("红莲之炼金术 (长): alt+shift+`")
+        ui.Text("瞬移到目的地: alt+1")
+        ui.Text("自定义临时热键(执行tool.hotkey_cfn): alt+c")
 
     def get_common_hotkeys(self):
         return (
@@ -660,4 +722,9 @@ class BaseGTATool(BaseTool):
             ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
             ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
             ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
+            ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
+            ('spawn_vehicle_id_prev', MOD_ALT, getVK('['), self.spawn_vehicle_id_prev),
+            ('spawn_vehicle_id_next', MOD_ALT, getVK(']'), self.spawn_vehicle_id_next),
+            ('spawn_choosed_vehicle', MOD_ALT, getVK('v'), self.spawn_choosed_vehicle),
+            ('custom_hotkey', MOD_ALT, getVK('c'), self.custom_hotkey),
         )
