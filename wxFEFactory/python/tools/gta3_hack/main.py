@@ -74,7 +74,7 @@ class Tool(BaseGTA3Tool):
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.GridLayout(cols=3, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
@@ -94,3 +94,7 @@ class Tool(BaseGTA3Tool):
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
+
+    def get_enemys(self):
+        """获取敌人标记的peds"""
+        return (blip.entity for blip in self.get_target_blips(self.models.Marker.MARKER_COLOR_LIGHT_GREEN))

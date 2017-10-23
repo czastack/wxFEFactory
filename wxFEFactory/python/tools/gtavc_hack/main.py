@@ -93,9 +93,6 @@ class Tool(BaseGTA3Tool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
-                ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=5))
-                ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=4))
-                ui.Button("敌人爆炸", onclick=self.enemys_explode)
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -150,3 +147,7 @@ class Tool(BaseGTA3Tool):
             cam_x = -cam_x
             cam_y = -cam_y
         return (cam_x, cam_y, cam_z)
+
+    def get_enemys(self):
+        """获取敌人标记的peds"""
+        return (blip.entity for blip in self.get_target_blips(self.models.Marker.MARKER_COLOR_YELLOW))

@@ -9,6 +9,7 @@ from commonstyle import dialog_style, styles
 from . import cheat, address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
 from .models import Player, Vehicle
+from .script import RunningScript
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
 import math
@@ -32,10 +33,7 @@ class Tool(BaseGTATool):
     SLING_SPEED_RATE = 4
     DEST_DEFAULT_COLOR = 0
     VEHICLE_LIST = VEHICLE_LIST
-
-    def __init__(self):
-        super().__init__()
-        self.spawn_code_injected = False
+    RunningScript = RunningScript
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -46,7 +44,7 @@ class Tool(BaseGTATool):
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
-            self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.getWantedLevel, self.setWantedLevel)
+            self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.Horizontal(className="expand"):
@@ -143,8 +141,6 @@ class Tool(BaseGTATool):
                     ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
                 with ui.Horizontal(className="container"):
                     ui.Button("同步", onclick=self.cheat_sync)
-                    # ui.Button("插入生产载具的代码", onclick=self.inject_spawn_code)
-                    self.spawn_code_injected_view = ui.Text("", className="vcenter")
 
         with Group(None, "女友进度", 0, handler=self.handler):
             # TODO
@@ -175,10 +171,6 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def init_remote_function(self):
-        super().init_remote_function()
-        self.inject_spawn_code()
-
     def get_hotkeys(self):
         return (
             ('turn_and_speed_up', MOD_ALT | MOD_SHIFT, getVK('m'), self.turn_and_speed_up),
@@ -186,6 +178,22 @@ class Tool(BaseGTATool):
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
         ) + self.get_common_hotkeys()
+
+    def init_remote_function(self):
+        super().init_remote_function()
+        
+        script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
+        self.script_context = self.RunningScript(script_ctx_addr, self, 
+            address.SCRIPT_SPACE_BASE, address.FUNC_CRunningScript__ProcessOneCommand, address.FUNC_CRunningScript__Init)
+
+    def free_remote_function(self):
+        super().free_remote_function()
+        del self.script_context
+
+    def script_call(self, command_id, signature, *args):
+        """执行一条脚本"""
+        if self.handler.active:
+            return self.script_context.run(command_id, signature, *args)
 
     def is_model_loaded(self, model_id):
         return self.native_call_auto(address.FUNC_CStreaming__HasModelLoaded, 'L', model_id) & 0xFF
@@ -304,21 +312,6 @@ class Tool(BaseGTATool):
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
         return self.handler.writeFloat(addr, value)
 
-    def inject_spawn_code(self, _=None):
-        cheat_config = self.get_cheat_config()
-
-        if not self.spawn_code_injected:
-            if (
-                self.handler.write(cheat_config['CodeInjectJumpAddr'], cheat_config['bInjectedJump'], 0)
-                and self.handler.write(cheat_config['CodeInjectCodeAddr'], cheat_config['bInjectedCode'], 0)
-            ):
-                self.spawn_code_injected = True
-                # self.spawn_code_injected_view.label = "已插入"
-        else:
-            self.handler.write(cheat_config['CodeInjectJumpAddr'], cheat_config['bNotInjectedJump'], 0)
-            self.spawn_code_injected = False
-            self.spawn_code_injected_view.label = ""
-
     def freeze_timer(self, cb):
         """冻结任务中的计时"""
         cheat_config = self.get_cheat_config()
@@ -339,8 +332,15 @@ class Tool(BaseGTATool):
         else:
             self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
+    # def spawn_vehicle(self, model_id):
+    #     self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, model_id)
+
     def spawn_vehicle(self, model_id):
-        self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, model_id)
+        self.load_model(model_id)
+        self.script_call(0xa5, 'L3fP', model_id, *self.get_front_coord(), self.native_context.get_temp_addr())
+        vehicle_handle = self.native_context.get_temp_value()
+        if vehicle_handle:
+            return self.vehicle_pool[vehicle_handle >> 8]
 
     def vehicle_lock_door(self, _=None, lock=True):
         car = self.player.vehicle
@@ -350,11 +350,11 @@ class Tool(BaseGTATool):
             else:
                 car.unlock_door()
 
-    def getWantedLevel(self):
+    def get_wanted_level(self):
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
         return self.handler.read8(ptr + 0x2C)
 
-    def setWantedLevel(self, level):
+    def set_wanted_level(self, level):
         level = int(level)
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
         cops = (0, 1, 3, 5, 9, 1, 2)[level]
@@ -408,6 +408,7 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         # (pExplodingEntity, pOwner, explosionType, vecPosition, uiActivationDelay, bMakeSound, fCamShake, bNoDamage)
         self.native_call_auto(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
+        # self.script_call(0x20C, '3fL', *coord, explosionType)
 
     def fix_vehicle(self, vehicle):
         """修车"""

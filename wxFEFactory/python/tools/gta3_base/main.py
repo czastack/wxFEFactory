@@ -1,4 +1,7 @@
+from functools import partial
 from ..gta_base.main import BaseGTATool
+import fefactory_api
+ui = fefactory_api.ui
 
 
 class BaseGTA3Tool(BaseGTATool):
@@ -6,7 +9,7 @@ class BaseGTA3Tool(BaseGTATool):
         super().init_remote_function()
         
         script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
-        self.script_context = self.RunningScript(script_ctx_addr, self.handler, 
+        self.script_context = self.RunningScript(script_ctx_addr, self, 
             self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript_ProcessOneCommand)
 
     def free_remote_function(self):
@@ -16,7 +19,13 @@ class BaseGTA3Tool(BaseGTATool):
     def script_call(self, command_id, signature, *args):
         """执行一条脚本"""
         if self.handler.active:
-            return self.script_context.run(self, command_id, signature, *args)
+            return self.script_context.run(command_id, signature, *args)
+
+    def render_common_button(self):
+        super().render_common_button()
+        ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=5))
+        ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=4))
+        ui.Button("敌人爆炸", onclick=self.enemys_explode)
 
     EXPLOSION_TYPE_GRENADE = 0
     EXPLOSION_TYPE_MOLOTOV = 1
@@ -35,10 +44,6 @@ class BaseGTA3Tool(BaseGTATool):
         # (X, Y, Z, iType, Radius)
         # self.native_call_auto(address.FUNC_AddExplosion, '3fLL', *coord, explosionType, radius)
         self.script_call(0x20C, '3fL', *coord, explosionType)
-
-    def get_enemys(self):
-        """获取红色标记的peds"""
-        return (blip.entity for blip in self.get_target_blips(self.models.Marker.MARKER_COLOR_YELLOW))
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""

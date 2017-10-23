@@ -1,4 +1,5 @@
 from lib.hack import model
+from ..gta_base.models import ManagedModel
 import struct
 
 
@@ -33,25 +34,14 @@ class ArgType:
     get = ARG_TYPE.get
 
 
-class RunningScript(model.Model):
-    """原生脚本调用环境"""
-    SIZE = 0x88
-
+class BaseRunningScript(ManagedModel):
     m_szName = model.StringField(0x08, 8)
-    m_nIp = model.Field(0x10)
-    scriptType = model.Field(0x2e)
-    m_aLVars = model.ArrayField(0x30, 16, model.Field(0))
-    m_nCondResult = model.Field(0x79, size=1)
-    m_bIsMission = model.Field(0x7a, size=1)
-    m_bNotFlag = model.Field(0x82, size=1)
-    m_bDeathArrestCheckEnabled = model.Field(0x83, size=1)
-    m_bMissionCleanup = model.Field(0x85, size=1)
 
-    def __init__(self, addr, handler, script_space_base, process_addr, buff_size=255):
+    def __init__(self, addr, mgr, script_space_base, process_addr, buff_size=255):
         """
         :param process_addr: 执行一条脚本的原生函数地址
         """
-        super().__init__(addr, handler)
+        super().__init__(addr, mgr)
         self.script_space_base = script_space_base
         self.process_addr = process_addr
         self.buff_size = buff_size
@@ -79,9 +69,9 @@ class RunningScript(model.Model):
             else:
                 fmt = chr(ch)
                 try:
-                    arg_type = ArgType.get(ch)
+                    arg_type = self.get_arg_type(ch)
                 except IndexError:
-                    raise ValueError('unsupported format ' + fmt)
+                    raise ValueError('unsupported format: ' + fmt)
 
                 if repeat is 0:
                     repeat = 1
@@ -106,24 +96,30 @@ class RunningScript(model.Model):
                         self.variables.append(arg)
                     elif arg_type is ArgType.STRING:
                         # 字符串参数
-                        self.buff.pop()
-                        if isinstance(arg, str):
-                            arg = bytes(arg, 'gbk')
-                        self.buff.extend(arg[:7] + b'\x00')
+                        self.push_string(arg)
                     else:
                         # 普通参数
-                        self.pack_common_arg(arg_type, fmt, arg)
+                        self.push_common_arg(arg_type, fmt, arg)
                 repeat = 0
 
     def push_end(self):
         """写入结束符"""
         self.buff.append(ArgType.END)
 
-    def pack_common_arg(self, arg_type, fmt, arg):
+    def push_common_arg(self, arg_type, fmt, arg):
         """ 压入通用参数
         :return: bytes object
         """
         self.buff.extend(struct.pack(fmt, arg))
+
+    def push_string(self, arg):
+        self.buff.pop()
+        if isinstance(arg, str):
+            arg = bytes(arg, 'gbk')
+        self.buff.extend(arg[:7] + b'\x00')
+
+    def get_arg_type(self, fmt_code):
+        return ArgType.get(fmt_code)
 
     def save_variables(self):
         var_type = ArgType.get(0x50)
@@ -135,8 +131,33 @@ class RunningScript(model.Model):
             for i in range(len(self.variables)):
                 self.handler.write32(self.variables[i], self.handler.read32(var_addr))
                 var_addr += 4
+    
+    def reset(self):
+        self.buff.clear()
+        self.variables.clear()
+    
+    def __enter__(self):
+        self.reset()
+        return self
 
-    def run(self, mgr, command_id, signature, *args):
+    def __exit__(self, *args):
+        pass
+
+
+class RunningScript(BaseRunningScript):
+    """原生脚本调用环境"""
+    SIZE = 0x88
+
+    m_nIp = model.Field(0x10)
+    scriptType = model.Field(0x2e)
+    m_aLVars = model.ArrayField(0x30, 16, model.Field(0))
+    m_nCondResult = model.Field(0x79, size=1)
+    m_bIsMission = model.Field(0x7a, size=1)
+    m_bNotFlag = model.Field(0x82, size=1)
+    m_bDeathArrestCheckEnabled = model.Field(0x83, size=1)
+    m_bMissionCleanup = model.Field(0x85, size=1)
+
+    def run(self, command_id, signature, *args):
         self.m_bDeathArrestCheckEnabled = True
         self.m_bIsMission = self.m_bMissionCleanup = False
         self.scriptType = self.m_bMissionCleanup = False
@@ -155,17 +176,6 @@ class RunningScript(model.Model):
         if self.m_nIp < 0:
             raise ValueError('申请的内存不太对，重新按下检测按钮吧')
 
-        mgr.native_call_auto(self.process_addr, None, this=self.addr)
+        self.mgr.native_call_auto(self.process_addr, None, this=self.addr)
         self.save_variables()
         return self.m_nCondResult != 0
-    
-    def reset(self):
-        self.buff.clear()
-        self.variables.clear()
-    
-    def __enter__(self):
-        self.reset()
-        return self
-
-    def __exit__(self, *args):
-        pass
