@@ -540,7 +540,7 @@ class Player(NativeEntity):
     def explode(self, *args, **kwargs):
         self.create_explosion(*args, **kwargs)
 
-    def addr_marker(self):
+    def add_marker(self):
         return Blip.add_blip_for_char(self)
 
     del getter, getter_ptr, setter
@@ -796,7 +796,7 @@ class Vehicle(NativeEntity):
     def explode(self):
         self.script_hook_call('EXPLODE_CAR', '3L', self.handle, 1, 0)
 
-    def addr_marker(self):
+    def add_marker(self):
         return Blip.add_blip_for_car(self)
 
     del getter, getter_ptr, setter

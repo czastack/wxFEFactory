@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool
-from ..gta3_base.models import Marker
+from ..gta3_base.models import BaseBlip
 import math
 
 
@@ -101,3 +101,16 @@ class Vehicle(Entity):
 
     def unlock_door(self):
         self.door_status = 1
+
+
+class Marker(BaseBlip):
+    SIZE = 56
+
+    color = Field(0)
+    blipType = Field(4)
+    entity_handle = Field(8)
+    coord = CoordField(24)
+    index = Field(36, size=2)
+    bright = Field(38, size=1)
+    active = Field(39, size=1)
+    sprite = Field(52, size=1)

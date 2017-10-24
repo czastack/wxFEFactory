@@ -1,10 +1,7 @@
-from lib.hack.model import Model, Field, CoordField
 from ..gta_base.models import ManagedModel
 
 
-class Marker(ManagedModel):
-    SIZE = 56
-
+class BaseBlip(ManagedModel):
     MARKER_TYPE_CAR = 1
     MARKER_TYPE_PED = 2
     MARKER_TYPE_OBJECT = 3
@@ -19,15 +16,6 @@ class Marker(ManagedModel):
     MARKER_COLOR_PINK = 5
     MARKER_COLOR_CYAN = 6
     MARKER_COLOR_BLACK = 7
-
-    color = Field(0)
-    blipType = Field(4)
-    entity_handle = Field(8)
-    coord = CoordField(24)
-    index = Field(36, size=2)
-    bright = Field(38, size=1)
-    active = Field(39, size=1)
-    sprite = Field(52, size=1)
 
     @property
     def entity(self):

@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField, ModelField
 from ..gta_base.models import Physicle, WeaponSet, Pool
-from ..gta3_base.models import Marker
+from ..gta3_base.models import BaseBlip
 from . import address
 import math
 
@@ -80,3 +80,16 @@ class Player(Entity):
     @property
     def cur_weapon(self):
         return self.weapons[self.cur_weapon_slop]
+
+
+class Marker(BaseBlip):
+    SIZE = 48
+
+    color = Field(0)
+    blipType = Field(4)
+    entity_handle = Field(8)
+    coord = CoordField(20)
+    index = Field(32, size=2)
+    bright = Field(34, size=1)
+    active = Field(35, size=1)
+    sprite = Field(44, size=1)
