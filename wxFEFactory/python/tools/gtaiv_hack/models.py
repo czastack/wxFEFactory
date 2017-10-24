@@ -1,7 +1,7 @@
 from functools import reduce
 from lib.hack.model import Model, Field, CoordField, ModelField
 from lib.lazy import lazy
-from lib.utils import normalFloat
+from lib.utils import float32
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
 from .data import COLOR_LIST
@@ -18,7 +18,7 @@ class Pos(Model):
 class Entity(Physicle):
     # speed = CoordField(0x78)
     # weight = Field(0xc0, float)
-    modelid = Field(0x2e, int, 2)
+    model_id = Field(0x2e, int, 2)
 
     @property
     def pos(self):
@@ -444,7 +444,7 @@ class Player(NativeEntity):
     def coord(self):
         ctx = self.native_context
         self.native_call('GET_CHAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
-        values = ctx.get_temp_values(1, 3, float, mapfn=normalFloat)
+        values = ctx.get_temp_values(1, 3, float, mapfn=float32)
         return CoordData(self, values)
 
     @coord.setter
@@ -455,7 +455,7 @@ class Player(NativeEntity):
 
     def get_offset_coord(self, offset):
         self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
-        return self.native_context.get_temp_values(1, 3, float, mapfn=normalFloat)
+        return self.native_context.get_temp_values(1, 3, float, mapfn=float32)
 
     get_vehicle_handle = getter_ptr('GET_CAR_CHAR_IS_USING')
 
@@ -651,7 +651,7 @@ class Vehicle(NativeEntity):
     def coord(self):
         ctx = self.native_context
         self.native_call('GET_CAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
-        values = ctx.get_temp_values(1, 3, float, mapfn=normalFloat)
+        values = ctx.get_temp_values(1, 3, float, mapfn=float32)
         return CoordData(self, values)
 
     @coord.setter
@@ -668,7 +668,7 @@ class Vehicle(NativeEntity):
     def quaternion(self):
         ctx = self.native_context
         self.native_call('GET_VEHICLE_QUATERNION', 'L4L', self.handle, *ctx.get_temp_addrs(1, 4))
-        values = ctx.get_temp_values(1, 4, float, mapfn=normalFloat)
+        values = ctx.get_temp_values(1, 4, float, mapfn=float32)
         return VectorField(self, values, 'quaternion')
 
     @quaternion.setter
@@ -726,7 +726,7 @@ class Vehicle(NativeEntity):
     def colors(self):
         ctx = self.native_context
         self.native_call('GET_CAR_COLOURS', 'L2L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
-        return normalFloat(ctx.get_temp_value(1)), normalFloat(ctx.get_temp_value(2))
+        return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
 
     @colors.setter
     def colors(self, value):
@@ -736,7 +736,7 @@ class Vehicle(NativeEntity):
     def ext_colors(self):
         ctx = self.native_context
         self.native_call('GET_EXTRA_CAR_COLOURS', 'L2L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
-        return normalFloat(ctx.get_temp_value(1)), normalFloat(ctx.get_temp_value(2))
+        return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
 
     @colors.setter
     def ext_colors(self, value):
@@ -867,7 +867,7 @@ class Blip(NativeModel):
     def coord(self):
         ctx = self.native_context
         self.script_hook_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3), ret_type=None)
-        return ctx.get_temp_values(3, 1, float, mapfn=normalFloat)
+        return ctx.get_temp_values(3, 1, float, mapfn=float32)
 
     @property
     def entity(self):

@@ -81,19 +81,35 @@ class Tool(BaseGTA3Tool):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
-    def vehicle_lock_door(self, _=None, lock=True):
-        car = self.player.vehicle
-        if car:
-            if lock:
-                car.lock_door()
-            else:
-                car.unlock_door()
-
     def weapon_max(self, _=None):
         for v in self.weapon_views:
             v.id_view.index = 1
             if v.has_ammo:
                 v.ammo_view.value = 9999
+
+    def is_model_loaded(self, model_id):
+        return self.script_call(0x247, 'L', model_id)
+
+    def load_model(self, model_id):
+        if model_id > 0 and not self.is_model_loaded(model_id):
+            self.script_call(0x248, 'L', model_id)
+            self.script_call(0x38b, None)
+
+    def vehicle_fix(self, vehicle):
+        """修车"""
+        model_id = vehicle.model_id
+
+        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
+        fix_addr = None
+
+        if not is_type(address.FUNC_IsBoatModel):
+            fix_addr = address.FUNC_CAutomobile__Fix
+
+        if fix_addr:
+            self.native_call_auto(fix_addr, None, this=vehicle.addr)
+
+    def get_camera_rot(self):
+        return self.read_vector(address.CAMERA_FRONT)
 
     def get_enemys(self):
         """获取敌人标记的peds"""

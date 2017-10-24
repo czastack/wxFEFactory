@@ -51,6 +51,7 @@ class BaseGTA3Tool(BaseGTATool):
             self.create_explosion(e.coord)
 
     def spawn_vehicle(self, model_id):
+        self.load_model(model_id)
         self.script_call(0xa5, 'L3fP', model_id, *self.get_front_coord(), self.native_context.get_temp_addr())
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:

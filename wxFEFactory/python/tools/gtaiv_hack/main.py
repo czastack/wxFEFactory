@@ -352,7 +352,7 @@ class Tool(BaseGTATool):
         """获取实体的移动速度"""
         ctx = self.native_context
         self.native_call_auto(address.GetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
-        return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.normalFloat))
+        return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.float32))
 
     def raise_up(self, _=None, speed=15):
         """升高(有速度)"""
@@ -364,15 +364,6 @@ class Tool(BaseGTATool):
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3
-
-    def vehicle_lock_door(self, _=None, lock=True):
-        """锁车门"""
-        car = self.vehicle
-        if car:
-            if lock:
-                car.lock_door()
-            else:
-                car.unlock_door()
 
     def weapon_max(self, _=None):
         """武器子弹数最大"""
@@ -397,14 +388,11 @@ class Tool(BaseGTATool):
         """当前角色不会从摩托车上甩出去"""
         self.player.keep_bike = value
 
-    def restore_hp(self, _=None):
-        """恢复hp，所乘载具会复原"""
-        super().restore_hp()
-        if self.isInVehicle:
-            vehicle = self.vehicle
-            vehicle.engine_hp = 1000
-            vehicle.fix()
-            vehicle.wash()
+    def vehicle_fix(self, vehicle):
+        """修车"""
+        vehicle.engine_hp = 1000
+        vehicle.fix()
+        vehicle.wash()
 
     def max_cur_weapon(self, _=None):
         """当前武器子弹全满"""
@@ -528,7 +516,7 @@ class Tool(BaseGTATool):
         self.native_call('GET_ROOT_CAM', 'L', ctx.get_temp_addr())
         cam = ctx.get_temp_value()
         self.native_call('GET_CAM_ROT', 'L3L', cam, *ctx.get_temp_addrs(1, 3))
-        return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.normalFloat))
+        return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.float32))
 
     def get_camera_rot(self):
         """ 获取摄像机参数

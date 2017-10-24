@@ -4,7 +4,7 @@ from lib.hack.form import (
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.utils import normalFloat
+from lib.utils import float32
 from commonstyle import dialog_style, styles
 from . import cheat, address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
@@ -206,13 +206,6 @@ class Tool(BaseGTATool):
     def on_weapon_change(self, weapon_view):
         self.load_model(weapon_view.selected_item[1])
 
-    def restore_hp(self, _=None):
-        """恢复hp，所乘载具会复原"""
-        super().restore_hp()
-        if self.isInVehicle:
-            vehicle = self.vehicle
-            self.fix_vehicle(vehicle)
-
     def dir_correct(self, _=None):
         # 按当前视角方向旋转
         if self.isInVehicle:
@@ -306,7 +299,7 @@ class Tool(BaseGTATool):
     def get_weapon_prop(self, index):
         """武器熟练度"""
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
-        return normalFloat(self.handler.readFloat(addr))
+        return float32(self.handler.readFloat(addr))
 
     def set_weapon_prop(self, value, index):
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
@@ -341,14 +334,6 @@ class Tool(BaseGTATool):
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:
             return self.vehicle_pool[vehicle_handle >> 8]
-
-    def vehicle_lock_door(self, _=None, lock=True):
-        car = self.player.vehicle
-        if car:
-            if lock:
-                car.lock_door()
-            else:
-                car.unlock_door()
 
     def get_wanted_level(self):
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
@@ -385,11 +370,7 @@ class Tool(BaseGTATool):
         return self.handler.read32(address.SYSTEM_TIME)
 
     def get_camera_rot(self):
-        return (
-            self.handler.readFloat(address.CAMERA + 0x10),
-            self.handler.readFloat(address.CAMERA + 0x14),
-            self.handler.readFloat(address.CAMERA + 0x18)
-        )
+        return self.read_vector(address.CAMERA + 0x10)
 
     EXPLOSION_TYPE_GRENADE = 0
     EXPLOSION_TYPE_MOLOTOV = 1
@@ -410,9 +391,8 @@ class Tool(BaseGTATool):
         self.native_call_auto(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
         # self.script_call(0x20C, '3fL', *coord, explosionType)
 
-    def fix_vehicle(self, vehicle):
+    def vehicle_fix(self, vehicle):
         """修车"""
-        vehicle.hp = 1000
         model_id = vehicle.model_id
 
         is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF

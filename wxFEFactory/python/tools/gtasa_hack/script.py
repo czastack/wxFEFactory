@@ -61,4 +61,4 @@ class RunningScript(BaseRunningScript):
 
         self.mgr.native_call_auto(self.process_addr, None, this=self.addr)
         self.save_variables()
-        return self.condResult != 0
+        return self.condResult

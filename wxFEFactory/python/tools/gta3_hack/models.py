@@ -9,7 +9,7 @@ class Entity(Physicle):
     coord = CoordField(0x34)
     speed = CoordField(0x78)
     weight = Field(0xc0, float)
-    modelid = Field(0x5c, int, 1)
+    model_id = Field(0x5c, int, 1)
 
 
 class Vehicle(Entity):

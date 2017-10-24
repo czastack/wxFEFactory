@@ -42,6 +42,7 @@ class Tool(BaseGTA3Tool):
             self.weight_view = ModelInputWidget("weight", "重量")
             self.stamina_view = ModelInputWidget("stamina", "体力")
             self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
+            self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
             ui.Text("")
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
@@ -61,12 +62,6 @@ class Tool(BaseGTA3Tool):
                 self.weapon_views.append(
                     WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player, self.on_weapon_change)
                 )
-
-        with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
-            self.camera_view = CoordWidget("camera", "摄像机", 0x7E46B8, ())
-            self.camera_z_rot_view = InputWidget("camera_z_rot", "摄像机z_rot", 0x7E48CC, (), float)
-            self.camera_x_rot_view = InputWidget("camera_x_rot", "摄像机x_rot", 0x7E48BC, (), float)
 
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -115,16 +110,13 @@ class Tool(BaseGTA3Tool):
         self.load_model(weapon_view.selected_item[1])
 
     def get_rotz(self):
-        if self.isInVehicle:
-            rotz = self.camera_z_rot_view.mem_value
-        else:
-            PI = math.pi
-            HALF_PI = PI / 2
-            rotz = self.rot_view.mem_value
-            rotz += HALF_PI
-            if rotz > PI:
-                rotz += PI * 2
+        rotz = self.handler.readFloat(address.CAMERA_ROTZ)
+        if not self.isInVehicle:
+            rotz = rotz - math.pi
         return rotz
+
+    def get_camera_rot(self):
+        return self.read_vector(address.CAMERA_FRONT)
 
     def promptWrite(self, text):
         text = (text + '\0').encode('utf-16le')
@@ -138,15 +130,20 @@ class Tool(BaseGTA3Tool):
     def bigbang(self, _=None):
         self.inputCheat('bigbang')
 
-    def get_camera_rot(self):
-        rotz = self.camera_z_rot_view.mem_value
-        cam_x = math.cos(rotz)
-        cam_y = math.sin(rotz)
-        cam_z = self.camera_x_rot_view.mem_value
-        if not self.isInVehicle:
-            cam_x = -cam_x
-            cam_y = -cam_y
-        return (cam_x, cam_y, cam_z)
+    def vehicle_fix(self, vehicle):
+        """修车"""
+        model_id = vehicle.model_id
+
+        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
+        fix_addr = None
+
+        if is_type(address.FUNC_IsCarModel):
+            fix_addr = address.FUNC_CAutomobile__Fix
+        elif is_type(address.FUNC_IsBikeModel):
+            fix_addr = address.FUNC_CBike_Fix
+
+        if fix_addr:
+            self.native_call_auto(fix_addr, None, this=vehicle.addr)
 
     def get_enemys(self):
         """获取敌人标记的peds"""

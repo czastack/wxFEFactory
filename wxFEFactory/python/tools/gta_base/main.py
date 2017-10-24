@@ -82,6 +82,13 @@ class BaseGTATool(BaseTool):
             self.free_remote_function()
         return super().onClose()
 
+    def read_vector(self, addr):
+        """ 在addr读三个float类型
+        :return: (x, y, z)
+        """
+        r = self.handler.readFloat
+        return (r(addr), r(addr + 4), r(addr + 8))
+
     def init_remote_function(self):
         """初始化远程函数"""
         self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
@@ -169,6 +176,22 @@ class BaseGTATool(BaseTool):
             rotz += PI * 2
         return rotz
 
+    def get_camera_rot(self):
+        """获取摄像机朝向参数 (x分量, y分量, z仰角)"""
+        rotz = self.get_rotz()
+        return (math.cos(rotz), math.sin(rotz), 0.1)
+
+    def get_front_coord(self):
+        """获取前面一点的坐标"""
+        rotz = self.get_rotz()
+
+        xVal = math.cos(rotz)
+        yVal = math.sin(rotz)
+        coord = self.player.coord.values()
+        coord[0] += xVal * 5
+        coord[1] += yVal * 5
+        return coord
+
     def go_forward(self, _=None, rate=0):
         """前进"""
         rate = rate or self.GO_FORWARD_COORD_RATE
@@ -229,6 +252,7 @@ class BaseGTATool(BaseTool):
         """恢复HP"""
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
+            self.vehicle_fix(self.vehicle)
         else:
             self.hp_view.mem_value = 200
             self.ap_view.mem_value = 200
@@ -237,9 +261,14 @@ class BaseGTATool(BaseTool):
         """恢复大量HP"""
         if self.isInVehicle:
             self.vehicle_hp_view.mem_value = 2000
+            self.vehicle_fix(self.vehicle)
         else:
             self.hp_view.mem_value = 999
             self.ap_view.mem_value = 999
+
+    def vehicle_fix(self, vehicle):
+        """修车"""
+        pass
 
     def from_player_coord(self, btn):
         """车坐标从人坐标取值"""
@@ -260,25 +289,6 @@ class BaseGTATool(BaseTool):
         view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
         view.listbox.next()
         view.write()
-
-    def get_front_coord(self):
-        """获取前面一点的坐标"""
-        rotz = self.get_rotz()
-
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
-        coord = self.player.coord.values()
-        coord[0] += xVal * 5
-        coord[1] += yVal * 5
-        return coord
-
-    def get_camera_rot(self):
-        """ 获取摄像机参数
-        :return: (x分量, y分量, z方位角)
-        z: 平视为0
-        """
-        rotz = self.get_rotz()
-        return (math.cos(rotz), math.sin(rotz), 0.1)
 
     def get_peds(self):
         """获取角色池中的角色列表"""
@@ -444,6 +454,15 @@ class BaseGTATool(BaseTool):
         coord[2] += cam_z * 5
         vehicle.stop()
         vehicle.coord = coord
+
+    def vehicle_lock_door(self, _=None, lock=True):
+        """锁车门"""
+        vehicle = self.player.vehicle
+        if vehicle:
+            if lock:
+                vehicle.lock_door()
+            else:
+                vehicle.unlock_door()
 
     #----------------------------------------------------------------------
     # MARKER

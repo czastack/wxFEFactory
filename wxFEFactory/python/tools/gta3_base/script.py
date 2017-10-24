@@ -162,13 +162,15 @@ class RunningScript(BaseRunningScript):
         self.m_bIsMission = self.m_bMissionCleanup = False
         self.scriptType = self.m_bMissionCleanup = False
         self.m_bNotFlag = (command_id >> 15) & 1
+        # self.m_nCondResult = 0
 
         self.reset()
         # 写入command_id
         self.buff.append(command_id & 0xFF)
         self.buff.append((command_id >> 8) & 0xFF)
         # 写入参数
-        self.push(signature, *args)
+        if signature:
+            self.push(signature, *args)
         self.push_end()
         self.handler.write(self.buff_addr, self.buff)
         self.m_nIp = self.buff_addr - self.script_space_base
@@ -178,4 +180,4 @@ class RunningScript(BaseRunningScript):
 
         self.mgr.native_call_auto(self.process_addr, None, this=self.addr)
         self.save_variables()
-        return self.m_nCondResult != 0
+        return self.m_nCondResult
