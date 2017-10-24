@@ -62,7 +62,7 @@ class HistoryList(list):
         self._index = 0
 
 
-def normalFloat(f):
+def float32(f):
     return round(f, 6)
 
 def u32bytes(n):

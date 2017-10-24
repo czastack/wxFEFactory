@@ -1,4 +1,4 @@
-from lib.utils import normalFloat
+from lib.utils import float32
 
 
 class Model:
@@ -23,7 +23,7 @@ class Field:
     def __get__(self, obj, type=None):
         ret = obj.handler.read(obj.addr + self.offset, self.type, self.size)
         if self.type is float:
-            ret = normalFloat(ret)
+            ret = float32(ret)
         return ret
 
     def __set__(self, obj, value):
@@ -36,7 +36,7 @@ class OffsetsField(Field):
     def __get__(self, obj, type=None):
         ret = obj.handler.ptrsRead(obj.addr + self.offset[0], self.offset[1:], self.type, self.size)
         if self.type is float:
-            ret = normalFloat(ret)
+            ret = float32(ret)
         return ret
 
     def __set__(self, obj, value):

@@ -1,4 +1,4 @@
-from lib.utils import normalFloat
+from lib.utils import float32
 import json
 import types
 import fefactory_api
@@ -181,7 +181,7 @@ class InputWidget(BaseInputWidget):
     def mem_value(self):
         ret = self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
         if self.type is float:
-            ret = normalFloat(ret)
+            ret = float32(ret)
         return ret
 
     @mem_value.setter
@@ -284,7 +284,7 @@ class CoordWidget(TwoWayWidget):
                 value = self._handler.ptrsRead(self.addr, offsets, float)
                 offsets[-1] += 4
             else:
-                value = normalFloat(self._handler.readFloat(self.addr))
+                value = float32(self._handler.readFloat(self.addr))
             ret.append(value)
         return ret
 
