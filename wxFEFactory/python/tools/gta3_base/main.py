@@ -24,6 +24,7 @@ class BaseGTA3Tool(BaseGTATool):
     def render_common_button(self):
         super().render_common_button()
         ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=5))
+        ui.Button("瞬移到目的地(深红)", onclick=partial(self.teleport_to_destination, color=0))
         ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=4))
         ui.Button("敌人爆炸", onclick=self.enemys_explode)
 
