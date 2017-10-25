@@ -526,30 +526,39 @@ class BaseGTATool(BaseTool):
                 entity.coord = coord
             if zinc:
                 coord[2] += zinc
+
+    def teleport_to_blip(self, blip):
+        """瞬移到指定标记"""
+        if blip:
+            blipType = blip.blipType
+            if blipType is self.models.Marker.MARKER_TYPE_COORDS:
+                coord = blip.coord
+            else:
+                entity = blip.entity
+                if entity:
+                    coord = entity.coord
+                else:
+                    return False
+            self.entity.coord = coord
+            return True
+        return False
     
     def teleport_to_destination(self, _=None, color=None, types=None):
         """瞬移到目的地"""
         Marker = self.models.Marker
 
         if color is None:
-            color = self.DEST_DEFAULT_COLOR
+            color = getattr(self, '_last_dest_color', self.DEST_DEFAULT_COLOR)
+        else:
+            self._last_dest_color = color
 
         if types is None:
             types = (Marker.MARKER_TYPE_CAR, Marker.MARKER_TYPE_PED, Marker.MARKER_TYPE_COORDS)
 
         for blip in self.get_blips(color, types):
             if blip.sprite is 0:
-                blipType = blip.blipType
-                if blipType is Marker.MARKER_TYPE_COORDS:
-                    coord = blip.coord
-                else:
-                    entity = blip.entity
-                    if entity:
-                        coord = entity.coord
-                    else:
-                        continue
-                self.entity.coord = coord
-                break
+                if self.teleport_to_blip(blip):
+                    break
 
     def spawn_choosed_vehicle(self, _=None):
         """生成选中的载具"""

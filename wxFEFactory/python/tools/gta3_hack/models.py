@@ -72,6 +72,7 @@ class Player(Entity):
     vehicle = ModelField(0x310, Vehicle)
     collidingCar = ModelField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
+    wanted_ptr = Field(0x53c)
 
     @property
     def weapons(self):
@@ -80,6 +81,19 @@ class Player(Entity):
     @property
     def cur_weapon(self):
         return self.weapons[self.cur_weapon_slop]
+
+    @property
+    def wanted_level(self):
+        return self.handler.read32(self.wanted_ptr + 0x18)
+
+    @wanted_level.setter
+    def wanted_level(self, value):
+        value = int(value)
+        if value < 0 or value > 6:
+            return print('wanted_level must between 0 and 6')
+        wanted_ptr = self.wanted_ptr
+        self.handler.write32(wanted_ptr + 0x18, value)
+        self.handler.write32(wanted_ptr, (0, 60, 220, 420, 820, 1620, 3220)[value])
 
 
 class Marker(BaseBlip):

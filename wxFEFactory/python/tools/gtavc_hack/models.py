@@ -33,7 +33,7 @@ class Player(Entity):
     def wanted_level(self, value):
         value = int(value)
         if value < 0 or value > 6:
-            return print('wanted_level must between 1 and 6')
+            return print('wanted_level must between 0 and 6')
         wanted_ptr = self.wanted_ptr
         self.handler.write32(wanted_ptr + 0x20, value)
         self.handler.write32(wanted_ptr, (0, 200, 570, 1220, 2420, 4820)[value])

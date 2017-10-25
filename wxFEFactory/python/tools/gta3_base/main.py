@@ -22,11 +22,15 @@ class BaseGTA3Tool(BaseGTATool):
             return self.script_context.run(command_id, signature, *args)
 
     def render_common_button(self):
+        Marker = self.models.Marker
         super().render_common_button()
-        ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=5))
-        ui.Button("瞬移到目的地(深红)", onclick=partial(self.teleport_to_destination, color=0))
-        ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=4))
         ui.Button("敌人爆炸", onclick=self.enemys_explode)
+        ui.Button("停止计时", onclick=self.freeze_timer)
+        ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+        ui.Button("瞬移到目的地(粉红)", onclick=partial(self.teleport_to_destination, color=Marker.MARKER_COLOR_PINK))
+        ui.Button("瞬移到目的地(深红)", onclick=partial(self.teleport_to_destination, color=Marker.MARKER_COLOR_DARK_RED))
+        ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=Marker.MARKER_COLOR_YELLOW))
+        ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=Marker.MARKER_COLOR_LIGHT_GREEN))
 
     EXPLOSION_TYPE_GRENADE = 0
     EXPLOSION_TYPE_MOLOTOV = 1
@@ -57,3 +61,7 @@ class BaseGTA3Tool(BaseGTATool):
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:
             return self.vehicle_pool[vehicle_handle >> 8]
+
+    def freeze_timer(self, _=None, freeze=True):
+        """停止计时"""
+        self.script_call(0x396, 'L', freeze)
