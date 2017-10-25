@@ -201,7 +201,7 @@ class Tool(BaseGTATool):
         :param arg_sign: 函数签名
         """
         addr = self.get_native_addr(name) if isinstance(name, str) else name
-        super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+        return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
     def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
