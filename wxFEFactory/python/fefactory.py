@@ -60,4 +60,12 @@ def reload(start_option=None, callback=None):
         callback()
 
 
+def executable_file():
+    return sys.argv[0]
+
+def executable_name():
+    path = executable_file()
+    return os.path.splitext(os.path.basename(path))[0]
+
+
 import mainframe

@@ -76,6 +76,7 @@ void init_layout(py::module &m)
 	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
 		.def("close", &BaseFrame::close)
 		.def("setOnClose", &BaseFrame::setOnClose)
+		.def("setIcon", &BaseFrame::setIcon)
 		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle)
 		.def_property("size", &BaseFrame::getSize, &BaseFrame::setSize)
 		.def_property("position", &BaseFrame::getPosition, &BaseFrame::setPosition);

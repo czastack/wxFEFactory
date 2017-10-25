@@ -30,7 +30,12 @@ public:
 		}
 		else if (PY_IS_TYPE(bitmap, PyUnicode))
 		{
-			bp.LoadFile(bitmap.cast<wxString>(), wxBITMAP_TYPE_PNG);
+			wxcstr path = bitmap.cast<wxString>();
+			wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
+			if (type)
+			{
+				bp.LoadFile(path, type);
+			}
 		}
 		else
 		{

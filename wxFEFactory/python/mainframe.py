@@ -74,6 +74,10 @@ class MainFrame:
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
                 ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
             ui.StatusBar()
+            # 尝试加载图标
+            icon_name = fefactory.executable_name() + '.ico'
+            if os.path.exists(icon_name):
+                win.setIcon(icon_name)
         
         self.win = win
         self.aui = aui

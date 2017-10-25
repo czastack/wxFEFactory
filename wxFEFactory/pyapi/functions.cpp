@@ -160,3 +160,29 @@ wxItemKind getItemKind(wxcstr kindStr)
 	}
 	return kind;
 }
+
+long getBitmapTypeByExt(wxcstr path)
+{
+	long type = 0;
+	if (path.EndsWith(".png"))
+	{
+		type = wxBITMAP_TYPE_PNG;
+	}
+	else if (path.EndsWith(".jpg") || path.EndsWith(".jpeg"))
+	{
+		type = wxBITMAP_TYPE_JPEG;
+	}
+	else if (path.EndsWith(".bmp"))
+	{
+		type = wxBITMAP_TYPE_BMP;
+	}
+	else if (path.EndsWith(".ico"))
+	{
+		type = wxBITMAP_TYPE_ICO;
+	}
+	else if (path.EndsWith(".gif"))
+	{
+		type = wxBITMAP_TYPE_GIF;
+	}
+	return type;
+}

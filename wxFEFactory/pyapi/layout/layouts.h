@@ -61,6 +61,19 @@ public:
 		((wxTopLevelWindow*)m_elem)->SetTitle(title);
 	}
 
+	bool setIcon(wxcstr path)
+	{
+		wxIcon icon;
+		wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
+		if (type)
+		{
+			icon.LoadFile(path, type);
+			((wxTopLevelWindow*)m_elem)->SetIcon(icon);
+			return true;
+		}
+		return false;
+	}
+
 	void setOnClose(pycref onclose)
 	{
 		m_onclose = onclose;
