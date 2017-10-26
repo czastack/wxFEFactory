@@ -2,8 +2,32 @@
 
 #include "ProcessHandler.h"
 #include "types.h"
+#include <tchar.h>
 #include <psapi.h>
 #include <iostream>
+
+
+bool Is64Bit_OS()
+{
+	typedef void (WINAPI *LPFN_PGNSI)(LPSYSTEM_INFO);
+
+	SYSTEM_INFO si = { 0 };
+	LPFN_PGNSI pGNSI = (LPFN_PGNSI)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "GetNativeSystemInfo");
+	if (pGNSI == NULL)
+	{
+		return FALSE;
+	}
+	pGNSI(&si);
+	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64 ||
+		si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
+	{
+		return true;
+	}
+	return false;
+}
+
+
+bool ProcessHandler::m_is64os = Is64Bit_OS();
 
 
 ProcessHandler::ProcessHandler():mProcess(nullptr)
@@ -53,6 +77,7 @@ bool ProcessHandler::attachByWindowHandle(HWND hWnd){
 		close();
 		GetWindowThreadProcessId(hWnd, &dwProcessId);
 		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
+		m_is32process = is32Process();
 		return mProcess != nullptr;
 	}
 	return false;
@@ -65,6 +90,27 @@ bool ProcessHandler::isValid()
 		DWORD code;
 		GetExitCodeProcess(mProcess, &code);
 		return code == STILL_ACTIVE;
+	}
+	return false;
+}
+
+bool ProcessHandler::is32Process()
+{
+	if (!m_is64os)
+	{
+		return true;
+	}
+
+	typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandleW(L"kernel32"), "IsWow64Process");
+	if (NULL != fnIsWow64Process)
+	{
+		BOOL bIsWow64 = FALSE;
+		fnIsWow64Process(mProcess, &bIsWow64);
+		if (bIsWow64)
+		{
+			return true;
+		}
 	}
 	return false;
 }

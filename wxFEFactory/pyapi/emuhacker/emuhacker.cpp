@@ -13,6 +13,8 @@
 
 class PyProcessHandler : public ProcessHandler {
 public:
+	friend void init_emuhacker(py::module &m);
+
 	auto read8(addr_t addr) { return readUint(addr, sizeof(u8)); }
 	auto read16(addr_t addr) { return readUint(addr, sizeof(u16)); }
 	auto read32(addr_t addr) { return readUint(addr, sizeof(u32)); }
@@ -185,7 +187,8 @@ void init_emuhacker(pybind11::module & m)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)
-		.def_readwrite("addr_is32", &ProcessHandler::m_addr_is32);
+		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
+		.def_readonly("is32process", &PyProcessHandler::m_is32process);
 
 	py::class_<VbaHandler, ProcessHandler>(emuhacker, "VbaHandler")
 		.def(py::init<>());

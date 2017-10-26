@@ -9,22 +9,18 @@ typedef const wchar_t* CSTR;
 
 class ProcessHandler
 {
-private:
+protected:
 	HANDLE		mProcess;
+	static bool m_is64os;
+	bool        m_is32process; // 目标是32位进程
 
 public:
-	bool        m_addr_is32 = true; // 目标是32位地址
-
 	ProcessHandler();
 	virtual ~ProcessHandler();
 
 	virtual bool attach() { return false; }
 	virtual addr_t prepareAddr(addr_t addr, size_t size) {
-		return 
-// #ifdef _WIN64
-// 			m_addr_is32 ? (addr & 0xFFFFFFFF) :
-// #endif
-			addr;
+		return addr;
 	};
 
 	/*
@@ -49,8 +45,8 @@ public:
 	 */
 	bool isValid();
 
+	bool is32Process();
 	auto getProcess() { return mProcess; }
-
 	DWORD getProcessId() { return ::GetProcessId(mProcess); }
 
 	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
@@ -123,7 +119,7 @@ public:
 	addr_t readAddr(addr_t addr)
 	{
 #ifdef _WIN64
-		if (m_addr_is32)
+		if (m_is32process)
 		{
 			addr &= 0xFFFFFFFF;
 		}
@@ -131,7 +127,7 @@ public:
 
 		if (!read(addr, &addr,
 #ifdef _WIN64
-			m_addr_is32 ? sizeof(u32) :
+			m_is32process ? sizeof(u32) :
 #endif
 			sizeof(addr)))
 		{
