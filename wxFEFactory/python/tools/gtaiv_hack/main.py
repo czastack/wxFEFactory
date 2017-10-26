@@ -99,13 +99,17 @@ class Tool(BaseGTATool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
-                ui.Button("缴械", onclick=self.remove_near_peds_weapon)
+                ui.Button("缴械", onclick=self.near_peds_remove_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
                 ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)
                 ui.Button("敌人爆头", onclick=self.enemys_explode_head)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
+                ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
+                ui.Button("敌人定住", onclick=self.enemys_freeze_position)
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
+                ui.Button("停止计时", onclick=self.freeze_timer)
+                ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -203,7 +207,7 @@ class Tool(BaseGTATool):
         addr = self.get_native_addr(name) if isinstance(name, str) else name
         return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
-    def script_hook_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
+    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
         if self.ScriptHookHelper:
             with self.native_context:
@@ -225,7 +229,7 @@ class Tool(BaseGTATool):
 
                         try_count -= 1
 
-                    print('获取script_hook_call返回失败，超过尝试次数')
+                    print('获取script_call返回失败，超过尝试次数')
 
     def _player(self):
         """获取当前角色"""
@@ -404,7 +408,7 @@ class Tool(BaseGTATool):
         if vehicle:
             vehicle.explode()
 
-    def remove_near_peds_weapon(self, _=None):
+    def near_peds_remove_weapon(self, _=None):
         """附近的人缴械"""
         for p in self.get_near_peds():
             p.remove_all_weapons()
@@ -437,11 +441,21 @@ class Tool(BaseGTATool):
         for p in self.get_enemys():
             p.create_explosion()
 
+    def enemys_remove_weapon(self, _=None):
+        """敌人缴械"""
+        for p in self.get_enemys():
+            p.remove_all_weapons()
+
+    def enemys_freeze_position(self, _=None):
+        """敌人定住"""
+        for p in self.get_enemys():
+            p.freeze_position()
+
     # def LoadEnvironmentNow(self, pos):
     #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
     #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
     #     self.native_call('POPULATE_NOW', None)
-    #     self.script_hook_call('LOAD_SCENE', '3f', *pos)
+    #     self.script_call('LOAD_SCENE', '3f', *pos)
 
     def GetGroundZ(self, pos):
         """获取指定位置地面的z值"""
@@ -469,7 +483,7 @@ class Tool(BaseGTATool):
                     yield blip
 
                 while True:
-                    blip = self.get_next_blip(models.Blip.BLIP_DESTINATION_1)
+                    blip = self.get_next_blip(i)
                     if blip:
                         if color is 0 or blip.color == color:
                             yield blip
@@ -572,14 +586,14 @@ class Tool(BaseGTATool):
         """生成载具"""
         m = models.IVModel(model, self)
         m.request()
-        self.script_hook_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
+        self.script_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
         return Vehicle(self.native_context.get_temp_value(), self)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""
         car = self.spawn_choosed_vehicle()
         if car:
-            self.script_hook_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0, sync=False)
+            self.script_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0, sync=False)
 
     def create_fire(self, coord, numGenerationsAllowed=0, strength=1):
         """生成火焰"""
@@ -591,7 +605,7 @@ class Tool(BaseGTATool):
 
     def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=True, fCameraShake=0):
         """产生爆炸"""
-        self.script_hook_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
+        self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
@@ -609,3 +623,7 @@ class Tool(BaseGTATool):
 
     def move_marker_to_front(self, _=None):
         super().move_marker_to_front(5)
+
+    def freeze_timer(self, _=None, freeze=True):
+        """停止计时"""
+        self.script_call('FREEZE_ONSCREEN_TIMER', 'L', freeze)

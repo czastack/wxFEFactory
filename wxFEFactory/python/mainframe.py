@@ -110,8 +110,7 @@ class MainFrame:
             m = Module()
             m.attach(self)
             __main__.m = m
-
-        except Exception as e:
+        except Exception:
             print('加载模块%s失败' % name)
             traceback.print_exc()
 
@@ -244,7 +243,7 @@ class MainFrame:
                         m.attach()
                         m.readFrom(reader)
 
-                    except Exception as e:
+                    except Exception:
                         print('加载模块%s失败' % name)
                         traceback.print_exc()
 

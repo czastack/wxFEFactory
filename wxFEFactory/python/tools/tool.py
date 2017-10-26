@@ -1,6 +1,7 @@
 from lib.basescene import BaseScene
 from lib.lazy import lazyclassmethod
 from . import tools
+import traceback
 import fefactory_api
 ui = fefactory_api.ui
 import __main__
@@ -11,17 +12,19 @@ class BaseTool(BaseScene):
     nested = False
 
     def attach(self, frame):
-        if self.nested:
-            with frame.book:
+        try:
+            if self.nested:
+                with frame.book:
+                    win = self.render()
+                    if win:
+                        ui.AuiItem(win, caption=self.getTitle())
+            else:
                 win = self.render()
-                if win:
-                    ui.AuiItem(win, caption=self.getTitle())
-        else:
-            win = self.render()
-        
-        if win:
-            win.setOnClose(self.onClose)
-            self.win = win
+            if win:
+                win.setOnClose(self.onClose)
+                self.win = win
+        except Exception:
+            traceback.print_exc()
 
     def render(self):
         """ 渲染视图，供attach调用
