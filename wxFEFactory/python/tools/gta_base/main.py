@@ -22,6 +22,7 @@ win_style = {
 
 class BaseGTATool(BaseTool):
     nested = True
+    NativeContext = NativeContext
 
     FUNCTION_NATIVE_CALL = (
         b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x8B\x56\x08\x8B\x02\x8B\x7A\x04\x83\x46\x04\xFE\x8B\x4E\x04\x41\x89\x45'
@@ -44,7 +45,7 @@ class BaseGTATool(BaseTool):
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
                     self.attach_status_view = ui.Text("", className="label_left grow")
-                    ui.CheckBox("保持最前", onchange=self.swithKeeptop)
+                    ui.CheckBox("保持最前", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill"):
                     self.render_main()
 
@@ -74,13 +75,13 @@ class BaseGTATool(BaseTool):
         """重写这个函数，返回要注册的热键列表"""
         return self.get_common_hotkeys()
 
-    def swithKeeptop(self, cb):
-        self.win.keeptop = cb.checked
-
     def onClose(self, _=None):
         if self.handler.active:
             self.free_remote_function()
         return super().onClose()
+
+    def swith_keeptop(self, cb):
+        self.win.keeptop = cb.checked
 
     def read_vector(self, addr):
         """ 在addr读三个float类型
@@ -93,8 +94,8 @@ class BaseGTATool(BaseTool):
         """初始化远程函数"""
         self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
         # 初始化Native调用的参数环境
-        context_addr = self.handler.alloc_memory(NativeContext.SIZE)
-        self.native_context = NativeContext(context_addr, self.handler)
+        context_addr = self.handler.alloc_memory(self.NativeContext.SIZE)
+        self.native_context = self.NativeContext(context_addr, self.handler)
 
     def free_remote_function(self):
         """释放远程函数"""

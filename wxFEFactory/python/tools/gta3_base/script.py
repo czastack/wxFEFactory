@@ -173,10 +173,12 @@ class RunningScript(BaseRunningScript):
             self.push(signature, *args)
         self.push_end()
         self.handler.write(self.buff_addr, self.buff)
-        self.m_nIp = self.buff_addr - self.script_space_base
-
-        if self.m_nIp < 0:
+        
+        ip = self.buff_addr - self.script_space_base
+        if ip < 0:
             raise ValueError('申请的内存不太对，重新按下检测按钮吧')
+
+        self.m_nIp = self.buff_addr - self.script_space_base
 
         self.mgr.native_call_auto(self.process_addr, None, this=self.addr)
         self.save_variables()

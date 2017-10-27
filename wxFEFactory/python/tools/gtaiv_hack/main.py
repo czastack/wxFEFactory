@@ -7,10 +7,10 @@ from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
-from ..gta_base.native import NativeContext
 from . import address, models
 from .data import VEHICLE_LIST
 from .models import Player, Vehicle
+from .native import NativeContext
 import math
 import os
 import json
@@ -27,6 +27,7 @@ class Tool(BaseGTATool):
     models = models
     Player = Player
     Vehicle = Vehicle
+    NativeContext = NativeContext
 
     SAFE_SPEED_RATE = 15
     SAFE_SPEED_UP = 6
@@ -515,8 +516,7 @@ class Tool(BaseGTATool):
         """瞬移到指定标记"""
         if blip:
             coord = list(blip.coord)
-            print(coord)
-
+            # print(coord)
             if coord[0] != 0 or coord[1] != 0:
                 self.player.coord = coord
                 if coord[2] == 0.0:
