@@ -49,6 +49,8 @@ public:
 	auto getProcess() { return mProcess; }
 	DWORD getProcessId() { return ::GetProcessId(mProcess); }
 
+	int getPtrSize() { return m_is32process ? 4 : 8; }
+
 	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
 	bool rawWrite(addr_t addr, LPCVOID buffer, size_t size);
 

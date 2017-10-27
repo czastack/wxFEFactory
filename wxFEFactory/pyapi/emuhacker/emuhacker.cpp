@@ -40,12 +40,8 @@ public:
 		}
 		else if (type == builtin.attr("int"))
 		{
-			UINT data = 0;
-			if (read(addr, &data, size ? size : 4))
-			{
-				return py::cast(data);
-			}
-			return py::cast(0);
+			UINT64 data = readUint(addr, size ? size : getPtrSize());
+			return py::cast(data);
 		}
 		else if (size)
 		{
@@ -71,8 +67,7 @@ public:
 		}
 		else if (PY_IS_TYPE(data, PyLong))
 		{
-			UINT tmp = data.cast<UINT64>();
-			return write(addr, &tmp, size ? size: 4);
+			writeUint(addr, data.cast<UINT64>(), size ? size : getPtrSize());
 		}
 		else if (PY_IS_TYPE(data, PyBytes))
 		{
@@ -187,6 +182,7 @@ void init_emuhacker(pybind11::module & m)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)
+		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process);
 

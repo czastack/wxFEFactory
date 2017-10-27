@@ -32,6 +32,14 @@ class Field:
         obj.handler.write(obj.addr + self.offset, value, self.size)
 
 
+class PtrField(Field):
+    def __init__(self, offset, size=0):
+        # 对于ProcessHandler
+        # size为0，readUint和writeUint时会自动取目标进程的指针大小
+        # 但用在ArrayField时还是得指定size
+        super().__init__(offset, int, size)
+
+
 class OffsetsField(Field):
     def __get__(self, obj, type=None):
         ret = obj.handler.ptrsRead(obj.addr + self.offset[0], self.offset[1:], self.type, self.size)
