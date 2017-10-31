@@ -9,6 +9,7 @@
 #include "nds/NogbaNdsHandler.h"
 #include "nds/DeSmuMEHandler.h"
 #include <windows.h>
+#include <psapi.h>
 
 
 class PyProcessHandler : public ProcessHandler {
@@ -19,12 +20,16 @@ public:
 	auto read16(addr_t addr) { return readUint(addr, sizeof(u16)); }
 	auto read32(addr_t addr) { return readUint(addr, sizeof(u32)); }
 	auto read64(addr_t addr) { return readUint(addr, sizeof(UINT64)); }
+	auto readPtr(addr_t addr) { return readUint(addr, getPtrSize()); }
 	auto readFloat(addr_t addr) { return read<float>(addr); }
-	bool write8(addr_t addr, UINT64 data) { return writeUint(addr, data, sizeof(u8)); }
-	bool write16(addr_t addr, UINT64 data) { return writeUint(addr, data, sizeof(u16)); }
-	bool write32(addr_t addr, UINT64 data) { return writeUint(addr, data, sizeof(u32)); }
+	auto readDouble(addr_t addr) { return read<double>(addr); }
+	bool write8(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u8)); }
+	bool write16(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u16)); }
+	bool write32(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u32)); }
 	bool write64(addr_t addr, UINT64 data) { return writeUint(addr, data, sizeof(UINT64)); }
+	bool writePtr(addr_t addr, size_t data) { return writeUint(addr, data, getPtrSize()); }
 	bool writeFloat(addr_t addr, float value) { return write(addr, value); }
+	bool writeDouble(addr_t addr, double value) { return write(addr, value); }
 
 
 	pyobj process_read(addr_t addr, pycref type, size_t size)
@@ -40,7 +45,7 @@ public:
 		}
 		else if (type == builtin.attr("int"))
 		{
-			UINT64 data = readUint(addr, size ? size : getPtrSize());
+			size_t data = readUint(addr, size ? size : getPtrSize());
 			return py::cast(data);
 		}
 		else if (size)
@@ -67,7 +72,7 @@ public:
 		}
 		else if (PY_IS_TYPE(data, PyLong))
 		{
-			writeUint(addr, data.cast<UINT64>(), size ? size : getPtrSize());
+			writeUint(addr, data.cast<size_t>(), size ? size : getPtrSize());
 		}
 		else if (PY_IS_TYPE(data, PyBytes))
 		{
@@ -135,6 +140,41 @@ public:
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
 		return ProcessHandler::write_function(buff, size);
 	}
+
+	wxString getModuleFile(addr_t module=0)
+	{
+		wxChar buff[MAX_PATH];
+		if (module == 0)
+		{
+			module = getProcessBaseAddress();
+		}
+		DWORD result = GetModuleFileNameEx(mProcess, (HMODULE)module, buff, sizeof(buff) / sizeof(wxChar));
+		if (result)
+		{
+			return wxString(buff, result);
+		}
+		return wxNoneString;
+	}
+
+	py::tuple getModuleVersion()
+	{
+		DWORD dwInfoSize, dwHandle;
+		wxcstr path = getModuleFile();
+		dwInfoSize = ::GetFileVersionInfoSize(path, &dwHandle);
+		wxChar* pData = new wxChar[dwInfoSize];
+		void *lpBuffer;
+		UINT uLength;
+		py::tuple result(2);
+
+		GetFileVersionInfo(path, NULL, dwInfoSize, (LPVOID)pData);
+		if (VerQueryValue((LPCVOID)pData, _T("\\"), &lpBuffer, &uLength))
+		{
+			VS_FIXEDFILEINFO *pFileInfo = (VS_FIXEDFILEINFO*)lpBuffer;
+			result[0] = pFileInfo->dwProductVersionMS;
+			result[1] = pFileInfo->dwProductVersionLS;
+		}
+		return result;
+	}
 };
 
 
@@ -156,6 +196,8 @@ void init_emuhacker(pybind11::module & m)
 		.def("attachByWindowName", &ProcessHandler::attachByWindowName)
 		.def("readUint", &ProcessHandler::readUint)
 		.def("writeUint", &ProcessHandler::writeUint)
+		.def("readInt", &ProcessHandler::readInt)
+		.def("writeInt", &ProcessHandler::writeInt)
 		.def("read8", &PyProcessHandler::read8)
 		.def("read16", &PyProcessHandler::read16)
 		.def("read32", &PyProcessHandler::read32)
@@ -164,18 +206,24 @@ void init_emuhacker(pybind11::module & m)
 		.def("write16", &PyProcessHandler::write16)
 		.def("write32", &PyProcessHandler::write32)
 		.def("write64", &PyProcessHandler::write64)
+		.def("readPtr", &PyProcessHandler::readPtr)
+		.def("writePtr", &PyProcessHandler::writePtr)
 		.def("read", &PyProcessHandler::process_read, addr_a, type_a, "size"_a=0)
 		.def("write", &PyProcessHandler::process_write, addr_a, data_a, "size"_a=0)
-		.def("add", &ProcessHandler::add)
 		.def("readAddr", &ProcessHandler::readAddr)
 		.def("readFloat", &PyProcessHandler::readFloat)
 		.def("writeFloat", &PyProcessHandler::writeFloat)
+		.def("readDouble", &PyProcessHandler::readDouble)
+		.def("writeDouble", &PyProcessHandler::writeDouble)
 		.def("ptrRead", &PyProcessHandler::ptrRead, addr_a, offsets_a, type_a, "size"_a=4)
 		.def("ptrWrite", &PyProcessHandler::ptrWrite, addr_a, offsets_a, data_a, "size"_a=4)
 		.def("readLastAddr", &PyProcessHandler::readLastAddr, addr_a, offsets_a)
 		.def("ptrsRead", &PyProcessHandler::ptrsRead, addr_a, offsets_a, type_a, "size"_a=4)
 		.def("ptrsWrite", &PyProcessHandler::ptrsWrite, addr_a, offsets_a, data_a, "size"_a = 4)
+		.def("add", &ProcessHandler::add)
 		.def("get_module", &PyProcessHandler::getModuleHandle)
+		.def("get_module_file", &PyProcessHandler::getModuleFile, "module"_a=0)
+		.def("get_module_version", &PyProcessHandler::getModuleVersion)
 		.def("write_function", &PyProcessHandler::write_function)
 		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a)
 		.def("free_memory", &ProcessHandler::free_memory)

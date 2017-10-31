@@ -64,16 +64,41 @@ public:
 		return write(addr, origin);
 	}
 
-	UINT64 readUint(addr_t addr, size_t size)
+	size_t readUint(addr_t addr, size_t size)
 	{
-		UINT64 data = 0;
+		size_t data = 0;
 		read(addr, &data, size);
 		return data;
 	}
 
-	bool writeUint(addr_t addr, UINT64 data, size_t size)
+	bool writeUint(addr_t addr, size_t data, size_t size)
 	{
 		return write(addr, &data, size);
+	}
+
+	INT64 readInt(addr_t addr, size_t size)
+	{
+		INT64 data = (INT64)readUint(addr, size);
+		switch (size)
+		{
+		case 1:
+			data = (char)data;
+			break;
+		case 2:
+			data = (short)data;
+			break;
+		case 4:
+			data = (int)data;
+			break;
+		default:
+			break;
+		}
+		return data;
+	}
+
+	bool writeInt(addr_t addr, INT64 data, size_t size)
+	{
+		return writeUint(addr, data & ((1 << (size << 3)) - 1), size);
 	}
 
 	/**
