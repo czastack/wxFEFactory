@@ -580,8 +580,11 @@ class Tool(BaseGTATool):
         """生成载具"""
         m = models.IVModel(model, self)
         m.request()
-        self.script_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
-        return Vehicle(self.native_context.get_temp_value(), self)
+        if m.loaded:
+            self.script_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
+            return Vehicle(self.native_context.get_temp_value(), self)
+        else:
+            print("模型未加载", hex(model))
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""

@@ -96,7 +96,11 @@ class BaseGTATool(BaseTool):
         return super().onClose()
 
     def swith_keeptop(self, cb):
-        self.win.keeptop = cb.checked
+        if self.nested:
+            from __main__ import win
+        else:
+            win = self.win
+        win.keeptop = cb.checked
 
     def read_vector(self, addr):
         """ 在addr读三个float类型
