@@ -285,8 +285,7 @@ class BaseGTATool(BaseTool):
 
     def stop(self, _=None):
         """停止移动"""
-        speed_view = self.vehicle_speed_view if self.isInVehicle else self.speed_view
-        speed_view.mem_value = (0, 0, 0)
+        self.entity.stop()
 
     def restore_hp(self, _=None):
         """恢复HP"""
@@ -525,9 +524,9 @@ class BaseGTATool(BaseTool):
         except StopIteration:
             pass
 
-    def get_target_blips(self, color=None, types=None):
+    def get_target_blips(self, color=None, types=None, sprite=0):
         """获取目标的所有标记"""
-        return self.get_blips(color, self.models.Marker.AVAILABLE_TYPE)
+        return self.get_blips(color, types or self.models.Marker.AVAILABLE_TYPE)
 
     def recal_markers(self, _=None):
         """重新获取人/车标记点"""

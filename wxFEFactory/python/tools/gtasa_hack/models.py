@@ -21,6 +21,7 @@ class Entity(Physicle):
 
     special = Field(0x42, int, 1) # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
     speed = CoordField(0x44)
+    turn_speed = CoordField(0x50)
     model_id = Field(0x22, int, 2)
     weight = Field(0x8c, float)
 
@@ -38,6 +39,7 @@ class Entity(Physicle):
 
     def stop(self):
         self.speed = (0, 0, 0)
+        self.turn_speed = (0, 0, 0)
 
     def setSpecial(self, on, bitindex):
         if on:

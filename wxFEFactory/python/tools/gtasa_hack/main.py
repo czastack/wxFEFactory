@@ -158,15 +158,18 @@ class Tool(BaseGTATool):
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
                     ui.Text("瞬移到标记点: alt+shift+g")
                     ui.Text("切换转向并加速: alt+shift+m")
+                    ui.Text("附近的车大风车: alt+r")
+                    ui.Text("附近的人大风车: alt+shift+r")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
+                ui.Button("附近的车大风车", onclick=self.near_vehicles_pinwheel)
                 ui.Button("瞬移到目的地(红)", onclick=self.teleport_to_destination)
                 ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
-                ui.Button("瞬移到目的地(黄)", onclick=partial(self.teleport_to_destination, color=8))
+                ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
                 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -176,6 +179,8 @@ class Tool(BaseGTATool):
         return (
             ('turn_and_speed_up', MOD_ALT | MOD_SHIFT, getVK('m'), self.turn_and_speed_up),
             ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
+            ('near_vehicles_pinwheel', MOD_ALT, getVK('r'), self.near_vehicles_pinwheel),
+            ('near_peds_pinwheel', MOD_ALT | MOD_SHIFT, getVK('r'), self.near_peds_pinwheel),
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('move_to_map_cursor', MOD_CONTROL | MOD_ALT, getVK('g'), self.move_to_map_cursor),
             ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
@@ -366,6 +371,14 @@ class Tool(BaseGTATool):
         coord = self.get_front_coord()
         for o in self.get_near_objects():
             o.coord = coord
+
+    def near_peds_pinwheel(self, _=None):
+        for p in self.get_near_peds():
+            p.turn_speed = (1, 1, 0.6)
+
+    def near_vehicles_pinwheel(self, _=None):
+        for v in self.get_near_vehicles():
+            v.turn_speed = (1, 1, 0.6)
 
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
