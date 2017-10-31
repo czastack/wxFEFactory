@@ -31,6 +31,21 @@ class BaseGTATool(BaseTool):
         b'\x5F\x5E\x89\x01\x8B\xE5\x5D\xC3'
     )
 
+    # x64 native_call
+    FUNCTION_NATIVE_CALL_64 = (
+        b'\x4C\x8B\xDC\x49\x89\x5B\x18\x49\x89\x6B\x20\x56\x57\x41\x56\x48\x83\xEC\x30\x48\x8B\x71\x10\x4C\x8B\xF1\x48\x8B\x3E\x48'
+        b'\x8B\x6E\x08\x48\x83\xC6\x10\x49\x89\x7B\xD8\x48\x8B\x16\x83\x41\x08\xFD\x8B\x59\x08\x48\x85\xD2\x74\x0C\xFF\xC3\x48\xC1'
+        b'\xE7\x08\x49\x89\x7B\xD8\xEB\x04\x48\x83\xC6\x08\x48\x33\xFF\x83\xFB\x05\x7C\x44\x48\x83\xC6\x20\x48\x83\xEB\x04\x4C\x8D'
+        b'\x14\xDD\x20\x00\x00\x00\x49\x8B\xC2\x48\x83\xE0\x0F\x48\x85\xC0\x74\x04\x49\x83\xC2\x08\x49\x2B\xE2\x48\x8B\xFC\x48\x83'
+        b'\xC7\x20\x48\x33\xC9\x8B\xCB\xF3\x48\xA5\x49\x8B\xFA\x83\xC3\x04\x49\x2B\xF2\x48\x85\xC0\x74\x04\x48\x83\xC6\x08\x83\xFB'
+        b'\x01\x0F\x8C\x84\x00\x00\x00\x41\x8A\x43\xD8\x3C\x00\x74\x10\x3C\x01\x74\x06\xF2\x0F\x10\x06\xEB\x09\xF3\x0F\x10\x06\xEB'
+        b'\x03\x48\x8B\x0E\x83\xFB\x02\x7C\x64\x41\x8A\x43\xD9\x3C\x00\x74\x12\x3C\x01\x74\x07\xF2\x0F\x10\x4E\x08\xEB\x0B\xF3\x0F'
+        b'\x10\x4E\x08\xEB\x04\x48\x8B\x56\x08\x83\xFB\x03\x7C\x41\x41\x8A\x43\xDA\x3C\x00\x74\x12\x3C\x01\x74\x07\xF2\x0F\x10\x56'
+        b'\x10\xEB\x0B\xF3\x0F\x10\x56\x10\xEB\x04\x4C\x8B\x46\x10\x83\xFB\x04\x7C\x1E\x41\x8A\x43\xDB\x3C\x00\x74\x12\x3C\x01\x74'
+        b'\x07\xF2\x0F\x10\x5E\x18\xEB\x0B\xF3\x0F\x10\x5E\x18\xEB\x04\x4C\x8B\x4E\x18\xFF\xD5\x49\x8B\x0E\x48\x89\x01\xF3\x0F\x11'
+        b'\x41\x08\xF2\x0F\x11\x41\x10\x48\x85\xFF\x74\x03\x48\x03\xE7\x48\x83\xC4\x30\x41\x5E\x5F\x5E\xC3'
+    )
+
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
@@ -114,13 +129,29 @@ class BaseGTATool(BaseTool):
                 return self.native_context.get_result(ret_type, ret_size)
 
     def native_call_auto(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
-        """ 以cdcel或thiscall形式调用远程函数
+        """ 以cdcel或thiscall形式调用远程函数(x86)
         :param addr: 目标函数地址
         :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
         :param arg_sign: 参数签名
         """
-        self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), addr, this, *args, ret_type=ret_type, ret_size=ret_size)
+        self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), 
+            addr, this, *args, ret_type=ret_type, ret_size=ret_size)
         return self.handler.read32(self.native_context.m_pReturn)
+
+    def native_call_64(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
+        """ 以x64默认调用约定调用远程函数
+        :param addr: 目标函数地址
+        :param this: this指针，为0则为普通函数
+        :param arg_sign: 参数签名
+        """
+        self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
+            self.native_context.fflag, addr, this, *args, ret_type=ret_type, ret_size=ret_size)
+        if ret_type is int:
+            return self.handler.read64(self.native_context.m_pReturn)
+        elif ret_type is float:
+            if ret_size is 8:
+                return self.handler.readDouble(self.native_context.m_pReturn + 16)
+            return self.handler.readFloat(self.native_context.m_pReturn + 8)
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)
@@ -141,6 +172,10 @@ class BaseGTATool(BaseTool):
 
     player = property(_player)
     vehicle = property(_vehicle)
+
+    @property
+    def last_vehicle(self):
+        return self.player.vehicle or self.vehicle
 
     @property
     def isInVehicle(self):
@@ -425,17 +460,17 @@ class BaseGTATool(BaseTool):
 
     def vehicle_flip(self, _=None):
         """当前的载具翻转"""
-        self.player.vehicle.flip()
+        self.last_vehicle.flip()
 
     def call_vehicle(self, _=None):
         """召唤上一辆车回来"""
-        car = self.player.vehicle
+        car = self.last_vehicle
         if car:
             car.coord = self.get_front_coord()
 
     def go_vehicle(self, _=None):
         """回到上一辆车旁边"""
-        car = self.player.vehicle
+        car = self.last_vehicle
         if car:
             coord = car.coord.values()
             coord[2] += 5
@@ -458,7 +493,7 @@ class BaseGTATool(BaseTool):
 
     def vehicle_lock_door(self, _=None, lock=True):
         """锁车门"""
-        vehicle = self.player.vehicle
+        vehicle = self.last_vehicle
         if vehicle:
             if lock:
                 vehicle.lock_door()
@@ -587,13 +622,13 @@ class BaseGTATool(BaseTool):
 
     def lock_door(self, _=None):
         """锁最近使用的载具的车门"""
-        car = self.player.vehicle
+        car = self.last_vehicle
         if car:
             car.lock_door()
 
     def unlock_door(self, _=None):
         """解锁最近使用的载具的车门"""
-        car = self.player.vehicle
+        car = self.last_vehicle
         if car:
             car.unlock_door()
 

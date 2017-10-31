@@ -5,6 +5,7 @@ tools = [
     ("圣安地列斯Hack", "gtasa_hack"),
     ("GTAIV Hack", "gtaiv_hack"),
     ("GTAIV-EFLC Hack", "gtaiv_eflc_hack"),
+    ("GTAV Hack", "gtav_hack"),
     ("快速剪切板", "quick_clipboard"),
 ]
 
@@ -14,4 +15,5 @@ toolbar_tools = (
     ("圣安地列斯Hack", "gtasa_hack"),
     ("GTAIV Hack", "gtaiv_hack"),
     ("GTAIV-EFLC Hack", "gtaiv_eflc_hack"),
+    ("GTAV Hack", "gtav_hack"),
 )

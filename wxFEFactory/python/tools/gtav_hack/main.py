@@ -22,7 +22,7 @@ ui = fefactory_api.ui
 
 class Tool(BaseGTATool):
     CLASS_NAME = 'grcWindow'
-    WINDOW_NAME = 'GTAIV'
+    WINDOW_NAME = 'Grand Theft Auto V'
     address = address
     models = models
     Player = Player
@@ -38,6 +38,9 @@ class Tool(BaseGTATool):
     VEHICLE_LIST = VEHICLE_LIST
 
     from .data import WEAPON_LIST, SLOT_NO_AMMO
+    
+    # use x64 native_call
+    FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -124,7 +127,6 @@ class Tool(BaseGTATool):
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('enemys_harmless', MOD_ALT, getVK('s'), self.enemys_harmless),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):
@@ -135,53 +137,47 @@ class Tool(BaseGTATool):
         """模块装载后的真实地址转原始地址"""
         return addr - self.MODULE_BASE
 
+    def get_offset_addr(self, addr):
+        return addr + self.handler.read32(addr + 3) + 7
+
     def get_version(self):
         """获取版本码"""
-        return self.handler.read32(self.get_addr(address.VERSION))
+        return 0
 
     def init_addr(self):
         """初始化地址信息"""
-        self.MODULE_BASE = self.handler.base - 0x400000
-        version = self.get_version()
-        version_depend = address.VERSION_DEPEND.get(version, None)
-        if version_depend:
-            # 装载针对当前版本的地址列表
-            for name in version_depend:
-                addr = version_depend[name]
-                setattr(address, name, self.get_addr(addr) if addr else 0)
+        self.MODULE_BASE = self.handler.base - 0x140000000
+        for name, addr in address.BASE.items():
+            setattr(address, name, self.get_addr(addr) if addr else 0)
 
-        # script hash获取native函数地址的机器码
-        self.FUNCTION_FIND_NATIVE_ADDRESS = (
-            b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
-            b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
-        )
+        address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 6)
+        
+        address.BLIP_LIST = self.get_offset_addr(address.BLIP_LIST_BASE)
 
-        # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
-        # 要在ScriptHook的线程中才能安全运行
-        self.ScriptHookHelper = self.handler.get_module(r'Test.asi')
-        if self.ScriptHookHelper:
-            self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
+        # # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
+        # # 要在ScriptHook的线程中才能安全运行
+        # self.ScriptHookHelper = self.handler.get_module(r'Test.asi')
+        # if self.ScriptHookHelper:
+        #     self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
 
         # 此次运行的Native Script地址缓存
         address.NATIVE_ADDRS = {}
-
+        
     def init_remote_function(self):
         """初始化远程函数"""
         self.init_addr()
         super().init_remote_function()
-        self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
-
-    def free_remote_function(self):
-        """释放远程函数"""
-        super().free_remote_function()
-        self.handler.free_memory(self.FindNativeAddress)
 
     def get_native_addr(self, name):
         """根据脚本名称获取装载后原生函数地址"""
         addr = address.NATIVE_ADDRS.get(name, 0)
         if addr is 0:
             # 获取原生函数地址
-            addr = address.NATIVE_ADDRS[name] = self.handler.remote_call(self.FindNativeAddress, address.NATIVE_HASH[name])
+            hash = address.NATIVE_HASH[name]
+            registration = models.NativeRegistration(self.handler.read64(address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
+            addr = registration.get_func(hash)
+            if addr:
+                address.NATIVE_ADDRS[name] = addr
         return addr
 
     def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
@@ -190,7 +186,7 @@ class Tool(BaseGTATool):
         :param arg_sign: 函数签名
         """
         addr = self.get_native_addr(name) if isinstance(name, str) else name
-        return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+        return super().native_call_64(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
     def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
@@ -435,15 +431,6 @@ class Tool(BaseGTATool):
         """敌人定住"""
         for p in self.get_enemys():
             p.freeze_position()
-            if isinstance(p, self.Player):
-                vehicle = p.vehicle
-                if vehicle:
-                    vehicle.freeze_position()
-
-    def enemys_harmless(self, _=None):
-        """敌人缴械+定住"""
-        self.enemys_remove_weapon()
-        self.enemys_freeze_position()
 
     # def LoadEnvironmentNow(self, pos):
     #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
@@ -596,7 +583,7 @@ class Tool(BaseGTATool):
         """熄灭生成的火焰"""
         self.native_call('REMOVE_SCRIPT_FIRE', 'L', fire)
 
-    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=False, fCameraShake=0):
+    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=True, fCameraShake=0):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 

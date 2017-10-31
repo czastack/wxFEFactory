@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ModelField
+from lib.hack.model import Model, Field, CoordField, ModelField, ArrayField
 from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
@@ -479,11 +479,11 @@ class Vehicle(NativeEntity):
     hp = property(getter_ptr('GET_CAR_HEALTH'), setter('SET_CAR_HEALTH'))
     engine_hp = property(getter('GET_ENGINE_HEALTH', float), setter('SET_ENGINE_HEALTH', float))
     heading = property(getter_ptr('GET_CAR_HEADING', float), setter('SET_CAR_HEADING', float))
-    model_id = property(getter_ptr('GET_CAR_MODEL'))
+    model_hash = property(getter_ptr('GET_CAR_MODEL'))
 
     @property
     def model(self):
-        return IVModel(self.model_id, self.mgr)
+        return IVModel(self.model_hash, self.mgr)
 
     existed = property(getter('DOES_VEHICLE_EXIST', bool))
 
@@ -579,7 +579,7 @@ class Vehicle(NativeEntity):
 
     @property
     def name(self):
-        addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'L', self.model_id)
+        addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'L', self.model_hash)
         data = self.mgr.handler.read(addr, bytes, 16)
         return data[:data.find(b'\x00')].decode()
 
@@ -753,3 +753,18 @@ class Blip(NativeModel):
     def add_blip_for_char(cls, ped):
         ped.script_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr())
         return cls(ped.native_context.get_temp_value(), ped.mgr)
+
+
+class NativeRegistration(Model):
+    nextRegistration = Field(0, size=8)
+    handlers = ArrayField(8, 7, Field(0, size=8))
+    numEntries = Field(0x40)
+    hashes = ArrayField(0x48, 7, Field(0, size=8))
+
+    def get_func(self, hash):
+        registration = NativeRegistration(self.addr, self.handler)
+        while registration.addr:
+            for i in range(registration.numEntries):
+                if hash == registration.hashes[i]:
+                    return registration.handlers[i]
+            registration.addr = registration.nextRegistration

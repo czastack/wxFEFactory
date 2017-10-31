@@ -242,7 +242,7 @@ class Tool(BaseGTATool):
 
     def setVehicleSpecial(self, checkbox, bitindex):
         """设置当前汽车特殊属性"""
-        self.player.vehicle.setSpecial(checkbox.checked, bitindex)
+        self.last_vehicle.setSpecial(checkbox.checked, bitindex)
 
     def player_special_all(self, _=None):
         for cb in self.player_special_views:

@@ -34,10 +34,24 @@ class Field:
 
 class PtrField(Field):
     def __init__(self, offset, size=0):
-        # 对于ProcessHandler
-        # size为0，readUint和writeUint时会自动取目标进程的指针大小
-        # 但用在ArrayField时还是得指定size
         super().__init__(offset, int, size)
+
+    def __get__(self, obj, type=None):
+        if self.size is 0:
+            # 对于ProcessHandler，根据目标进程获取指针大小
+            self.size = obj.handler.ptr_size
+        ret = obj.handler.readUint(obj.addr + self.offset, self.size)
+        return ret
+
+
+class SignedField(Field):
+    def __get__(self, obj, type=None):
+        return obj.handler.readInt(obj.addr + self.offset, self.type, self.size)
+
+    def __set__(self, obj, value):
+        if not isinstance(value, self.type):
+            value = self.type(value)
+        obj.handler.writeInt(obj.addr + self.offset, value, self.size)
 
 
 class OffsetsField(Field):
@@ -127,13 +141,13 @@ class CoordData:
 
 
 class ArrayField(Field):
-    def __init__(self, offset, length, field_t):
+    def __init__(self, offset, length, field):
         self.offset = offset
         self.length = length
-        self.field_t = field_t
+        self.field = field
 
     def __get__(self, obj, type):
-        return ArrayData(obj.addr + self.offset, self.length, self.__dict__['field_t'], obj)
+        return ArrayData(obj, self.offset, self.length, self.field)
 
     def __set__(self, obj, value):
         data = self.__get__(obj, type(obj))
@@ -146,24 +160,24 @@ class ArrayField(Field):
 
 
 class ArrayData:
-    def __init__(self, addr, length, field_t, obj):
-        self.addr = addr
-        self.length = length
-        self.field_t = field_t
+    def __init__(self, obj, offset, length, field):
         self.obj = obj
-
-    @property
-    def field(self):
-        return self.__dict__['field_t']
+        self.offset = offset
+        self.addr = obj.addr + offset
+        self.length = length
+        self.field = field
+        if field.size is 0:
+            """传入了延迟设置size的field"""
+            field.__get__(obj)
 
     def __getitem__(self, i):
         field = self.field
-        field.offset = self.obj.addr - self.addr + field.size * i
+        field.offset = self.offset + field.size * i
         return field.__get__(self.obj)
 
     def __setitem__(self, i, value):
         field = self.field
-        field.offset = self.obj.addr - self.addr + field.size * i
+        field.offset = self.offset + field.size * i
         return field.__set__(self.obj, value)
 
     def __iter__(self):
