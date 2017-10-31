@@ -162,6 +162,8 @@ class Marker(ManagedModel):
     MARKER_TYPE_CONTACT = 5
     AVAILABLE_TYPE = (MARKER_TYPE_CAR, MARKER_TYPE_PED)
 
+    MARKER_SPRITE_WAYPOINT = 41
+
     color = Field(0)
     entity_handle = Field(4, int)
     coord = CoordField(8)

@@ -156,6 +156,7 @@ class Tool(BaseGTATool):
                     self.render_common_text()
                     ui.Text("根据左边列表生产载具: alt+V")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
+                    ui.Text("瞬移到标记点: alt+shift+g")
                     ui.Text("切换转向并加速: alt+shift+m")
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
@@ -176,7 +177,8 @@ class Tool(BaseGTATool):
             ('turn_and_speed_up', MOD_ALT | MOD_SHIFT, getVK('m'), self.turn_and_speed_up),
             ('near_objects_to_front', MOD_ALT | MOD_SHIFT, getVK('o'), self.near_objects_to_front),
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-            ('moveToMapPtr', MOD_CONTROL | MOD_ALT, getVK('g'), self.moveToMapPtr),
+            ('move_to_map_cursor', MOD_CONTROL | MOD_ALT, getVK('g'), self.move_to_map_cursor),
+            ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
         ) + self.get_common_hotkeys()
 
     def init_remote_function(self):
@@ -231,7 +233,7 @@ class Tool(BaseGTATool):
         self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
         self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
 
-    def moveToMapPtr(self, _=None):
+    def move_to_map_cursor(self, _=None):
         coord = self.vehicle.coord
         coord[0] = self.handler.readFloat(address.MAP_X_ADDR)
         coord[1] = self.handler.readFloat(address.MAP_Y_ADDR)
@@ -364,6 +366,12 @@ class Tool(BaseGTATool):
         coord = self.get_front_coord()
         for o in self.get_near_objects():
             o.coord = coord
+
+    def teleport_to_waypoint(self, _=None):
+        """瞬移到标记点"""
+        blip = self.get_first_blip(sprite=models.Marker.MARKER_SPRITE_WAYPOINT)
+        if not (blip and self.teleport_to_blip(blip)):
+            print('无法获取标记坐标')
 
     @property
     def system_time(self):

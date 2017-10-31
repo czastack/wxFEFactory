@@ -507,7 +507,7 @@ class BaseGTATool(BaseTool):
     #----------------------------------------------------------------------
     # MARKER
     #----------------------------------------------------------------------
-    def get_blips(self, color=None, types=None):
+    def get_blips(self, color=None, types=None, sprite=None):
         """获取所有标记"""
         Marker = self.models.Marker
         addr = self.address.BLIP_LIST
@@ -515,9 +515,15 @@ class BaseGTATool(BaseTool):
 
         for i in range(self.MARKER_RANGE):
             blipType = it.blipType
-            if it.blipType and (types is None or blipType in types) and (color is None or it.color is color):
+            if it.blipType and (types is None or blipType in types) and (color is None or it.color is color) and (sprite is None or it.sprite is sprite):
                 yield Marker(it.addr, self)
             it.next()
+
+    def get_first_blip(self, *args, **kwargs):
+        try:
+            return next(self.get_blips(*args, **kwargs))
+        except StopIteration:
+            pass
 
     def get_target_blips(self, color=None, types=None):
         """获取目标的所有标记"""
