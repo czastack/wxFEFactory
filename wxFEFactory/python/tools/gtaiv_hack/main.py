@@ -429,7 +429,8 @@ class Tool(BaseGTATool):
     def enemys_remove_weapon(self, _=None):
         """敌人缴械"""
         for p in self.get_enemys():
-            p.remove_all_weapons()
+            if isinstance(p, self.Player):
+                p.remove_all_weapons()
 
     def enemys_freeze_position(self, _=None):
         """敌人定住"""
