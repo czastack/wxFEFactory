@@ -8,101 +8,6 @@ import math
 import time
 
 
-class Pos(Model):
-    grad = CoordField(0)
-    looking = CoordField(0x10)
-    coord = CoordField(0x30)
-
-
-class Entity(Physicle):
-    # speed = CoordField(0x78)
-    # weight = Field(0xc0, float)
-    model_id = Field(0x2e, int, 2)
-
-    @property
-    def pos(self):
-        return Pos(self.handler.read32(self.addr + 0x20), self.handler)
-
-    @property
-    def coord(self):
-        return self.pos.coord
-
-    @coord.setter
-    def coord(self, value):
-        self.pos.coord = value
-
-
-class MemVehicle(Entity):
-    SIZE = 0x20d0
-
-    hp = Field(0x200, float)
-    engine_hp = Field(0x10FC, float)
-    roll = CoordField(0x04)
-    dir = CoordField(0x14)
-    numPassengers = Field(0x1c8, int, 1)
-    maxPassengers = Field(0x1cc, int, 1)
-    door_status = Field(0x224, int, 1)
-    flags = Field(0x1f5, int, 1)
-    primaryColor = Field(0x19c, int, 1)
-    secondaryColor = Field(0x19d, int, 1)
-    type = Field(0x284, int, 4)
-
-#     @property
-#     def passengers(self):
-#         offset = 0x1a8
-#         for i in range(4):
-#             yield Player(self.handler.read32(self.addr + offset), self.handler)
-#             offset += 4
-
-#     @property
-#     def driver(self):
-#         addr = self.handler.read32(self.addr + 0x1a4)
-#         if addr:
-#             return Player(addr, self.handler)
-
-#     def stop(self):
-#         self.speed = (0, 0, 0)
-
-#     def flip(self):
-#         self.coord[2] += 0.05
-#         self.dir[0] = -self.dir[0]
-#         self.dir[1] = -self.dir[1]
-
-#     def lock_door(self):
-#         self.door_status = 2
-
-#     def unlock_door(self):
-#         self.door_status = 1
-
-#     def ignoreDamage(self, ignore=True):
-#         if ignore:
-#             self.flags |= 4
-#         else:
-#             self.flags &= (~4 & 0xFFFFFFFF)
-
-
-class MemPlayer(Entity):
-    SIZE = 0xf00
-
-    hp = Field(0x1f0, float)
-    ap = Field(0x2c4, float)
-    rotation = Field(0x2dc, float)
-    # stamina = Field(0x600, float)
-    isInVehicle = Field(0x314, bool, 1)
-    cur_weapon = Field(0x504, int)
-    vehicle = ModelField(0x310, MemVehicle)
-    collidingCar = ModelField(0x34c, MemVehicle)
-    cur_weapon_slop = Field(0x498, int, 1)
-
-#     @lazy
-#     def weapons(self):
-#         return WeaponSet(self.addr + 0x35c, self.handler, 13)
-
-#     @property
-#     def cur_weapon(self):
-#         return self.weapons[self.cur_weapon_slop]
-
-
 class NativeModel:
     def __init__(self, handle, mgr):
         self.handle = handle
@@ -245,78 +150,69 @@ class Player(NativeEntity):
     def addr(self):
         return self.mgr.ped_pool.addr_at(self.ped_index)
 
-    @property
-    def memobj(self):
-        return MemPlayer(self.addr, self.mgr.handler)
+    existed = property(getter('DOES_ENTITY_EXIST', bool))
+    hp = property(getter_ptr('GET_ENTITY_HEALTH'), setter('SET_ENTITY_HEALTH'))
 
-    existed = property(getter('DOES_CHAR_EXIST', bool))
-    hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
-    ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('ADD_ARMOUR_TO_CHAR'))
-    max_health = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_HEALTH'))
-    max_armor = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_ARMOUR'))
+    @hp.setter
+    def hp(self, value):
+        value = int(value) + 100
+        self.native_call('SET_ENTITY_HEALTH', 'LL', self.handle, value)
 
-    money = property(player_getter_ptr('STORE_SCORE'))
+    ap = property(getter_ptr('GET_PED_ARMOUR'), setter('SET_PED_ARMOUR'))
+    max_health = property(getter('GET_PED_MAX_HEALTH'), setter('SET_PED_MAX_HEALTH'))
+    max_armor = property(player_getter('GET_PLAYER_MAX_ARMOUR'), player_setter('SET_PLAYER_MAX_ARMOUR'))
+
+    money = property(player_getter_ptr('GET_PED_MONEY'))
 
     @money.setter
     def money(self, value):
         value = int(value)
-        if value < 0:
-            value = 0
-        else:
-            value -= self.money
-        self.native_call('ADD_SCORE', 'LL', self.index, value)
+        self.native_call('SET_PED_MONEY', 'LL', self.handle, value)
 
-    gravity = property(getter('GET_CHAR_GRAVITY', float), setter('SET_CHAR_GRAVITY', float))
+    gravity = property(None, setter('SET_PED_GRAVITY', bool))
     # 朝向
-    heading = property(getter_ptr('GET_CHAR_HEADING', float), setter('SET_CHAR_HEADING', float))
+    heading = property(getter_ptr('GET_ENTITY_HEADING', float), setter('SET_ENTITY_HEADING', float))
     # 无敌
-    invincible = property(None, setter('SET_CHAR_INVINCIBLE', bool))
-    # 限制切换武器
-    block_switch_weapons = property(None, setter('BLOCK_PED_WEAPON_SWITCHING', bool))
+    invincible = property(None, setter('SET_ENTITY_INVINCIBLE', bool))
     # 不会被拽出车
-    can_be_dragged_out_of_vehicle = property(None, setter('SET_CHAR_CANT_BE_DRAGGED_OUT', bool))
+    can_be_dragged_out_of_vehicle = property(None, setter('SET_PED_CAN_BE_DRAGGED_OUT', bool))
 
     # 通缉等级
-    wanted_level = property(player_getter_ptr('STORE_WANTED_LEVEL'))
+    wanted_level = property(player_getter_ptr('GET_PLAYER_WANTED_LEVEL'))
     @wanted_level.setter
     def wanted_level(self, level):
         level = int(level)
-        if level > 0:
-            self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
+            self.native_call('SET_PLAYER_WANTED_LEVEL', 'LL', self.index, level)
         else:
-            self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
-        self.script_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index, sync=False)
+            self.native_call('CLEAR_PLAYER_WANTED_LEVEL', 'L', self.index)
+        self.script_call('SET_PLAYER_WANTED_LEVEL_NOW', 'L', self.index, sync=False)
 
-    isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
+    isInVehicle = property(getter('IS_PED_IN_ANY_VEHICLE', bool, 1))
     # 被其他角色忽略
     ignored_by_everyone = player_setter('SET_EVERYONE_IGNORE_PLAYER', bool)
-    # 不会累
-    never_gets_tired = player_setter('SET_PLAYER_NEVER_GETS_TIRED', bool)
-    # 不会从摩托车上摔下来
-    keep_bike = property(None, setter('SET_CHAR_CAN_BE_KNOCKED_OFF_BIKE', bool))
+    # 不会从车上摔下来
+    keep_bike = property(None, setter('SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE', bool))
 
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
+        self.native_call('GET_ENTITY_COORDS', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
         values = ctx.get_temp_values(1, 3, float, mapfn=float32)
         return utils.CoordData(self, values)
 
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        self.script_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
-        # self.mgr.LoadEnvironmentNow(pos)
+        self.script_call('SET_ENTITY_COORDS', 'L3f', self.handle, *pos, sync=False)
 
     def get_offset_coord(self, offset):
-        self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
+        self.native_call('GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
         return self.native_context.get_temp_values(1, 3, float, mapfn=float32)
 
-    get_vehicle_handle = getter_ptr('GET_CAR_CHAR_IS_USING')
+    get_vehicle_handle = getter_ptr('GET_VEHICLE_PED_IS_USING')
 
     def get_last_vehicle_handle(self):
-        self.native_call('GET_PLAYERS_LAST_CAR_NO_SAVE', 'L', self.native_context.get_temp_addr())
-        return self.native_context.get_temp_value()
+        return self.native_call('GET_PLAYERS_LAST_VEHICLE', None)
 
     @property
     def vehicle(self):
@@ -471,10 +367,6 @@ class Vehicle(NativeEntity):
     @property
     def addr(self):
         return self.mgr.vehicle_pool.addr_at(self.index)
-
-    @property
-    def memobj(self):
-        return MemVehicle(self.addr, self.mgr.handler)
 
     hp = property(getter_ptr('GET_CAR_HEALTH'), setter('SET_CAR_HEALTH'))
     engine_hp = property(getter('GET_ENGINE_HEALTH', float), setter('SET_ENGINE_HEALTH', float))

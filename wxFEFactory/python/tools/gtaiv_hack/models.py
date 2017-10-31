@@ -166,6 +166,15 @@ class NativeEntity(NativeModel):
     def speed(self, value):
         self.mgr.set_move_speed(self.addr, value)
 
+    @property
+    def turn_speed(self):
+        values = self.mgr.get_move_turn_speed(self.addr)
+        return utils.VectorField(self, values, 'turn_speed')
+
+    @turn_speed.setter
+    def turn_speed(self, value):
+        self.mgr.set_move_speed(self.addr, value)
+
     def create_fire(self):
         self._fire = self.mgr.create_fire(self.coord)
         return self._fire
@@ -306,7 +315,6 @@ class Player(NativeEntity):
     def coord(self, value):
         pos = tuple(value)
         self.script_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
-        # self.mgr.LoadEnvironmentNow(pos)
 
     def get_offset_coord(self, offset):
         self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
@@ -521,7 +529,6 @@ class Vehicle(NativeEntity):
         mycar = self.mgr.player.get_vehicle_handle()
         if self.handle == mycar:
             self.script_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
-            # self.mgr.LoadEnvironmentNow(pos)
         else:
             self.native_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos)
 

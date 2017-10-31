@@ -23,26 +23,31 @@ VERSION_DEPEND = {
         'LOCAL_PLAYER_ID'      : 0x00EA68A8,
         'PLAYER_INFO_ARRAY'    : 0x01033058,
         'FindNativeAddress'    : 0x00617280,
-        'SetMoveSpeed'         : 0, # TODO
-        'CClock__Hour'         : 0, # TODO
+        'SetMoveSpeed'         : 0x0, # TODO
+        'GetMoveSpeed'         : 0x0, # TODO
+        'SetTurnSpeed':        : 0x0, # TODO
+        'GetTurnSpeed':        : 0x0, # TODO
+        'CClock__Hour'         : 0x0, # TODO
     },
     VERSION_107: {
-        'PED_POOL'             : 0x18A82AC,
-        'VEHICLE_POOL'         : 0x1619240,
-        'OBJECT_POOL'          : 0x1350CE0,
-        'BLIP_LIST'            : 0x119ED50,
-        'LOCAL_PLAYER_ID'      : 0xF1CC68,
-        'PLAYER_INFO_ARRAY'    : 0x11A7008,
-        'FindNativeAddress'    : 0x5A76D0,
-        'SetMoveSpeed'         : 0xA47750,
-        'GetMoveSpeed'         : 0xA477F0,
-        'SetTimeOfDay'         : 0x821200,
-        'TimeOfDay'            : 0x11E8F0C,
-        'CClock__Hour'         : 0x11D5300,
-        'CClock__Minute'       : 0x11D52FC,
-        'CClock__LockedHour'   : 0x11D5308,
-        'CClock__LockedMinute' : 0x11D52F0,
-        'CClock__DayOfWeek'    : 0x11D5310,
+        'PED_POOL'             : 0x018A82AC,
+        'VEHICLE_POOL'         : 0x01619240,
+        'OBJECT_POOL'          : 0x01350CE0,
+        'BLIP_LIST'            : 0x0119ED50,
+        'LOCAL_PLAYER_ID'      : 0x00F1CC68,
+        'PLAYER_INFO_ARRAY'    : 0x011A7008,
+        'FindNativeAddress'    : 0x005A76D0,
+        'SetMoveSpeed'         : 0x00A47750,
+        'GetMoveSpeed'         : 0x00A477F0,
+        'SetTurnSpeed':        : 0x00A47840,
+        'GetTurnSpeed':        : 0x00A478E0,
+        'SetTimeOfDay'         : 0x00821200,
+        'TimeOfDay'            : 0x011E8F0C,
+        'CClock__Hour'         : 0x011D5300,
+        'CClock__Minute'       : 0x011D52FC,
+        'CClock__LockedHour'   : 0x011D5308,
+        'CClock__LockedMinute' : 0x011D52F0,
+        'CClock__DayOfWeek'    : 0x011D5310,
     },
     VERSION_EFLC2: {
         'PED_POOL'             : 0x018219EC,
@@ -54,6 +59,8 @@ VERSION_DEPEND = {
         'FindNativeAddress'    : 0x004CF760,
         'SetMoveSpeed'         : 0x00A7C040,
         'GetMoveSpeed'         : 0x00A7C0E0,
+        'SetTurnSpeed':        : 0x00A7C130,
+        'GetTurnSpeed':        : 0x00A7C1D0,
         'SetTimeOfDay'         : 0x00846970,
         'TimeOfDay'            : 0x010A4EA8,
         'CClock__Hour'         : 0x010C9398,

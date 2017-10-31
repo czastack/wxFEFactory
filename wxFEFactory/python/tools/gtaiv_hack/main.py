@@ -234,7 +234,6 @@ class Tool(BaseGTATool):
     def _vehicle(self):
         """获取当前角色的上次使用的载具"""
         return self.player.last_vehicle
-        # return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
 
     player = property(_player)
     vehicle = property(_vehicle)
@@ -250,13 +249,6 @@ class Tool(BaseGTATool):
 
     def get_ped_handle(self, player_index=0):
         """获取当前角色的句柄"""
-        # 方法一
-        # player_id = (index or self.get_player_index_of_pool()) << 8
-        # return player_id | self.handler.read8(
-        #     self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + (player_id >> 8)
-        # )
-
-        # 方法二
         self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_index(), self.native_context.get_temp_addr())
         return self.native_context.get_temp_value()
 
@@ -341,6 +333,18 @@ class Tool(BaseGTATool):
         """获取实体的移动速度"""
         ctx = self.native_context
         self.native_call_auto(address.GetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
+        return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.float32))
+
+    def set_turn_speed(self, entity_addr, value):
+        """设置实体的转向速度"""
+        ctx = self.native_context
+        ctx.push_manual(-3, '3f', *value)
+        self.native_call_auto(address.SetTurnSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
+
+    def get_turn_speed(self, entity_addr):
+        """获取实体的转向速度"""
+        ctx = self.native_context
+        self.native_call_auto(address.GetTurnSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
         return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.float32))
 
     def raise_up(self, _=None, speed=15):

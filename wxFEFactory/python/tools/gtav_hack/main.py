@@ -142,17 +142,27 @@ class Tool(BaseGTATool):
 
     def get_version(self):
         """获取版本码"""
-        return 0
+        return self.handler.get_module_version()[1] >> 16
 
     def init_addr(self):
         """初始化地址信息"""
         self.MODULE_BASE = self.handler.base - 0x140000000
-        for name, addr in address.BASE.items():
-            setattr(address, name, self.get_addr(addr) if addr else 0)
 
-        address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 6)
+        version = self.get_version()
+        version_depend = address.VERSION_DEPEND.get(version, None)
+        if version_depend:
+            # 装载针对当前版本的地址列表
+            for name in version_depend:
+                addr = version_depend[name]
+                setattr(address, name, self.get_addr(addr) if addr else 0)
         
+        address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 6)
         address.BLIP_LIST = self.get_offset_addr(address.BLIP_LIST_BASE)
+
+        # 装载针对当前版本的native_hash
+        name = 'hash_%d' % version
+        module = getattr(__import__(__package__ + '.native_hash', fromlist=[name]), name)
+        address.NATIVE_HASH = module.NATIVE_HASH
 
         # # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
         # # 要在ScriptHook的线程中才能安全运行
@@ -180,15 +190,15 @@ class Tool(BaseGTATool):
                 address.NATIVE_ADDRS[name] = addr
         return addr
 
-    def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
+    def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=8):
         """ 远程调用GTAIV中的方法
         :param name: 方法名称，见address.NATIVE_HASH
         :param arg_sign: 函数签名
         """
         addr = self.get_native_addr(name) if isinstance(name, str) else name
-        return super().native_call_64(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+        return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
-    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
+    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
         if self.ScriptHookHelper:
             with self.native_context:
@@ -241,20 +251,11 @@ class Tool(BaseGTATool):
 
     def get_player_index(self):
         """获取当前角色的序号"""
-        # return self.native_call('GET_PLAYER_ID', None)
-        return self.handler.read32(address.LOCAL_PLAYER_ID)
+        return self.native_call('GET_PLAYER_INDEX', None)
 
     def get_ped_handle(self, player_index=0):
         """获取当前角色的句柄"""
-        # 方法一
-        # player_id = (index or self.get_player_index_of_pool()) << 8
-        # return player_id | self.handler.read8(
-        #     self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + (player_id >> 8)
-        # )
-
-        # 方法二
-        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_index(), self.native_context.get_temp_addr())
-        return self.native_context.get_temp_value()
+        return self.native_call('GET_PLAYER_PED', 'L', player_index or self.get_player_index())
 
     def ped_index_to_handle(self, index):
         """角色序号转角色句柄"""

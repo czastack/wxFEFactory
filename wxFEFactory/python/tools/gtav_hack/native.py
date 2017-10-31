@@ -71,3 +71,11 @@ class NativeContext(NativeContext):
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
         self.handler.write(addr, buff)
         self.m_nArgCount += len(args)
+
+    def get_result(self, type, size=0):
+        if type is int:
+            return self.handler.readUint(self.m_pReturn, size)
+        elif type is float:
+            if size is 8:
+                return self.handler.readDouble(self.m_pReturn + 16)
+            return self.handler.readFloat(self.m_pReturn + 8)

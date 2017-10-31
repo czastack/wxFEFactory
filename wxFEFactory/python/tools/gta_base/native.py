@@ -85,7 +85,7 @@ class NativeContext(Model):
 
     def get_result(self, type, size=0):
         """获取调用结果"""
-        return self.handler.read(self.m_TempStack.addr, type, size)
+        return self.handler.read(self.m_pReturn, type, size)
 
     def reset(self):
         self.m_nArgCount = 0

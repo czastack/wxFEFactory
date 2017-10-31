@@ -138,24 +138,17 @@ class BaseGTATool(BaseTool):
         :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
         :param arg_sign: 参数签名
         """
-        self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), 
+        return self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), 
             addr, this, *args, ret_type=ret_type, ret_size=ret_size)
-        return self.handler.read32(self.native_context.m_pReturn)
 
-    def native_call_64(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
+    def native_call_64(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=8):
         """ 以x64默认调用约定调用远程函数
         :param addr: 目标函数地址
         :param this: this指针，为0则为普通函数
         :param arg_sign: 参数签名
         """
-        self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
+        return self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
             self.native_context.fflag, addr, this, *args, ret_type=ret_type, ret_size=ret_size)
-        if ret_type is int:
-            return self.handler.read64(self.native_context.m_pReturn)
-        elif ret_type is float:
-            if ret_size is 8:
-                return self.handler.readDouble(self.native_context.m_pReturn + 16)
-            return self.handler.readFloat(self.native_context.m_pReturn + 8)
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)
