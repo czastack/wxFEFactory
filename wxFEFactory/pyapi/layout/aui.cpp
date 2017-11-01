@@ -146,9 +146,9 @@ bool AuiNotebook::canPageClose(int n)
 
 	if (ret) {
 		// 手动调用子窗口的onClose
-		if (py::isinstance<BaseFrame>(page))
+		if (py::isinstance<BaseTopLevelWindow>(page))
 		{
-			page.cast<BaseFrame*>()->onClose(wxCloseEvent());
+			page.cast<BaseTopLevelWindow*>()->onClose(wxCloseEvent());
 		}
 	}
 

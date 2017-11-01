@@ -280,6 +280,8 @@ public:
 		return layout;
 	}
 
+	static wxWindow* getActiveWindow();
+
 	static wxWindow* safeActiveWindow();
 
 

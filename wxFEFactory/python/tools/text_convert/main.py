@@ -9,7 +9,7 @@ class Tool(BaseTool):
             'height': 60,
         }
 
-        with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menuBar=self.render_menu()) as win:
+        with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menubar=self.render_menu()) as win:
             with ui.Vertical():
                 with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as container:
                     ui.Text("Rom", className="vcenter")

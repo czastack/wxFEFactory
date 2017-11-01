@@ -51,6 +51,12 @@ int View::parseColor(wxcstr color, uint defval)
 	return rgb;
 }
 
+wxWindow * View::getActiveWindow()
+{
+	Layout *layout = getActiveLayout();
+	return layout ? layout->ptr() : nullptr;
+}
+
 wxWindow* View::safeActiveWindow()
 {
 	Layout *layout = getActiveLayout();

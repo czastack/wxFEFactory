@@ -6,9 +6,10 @@
 #include <wx/panel.h>
 #include <wx/splitter.h>
 #include <wx/notebook.h>
+#include <wx/mdi.h>
 
 
-class BaseFrame : public Layout
+class BaseTopLevelWindow : public Layout
 {
 public:
 	using Layout::Layout;
@@ -101,21 +102,9 @@ protected:
 };
 
 
-class Window : public BaseFrame
-{
+class BaseFrame : public BaseTopLevelWindow {
 public:
-	template <class... Args>
-	Window(wxcstr title, MenuBar *menuBar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
-	{
-		bindElem(new wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
-		if (menuBar)
-		{
-			setMenu(*menuBar);
-		}
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
-		m_onclose = None;
-	}
-
+	using BaseTopLevelWindow::BaseTopLevelWindow;
 	wxFrame& win() const
 	{
 		return *(wxFrame*)m_elem;
@@ -124,7 +113,7 @@ public:
 	void setMenu(MenuBar &menubar)
 	{
 		win().SetMenuBar(menubar);
-		m_elem->Bind(wxEVT_MENU, &Window::onMenu, this);
+		m_elem->Bind(wxEVT_MENU, &BaseFrame::onMenu, this);
 		py::cast(&menubar).inc_ref();
 	}
 
@@ -136,7 +125,7 @@ public:
 	MenuBar* getMenuBar()
 	{
 		auto menubar = win().GetMenuBar();
-		return menubar ? ((MenuBar*)menubar->GetClientData()): nullptr;
+		return menubar ? ((MenuBar*)menubar->GetClientData()) : nullptr;
 	}
 
 	StatusBar* getStatusBar()
@@ -147,11 +136,11 @@ public:
 	void onClose(class wxCloseEvent &event) override
 	{
 		auto menubar = getMenuBar();
-		
+
 		if (menubar)
 			py::cast(menubar).dec_ref();
 
-		BaseFrame::onClose(event);
+		BaseTopLevelWindow::onClose(event);
 	}
 
 	bool isKeepTop()
@@ -171,6 +160,63 @@ public:
 			style &= ~wxSTAY_ON_TOP;
 		}
 		m_elem->SetWindowStyle(style);
+	}
+};
+
+
+template<class T>
+class BaseWindow : public BaseFrame
+{
+public:
+	template <class... Args>
+	BaseWindow(wxcstr title, MenuBar *menubar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
+	{
+		bindElem(new T(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		if (menubar)
+		{
+			setMenu(*menubar);
+		}
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_onclose = None;
+	}
+};
+
+
+using Window = BaseWindow<wxFrame>;
+
+
+class MDIParentFrame : public BaseFrame
+{
+public:
+	template <class... Args>
+	MDIParentFrame(wxcstr title, MenuBar *menubar, long exstyle, Args ...args) : BaseFrame(args...)
+	{
+		bindElem(new wxMDIParentFrame(getActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		if (!menubar)
+		{
+			menubar = new MenuBar(None);
+		}
+		setMenu(*menubar);
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_onclose = None;
+	}
+};
+
+
+class MDIChildFrame : public BaseFrame
+{
+public:
+	template <class... Args>
+	MDIChildFrame(wxcstr title, MenuBar *menubar, long exstyle, Args ...args) : BaseFrame(args...)
+	{
+		wxMDIParentFrame *parent = (wxMDIParentFrame*)getActiveWindow();
+		bindElem(new wxMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		if (menubar)
+		{
+			setMenu(*menubar);
+		}
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_onclose = None;
 	}
 };
 
@@ -213,11 +259,11 @@ protected:
 };
 
 
-class Dialog : public BaseFrame
+class Dialog : public BaseTopLevelWindow
 {
 public:
 	template <class... Args>
-	Dialog(wxcstr title, long exstyle/*=wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX*/, Args ...args) : BaseFrame(args...)
+	Dialog(wxcstr title, long exstyle/*=wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX*/, Args ...args) : BaseTopLevelWindow(args...)
 	{
 		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);

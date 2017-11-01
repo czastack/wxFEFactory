@@ -54,7 +54,7 @@ class MainFrame:
             with ui.Menu("窗口"):
                 pass
 
-        with ui.Window("火纹工厂", style=winstyle, styles=styles, menuBar=menubar) as win:
+        with ui.Window("火纹工厂", style=winstyle, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
                 toolbar = self.render_toolbar()
                 ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
@@ -295,8 +295,8 @@ class MainFrame:
 
 
 winstyle = {
-    'width': 1200,
-    'height': 960,
+    # 'width': 1200,
+    # 'height': 960,
     'width': 900,
     'height': 1200,
 }

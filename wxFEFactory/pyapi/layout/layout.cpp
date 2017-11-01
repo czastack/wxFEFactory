@@ -73,20 +73,37 @@ void init_layout(py::module &m)
 		.def("findFocus", &Layout::findFocus)
 		.def_readonly("children", &Layout::m_children);
 
-	py::class_t<BaseFrame, Layout>(layout, "BaseFrame")
-		.def("close", &BaseFrame::close)
-		.def("setOnClose", &BaseFrame::setOnClose)
-		.def("setIcon", &BaseFrame::setIcon)
-		.def_property("title", &BaseFrame::getTitle, &BaseFrame::setTitle)
-		.def_property("size", &BaseFrame::getSize, &BaseFrame::setSize)
-		.def_property("position", &BaseFrame::getPosition, &BaseFrame::setPosition);
+	py::class_t<BaseTopLevelWindow, Layout>(layout, "BaseTopLevelWindow")
+		.def("close", &BaseTopLevelWindow::close)
+		.def("setOnClose", &BaseTopLevelWindow::setOnClose)
+		.def("setIcon", &BaseTopLevelWindow::setIcon)
+		.def_property("title", &BaseTopLevelWindow::getTitle, &BaseTopLevelWindow::setTitle)
+		.def_property("size", &BaseTopLevelWindow::getSize, &BaseTopLevelWindow::setSize)
+		.def_property("position", &BaseTopLevelWindow::getPosition, &BaseTopLevelWindow::setPosition);
 
-	py::class_t<Window, BaseFrame>(layout, "Window")
-		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(),
-			label, "menuBar"_a=nullptr, "exstyle"_a=(long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), styles, className, style)
+
+	auto base_frame_init = py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>();
+	auto base_frame_exstyle_a = "exstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	auto menubar_a = "menubar"_a = nullptr;
+	py::class_t<BaseFrame, BaseTopLevelWindow>(layout, "BaseFrame")
 		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
 		.def_property_readonly("menubar", &Window::getMenuBar)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
+
+	py::class_t<Window, BaseFrame>(layout, "Window")
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+
+	py::class_t<MDIParentFrame, BaseFrame>(layout, "MDIParentFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+
+	py::class_t<MDIChildFrame, BaseFrame>(layout, "MDIChildFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+
+	py::class_t<AuiMDIParentFrame, BaseFrame>(layout, "AuiMDIParentFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+
+	py::class_t<AuiMDIChildFrame, BaseFrame>(layout, "AuiMDIChildFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
 
 	py::class_t<HotkeyWindow, Window>(layout, "HotkeyWindow")
 		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(),
@@ -96,7 +113,7 @@ void init_layout(py::module &m)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
 		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
 
-	py::class_t<Dialog, BaseFrame>(layout, "Dialog")
+	py::class_t<Dialog, BaseTopLevelWindow>(layout, "Dialog")
 		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
 			label, "exstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
 		.def("showModal", &Dialog::showModal)

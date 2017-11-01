@@ -68,7 +68,7 @@ class BaseGTATool(BaseTool):
 
     def render_win(self):
         menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menuBar=menubar, exstyle=0x80804)
+        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=menubar, exstyle=0x80804)
         self.win.position = (70, 4)
         return self.win
 

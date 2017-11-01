@@ -1,6 +1,8 @@
 #pragma once
 #include "layoutbase.h"
+#include "layouts.h"
 #include <wx/aui/aui.h>
+#include <wx/aui/tabmdi.h>
 
 using AuiItem = Item;
 
@@ -119,4 +121,52 @@ public:
 
 protected:
 	py::dict m_close_listeners;
+};
+
+
+using AuiMDIChildFrame = BaseWindow<wxAuiMDIChildFrame>;
+
+
+class AuiMDIParentFrame : public BaseFrame {
+public:
+	template <class... Args>
+	AuiMDIParentFrame(wxcstr title, MenuBar *menuBar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
+	{
+		bindElem(new wxAuiMDIParentFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		if (menuBar)
+		{
+			setMenu(*menuBar);
+		}
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_onclose = None;
+
+		m_mgr = new wxAuiManager(m_elem);
+	}
+
+	virtual ~AuiMDIParentFrame()
+	{
+		m_mgr->UnInit();
+		delete m_mgr;
+	}
+
+	wxAuiMDIParentFrame& win() const
+	{
+		return *(wxAuiMDIParentFrame*)m_elem;
+	}
+
+	void onClose(class wxCloseEvent &event) override
+	{
+		wxAuiNotebook * notebook = win().GetNotebook();
+		if (notebook)
+		{
+			/// 关闭所有子窗口.
+			notebook->DeleteAllPages();
+		}
+
+		BaseFrame::onClose(event);
+	}
+
+
+protected:
+	wxAuiManager *m_mgr;
 };
