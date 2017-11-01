@@ -255,7 +255,7 @@ class Tool(BaseGTATool):
 
     def get_ped_handle(self, player_index=0):
         """获取当前角色的句柄"""
-        return self.native_call('GET_PLAYER_PED', 'L', player_index or self.get_player_index())
+        return self.native_call('GET_PLAYER_PED', 'Q', player_index or self.get_player_index())
 
     def ped_index_to_handle(self, index):
         """角色序号转角色句柄"""
@@ -273,7 +273,7 @@ class Tool(BaseGTATool):
 
     def player_has_ped(self, player_index):
         """指定序号是否有对应的角色句柄"""
-        return self.native_call('PLAYER_HAS_CHAR', 'L', player_index, ret_type=bool)
+        return self.native_call('PLAYER_HAS_CHAR', 'Q', player_index, ret_type=bool)
 
     @property
     def ped_pool(self):
@@ -315,30 +315,18 @@ class Tool(BaseGTATool):
 
     def get_nearest_ped(self, distance=50):
         """获取最近的人"""
-        self.native_call('GET_CLOSEST_CHAR', '4f3L', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
+        self.native_call('GET_CLOSEST_PED', '4f3Q', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
         ped = self.native_context.get_temp_value()
         if ped:
             return Player(0, ped, self)
 
     def get_nearest_vehicle(self, distance=50):
         """获取最近的载具"""
-        handle = self.native_call('GET_CLOSEST_CAR', '4f2L', *self.entity.coord, distance, 0, 70)
+        handle = self.native_call('GET_CLOSEST_VEHICLE', '4f2Q', *self.entity.coord, distance, 0, 70)
         if handle:
             vehicle = Vehicle(handle, self)
             if vehicle.existed:
                 return vehicle
-
-    def set_move_speed(self, entity_addr, value):
-        """设置实体的移动速度"""
-        ctx = self.native_context
-        ctx.push_manual(-3, '3f', *value)
-        self.native_call_auto(address.SetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
-
-    def get_move_speed(self, entity_addr):
-        """获取实体的移动速度"""
-        ctx = self.native_context
-        self.native_call_auto(address.GetMoveSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
-        return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.float32))
 
     def raise_up(self, _=None, speed=15):
         """升高(有速度)"""
@@ -433,15 +421,9 @@ class Tool(BaseGTATool):
         for p in self.get_enemys():
             p.freeze_position()
 
-    # def LoadEnvironmentNow(self, pos):
-    #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
-    #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
-    #     self.native_call('POPULATE_NOW', None)
-    #     self.script_call('LOAD_SCENE', '3f', *pos)
-
     def GetGroundZ(self, pos):
         """获取指定位置地面的z值"""
-        self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, self.native_context.get_temp_addr())
+        self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fQ', *pos, self.native_context.get_temp_addr())
         return self.native_context.get_temp_value(type=float)
 
     def get_first_blip(self, blipType):
@@ -507,11 +489,15 @@ class Tool(BaseGTATool):
 
     def get_camera_rot_raw(self):
         """获取摄像机原始参数"""
-        ctx = self.native_context
-        self.native_call('GET_ROOT_CAM', 'L', ctx.get_temp_addr())
-        cam = ctx.get_temp_value()
-        self.native_call('GET_CAM_ROT', 'L3L', cam, *ctx.get_temp_addrs(1, 3))
-        return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.float32))
+        cam = self.native_call('GET_RENDERING_CAM', None)
+        self.native_call('GET_CAM_ROT', 'Q', cam)
+        return self.native_context.get_vector_result(8)
+
+    def get_camera_pos(self):
+        """获取摄像机原始参数"""
+        cam = self.native_call('GET_RENDERING_CAM', None)
+        self.native_call('GET_CAM_COORD', 'Q', cam)
+        return self.native_context.get_vector_result(8)
 
     def get_camera_rot(self):
         """ 获取摄像机参数
@@ -567,30 +553,30 @@ class Tool(BaseGTATool):
         """生成载具"""
         m = models.IVModel(model, self)
         m.request()
-        self.script_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
-        return Vehicle(self.native_context.get_temp_value(), self)
+        handle = self.script_call('CREATE_CAR', 'Q3f2Q', model, *self.player.get_offset_coord((2, 0, 0)), 0, 0, 1)
+        return Vehicle(handle, self)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""
         car = self.spawn_choosed_vehicle()
         if car:
-            self.script_call('TASK_WARP_CHAR_INTO_CAR_AS_DRIVER', '3L', self.player.handle, car.handle, 0, sync=False)
+            self.script_call('TASK_WARP_PED_INTO_VEHICLE', '3Q', self.player.handle, car.handle, 0, sync=False)
 
-    def create_fire(self, coord, numGenerationsAllowed=0, strength=1):
+    def create_fire(self, coord, maxChildren=10, isGasFire=1):
         """生成火焰"""
-        return self.native_call('START_SCRIPT_FIRE', '3f2L', *coord, numGenerationsAllowed, strength)
+        return self.native_call('START_SCRIPT_FIRE', '3f2Q', *coord, maxChildren, isGasFire)
 
     def delete_fire(self, fire):
         """熄灭生成的火焰"""
-        self.native_call('REMOVE_SCRIPT_FIRE', 'L', fire)
+        self.native_call('REMOVE_SCRIPT_FIRE', 'Q', fire)
 
-    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=True, fCameraShake=0):
+    def create_explosion(self, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=True, fCameraShake=0):
         """产生爆炸"""
-        self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
+        self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
-        self.native_call('ACTIVATE_SAVE_MENU', None)
+        self.native_call('SET_SAVE_MENU_ACTIVE', 'Q', 1)
 
     def near_peds_to_front(self, _=None):
         super().near_peds_to_front(zinc=6)
@@ -607,4 +593,5 @@ class Tool(BaseGTATool):
 
     def freeze_timer(self, _=None, freeze=True):
         """停止计时"""
-        self.script_call('FREEZE_ONSCREEN_TIMER', 'L', freeze)
+        pass
+        # self.script_call('FREEZE_ONSCREEN_TIMER', 'L', freeze)

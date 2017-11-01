@@ -21,7 +21,8 @@ class NativeContext(NativeContext):
     def reset(self):
         self.m_nArgCount = 0
         self.m_nDataCount = 0
-        self.fflag.clear()
+        for i in range(4):
+            self.fflag[i] = 0
 
     def push(self, signature, *args):
         """压入参数"""

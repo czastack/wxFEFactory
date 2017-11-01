@@ -62,56 +62,53 @@ class NativeEntity(NativeModel):
     EXPLOSION_TYPE_CAR = 4
     EXPLOSION_TYPE_PLANE = 5
 
+    getter, getter_ptr, setter = NativeModel.builders
+
     # 朝向
-    heading = property(NativeModel.getter('GET_ENTITY_HEADING', float), NativeModel.setter('SET_ENTITY_HEADING', float))
+    heading = property(getter('GET_ENTITY_HEADING', float), setter('SET_ENTITY_HEADING', float))
     # 无敌
-    invincible = property(None, NativeModel.setter('SET_ENTITY_INVINCIBLE', bool))
+    invincible = property(None, setter('SET_ENTITY_INVINCIBLE', bool))
     existed = property(getter('DOES_ENTITY_EXIST', bool))
-    hp = property(getter('GET_ENTITY_HEALTH'), setter('SET_ENTITY_HEALTH'))
+    hp = property(getter('GET_ENTITY_HEALTH'))
 
     @hp.setter
     def hp(self, value):
-        value = int(value) + 100
+        value = int(value)
+        if value < 100:
+            value = 100
         self.native_call('SET_ENTITY_HEALTH', '2Q', self.handle, value)
 
     @property
     def coord(self):
         self.native_call('GET_ENTITY_COORDS', 'Q', self.handle)
-        values = self.native_context.get_vector_result()
+        values = self.native_context.get_vector_result(8)
         return utils.CoordData(self, values)
 
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        self.script_call('SET_ENTITY_COORDS', 'Q3f', self.handle, *pos, sync=False)
+        self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *pos, True, True, True, False, sync=False)
 
     def get_offset_coord(self, offset):
         self.native_call('GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS', 'Q3f', self.handle, *offset)
-        return self.native_context.get_vector_result()
+        return self.native_context.get_vector_result(8)
 
     @property
     def speed(self):
-        values = self.mgr.get_move_speed(self.addr)
+        self.native_call('GET_ENTITY_VELOCITY', 'Q', self.handle)
+        values = self.native_context.get_vector_result(8)
         return utils.VectorField(self, values, 'speed')
 
     @speed.setter
     def speed(self, value):
-        self.mgr.set_move_speed(self.addr, value)
-
-    # 前进速度
-    forard_speed = property(getter('GET_ENTITY_SPEED', float))
-
-    # 速度?
-    def speed_vector(self):
-        self.native_call('GET_ENTITY_SPEED_VECTOR', 'Q', self.handle)
-        return self.native_context.get_vector_result()
+        self.native_call('SET_ENTITY_VELOCITY', 'Q3f', self.handle, *value)
 
     # model hash
     model_id = property(getter('GET_ENTITY_MODEL'))
 
     @property
     def model(self):
-        return IVModel(self.model_hash, self.mgr)
+        return IVModel(self.model_id, self.mgr)
 
     # 是否能被破坏
     can_be_damaged = property(None, setter('SET_ENTITY_CAN_BE_DAMAGED', bool))
@@ -192,6 +189,8 @@ class NativeEntity(NativeModel):
 
     get_offset_coord = get_offset_coord_m
 
+    del getter, getter_ptr, setter
+
 
 class Player(NativeEntity):
     # SIZE = 0xf00
@@ -255,6 +254,7 @@ class Player(NativeEntity):
     @wanted_level.setter
     def wanted_level(self, level):
         level = int(level)
+        if level > 0:
             self.native_call('SET_PLAYER_WANTED_LEVEL', '2Q', self.index, level)
         else:
             self.native_call('CLEAR_PLAYER_WANTED_LEVEL', 'Q', self.index)
@@ -449,7 +449,7 @@ class Vehicle(NativeEntity):
 
     @property
     def name(self):
-        addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'Q', self.model_hash)
+        addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'Q', self.model_id)
         data = self.mgr.handler.read(addr, bytes, 16)
         return data[:data.find(b'\x00')].decode()
 
@@ -589,7 +589,7 @@ class Blip(NativeModel):
     def coord(self):
         ctx = self.native_context
         self.script_call('GET_BLIP_COORDS', 'Q', self.handle)
-        return ctx.get_vector_result()
+        return ctx.get_vector_result(8)
 
     @property
     def entity(self):

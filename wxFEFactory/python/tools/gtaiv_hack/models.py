@@ -216,7 +216,7 @@ class Player(NativeEntity):
     SIZE = 0xf00
     WEAPON_SLOT = 13
 
-    getter, getter_ptr, setter = NativeEntity.builders
+    getter, getter_ptr, setter = NativeModel.builders
 
     def __init__(self, index, handle, mgr):
         super().__init__(handle, mgr)
@@ -470,7 +470,7 @@ class WeaponItem:
 class Vehicle(NativeEntity):
     SIZE = 0x20d0
     
-    getter, getter_ptr, setter = NativeEntity.builders
+    getter, getter_ptr, setter = NativeModel.builders
 
     @property
     def index(self):
@@ -673,7 +673,7 @@ class Vehicle(NativeEntity):
 
 
 class IVModel(NativeModel):
-    getter, getter_ptr, setter = NativeEntity.builders
+    getter, getter_ptr, setter = NativeModel.builders
 
     is_bike = property(getter("IS_THIS_MODEL_A_BIKE", bool))
     is_boat = property(getter("IS_THIS_MODEL_A_BOAT", bool))
