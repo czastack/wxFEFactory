@@ -87,6 +87,11 @@ class NativeContext(Model):
         """获取调用结果"""
         return self.handler.read(self.m_pReturn, type, size)
 
+    def get_vector_result(self):
+        r = self.handler.readFloat
+        addr = self.m_pReturn
+        return (r(addr), r(addr + 4), r(addr + 8))
+
     def reset(self):
         self.m_nArgCount = 0
 

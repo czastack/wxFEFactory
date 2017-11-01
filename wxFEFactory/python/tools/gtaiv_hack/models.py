@@ -127,7 +127,7 @@ class NativeModel:
 
     def getter_ptr(name, ret_type=int, ret_size=4):
         def getter(self):
-            self.native_call(name, 'LL', self.handle, self.native_context.get_temp_addr())
+            self.native_call(name, '2L', self.handle, self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
@@ -229,7 +229,7 @@ class Player(NativeEntity):
 
     def player_getter_ptr(name, ret_type=int, ret_size=4):
         def getter(self):
-            self.native_call(name, 'LL', self.index, self.native_context.get_temp_addr())
+            self.native_call(name, '2L', self.index, self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
@@ -273,7 +273,7 @@ class Player(NativeEntity):
             value = 0
         else:
             value -= self.money
-        self.native_call('ADD_SCORE', 'LL', self.index, value)
+        self.native_call('ADD_SCORE', '2L', self.index, value)
 
     gravity = property(getter('GET_CHAR_GRAVITY', float), setter('SET_CHAR_GRAVITY', float))
     # 朝向
@@ -291,7 +291,7 @@ class Player(NativeEntity):
     def wanted_level(self, level):
         level = int(level)
         if level > 0:
-            self.native_call('ALTER_WANTED_LEVEL', 'LL', self.index, level)
+            self.native_call('ALTER_WANTED_LEVEL', '2L', self.index, level)
         else:
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
         self.script_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index, sync=False)
@@ -307,7 +307,7 @@ class Player(NativeEntity):
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CHAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
+        self.native_call('GET_CHAR_COORDINATES', '4L', self.handle, *ctx.get_temp_addrs(1, 3))
         values = ctx.get_temp_values(1, 3, float, mapfn=float32)
         return utils.CoordData(self, values)
 
@@ -342,12 +342,12 @@ class Player(NativeEntity):
     # 武器相关
     # ----------------------------------------------------------------------
     def give_weapon(self, weapon, ammo):
-        self.native_call('GIVE_WEAPON_TO_CHAR', 'L3L', self.handle, weapon, ammo, 0)
+        self.native_call('GIVE_WEAPON_TO_CHAR', '4L', self.handle, weapon, ammo, 0)
 
     def get_weapon_in_slot(self, slot):
         """获取指定武器槽中的武器种类和弹药数"""
         ctx = self.native_context
-        self.native_call('GET_CHAR_WEAPON_IN_SLOT', 'L4L', self.handle, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
+        self.native_call('GET_CHAR_WEAPON_IN_SLOT', '5L', self.handle, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
         return (
             ctx.get_temp_value(1), # weapon_type
             ctx.get_temp_value(2), # ammo
@@ -360,17 +360,17 @@ class Player(NativeEntity):
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""
         ctx = self.native_context
-        self.native_call('GET_AMMO_IN_CHAR_WEAPON', 'L2L', self.handle, weapon, ctx.get_temp_addr())
+        self.native_call('GET_AMMO_IN_CHAR_WEAPON', '3L', self.handle, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
         
     def set_ammo(self, weapon, ammo):
         """设置指定武器的弹药数"""
-        self.native_call('SET_CHAR_AMMO', 'L2L', self.handle, weapon, ammo)
+        self.native_call('SET_CHAR_AMMO', '3L', self.handle, weapon, ammo)
 
     def get_max_ammo(self, weapon):
         """获取指定武器的最大弹药数"""
         ctx = self.native_context
-        self.native_call('GET_MAX_AMMO', 'L2L', self.handle, weapon, ctx.get_temp_addr())
+        self.native_call('GET_MAX_AMMO', '3L', self.handle, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
 
     def max_ammo(self):
@@ -390,7 +390,7 @@ class Player(NativeEntity):
     @weapon.setter
     def weapon(self, weapon):
         """设置当前武器种类"""
-        self.native_call('SET_CURRENT_CHAR_WEAPON', 'L2L', self.handle, weapon, 1)
+        self.native_call('SET_CURRENT_CHAR_WEAPON', '3L', self.handle, weapon, 1)
 
     @lazy
     def weapons(self):
@@ -519,7 +519,7 @@ class Vehicle(NativeEntity):
     @property
     def coord(self):
         ctx = self.native_context
-        self.native_call('GET_CAR_COORDINATES', 'L3L', self.handle, *ctx.get_temp_addrs(1, 3))
+        self.native_call('GET_CAR_COORDINATES', '4L', self.handle, *ctx.get_temp_addrs(1, 3))
         values = ctx.get_temp_values(1, 3, float, mapfn=float32)
         return utils.CoordData(self, values)
 
@@ -535,7 +535,7 @@ class Vehicle(NativeEntity):
     @property
     def quaternion(self):
         ctx = self.native_context
-        self.native_call('GET_VEHICLE_QUATERNION', 'L4L', self.handle, *ctx.get_temp_addrs(1, 4))
+        self.native_call('GET_VEHICLE_QUATERNION', '5L', self.handle, *ctx.get_temp_addrs(1, 4))
         values = ctx.get_temp_values(1, 4, float, mapfn=float32)
         return utils.VectorField(self, values, 'quaternion')
 
@@ -565,10 +565,6 @@ class Vehicle(NativeEntity):
 
     is_on_fire = property(getter('IS_CAR_ON_FIRE', bool))
 
-    # @is_on_fire.setter
-    # def is_on_fire(self, value):
-    #     self.native_call('START_CAR_FIRE' if value else 'EXTINGUISH_CAR_FIRE', 'L', self.handle)
-
     door_status = property(getter_ptr('GET_CAR_DOOR_LOCK_STATUS'), setter('LOCK_CAR_DOORS'))
 
     def lock_door(self):
@@ -580,7 +576,7 @@ class Vehicle(NativeEntity):
 
     @property
     def driver(self):
-        self.native_call('GET_DRIVER_OF_CAR', 'LL', self.handle, self.native_context.get_temp_addr())
+        self.native_call('GET_DRIVER_OF_CAR', '2L', self.handle, self.native_context.get_temp_addr())
         ped_handle = self.native_context.get_temp_value()
         return Player(0, ped_handle, self.mgr) if ped_handle else None
 
@@ -593,22 +589,22 @@ class Vehicle(NativeEntity):
     @property
     def colors(self):
         ctx = self.native_context
-        self.native_call('GET_CAR_COLOURS', 'L2L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
+        self.native_call('GET_CAR_COLOURS', '3L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
         return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
 
     @colors.setter
     def colors(self, value):
-        self.native_call('CHANGE_CAR_COLOUR', 'L2f', self.handle, *value)
+        self.native_call('CHANGE_CAR_COLOUR', '3L', self.handle, *value)
 
     @property
     def ext_colors(self):
         ctx = self.native_context
-        self.native_call('GET_EXTRA_CAR_COLOURS', 'L2L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
+        self.native_call('GET_EXTRA_CAR_COLOURS', '3L', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
         return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
 
     @colors.setter
     def ext_colors(self, value):
-        self.native_call('SET_EXTRA_CAR_COLOURS', 'L2f', self.handle, *value)
+        self.native_call('SET_EXTRA_CAR_COLOURS', '3L', self.handle, *value)
 
     @property
     def color(self):
@@ -656,7 +652,7 @@ class Vehicle(NativeEntity):
 
     def wash(self):
         self.dirtyness = 0
-        self.native_call('WASH_VEHICLE_TEXTURES', 'LL', self.handle, 255)
+        self.native_call('WASH_VEHICLE_TEXTURES', '2L', self.handle, 255)
 
     def fix(self):
         self.native_call('FIX_CAR', 'L', self.handle)
@@ -740,7 +736,7 @@ class Blip(NativeModel):
     @property
     def coord(self):
         ctx = self.native_context
-        self.script_call('GET_BLIP_COORDS', 'LL', self.handle, ctx.get_temp_addr(3), ret_type=None)
+        self.script_call('GET_BLIP_COORDS', '2L', self.handle, ctx.get_temp_addr(3), ret_type=None)
         return ctx.get_temp_values(3, 1, float, mapfn=float32)
 
     @property

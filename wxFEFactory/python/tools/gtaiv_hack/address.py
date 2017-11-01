@@ -25,8 +25,8 @@ VERSION_DEPEND = {
         'FindNativeAddress'    : 0x00617280,
         'SetMoveSpeed'         : 0x0, # TODO
         'GetMoveSpeed'         : 0x0, # TODO
-        'SetTurnSpeed':        : 0x0, # TODO
-        'GetTurnSpeed':        : 0x0, # TODO
+        'SetTurnSpeed'         : 0x0, # TODO
+        'GetTurnSpeed'         : 0x0, # TODO
         'CClock__Hour'         : 0x0, # TODO
     },
     VERSION_107: {
@@ -39,8 +39,8 @@ VERSION_DEPEND = {
         'FindNativeAddress'    : 0x005A76D0,
         'SetMoveSpeed'         : 0x00A47750,
         'GetMoveSpeed'         : 0x00A477F0,
-        'SetTurnSpeed':        : 0x00A47840,
-        'GetTurnSpeed':        : 0x00A478E0,
+        'SetTurnSpeed'         : 0x00A47840,
+        'GetTurnSpeed'         : 0x00A478E0,
         'SetTimeOfDay'         : 0x00821200,
         'TimeOfDay'            : 0x011E8F0C,
         'CClock__Hour'         : 0x011D5300,
@@ -59,8 +59,8 @@ VERSION_DEPEND = {
         'FindNativeAddress'    : 0x004CF760,
         'SetMoveSpeed'         : 0x00A7C040,
         'GetMoveSpeed'         : 0x00A7C0E0,
-        'SetTurnSpeed':        : 0x00A7C130,
-        'GetTurnSpeed':        : 0x00A7C1D0,
+        'SetTurnSpeed'         : 0x00A7C130,
+        'GetTurnSpeed'         : 0x00A7C1D0,
         'SetTimeOfDay'         : 0x00846970,
         'TimeOfDay'            : 0x010A4EA8,
         'CClock__Hour'         : 0x010C9398,
