@@ -124,29 +124,21 @@ protected:
 };
 
 
-using AuiMDIChildFrame = BaseWindow<wxAuiMDIChildFrame>;
-
-
 class AuiMDIParentFrame : public BaseFrame {
 public:
 	template <class... Args>
-	AuiMDIParentFrame(wxcstr title, MenuBar *menuBar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
+	AuiMDIParentFrame(wxcstr title, MenuBar *menubar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
 	{
 		bindElem(new wxAuiMDIParentFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
-		if (menuBar)
+		if (!menubar)
 		{
-			setMenu(*menuBar);
+			menubar = new MenuBar(None);
 		}
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		setMenu(*menubar);
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIParentFrame::onClose, this);
 		m_onclose = None;
 
 		m_mgr = new wxAuiManager(m_elem);
-	}
-
-	virtual ~AuiMDIParentFrame()
-	{
-		m_mgr->UnInit();
-		delete m_mgr;
 	}
 
 	wxAuiMDIParentFrame& win() const
@@ -163,10 +155,32 @@ public:
 			notebook->DeleteAllPages();
 		}
 
+		m_mgr->UnInit();
+		delete m_mgr;
+
 		BaseFrame::onClose(event);
 	}
 
 
 protected:
 	wxAuiManager *m_mgr;
+};
+
+
+class AuiMDIChildFrame : public BaseTopLevelWindow
+{
+public:
+	template <class... Args>
+	AuiMDIChildFrame(wxcstr title, long exstyle, Args ...args) : BaseTopLevelWindow(args...)
+	{
+		wxAuiMDIParentFrame *parent = (wxAuiMDIParentFrame*)getActiveWindow();
+		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIChildFrame::onClose, this);
+		m_onclose = None;
+	}
+
+	void __exit__(py::args &args) override
+	{
+		Layout::__exit__(args);
+	}
 };

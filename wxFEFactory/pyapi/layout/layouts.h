@@ -164,14 +164,13 @@ public:
 };
 
 
-template<class T>
-class BaseWindow : public BaseFrame
+class Window : public BaseFrame
 {
 public:
 	template <class... Args>
-	BaseWindow(wxcstr title, MenuBar *menubar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
+	Window(wxcstr title, MenuBar *menubar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new T(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
 		if (menubar)
 		{
 			setMenu(*menubar);
@@ -180,9 +179,6 @@ public:
 		m_onclose = None;
 	}
 };
-
-
-using Window = BaseWindow<wxFrame>;
 
 
 class MDIParentFrame : public BaseFrame
@@ -197,7 +193,7 @@ public:
 			menubar = new MenuBar(None);
 		}
 		setMenu(*menubar);
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIParentFrame::onClose, this);
 		m_onclose = None;
 	}
 };
@@ -215,7 +211,7 @@ public:
 		{
 			setMenu(*menubar);
 		}
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIChildFrame::onClose, this);
 		m_onclose = None;
 	}
 };

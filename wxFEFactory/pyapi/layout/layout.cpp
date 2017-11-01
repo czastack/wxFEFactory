@@ -102,15 +102,14 @@ void init_layout(py::module &m)
 	py::class_t<AuiMDIParentFrame, BaseFrame>(layout, "AuiMDIParentFrame")
 		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
 
-	py::class_t<AuiMDIChildFrame, BaseFrame>(layout, "AuiMDIChildFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+	py::class_t<AuiMDIChildFrame, BaseTopLevelWindow>(layout, "AuiMDIChildFrame")
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_exstyle_a, styles, className, style);
 
 	py::class_t<HotkeyWindow, Window>(layout, "HotkeyWindow")
-		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(),
-			label, "menuBar"_a=nullptr, "exstyle"_a=(long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), styles, className, style)
+		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style)
 		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
 		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
-		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
+		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a=false)
 		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
 
 	py::class_t<Dialog, BaseTopLevelWindow>(layout, "Dialog")
@@ -166,7 +165,6 @@ void init_layout(py::module &m)
 		.def("setPageText", &Notebook::setPageText)
 		.def("getPageText", &Notebook::getPageText)
 		.def_property("index", &Notebook::getSelection, &Notebook::setSelection);
-
 
 
 	// controls
