@@ -23,6 +23,10 @@ win_style = {
 class BaseGTATool(BaseTool):
     nested = True
     NativeContext = NativeContext
+    RAISE_UP_SPEED = 1.0
+    GO_DOWN_SPEED = 0.5
+    TO_UP_DELTA = 10
+    TO_DOWN_DELTA = 6
 
     FUNCTION_NATIVE_CALL = (
         b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x8B\x56\x08\x8B\x02\x8B\x7A\x04\x83\x46\x04\xFE\x8B\x4E\x04\x41\x89\x45'
@@ -147,8 +151,15 @@ class BaseGTATool(BaseTool):
         :param this: this指针，为0则为普通函数
         :param arg_sign: 参数签名
         """
-        return self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
-            self.native_context.fflag, addr, this, *args, ret_type=ret_type, ret_size=ret_size)
+        self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
+            self.native_context.fflag, addr, this, *args, ret_type=None, ret_size=ret_size)
+        # 获取结果
+        if ret_type is int:
+            return self.handler.readUint(self.native_context.m_pReturn, ret_size)
+        elif ret_type is float:
+            if ret_size is 8:
+                return self.handler.readDouble(self.native_context.m_pReturn + 16)
+            return self.handler.readFloat(self.native_context.m_pReturn + 8)
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)
@@ -225,6 +236,14 @@ class BaseGTATool(BaseTool):
         coord[1] += yVal * 5
         return coord
 
+    def get_cam_front_coord(self):
+        """根据摄像机朝向获取前面一点的坐标"""
+        rot = self.get_camera_rot()
+        coord = self.player.coord.values()
+        coord[0] += rot[0] * 5
+        coord[1] += rot[1] * 5
+        return coord
+
     def go_forward(self, _=None, rate=0):
         """前进"""
         rate = rate or self.GO_FORWARD_COORD_RATE
@@ -260,21 +279,21 @@ class BaseGTATool(BaseTool):
             time.sleep(0.1)
         entity.speed = speed
 
-    def raise_up(self, _=None, speed=1.0):
+    def raise_up(self, _=None, speed=0):
         """上天（有速度）"""
-        self.entity.speed[2] = speed
+        self.entity.speed[2] = speed or self.RAISE_UP_SPEED
 
-    def go_down(self, _=None, speed=0.5):
+    def go_down(self, _=None, speed=0):
         """向下（有速度）"""
-        self.entity.speed[2] = -speed
+        self.entity.speed[2] = -(speed or self.GO_DOWN_SPEED)
 
-    def to_up(self, _=None):
+    def to_up(self, _=None, delta=0):
         """往上（无速度）"""
-        self.entity.coord[2] += 10
+        self.entity.coord[2] += delta or self.TO_UP_DELTA
 
-    def to_down(self, _=None):
+    def to_down(self, _=None, delta=0):
         """向下（无速度）"""
-        self.entity.coord[2] -= 6
+        self.entity.coord[2] -= delta or self.TO_DOWN_DELTA
 
     def stop(self, _=None):
         """停止移动"""
@@ -643,10 +662,11 @@ class BaseGTATool(BaseTool):
 
         cam_x, cam_y, cam_z = self.get_camera_rot()
         coord_up = getattr(self, 'SLING_COORD_UP', 1)
+        coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
         coord = self.player.coord.values()
-        coord[0] += cam_x * 5
-        coord[1] += cam_y * 5
-        coord[2] += cam_z * 5 + coord_up
+        coord[0] += cam_x * coord_delta
+        coord[1] += cam_y * coord_delta
+        coord[2] += cam_z * coord_delta + coord_up
         speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
         speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
         vehicle.stop()
@@ -674,6 +694,12 @@ class BaseGTATool(BaseTool):
         fn = getattr(self, 'hotkey_cfn', None)
         if fn:
             fn()
+
+    def toggle_setting(self, name, default=False):
+        """切换设置"""
+        toggle = not getattr(self, name, default)
+        setattr(self, name, toggle)
+        return toggle
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
@@ -788,6 +814,7 @@ class BaseGTATool(BaseTool):
             ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
             ('explode_art', MOD_ALT, getVK('`'), self.explode_art),
             ('explode_art_long', MOD_ALT | MOD_SHIFT, getVK('`'), partial(self.explode_art, count=24)),
+            ('explode_art_one', MOD_ALT, getVK('q'), partial(self.explode_art, count=1)),
             ('teleport_to_destination', MOD_ALT, getVK('1'), self.teleport_to_destination),
             ('spawn_vehicle_id_prev', MOD_ALT, getVK('['), self.spawn_vehicle_id_prev),
             ('spawn_vehicle_id_next', MOD_ALT, getVK(']'), self.spawn_vehicle_id_next),

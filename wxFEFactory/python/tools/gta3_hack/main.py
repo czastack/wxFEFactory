@@ -59,7 +59,7 @@ class Tool(BaseGTA3Tool):
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(1, 13):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player))
+                self.weapon_views.append(WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 

@@ -12,6 +12,21 @@ def headingToDirection(heading):
     heading = degreeToRadian(heading)
     return -math.sin(heading), math.cos(heading)
 
+def get_vertical_vector(v):
+    """获取一个垂直的向量"""
+    length = len(v)
+    for i in range(length):
+        if v[i]:
+            break
+    else:
+        # 0向量
+        pass
+
+    a = v[i]
+    result = [1] * length
+    result[i] = -(sum(v) - a) / a
+    return result
+
 
 class Vector:
     def __init__(self, values):
@@ -29,10 +44,50 @@ class Vector:
     def __iter__(self):
         return iter(self._values)
 
+    def __add__(self, value):
+        if hasattr(value, '__iter__'):
+            return self.__class__(self[i] + it for i, it in enumerate(value))
+        else:
+            return self.__class__(it + value for it in self)
+
+    def __iadd__(self, value):
+        if hasattr(value, '__iter__'):
+            for i, it in enumerate(value):
+                self[i] += it
+        else:
+            for i in range(self.len):
+                self[i] += value
+        return self
+
+    def __mul__(self, value):
+        if hasattr(value, '__iter__'):
+            return self.__class__(self[i] * it for i, it in enumerate(value))
+        else:
+            return self.__class__(it * value for it in self)
+
+    def __imul__(self, value):
+        if hasattr(value, '__iter__'):
+            for i, it in enumerate(value):
+                self[i] *= it
+        else:
+            for i in range(self.len):
+                self[i] *= value
+        return self
+
+    def __len__(self):
+        """向量维度"""
+        return len(self._values)
+
+    def __str__(self):
+        return str(self._values)
+
+    def __repr__(self):
+        return self.__class__.__name__ + str(tuple(self._values))
+
     @property
     def len(self):
         """向量维度"""
-        return len(self._values)
+        return self.__len__()
 
     @property
     def length(self):
@@ -59,24 +114,41 @@ class Vector:
             obj[self.i] = value
 
 
-class Vector3(Vector):
-    def __init__(self, values=(0.0, 0.0, 0.0)):
-        if len(values) is not 3:
-            raise ValueError('Vector3 need 3 element values')
+class Vector2(Vector):
+    x = Vector.Item(0)
+    y = Vector.Item(1)
+
+    def __init__(self, values=(0.0, 0.0)):
         Vector.__init__(self, values)
 
+    def get_vetical_xy(self):
+        """获取xy面上垂直的向量"""
+        v1 = Vector2(get_vertical_vector((self.x, self.y)))
+        v2 = Vector2(v1)
+        v2 *= -1
+        return v1, v2
+
+
+class Vector3(Vector):
     x = Vector.Item(0)
     y = Vector.Item(1)
     z = Vector.Item(2)
 
+    def __init__(self, values=(0.0, 0.0, 0.0)):
+        Vector.__init__(self, values)
+        if self.len is not 3:
+            raise ValueError('Vector3 need 3 element values')
+
+    get_vetical_xy = Vector2.get_vetical_xy
+
 
 class Quaternion(Vector3):
+    w = Vector.Item(3)
+
     def __init__(self, values=(0.0, 0.0, 0.0, 0.0)):
         if len(values) is not 4:
             raise ValueError('Quaternion need 4 element values')
         Vector.__init__(self, values)
-
-    w = Vector.Item(3)
 
     def to_rotation(self):
         x, y, z, w = self
@@ -137,6 +209,10 @@ class Quaternion(Vector3):
 
 
 class VectorField(Vector):
+    x = Vector.Item(0)
+    y = Vector.Item(1)
+    z = Vector.Item(2)
+
     def __init__(self, obj, values, name):
         super().__init__(values)
         self.obj = obj
@@ -145,10 +221,6 @@ class VectorField(Vector):
     def __setitem__(self, i, value):
         super().__setitem__(i, value)
         setattr(self.obj, self.name, self._values)
-
-    x = Vector.Item(0)
-    y = Vector.Item(1)
-    z = Vector.Item(2)
 
 
 class CoordData(VectorField):

@@ -3,7 +3,6 @@ from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
-from .data import COLOR_LIST
 import math
 import time
 

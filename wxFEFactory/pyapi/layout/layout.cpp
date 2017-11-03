@@ -10,6 +10,7 @@
 #include "aui.h"
 #include "bars.hpp"
 #include "console.h"
+#include "thread.h"
 
 void setConsoleElem(TextInput &input, TextInput &output)
 {
@@ -405,6 +406,10 @@ void init_layout(py::module &m)
 		.def_init(py::init<pyobj, pyobj>(), className, style)
 		.def("appendColumns", &ListView::appendColumns)
 		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a = -1, "create"_a = true);
+
+	py::class_<PyThread>(layout, "Thread")
+		.def(py::init<pyobj, DWORD>(), "fn"_a, "delay"_a=0)
+		.def("Run", &PyThread::Run);
 
 
 	// °´¼üÊÂ¼þ

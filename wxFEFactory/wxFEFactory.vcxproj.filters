@@ -192,6 +192,9 @@
     <ClInclude Include="pyapi\layout\bitmap.h">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
+    <ClInclude Include="pyapi\layout\thread.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">

@@ -60,7 +60,7 @@ class Tool(BaseGTA3Tool):
             self.weapon_views = []
             for i in range(11):
                 self.weapon_views.append(
-                    WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self._player, self.on_weapon_change)
+                    WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self.on_weapon_change)
                 )
 
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):

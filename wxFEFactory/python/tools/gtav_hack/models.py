@@ -3,7 +3,6 @@ from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
-from .data import COLOR_LIST
 import math
 import time
 
@@ -20,6 +19,10 @@ class NativeModel:
     @property
     def native_call(self):
         return self.mgr.native_call
+
+    @property
+    def native_call_vector(self):
+        return self.mgr.native_call_vector
 
     @property
     def script_call(self):
@@ -80,28 +83,35 @@ class NativeEntity(NativeModel):
 
     @property
     def coord(self):
-        self.native_call('GET_ENTITY_COORDS', 'Q', self.handle)
-        values = self.native_context.get_vector_result(8)
+        values = self.native_call_vector('GET_ENTITY_COORDS', 'Q', self.handle)
         return utils.CoordData(self, values)
 
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
         self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *pos, True, True, True, False, sync=False)
+        time.sleep(0.2)
 
     def get_offset_coord(self, offset):
-        self.native_call('GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS', 'Q3f', self.handle, *offset)
-        return self.native_context.get_vector_result(8)
+        return self.native_call_vector('GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS', 'Q3f', self.handle, *offset)
 
     @property
     def speed(self):
-        self.native_call('GET_ENTITY_VELOCITY', 'Q', self.handle)
-        values = self.native_context.get_vector_result(8)
+        values = self.native_call_vector('GET_ENTITY_VELOCITY', 'Q', self.handle)
         return utils.VectorField(self, values, 'speed')
 
     @speed.setter
     def speed(self, value):
         self.native_call('SET_ENTITY_VELOCITY', 'Q3f', self.handle, *value)
+
+    @property
+    def turn_speed(self):
+        values = self.native_call_vector('GET_ENTITY_ROTATION_VELOCITY', 'Q', self.handle)
+        return utils.VectorField(self, values, 'turn_speed')
+
+    @speed.setter
+    def turn_speed(self, value):
+        self.native_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value, 0, 0, 0, True, False, True, True, True, True)
 
     # model hash
     model_id = property(getter('GET_ENTITY_MODEL'))
@@ -170,6 +180,7 @@ class NativeEntity(NativeModel):
 
     def stop(self):
         self.speed = (0, 0, 0)
+        self.turn_speed = (0, 0, 0)
 
     def freeze_position(self, value=True):
         """冻结位置"""
@@ -234,6 +245,7 @@ class Player(NativeEntity):
     def addr(self):
         return self.mgr.ped_pool.addr_at(self.ped_index)
 
+    is_player = property(getter('IS_PED_A_PLAYER'))
     ap = property(getter('GET_PED_ARMOUR'), setter('SET_PED_ARMOUR'))
     max_health = property(getter('GET_PED_MAX_HEALTH'), setter('SET_PED_MAX_HEALTH'))
     max_armor = property(player_getter('GET_PLAYER_MAX_ARMOUR'), player_setter('SET_PLAYER_MAX_ARMOUR'))
@@ -287,11 +299,15 @@ class Player(NativeEntity):
     # 武器相关
     # ----------------------------------------------------------------------
     def give_weapon(self, weapon, ammo, equipNow=True):
-        self.native_call('GIVE_WEAPON_TO_PED', '5Q', self.handle, weapon, ammo, 0, equipNow)
+        self.script_call('GIVE_WEAPON_TO_PED', '5Q', self.handle, weapon, ammo, 0, equipNow)
 
     def get_weapon_in_slot(self, slot):
         """获取指定武器槽中的武器种类"""
         return self.native_call('GET_PED_WEAPONTYPE_IN_SLOT', '2Q', self.handle, slot)
+
+    def remove_weapon(self, weapon):
+        """移除指定武器"""
+        self.script_call('REMOVE_WEAPON_FROM_PED', '2Q', self.handle, weapon)
 
     def remove_all_weapons(self, toggle=True):
         """移除所有武器"""
@@ -299,19 +315,20 @@ class Player(NativeEntity):
         
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""
-        ctx = self.native_context
-        self.native_call('GET_AMMO_IN_CLIP', '3Q', self.handle, weapon, ctx.get_temp_addr())
-        return ctx.get_temp_value()
+        return self.native_call('GET_AMMO_IN_PED_WEAPON', '2Q', self.handle, weapon)
         
     def set_ammo(self, weapon, ammo):
         """设置指定武器的弹药数"""
-        self.native_call('SET_AMMO_IN_CLIP', '3Q', self.handle, weapon, ammo)
+        self.native_call('SET_PED_AMMO', '3Q', self.handle, weapon, ammo)
 
     def get_max_ammo(self, weapon):
         """获取指定武器的最大弹药数"""
         ctx = self.native_context
         self.native_call('GET_MAX_AMMO', '3Q', self.handle, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
+
+    def has_weapon(self, weapon):
+        return self.native_call('HAS_PED_GOT_WEAPON', '3Q', self.handle, weapon, 0)
 
     def max_ammo(self):
         """全部武器弹药全满"""
@@ -324,6 +341,14 @@ class Player(NativeEntity):
         """当前武器子弹全满"""
         self.set_ammo(self.weapon, 9999)
 
+    def set_infinite_ammo(self, weapon, toggle=True):
+        """无限弹药"""
+        self.native_call('SET_PED_INFINITE_AMMO', '3Q', self.handle, weapon, toggle)
+
+    def set_infinite_ammo_clip(self, toggle=True):
+        """全部武器无限弹药"""
+        self.native_call('SET_PED_INFINITE_AMMO_CLIP', '2Q', self.handle, toggle)
+
     # 当前武器种类
     weapon = property(getter_ptr('GET_CURRENT_PED_WEAPON'))
 
@@ -331,10 +356,6 @@ class Player(NativeEntity):
     def weapon(self, weapon):
         """设置当前武器种类"""
         self.native_call('SET_CURRENT_PED_WEAPON', '3Q', self.handle, weapon, 1)
-
-    @lazy
-    def weapons(self):
-        return WeaponSet(self, self.WEAPON_SLOT)
 
     def explode_head(self):
         """爆头"""
@@ -344,59 +365,15 @@ class Player(NativeEntity):
         """爆炸"""
         self.create_explosion(*args, **kwargs)
 
+    def as_enemy(self, toggle=True):
+        """变成敌人"""
+        self.native_call('SET_PED_AS_ENEMY', '2Q', self.handle, toggle)
+
+    def as_cop(self, toggle=True):
+        """变成敌人"""
+        self.native_call('SET_PED_AS_COP', '2Q', self.handle, toggle)
+
     del getter, getter_ptr, setter
-
-
-class WeaponSet:
-    def __init__(self, ped, size):
-        self.ped = ped
-        self.size = size
-
-    def __getitem__(self, i):
-        if i < 0 or i >= self.size:
-            print("not available i")
-            return
-        return WeaponItem(self.ped, i)
-
-    def __setitem__(self, i, item):
-        if i < 0 or i >= self.size:
-            print("not available i")
-            return
-        self[i].set(item)
-
-
-class WeaponItem:
-    def __init__(self, ped, slot):
-        self.ped = ped
-        self.slot = slot
-
-    @property
-    def data(self):
-        return self.ped.get_weapon_in_slot(self.slot), 0
-
-    @property
-    def id(self):
-        return self.data[0]
-
-    @property
-    def ammo(self):
-        return self.data[1]
-
-    @ammo.setter
-    def ammo(self, ammo):
-        self.ped.set_ammo(self.id, ammo)
-
-    def set(self, other):
-        if isinstance(other, WeaponItem):
-            # self.id = other.id
-            # self.ammo = other.ammo
-            id = other.id
-            ammo = other.ammo
-        elif isinstance(other, (tuple, list)):
-            # self.id, self.ammo = other
-            id, ammo = other
-
-        self.ped.give_weapon(id, ammo)
 
 
 class Vehicle(NativeEntity):
@@ -518,7 +495,7 @@ class Vehicle(NativeEntity):
         self.ext_colors = c1, c2
 
     def fix(self):
-        self.native_call('SET_VEHICLE_FIXED', 'Q', self.handle)
+        self.script_call('SET_VEHICLE_FIXED', 'Q', self.handle)
 
     def explode(self):
         """爆炸"""
@@ -555,6 +532,13 @@ class IVModel(NativeModel):
     def release(self):
         self.script_call('SET_MODEL_AS_NO_LONGER_NEEDED', 'Q', self.handle)
 
+    def get_dimensions(self):
+        ctx = self.native_context
+        self.native_call('GET_MODEL_DIMENSIONS', '3Q', self.handle, ctx.get_temp_addr(6), ctx.get_temp_addr(3))
+        v0 = ctx.get_temp_values(3, 1, float, mapfn=float32)
+        v1 = ctx.get_temp_values(6, 4, float, mapfn=float32)
+        return utils.Vector3(v0), utils.Vector3(v1)
+
     del getter, getter_ptr, setter
 
 
@@ -572,7 +556,7 @@ class Blip(NativeModel):
     BLIP_TYPE_CONTACT = 5          # FRIEND
     BLIP_TYPE_PICKUP = 6
 
-    BLIP_COLOR_ENEMY = 0x4
+    BLIP_COLOR_ENEMY = 1
     BLIP_COLOR_FRIEND = 0x9
 
     color = property(NativeModel.getter('GET_BLIP_COLOUR'), NativeModel.setter('SET_BLIP_COLOUR'))
@@ -587,9 +571,7 @@ class Blip(NativeModel):
 
     @property
     def coord(self):
-        ctx = self.native_context
-        self.script_call('GET_BLIP_COORDS', 'Q', self.handle)
-        return ctx.get_vector_result(8)
+        return utils.Vector3(self.native_call_vector('GET_BLIP_COORDS', 'Q', self.handle))
 
     @property
     def entity(self):

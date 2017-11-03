@@ -29,6 +29,7 @@ class Tool(BaseGTATool):
     Vehicle = Vehicle
     NativeContext = NativeContext
 
+    RAISE_UP_SPEED = 15
     SAFE_SPEED_RATE = 15
     SAFE_SPEED_UP = 6
     GO_FORWARD_COORD_RATE = 3
@@ -73,7 +74,7 @@ class Tool(BaseGTATool):
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(1, len(self.WEAPON_LIST)):
-                self.weapon_views.append(WeaponWidget("weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST, self._player))
+                self.weapon_views.append(WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
@@ -347,10 +348,6 @@ class Tool(BaseGTATool):
         self.native_call_auto(address.GetTurnSpeed, 'L', ctx.get_temp_addr(3), this=entity_addr)
         return tuple(ctx.get_temp_values(3, 1, float, mapfn=utils.float32))
 
-    def raise_up(self, _=None, speed=15):
-        """升高(有速度)"""
-        self.entity.speed[2] = speed
-
     def to_up(self, _=None):
         """升高(无速度)"""
         if self.isInVehicle:
@@ -515,11 +512,12 @@ class Tool(BaseGTATool):
         if blip:
             coord = list(blip.coord)
             # print(coord)
+            entity = self.entity
             if coord[0] != 0 or coord[1] != 0:
-                self.player.coord = coord
+                entity.coord = coord
                 if coord[2] == 0.0:
                     coord[2] = self.GetGroundZ(coord) or 16
-                self.player.coord = coord
+                entity.coord = coord
                 return True
 
     def get_camera_rot_raw(self):
@@ -531,9 +529,8 @@ class Tool(BaseGTATool):
         return tuple(ctx.get_temp_values(1, 3, float, mapfn=utils.float32))
 
     def get_camera_rot(self):
-        """ 获取摄像机参数
+        """ 获取摄像机朝向参数
         :return: (x分量, y分量, z方位角)
-        z: 平视为0
         """
         data = self.get_camera_rot_raw()
         rotz = degreeToRadian(data[2]) + math.pi / 2

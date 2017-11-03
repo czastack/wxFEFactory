@@ -194,6 +194,7 @@
     <ClInclude Include="pyapi\layout\layouts.h" />
     <ClInclude Include="pyapi\layout\layout.h" />
     <ClInclude Include="pyapi\layout\menu.h" />
+    <ClInclude Include="pyapi\layout\thread.h" />
     <ClInclude Include="pyapi\pybindext.h" />
     <ClInclude Include="pyapi\pyutils.h" />
     <ClInclude Include="pyapi\layout\bars.hpp" />
