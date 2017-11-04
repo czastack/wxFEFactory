@@ -458,41 +458,56 @@ class Tool(BaseGTATool):
         self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3fL', *pos, self.native_context.get_temp_addr())
         return self.native_context.get_temp_value(type=float)
 
-    def get_first_blip(self, blipType):
+    def get_first_blip(self, sprite):
         """获取指定类型的第一个标记"""
-        blip_id = self.native_call('GET_FIRST_BLIP_INFO_ID', 'L', blipType)
+        blip_id = self.native_call('GET_FIRST_BLIP_INFO_ID', 'L', sprite)
         if blip_id:
             return models.Blip(blip_id, self)
 
-    def get_next_blip(self, blipType):
+    def get_next_blip(self, sprite):
         """获取指定类型的下一个标记"""
-        blip_id = self.native_call('GET_NEXT_BLIP_INFO_ID', 'L', blipType)
+        blip_id = self.native_call('GET_NEXT_BLIP_INFO_ID', 'L', sprite)
         if blip_id:
             return models.Blip(blip_id, self)
 
-    def get_target_blips(self, color=None):
-        """获取目标的所有标记"""
-        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
+    def get_blips(self, sprites, color=None, types=None):
+        """根据sprite获取所有标记"""
+        check_blip = lambda blip: blip.blipType and (
+            (color is None or blip.color is color) and
+            (types is None or blipType in types) )
+
+        if isinstance(sprites, int):
+            sprites = (sprites,)
+
+        for i in sprites:
             blip = self.get_first_blip(i)
             if blip:
-                if color is None or blip.color == color:
+                if check_blip(blip):
                     yield blip
 
                 while True:
                     blip = self.get_next_blip(i)
                     if blip:
-                        if color is 0 or blip.color == color:
+                        if check_blip(blip):
                             yield blip
                     else:
                         break
+
+    def get_target_blips(self, color=None):
+        """获取目标的所有标记"""
+        return self.get_blips(range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1), color=color)
 
     def get_friends(self):
         """获取蓝色标记的peds"""
         return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_FRIEND)]
 
+    def get_enemy_blips(self):
+        """获取红色标记"""
+        return self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY)
+
     def get_enemys(self):
         """获取红色标记的peds"""
-        return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY)]
+        return [blip.entity for blip in self.get_enemy_blips()]
 
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""

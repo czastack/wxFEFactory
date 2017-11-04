@@ -88,8 +88,7 @@ class NativeEntity(NativeModel):
 
     @coord.setter
     def coord(self, value):
-        pos = tuple(value)
-        self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *pos, True, True, True, False, sync=False)
+        self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *value, True, True, True, False, sync=False)
         time.sleep(0.2)
 
     def get_offset_coord(self, offset):
@@ -546,8 +545,10 @@ class Blip(NativeModel):
     BLIP_DESTINATION = 0
     BLIP_DESTINATION_1 = 1
     BLIP_DESTINATION_2 = 2
+    BLIP_CIRCLE = 1
+    BLIP_COP = 3
     BLIP_WAYPOINT = 8
-    BLIP_BOSS = 93
+    BLIP_COPHELICOPTER = 15
 
     BLIP_TYPE_CAR = 1
     BLIP_TYPE_CHAR = 2             # ENEMY
@@ -571,7 +572,12 @@ class Blip(NativeModel):
 
     @property
     def coord(self):
-        return utils.Vector3(self.native_call_vector('GET_BLIP_COORDS', 'Q', self.handle))
+        values = self.native_call_vector('GET_BLIP_COORDS', 'Q', self.handle)
+        return utils.CoordData(self, values)
+
+    @coord.setter
+    def coord(self, value):
+        self.script_call('SET_BLIP_COORDS', 'Q3f', self.handle, *value)
 
     @property
     def entity(self):

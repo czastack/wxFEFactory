@@ -122,7 +122,7 @@ class Tool(BaseGTATool):
                 ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
                 ui.Button("敌人定住", onclick=self.enemys_freeze_position)
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
-                ui.Button("导弹攻击敌人", onclick=self.enemy_rocket_attack)
+                ui.Button("导弹攻击敌人", onclick=self.rocket_attack_enemy)
                 # ui.Button("停止计时", onclick=self.freeze_timer)
                 # ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
 
@@ -136,7 +136,7 @@ class Tool(BaseGTATool):
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
             ('shoot_vehicle_rocket', MOD_ALT, getVK(';'), self.shoot_vehicle_rocket),
             ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK(';'), partial(self.shoot_vehicle_rocket, count=3)),
-            ('enemy_rocket_attack', MOD_ALT, getVK("-"), self.enemy_rocket_attack),
+            ('rocket_attack_enemy', MOD_ALT, getVK("-"), self.rocket_attack_enemy),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):
@@ -422,8 +422,8 @@ class Tool(BaseGTATool):
 
     def enemys_make_fire(self, _=None):
         """敌人着火"""
-        for p in self.get_enemys():
-            p.make_fire()
+        for blip in self.get_enemy_blips():
+            self.create_fire(blip.coord)
 
     def enemys_explode_head(self, _=None):
         """敌人爆头"""
@@ -435,8 +435,8 @@ class Tool(BaseGTATool):
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""
-        for p in self.get_enemys():
-            p.create_explosion()
+        for blip in self.get_enemy_blips():
+            self.create_explosion(blip.coord)
 
     def enemys_remove_weapon(self, _=None):
         """敌人缴械"""
@@ -465,14 +465,16 @@ class Tool(BaseGTATool):
         if blip_id:
             return models.Blip(blip_id, self)
 
-    def get_blips(self, color=None, types=None, sprite=None):
+    def get_blips(self, sprites, color=None, types=None):
         """获取目标的所有标记"""
         check_blip = lambda blip: blip.blipType and (
             (color is None or blip.color is color) and
-            (types is None or blipType in types) and
-            (sprite is None or blip.sprite is sprite) )
+            (types is None or blipType in types) )
 
-        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
+        if isinstance(sprites, int):
+            sprites = (sprites,)
+
+        for i in sprites:
             blip = self.get_first_blip(i)
             if blip:
                 if check_blip(blip):
@@ -488,7 +490,10 @@ class Tool(BaseGTATool):
 
     def get_target_blips(self, color=None):
         """获取目标的所有标记"""
-        return self.get_blips(color=color)
+        return self.get_blips(range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1), color=color)
+
+    def get_enemy_blips(self):
+        return self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY)
 
     def get_friends(self):
         """获取蓝色标记的peds"""
@@ -496,7 +501,15 @@ class Tool(BaseGTATool):
 
     def get_enemys(self):
         """获取红色标记的peds"""
-        return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY)]
+        return [blip.entity for blip in self.get_enemy_blips() if blip.handle]
+
+    def get_police_blips(self):
+        """获取警察标记"""
+        return self.get_blips(models.Blip.BLIP_COP)
+
+    def get_police_helicopter_blips(self):
+        """获取警察直升机标记"""
+        return self.get_blips(models.Blip.BLIP_COPHELICOPTER)
 
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
@@ -639,12 +652,12 @@ class Tool(BaseGTATool):
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def shoot_between(self, v1, v2, demage, weapon, owner, speed):
+        self.request_weapon_model(weapon)
         self.script_call('SHOOT_SINGLE_BULLET_BETWEEN_COORDS', '6f6Qf', *v1, *v2, demage, 1, weapon, owner, 1, 0, speed)
 
     def shoot_vehicle_rocket(self, _=None, ped_id=None, count=1):
         """发射两枚车载火箭"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
-        self.request_weapon_model(weapon)
         coord = Vector3(self.get_cam_front_coord())
         rot = Vector3(self.get_camera_rot())
         if self.isInVehicle:
@@ -664,20 +677,27 @@ class Tool(BaseGTATool):
             self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped_id, -1.0)
             self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped_id, -1.0)
 
-    def rocket_attack(self, entitys):
+    def rocket_attack(self, entitys, speed=40, height=10):
         """天降正义(导弹攻击敌人)"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
         for p in entitys:
             if p.handle:
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
-                coord0[2] += 10
-                print(coord0, coord1)
-                self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), 40)
+                coord0[2] += height
+                self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), speed)
 
-    def enemy_rocket_attack(self, _=None):
+    def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""
-        self.rocket_attack(self.get_enemys())
+        self.rocket_attack(self.get_enemy_blips(), *args, **kwargs)
+
+    def rocket_attack_police(self, _=None, *args, **kwargs):
+        """乱世枭雄(导弹攻击警察)"""
+        self.rocket_attack(self.get_police_blips(), *args, **kwargs)
+
+    def rocket_attack_police_and_helicopter(self, _=None, *args, **kwargs):
+        """乱世枭雄(导弹攻击警察和警用直升机)"""
+        self.rocket_attack(tuple(self.get_police_blips()) + tuple(self.get_police_helicopter_blips()), *args, **kwargs)
 
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
