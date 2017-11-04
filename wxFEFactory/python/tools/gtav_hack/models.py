@@ -39,7 +39,7 @@ class NativeModel:
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
-    def setter(name, type_=int):
+    def setter(name, type_=int, default=None):
         if type_ is int:
             s = 'Q'
         elif type_ is float:
@@ -48,8 +48,12 @@ class NativeModel:
             s = '?'
         else:
             raise ValueError('not support type: ' + type_.__name__)
-        def setter(self, value):
-            self.native_call(name, 'Q' + s, self.handle, type_(value))
+        if default is not None:
+            def setter(self, value=default):
+                self.native_call(name, 'Q' + s, self.handle, value)
+        else:
+            def setter(self, value):
+                self.native_call(name, 'Q' + s, self.handle, value)
         return setter
 
     builders = (getter, getter_ptr, setter)
@@ -71,8 +75,20 @@ class NativeEntity(NativeModel):
     heading = property(getter('GET_ENTITY_HEADING', float), setter('SET_ENTITY_HEADING', float))
     # 无敌
     invincible = property(None, setter('SET_ENTITY_INVINCIBLE', bool))
+    # 是否能被破坏
+    can_be_damaged = property(None, setter('SET_ENTITY_CAN_BE_DAMAGED', bool))
     existed = property(getter('DOES_ENTITY_EXIST', bool))
     hp = property(getter('GET_ENTITY_HEALTH'))
+    # 是否悬空
+    is_in_air = property(getter('IS_ENTITY_IN_AIR'))
+    is_on_fire = property(getter('IS_ENTITY_ON_FIRE', bool))
+
+    # model hash
+    model_id = property(getter('GET_ENTITY_MODEL'))
+
+    @property
+    def model(self):
+        return VModel(self.model_id, self.mgr)
 
     @hp.setter
     def hp(self, value):
@@ -112,16 +128,7 @@ class NativeEntity(NativeModel):
     def turn_speed(self, value):
         self.native_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value, 0, 0, 0, True, False, True, True, True, True)
 
-    # model hash
-    model_id = property(getter('GET_ENTITY_MODEL'))
-
-    @property
-    def model(self):
-        return IVModel(self.model_id, self.mgr)
-
-    # 是否能被破坏
-    can_be_damaged = property(None, setter('SET_ENTITY_CAN_BE_DAMAGED', bool))
-    is_on_fire = property(getter('IS_ENTITY_ON_FIRE', bool))
+    max_speed = property(None, setter('SET_ENTITY_MAX_SPEED', float))
 
     def create_fire(self):
         self._fire = self.mgr.create_fire(self.coord)
@@ -181,9 +188,8 @@ class NativeEntity(NativeModel):
         self.speed = (0, 0, 0)
         self.turn_speed = (0, 0, 0)
 
-    def freeze_position(self, value=True):
-        """冻结位置"""
-        self.script_call('FREEZE_ENTITY_POSITION', '2Q', self.handle, value)
+    # 冻结位置
+    freeze_position = setter('FREEZE_ENTITY_POSITION', default=True)
 
     def add_marker(self):
         """添加标记"""
@@ -223,7 +229,7 @@ class Player(NativeEntity):
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
-    def player_setter(name, type_=int):
+    def player_setter(name, type_=int, default=None):
         if type_ is int:
             s = 'Q'
         elif type_ is float:
@@ -232,8 +238,12 @@ class Player(NativeEntity):
             s = '?'
         else:
             raise ValueError('not support type: ' + type_.__name__)
-        def setter(self, value):
-            self.native_call(name, 'Q' + s, self.index, value)
+        if default is not None:
+            def setter(self, value=default):
+                self.native_call(name, 'Q' + s, self.index, value)
+        else:
+            def setter(self, value):
+                self.native_call(name, 'Q' + s, self.index, value)
         return setter
 
     @property
@@ -245,6 +255,7 @@ class Player(NativeEntity):
         return self.mgr.ped_pool.addr_at(self.ped_index)
 
     is_player = property(getter('IS_PED_A_PLAYER'))
+    type = property(getter('GET_PED_TYPE'))
     ap = property(getter('GET_PED_ARMOUR'), setter('SET_PED_ARMOUR'))
     max_health = property(getter('GET_PED_MAX_HEALTH'), setter('SET_PED_MAX_HEALTH'))
     max_armor = property(player_getter('GET_PLAYER_MAX_ARMOUR'), player_setter('SET_PLAYER_MAX_ARMOUR'))
@@ -274,8 +285,48 @@ class Player(NativeEntity):
     isInVehicle = property(getter('IS_PED_IN_ANY_VEHICLE', bool, 1))
     # 被其他角色忽略
     ignored_by_everyone = player_setter('SET_EVERYONE_IGNORE_PLAYER', bool)
+    # 被警察忽略
+    ignored_by_police = player_setter('SET_POLICE_IGNORE_PLAYER', bool)
+    # 变成敌人？
+    set_as_enemy = player_setter('SET_PED_AS_ENEMY', bool)
     # 不会从车上摔下来
     keep_bike = property(None, setter('SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE', bool))
+    # 产生噪声比例 (默认1.0)
+    set_noise_rate = player_setter('SET_PLAYER_NOISE_MULTIPLIER', float)
+    # 游泳速度比例 (默认1.0)
+    set_swim_rate = player_setter('SET_SWIM_MULTIPLIER_FOR_PLAYER', float)
+    # 跑步速度比例 (默认1.0)
+    set_run_rate = player_setter('SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER', float)
+
+    def reset_skin(self):
+        """修复衣服"""
+        self.script_call('SET_PED_DEFAULT_COMPONENT_VARIATION', 'Q', self.handle)
+
+    def reset_visible_damage(self):
+        """修复可见损害"""
+        self.native_call('RESET_PED_VISIBLE_DAMAGE', 'Q', self.handle)
+
+    def super_jump(self):
+        self.native_call('SET_SUPER_JUMP_THIS_FRAME', 'Q', self.index)
+
+    def weapon_fire_ammo(self):
+        self.native_call('SET_FIRE_AMMO_THIS_FRAME', 'Q', self.index)
+
+    def weapon_explosive_ammo(self):
+        self.native_call('SET_EXPLOSIVE_AMMO_THIS_FRAME', 'Q', self.index)
+
+    def weapon_explosive_melee(self):
+        self.native_call('SET_EXPLOSIVE_MELEE_THIS_FRAME', 'Q', self.index)
+
+    def set_model(self, model):
+        """设置模型"""
+        VModel(model, self.mgr).request()
+        self.script_call('SET_PLAYER_MODEL', '2Q', self.index, model)
+        self.script_call('SET_PED_DEFAULT_COMPONENT_VARIATION', 'Q', self.handle)
+
+    # ----------------------------------------------------------------------
+    # 载具相关
+    # ----------------------------------------------------------------------
 
     get_vehicle_handle = getter('GET_VEHICLE_PED_IS_USING')
 
@@ -308,9 +359,8 @@ class Player(NativeEntity):
         """移除指定武器"""
         self.script_call('REMOVE_WEAPON_FROM_PED', '2Q', self.handle, weapon)
 
-    def remove_all_weapons(self, toggle=True):
-        """移除所有武器"""
-        self.native_call('REMOVE_ALL_PED_WEAPONS', '2Q', self.handle, toggle)
+    # 移除所有武器
+    remove_all_weapons = setter('REMOVE_ALL_PED_WEAPONS', bool)
         
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""
@@ -344,9 +394,8 @@ class Player(NativeEntity):
         """无限弹药"""
         self.native_call('SET_PED_INFINITE_AMMO', '3Q', self.handle, weapon, toggle)
 
-    def set_infinite_ammo_clip(self, toggle=True):
-        """全部武器无限弹药"""
-        self.native_call('SET_PED_INFINITE_AMMO_CLIP', '2Q', self.handle, toggle)
+    # 全部武器无限弹药
+    set_infinite_ammo_clip = setter('SET_PED_INFINITE_AMMO_CLIP')
 
     # 当前武器种类
     weapon = property(getter_ptr('GET_CURRENT_PED_WEAPON'))
@@ -363,14 +412,6 @@ class Player(NativeEntity):
     def explode(self, *args, **kwargs):
         """爆炸"""
         self.create_explosion(*args, **kwargs)
-
-    def as_enemy(self, toggle=True):
-        """变成敌人"""
-        self.native_call('SET_PED_AS_ENEMY', '2Q', self.handle, toggle)
-
-    def as_cop(self, toggle=True):
-        """变成敌人"""
-        self.native_call('SET_PED_AS_COP', '2Q', self.handle, toggle)
 
     del getter, getter_ptr, setter
 
@@ -393,7 +434,12 @@ class Vehicle(NativeEntity):
     def __bool__(self):
         return self.existed and self.engine_hp > 0
 
-    # 损坏等级？
+    tyres_can_burst = property(None, setter('SET_VEHICLE_TYRES_CAN_BURST'))
+    wheels_can_break = property(None, setter('SET_VEHICLE_WHEELS_CAN_BREAK'))
+    can_be_visibly_damaged = property(None, setter('SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED'))
+    has_strong_axles = property(None, setter('SET_VEHICLE_HAS_STRONG_AXLES'))
+
+    # 车身脏的程度
     dirtyness = property(
         getter('GET_VEHICLE_DIRT_LEVEL', float),
         setter('SET_VEHICLE_DIRT_LEVEL', float)
@@ -494,16 +540,33 @@ class Vehicle(NativeEntity):
         self.ext_colors = c1, c2
 
     def fix(self):
+        """修车"""
         self.script_call('SET_VEHICLE_FIXED', 'Q', self.handle)
+
+    def wash(self):
+        """洗车"""
+        self.dirtyness = 0
+        self.fix()
 
     def explode(self):
         """爆炸"""
         self.script_call('EXPLODE_VEHICLE', '3Q', self.handle, 1, 0)
 
+    def set_invincible(self, toggle=True):
+        """设置是否不可损坏"""
+        not_toggle = not toggle
+        self.invincible = toggle
+        self.native_call("SET_ENTITY_PROOFS", '9Q', self.handle, 
+            toggle, toggle, toggle, toggle, toggle, toggle, toggle, toggle)
+        self.tyres_can_burst = not_toggle
+        self.wheels_can_break = not_toggle
+        self.can_be_damaged = not_toggle
+        self.can_be_visibly_damaged = not_toggle
+
     del getter, getter_ptr, setter
 
 
-class IVModel(NativeModel):
+class VModel(NativeModel):
     getter, getter_ptr, setter = NativeEntity.builders
 
     is_bike = property(getter("IS_THIS_MODEL_A_BIKE", bool))
@@ -514,6 +577,8 @@ class IVModel(NativeModel):
     is_plane = property(getter("IS_THIS_MODEL_A_PLANE", bool))
     is_train = property(getter("IS_THIS_MODEL_A_TRAIN", bool))
     loaded = property(getter('HAS_MODEL_LOADED', bool))
+    is_in_cdimage = property(getter('IS_MODEL_IN_CDIMAGE', bool))
+    is_valid = property(getter('IS_MODEL_VALID', bool))
 
     def request(self):
         if self.loaded:
@@ -558,7 +623,7 @@ class Blip(NativeModel):
     BLIP_TYPE_PICKUP = 6
 
     BLIP_COLOR_ENEMY = 1
-    BLIP_COLOR_FRIEND = 0x9
+    BLIP_COLOR_FRIEND = 49
 
     color = property(NativeModel.getter('GET_BLIP_COLOUR'), NativeModel.setter('SET_BLIP_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))

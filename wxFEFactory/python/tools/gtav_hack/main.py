@@ -7,7 +7,7 @@ from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from . import address, models
-from .data import VEHICLE_LIST, WEAPON_HASH
+from .data import VEHICLE_LIST, WEAPON_HASH, PLAYER_MODEL
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget
@@ -53,14 +53,16 @@ class Tool(BaseGTATool):
             self.rot_view = ModelInputWidget("rotation", "旋转")
             self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
             self.money = ModelInputWidget("money", "金钱")
-            ui.Text("")
+            ui.Hr()
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
+                ui.Button(label="关闭无伤", onclick=partial(self.set_ped_invincible, value=False))
                 ui.Button(label="可以切换武器", onclick=self.set_ped_block_switch_weapons)
                 ui.Button(label="不会被拽出车", onclick=self.set_ped_can_be_dragged_out_of_vehicle)
                 ui.Button(label="摩托车老司机", onclick=self.set_ped_keep_bike)
                 ui.Button(label="切换无限弹药", onclick=self.set_ped_infinite_ammo_clip)
+                ui.Button(label="切换不被警察注意", onclick=self.set_ped_ignored_by_police)
 
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
@@ -69,9 +71,11 @@ class Tool(BaseGTATool):
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
-            ui.Text("")
-            with ui.Horizontal(className="expand"):
+            ui.Hr()
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+                ui.Button(label="开启无伤", onclick=self.set_vechile_invincible)
+                ui.Button(label="关闭无伤", onclick=partial(self.set_vechile_invincible, value=False))
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
 
@@ -110,6 +114,17 @@ class Tool(BaseGTATool):
                     ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
                     ui.Text("爆破最近的车: alt+o")
 
+        with Group(None, "角色模型", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+            with ui.Horizontal(className="fill container"):
+                self.player_model_view = ui.ListBox(className="expand",
+                    choices=(item[0] for item in PLAYER_MODEL))
+                with ui.ScrollView(className="fill container"):
+                    ui.Text("1. 切换模型会失去武器")
+                    ui.Text("2. 切换动物模型容易引发bug，请慎用")
+                    ui.Text("3. 在陆地上切换鱼类模型会突然失去梦想，请注意")
+                    ui.Button("切换模型", onclick=self.set_player_model)
+                    ui.Button("生产人物", onclick=self.create_selected_ped)
+
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
@@ -123,6 +138,7 @@ class Tool(BaseGTATool):
                 ui.Button("敌人定住", onclick=self.enemys_freeze_position)
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
                 ui.Button("导弹攻击敌人", onclick=self.rocket_attack_enemy)
+                ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
                 # ui.Button("停止计时", onclick=self.freeze_timer)
                 # ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
 
@@ -134,9 +150,10 @@ class Tool(BaseGTATool):
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('shoot_vehicle_rocket', MOD_ALT, getVK(';'), self.shoot_vehicle_rocket),
-            ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK(';'), partial(self.shoot_vehicle_rocket, count=3)),
-            ('rocket_attack_enemy', MOD_ALT, getVK("-"), self.rocket_attack_enemy),
+            ('shoot_vehicle_rocket', MOD_ALT, getVK('r'), self.shoot_vehicle_rocket),
+            ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK('r'), partial(self.shoot_vehicle_rocket, count=3)),
+            ('rocket_attack_enemy', MOD_ALT, getVK("enter"), self.rocket_attack_enemy),
+            ('special_ability_fill_meter', MOD_ALT, getVK("capslock"), self.special_ability_fill_meter),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):
@@ -241,6 +258,9 @@ class Tool(BaseGTATool):
                         try_count -= 1
 
                     print('获取script_call返回失败，超过尝试次数')
+
+    def get_hash_key(self, name):
+        return self.native_call('GET_HASH_KEY', 's', name)
 
     def _player(self):
         """获取当前角色"""
@@ -377,6 +397,10 @@ class Tool(BaseGTATool):
     def set_ped_invincible(self, _=None, value=True):
         """当前角色无伤"""
         self.player.invincible = value
+
+    def set_vechile_invincible(self, _=None, value=True):
+        """当前载具无伤"""
+        self.vehicle.set_invincible(value)
 
     def set_ped_block_switch_weapons(self, _=None):
         """解除当前角色武器切换限制"""
@@ -628,10 +652,17 @@ class Tool(BaseGTATool):
 
     def spawn_vehicle(self, model):
         """生成载具"""
-        m = models.IVModel(model, self)
+        m = models.VModel(model, self)
         m.request()
         handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model, *self.get_front_coord(), self.player.heading, 0, 1)
         return Vehicle(handle, self)
+
+    def create_ped(self, model, pedType=21):
+        """生成载具"""
+        m = models.VModel(model, self)
+        m.request()
+        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *self.get_front_coord(), self.player.heading, 0, 1)
+        return Player(0, handle, self)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""
@@ -651,13 +682,22 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
-    def shoot_between(self, v1, v2, demage, weapon, owner, speed):
-        self.request_weapon_model(weapon)
+    def shoot_between(self, v1, v2, demage, weapon, owner, speed, check_model=True):
+        """ 武器把子弹从v1射向v2
+        :param demage: 伤害值: int
+        :param weapon: 武器hash
+        :param owner: 行为人: ped
+        :param speed: 子弹速度: float
+        :param check_model: 是否检查武器model加载情况
+        """
+        if check_model:
+            self.request_weapon_model(weapon)
         self.script_call('SHOOT_SINGLE_BULLET_BETWEEN_COORDS', '6f6Qf', *v1, *v2, demage, 1, weapon, owner, 1, 0, speed)
 
     def shoot_vehicle_rocket(self, _=None, ped_id=None, count=1):
-        """发射两枚车载火箭"""
+        """发射车载火箭"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
+        self.request_weapon_model(weapon)
         coord = Vector3(self.get_cam_front_coord())
         rot = Vector3(self.get_camera_rot())
         if self.isInVehicle:
@@ -674,22 +714,27 @@ class Tool(BaseGTATool):
         vertical_2 *= 0.5
 
         for i in range(1, count + 1):
-            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped_id, -1.0)
-            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped_id, -1.0)
+            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped_id, -1.0, False)
+            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped_id, -1.0, False)
 
     def rocket_attack(self, entitys, speed=40, height=10):
         """天降正义(导弹攻击敌人)"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
+        self.request_weapon_model(weapon)
         for p in entitys:
             if p.handle:
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
                 coord0[2] += height
-                self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), speed)
+                self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), speed, False)
 
     def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""
         self.rocket_attack(self.get_enemy_blips(), *args, **kwargs)
+
+    def rocket_attack_target(self, _=None, *args, **kwargs):
+        """天降正义(导弹攻击敌人)"""
+        self.rocket_attack(self.get_target_blips(), *args, **kwargs)
 
     def rocket_attack_police(self, _=None, *args, **kwargs):
         """乱世枭雄(导弹攻击警察)"""
@@ -723,8 +768,7 @@ class Tool(BaseGTATool):
 
     def freeze_timer(self, _=None, freeze=True):
         """停止计时"""
-        pass
-        # self.script_call('FREEZE_ONSCREEN_TIMER', 'L', freeze)
+        self.script_call('PAUSE_CLOCK', 'L', freeze)
 
     def create_enemy(self, count=1):
         for p in self.get_peds(count):
@@ -733,3 +777,23 @@ class Tool(BaseGTATool):
     def set_ped_infinite_ammo_clip(self, _=None):
         """角色无限弹药"""
         self.player.set_infinite_ammo_clip(self.toggle_setting('infinite_ammo_clip'))
+
+    def set_ped_ignored_by_police(self, _=None):
+        """角色不会被警察注意"""
+        self.player.ignored_by_police = self.toggle_setting('ignored_by_police')
+
+    def special_ability_fill_meter(self, _=None):
+        """特殊能力能量充满"""
+        self.native_call('SPECIAL_ABILITY_FILL_METER', '2Q', self.get_player_index(), 1)
+
+    def set_player_model(self, _=None):
+        """设置当前玩家模型"""
+        model_name = PLAYER_MODEL[self.player_model_view.index][1]
+        model = self.get_cache('player_model', model_name, self.get_hash_key)
+        self.player.set_model(model)
+
+    def create_selected_ped(self, _=None):
+        """生产该模型的人物"""
+        model_name = PLAYER_MODEL[self.player_model_view.index][1]
+        model = self.get_cache('player_model', model_name, self.get_hash_key)
+        self.create_ped(model)

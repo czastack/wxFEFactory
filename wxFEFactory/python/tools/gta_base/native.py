@@ -1,5 +1,6 @@
 from lib.hack.model import Model, Field, ArrayField, ModelField, CoordField, CoordData
 from lib.lazy import lazy
+import math
 import struct
 
 
@@ -113,35 +114,43 @@ class NativeContext(Model):
 class NativeContext64(NativeContext):
     """x64原生函数调用环境 (GTAV)"""
     SIZE = 144
+    ARG_MAX = 16
 
     m_pReturn = Field(0x00, size=8)                                    # void * m_pReturn;              // 00-04
     m_nArgCount = Field(0x08)                                          # unsigned int m_nArgCount;      // 04-08
     m_pArgs = Field(0x10)                                              # void * m_pArgs;                // 08-0C
     m_nDataCount = Field(0x18)                                         # unsigned int m_nArgCount;      // 04-08
-    m_TempStack = ArrayField(0x20, 16, Field(0, size=8))               # int m_TempStack[16];           // 10-90
+    m_TempStack = ArrayField(0x20, ARG_MAX, Field(0, size=8))          # int m_TempStack[16];           // 10-90
 
     def __init__(self, addr, handler):
         super().__init__(addr, handler)
         # 前四个参数是否是float, double的标记, 0: 非浮点型, 1: float, 2: double
         self.fflag = bytearray(8)
+        # 字符串参数占的块数，每块8字节
+        self.str_arg_block = 0
 
     def reset(self):
         self.m_nArgCount = 0
         self.m_nDataCount = 0
+        self.str_arg_block = 0
         for i in range(4):
             self.fflag[i] = 0
 
     def push(self, signature, *args):
         """压入参数"""
-        if isinstance(signature, str):
-            signature = signature.encode()
-        
+        # 除去fflag, dwFunc, this，剩余参数的序号
+        arg_count = self.m_nArgCount
+        # 调用NativeCall 汇编函数时用到
+        if arg_count + self.str_arg_block >= 16:
+            raise ValueError('参数缓冲区容量不足')
+
         buff = bytearray()
         # 重复次数，例如2L中为2，L中为1
         repeat = 0
-        # 除去fflag, dwFunc, this，剩余参数的序号
-        arg_index = self.m_nArgCount - 3
         arg_it = iter(args)
+
+        if isinstance(signature, str):
+            signature = signature.encode()
 
         for ch in signature:
             if 0x30 <= ch <= 0x39:
@@ -156,13 +165,33 @@ class NativeContext64(NativeContext):
                 for i in range(repeat):
                     arg = next(arg_it)
 
-                    if 0 <= arg_index < 4:
+                    if 3 <= arg_count < 7:
                         if fmt == 'f':
                             # float
-                            self.fflag[arg_index] = 1
+                            self.fflag[arg_count - 3] = 1
                         elif fmt == 'd':
                             # double
-                            self.fflag[arg_index] = 2
+                            self.fflag[arg_count - 3] = 2
+
+                    if fmt == 'p' or fmt == 's':
+                        # 字符串(s是c style, p是pascal style)
+                        if repeat is not 1:
+                            raise ValueError('对于字符串参数, s和p前暂不支持加数字')
+
+                        length = len(arg) + 1
+                        if isinstance(arg, str):
+                            arg = arg.encode()
+                        block_count = math.ceil(length / 8)
+
+                        if arg_count + self.str_arg_block + block_count > self.ARG_MAX:
+                            raise ValueError('字符串长度过长，参数缓冲区容量不足')
+
+                        self.str_arg_block += block_count
+                        temp_addr = self.get_temp_addr(self.str_arg_block)
+                        self.handler.write(temp_addr, struct.pack('%ds' % (length + 1), arg))
+                        arg = temp_addr
+                        fmt = 'Q'
+
                     data = struct.pack(fmt, arg)
                     data_size = len(data)
                     buff.extend(data)
@@ -170,7 +199,7 @@ class NativeContext64(NativeContext):
                         # 对齐8个字节
                         buff.extend(bytes(8 - data_size))
 
-                    arg_index += 1
+                    arg_count += 1
                 repeat = 0
 
         if args[0] is self.fflag:
@@ -178,4 +207,4 @@ class NativeContext64(NativeContext):
 
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
         self.handler.write(addr, buff)
-        self.m_nArgCount += len(args)
+        self.m_nArgCount = arg_count

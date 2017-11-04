@@ -691,7 +691,7 @@ class BaseGTATool(BaseTool):
 
     def custom_hotkey(self, _=None):
         """用于自定义的临时热键功能"""
-        fn = getattr(self, 'hotkey_cfn', None)
+        fn = getattr(self, 'cfn', None)
         if fn:
             fn()
 
@@ -700,6 +700,21 @@ class BaseGTATool(BaseTool):
         toggle = not getattr(self, name, default)
         setattr(self, name, toggle)
         return toggle
+
+    def get_cache(self, name, key, fn):
+        """ 获取缓存的内容
+        :param fn: 缓存不存在时通过fn(key)获取
+        """
+        cache_name = '_cache_' + name
+        cache = getattr(self, cache_name, None)
+        if cache is None:
+            cache = {}
+            setattr(self, cache_name, cache)
+
+        value = cache.get(key, None)
+        if value is None:
+            value = cache[key] = fn(key)
+        return value
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
@@ -781,7 +796,7 @@ class BaseGTATool(BaseTool):
         ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
         ui.Text("红莲之炼金术 (长): alt+shift+`")
         ui.Text("瞬移到目的地: alt+1")
-        ui.Text("自定义临时热键(执行tool.hotkey_cfn): alt+c")
+        ui.Text("自定义临时热键(执行tool.cfn): alt+c")
 
     def get_common_hotkeys(self):
         return (
