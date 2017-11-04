@@ -3,10 +3,10 @@ from ..gta_base.native import NativeContext
 
 
 class NativeContext(NativeContext):
-    """GTAIV原生函数调用的环境 TODO"""
+    """GTAIV原生函数调用的环境"""
     SIZE = 160
 
-    m_nDataCount = Field(0x0C)                                         # unsigned int m_nDataCount;   // 0C-10
+    m_nDataCount = Field(0x0C)                                         # unsigned int m_nDataCount;     // 0C-10
     m_pOriginalData = ArrayField(0x10, 4, ModelField(0, CoordData))    # CVector3 * m_pOriginalData[4]; // 10-20
     m_TemporaryData = ArrayField(0x20, 4, CoordField(0, 4))            # Vector4 m_TemporaryData[4];    // 20-60
     m_TempStack = ArrayField(0x60, 16, Field(0))                       # int m_TempStack[16];           // 60-A0
