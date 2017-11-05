@@ -72,7 +72,7 @@ class BaseGTATool(BaseTool):
 
     def render_win(self):
         menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=menubar, exstyle=0x80804)
+        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=menubar, wxstyle=0x80804)
         self.win.position = (70, 4)
         return self.win
 
@@ -763,7 +763,7 @@ class BaseGTATool(BaseTool):
         ui.Button("锁定载具迭代", onclick=self.iter_vehicle_lock)
 
     def render_common_text(self):
-        ui.Text("根据左边列表生产载具: alt+v")
+        ui.Text("生产选中的载具: alt+v")
         ui.Text("选中上一个载具: alt+[")
         ui.Text("选中下一个载具: alt+]")
         ui.Text("向前穿墙: alt+w")

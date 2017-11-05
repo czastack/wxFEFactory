@@ -1,6 +1,6 @@
 #pragma once
 #include "layoutbase.h"
-#include "layouts.h"
+#include "frames.h"
 #include <wx/aui/aui.h>
 #include <wx/aui/tabmdi.h>
 
@@ -127,9 +127,9 @@ protected:
 class AuiMDIParentFrame : public BaseFrame {
 public:
 	template <class... Args>
-	AuiMDIParentFrame(wxcstr title, MenuBar *menubar, long exstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
+	AuiMDIParentFrame(wxcstr title, MenuBar *menubar, long wxstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new wxAuiMDIParentFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxAuiMDIParentFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		if (!menubar)
 		{
 			menubar = new MenuBar(None);
@@ -171,10 +171,10 @@ class AuiMDIChildFrame : public BaseTopLevelWindow
 {
 public:
 	template <class... Args>
-	AuiMDIChildFrame(wxcstr title, long exstyle, Args ...args) : BaseTopLevelWindow(args...)
+	AuiMDIChildFrame(wxcstr title, long wxstyle, Args ...args) : BaseTopLevelWindow(args...)
 	{
 		wxAuiMDIParentFrame *parent = (wxAuiMDIParentFrame*)getActiveWindow();
-		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIChildFrame::onClose, this);
 		m_onclose = None;
 	}

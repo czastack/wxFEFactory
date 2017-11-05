@@ -1,6 +1,6 @@
 #include <wx/wx.h>
 #include "aui.h"
-#include "layouts.h"
+
 
 void AuiManager::doAdd(View & child)
 {

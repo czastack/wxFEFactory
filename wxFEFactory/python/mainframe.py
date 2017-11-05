@@ -64,7 +64,7 @@ class MainFrame:
                 with ui.Vertical(className="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
-                        self.console_input = ui.TextInput(exstyle=0x0400, className="expand console-input")
+                        self.console_input = ui.TextInput(wxstyle=0x0400, className="expand console-input")
                         ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)

@@ -78,8 +78,12 @@ class BaseTool(BaseScene):
 
     def closeWindow(self, _=None):
         if self.nested:
-            self.win.parent.closePage()
-            # closePage会自动调用onClose
+            try:
+                # closePage会自动调用onClose
+                self.win.parent.closePage()
+            except:
+                traceback.print_exc()
+                self.win.close()
         else:
             # win应该设置close回调为self.onClose
             self.win.close()

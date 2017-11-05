@@ -403,7 +403,7 @@ class Player(NativeEntity):
     @weapon.setter
     def weapon(self, weapon):
         """设置当前武器种类"""
-        self.native_call('SET_CURRENT_PED_WEAPON', '3Q', self.handle, weapon, 1)
+        self.script_call('SET_CURRENT_PED_WEAPON', '3Q', self.handle, weapon, 1)
 
     def explode_head(self):
         """爆头"""
@@ -429,6 +429,7 @@ class Vehicle(NativeEntity):
     def addr(self):
         return self.mgr.vehicle_pool.addr_at(self.index)
 
+    vehicle_class = property(getter('GET_VEHICLE_CLASS'))
     engine_hp = property(getter('GET_VEHICLE_ENGINE_HEALTH', float), setter('SET_VEHICLE_ENGINE_HEALTH', float))
 
     def __bool__(self):
@@ -607,23 +608,36 @@ class VModel(NativeModel):
 
 
 class Blip(NativeModel):
-    BLIP_DESTINATION = 0
-    BLIP_DESTINATION_1 = 1
-    BLIP_DESTINATION_2 = 2
     BLIP_CIRCLE = 1
     BLIP_COP = 3
     BLIP_WAYPOINT = 8
     BLIP_COPHELICOPTER = 15
 
     BLIP_TYPE_CAR = 1
-    BLIP_TYPE_CHAR = 2             # ENEMY
+    BLIP_TYPE_CHAR = 2
     BLIP_TYPE_OBJECT = 3
     BLIP_TYPE_COORD = 4
-    BLIP_TYPE_CONTACT = 5          # FRIEND
+    BLIP_TYPE_CONTACT = 5
     BLIP_TYPE_PICKUP = 6
 
-    BLIP_COLOR_ENEMY = 1
-    BLIP_COLOR_FRIEND = 49
+    BLIP_COLOR_NONE = 0x0
+    BLIP_COLOR_RED = 0x1
+    BLIP_COLOR_GREEN = 0x2
+    BLIP_COLOR_BLUE = 0x3
+    BLIP_COLOR_PLAYER = 0x4
+    BLIP_COLOR_YELLOWMISSION = 0x5
+    BLIP_COLOR_FRIENDLYVEHICLE = 0x26
+    BLIP_COLOR_MICHAEL = 0x2A
+    BLIP_COLOR_FRANKLIN = 0x2B
+    BLIP_COLOR_TREAVOR = 0x2C
+    BLIP_COLOR_REDMISSION = 0x31
+    BLIP_COLOR_MISSIONVEHICLE = 0x36
+    BLIP_COLOR_REDMISSION2 = 0x3B
+    BLIP_COLOR_YELLOWMISSION2 = 0x3C
+    BLIP_COLOR_MISSION = 0x42
+    BLIP_COLOR_WAYPOINT = 0x53
+
+    BLIP_COLORS_ENEMY = (BLIP_COLOR_RED, BLIP_COLOR_REDMISSION)
 
     color = property(NativeModel.getter('GET_BLIP_COLOUR'), NativeModel.setter('SET_BLIP_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))

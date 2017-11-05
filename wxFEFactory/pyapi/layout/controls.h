@@ -1,6 +1,7 @@
 #pragma once
 #include "layoutbase.h"
 #include <wx/button.h>
+#include <wx/tglbtn.h>
 #include <wx/stattext.h>
 #include <wx/spinctrl.h>
 #include <wx/srchctrl.h>
@@ -28,6 +29,58 @@ public:
 	{
 		bindEvt(wxEVT_BUTTON, fn);
 	}
+};
+
+
+class ToggleButton : public Control
+{
+public:
+	template <class... Args>
+	ToggleButton(wxcstr label, bool checked, pyobj &onchange, Args ...args) :
+		Control(args...), m_change(onchange)
+	{
+
+		bindElem(new wxToggleButton(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
+		if (checked)
+		{
+			setChecked(true);
+		}
+		m_elem->Bind(wxEVT_TOGGLEBUTTON, &ToggleButton::onChange, this);
+	}
+
+	wxToggleButton& ctrl() const
+	{
+		return *(wxToggleButton*)m_elem;
+	}
+
+	void trigger()
+	{
+		setChecked(!getChecked());
+		addPendingEvent(wxEVT_TOGGLEBUTTON);
+	}
+
+	void setChecked(bool checked)
+	{
+		ctrl().SetValue(checked);
+	}
+
+	bool getChecked()
+	{
+		return ctrl().GetValue();
+	}
+
+	void onChange(wxCommandEvent & event)
+	{
+		if (!m_change.is_none())
+		{
+			handleEvent(m_change, event);
+		}
+	}
+
+	friend void init_layout(py::module &m);
+
+protected:
+	pyobj m_change;
 };
 
 
@@ -110,7 +163,7 @@ class TextInput : public Control
 {
 public:
 	template <class... Args>
-	TextInput(wxcstr value, wxcstr type, bool readonly, bool multiline, long exstyle, Args ...args) : Control(args...)
+	TextInput(wxcstr value, wxcstr type, bool readonly, bool multiline, long wxstyle, Args ...args) : Control(args...)
 	{
 		long style = 0L;
 		if (readonly)
@@ -129,9 +182,9 @@ public:
 		{
 
 		}
-		if (exstyle)
+		if (wxstyle)
 		{
-			style |= exstyle;
+			style |= wxstyle;
 		}
 		style |= ((Text*)this)->getAlignStyle();
 		bindElem(new wxTextCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), style));
@@ -197,9 +250,9 @@ class SearchCtrl: public Control
 {
 public:
 	template <class... Args>
-	SearchCtrl(wxcstr value, bool search_button, bool cancel_button, long exstyle, Args ...args) : Control(args...)
+	SearchCtrl(wxcstr value, bool search_button, bool cancel_button, long wxstyle, Args ...args) : Control(args...)
 	{
-		bindElem(new wxSearchCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxSearchCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), wxstyle));
 		
 		if (!search_button)
 		{
@@ -744,9 +797,9 @@ class FilePickerCtrl : public Control
 {
 public:
 	template <class... Args>
-	FilePickerCtrl(wxcstr path, wxcstr msg, wxcstr wildcard, long exstyle, Args ...args) : Control(args...)
+	FilePickerCtrl(wxcstr path, wxcstr msg, wxcstr wildcard, long wxstyle, Args ...args) : Control(args...)
 	{
-		bindElem(new wxFilePickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wildcard, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxFilePickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wildcard, wxDefaultPosition, getStyleSize(), wxstyle));
 	}
 
 	wxFilePickerCtrl& ctrl() const
@@ -775,9 +828,9 @@ class DirPickerCtrl : public Control
 {
 public:
 	template <class... Args>
-	DirPickerCtrl(wxcstr path, wxcstr msg, long exstyle, Args ...args) : Control(args...)
+	DirPickerCtrl(wxcstr path, wxcstr msg, long wxstyle, Args ...args) : Control(args...)
 	{
-		bindElem(new wxDirPickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new wxDirPickerCtrl(*getActiveLayout(), wxID_ANY, path, msg, wxDefaultPosition, getStyleSize(), wxstyle));
 	}
 
 	wxDirPickerCtrl& ctrl() const

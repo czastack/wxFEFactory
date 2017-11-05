@@ -77,7 +77,7 @@ class HotkeyCtrl(ui.TextInput):
 
     def __init__(self, *args, **kwargs):
         kwargs['readonly'] = True
-        kwargs['exstyle'] = 0x0400
+        kwargs['wxstyle'] = 0x0400
         super().__init__(*args, **kwargs)
         self.setOnKeyDown(self.onKey)
 

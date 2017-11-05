@@ -59,9 +59,6 @@
     <ClCompile Include="pyapi\fe\fe.cpp">
       <Filter>pyapi\fe</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\layouts.cpp">
-      <Filter>pyapi\layout</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\layout\layoutbase.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
@@ -81,6 +78,12 @@
       <Filter>pyapi\auto</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\layout\bitmap.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\frames.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\layout\containers.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
   </ItemGroup>
@@ -168,9 +171,6 @@
     <ClInclude Include="pyapi\fe\fe.h">
       <Filter>pyapi\fe</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\layouts.h">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\layout\layoutbase.h">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
@@ -193,6 +193,12 @@
       <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\layout\thread.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\frames.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\containers.h">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
   </ItemGroup>

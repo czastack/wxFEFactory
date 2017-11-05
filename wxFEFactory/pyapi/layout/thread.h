@@ -20,5 +20,6 @@ public:
 			wxMilliSleep(m_delay);
 		}
 		pyCall(m_fn);
+		return 0;
 	}
 };

@@ -4,7 +4,8 @@
 #include "layout.h"
 #include "menu.h"
 #include "bitmap.h"
-#include "layouts.h"
+#include "frames.h"
+#include "containers.h"
 #include "controls.h"
 #include "datacontrols.h"
 #include "aui.h"
@@ -27,7 +28,7 @@ void init_layout(py::module &m)
 	auto styles = "styles"_a=None;
 	auto label = "label"_a;
 	auto type = "type"_a=wxEmptyString;
-	auto exstyle = "exstyle"_a=0;
+	auto wxstyle = "wxstyle"_a=0;
 	auto n = "n"_a;
 
 	auto view_init = py::init<pyobj, pyobj>();
@@ -84,7 +85,7 @@ void init_layout(py::module &m)
 
 
 	auto base_frame_init = py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>();
-	auto base_frame_exstyle_a = "exstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	auto base_frame_wxstyle_a = "wxstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 	auto menubar_a = "menubar"_a = nullptr;
 	py::class_t<BaseFrame, BaseTopLevelWindow>(layout, "BaseFrame")
 		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
@@ -92,22 +93,22 @@ void init_layout(py::module &m)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
 
 	py::class_t<Window, BaseFrame>(layout, "Window")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<MDIParentFrame, BaseFrame>(layout, "MDIParentFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<MDIChildFrame, BaseFrame>(layout, "MDIChildFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<AuiMDIParentFrame, BaseFrame>(layout, "AuiMDIParentFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style);
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<AuiMDIChildFrame, BaseTopLevelWindow>(layout, "AuiMDIChildFrame")
-		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_exstyle_a, styles, className, style);
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<HotkeyWindow, Window>(layout, "HotkeyWindow")
-		.def_init(base_frame_init, label, menubar_a, base_frame_exstyle_a, styles, className, style)
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style)
 		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
 		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a=false)
@@ -115,13 +116,13 @@ void init_layout(py::module &m)
 
 	py::class_t<Dialog, BaseTopLevelWindow>(layout, "Dialog")
 		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
-			label, "exstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
+			label, "wxstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
 		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal);
 
 	py::class_t<StdModalDialog, Dialog>(layout, "StdModalDialog")
 		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
-			label, "exstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
+			label, "wxstyle"_a=(long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
 
 	py::class_t<Vertical, Layout>(layout, "Vertical")
 		.def_init(layout_init, styles, className, style);
@@ -159,13 +160,18 @@ void init_layout(py::module &m)
 		.def("setLabel", &StaticBox::setLabel)
 		.def_property("label", &StaticBox::getLabel, &StaticBox::setLabel);
 
-	py::class_t<Notebook, Layout>(layout, "Notebook")
-		.def_init(layout_init, styles, className, style)
-		.def("getPage", &Notebook::getPage)
-		.def("getPageCount", &Notebook::getPageCount)
-		.def("setPageText", &Notebook::setPageText)
-		.def("getPageText", &Notebook::getPageText)
-		.def_property("index", &Notebook::getSelection, &Notebook::setSelection);
+	py::class_t<BookCtrlBase, Layout>(layout, "BookCtrlBase")
+		.def("getPage", &BookCtrlBase::getPage)
+		.def("getPageCount", &BookCtrlBase::getPageCount)
+		.def("setPageText", &BookCtrlBase::setPageText)
+		.def("getPageText", &BookCtrlBase::getPageText)
+		.def_property("index", &BookCtrlBase::getSelection, &BookCtrlBase::setSelection);
+
+	py::class_t<Notebook, BookCtrlBase>(layout, "Notebook")
+		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
+
+	py::class_t<Listbook, BookCtrlBase>(layout, "Listbook")
+		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
 
 
 	// controls
@@ -178,13 +184,23 @@ void init_layout(py::module &m)
 		.def("setLabel", &Button::setLabel)
 		.def_property("label", &Button::getLabel, &Button::setLabel);
 
+	py::class_t<ToggleButton, Control>(layout, "ToggleButton")
+		.def_init(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(), 
+			label, "checked"_a=false, "onchange"_a=None, className, style)
+		.def("getLabel", &ToggleButton::getLabel)
+		.def("setLabel", &ToggleButton::setLabel)
+		.def("trigger", &ToggleButton::trigger)
+		.def_property("label", &ToggleButton::getLabel, &ToggleButton::setLabel)
+		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked)
+		.def_readwrite("onchange", &ToggleButton::m_change);
+
 	py::class_t<CheckBox, Control>(layout, "CheckBox")
 		.def_init(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(), 
-			label, "checked"_a=false, "alignRight"_a=false, "onchange"_a = None, className, style)
+			label, "checked"_a=false, "alignRight"_a=false, "onchange"_a=None, className, style)
 		.def("getLabel", &CheckBox::getLabel)
 		.def("setLabel", &CheckBox::setLabel)
 		.def("trigger", &CheckBox::trigger)
-		.def_property("label", &Button::getLabel, &Button::setLabel)
+		.def_property("label", &CheckBox::getLabel, &CheckBox::setLabel)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked)
 		.def_readwrite("onchange", &CheckBox::m_change);
 
@@ -196,7 +212,7 @@ void init_layout(py::module &m)
 
 	py::class_t<TextInput, Control>(layout, "TextInput")
 		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
-			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, exstyle, className, style)
+			"value"_a=wxEmptyString, type, "readonly"_a=false, "multiline"_a=false, wxstyle, className, style)
 		.def("setOnEnter", &TextInput::setOnEnter)
 		.def("appendText", &TextInput::appendText)
 		.def("writeText", &TextInput::writeText)
@@ -207,7 +223,7 @@ void init_layout(py::module &m)
 
 	py::class_t<SearchCtrl, Control>(layout, "SearchCtrl")
 		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj>(),
-			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, exstyle, className, style)
+			"value"_a=wxEmptyString, "search_button"_a=true, "cancel_button"_a=true, wxstyle, className, style)
 		.def("setOnSubmit", &SearchCtrl::setOnSubmit)
 		.def("setOnCancel", &SearchCtrl::setOnCancel)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
@@ -288,7 +304,7 @@ void init_layout(py::module &m)
 	auto pyFilePickerCtrl = py::class_t<FilePickerCtrl, Control>(layout, "FilePickerCtrl")
 		.def_init(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "wildcard"_a=(const char*)wxFileSelectorDefaultWildcardStr,
-			"exstyle"_a=(long)(wxFLP_DEFAULT_STYLE|wxFLP_SMALL), className, style)
+			"wxstyle"_a=(long)(wxFLP_DEFAULT_STYLE|wxFLP_SMALL), className, style)
 		.def("setOnChange", &FilePickerCtrl::setOnChange)
 		.def_property("path", &FilePickerCtrl::getPath, &FilePickerCtrl::setPath)
 		.ptr();
@@ -304,7 +320,7 @@ void init_layout(py::module &m)
 
 	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(layout, "DirPickerCtrl")
 		.def_init(py::init<wxcstr, wxcstr, long, pyobj, pyobj>(),
-			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "exstyle"_a=(long)(wxDIRP_DEFAULT_STYLE|wxDIRP_SMALL), className, style)
+			"path"_a=wxEmptyString, "msg"_a=wxEmptyString, "wxstyle"_a=(long)(wxDIRP_DEFAULT_STYLE|wxDIRP_SMALL), className, style)
 		.def("setOnChange", &DirPickerCtrl::setOnChange)
 		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)
 		.ptr();
@@ -339,7 +355,7 @@ void init_layout(py::module &m)
 	// bars
 
 	py::class_t<ToolBar, Layout>(layout, "ToolBar")
-		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "exstyle"_a=(long)wxHORIZONTAL|wxTB_TEXT, styles, className, style)
+		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a=(long)wxHORIZONTAL|wxTB_TEXT, styles, className, style)
 		.def("addTool", &ToolBar::addTool, 
 			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
 		.def("addControl", &ToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)
@@ -349,7 +365,7 @@ void init_layout(py::module &m)
 		.def("setToolBitmapSize", &ToolBar::setToolBitmapSize);
 
 	py::class_t<AuiToolBar, Layout>(layout, "AuiToolBar")
-		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "exstyle"_a=(long)wxAUI_TB_HORIZONTAL|wxAUI_TB_TEXT, styles, className, style)
+		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a=(long)wxAUI_TB_HORIZONTAL|wxAUI_TB_TEXT, styles, className, style)
 		.def("addTool", &AuiToolBar::addTool, 
 			"label"_a, "shortHelp"_a=wxEmptyString, "bitmap"_a=None, "onclick"_a=None, "toolid"_a=-1, "kind"_a=wxEmptyString)
 		.def("addControl", &AuiToolBar::addControl, "view"_a, "label"_a=wxNoneString, "onclick"_a=None)

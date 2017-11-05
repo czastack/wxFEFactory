@@ -145,7 +145,7 @@ class BaseInputWidget(TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
-            self.view = ui.TextInput(className="fill", exstyle=0x0400)
+            self.view = ui.TextInput(className="fill", wxstyle=0x0400)
             self.render_btn()
 
             self.view.setOnKeyDown(self.onKey)

@@ -156,11 +156,12 @@
     <ClCompile Include="pyapi\layout\dialogs.cpp" />
     <ClCompile Include="pyapi\fefactory_api.cpp" />
     <ClCompile Include="pyapi\functions.cpp" />
+    <ClCompile Include="pyapi\layout\frames.cpp" />
     <ClCompile Include="pyapi\layout\layout.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="pyapi\layout\layoutbase.cpp" />
-    <ClCompile Include="pyapi\layout\layouts.cpp" />
+    <ClCompile Include="pyapi\layout\containers.cpp" />
     <ClCompile Include="pyapi\layout\menu.cpp" />
     <ClCompile Include="pyapi\pyutils.cpp" />
     <ClCompile Include="wxpatch.cpp" />
@@ -190,8 +191,9 @@
     <ClInclude Include="pyapi\fefactory_api.h" />
     <ClInclude Include="pyapi\functions.h" />
     <ClInclude Include="pyapi\layout\drop.hpp" />
+    <ClInclude Include="pyapi\layout\frames.h" />
     <ClInclude Include="pyapi\layout\layoutbase.h" />
-    <ClInclude Include="pyapi\layout\layouts.h" />
+    <ClInclude Include="pyapi\layout\containers.h" />
     <ClInclude Include="pyapi\layout\layout.h" />
     <ClInclude Include="pyapi\layout\menu.h" />
     <ClInclude Include="pyapi\layout\thread.h" />
