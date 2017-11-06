@@ -8,17 +8,56 @@ ui = fefactory_api.ui
 __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
 
 
-class BaseConfig(ABC):
-    def __init__(self, owner, name, label, default):
+
+class ConfigGroup:
+    GROUPS = []
+
+    def __init__(self, owner):
         if not isinstance(owner, Configurable):
             raise ValueError('owner must be Configurable object')
-        setattr(owner, name, self)
         self.owner = owner
+        self.children = []
+
+    def __del__(self):
+        self.children.clear()
+
+    def appendChild(self, child):
+        self.children.append(child)
+
+    def __enter__(self):
+        self.GROUPS.append(self)
+        return self
+
+    def __exit__(self, *args):
+        if self.GROUPS.pop() is not self:
+            raise ValueError('GROUPS层次校验失败')
+        for field in self.children:
+            field.render()
+            field.read()
+
+    def read(self, _=None):
+        for field in self.children:
+            field.read()
+
+    def write(self, _=None):
+        for field in self.children:
+            field.write()
+
+
+class ConfigCtrl(ABC):
+    def __init__(self, name, label, default):
+        parent = ConfigGroup.GROUPS[-1] if len(ConfigGroup.GROUPS) else None
+
+        if not parent:
+            raise ValueError('Config Widget must put within ConfigGroup')
+        
         self.name = name
         self.label = label
         self.default = default
-        owner.registerObserver(name, self._onConfigChange)
-        self.read()
+        parent.appendChild(self)
+        self.owner = parent.owner
+        setattr(self.owner, name, self)
+        self.owner.registerObserver(name, self._onConfigChange)
 
     def _onConfigChange(self, config, key, value):
         self.onConfigChange(value)
@@ -56,11 +95,17 @@ class BaseConfig(ABC):
         ui.Button(label="r", style=btn_style, onclick=self.read)
         ui.Button(label="w", style=btn_style, onclick=self.write)
 
+    def onDestroy(self, view):
+        """如果self.view有引用本类的函数，必须注册destroy事件以免循环引用"""
+        del self.view
 
-class BoolConfig(BaseConfig):
-    def __init__(self, owner, name, label, default=False):
-        self.view = ui.CheckBox(label, onchange=self.write)
-        super().__init__(owner, name, label, default)
+
+class BoolConfig(ConfigCtrl):
+    def __init__(self, name, label, default=False):
+        super().__init__(name, label, default)
+
+    def render(self):
+        self.view = ui.CheckBox(self.label, onchange=self.write)
 
     def get_input_value(self):
         return self.view.checked
@@ -69,14 +114,17 @@ class BoolConfig(BaseConfig):
         self.view.checked = value
 
 
-class InputConfig(BaseConfig):
-    def __init__(self, owner, name, label, default, type):
-        super().__init__(owner, name, label, default)
+class InputConfig(ConfigCtrl):
+    def __init__(self, name, label, default, type):
+        super().__init__(name, label, default)
         self.type = type
+
+    def render(self):
         self.render_lable()
         self.view = ui.TextInput(className="fill", wxstyle=0x0400)
-        self.render_btn()
         self.view.setOnKeyDown(self.onKey)
+        self.view.setOnDestroy(self.onDestroy)
+        self.render_btn()
 
     def get_input_value(self):
         return self.type(self.view.value)
@@ -109,6 +157,31 @@ class FloatConfig(InputConfig):
         kwargs['type'] = float
         kwargs.setdefault('default', 0.0)
         return super().__init__(*args, **kwargs)
+
+
+class SelectConfig(ConfigCtrl):
+    def __init__(self, name, label, choices, default=None):
+        super().__init__(name, label, default)
+        if default is None:
+            default = choices[0][1]
+        self.choices = choices
+
+    def render(self):
+        self.render_lable()
+        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=self.write)
+        self.view.setOnDestroy(self.onDestroy)
+        self.view.setSelection(0, True)
+
+    def get_input_value(self):
+        return self.choices[self.view.index]
+
+    def set_input_value(self, value):
+        for i, item in enumerate(self.choices):
+            if value == item[1]:
+                break
+        else:
+            return
+        self.view.index = i
 
 
 btn_style = {

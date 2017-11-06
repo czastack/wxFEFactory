@@ -74,8 +74,7 @@ class BaseTool(BaseScene):
         if self.nested:
             # 因为nested模式下，onClose在book的closePage后调用onClose（异步）
             # 故使用回调的方式
-            self.close_callback = close_callback
-            self.closeWindow()
+            close_callback()
         else:
             self.closeWindow()
             close_callback()

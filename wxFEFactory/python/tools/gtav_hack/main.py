@@ -12,7 +12,7 @@ from .data import VEHICLE_LIST, WEAPON_HASH, PLAYER_MODEL, WEAPON_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget
-from lib.config.widgets import IntConfig, BoolConfig, FloatConfig
+from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
 import math
 import os
 import json
@@ -154,9 +154,11 @@ class Tool(BaseGTATool):
                 ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
                 ui.Button("停止计时", onclick=self.freeze_timer)
                 ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+
         with Group(None, "设置", None, hasfootbar=False):
             ui.Hr()
-            BoolConfig(self.config, 'rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
+            with ConfigGroup(self.config):
+                BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
