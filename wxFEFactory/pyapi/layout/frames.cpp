@@ -115,3 +115,56 @@ void StdModalDialog::__exit__(py::args & args)
 	wxSizer* topsizer = m_elem->GetSizer();
 	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
 }
+
+bool BaseTopLevelWindow::setIcon(wxcstr path)
+{
+	wxIcon icon;
+	wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
+	if (type)
+	{
+		icon.LoadFile(path, type);
+		((wxTopLevelWindow*)m_elem)->SetIcon(icon);
+		return true;
+	}
+	return false;
+}
+
+bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
+{
+	if (hasEventHandler(event))
+	{
+		if (!handleEvent(event))
+		{
+			event.Veto();
+			return false;
+		}
+	}
+
+	// 引用减一，销毁对象
+	py::cast(this).dec_ref();
+	event.Skip();
+	return true;
+}
+
+bool BaseFrame::onClose(wxCloseEvent & event)
+{
+	bool result = BaseTopLevelWindow::onClose(event);
+	if (result)
+	{
+		auto menubar = getMenuBar();
+
+		if (menubar)
+			py::cast(menubar).dec_ref();
+	}
+	return result;
+}
+
+bool HotkeyWindow::onClose(wxCloseEvent & event)
+{
+	bool result = BaseFrame::onClose(event);
+	if (result)
+	{
+		stopHotkey();
+	}
+	return result;
+}

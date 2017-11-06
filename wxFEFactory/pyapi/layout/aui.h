@@ -114,17 +114,14 @@ public:
 		ctrl().SetSelection(n);
 	}
 
-	int getPageCount(int n)
+	int getPageCount()
 	{
 		return ctrl().GetPageCount();
 	}
 
 	bool canPageClose(int n = -1);
 
-	View* getPage(int n)
-	{
-		return (View*)ctrl().GetPage(n)->GetClientData();
-	}
+	View* getPage(int n = -1);
 
 	void _removePage(int n);
 
@@ -150,7 +147,7 @@ public:
 			menubar = new MenuBar(None);
 		}
 		setMenu(*menubar);
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIParentFrame::onClose, this);
+		init();
 
 		m_mgr = new wxAuiManager(m_elem);
 	}
@@ -160,20 +157,7 @@ public:
 		return *(wxAuiMDIParentFrame*)m_elem;
 	}
 
-	void onClose(class wxCloseEvent &event) override
-	{
-		wxAuiNotebook * notebook = win().GetNotebook();
-		if (notebook)
-		{
-			/// 关闭所有子窗口.
-			notebook->DeleteAllPages();
-		}
-
-		m_mgr->UnInit();
-		delete m_mgr;
-
-		BaseFrame::onClose(event);
-	}
+	bool onClose(class wxCloseEvent &event) override;
 };
 
 
@@ -185,7 +169,7 @@ public:
 	{
 		wxAuiMDIParentFrame *parent = (wxAuiMDIParentFrame*)getActiveWindow();
 		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIChildFrame::onClose, this);
+		init();
 	}
 
 	void __exit__(py::args &args) override

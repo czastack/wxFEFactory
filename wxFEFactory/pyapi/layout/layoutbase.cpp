@@ -309,7 +309,7 @@ Layout* View::getParent()
 	return (Layout*)parent;
 }
 
-void View::_handleEvent(wxEvent & event)
+bool View::handleEvent(wxEvent & event)
 {
 	py::object event_list = pyDictGet(m_event_table, py::int_(event.GetEventType()));
 
@@ -323,7 +323,7 @@ void View::_handleEvent(wxEvent & event)
 			callback = py::reinterpret_borrow<py::object>(e);
 			if (isPyDict(callback))
 			{
-				if (PyObject_IsTrue(pyDictGet(callback, "arg_event").ptr()))
+				if (callback.contains("arg_event"))
 				{
 					ret = pyCall(callback["callback"], this, &event);
 				}
@@ -333,10 +333,15 @@ void View::_handleEvent(wxEvent & event)
 			}
 			if (!PyObject_IsTrue(ret.ptr()))
 			{
+				if (ret.ptr() == Py_False)
+				{
+					return false;
+				}
 				event.Skip();
 			}
 		}
 	}
+	return true;
 }
 
 pyobj Layout::__enter__() {

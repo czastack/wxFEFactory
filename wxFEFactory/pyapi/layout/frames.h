@@ -11,6 +11,11 @@ class BaseTopLevelWindow : public Layout
 public:
 	using Layout::Layout;
 
+	void init()
+	{
+		m_elem->Bind(wxEVT_CLOSE_WINDOW, &BaseTopLevelWindow::_onClose, this);
+	}
+
 	void __exit__(py::args &args) override
 	{
 		Layout::__exit__(args);
@@ -58,18 +63,7 @@ public:
 		((wxTopLevelWindow*)m_elem)->SetTitle(title);
 	}
 
-	bool setIcon(wxcstr path)
-	{
-		wxIcon icon;
-		wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
-		if (type)
-		{
-			icon.LoadFile(path, type);
-			((wxTopLevelWindow*)m_elem)->SetIcon(icon);
-			return true;
-		}
-		return false;
-	}
+	bool setIcon(wxcstr path);
 
 	void setOnClose(pycref onclose)
 	{
@@ -81,17 +75,11 @@ public:
 		m_elem->Close();
 	}
 
-	virtual void onClose(class wxCloseEvent &event)
-	{
-		if (hasEventHandler(event))
-		{
-			_handleEvent(event);
-		}
-
-		// 引用减一，销毁对象
-		py::cast(this).dec_ref();
-		event.Skip();
+	void _onClose(class wxCloseEvent &event) {
+		onClose(event);
 	}
+
+	virtual bool onClose(class wxCloseEvent &event);
 };
 
 
@@ -126,15 +114,7 @@ public:
 		return ((StatusBar*)win().GetStatusBar()->GetClientData());
 	}
 
-	void onClose(class wxCloseEvent &event) override
-	{
-		auto menubar = getMenuBar();
-
-		if (menubar)
-			py::cast(menubar).dec_ref();
-
-		BaseTopLevelWindow::onClose(event);
-	}
+	bool onClose(class wxCloseEvent &event) override;
 
 	bool isKeepTop()
 	{
@@ -168,7 +148,7 @@ public:
 		{
 			setMenu(*menubar);
 		}
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
+		init();
 	}
 };
 
@@ -185,7 +165,7 @@ public:
 			menubar = new MenuBar(None);
 		}
 		setMenu(*menubar);
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIParentFrame::onClose, this);
+		init();
 	}
 };
 
@@ -202,7 +182,7 @@ public:
 		{
 			setMenu(*menubar);
 		}
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIChildFrame::onClose, this);
+		init();
 	}
 };
 
@@ -216,7 +196,7 @@ public:
 	template <class... Args>
 	HotkeyWindow(Args ...args) : Window(args...)
 	{
-		m_elem->Bind(wxEVT_HOTKEY, &HotkeyWindow::onHotkey, this);
+		
 	}
 
 	virtual ~HotkeyWindow()
@@ -242,12 +222,7 @@ public:
 		return py::module::import("types").attr("MappingProxyType")(m_hotkey_map);
 	}
 
-	void onClose(class wxCloseEvent &event) override
-	{
-		stopHotkey();
-
-		Window::onClose(event);
-	}
+	bool onClose(class wxCloseEvent &event) override;
 };
 
 
@@ -258,7 +233,7 @@ public:
 	Dialog(wxcstr title, long wxstyle/*=wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX*/, Args ...args) : BaseTopLevelWindow(args...)
 	{
 		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
-		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
+		init();
 	}
 
 	wxDialog& win() const

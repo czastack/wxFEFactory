@@ -349,7 +349,7 @@ void init_layout(py::module &m)
 
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
 		.def_init(layout_init, styles, className, style)
-		.def("getPage", &AuiNotebook::getPage)
+		.def("getPage", &AuiNotebook::getPage, "n"_a=-1)
 		.def("closePage", &AuiNotebook::closePage, "n"_a=-1)
 		.def("closeAllPage", &AuiNotebook::closeAllPage)
 		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
@@ -434,7 +434,8 @@ void init_layout(py::module &m)
 
 	// °´¼üÊÂ¼þ
 	py::class_<wxEvent>(layout, "Event")
-		.def("Skip", &wxEvent::Skip, "skip"_a=true);
+		.def("Skip", &wxEvent::Skip, "skip"_a = true)
+		.def_property("id", &wxEvent::GetId, &wxEvent::SetId);
 
 	auto KeyEvent = py::class_<wxKeyEvent, wxEvent>(layout, "KeyEvent")
 		.def("GetKeyCode", &wxKeyEvent::GetKeyCode)

@@ -96,11 +96,11 @@ class BaseGTATool(BaseTool):
         """重写这个函数，返回要注册的热键列表"""
         return self.get_common_hotkeys()
 
-    def onClose(self, _=None):
+    def onClose(self, *args):
         if self.handler.active:
             self.free_remote_function()
         self.config.writeConfig()
-        return super().onClose()
+        return super().onClose(*args)
 
     def discard_config(self, _=None):
         self.config.cancel_change()

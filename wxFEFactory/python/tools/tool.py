@@ -25,7 +25,8 @@ class BaseTool(BaseScene):
             else:
                 win = self.render()
             if win:
-                win.setOnClose(self.onClose)
+                
+                win.setOnClose({'callback': self.onClose, 'arg_event': True})
                 self.win = win
         except Exception:
             traceback.print_exc()
@@ -72,8 +73,7 @@ class BaseTool(BaseScene):
             frame.restart(callback=callback)
 
         if self.nested:
-            # 因为nested模式下，onClose在book的closePage后调用onClose（异步）
-            # 故使用回调的方式
+            # 现在改成了mainframe的onClose里会先关闭所有未关闭子窗口
             close_callback()
         else:
             self.closeWindow()
@@ -91,9 +91,20 @@ class BaseTool(BaseScene):
             # win应该设置close回调为self.onClose
             self.win.close()
 
-    def onClose(self, _=None):
+    def onClose(self, view=None, event=None):
+        """
+        有三种情况进入这里
+        1. nested且有关闭按钮，点关闭按钮触发
+        2. 手动调用self.closeWindow(菜单)，由parent.closePage内调用window的onClose触发
+        3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
+        """
+        if event and event.id is not 0:
+            # 第一种情况阻止关闭
+            fefactory_api.alert('请通过菜单过Tab上的关闭按钮关闭')
+            return False
+
         super().onClose()
-        
+
         if getattr(__main__, 'tool', None) == self:
             del __main__.tool
 

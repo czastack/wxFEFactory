@@ -205,7 +205,9 @@ public:
 		}
 	}
 
-	void _handleEvent(wxEvent &event);
+	bool handleEvent(wxEvent &event);
+
+	void View::_handleEvent(wxEvent & event) { handleEvent(event); }
 
 	template <typename EventTag>
 	void removeEvt(const EventTag& eventType, pycref fn)
@@ -449,11 +451,6 @@ void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbin
 {
 	if (!fn.is_none())
 	{
-		/*fn.inc_ref();
-		((wxEvtHandler*)m_elem)->Bind(eventType, [fn, this](auto &event) {
-		handleEvent(fn, event);
-		});*/
-
 		py::int_ eventKey((int)eventType);
 		py::object event_list;
 
