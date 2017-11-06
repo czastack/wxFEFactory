@@ -787,22 +787,30 @@ class Tool(BaseGTATool):
         """天降正义(导弹攻击坐标)"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
         self.request_weapon_model(weapon)
+        if self.config.rocket_attack_no_owner:
+            ped = 0
+        else:
+            ped = self.get_ped_id()
         for coord in coords:
             coord0 = list(coord)
             coord1 = coord
             coord0[2] += height
-            self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), speed, False)
+            self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
 
     def rocket_attack(self, entitys, speed=100, height=10):
         """天降正义(导弹攻击敌人)"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
         self.request_weapon_model(weapon)
+        if self.config.rocket_attack_no_owner:
+            ped = 0
+        else:
+            ped = self.get_ped_id()
         for p in entitys:
             if p.handle:
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
                 coord0[2] += height
-                self.shoot_between(coord0, coord1, 250, weapon, self.get_ped_id(), speed, False)
+                self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
 
     def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""

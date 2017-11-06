@@ -350,7 +350,7 @@ void init_layout(py::module &m)
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
 		.def_init(layout_init, styles, className, style)
 		.def("getPage", &AuiNotebook::getPage)
-		.def("closePage", &AuiNotebook::closePage)
+		.def("closePage", &AuiNotebook::closePage, "n"_a=-1)
 		.def("closeAllPage", &AuiNotebook::closeAllPage)
 		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
 		.def_property_readonly("index", &AuiNotebook::getPageCount);
