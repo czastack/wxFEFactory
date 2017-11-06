@@ -9,8 +9,6 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseTool):
-    nested = True
-
     def attach(self, frame):
         super().attach(frame)
         self.win.RegisterHotKeys((

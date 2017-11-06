@@ -157,7 +157,7 @@ public:
 		return *(wxAuiMDIParentFrame*)m_elem;
 	}
 
-	bool onClose(class wxCloseEvent &event) override;
+	void onRelease() override;
 };
 
 

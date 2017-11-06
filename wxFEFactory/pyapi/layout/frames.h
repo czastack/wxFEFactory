@@ -75,11 +75,11 @@ public:
 		m_elem->Close();
 	}
 
-	void _onClose(class wxCloseEvent &event) {
-		onClose(event);
-	}
+	void _onClose(class wxCloseEvent &event);
 
-	virtual bool onClose(class wxCloseEvent &event);
+	bool onClose(class wxCloseEvent &event);
+
+	virtual void onRelease();
 };
 
 
@@ -114,7 +114,7 @@ public:
 		return ((StatusBar*)win().GetStatusBar()->GetClientData());
 	}
 
-	bool onClose(class wxCloseEvent &event) override;
+	void onRelease() override;
 
 	bool isKeepTop()
 	{
@@ -196,7 +196,7 @@ public:
 	template <class... Args>
 	HotkeyWindow(Args ...args) : Window(args...)
 	{
-		
+		m_elem->Bind(wxEVT_HOTKEY, &HotkeyWindow::onHotkey, this);
 	}
 
 	virtual ~HotkeyWindow()
@@ -222,7 +222,7 @@ public:
 		return py::module::import("types").attr("MappingProxyType")(m_hotkey_map);
 	}
 
-	bool onClose(class wxCloseEvent &event) override;
+	void onRelease() override;
 };
 
 

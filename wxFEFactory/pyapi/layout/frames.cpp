@@ -129,6 +129,10 @@ bool BaseTopLevelWindow::setIcon(wxcstr path)
 	return false;
 }
 
+void BaseTopLevelWindow::_onClose(wxCloseEvent & event) {
+	onClose(event);
+}
+
 bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
 {
 	if (hasEventHandler(event))
@@ -139,32 +143,28 @@ bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
 			return false;
 		}
 	}
+	onRelease();
+	event.Skip();
+}
 
+void BaseTopLevelWindow::onRelease()
+{
 	// 引用减一，销毁对象
 	py::cast(this).dec_ref();
-	event.Skip();
-	return true;
 }
 
-bool BaseFrame::onClose(wxCloseEvent & event)
+void BaseFrame::onRelease()
 {
-	bool result = BaseTopLevelWindow::onClose(event);
-	if (result)
-	{
-		auto menubar = getMenuBar();
+	auto menubar = getMenuBar();
 
-		if (menubar)
-			py::cast(menubar).dec_ref();
-	}
-	return result;
+	if (menubar)
+		py::cast(menubar).dec_ref();
+
+	BaseTopLevelWindow::onRelease();
 }
 
-bool HotkeyWindow::onClose(wxCloseEvent & event)
+void HotkeyWindow::onRelease()
 {
-	bool result = BaseFrame::onClose(event);
-	if (result)
-	{
-		stopHotkey();
-	}
-	return result;
+	stopHotkey();
+	Window::onRelease();
 }

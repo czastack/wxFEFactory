@@ -98,7 +98,7 @@ class BaseTool(BaseScene):
         2. 手动调用self.closeWindow(菜单)，由parent.closePage内调用window的onClose触发
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
-        if event and event.id is not 0:
+        if self.nested and event and event.id is not 0:
             # 第一种情况阻止关闭
             fefactory_api.alert('请通过菜单过Tab上的关闭按钮关闭')
             return False

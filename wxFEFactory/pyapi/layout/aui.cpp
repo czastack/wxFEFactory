@@ -210,22 +210,17 @@ bool AuiNotebook::closeAllPage()
 	return true;
 }
 
-bool AuiMDIParentFrame::onClose(wxCloseEvent & event)
+void AuiMDIParentFrame::onRelease()
 {
-	bool result = BaseFrame::onClose(event);
-
-	if (result)
+	wxAuiNotebook * notebook = win().GetNotebook();
+	if (notebook)
 	{
-		wxAuiNotebook * notebook = win().GetNotebook();
-		if (notebook)
-		{
-			/// 关闭所有子窗口.
-			notebook->DeleteAllPages();
-		}
-
-		m_mgr->UnInit();
-		delete m_mgr;
+		/// 关闭所有子窗口.
+		notebook->DeleteAllPages();
 	}
 
-	return result;
+	m_mgr->UnInit();
+	delete m_mgr;
+
+	BaseFrame::onRelease();
 }
