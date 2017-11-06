@@ -36,7 +36,6 @@ void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyC
 		if (m_elem->RegisterHotKey(_hotkeyId, modifiers, virtualKeyCode))
 		{
 			m_hotkey_map[hotkeyId] = onhotkey;
-			onhotkey.inc_ref();
 		}
 		else {
 			py::print(origin_hotkey_id, "ÈÈ¼ü×¢²áÊ§°Ü");

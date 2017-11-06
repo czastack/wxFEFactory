@@ -1,31 +1,5 @@
 import os
-import json
 import struct
-
-
-class Configurable:
-    """
-    virtual getConfigFile() -> str
-    """
-
-    def __init__(self):
-        self.config_changed = False
-
-    def setConfig(self, key, value):
-        self.config[key] = value
-        self.config_changed = True
-
-    def loadConfig(self):
-        try:
-            with open(self.getConfigFile()) as file:
-                self.config = json.load(file)
-        except FileNotFoundError:
-            self.config = {}
-
-    def writeConfig(self):
-        if self.config_changed:
-            with open(self.getConfigFile(), 'w') as file:
-                self.config = json.dump(self.config, file)
 
 
 class HistoryList(list):

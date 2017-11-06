@@ -148,10 +148,56 @@ bool AuiNotebook::canPageClose(int n)
 		// 手动调用子窗口的onClose
 		if (py::isinstance<BaseTopLevelWindow>(page))
 		{
-			page.cast<BaseTopLevelWindow*>()->onClose(wxCloseEvent());
+			page.cast<BaseTopLevelWindow*>()->onClose(wxCloseEvent(wxEVT_CLOSE_WINDOW));
 		}
 	}
 
 	return ret;
+}
+
+
+void AuiNotebook::_removePage(int n)
+{
+	pyCall(m_children.attr("remove"), py::cast(getPage(n)));
+}
+
+void AuiNotebook::OnPageClose(wxAuiNotebookEvent & event)
+{
+	auto selection = event.GetSelection();
+	if (!canPageClose(selection))
+	{
+		event.Veto();
+	}
+	else {
+		_removePage(event.GetSelection());
+	}
+}
+
+bool AuiNotebook::closePage(int n)
+{
+	if (n == -1)
+	{
+		n = ctrl().GetSelection();
+	}
+
+	if (canPageClose(n))
+	{
+		_removePage(n);
+		ctrl().DeletePage(n);
+		return true;
+	}
+	return false;
+}
+
+bool AuiNotebook::closeAllPage()
+{
+	for (int i = 0; i < ctrl().GetPageCount(); i++)
+	{
+		if (!closePage(i))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 

@@ -26,6 +26,16 @@ View::View(pycref className, pycref style)
 	}
 }
 
+View::~View() {
+	m_event_table.clear();
+	m_event_table.release();
+	if (m_contextmenu)
+	{
+		m_contextmenu.dec_ref();
+		m_contextmenu.release();
+	}
+}
+
 void View::addToParent() {
 	Layout* pLayout = getActiveLayout();
 	if (pLayout)
@@ -259,6 +269,29 @@ void View::applyStyle()
 		if (style != None)
 			size.SetHeight(style.cast<int>());
 		m_elem->SetMaxSize(size);
+	}
+}
+
+void View::setContextMenu(ContextMenu & menu)
+{
+	m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
+	m_elem->Bind(wxEVT_MENU, &View::onContextMenu, this);
+	m_contextmenu = py::cast(menu);
+}
+
+void View::onPopMenu(wxContextMenuEvent & event)
+{
+	if (m_contextmenu)
+	{
+		m_elem->PopupMenu(py::cast<ContextMenu*>(m_contextmenu)->ptr());
+	}
+}
+
+void View::onContextMenu(wxCommandEvent & event)
+{
+	if (m_contextmenu)
+	{
+		py::cast<ContextMenu*>(m_contextmenu)->onSelect(py::cast(this), event.GetId());
 	}
 }
 

@@ -15,6 +15,12 @@ public:
 		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBarBase::onClick, this);
 	}
 
+	virtual ~ToolBarBase()
+	{
+		m_listeners.clear();
+		m_listeners = None;
+	}
+
 	T& ctrl() const
 	{
 		return *(T*)m_elem;

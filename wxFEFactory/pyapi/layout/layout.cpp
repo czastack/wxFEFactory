@@ -30,6 +30,8 @@ void init_layout(py::module &m)
 	auto type = "type"_a=wxEmptyString;
 	auto wxstyle = "wxstyle"_a=0;
 	auto n = "n"_a;
+	auto onchange = "onchange"_a;
+	auto evt_reset = "reset"_a = true;
 
 	auto view_init = py::init<pyobj, pyobj>();
 	auto layout_init = py::init<pyobj, pyobj, pyobj>();
@@ -56,6 +58,7 @@ void init_layout(py::module &m)
 		.def("setOnTextDrop", &View::setOnTextDrop)
 		.def("setOnClick", &View::setOnClick)
 		.def("setOnDoubleClick", &View::setOnDoubleClick)
+		.def("setOnDestroy", &View::setOnDestroy)
 		.def("refresh", &View::refresh)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("className", &View::m_class)
@@ -179,7 +182,7 @@ void init_layout(py::module &m)
 	py::class_t<Button, Control>(layout, "Button")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
 			label, "onclick"_a=None, className, style)
-		.def("setOnClick", &Button::setOnClick)
+		.def("setOnClick", &Button::setOnClick, "onclick"_a, evt_reset)
 		.def("getLabel", &Button::getLabel)
 		.def("setLabel", &Button::setLabel)
 		.def_property("label", &Button::getLabel, &Button::setLabel);
@@ -190,9 +193,9 @@ void init_layout(py::module &m)
 		.def("getLabel", &ToggleButton::getLabel)
 		.def("setLabel", &ToggleButton::setLabel)
 		.def("trigger", &ToggleButton::trigger)
+		.def("setOnChange", &ToggleButton::setOnChange, "onchange"_a, evt_reset)
 		.def_property("label", &ToggleButton::getLabel, &ToggleButton::setLabel)
-		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked)
-		.def_readwrite("onchange", &ToggleButton::m_change);
+		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked);
 
 	py::class_t<CheckBox, Control>(layout, "CheckBox")
 		.def_init(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(), 
@@ -201,8 +204,7 @@ void init_layout(py::module &m)
 		.def("setLabel", &CheckBox::setLabel)
 		.def("trigger", &CheckBox::trigger)
 		.def_property("label", &CheckBox::getLabel, &CheckBox::setLabel)
-		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked)
-		.def_readwrite("onchange", &CheckBox::m_change);
+		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked);
 
 	py::class_t<Text, Control>(layout, "Text")
 		.def_init(py::init<wxcstr, pyobj, pyobj>(), label, className, style)
@@ -250,7 +252,6 @@ void init_layout(py::module &m)
 		.def("__len__", &BaseControlWithItems::getCount)
 		.def("prev", &BaseControlWithItems::prev, "handle"_a=true)
 		.def("next", &BaseControlWithItems::next, "handle"_a=true)
-		.def_readwrite("onselect", &BaseControlWithItems::m_onselect)
 		.def_property("text", &BaseControlWithItems::getText1, &BaseControlWithItems::setText1)
 		.def_property("index", &BaseControlWithItems::getSelection, &BaseControlWithItems::doSetSelection)
 		.def_property_readonly("count", &BaseControlWithItems::getCount);
@@ -349,7 +350,10 @@ void init_layout(py::module &m)
 	py::class_t<AuiNotebook, Layout>(layout, "AuiNotebook")
 		.def_init(layout_init, styles, className, style)
 		.def("getPage", &AuiNotebook::getPage)
-		.def("closePage", &AuiNotebook::closePage);
+		.def("closePage", &AuiNotebook::closePage)
+		.def("closeAllPage", &AuiNotebook::closeAllPage)
+		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
+		.def_property_readonly("index", &AuiNotebook::getPageCount);
 
 
 	// bars

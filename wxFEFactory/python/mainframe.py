@@ -79,6 +79,8 @@ class MainFrame:
             if os.path.exists(icon_name):
                 win.setIcon(icon_name)
         
+        win.setOnClose(self.onClose)
+
         self.win = win
         self.aui = aui
         self.console = console
@@ -113,6 +115,12 @@ class MainFrame:
         except Exception:
             print('加载模块%s失败' % name)
             traceback.print_exc()
+
+    def onClose(self, _=None):
+        if self.book.closeAllPage():
+            del self.book
+            return True
+        return False
 
     def closeWindow(self, _=None):
         self.win.close()
@@ -248,9 +256,8 @@ class MainFrame:
                         traceback.print_exc()
 
     def openTool(self, m):
-        dialog = exui.ChoiceDialog("选择工具", style=dialog_style, combobox={'choices': self.tool_names})
+        dialog = exui.ChoiceDialog("选择工具", style=dialog_style, combobox={'choices': self.tool_names, 'onselect': self.onToolOpen})
         dialog.combobox.setOnEnter(self.onToolPanelEnter)
-        dialog.combobox.onselect = self.onToolOpen
         self.dialog = dialog
         dialog.showModal()
 
@@ -318,6 +325,7 @@ if __name__ == 'mainframe':
     frame = MainFrame(getattr(__main__, 'start_option', None))
 
     __main__.app = app
+    __main__.frame = frame
     __main__.win = win = frame.win
     __main__.fefactory_api = fefactory_api
     __main__.copy = fefactory_api.set_clipboard

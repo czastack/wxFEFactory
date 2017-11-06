@@ -332,12 +332,9 @@ class Tool(BaseGTATool):
         else:
             self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
-    # def spawn_vehicle(self, model_id):
-    #     self.handler.write32(cheat.SPAWN_VEHICLE_ID_BASE, model_id)
-
-    def spawn_vehicle(self, model_id):
+    def spawn_vehicle(self, model_id, coord=None):
         self.load_model(model_id)
-        self.script_call(0xa5, 'L3fP', model_id, *self.get_front_coord(), self.native_context.get_temp_addr())
+        self.script_call(0xa5, 'L3fP', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr())
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:
             return self.vehicle_pool[vehicle_handle >> 8]

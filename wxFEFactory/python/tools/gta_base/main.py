@@ -2,6 +2,7 @@ from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
+from lib.config import Configurable
 from commonstyle import styles
 from ..tool import BaseTool
 from .models import Pool
@@ -53,6 +54,7 @@ class BaseGTATool(BaseTool):
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
+        self.config = Configurable(self.getName() + '_config.json')
 
     def attach(self, frame):
         super().attach(frame)
@@ -97,7 +99,11 @@ class BaseGTATool(BaseTool):
     def onClose(self, _=None):
         if self.handler.active:
             self.free_remote_function()
+        self.config.writeConfig()
         return super().onClose()
+
+    def discard_config(self, _=None):
+        self.config.cancel_change()
 
     def swith_keeptop(self, cb):
         if self.nested:
@@ -225,23 +231,23 @@ class BaseGTATool(BaseTool):
         rotz = self.get_rotz()
         return (math.cos(rotz), math.sin(rotz), 0.1)
 
-    def get_front_coord(self):
+    def get_front_coord(self, delta=5):
         """获取前面一点的坐标"""
         rotz = self.get_rotz()
 
         xVal = math.cos(rotz)
         yVal = math.sin(rotz)
         coord = self.player.coord.values()
-        coord[0] += xVal * 5
-        coord[1] += yVal * 5
+        coord[0] += xVal * delta
+        coord[1] += yVal * delta
         return coord
 
-    def get_cam_front_coord(self):
+    def get_cam_front_coord(self, delta=5):
         """根据摄像机朝向获取前面一点的坐标"""
         rot = self.get_camera_rot()
         coord = self.player.coord.values()
-        coord[0] += rot[0] * 5
-        coord[1] += rot[1] * 5
+        coord[0] += rot[0] * delta
+        coord[1] += rot[1] * delta
         return coord
 
     def go_forward(self, _=None, rate=0):
@@ -617,11 +623,15 @@ class BaseGTATool(BaseTool):
                 if self.teleport_to_blip(blip):
                     break
 
-    def spawn_choosed_vehicle(self, _=None):
+    def get_selected_vehicle_model(self):
+        """获取刷车器选中的载具模型"""
+        return getattr(self, 'spwan_vehicle_id', None)
+
+    def spawn_choosed_vehicle(self, _=None, coord=None):
         """生成选中的载具"""
-        model = getattr(self, 'spwan_vehicle_id', None)
+        model = self.get_selected_vehicle_model()
         if model:
-            return self.spawn_vehicle(model)
+            return self.spawn_vehicle(model, coord)
 
     def on_spawn_vehicle_id_change(self, lb):
         """刷车器listbox回调"""
@@ -643,35 +653,52 @@ class BaseGTATool(BaseTool):
 
     def lock_door(self, _=None):
         """锁最近使用的载具的车门"""
-        car = self.last_vehicle
-        if car:
-            car.lock_door()
+        vehicle = self.last_vehicle
+        if vehicle:
+            vehicle.lock_door()
 
     def unlock_door(self, _=None):
         """解锁最近使用的载具的车门"""
-        car = self.last_vehicle
-        if car:
-            car.unlock_door()
+        vehicle = self.last_vehicle
+        if vehicle:
+            vehicle.unlock_door()
+
+    def launch_vehicle(self, vehicle, need_set_coord=True):
+        """朝前方发射载具"""
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
+        speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
+        if need_set_coord:
+            coord_up = getattr(self, 'SLING_COORD_UP', 1)
+            coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
+            if self.isInVehicle:
+                coord_delta *= 1.5
+            coord = self.player.coord.values()
+            coord[0] += cam_x * coord_delta
+            coord[1] += cam_y * coord_delta
+            coord[2] += cam_z * coord_delta + coord_up
+            vehicle.stop()
+            vehicle.coord = coord
+        vehicle.speed = speed
 
     def sling(self, _=None, recollect=False):
         """载具发射台"""
         vehicle = self.next_collected_vehicle(recollect=recollect)
-        
-        if not vehicle:
-            return
+        if vehicle:
+            self.launch_vehicle(vehicle)
 
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-        coord_up = getattr(self, 'SLING_COORD_UP', 1)
-        coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
-        coord = self.player.coord.values()
-        coord[0] += cam_x * coord_delta
-        coord[1] += cam_y * coord_delta
-        coord[2] += cam_z * coord_delta + coord_up
-        speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
-        speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
-        vehicle.stop()
-        vehicle.coord = coord
-        vehicle.speed = speed
+    def spawn_and_launch(self, _=None, recreate=False):
+        vehicle = None
+        if not recreate:
+            vehicle = getattr(self, '_last_spawn_and_launch_vehicle', None)
+        if not vehicle or vehicle.model_id != self.get_selected_vehicle_model():
+            coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
+            if self.isInVehicle:
+                coord_delta *= 1.5
+            vehicle = self.spawn_choosed_vehicle(coord=self.get_cam_front_coord(coord_delta))
+            self._last_spawn_and_launch_vehicle = vehicle
+        if vehicle:
+            self.launch_vehicle(vehicle)
 
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
@@ -825,6 +852,7 @@ class BaseGTATool(BaseTool):
             ('unlock_door', MOD_ALT | MOD_SHIFT, getVK('l'), self.unlock_door),
             ('sling', MOD_ALT, getVK('d'), self.sling),
             ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, recollect=True)),
+            ('spawn_and_launch', MOD_ALT, getVK('a'), self.spawn_and_launch),
             ('bring_one_vehicle', MOD_ALT, getVK('b'), self.bring_one_vehicle),
             ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
             ('explode_art', MOD_ALT, getVK('`'), self.explode_art),

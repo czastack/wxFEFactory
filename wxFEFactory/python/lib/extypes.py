@@ -148,3 +148,10 @@ class INum:
         return self.i
 
     __index__ = __int__
+
+
+def empty_method(self):
+    pass
+
+def empty_function():
+    pass

@@ -9,6 +9,9 @@ using AuiItem = Item;
 
 class AuiManager : public Layout
 {
+protected:
+	py::dict m_close_listeners;
+
 public:
 	AuiManager() : Layout(*safeActiveLayout())
 	{
@@ -20,6 +23,8 @@ public:
 	{
 		m_mgr->UnInit();
 		delete m_mgr;
+		m_close_listeners.clear();
+		m_close_listeners.release();
 	}
 
 	void doAdd(View &child) override;
@@ -74,6 +79,9 @@ protected:
 
 class AuiNotebook: public Layout
 {
+protected:
+	py::dict m_close_listeners;
+
 public:
 	template <class... Args>
 	AuiNotebook(Args ...args) : Layout(args...)
@@ -83,9 +91,10 @@ public:
 		m_elem->Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &AuiNotebook::OnPageClose, this);
 	}
 
-	~AuiNotebook()
+	virtual ~AuiNotebook()
 	{
-		
+		m_close_listeners.clear();
+		m_close_listeners.release();
 	}
 
 	wxAuiNotebook& ctrl() const
@@ -95,10 +104,19 @@ public:
 
 	void doAdd(View &child) override;
 
-	void closePage()
+	int getSelection()
 	{
-		if (canPageClose())
-			ctrl().DeletePage(ctrl().GetSelection());
+		return ctrl().GetSelection();
+	}
+
+	void setSelection(int n)
+	{
+		ctrl().SetSelection(n);
+	}
+
+	int getPageCount(int n)
+	{
+		return ctrl().GetPageCount();
 	}
 
 	bool canPageClose(int n = -1);
@@ -108,23 +126,20 @@ public:
 		return (View*)ctrl().GetPage(n)->GetClientData();
 	}
 
-	void OnPageClose(wxAuiNotebookEvent & event)
-	{
-		if (!canPageClose(event.GetSelection()))
-		{
-			event.Veto();
-		}
-		else {
-			pyCall(m_children.attr("remove"), py::cast(getPage(event.GetSelection())));
-		}
-	}
+	void _removePage(int n);
 
-protected:
-	py::dict m_close_listeners;
+	void OnPageClose(wxAuiNotebookEvent & event);
+
+	bool closePage(int n = -1);
+
+	bool closeAllPage();
 };
 
 
 class AuiMDIParentFrame : public BaseFrame {
+protected:
+	wxAuiManager *m_mgr;
+
 public:
 	template <class... Args>
 	AuiMDIParentFrame(wxcstr title, MenuBar *menubar, long wxstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
@@ -136,7 +151,6 @@ public:
 		}
 		setMenu(*menubar);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIParentFrame::onClose, this);
-		m_onclose = None;
 
 		m_mgr = new wxAuiManager(m_elem);
 	}
@@ -160,10 +174,6 @@ public:
 
 		BaseFrame::onClose(event);
 	}
-
-
-protected:
-	wxAuiManager *m_mgr;
 };
 
 
@@ -176,7 +186,6 @@ public:
 		wxAuiMDIParentFrame *parent = (wxAuiMDIParentFrame*)getActiveWindow();
 		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &AuiMDIChildFrame::onClose, this);
-		m_onclose = None;
 	}
 
 	void __exit__(py::args &args) override

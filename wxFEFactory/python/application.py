@@ -1,4 +1,5 @@
-from lib.utils import Configurable, HistoryList
+from lib.utils import HistoryList
+from lib.config import Configurable
 from project import Project
 import json
 import fefactory_api
@@ -6,12 +7,11 @@ import fefactory_api
 CONFIG_FILE = 'config.json'
 HISTORY_SIZE = 10
 
-class Application((Configurable)):
+class Application(Configurable):
     """保存一些全局数据"""
     
     def __init__(self):
-        super().__init__()
-        self.loadConfig()
+        Configurable.__init__(self, CONFIG_FILE)
         config = self.config
         if 'recent_project' in config:
             config['recent_project'] = HistoryList(config['recent_project'], HISTORY_SIZE)
@@ -26,12 +26,6 @@ class Application((Configurable)):
             return False
         return True
 
-    def getConfigFile(self):
-        return CONFIG_FILE
-
-    def getConfig(self, name, defval=None):
-        return self.config.get(name, defval)
-
     def setConfig(self, name, value):
         self.config[name] = value
 
@@ -44,6 +38,10 @@ class Application((Configurable)):
         self.writeConfig()
         if self.project:
             self.project.writeConfig()
+        import __main__, application
+        del __main__.app
+        del __main__.win
+        del application.app
 
 
 app = Application()

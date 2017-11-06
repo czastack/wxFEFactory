@@ -55,9 +55,9 @@ class BaseGTA3Tool(BaseGTATool):
         for e in self.get_enemys():
             self.create_explosion(e.coord)
 
-    def spawn_vehicle(self, model_id):
+    def spawn_vehicle(self, model_id, coord=None):
         self.load_model(model_id)
-        self.script_call(0xa5, 'L3fP', model_id, *self.get_front_coord(), self.native_context.get_temp_addr())
+        self.script_call(0xa5, 'L3fP', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr())
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:
             return self.vehicle_pool[vehicle_handle >> 8]

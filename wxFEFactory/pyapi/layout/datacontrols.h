@@ -4,7 +4,7 @@
 #include <wx/listctrl.h>
 
 
-class PropertyGrid: public Control
+class PropertyGrid : public Control
 {
 public:
 	template <class... Args>
@@ -18,6 +18,11 @@ public:
 		pg.SetCaptionBackgroundColour(0xeeeeee);
 		pg.SetMarginColour(0xeeeeee);
 		pg.Bind(wxEVT_PG_CHANGING, &PropertyGrid::OnChange, this);
+	}
+
+	virtual ~PropertyGrid()
+	{
+		m_onchange.release();
 	}
 
 	wxPropertyGrid& ctrl() const

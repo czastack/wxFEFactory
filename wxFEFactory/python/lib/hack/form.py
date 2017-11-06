@@ -19,8 +19,15 @@ class Widget:
             parent.appendChild(self)
             if self.addr is None:
                 self.addr = parent.addr
-        self.parent = parent
+
+            if parent.handler:
+                self.handler = parent.handler
         self.render()
+        if hasattr(self, 'view'):
+            self.view.setOnDestroy(self.onDestroy)
+
+    def __del__(self):
+        pass
 
     def render(self):
         ui.Text(self.label, className="label_left expand")
@@ -35,9 +42,8 @@ class Widget:
     def write(self):
         pass
 
-    @property
-    def _handler(self):
-        return self.parent.handler if self.parent else None
+    def onDestroy(self, view):
+        del self.view
 
     def __repr__(self):
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
@@ -91,15 +97,29 @@ class ModelWidget:
 class Group(Widget):
 
     def __init__(self, name, label, addr, flexgrid=True, hasfootbar=True, handler=None):
-        super().__init__(name, label, addr)
         self.flexgrid = flexgrid
         self.hasfootbar = hasfootbar
         self.children = []
-        self.handler = handler or (self._handler if self.parent else None)
+        self.handler = handler
+        super().__init__(name, label, addr)
+
+    def __del__(self):
+        super().__del__()
+        self.children.clear()
 
     def render(self):
-        with ui.ScrollView(className="fill") as root:
-            self.view = ui.Vertical(className="fill container")
+        with ui.Vertical() as root:
+            with ui.ScrollView(className="fill container"):
+                if self.flexgrid:
+                    self.view = ui.FlexGridLayout(cols=2, vgap=10, className="fill")
+                    self.view.AddGrowableCol(1)
+                else:
+                    self.view = ui.Vertical(className="fill")
+
+            if self.hasfootbar:
+                with ui.Horizontal(className="container"):
+                    ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
+                    ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
         ui.Item(root, caption=self.label)
 
     def appendChild(self, child):
@@ -107,22 +127,10 @@ class Group(Widget):
 
     def __enter__(self):
         self.view.__enter__()
-        if self.flexgrid:
-            self.container = ui.FlexGridLayout(cols=2, vgap=10, className="fill container")
-            self.container.AddGrowableCol(1)
-            self.container.__enter__()
-
         self.GROUPS.append(self)
         return self
 
     def __exit__(self, *args):
-        if self.flexgrid:
-            self.container.__exit__(*args)
-        if self.hasfootbar:
-            with ui.Horizontal(className="container"):
-                ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
-                ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
-
         self.view.__exit__(*args)
         if self.GROUPS.pop() is not self:
             raise ValueError('GROUPS层次校验失败')
@@ -179,14 +187,14 @@ class InputWidget(BaseInputWidget):
 
     @property
     def mem_value(self):
-        ret = self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
         if self.type is float:
             ret = float32(ret)
         return ret
 
     @mem_value.setter
     def mem_value(self, value):
-        self._handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
 
 
 class ProxyInputWidget(BaseInputWidget):
@@ -223,7 +231,7 @@ class CheckBoxWidget(Widget):
 
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
-        self._handler.ptrsWrite(self.addr, self.offsets, data, len(data))
+        self.handler.ptrsWrite(self.addr, self.offsets, data, len(data))
 
 
 class CoordWidget(TwoWayWidget):
@@ -235,13 +243,19 @@ class CoordWidget(TwoWayWidget):
             self.data_list = []
             self.lastfile = None
 
+    def onDestroy(self, view):
+        super().onDestroy(view)
+        del self.views
+        if self.savable:
+            del self.listbox
+
     def render(self):
         super().render()
         if not self.savable:
             with ui.Horizontal(className="expand"):
-                self.x_view = ui.TextInput(className="fill")
-                self.y_view = ui.TextInput(className="fill")
-                self.z_view = ui.TextInput(className="fill")
+                x_view = ui.TextInput(className="fill")
+                y_view = ui.TextInput(className="fill")
+                z_view = ui.TextInput(className="fill")
                 self.render_btn()
 
         else:
@@ -251,11 +265,11 @@ class CoordWidget(TwoWayWidget):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
                             ui.Text("X坐标", className="label_left expand")
-                            self.x_view = ui.TextInput(className="fill")
+                            x_view = ui.TextInput(className="fill")
                             ui.Text("Y坐标", className="label_left expand")
-                            self.y_view = ui.TextInput(className="fill")
+                            y_view = ui.TextInput(className="fill")
                             ui.Text("Z坐标", className="label_left expand")
-                            self.z_view = ui.TextInput(className="fill")
+                            z_view = ui.TextInput(className="fill")
                             ui.Text("名称", className="label_left expand")
                             self.name_view = ui.TextInput(className="fill")
                         with ui.Horizontal(className="container"):
@@ -273,7 +287,8 @@ class CoordWidget(TwoWayWidget):
                     ui.MenuItem("粘贴(&V)", onselect=self.onPaste)
                 root.setContextMenu(contextmenu)
 
-        self.views = (self.x_view, self.y_view, self.z_view)
+        self.views = (x_view, y_view, z_view)
+        self.view = x_view
 
     @property
     def mem_value(self):
@@ -281,10 +296,10 @@ class CoordWidget(TwoWayWidget):
         ret = []
         for child in self.views:
             if offsets:
-                value = self._handler.ptrsRead(self.addr, offsets, float)
+                value = self.handler.ptrsRead(self.addr, offsets, float)
                 offsets[-1] += 4
             else:
-                value = float32(self._handler.readFloat(self.addr))
+                value = float32(self.handler.readFloat(self.addr))
             ret.append(value)
         return ret
 
@@ -298,10 +313,10 @@ class CoordWidget(TwoWayWidget):
                 continue
             value = float(value)
             if offsets:
-                self._handler.ptrsWrite(self.addr, offsets, value)
+                self.handler.ptrsWrite(self.addr, offsets, value)
                 offsets[-1] += 4
             else:
-                self._handler.writeFloat(self.addr, value)
+                self.handler.writeFloat(self.addr, value)
 
     @property
     def input_value(self):
@@ -420,11 +435,11 @@ class SelectWidget(BaseSelectWidget):
 
     @property
     def mem_value(self):
-        return self._handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        return self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
 
     @mem_value.setter
     def mem_value(self, value):
-        self._handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
 
 
 class ModelSelectWidget(ModelWidget, BaseSelectWidget):

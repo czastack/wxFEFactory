@@ -7,6 +7,7 @@
 
 class BaseTopLevelWindow : public Layout
 {
+
 public:
 	using Layout::Layout;
 
@@ -14,10 +15,9 @@ public:
 	{
 		Layout::__exit__(args);
 		m_elem->Show();
-		if (!m_elem->GetParent())
-		{
-			py::cast(this).inc_ref();
-		}
+		
+		// 引用加一
+		py::cast(this).inc_ref();
 	}
 
 	void setSize(py::tuple &size)
@@ -73,7 +73,7 @@ public:
 
 	void setOnClose(pycref onclose)
 	{
-		m_onclose = onclose;
+		bindEvt(wxEVT_CLOSE_WINDOW, onclose, true, false);
 	}
 
 	void close()
@@ -83,18 +83,15 @@ public:
 
 	virtual void onClose(class wxCloseEvent &event)
 	{
-		if (!m_onclose.is_none())
+		if (hasEventHandler(event))
 		{
-			handleEvent(m_onclose, event);
+			_handleEvent(event);
 		}
 
 		// 引用减一，销毁对象
 		py::cast(this).dec_ref();
 		event.Skip();
 	}
-
-protected:
-	pyobj m_onclose;
 };
 
 
@@ -172,7 +169,6 @@ public:
 			setMenu(*menubar);
 		}
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Window::onClose, this);
-		m_onclose = None;
 	}
 };
 
@@ -190,7 +186,6 @@ public:
 		}
 		setMenu(*menubar);
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIParentFrame::onClose, this);
-		m_onclose = None;
 	}
 };
 
@@ -208,18 +203,26 @@ public:
 			setMenu(*menubar);
 		}
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &MDIChildFrame::onClose, this);
-		m_onclose = None;
 	}
 };
 
 
 class HotkeyWindow : public Window
 {
+protected:
+	py::dict m_hotkey_map;
+
 public:
 	template <class... Args>
 	HotkeyWindow(Args ...args) : Window(args...)
 	{
 		m_elem->Bind(wxEVT_HOTKEY, &HotkeyWindow::onHotkey, this);
+	}
+
+	virtual ~HotkeyWindow()
+	{
+		m_hotkey_map.clear();
+		m_hotkey_map.release();
 	}
 
 	bool prepareHotkey(pyobj &hotkeyId, WORD &int_hotkeyId);
@@ -245,9 +248,6 @@ public:
 
 		Window::onClose(event);
 	}
-
-protected:
-	py::dict m_hotkey_map;
 };
 
 
@@ -259,7 +259,6 @@ public:
 	{
 		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &Dialog::onClose, this);
-		m_onclose = None;
 	}
 
 	wxDialog& win() const

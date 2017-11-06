@@ -21,6 +21,11 @@ public:
 class MenuHolder : public BaseMenu
 {
 public:
+	virtual ~MenuHolder()
+	{
+		m_children.attr("clear")();
+	}
+
 	virtual void append(wxMenu *menu, wxcstr text, wxcstr helpStr) = 0;
 	virtual wxMenuItem* append(int id, wxcstr text, wxcstr helpStr, wxcstr kindStr) = 0;
 	virtual py::dict* getHandlers() = 0;
@@ -110,6 +115,13 @@ public:
 
 	}
 
+	virtual ~ContextMenu()
+	{
+		m_handlers.clear();
+		m_handlers.release();
+		m_onselect.release();
+	}
+
 	bool onSelect(pycref view, int id);
 
 private:
@@ -124,6 +136,13 @@ public:
 	MenuBar(pycref onselect) : m_elem(new wxMenuBar(0)), m_onselect(onselect)
 	{
 		m_elem->SetClientData(this);
+	}
+
+	virtual ~MenuBar()
+	{
+		m_handlers.clear();
+		m_handlers.release();
+		m_onselect.release();
 	}
 
 	void append(wxMenu *menu, wxcstr text, wxcstr helpStr) override

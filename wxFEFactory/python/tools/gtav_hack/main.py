@@ -12,6 +12,7 @@ from .data import VEHICLE_LIST, WEAPON_HASH, PLAYER_MODEL, WEAPON_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget
+from lib.config.widgets import IntConfig, BoolConfig, FloatConfig
 import math
 import os
 import json
@@ -35,6 +36,7 @@ class Tool(BaseGTATool):
     SAFE_SPEED_UP = 6
     GO_FORWARD_COORD_RATE = 3
     FLY_SPEED = 15
+    SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
     SLING_SPEED_RATE = 60
     VEHICLE_LIST = VEHICLE_LIST
@@ -152,6 +154,11 @@ class Tool(BaseGTATool):
                 ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
                 ui.Button("停止计时", onclick=self.freeze_timer)
                 ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+        with Group(None, "设置", None, hasfootbar=False):
+            ui.Hr()
+            BoolConfig(self.config, 'rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
+            ui.Hr()
+            ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
     def get_hotkeys(self):
         return (
@@ -577,7 +584,7 @@ class Tool(BaseGTATool):
             coord = list(blip.coord)
             if coord[0] != 0 or coord[1] != 0:
                 if coord[2] < 3:
-                    coord[2] = 40
+                    coord[2] = 1024
                     coord[2] = self.GetGroundZ(coord) or 36
                 self.entity.coord = coord
                 return True
@@ -709,17 +716,11 @@ class Tool(BaseGTATool):
                 return model_name
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
-    def spawn_choosed_vehicle(self, _=None):
-        """生成选中的载具"""
-        model = self.get_selected_vehicle_model()
-        if model:
-            return self.spawn_vehicle(model)
-
-    def spawn_vehicle(self, model):
+    def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
-        m = models.VModel(model, self)
+        m = models.VModel(model_id, self)
         m.request()
-        handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model, *self.get_front_coord(), self.player.heading, 0, 1)
+        handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model_id, *(coord or self.get_front_coord()), self.player.heading, 0, 1)
         return Vehicle(handle, self)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):

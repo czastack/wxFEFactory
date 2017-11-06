@@ -54,18 +54,22 @@ class Layout;
 
 class View
 {
+protected:
+	wxWindow *m_elem;
+	pyobj m_style;
+	pyobj m_class;
+	pyobj m_contextmenu;
+	py::dict m_event_table;
+	bool m_added = false;
+
+	static wxVector<Layout*> LAYOUTS;
+
 public:
 	View(pycref className, pycref style);
 
-	View(wxWindow* elem)
-		:View(None, None)
-	{
-		m_elem = elem;
-	}
+	View(wxWindow* elem) : View(None, None) { m_elem = elem; }
 
-	virtual ~View() {
-		
-	}
+	virtual ~View();
 
 	wxWindow *ptr() const
 	{
@@ -155,28 +159,11 @@ public:
 		return ptr()->IsShown();
 	}
 
-	void setContextMenu(ContextMenu &menu)
-	{
-		m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
-		m_elem->Bind(wxEVT_MENU, &View::onContextMenu, this);
-		m_contextmenu = py::cast(menu);
-	}
+	void setContextMenu(ContextMenu &menu);
 
-	void onPopMenu(wxContextMenuEvent& event)
-	{
-		if (m_contextmenu)
-		{
-			m_elem->PopupMenu(py::cast<ContextMenu*>(m_contextmenu)->ptr());
-		}
-	}
+	void onPopMenu(wxContextMenuEvent& event);
 
-	void onContextMenu(wxCommandEvent& event)
-	{
-		if (m_contextmenu)
-		{
-			py::cast<ContextMenu*>(m_contextmenu)->onSelect(py::cast(this), event.GetId());
-		}
-	}
+	void onContextMenu(wxCommandEvent& event);
 
 	void refresh()
 	{
@@ -200,8 +187,14 @@ public:
 		return m_elem;
 	}
 
+	bool hasEventHandler(const wxEvent& event)
+	{
+		py::int_ eventKey((int)event.GetEventType());
+		return m_event_table.contains(eventKey);
+	}
+
 	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false);
+	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false, bool wxbind = true);
 
 	void handleEvent(pycref fn, wxEvent &event)
 	{
@@ -261,6 +254,11 @@ public:
 	void setOnClick(pycref fn)
 	{
 		bindEvt(wxEVT_LEFT_DOWN, fn);
+	}
+
+	void setOnDestroy(pycref fn)
+	{
+		bindEvt(wxEVT_DESTROY, fn);
 	}
 
 	static int parseColor(wxcstr color, uint defval = 0);
@@ -344,16 +342,6 @@ public:
 	}
 
 	friend void init_layout(py::module &m);
-
-protected:
-	wxWindow *m_elem;
-	pyobj m_style;
-	pyobj m_class;
-	pyobj m_contextmenu;
-	py::dict m_event_table;
-	bool m_added = false;
-
-	static wxVector<Layout*> LAYOUTS;
 };
 
 
@@ -380,6 +368,11 @@ public:
 		m_children(proxyed.m_children), m_styles(None)
 	{
 
+	}
+
+	virtual ~Layout() {
+		m_children.attr("clear")();
+		m_children.release();
 	}
 
 	void add(View &child) {
@@ -452,7 +445,7 @@ public:
 
 
 template<typename EventTag>
-void View::bindEvt(const EventTag & eventType, pycref fn, bool reset)
+void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbind)
 {
 	if (!fn.is_none())
 	{
@@ -478,7 +471,10 @@ void View::bindEvt(const EventTag & eventType, pycref fn, bool reset)
 			event_list = py::list();
 			m_event_table[eventKey] = event_list;
 
-			((wxEvtHandler*)m_elem)->Bind(eventType, &View::_handleEvent, this);
+			if (wxbind)
+			{
+				((wxEvtHandler*)m_elem)->Bind(eventType, &View::_handleEvent, this);
+			}
 		}
 		event_list.attr("append")(fn);
 	}

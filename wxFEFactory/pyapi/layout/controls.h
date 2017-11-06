@@ -25,9 +25,9 @@ public:
 		return *(wxButton*)m_elem;
 	}
 
-	void setOnClick(pyobj &fn)
+	void setOnClick(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_BUTTON, fn);
+		bindEvt(wxEVT_BUTTON, fn, reset);
 	}
 };
 
@@ -37,7 +37,7 @@ class ToggleButton : public Control
 public:
 	template <class... Args>
 	ToggleButton(wxcstr label, bool checked, pyobj &onchange, Args ...args) :
-		Control(args...), m_change(onchange)
+		Control(args...)
 	{
 
 		bindElem(new wxToggleButton(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize()));
@@ -45,7 +45,7 @@ public:
 		{
 			setChecked(true);
 		}
-		m_elem->Bind(wxEVT_TOGGLEBUTTON, &ToggleButton::onChange, this);
+		setOnChange(onchange);
 	}
 
 	wxToggleButton& ctrl() const
@@ -69,18 +69,10 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void onChange(wxCommandEvent & event)
+	void setOnChange(pyobj &fn, bool reset=true)
 	{
-		if (!m_change.is_none())
-		{
-			handleEvent(m_change, event);
-		}
+		bindEvt(wxEVT_TOGGLEBUTTON, fn);
 	}
-
-	friend void init_layout(py::module &m);
-
-protected:
-	pyobj m_change;
 };
 
 
@@ -89,7 +81,7 @@ class CheckBox : public Control
 public:
 	template <class... Args>
 	CheckBox(wxcstr label, bool checked, bool alignRight, pyobj &onchange, Args ...args) :
-		Control(args...), m_change(onchange)
+		Control(args...)
 	{
 		long style = 0L;
 		if (alignRight)
@@ -102,7 +94,7 @@ public:
 		{
 			setChecked(true);
 		}
-		m_elem->Bind(wxEVT_CHECKBOX, &CheckBox::onChange, this);
+		setOnChange(onchange);
 	}
 
 	wxCheckBox& ctrl() const
@@ -126,18 +118,10 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void onChange(wxCommandEvent & event)
+	void setOnChange(pyobj &fn, bool reset = true)
 	{
-		if (!m_change.is_none())
-		{
-			handleEvent(m_change, event);
-		}
+		bindEvt(wxEVT_CHECKBOX, fn);
 	}
-
-	friend void init_layout(py::module &m);
-
-protected:
-	pyobj m_change;
 };
 
 
@@ -342,7 +326,7 @@ class BaseControlWithItems : public Control
 {
 public:
 	BaseControlWithItems(pycref onselect, pycref className, pycref style) :
-		Control(className, style), m_onselect(onselect)
+		Control(className, style)
 	{
 
 	}
@@ -350,14 +334,6 @@ public:
 	wxControlWithItems& ctrl() const
 	{
 		return *(wxControlWithItems*)m_elem;
-	}
-
-	void onSelect(wxCommandEvent & event)
-	{
-		if (!m_onselect.is_none())
-		{
-			handleEvent(m_onselect, event);
-		}
 	}
 
 	virtual int getSelection()
@@ -490,11 +466,6 @@ public:
 
 		setSelection(pos + 1, handle);
 	}
-
-	friend void init_layout(py::module &m);
-
-protected:
-	pyobj m_onselect;
 };
 
 
@@ -550,7 +521,7 @@ public:
 		ControlWithItems(onselect, args...)
 	{
 		bindElem(new wxListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
-		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
 	wxListBox& ctrl() const
@@ -574,7 +545,7 @@ public:
 		ListBox(onselect, args...)
 	{
 		bindElem(new wxCheckListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
-		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
 	wxCheckListBox& ctrl() const
@@ -630,7 +601,7 @@ public:
 	{
 		bindElem(new wxRearrangeListPatched(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(),
 			py::cast<wxArrayInt>(order), py::cast<wxArrayString>(choices)));
-		m_elem->Bind(wxEVT_LISTBOX, &ListBox::onSelect, this);
+		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
 	wxRearrangeList& ctrl() const
@@ -657,7 +628,7 @@ public:
 		ControlWithItems(onselect, args...)
 	{
 		bindElem(new wxChoice(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
-		m_elem->Bind(wxEVT_CHOICE, &Choice::onSelect, this);
+		bindEvt(wxEVT_CHOICE, onselect);
 	}
 
 	void triggerSelectEvent() override
@@ -688,7 +659,7 @@ public:
 			style |= wxCB_READONLY;
 		}
 		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), style));
-		m_elem->Bind(wxEVT_COMBOBOX, &ComboBox::onSelect, this);
+		bindEvt(wxEVT_COMBOBOX, onselect);
 
 		if (!(style & wxCB_READONLY))
 		{
@@ -737,7 +708,7 @@ public:
 		BaseControlWithItems(onselect, args...)
 	{
 		bindElem(new wxRadioBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
-		m_elem->Bind(wxEVT_RADIOBOX, &ComboBox::onSelect, this);
+		bindEvt(wxEVT_RADIOBOX, onselect);
 	}
 
 	wxRadioBox& ctrl() const

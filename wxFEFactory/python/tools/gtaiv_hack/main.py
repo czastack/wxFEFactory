@@ -530,7 +530,8 @@ class Tool(BaseGTATool):
             entity = self.entity
             if coord[0] != 0 or coord[1] != 0:
                 entity.coord = coord
-                if coord[2] == 0.0:
+                if coord[2] < 3:
+                    coord[2] = 1024
                     coord[2] = self.GetGroundZ(coord) or 16
                 entity.coord = coord
                 return True
@@ -592,12 +593,12 @@ class Tool(BaseGTATool):
     def game_week(self, value):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
 
-    def spawn_vehicle(self, model):
+    def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
-        m = models.IVModel(model, self)
+        m = models.IVModel(model_id, self)
         m.request()
         if m.loaded:
-            self.script_call('CREATE_CAR', 'L3fLL', model, *self.player.get_offset_coord((2, 0, 0)), self.native_context.get_temp_addr(), 1)
+            self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr(), 1)
             return Vehicle(self.native_context.get_temp_value(), self)
         else:
             print("模型未加载", hex(model))

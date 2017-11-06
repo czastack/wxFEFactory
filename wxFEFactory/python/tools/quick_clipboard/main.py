@@ -11,7 +11,7 @@ ui = fefactory_api.ui
 class Tool(BaseTool):
 
     def attach(self, frame):
-        self.render()
+        super().attach(frame)
         self.win.RegisterHotKeys((
             ('item_prev', MOD_ALT, getVK('['), self.item_prev),
             ('item_next', MOD_ALT, getVK(']'), self.item_next),
@@ -32,12 +32,7 @@ class Tool(BaseTool):
                         ui.Text("切换下一个: alt+]")
                         ui.Text("切换并粘贴上一个: alt+shift+[")
                         ui.Text("切换并粘贴下一个: alt+shift+]")
-
-
-        self.win = win
-
-    def closeWindow(self, m=None):
-        self.win.close()
+        return win
 
     def input_text(self, _=None):
         self.listbox.setItems(self.textinput.value.split('\n'))
