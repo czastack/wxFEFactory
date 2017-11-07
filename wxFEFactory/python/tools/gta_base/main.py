@@ -2,7 +2,7 @@ from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.config import Configurable
+from lib.config import Config
 from commonstyle import styles
 from ..tool import BaseTool
 from .models import Pool
@@ -54,7 +54,7 @@ class BaseGTATool(BaseTool):
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
-        self.config = Configurable(self.getName() + '_config.json')
+        self.config = Config(self.getName() + '_config.json')
 
     def attach(self, frame):
         super().attach(frame)
@@ -99,7 +99,7 @@ class BaseGTATool(BaseTool):
     def onClose(self, *args):
         if self.handler.active:
             self.free_remote_function()
-        self.config.writeConfig()
+        self.config.write()
         return super().onClose(*args)
 
     def discard_config(self, _=None):

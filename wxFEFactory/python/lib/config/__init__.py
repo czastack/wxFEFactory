@@ -1,1 +1,1 @@
-from .configurable import Configurable
+from .configurable import Configurable, Config

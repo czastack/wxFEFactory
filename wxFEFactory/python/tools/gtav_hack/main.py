@@ -159,6 +159,7 @@ class Tool(BaseGTATool):
             ui.Hr()
             with ConfigGroup(self.config):
                 BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
+                FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -696,7 +697,7 @@ class Tool(BaseGTATool):
         try:
             i = self.player_models.index(self.player.model_id)
             self.native_call('STAT_GET_INT', '2Ql', self.money_keys[i], self.native_context.get_temp_addr(), -1)
-            return self.native_context.get_temp_value()
+            return self.native_context.get_temp_value(size=4)
         except:
             print('请确保当前人物模型是三主角之一')
 
@@ -704,7 +705,7 @@ class Tool(BaseGTATool):
     def money(self, value):
         try:
             i = self.player_models.index(self.player.model_id)
-            self.native_call('STAT_SET_INT', '2Ql', self.money_keys[i], int(value), 1)
+            self.native_call('STAT_SET_INT', 'Q2l', self.money_keys[i], int(value), 1)
         except:
             print('请确保当前人物模型是三主角之一')
 
@@ -762,7 +763,7 @@ class Tool(BaseGTATool):
             self.request_weapon_model(weapon)
         self.script_call('SHOOT_SINGLE_BULLET_BETWEEN_COORDS', '6f6Qf', *v1, *v2, demage, 1, weapon, owner, 1, 0, speed)
 
-    def shoot_vehicle_rocket(self, _=None, ped_id=None, count=1):
+    def shoot_vehicle_rocket(self, _=None, ped=None, count=1):
         """发射车载火箭"""
         weapon = WEAPON_HASH['VEHICLE_ROCKET']
         self.request_weapon_model(weapon)
@@ -774,16 +775,19 @@ class Tool(BaseGTATool):
         # 目标坐标
         target = coord + rot * 100
 
-        if ped_id is None:
-            ped_id = self.get_ped_id()
+        if ped is None:
+            if self.config.rocket_attack_no_owner:
+                ped = 0
+            else:
+                ped = self.get_ped_id()
 
         vertical_1, vertical_2 = rot.get_vetical_xy()
         vertical_1 *= 0.5
         vertical_2 *= 0.5
 
         for i in range(1, count + 1):
-            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped_id, -1.0, False)
-            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped_id, -1.0, False)
+            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped, -1.0, False)
+            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped, -1.0, False)
 
     def rocket_attack_coords(self, coords, speed=100, height=10):
         """天降正义(导弹攻击坐标)"""
@@ -807,6 +811,9 @@ class Tool(BaseGTATool):
             ped = 0
         else:
             ped = self.get_ped_id()
+
+        speed = self.config.rocket_attack_speed or speed
+
         for p in entitys:
             if p.handle:
                 coord0 = p.coord.values()

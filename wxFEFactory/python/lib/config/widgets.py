@@ -14,7 +14,7 @@ class ConfigGroup:
 
     def __init__(self, owner):
         if not isinstance(owner, Configurable):
-            raise ValueError('owner must be Configurable object')
+            raise TypeError('owner must be Configurable object')
         self.owner = owner
         self.children = []
 
@@ -49,18 +49,18 @@ class ConfigCtrl(ABC):
         parent = ConfigGroup.GROUPS[-1] if len(ConfigGroup.GROUPS) else None
 
         if not parent:
-            raise ValueError('Config Widget must put within ConfigGroup')
+            raise TypeError('Config Widget must put within ConfigGroup')
         
         self.name = name
         self.label = label
         self.default = default
         parent.appendChild(self)
         self.owner = parent.owner
-        setattr(self.owner, name, self)
+        self.owner.setDefault(name, default)
         self.owner.registerObserver(name, self._onConfigChange)
 
-    def _onConfigChange(self, config, key, value):
-        self.onConfigChange(value)
+    def _onConfigChange(self, config, name, value):
+        self.read()
 
     def __get__(self, obj, type=None):
         return self.get_config_value()
@@ -121,16 +121,17 @@ class InputConfig(ConfigCtrl):
 
     def render(self):
         self.render_lable()
-        self.view = ui.TextInput(className="fill", wxstyle=0x0400)
+        with ui.Horizontal(className="fill"):
+            self.view = ui.TextInput(className="fill", wxstyle=0x0400)
+            self.render_btn()
         self.view.setOnKeyDown(self.onKey)
         self.view.setOnDestroy(self.onDestroy)
-        self.render_btn()
 
     def get_input_value(self):
         return self.type(self.view.value)
 
     def set_input_value(self, value):
-        self.value = extypes.astr(value)
+        self.view.value = extypes.astr(value)
 
     def onKey(self, v, event):
         mod = event.GetModifiers()
@@ -146,17 +147,13 @@ class InputConfig(ConfigCtrl):
 
 
 class IntConfig(InputConfig):
-    def __init__(self, *args, **kwargs):
-        kwargs['type'] = int
-        kwargs.setdefault('default', 0)
-        return super().__init__(*args, **kwargs)
+    def __init__(self, name, label, default=0):
+        return super().__init__(name, label, default, int)
 
 
 class FloatConfig(InputConfig):
-    def __init__(self, *args, **kwargs):
-        kwargs['type'] = float
-        kwargs.setdefault('default', 0.0)
-        return super().__init__(*args, **kwargs)
+    def __init__(self, name, label, default=0.0):
+        return super().__init__(name, label, default, float)
 
 
 class SelectConfig(ConfigCtrl):
