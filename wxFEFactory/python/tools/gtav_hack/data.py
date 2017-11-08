@@ -1,8 +1,3 @@
-WEAPON_HASH = {
-    'VEHICLE_ROCKET': 0xBEFDC581,
-}
-
-
 WEAPON_LIST = [
     ("Melee 手持物", (
         ("GOLFCLUB", "高尔夫球杆", 0x440E4788),
@@ -90,6 +85,15 @@ WEAPON_LIST = [
         ("BRIEFCASE", "公文包", 0x88C78EB7),
     )),
 ]
+
+SHOOT_WEAPON_CHOICES = (
+    ("车载火箭炮", 0xBEFDC581),
+    ("空袭", 0x13579279),
+    ("火箭砲", 0xB1CA77B1),
+    ("火箭砲2", 0x687652CE),
+    ("镭射枪", 0x6D544C99),
+    ("追踪弹发射器", 0x63AB0442),
+)
 
 
 # 载具种类

@@ -25,7 +25,6 @@ class BaseTool(BaseScene):
             else:
                 win = self.render()
             if win:
-                
                 win.setOnClose({'callback': self.onClose, 'arg_event': True})
                 self.win = win
         except Exception:

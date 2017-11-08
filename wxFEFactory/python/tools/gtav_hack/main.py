@@ -9,7 +9,7 @@ from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
 from . import address, models
-from .data import VEHICLE_LIST, WEAPON_HASH, PLAYER_MODEL, WEAPON_LIST
+from .data import VEHICLE_LIST, PLAYER_MODEL, WEAPON_LIST, SHOOT_WEAPON_CHOICES
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget
@@ -174,9 +174,10 @@ class Tool(BaseGTATool):
         with Group(None, "设置", None, hasfootbar=False):
             ui.Hr()
             with ConfigGroup(self.config):
-                BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
+                BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉，但某些任务敌人打不死)')
                 FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
                 FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
+                SelectConfig('shoot_weapon_hash', '射击武器种类', SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -773,6 +774,19 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
+    def get_weapon_hash(self, name):
+        """通过武器名称获取hash"""
+        for group in WEAPON_LIST:
+            for item in group[1]:
+                if item[0] == name:
+                    return item[2]
+
+    def get_shoot_weapon(self):
+        """获取要射击的武器模型"""
+        weapon = self.config.shoot_weapon_hash
+        self.request_weapon_model(weapon)
+        return weapon
+
     def shoot_between(self, v1, v2, demage, weapon, owner, speed, check_model=True):
         """ 武器把子弹从v1射向v2
         :param demage: 伤害值: int
@@ -787,8 +801,7 @@ class Tool(BaseGTATool):
 
     def shoot_vehicle_rocket(self, _=None, ped=None, count=1):
         """发射车载火箭"""
-        weapon = WEAPON_HASH['VEHICLE_ROCKET']
-        self.request_weapon_model(weapon)
+        weapon = self.get_shoot_weapon()
         coord = Vector3(self.get_cam_front_coord())
         rot = Vector3(self.get_camera_rot())
         if self.isInVehicle:
@@ -815,8 +828,7 @@ class Tool(BaseGTATool):
 
     def rocket_attack_coords(self, coords, speed=100, height=10):
         """天降正义(导弹攻击坐标)"""
-        weapon = WEAPON_HASH['VEHICLE_ROCKET']
-        self.request_weapon_model(weapon)
+        weapon = self.get_shoot_weapon()
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
@@ -829,8 +841,7 @@ class Tool(BaseGTATool):
 
     def rocket_attack(self, entitys, speed=100, height=10):
         """天降正义(导弹攻击敌人)"""
-        weapon = WEAPON_HASH['VEHICLE_ROCKET']
-        self.request_weapon_model(weapon)
+        weapon = self.get_shoot_weapon()
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
@@ -847,8 +858,7 @@ class Tool(BaseGTATool):
 
     def rocket_shoot(self, entitys, speed=100, height=10):
         """导弹射向目标"""
-        weapon = WEAPON_HASH['VEHICLE_ROCKET']
-        self.request_weapon_model(weapon)
+        weapon = self.get_shoot_weapon()
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:

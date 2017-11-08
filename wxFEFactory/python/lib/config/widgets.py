@@ -34,6 +34,9 @@ class ConfigGroup:
         for field in self.children:
             field.render()
             field.read()
+            help_text = getattr(field, 'help', None)
+            if help_text is not None:
+                field.set_help()
 
     def read(self, _=None):
         for field in self.children:
@@ -94,6 +97,15 @@ class ConfigCtrl(ABC):
     def render_btn(self):
         ui.Button(label="r", style=btn_style, onclick=self.read)
         ui.Button(label="w", style=btn_style, onclick=self.write)
+
+    def set_help(self, text=None):
+        if text is None:
+            text = self.help
+        try:
+            self.view.setToolTip(text)
+        except Exception:
+            self.help = text
+        return self
 
     def onDestroy(self, view):
         """如果self.view有引用本类的函数，必须注册destroy事件以免循环引用"""
@@ -170,7 +182,7 @@ class SelectConfig(ConfigCtrl):
         self.view.setSelection(0, True)
 
     def get_input_value(self):
-        return self.choices[self.view.index]
+        return self.choices[self.view.index][1]
 
     def set_input_value(self, value):
         for i, item in enumerate(self.choices):
