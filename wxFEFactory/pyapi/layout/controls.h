@@ -29,6 +29,11 @@ public:
 	{
 		bindEvt(wxEVT_BUTTON, fn, reset);
 	}
+
+	void click()
+	{
+		addPendingEvent(wxEVT_BUTTON);
+	}
 };
 
 

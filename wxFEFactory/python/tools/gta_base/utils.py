@@ -35,6 +35,9 @@ class Vector:
     def values(self):
         return list(self._values)
 
+    def clone(self):
+        return self.__class__(self._values)
+
     def __getitem__(self, i):
         return self._values[i]
 
@@ -102,6 +105,12 @@ class Vector:
         for i in range(self.len):
             self[i] /= length
 
+    def distance(self, v):
+        if v.length != self.length:
+            raise ValueError('维度不一致')
+        return math.sqrt(sum(
+            (abs(self[i] - v[i]) ** 2) for i in range(self.length)
+        ))
 
     class Item:
         def __init__(self, i):

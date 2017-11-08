@@ -104,7 +104,7 @@ class NativeEntity(NativeModel):
 
     @coord.setter
     def coord(self, value):
-        self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *value, True, True, True, False, sync=False)
+        self.script_call('SET_ENTITY_COORDS', 'Q3f4Q', self.handle, *value, True, True, True, False)
         time.sleep(0.2)
 
     def get_offset_coord(self, offset):
@@ -126,7 +126,8 @@ class NativeEntity(NativeModel):
 
     @speed.setter
     def turn_speed(self, value):
-        self.native_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value, 0, 0, 0, True, False, True, True, True, True)
+        # 结果还是speed...
+        self.script_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value, 0, 0, 0, True, False, True, True, True, True)
 
     max_speed = property(None, setter('SET_ENTITY_MAX_SPEED', float))
 
@@ -268,8 +269,10 @@ class Player(NativeEntity):
         self.native_call('SET_PED_MONEY', '2Q', self.handle, value)
 
     gravity = property(None, setter('SET_PED_GRAVITY', bool))
-    # 不会被拽出车
+    # 能否被拽出车
     can_be_dragged_out_of_vehicle = property(None, setter('SET_PED_CAN_BE_DRAGGED_OUT', bool))
+    # 能否在车中被射击
+    can_be_shot_in_vehicle = property(None, setter('SET_PED_CAN_BE_SHOT_IN_VEHICLE', bool))
 
     # 通缉等级
     wanted_level = property(player_getter('GET_PLAYER_WANTED_LEVEL'))
@@ -344,6 +347,14 @@ class Player(NativeEntity):
         handle = self.get_last_vehicle_handle()
         if handle:
             return Vehicle(handle, self.mgr)
+
+    def into_vehicle(self, vehicle, seat=-1):
+        """进入车辆"""
+        self.script_call('TASK_WARP_PED_INTO_VEHICLE', '2Ql', self.handle, vehicle, seat)
+
+    def into_vehicle2(self, vehicle, seat=-1):
+        """进入车辆"""
+        self.script_call('SET_PED_INTO_VEHICLE', '2Ql', self.handle, vehicle, seat)
 
     # ----------------------------------------------------------------------
     # 武器相关
@@ -640,6 +651,7 @@ class Blip(NativeModel):
     BLIP_COLORS_ENEMY = (BLIP_COLOR_RED, BLIP_COLOR_REDMISSION)
 
     color = property(NativeModel.getter('GET_BLIP_COLOUR'), NativeModel.setter('SET_BLIP_COLOUR'))
+    hud_color = property(NativeModel.getter('GET_BLIP_HUD_COLOUR'))
     blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
     sprite = property(NativeModel.getter('GET_BLIP_SPRITE'))
     existed = property(NativeModel.getter('DOES_BLIP_EXIST', bool))

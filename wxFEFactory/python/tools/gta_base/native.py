@@ -208,3 +208,24 @@ class NativeContext64(NativeContext):
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
         self.handler.write(addr, buff)
         self.m_nArgCount = arg_count
+
+
+class SafeScriptEnv:
+    def __init__(self, owner, names=None):
+        """
+        :param names: 确保调用script_call执行的方法名集合
+        """
+        self.owner = owner
+        self.names = names
+
+    def __enter__(self):
+        self._native_call = self.owner.native_call
+        self.owner.native_call = self.hook if self.names else self.owner.script_call
+        return self
+
+    def __exit__(self, *args):
+        self.owner.native_call = self._native_call
+        del self._native_call
+
+    def hook(self, name, *args, **kwargs):
+        return (self.owner.script_call if name in self.names else self._native_call)(name, *args, **kwargs)

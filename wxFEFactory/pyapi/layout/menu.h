@@ -119,7 +119,7 @@ public:
 	{
 		m_handlers.clear();
 		m_handlers.release();
-		m_onselect.release();
+		m_onselect = None;
 	}
 
 	bool onSelect(pycref view, int id);
@@ -142,7 +142,7 @@ public:
 	{
 		m_handlers.clear();
 		m_handlers.release();
-		m_onselect.release();
+		m_onselect = None;
 	}
 
 	void append(wxMenu *menu, wxcstr text, wxcstr helpStr) override

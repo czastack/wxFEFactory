@@ -170,6 +170,7 @@ class Tool(BaseGTATool):
                 ui.Button("瞬移到目的地(红)", onclick=self.teleport_to_destination)
                 ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
                 ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
+                self.set_buttons_contextmenu()
                 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
@@ -370,10 +371,12 @@ class Tool(BaseGTATool):
             o.coord = coord
 
     def near_peds_pinwheel(self, _=None):
+        """附近的人大风车"""
         for p in self.get_near_peds():
             p.turn_speed = (1, 1, 0.6)
 
     def near_vehicles_pinwheel(self, _=None):
+        """附近的车大风车"""
         for v in self.get_near_vehicles():
             v.turn_speed = (1, 1, 0.6)
 

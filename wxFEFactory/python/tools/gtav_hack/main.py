@@ -7,6 +7,7 @@ from lib import utils
 from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
+from ..gta_base.native import SafeScriptEnv
 from . import address, models
 from .data import VEHICLE_LIST, WEAPON_HASH, PLAYER_MODEL, WEAPON_LIST
 from .models import Player, Vehicle
@@ -44,6 +45,11 @@ class Tool(BaseGTATool):
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
 
+
+    def __init__(self):
+        super().__init__()
+        self.safe_script_env = SafeScriptEnv(self)
+
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
             self.hp_view = ModelInputWidget("hp", "生命")
@@ -58,7 +64,8 @@ class Tool(BaseGTATool):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
                 ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_can_switch_weapons)
-                ui.ToggleButton(label="不会被拽出车", onchange=self.set_ped_canot_be_dragged_out)
+                ui.ToggleButton(label="不能被拽出载具", onchange=self.set_ped_canot_be_dragged_out)
+                ui.ToggleButton(label="不能在车中被射击", onchange=self.set_ped_can_be_shot_in_vehicle)
                 ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
                 ui.ToggleButton(label="切换无限弹药", onchange=self.set_ped_infinite_ammo_clip)
                 ui.ToggleButton(label="不被警察注意", onchange=self.set_ped_ignored_by_police)
@@ -152,14 +159,24 @@ class Tool(BaseGTATool):
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
                 ui.Button("导弹攻击敌人", onclick=self.rocket_attack_enemy)
                 ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
+                ui.Button("导弹攻击警察", onclick=self.rocket_attack_police)
+                ui.Button("导弹攻击警察和警用直升机", onclick=self.rocket_attack_police_and_helicopter)
+                ui.Button("导弹射向敌人", onclick=self.rocket_shoot_enemy)
+                ui.Button("导弹射向所有标记", onclick=self.rocket_shoot_target)
+                ui.Button("导弹射向警察", onclick=self.rocket_shoot_police)
+                ui.Button("导弹射向警察和警用直升机", onclick=self.rocket_shoot_police_and_helicopter)
                 ui.Button("停止计时", onclick=self.freeze_timer)
                 ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+                ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
+                ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
+                self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
             ui.Hr()
             with ConfigGroup(self.config):
                 BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉)')
                 FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
+                FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -174,6 +191,7 @@ class Tool(BaseGTATool):
             ('shoot_vehicle_rocket', MOD_ALT, getVK('r'), self.shoot_vehicle_rocket),
             ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK('r'), partial(self.shoot_vehicle_rocket, count=3)),
             ('rocket_attack_enemy', MOD_ALT, getVK("enter"), self.rocket_attack_enemy),
+            ('rocket_shoot_enemy', MOD_ALT | MOD_SHIFT, getVK("enter"), self.rocket_shoot_enemy),
             ('special_ability_fill_meter', MOD_ALT, getVK("capslock"), self.special_ability_fill_meter),
         ) + self.get_common_hotkeys()
 
@@ -428,8 +446,12 @@ class Tool(BaseGTATool):
         self.player.block_switch_weapons = not tb.checked
 
     def set_ped_canot_be_dragged_out(self, tb):
-        """当前角色不会被拖出载具"""
+        """当前角色不能被拖出载具"""
         self.player.can_be_dragged_out_of_vehicle = not tb.checked
+
+    def set_ped_can_be_shot_in_vehicle(self, tb):
+        """当前角色不能否在车中被射击"""
+        self.player.can_be_shot_in_vehicle = not tb.checked
 
     def set_ped_keep_bike(self, tb):
         """当前角色不会从摩托车上甩出去"""
@@ -553,7 +575,7 @@ class Tool(BaseGTATool):
 
     def get_enemy_blips(self):
         """获取所有红色标记"""
-        return self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY)
+        return (blip for blip in self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY) if blip.hud_color == 6)
 
     def get_friends(self):
         """获取蓝色标记的peds"""
@@ -728,9 +750,9 @@ class Tool(BaseGTATool):
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""
-        car = self.spawn_choosed_vehicle()
-        if car:
-            self.script_call('TASK_WARP_PED_INTO_VEHICLE', '3Q', self.player.handle, car.handle, 0, sync=False)
+        vehicle = self.spawn_choosed_vehicle()
+        if vehicle:
+            self.player.into_vehicle(vehicle.handle)
 
     def create_ped(self, model, pedType=21):
         """生成角色"""
@@ -785,9 +807,11 @@ class Tool(BaseGTATool):
         vertical_1 *= 0.5
         vertical_2 *= 0.5
 
+        speed = self.config.rocket_shoot_speed or -1.0
+
         for i in range(1, count + 1):
-            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped, -1.0, False)
-            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped, -1.0, False)
+            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped, speed, False)
+            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped, speed, False)
 
     def rocket_attack_coords(self, coords, speed=100, height=10):
         """天降正义(导弹攻击坐标)"""
@@ -821,6 +845,25 @@ class Tool(BaseGTATool):
                 coord0[2] += height
                 self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
 
+    def rocket_shoot(self, entitys, speed=100, height=10):
+        """导弹射向目标"""
+        weapon = WEAPON_HASH['VEHICLE_ROCKET']
+        self.request_weapon_model(weapon)
+        if self.config.rocket_attack_no_owner:
+            ped = 0
+        else:
+            ped = self.get_ped_id()
+
+        speed = self.config.rocket_shoot_speed or speed
+
+        coord = Vector3(self.player.coord)
+
+        for p in entitys:
+            if p.handle:
+                coord1 = Vector3(p.coord)
+                coord0 = (coord + coord1) * 0.5
+                self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
+
     def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""
         self.rocket_attack(self.get_enemy_blips(), *args, **kwargs)
@@ -836,6 +879,22 @@ class Tool(BaseGTATool):
     def rocket_attack_police_and_helicopter(self, _=None, *args, **kwargs):
         """乱世枭雄(导弹攻击警察和警用直升机)"""
         self.rocket_attack(tuple(self.get_police_blips()) + tuple(self.get_police_helicopter_blips()), *args, **kwargs)
+
+    def rocket_shoot_enemy(self, _=None, *args, **kwargs):
+        """导弹射向敌人"""
+        self.rocket_shoot(self.get_enemy_blips(), *args, **kwargs)
+
+    def rocket_shoot_target(self, _=None, *args, **kwargs):
+        """导弹射向所有圆形标记"""
+        self.rocket_shoot(self.get_target_blips(), *args, **kwargs)
+
+    def rocket_shoot_police(self, _=None, *args, **kwargs):
+        """导弹射向警察"""
+        self.rocket_shoot(self.get_police_blips(), *args, **kwargs)
+
+    def rocket_shoot_police_and_helicopter(self, _=None, *args, **kwargs):
+        """导弹射向警察和警用直升机"""
+        self.rocket_shoot(tuple(self.get_police_blips()) + tuple(self.get_police_helicopter_blips()), *args, **kwargs)
 
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
@@ -889,3 +948,13 @@ class Tool(BaseGTATool):
         model = self.get_selected_ped_model()
         if model:
             self.create_ped(self.get_selected_ped_model())
+
+    def near_peds_go_away(self, _=None):
+        """附近的人吹飞"""
+        with SafeScriptEnv(self, ('SET_ENTITY_VELOCITY',)):
+            self.launch_entity(self.get_near_peds(), False)
+
+    def near_vehicles_go_away(self, _=None):
+        """附近的车吹飞"""
+        with SafeScriptEnv(self, ('SET_ENTITY_VELOCITY',)):
+            self.launch_entity(self.get_near_vehicles(), False)

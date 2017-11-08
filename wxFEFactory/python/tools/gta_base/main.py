@@ -663,29 +663,33 @@ class BaseGTATool(BaseTool):
         if vehicle:
             vehicle.unlock_door()
 
-    def launch_vehicle(self, vehicle, need_set_coord=True):
+    def launch_entity(self, entitys, need_set_coord=True):
         """朝前方发射载具"""
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-        speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
-        speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
-        if need_set_coord:
-            coord_up = getattr(self, 'SLING_COORD_UP', 1)
-            coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
-            if self.isInVehicle:
-                coord_delta *= 1.5
-            coord = self.player.coord.values()
-            coord[0] += cam_x * coord_delta
-            coord[1] += cam_y * coord_delta
-            coord[2] += cam_z * coord_delta + coord_up
-            vehicle.stop()
-            vehicle.coord = coord
-        vehicle.speed = speed
+        if not hasattr(entitys, '__iter__'):
+            entitys = (entitys,)
+
+        for entity in entitys:
+            cam_x, cam_y, cam_z = self.get_camera_rot()
+            speed_rate = getattr(self, 'SLING_SPEED_RATE', 3)
+            speed = (cam_x * speed_rate, cam_y * speed_rate, cam_z * speed_rate)
+            if need_set_coord:
+                coord_up = getattr(self, 'SLING_COORD_UP', 1)
+                coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
+                if self.isInVehicle:
+                    coord_delta *= 1.5
+                coord = self.player.coord.values()
+                coord[0] += cam_x * coord_delta
+                coord[1] += cam_y * coord_delta
+                coord[2] += cam_z * coord_delta + coord_up
+                entity.stop()
+                entity.coord = coord
+            entity.speed = speed
 
     def sling(self, _=None, recollect=False):
         """载具发射台"""
         vehicle = self.next_collected_vehicle(recollect=recollect)
         if vehicle:
-            self.launch_vehicle(vehicle)
+            self.launch_entity(vehicle)
 
     def spawn_and_launch(self, _=None, recreate=False):
         vehicle = None
@@ -698,7 +702,7 @@ class BaseGTATool(BaseTool):
             vehicle = self.spawn_choosed_vehicle(coord=self.get_cam_front_coord(coord_delta))
             self._last_spawn_and_launch_vehicle = vehicle
         if vehicle:
-            self.launch_vehicle(vehicle)
+            self.launch_entity(vehicle)
 
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
@@ -773,6 +777,16 @@ class BaseGTATool(BaseTool):
                 json.dump(datas, file, ensure_ascii=False)
 
             fefactory_api.alert('转换成功: ' + jsonpath)
+
+    def set_cfn(self, btn, m=None):
+        self.cfn = btn.click
+
+    def set_buttons_contextmenu(self):
+        parent = ui.View.get_active_layout()
+        with ui.ContextMenu(onselect=self.set_cfn) as contextmenu:
+            ui.MenuItem("设为alt+c快捷键(&C)")
+        for btn in parent.children:
+            btn.setContextMenu(contextmenu)
 
     def render_common_button(self):
         ui.Button("杀掉附近的人", onclick=self.kill_near_peds)
