@@ -165,7 +165,7 @@ void init_layout(py::module &m)
 		.def_property("label", &StaticBox::getLabel, &StaticBox::setLabel);
 
 	py::class_t<BookCtrlBase, Layout>(layout, "BookCtrlBase")
-		.def("getPage", &BookCtrlBase::getPage)
+		.def("getPage", &BookCtrlBase::getPage, "n"_a=-1)
 		.def("getPageCount", &BookCtrlBase::getPageCount)
 		.def("setPageText", &BookCtrlBase::setPageText)
 		.def("getPageText", &BookCtrlBase::getPageText)

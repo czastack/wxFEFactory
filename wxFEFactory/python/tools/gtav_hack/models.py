@@ -50,10 +50,10 @@ class NativeModel:
             raise ValueError('not support type: ' + type_.__name__)
         if default is not None:
             def setter(self, value=default):
-                self.native_call(name, 'Q' + s, self.handle, value)
+                self.native_call(name, 'Q' + s, self.handle, type_(value))
         else:
             def setter(self, value):
-                self.native_call(name, 'Q' + s, self.handle, value)
+                self.native_call(name, 'Q' + s, self.handle, type_(value))
         return setter
 
     builders = (getter, getter_ptr, setter)
@@ -241,10 +241,10 @@ class Player(NativeEntity):
             raise ValueError('not support type: ' + type_.__name__)
         if default is not None:
             def setter(self, value=default):
-                self.native_call(name, 'Q' + s, self.index, value)
+                self.native_call(name, 'Q' + s, self.index, type_(value))
         else:
             def setter(self, value):
-                self.native_call(name, 'Q' + s, self.index, value)
+                self.native_call(name, 'Q' + s, self.index, type_(value))
         return setter
 
     @property
@@ -370,8 +370,9 @@ class Player(NativeEntity):
         """移除指定武器"""
         self.script_call('REMOVE_WEAPON_FROM_PED', '2Q', self.handle, weapon)
 
-    # 移除所有武器
-    remove_all_weapons = setter('REMOVE_ALL_PED_WEAPONS', bool)
+    def remove_all_weapons(self):
+        """移除所有武器"""
+        self.script_call('REMOVE_ALL_PED_WEAPONS', '2Q', self.handle, True)
         
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""

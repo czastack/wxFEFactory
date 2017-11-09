@@ -129,3 +129,12 @@ void BookCtrlBase::doAdd(View & child)
 		log_message(wxString::Format("Child of %s must be Item.", "Notebook"));
 	}
 }
+
+View * BookCtrlBase::getPage(int n)
+{
+	if (n == -1)
+	{
+		n = getSelection();
+	}
+	return (View*)ctrl().GetPage(n)->GetClientData();
+}

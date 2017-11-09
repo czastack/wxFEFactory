@@ -237,10 +237,7 @@ public:
 		return ctrl().GetPageText(n);
 	}
 
-	View* getPage(int n)
-	{
-		return (View*)ctrl().GetPage(n)->GetClientData();
-	}
+	View* getPage(int n = -1);
 };
 
 

@@ -174,6 +174,8 @@ class Tool(BaseGTATool):
                 ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
                 ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
                 ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
+                ui.Button("驾驶到到黄色检查点", onclick=self.drive_to_yellow_checkpoint)
+                ui.Button("瞬移到到黄色检查点", onclick=self.teleport_to_yellow_checkpoint)
                 ui.Button("跟着敌人", onclick=self.drive_follow)
                 ui.Button("追捕敌人", onclick=self.vehicle_chase)
                 ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
@@ -312,6 +314,10 @@ class Tool(BaseGTATool):
 
     def get_hash_key(self, name):
         return self.native_call('GET_HASH_KEY', 's', name)
+
+    @property
+    def spawn_vehicle_id_view(self):
+        return self.vehicle_model_book.getPage()
 
     def _player(self):
         """获取当前角色"""
@@ -540,7 +546,8 @@ class Tool(BaseGTATool):
     def enemys_remove_weapon(self, _=None):
         """敌人缴械"""
         for p in self.get_enemys():
-            p.remove_all_weapons()
+            if isinstance(p, Player):
+                p.remove_all_weapons()
 
     def enemys_freeze_position(self, _=None):
         """敌人定住"""
@@ -602,6 +609,11 @@ class Tool(BaseGTATool):
         """获取所有的圆形标记"""
         return self.get_blips(models.Blip.BLIP_CIRCLE, color)
 
+    def get_yellow_checkpoints(self):
+        """获取所有的黄色检查点标记"""
+        return self.get_blips(models.Blip.BLIP_CIRCLE, 
+            (models.Blip.BLIP_COLOR_YELLOWMISSION, models.Blip.BLIP_COLOR_YELLOWMISSION2, models.Blip.BLIP_COLOR_MISSION))
+
     def get_enemy_blips(self):
         """获取所有红色标记"""
         return (blip for blip in self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY) if blip.hud_color == 6)
@@ -633,15 +645,21 @@ class Tool(BaseGTATool):
                 self.entity.coord = coord
                 return True
 
+    def teleport_to_destination(self, _=None):
+        """瞬移到目的地"""
+        if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_CIRCLE)):
+            print('无法获取目的地坐标')
+
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
         if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
             print('无法获取标记坐标')
 
-    def teleport_to_destination(self, _=None):
-        """瞬移到目的地"""
-        if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_CIRCLE)):
-            print('无法获取目的地坐标')
+    def teleport_to_yellow_checkpoint(self, _=None):
+        """瞬移到到黄色检查点"""
+        blips = tuple(self.get_yellow_checkpoints())
+        if blips:
+            self.teleport_to_blip(blips[0])
 
     def drive_to_blip(self, blip):
         """驾驶到到目的地"""
@@ -655,6 +673,12 @@ class Tool(BaseGTATool):
     def drive_to_waypoint(self, _=None):
         """驾驶到到标记点"""
         self.drive_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT))
+
+    def drive_to_yellow_checkpoint(self, _=None):
+        """驾驶到到黄色检查点"""
+        blips = tuple(self.get_yellow_checkpoints())
+        if blips:
+            self.drive_to_blip(blips[0])
 
     def drive_follow(self, _=None):
         """跟着敌人"""
