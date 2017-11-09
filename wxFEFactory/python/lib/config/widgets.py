@@ -117,6 +117,7 @@ class BoolConfig(ConfigCtrl):
         super().__init__(name, label, default)
 
     def render(self):
+        ui.Hr()
         self.view = ui.CheckBox(self.label, onchange=self.write)
 
     def get_input_value(self):
