@@ -44,7 +44,7 @@ class Configurable(ABC):
         try:
             with open(self.config_file) as file:
                 self.config = json.load(file)
-        except FileNotFoundError:
+        except:
             self.config = {}
 
     def writeConfig(self):

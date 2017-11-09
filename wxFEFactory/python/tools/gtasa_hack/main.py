@@ -1,10 +1,10 @@
 from functools import partial
+from lib import utils
 from lib.hack.form import (
     Group, InputWidget, ProxyInputWidget, SelectWidget, ModelInputWidget, ModelCoordWidget
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.utils import float32
 from commonstyle import dialog_style, styles
 from . import cheat, address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
@@ -307,7 +307,7 @@ class Tool(BaseGTATool):
     def get_weapon_prop(self, index):
         """武器熟练度"""
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
-        return float32(self.handler.readFloat(addr))
+        return utils.float32(self.handler.readFloat(addr))
 
     def set_weapon_prop(self, value, index):
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]

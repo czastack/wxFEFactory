@@ -1,8 +1,9 @@
 from functools import partial
+from lib import utils
 from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib import utils
+from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
 from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
@@ -53,10 +54,11 @@ class Tool(BaseGTATool):
             ui.Text("")
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.Button(label="开启无伤", onclick=self.set_ped_invincible)
-                ui.Button(label="可以切换武器", onclick=self.set_ped_block_switch_weapons)
-                ui.Button(label="不会被拽出车", onclick=self.set_ped_can_be_dragged_out_of_vehicle)
-                ui.Button(label="摩托车老司机", onclick=self.set_ped_keep_bike)
+                ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+                ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_block_switch_weapons)
+                ui.ToggleButton(label="不会被拽出车", onchange=self.set_ped_can_be_dragged_out_of_vehicle)
+                ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
 
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
@@ -68,6 +70,7 @@ class Tool(BaseGTATool):
             ui.Text("")
             with ui.Horizontal(className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+                ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
 
@@ -109,13 +112,24 @@ class Tool(BaseGTATool):
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
                 ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
                 ui.Button("敌人定住", onclick=self.enemys_freeze_position)
+                ui.Button("警车爆炸", onclick=self.police_car_explode)
+                ui.Button("警察和直升机爆炸", onclick=self.police_and_helicopter_explode)
                 ui.Button("保存菜单", onclick=self.activate_save_menu)
                 ui.Button("停止计时", onclick=self.freeze_timer)
                 ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+                ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
+                ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
+                # ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
+                # ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
+                ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
+                ui.Button("修复衣服", onclick=self.repair_cloth)
+                self.set_buttons_contextmenu()
 
-        with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
-            with ui.Vertical(className="fill container"):
-                ui.Button("g3l坐标转json", onclick=self.g3l2json)
+        with Group(None, "设置", None, hasfootbar=False):
+            with ConfigGroup(self.config):
+                FloatConfig('auto_driving_speed', '自动驾驶速度', 10)
+            ui.Hr()
+            ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
     def get_hotkeys(self):
         return (
@@ -362,21 +376,33 @@ class Tool(BaseGTATool):
             if v.has_ammo:
                 v.ammo_view.value = 9999
 
-    def set_ped_invincible(self, _=None, value=True):
+    def player_coord_from_waypoint(self, _=None):
+        # 从标记点读取坐标
+        blip = self.get_first_blip(models.Blip.BLIP_WAYPOINT)
+        if blip:
+            self.coord_view.input_value = blip.coord
+
+    def vehicle_coord_from_waypoint(self, _=None):
+        # 从标记点读取坐标
+        blip = self.get_first_blip(models.Blip.BLIP_WAYPOINT)
+        if blip:
+            self.vehicle_coord_view.input_value = blip.coord
+
+    def set_ped_invincible(self, tb):
         """当前角色无伤"""
-        self.player.invincible = value
+        self.player.invincible = tb.checked
 
-    def set_ped_block_switch_weapons(self, _=None):
+    def set_ped_block_switch_weapons(self, tb):
         """解除当前角色武器切换限制"""
-        self.player.block_switch_weapons = False
+        self.player.block_switch_weapons = not tb.checked
 
-    def set_ped_can_be_dragged_out_of_vehicle(self, _=None):
+    def set_ped_can_be_dragged_out_of_vehicle(self, tb):
         """当前角色不会被拖出载具"""
-        self.player.can_be_dragged_out_of_vehicle = False
+        self.player.can_be_dragged_out_of_vehicle = not tb.checked
 
-    def set_ped_keep_bike(self, _=None, value=True):
+    def set_ped_keep_bike(self, tb):
         """当前角色不会从摩托车上甩出去"""
-        self.player.keep_bike = value
+        self.player.keep_bike = tb.checked
 
     def vehicle_fix(self, vehicle):
         """修车"""
@@ -447,6 +473,16 @@ class Tool(BaseGTATool):
         self.enemys_remove_weapon()
         self.enemys_freeze_position()
 
+    def police_car_explode(self, _=None):
+        """警车爆炸"""
+        for blip in self.get_police_car_blips():
+            blip.entity.create_explosion()
+
+    def police_and_helicopter_explode(self, _=None):
+        """警察和直升机爆炸"""
+        for blip in self.get_cop_blips():
+            blip.entity.create_explosion()
+
     # def LoadEnvironmentNow(self, pos):
     #     self.native_call('REQUEST_COLLISION_AT_POSN', '3f', *pos)
     #     self.native_call('LOAD_ALL_OBJECTS_NOW', None)
@@ -509,18 +545,23 @@ class Tool(BaseGTATool):
         """获取红色标记的peds"""
         return [blip.entity for blip in self.get_enemy_blips()]
 
-    def teleport_to_waypoint(self, _=None):
-        """瞬移到标记点"""
-        if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
-            print('无法获取标记坐标')
+    def get_police_car_blips(self):
+        """获取警车标记"""
+        return self.get_blips(models.Blip.BLIP_COP_CAR)
 
-    def teleport_to_destination(self, _=None):
-        """瞬移到目的地"""
-        for i in range(models.Blip.BLIP_DESTINATION, models.Blip.BLIP_DESTINATION_2 + 1):
-            if self.teleport_to_blip(self.get_first_blip(i)):
-                break
-        else:
-            print('无法获取目的地坐标')
+    def get_police_helicopter_blips(self):
+        """获取警用直升机标记"""
+        return self.get_blips(models.Blip.BLIP_COP_CHOPPER)
+
+    def get_cop_blips(self):
+        """获取所有警察标记"""
+        for blip in self.get_police_car_blips():
+            yield blip
+        for blip in self.get_police_helicopter_blips():
+            yield blip
+        for blip in self.get_target_blips():
+            if blip.is_short_range:
+                yield blip
 
     def teleport_to_blip(self, blip):
         """瞬移到指定标记"""
@@ -535,6 +576,41 @@ class Tool(BaseGTATool):
                     coord[2] = self.GetGroundZ(coord) or 16
                 entity.coord = coord
                 return True
+
+    def teleport_to_waypoint(self, _=None):
+        """瞬移到标记点"""
+        if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
+            print('无法获取标记坐标')
+
+    def teleport_to_destination(self, _=None):
+        """瞬移到目的地"""
+        for blip in self.get_target_blips():
+            if self.teleport_to_blip(blip):
+                break
+        else:
+            print('无法获取目的地坐标')
+
+    def drive_to_blip(self, blip):
+        """驾驶到到目的地"""
+        if blip and self.vehicle:
+            self.vehicle.drive_to(blip.coord, self.config.auto_driving_speed)
+
+    def drive_to_destination(self, _=None):
+        """驾驶到到目的地"""
+        for blip in self.get_target_blips():
+            if self.drive_to_blip(blip):
+                break
+        else:
+            print('无法获取目的地坐标')
+
+    def drive_to_waypoint(self, _=None):
+        """驾驶到到标记点"""
+        self.drive_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT))
+
+    def clear_driver_tasks(self, _=None):
+        """停止自动驾驶"""
+        if self.vehicle:
+            self.vehicle.clear_driver_tasks()
 
     def get_camera_rot_raw(self):
         """获取摄像机原始参数"""
@@ -596,12 +672,15 @@ class Tool(BaseGTATool):
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
         m = models.IVModel(model_id, self)
-        m.request()
-        if m.loaded:
-            self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr(), 1)
-            return Vehicle(self.native_context.get_temp_value(), self)
+        if m.is_in_cdimage and m.is_vehicle:
+            m.request()
+            if m.loaded:
+                self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr(), 1)
+                return Vehicle(self.native_context.get_temp_value(), self)
+            else:
+                print("模型未加载", hex(model))
         else:
-            print("模型未加载", hex(model))
+            print('该模型不支持或不是载具模型')
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
         """生成选中的载具并进入"""
@@ -641,3 +720,15 @@ class Tool(BaseGTATool):
     def freeze_timer(self, _=None, freeze=True):
         """停止计时"""
         self.script_call('FREEZE_ONSCREEN_TIMER', 'L', freeze)
+
+    def near_peds_go_away(self, _=None):
+        """附近的人吹飞"""
+        self.launch_entity(self.get_near_peds(), False)
+
+    def near_vehicles_go_away(self, _=None):
+        """附近的车吹飞"""
+        self.launch_entity(self.get_near_vehicles(), False)
+
+    def repair_cloth(self, _=None):
+        """修复衣服"""
+        self.player.reset_visible_damage()

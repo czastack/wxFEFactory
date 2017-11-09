@@ -1,5 +1,5 @@
 from lib.basescene import BaseScene
-from lib.lazy import lazyclassmethod
+from lib.lazy import lazyclassmethod_indict
 from . import tools
 import traceback
 import fefactory_api
@@ -47,7 +47,7 @@ class BaseTool(BaseScene):
 
         return menubar
 
-    @lazyclassmethod
+    @lazyclassmethod_indict
     def doGetTitle(class_):
         """获取原始标题，显示在标签页标题和菜单栏"""
         name = class_.getName()
@@ -56,7 +56,7 @@ class BaseTool(BaseScene):
                 return item[0]
         return name
 
-    @lazyclassmethod
+    @lazyclassmethod_indict
     def getName(class_):
         """模块名称，即模块文件夹名"""
         return class_.__module__.split('.')[1]

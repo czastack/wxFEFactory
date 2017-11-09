@@ -337,6 +337,10 @@ class Player(NativeEntity):
         if handle:
             return Vehicle(handle, self.mgr)
 
+    def reset_visible_damage(self):
+        """修复可见损害"""
+        self.native_call('RESET_VISIBLE_PED_DAMAGE', 'Q', self.handle)
+
     # ----------------------------------------------------------------------
     # 武器相关
     # ----------------------------------------------------------------------
@@ -410,6 +414,14 @@ class Player(NativeEntity):
     def freeze_position(self, value=True):
         """冻结位置"""
         self.script_call('FREEZE_CHAR_POSITION', '2L', self.handle, value)
+
+    def clear_tasks(self):
+        """清除任务"""
+        self.script_call('CLEAR_CHAR_TASKS', 'Q', self.handle)
+
+    def clear_tasks_now(self):
+        """清除任务，会下车"""
+        self.script_call('CLEAR_CHAR_TASKS_IMMEDIATELY', 'Q', self.handle)
 
     del getter, getter_ptr, setter
 
@@ -654,7 +666,7 @@ class Vehicle(NativeEntity):
         self.native_call('WASH_VEHICLE_TEXTURES', '2L', self.handle, 255)
 
     def fix(self):
-        self.native_call('FIX_CAR', 'L', self.handle)
+        self.script_call('FIX_CAR', 'L', self.handle)
 
     def explode(self):
         """爆炸"""
@@ -667,6 +679,15 @@ class Vehicle(NativeEntity):
     def freeze_position(self, value=True):
         """冻结位置"""
         self.script_call('FREEZE_CAR_POSITION', '2L', self.handle, value)
+
+    def drive_to(self, coord, speed):
+        """驾驶到坐标"""
+        self.script_call('TASK_CAR_DRIVE_TO_COORD', '2Q4f3lfl', 
+            self.driver.handle, self.handle, *coord, speed, 1, 0, 0, 10.0, -1)
+
+    def clear_driver_tasks(self):
+        """停止自动驾驶"""
+        self.driver.clear_tasks()
 
     del getter, getter_ptr, setter
 
@@ -683,6 +704,7 @@ class IVModel(NativeModel):
     is_train = property(getter("IS_THIS_MODEL_A_TRAIN", bool))
     is_vehicle = property(getter("IS_THIS_MODEL_A_VEHICLE", bool))
     loaded = property(getter('HAS_MODEL_LOADED', bool))
+    is_in_cdimage = property(getter('IS_MODEL_IN_CDIMAGE', bool))
 
     def request(self):
         if self.loaded:
@@ -708,7 +730,8 @@ class Blip(NativeModel):
     BLIP_DESTINATION_1 = 1
     BLIP_DESTINATION_2 = 2
     BLIP_WAYPOINT = 8
-    BLIP_BOSS = 93
+    BLIP_COP_CAR = 68
+    BLIP_COP_CHOPPER = 73
 
     BLIP_TYPE_CAR = 1
     BLIP_TYPE_CHAR = 2             # ENEMY
@@ -728,6 +751,7 @@ class Blip(NativeModel):
     ped_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PED_INDEX'))
     object_index = property(NativeModel.getter('GET_BLIP_INFO_ID_OBJECT_INDEX'))
     pickup_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PICKUP_INDEX'))
+    is_short_range = property(NativeModel.getter('IS_BLIP_SHORT_RANGE'))
     
     def remove(self):
         self.script_call('REMOVE_BLIP', 'L', self.handle, ret_type=None)

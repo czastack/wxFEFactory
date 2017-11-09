@@ -302,7 +302,7 @@ class Player(NativeEntity):
     set_run_rate = player_setter('SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER', float)
 
     def reset_skin(self):
-        """修复衣服"""
+        """使用初始衣服"""
         self.script_call('SET_PED_DEFAULT_COMPONENT_VARIATION', 'Q', self.handle)
 
     def reset_visible_damage(self):
@@ -424,6 +424,18 @@ class Player(NativeEntity):
         """爆炸"""
         self.create_explosion(*args, **kwargs)
 
+    def clear_tasks(self):
+        """清除任务"""
+        self.script_call('CLEAR_PED_TASKS', 'Q', self.handle)
+
+    def clear_tasks_now(self):
+        """清除任务，会下车"""
+        self.script_call('CLEAR_PED_TASKS_IMMEDIATELY', 'Q', self.handle)
+
+    def chase(self, entity):
+        """追捕目标"""
+        self.script_call('TASK_VEHICLE_CHASE', '2Q', self.handle, entity)
+
     del getter, getter_ptr, setter
 
 
@@ -478,7 +490,7 @@ class Vehicle(NativeEntity):
 
     @property
     def driver(self):
-        ped_handle = self.native_call('GET_PED_IN_VEHICLE_SEAT', '2Q', self.handle, 0)
+        ped_handle = self.native_call('GET_PED_IN_VEHICLE_SEAT', 'Ql', self.handle, -1)
         return Player(0, ped_handle, self.mgr) if ped_handle else None
 
     @property
@@ -574,6 +586,27 @@ class Vehicle(NativeEntity):
         self.wheels_can_break = not_toggle
         self.can_be_damaged = not_toggle
         self.can_be_visibly_damaged = not_toggle
+
+    def drive_to(self, coord, speed, driving_style):
+        """驾驶到坐标"""
+        self.script_call('TASK_VEHICLE_DRIVE_TO_COORD', '2Q4fl2Q2f', 
+            self.driver.handle, self.handle, *coord, speed, 1, self.model_id, driving_style, -1.0, -1.0)
+
+    def drive_follow(self, entity, speed, driving_style):
+        """跟着目标"""
+        self.script_call('_TASK_VEHICLE_FOLLOW', '3Qfll', 
+            self.driver.handle, self.handle, entity, speed, driving_style, 10)
+
+    def clear_driver_tasks(self):
+        """停止自动驾驶"""
+        self.driver.clear_tasks()
+
+    def chase(self, entity):
+        """追捕目标"""
+        self.driver.chase(entity)
+
+    def SET_VEHICLE_OUT_OF_CONTROL(self, killDriver=False, explodeOnImpact=False):
+        self.native_call('SET_VEHICLE_OUT_OF_CONTROL', '3Q', self.handle, killDriver, explodeOnImpact)
 
     del getter, getter_ptr, setter
 

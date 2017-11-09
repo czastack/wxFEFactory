@@ -1,8 +1,6 @@
 
 
 class BaseScene:
-    INS = None
-
     # 这些方法可以在实例中用self访问
     from fefactory_api import alert, confirm, confirm_yes, YES, NO, CANCEL, longtext_dialog
     alert = staticmethod(alert)
@@ -12,7 +10,7 @@ class BaseScene:
 
     def __init__(self):
         # 同一类实例列表
-        ins = self.__class__.INS
+        ins = self.__class__.__dict__.get('INS', None)
         if ins is None:
             ins = self.__class__.INS = []
         

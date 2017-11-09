@@ -88,6 +88,7 @@ class Tool(BaseGTA3Tool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
+                self.set_buttons_contextmenu()
 
         with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):

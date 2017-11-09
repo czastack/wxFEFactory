@@ -1410,3 +1410,15 @@ PLAYER_MODEL = (
         ("维戈斯帮派女子", "g_f_y_vagos_01"),
     )),
 )
+
+
+DRIVING_STYLE = (
+    ("IgnoreLights", 0x2c0025),
+    ("Normal (typically used by the game)", 0xc00ab),
+    ("Sometimes Overtake traffic", 0x5),
+    ("Rushed", 0x400c0025),
+    ("Avoid traffic", 0xc0024),
+    ("Avoid traffic extreme", 0x6),
+    ("Avoid everything", 0x34),
+    ("Careful driving", 0x23),
+)
