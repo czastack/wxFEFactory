@@ -190,8 +190,8 @@ public:
 	}
 
 	/**
-	* 多级指针读取数据
-	*/
+	 * 多级指针读取数据
+	 */
 	template<typename ListType>
 	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
 		addr = readLastAddr(addr, offsets);
@@ -199,8 +199,8 @@ public:
 	}
 
 	/**
-	* 多级指针写入数据
-	*/
+	 * 多级指针写入数据
+	 */
 	template<typename ListType>
 	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
 		addr = readLastAddr(addr, offsets);

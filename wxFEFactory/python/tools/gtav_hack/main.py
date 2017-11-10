@@ -246,7 +246,7 @@ class Tool(BaseGTATool):
 
         # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
         # 要在ScriptHook的线程中才能安全运行
-        self.ScriptHookHelper = self.handler.get_module(r'NativeHelper.asi')
+        self.ScriptHookHelper = self.handler.get_module('NativeHelper.asi')
         if self.ScriptHookHelper:
             self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x15A90
 
