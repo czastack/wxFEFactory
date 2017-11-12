@@ -70,6 +70,8 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
                 ui.ToggleButton(label="切换无限弹药", onchange=self.set_ped_infinite_ammo_clip)
                 ui.ToggleButton(label="不被警察注意", onchange=self.set_ped_ignored_by_police)
+                ui.ToggleButton(label="快速奔跑", onchange=self.set_player_fast_run)
+                ui.ToggleButton(label="快速游泳", onchange=self.set_player_fast_swim)
 
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
@@ -178,16 +180,26 @@ class Tool(BaseGTATool):
                 ui.Button("瞬移到到黄色检查点", onclick=self.teleport_to_yellow_checkpoint)
                 ui.Button("跟着敌人", onclick=self.drive_follow)
                 ui.Button("追捕敌人", onclick=self.vehicle_chase)
+                ui.Button("跟着蓝色标记", onclick=self.drive_follow_blue)
                 ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
                 ui.Button("修复衣服", onclick=self.repair_cloth)
+                ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
+                ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
+                ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
+                ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
             with ConfigGroup(self.config):
+                BoolConfig('mark_police_as_enemy', '把警察标记为敌人').set_help('对敌人的操作也会对警察有效')
                 BoolConfig('explode_no_owner', '生成爆炸时不设置所有者(不会被通缉，但某些任务敌人打不死)')
                 BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉，但某些任务敌人打不死)')
                 FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
                 FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
+                IntConfig('rocket_shoot_count_little', '导弹发射对数(少)', 1)
+                IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
+                IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
+                IntConfig('rocket_damage', '导弹攻击伤害', 250)
                 SelectConfig('shoot_weapon_hash', '射击武器种类', SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
                 SelectConfig('auto_driving_style', '自动驾驶风格', DRIVING_STYLE)
@@ -202,8 +214,8 @@ class Tool(BaseGTATool):
             ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
             ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
             ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('shoot_vehicle_rocket', MOD_ALT, getVK('r'), self.shoot_vehicle_rocket),
-            ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK('r'), partial(self.shoot_vehicle_rocket, count=3)),
+            ('shoot_vehicle_rocket_little', MOD_ALT, getVK('r'), self.shoot_vehicle_rocket_little),
+            ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK('r'), self.shoot_vehicle_rocket_more),
             ('rocket_attack_enemy', MOD_ALT, getVK("enter"), self.rocket_attack_enemy),
             ('rocket_shoot_enemy', MOD_ALT | MOD_SHIFT, getVK("enter"), self.rocket_shoot_enemy),
             ('special_ability_fill_meter', MOD_ALT, getVK("capslock"), self.special_ability_fill_meter),
@@ -495,6 +507,14 @@ class Tool(BaseGTATool):
         """角色不会被警察注意"""
         self.player.ignored_by_police = tb.checked
 
+    def set_player_fast_run(self, tb):
+        """快速奔跑"""
+        self.player.fast_run = tb.checked
+
+    def set_player_fast_swim(self, tb):
+        """快速游泳"""
+        self.player.fast_swim = tb.checked
+
     def vehicle_fix(self, vehicle):
         """修车"""
         vehicle.engine_hp = 2000
@@ -615,16 +635,23 @@ class Tool(BaseGTATool):
             (models.Blip.BLIP_COLOR_YELLOWMISSION, models.Blip.BLIP_COLOR_YELLOWMISSION2, models.Blip.BLIP_COLOR_MISSION))
 
     def get_enemy_blips(self):
-        """获取所有红色标记"""
-        return (blip for blip in self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY) if blip.hud_color == 6)
+        """获取红色标记"""
+        blips = (blip for blip in self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY) if blip.hud_color == 6)
+        if self.config.mark_police_as_enemy:
+            blips = tuple(blips) + self.get_cop_blips()
+        return blips
 
-    def get_friends(self):
-        """获取蓝色标记的peds"""
-        return [blip.entity for blip in self.get_target_blips(models.Blip.BLIP_COLOR_FRIEND)]
+    def get_friends_blips(self):
+        """获取蓝色标记"""
+        return (blip for blip in self.get_target_blips(models.Blip.BLIP_COLORS_FRIEND) if blip.hud_color == 9)
 
     def get_enemys(self):
-        """获取红色标记的peds"""
+        """获取红色标记的entity"""
         return [blip.entity for blip in self.get_enemy_blips() if blip.handle]
+
+    def get_friends(self):
+        """获取蓝色标记的entity"""
+        return [blip.entity for blip in self.get_friends_blips() if blip.entity]
 
     def get_police_blips(self):
         """获取警察标记"""
@@ -633,6 +660,10 @@ class Tool(BaseGTATool):
     def get_police_helicopter_blips(self):
         """获取警察直升机标记"""
         return self.get_blips(models.Blip.BLIP_COPHELICOPTER)
+
+    def get_cop_blips(self):
+        """获取所有警察标记"""
+        return tuple(self.get_police_blips()) + tuple(self.get_police_helicopter_blips())
 
     def teleport_to_blip(self, blip):
         """瞬移到指定标记"""
@@ -683,8 +714,16 @@ class Tool(BaseGTATool):
     def drive_follow(self, _=None):
         """跟着敌人"""
         if self.vehicle:
-            enemys = self.get_enemys()
-            enemys and self.vehicle and self.vehicle.drive_follow(enemys[0].handle, self.config.auto_driving_speed, self.config.auto_driving_style)
+            entitys = self.get_enemys()
+            if entitys:
+                self.vehicle.drive_follow(entitys[0].handle, self.config.auto_driving_speed, self.config.auto_driving_style)
+
+    def drive_follow_blue(self, _=None):
+        """跟着蓝色标记"""
+        if self.vehicle:
+            entitys = self.get_friends()
+            if entitys:
+                self.vehicle.drive_follow(entitys[0].handle, self.config.auto_driving_speed, self.config.auto_driving_style)
 
     def vehicle_chase(self, _=None):
         """追捕敌人"""
@@ -893,36 +932,52 @@ class Tool(BaseGTATool):
             self.request_weapon_model(weapon)
         self.script_call('SHOOT_SINGLE_BULLET_BETWEEN_COORDS', '6f6Qf', *v1, *v2, demage, 1, weapon, owner, 1, 0, speed)
 
-    def shoot_vehicle_rocket(self, _=None, ped=None, count=1):
+    def shoot_vehicle_rocket(self, ped=0, count=1):
         """发射车载火箭"""
         weapon = self.get_shoot_weapon()
         coord = Vector3(self.get_cam_front_coord())
         rot = Vector3(self.get_camera_rot())
-        if rot.z < 0 and self.isInVehicle:
-            rot.z *= 0.4
+        if rot.z > 0.2:
+            rot.z += 0.015
 
         # 目标坐标
         target = coord + rot * 100
 
-        if ped is None:
-            if self.config.rocket_attack_no_owner:
-                ped = 0
-            else:
-                ped = self.get_ped_id()
-
         vertical_1, vertical_2 = rot.get_vetical_xy()
-        vertical_1 *= 0.5
-        vertical_2 *= 0.5
+        if not self.isInVehicle:
+            vertical_1 *= 0.5
+            vertical_2 *= 0.5
+        else:
+            vehicle = self.vehicle
+            if vehicle.model.is_car:
+                height = vehicle.height
+                driver_height = vehicle.driver.height
+                if driver_height > height:
+                    height = driver_height + 0.2
+                coord[2] += height
+                target[2] += 1
 
         speed = self.config.rocket_shoot_speed or -1.0
+        damage = self.config.rocket_damage
 
         for i in range(1, count + 1):
-            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, 250, weapon, ped, speed, False)
-            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, 250, weapon, ped, speed, False)
+            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, damage, weapon, ped, speed, False)
+            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, damage, weapon, ped, speed, False)
+
+    def shoot_vehicle_rocket_little(self, _=None):
+        """发射少量车载火箭"""
+        ped = 0 if self.config.rocket_attack_no_owner else self.get_ped_id()
+        self.shoot_vehicle_rocket(ped, self.config.rocket_shoot_count_little)
+
+    def shoot_vehicle_rocket_more(self, _=None):
+        """发射多量车载火箭"""
+        ped = 0 if self.config.rocket_attack_no_owner else self.get_ped_id()
+        self.shoot_vehicle_rocket(ped, self.config.rocket_shoot_count_more)
 
     def rocket_attack_coords(self, coords, speed=100, height=10):
         """天降正义(导弹攻击坐标)"""
         weapon = self.get_shoot_weapon()
+        damage = self.config.rocket_damage
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
@@ -931,11 +986,12 @@ class Tool(BaseGTATool):
             coord0 = list(coord)
             coord1 = coord
             coord0[2] += height
-            self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
+            self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
     def rocket_attack(self, entitys, speed=100, height=10):
         """天降正义(导弹攻击敌人)"""
         weapon = self.get_shoot_weapon()
+        damage = self.config.rocket_damage
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
@@ -948,7 +1004,7 @@ class Tool(BaseGTATool):
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
                 coord0[2] += height
-                self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
+                self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
     def rocket_shoot(self, entitys, speed=100, height=10):
         """导弹射向目标"""
@@ -962,11 +1018,23 @@ class Tool(BaseGTATool):
 
         coord = Vector3(self.player.coord)
 
+        count = self.config.rocket_shoot_target_count
+        damage = self.config.rocket_damage
+        rot = None
+
         for p in entitys:
             if p.handle:
                 coord1 = Vector3(p.coord)
                 coord0 = (coord + coord1) * 0.5
-                self.shoot_between(coord0, coord1, 250, weapon, ped, speed, False)
+                if count is 1:
+                    self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
+                else:
+                    if rot is None:
+                        rot = Vector3(self.get_camera_rot())
+                    vertical_1, vertical_2 = rot.get_vetical_xy()
+                    for i in range(1, count + 1):
+                        self.shoot_between(coord0 + (vertical_1[0] * i, vertical_1[1] * i, 1), coord1, damage, weapon, ped, speed, False)
+                        self.shoot_between(coord0 + (vertical_2[1] * i, vertical_2[1] * i, 1), coord1, damage, weapon, ped, speed, False)
 
     def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""
@@ -982,7 +1050,16 @@ class Tool(BaseGTATool):
 
     def rocket_attack_police_and_helicopter(self, _=None, *args, **kwargs):
         """乱世枭雄(导弹攻击警用载具)"""
-        self.rocket_attack(tuple(self.get_police_blips()) + tuple(self.get_police_helicopter_blips()), *args, **kwargs)
+        self.rocket_attack(self.get_cop_blips(), *args, **kwargs)
+
+    def rocket_attack_waypint(self, _=None, *args, **kwargs):
+        """导弹攻击标记点"""
+        blip = self.get_first_blip(self.models.Blip.BLIP_WAYPOINT)
+        if blip:
+            coord = list(blip.coord)
+            coord[2] = 1024
+            coord[2] = self.GetGroundZ(coord)
+            self.rocket_attack_coords((coord,), *args, **kwargs)
 
     def rocket_shoot_enemy(self, _=None, *args, **kwargs):
         """导弹射向敌人"""
@@ -1016,7 +1093,7 @@ class Tool(BaseGTATool):
         super().near_vehicles_to_front(zinc=5)
 
     def recal_markers(self, _=None):
-        self._markers = tuple(self.get_target_blips(models.Blip.BLIP_COLOR_ENEMY))
+        self._markers = tuple(self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY))
         self._marker_index = 0
 
     def move_marker_to_front(self, _=None):
@@ -1063,3 +1140,19 @@ class Tool(BaseGTATool):
     def repair_cloth(self, _=None):
         """修复衣服"""
         self.player.reset_visible_damage()
+
+    def clear_area_of_vehicles(self, _=None):
+        """清空区域内的载具"""
+        self.script_call('CLEAR_AREA_OF_VEHICLES', '4f5Q', *self.player.coord, 200, False, False, False, False, False)
+
+    def clear_area_of_peds(self, _=None):
+        """清空区域内的角色"""
+        self.script_call('CLEAR_AREA_OF_PEDS', '4fQ', *self.player.coord, 200, True)
+
+    def clear_area_of_cops(self, _=None):
+        """清空区域内的警察"""
+        self.script_call('CLEAR_AREA_OF_COPS', '4fQ', *self.player.coord, 200, True)
+
+    def clear_area_of_fire(self, _=None):
+        """清空区域内的火焰"""
+        self.script_call('STOP_FIRE_IN_RANGE', '4f', *self.player.coord, 100)

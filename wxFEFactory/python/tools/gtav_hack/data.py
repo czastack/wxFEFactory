@@ -84,6 +84,25 @@ WEAPON_LIST = [
         ("BRIEFCASE_02", "公文包02", 0x01B79F17),
         ("BRIEFCASE", "公文包", 0x88C78EB7),
     )),
+    # ("车载武器", (
+    #     ("ROTORS", "轮子", 0xB1205A4E),
+    #     ("TANK", "坦克", 0x73F7C04B),
+    #     ("SPACE_ROCKET", "飞弹", 0xF8A3939F),
+    #     ("PLANE_ROCKET", "飞机导弹", 0xCF0896E0),
+    #     ("PLAYER_LAZER", "激光炮", 0xE2822A29),
+    #     ("PLAYER_LASER", "玩家激光(无杀伤力)", 0xEFFD014B),
+    #     ("PLAYER_BULLET", "PLAYER_BULLET", 0x4B139B2D),
+    #     ("PLAYER_BUZZARD", "PLAYER_BUZZARD", 0x46B89C8E),
+    #     ("PLAYER_HUNTER", "近距离威力强的子弹", 0x9F1A91DE),
+    #     ("ENEMY_LASER", "敌人激光(无杀伤力)", 0x5D6660AB),
+    #     ("SEARCHLIGHT", "搜寻光", 0xCDAC517D),
+    #     ("RADAR", "雷达", 0xD276317E),
+    #     ("WATER_CANNON", "高压水枪", 0x67D18297),
+    #     ("TURRET_INSURGENT", "炮塔叛乱", 0x44DB5498),
+    #     ("TURRET_TECHNICAL", "炮塔工艺", 0x7FD2EA0B),
+    #     ("NOSE_TURRET_VALKYRIE", "鼻炮塔", 0x4170E491),
+    #     ("PLAYER_SAVAGE", "PLAYER_SAVAGE", 0x61A31349),
+    # )),
 ]
 
 SHOOT_WEAPON_CHOICES = (
@@ -94,7 +113,12 @@ SHOOT_WEAPON_CHOICES = (
     ("镭射枪", 0x6D544C99),
     ("追踪弹发射器", 0x63AB0442),
     ("烟火发射器", 0x7F7497E5),
-    
+    ("坦克", 0x73F7C04B),
+    ("飞弹", 0xF8A3939F),
+    ("飞机导弹", 0xCF0896E0),
+    ("激光炮", 0xE2822A29),
+    ("近距离威力强的子弹", 0x9F1A91DE),
+    ("鼻炮塔", 0x4170E491),
 )
 
 
@@ -144,14 +168,14 @@ VEHICLE_LIST = (
         ("威乐 宗派", 0x81A9CDDF), # FACTION
         ("威乐 宗派改装款", 0x95466BDB), # FACTION2
         ("威乐 宗派巨轮改装款", "FACTION3"),
-        ("絶致 月光", 0x1F52A43F), # MOONBEAM
-        ("絶致 月光改装款", 0x710A2B9B), # MOONBEAM2
+        ("绝致 月光", 0x1F52A43F), # MOONBEAM
+        ("绝致 月光改装款", 0x710A2B9B), # MOONBEAM2
         ("亚班尼 初代改装款", 0x86618EDA), # PRIMO2
-        ("絶致 巫毒改装款", 0x779B4F2D), # VOODOO
+        ("绝致 巫毒改装款", 0x779B4F2D), # VOODOO
         ("威皮 迷你厢行车改装款", "MINIVAN2"),
         ("绝緻 涡轮剑齿虎改装款", "SABREGT2"),
         ("威皮 帮派厢型车改装款", "SLAMVAN3"),
-        ("絶致 旋风改装款", "TORNADO5"),
+        ("绝致 旋风改装款", "TORNADO5"),
         ("亚班尼 室女2", "VIRGO2"),
         ("亚班尼 室女改装款", "VIRGO3"),
     )),

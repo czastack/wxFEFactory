@@ -79,6 +79,7 @@ class NativeEntity(NativeModel):
     can_be_damaged = property(None, setter('SET_ENTITY_CAN_BE_DAMAGED', bool))
     existed = property(getter('DOES_ENTITY_EXIST', bool))
     hp = property(getter('GET_ENTITY_HEALTH'))
+    height = property(getter('GET_ENTITY_HEIGHT_ABOVE_GROUND', float))
     # 是否悬空
     is_in_air = property(getter('IS_ENTITY_IN_AIR'))
     is_on_fire = property(getter('IS_ENTITY_ON_FIRE', bool))
@@ -295,11 +296,18 @@ class Player(NativeEntity):
     # 不会从车上摔下来
     keep_bike = property(None, setter('SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE', bool))
     # 产生噪声比例 (默认1.0)
-    set_noise_rate = player_setter('SET_PLAYER_NOISE_MULTIPLIER', float)
-    # 游泳速度比例 (默认1.0)
-    set_swim_rate = player_setter('SET_SWIM_MULTIPLIER_FOR_PLAYER', float)
-    # 跑步速度比例 (默认1.0)
-    set_run_rate = player_setter('SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER', float)
+    noise_rate = property(None, player_setter('SET_PLAYER_NOISE_MULTIPLIER', float))
+
+    def _fast_run(self, toggle=True):
+        """快速奔跑"""
+        self.native_call('SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER', 'Qf', self.index, 1.49 if toggle else 1)
+
+    def _fast_swim(self, toggle=True):
+        """快速游泳"""
+        self.native_call('SET_SWIM_MULTIPLIER_FOR_PLAYER', 'Qf', self.index, 1.49 if toggle else 1)
+
+    fast_run = property(None, _fast_run)
+    fast_swim = property(None, _fast_swim)
 
     def reset_skin(self):
         """使用初始衣服"""
@@ -416,6 +424,17 @@ class Player(NativeEntity):
     def weapon(self, weapon):
         """设置当前武器种类"""
         self.script_call('SET_CURRENT_PED_WEAPON', '3Q', self.handle, weapon, 1)
+    
+    def get_vehicle_weapon(self):
+        """当前车载武器种类"""
+        self.script_call('GET_CURRENT_PED_VEHICLE_WEAPON', '2Q', self.handle, self.native_context.get_temp_addr())
+        return self.native_context.get_temp_value(size=8)
+
+    def set_vehicle_weapon(self, weapon):
+        """设置当前车载武器种类"""
+        self.script_call('SET_CURRENT_PED_VEHICLE_WEAPON', '2Q', self.handle, weapon)
+
+    vehicle_weapon = property(get_vehicle_weapon, set_vehicle_weapon)
 
     def explode_head(self):
         """爆头"""
@@ -591,7 +610,7 @@ class Vehicle(NativeEntity):
     def drive_to(self, coord, speed, driving_style):
         """驾驶到坐标"""
         self.script_call('TASK_VEHICLE_DRIVE_TO_COORD', '2Q4fl2Q2f', 
-            self.driver.handle, self.handle, *coord, speed, 1, self.model_id, driving_style, -1.0, -1.0)
+            self.driver.handle, self.handle, *coord, speed, 1, self.model_id, driving_style, 10.0, -1.0)
 
     def drive_follow(self, entity, speed, driving_style):
         """跟着目标"""
@@ -683,6 +702,7 @@ class Blip(NativeModel):
     BLIP_COLOR_WAYPOINT = 0x53
 
     BLIP_COLORS_ENEMY = (BLIP_COLOR_RED, BLIP_COLOR_REDMISSION)
+    BLIP_COLORS_FRIEND = (BLIP_COLOR_BLUE, BLIP_COLOR_REDMISSION)
 
     color = property(NativeModel.getter('GET_BLIP_COLOUR'), NativeModel.setter('SET_BLIP_COLOUR'))
     hud_color = property(NativeModel.getter('GET_BLIP_HUD_COLOUR'))
