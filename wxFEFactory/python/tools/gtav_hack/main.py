@@ -155,6 +155,7 @@ class Tool(BaseGTATool):
                 ui.Button("缴械", onclick=self.near_peds_remove_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
                 ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
+                ui.Button("附近的人下车", onclick=self.near_peds_exit_vehicle)
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)
                 ui.Button("敌人爆头", onclick=self.enemys_explode_head)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)
@@ -182,11 +183,11 @@ class Tool(BaseGTATool):
                 ui.Button("追捕敌人", onclick=self.vehicle_chase)
                 ui.Button("跟着蓝色标记", onclick=self.drive_follow_blue)
                 ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
-                ui.Button("修复衣服", onclick=self.repair_cloth)
                 ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
                 ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
                 ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
                 ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
+                ui.Button("修复衣服", onclick=self.repair_cloth)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
@@ -579,6 +580,11 @@ class Tool(BaseGTATool):
         for p in self.get_target_blips():
             p.entity and p.entity.freeze_position()
 
+    def near_peds_exit_vehicle(self, _=None):
+        """附近的人下车"""
+        for p in self.get_near_peds():
+            p.clear_tasks_now()
+
     def GetGroundZ(self, pos):
         """获取指定位置地面的z值"""
         self.native_call('GET_GROUND_Z_FOR_3D_COORD', '3f2Q', *pos, self.native_context.get_temp_addr(), 1)
@@ -949,13 +955,16 @@ class Tool(BaseGTATool):
             vertical_2 *= 0.5
         else:
             vehicle = self.vehicle
+            height = vehicle.height
             if vehicle.model.is_car:
-                height = vehicle.height
                 driver_height = vehicle.driver.height
                 if driver_height > height:
                     height = driver_height + 0.2
                 coord[2] += height
                 target[2] += 1
+            elif height > 15:
+                # 在飞机上
+                coord += rot * 5
 
         speed = self.config.rocket_shoot_speed or -1.0
         damage = self.config.rocket_damage
