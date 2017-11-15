@@ -52,7 +52,7 @@ class MainFrame:
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.openTool)
                 ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attachEmu, kind="check")
             with ui.Menu("窗口"):
-                pass
+                ui.MenuItem("保存窗口位置和大小", onselect=self.saveWinOption)
 
         with ui.Window("火纹工厂", style=winstyle, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
@@ -300,6 +300,12 @@ class MainFrame:
                 __main__.emu.close()
                 __main__.emu = None
 
+    def saveWinOption(self, m):
+        app.setConfig('start_option', {
+            'position': self.win.position,
+            'size': self.win.size,
+        })
+
 
 winstyle = {
     # 'width': 1200,
@@ -322,7 +328,7 @@ styles = {
 }
 
 if __name__ == 'mainframe':
-    frame = MainFrame(getattr(__main__, 'start_option', None))
+    frame = MainFrame(app.start_option)
 
     __main__.app = app
     __main__.frame = frame

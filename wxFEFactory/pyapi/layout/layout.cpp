@@ -239,6 +239,11 @@ void init_layout(py::module &m)
 		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
 		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);
 
+	py::class_t<ColorPicker, Control>(layout, "ColorPicker")
+		.def_init(py::init<uint, pyobj, pyobj, pyobj>(),
+			"color"_a=0, "onchange"_a=None, className, style)
+		.def_property("color", &ColorPicker::getColor, &ColorPicker::setColor);
+
 	auto choices = "choices"_a=None,
 		onselect = "onselect"_a=None;
 

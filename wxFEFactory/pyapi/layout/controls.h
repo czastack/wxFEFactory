@@ -7,6 +7,7 @@
 #include <wx/srchctrl.h>
 #include <wx/statline.h>
 #include <wx/filepicker.h>
+#include <wx/clrpicker.h>
 #include "wxpatch.h"
 
 
@@ -223,7 +224,7 @@ public:
 		selection[0] = end;
 	}
 
-	void setSelection(py::tuple &selection)
+	void setSelection(py::sequence &selection)
 	{
 		ctrl().SetSelection(selection[0].cast<long>(), selection[1].cast<long>());
 	}
@@ -323,6 +324,40 @@ public:
 	int getMax()
 	{
 		return ctrl().GetMax();
+	}
+};
+
+
+class ColorPicker : public Control
+{
+public:
+	template <class... Args>
+	ColorPicker(uint color, pyobj &onchange, Args ...args) :
+		Control(args...)
+	{
+
+		bindElem(new wxColourPickerCtrl(*getActiveLayout(), wxID_ANY, wxColor(color), wxDefaultPosition, getStyleSize()));
+		setOnChange(onchange);
+	}
+
+	wxColourPickerCtrl& ctrl() const
+	{
+		return *(wxColourPickerCtrl*)m_elem;
+	}
+
+	void setOnChange(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_COLOURPICKER_CHANGED, fn);
+	}
+
+	void setColor(uint rgb)
+	{
+		ctrl().SetColour(wxColor(rgb));
+	}
+
+	uint getColor()
+	{
+		return ctrl().GetColour().GetRGB();
 	}
 };
 

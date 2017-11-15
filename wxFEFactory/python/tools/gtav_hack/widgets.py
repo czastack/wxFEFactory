@@ -1,5 +1,6 @@
 from fefactory_api import ui
-from lib.hack.form import TwoWayWidget
+from lib.hack.form import ModelWidget, TwoWayWidget
+from lib.utils import rgb2bgr
 
 btn_style = {'width': 50}
 
@@ -65,3 +66,23 @@ class WeaponWidget(TwoWayWidget):
 
     def remove_weapon(self, _=None):
         self.ped.remove_weapon(self.weapon)
+
+
+class CustomColorWidget(ModelWidget, TwoWayWidget):
+    def render(self):
+        super().render()
+        with ui.Horizontal(className="fill"):
+            self.view = ui.ColorPicker(className="vcenter", onchange=lambda v: self.write())
+            self.render_btn()
+            ui.Button("清除", onclick=self.clear_color)
+
+    def clear_color(self, _=None):
+        del self.mem_value
+
+    @property
+    def input_value(self):
+        return rgb2bgr(self.view.color)
+
+    @input_value.setter
+    def input_value(self, value):
+        self.view.color = rgb2bgr(value)

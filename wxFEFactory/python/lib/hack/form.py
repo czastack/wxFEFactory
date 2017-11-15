@@ -92,6 +92,16 @@ class ModelWidget:
                 setattr(ins, prop, value)
             else:
                 prop.__set__(ins, value)
+
+    @mem_value.deleter
+    def mem_value(self):
+        ins = self.ins
+        if ins:
+            prop = self.offsets
+            if isinstance(prop, str):
+                delattr(ins, prop)
+            else:
+                prop.__delete__(ins, value)
     
 
 class Group(Widget):

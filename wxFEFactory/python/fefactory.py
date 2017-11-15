@@ -52,7 +52,8 @@ def reload(start_option=None, callback=None):
             del __main__.__dict__[name]
 
     if start_option:
-        __main__.start_option = start_option
+        from application import app
+        app.start_option = start_option
 
     __import__(__name__)
 

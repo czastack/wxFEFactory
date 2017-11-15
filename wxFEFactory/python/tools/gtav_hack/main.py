@@ -9,11 +9,12 @@ from commonstyle import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
-from . import address, models
-from .data import VEHICLE_LIST, PLAYER_MODEL, WEAPON_LIST, SHOOT_WEAPON_CHOICES, DRIVING_STYLE
+from ..gta_base.widgets import ColorWidget
+from . import address, models, data as dataset
+from .data import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
-from .widgets import WeaponWidget
+from .widgets import WeaponWidget, CustomColorWidget
 import math
 import os
 import json
@@ -72,6 +73,7 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="不被警察注意", onchange=self.set_ped_ignored_by_police)
                 ui.ToggleButton(label="快速奔跑", onchange=self.set_player_fast_run)
                 ui.ToggleButton(label="快速游泳", onchange=self.set_player_fast_swim)
+                ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
 
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
@@ -87,13 +89,21 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+            ui.Text("颜色", className="label_left expand")
+            with ui.Horizontal(className="fill"):
+                ColorWidget("vehicle_color", "车身", self._vehicle, "color", dataset.COLOR_LIST)
+                ColorWidget("vehicle_specular_color", "条纹", self._vehicle, "specular_color", dataset.COLOR_LIST)
+                ColorWidget("vehicle_feature_color1", "边缘", self._vehicle, "feature_color1", dataset.COLOR_LIST)
+                ColorWidget("vehicle_feature_color2", "轮胎", self._vehicle, "feature_color2", dataset.COLOR_LIST)
+            CustomColorWidget("vehicle_custom_primary_color", "自定义颜色1", self._vehicle, "custom_primary_color")
+            CustomColorWidget("vehicle_custom_secondary_color", "自定义颜色2", self._vehicle, "custom_secondary_color")
 
         with Group("weapon", "武器槽", None, handler=self.handler, flexgrid=False):
             self.weapon_views = []
             with ui.Vertical(className="fill container"):
                 self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.weapon_model_book:
-                    for category in WEAPON_LIST:
+                    for category in dataset.WEAPON_LIST:
                         with ui.Vertical():
                             with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as view:
                                 view.AddGrowableCol(1)
@@ -114,6 +124,14 @@ class Tool(BaseGTATool):
             ModelInputWidget("game_year", "当前年份")
             ModelInputWidget("money", "金钱")
 
+            ModelInputWidget("wind_speed", "风速")
+            ui.Text("天气", className="label_left expand")
+            with ui.Horizontal(className="fill"):
+                self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in dataset.WEATHER_LIST))
+                ui.Button("短暂", onclick=self.apply_weather)
+                ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
+                ui.ToggleButton("起风", onchange=self.set_wind)
+
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.ScrollView(className="fill"):
                 self.render_common_text()
@@ -133,7 +151,7 @@ class Tool(BaseGTATool):
             with ui.Horizontal(className="fill container"):
                 self.player_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.player_model_book:
-                    for category in PLAYER_MODEL:
+                    for category in dataset.PLAYER_MODEL:
                         ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
                 with ui.ScrollView(className="fill container"):
                     ui.Text("1. 切换模型会失去武器")
@@ -201,9 +219,9 @@ class Tool(BaseGTATool):
                 IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
                 IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
                 IntConfig('rocket_damage', '导弹攻击伤害', 250)
-                SelectConfig('shoot_weapon_hash', '射击武器种类', SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
+                SelectConfig('shoot_weapon_hash', '射击武器种类', dataset.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
-                SelectConfig('auto_driving_style', '自动驾驶风格', DRIVING_STYLE)
+                SelectConfig('auto_driving_style', '自动驾驶风格', dataset.DRIVING_STYLE)
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -338,10 +356,10 @@ class Tool(BaseGTATool):
         player_index = self.get_player_index()
 
         if not player:
-            player = self._playerins = self.Player(player_index, self.get_ped_id(), self)
+            player = self._playerins = self.Player(player_index, self.ped_id, self)
         else:
             player.index = player_index
-            player.handle = self.get_ped_id()
+            player.handle = self.ped_id
         return player
 
     def _vehicle(self):
@@ -363,7 +381,8 @@ class Tool(BaseGTATool):
         """获取当前角色的句柄"""
         return self.native_call('GET_PLAYER_PED', 'Q', player_index or self.get_player_index())
 
-    def get_ped_id(self, player_index=0):
+    @property
+    def ped_id(self):
         """获取当前角色的句柄"""
         return self.native_call('PLAYER_PED_ID', None)
 
@@ -397,9 +416,9 @@ class Tool(BaseGTATool):
         """获取角色池中的角色列表"""
         addr = self.near_entity_buff
         self.handler.write64(addr, count)
-        real_count = self.script_call('GET_PED_NEARBY_PEDS', '2Ql', self.get_ped_id(), addr, -1)
+        real_count = self.script_call('GET_PED_NEARBY_PEDS', '2Ql', self.ped_id, addr, -1)
         tmp_ped = Player(0, 0, self)
-        my_handle = self.get_ped_id()
+        my_handle = self.ped_id
         for i in range(real_count):
             addr += 8
             tmp_ped.handle = self.handler.read64(addr)
@@ -416,7 +435,7 @@ class Tool(BaseGTATool):
         """载具池中的载具列表"""
         addr = self.near_entity_buff
         self.handler.write64(addr, count)
-        real_count = self.script_call('GET_PED_NEARBY_VEHICLES', '2Q', self.get_ped_id(), addr)
+        real_count = self.script_call('GET_PED_NEARBY_VEHICLES', '2Q', self.ped_id, addr)
         tmp_vehicle = Vehicle(0, self)
         my_handle = self.player.get_vehicle_handle()
         for i in range(real_count):
@@ -515,6 +534,10 @@ class Tool(BaseGTATool):
     def set_player_fast_swim(self, tb):
         """快速游泳"""
         self.player.fast_swim = tb.checked
+
+    def set_never_wanted(self, tb):
+        """不被通缉"""
+        self.max_wanted_level = 0 if tb.checked else 5
 
     def vehicle_fix(self, vehicle):
         """修车"""
@@ -799,7 +822,7 @@ class Tool(BaseGTATool):
 
     @game_seconds.setter
     def game_seconds(self, value):
-        self.native_call('SET_CLOCK_TIME', self.game_hour, self.game_minute, int(value))
+        self.native_call('SET_CLOCK_TIME', '3L', self.game_hour, self.game_minute, int(value))
 
     @property
     def game_day(self):
@@ -826,7 +849,7 @@ class Tool(BaseGTATool):
 
     @game_year.setter
     def game_year(self, value):
-        self.native_call('SET_CLOCK_DATE', self.game_day, self.game_month, int(value))
+        self.native_call('SET_CLOCK_DATE', '3L', self.game_day, self.game_month, int(value))
 
     @property
     def game_week(self):
@@ -858,6 +881,15 @@ class Tool(BaseGTATool):
             self.native_call('STAT_SET_INT', 'Q2l', self.money_keys[i], int(value), 1)
         except:
             print('请确保当前人物模型是三主角之一')
+
+    @property
+    def max_wanted_level(self):
+        """当前金钱"""
+        return self.native_call('GET_MAX_WANTED_LEVEL', None)
+
+    @max_wanted_level.setter
+    def max_wanted_level(self, value):
+        self.native_call('SET_MAX_WANTED_LEVEL', 'Q', value)
 
     def get_selected_vehicle_model(self):
         """获取刷车器选中的载具模型"""
@@ -911,11 +943,11 @@ class Tool(BaseGTATool):
         if self.config.explode_no_owner:
             self._create_explosion(*args, **kwargs)
         else:
-            self.create_owned_explosion(self.get_ped_id(), *args, **kwargs)
+            self.create_owned_explosion(self.ped_id, *args, **kwargs)
 
     def get_weapon_hash(self, name):
         """通过武器名称获取hash"""
-        for group in WEAPON_LIST:
+        for group in dataset.WEAPON_LIST:
             for item in group[1]:
                 if item[0] == name:
                     return item[2]
@@ -975,12 +1007,12 @@ class Tool(BaseGTATool):
 
     def shoot_vehicle_rocket_little(self, _=None):
         """发射少量车载火箭"""
-        ped = 0 if self.config.rocket_attack_no_owner else self.get_ped_id()
+        ped = 0 if self.config.rocket_attack_no_owner else self.ped_id
         self.shoot_vehicle_rocket(ped, self.config.rocket_shoot_count_little)
 
     def shoot_vehicle_rocket_more(self, _=None):
         """发射多量车载火箭"""
-        ped = 0 if self.config.rocket_attack_no_owner else self.get_ped_id()
+        ped = 0 if self.config.rocket_attack_no_owner else self.ped_id
         self.shoot_vehicle_rocket(ped, self.config.rocket_shoot_count_more)
 
     def rocket_attack_coords(self, coords, speed=100, height=10):
@@ -990,7 +1022,7 @@ class Tool(BaseGTATool):
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
-            ped = self.get_ped_id()
+            ped = self.ped_id
         for coord in coords:
             coord0 = list(coord)
             coord1 = coord
@@ -1004,7 +1036,7 @@ class Tool(BaseGTATool):
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
-            ped = self.get_ped_id()
+            ped = self.ped_id
 
         speed = self.config.rocket_attack_speed or speed
 
@@ -1012,6 +1044,7 @@ class Tool(BaseGTATool):
             if p.handle:
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
+                coord0[0] += 0.1 # 如果xy坐标一样，有些武器子弹会无法移动
                 coord0[2] += height
                 self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
@@ -1021,7 +1054,7 @@ class Tool(BaseGTATool):
         if self.config.rocket_attack_no_owner:
             ped = 0
         else:
-            ped = self.get_ped_id()
+            ped = self.ped_id
 
         speed = self.config.rocket_shoot_speed or speed
 
@@ -1121,7 +1154,7 @@ class Tool(BaseGTATool):
         page_index = self.player_model_book.index
         item_index = self.player_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = PLAYER_MODEL[page_index][1][item_index][1]
+            model_name = dataset.PLAYER_MODEL[page_index][1][item_index][1]
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
     def set_player_model(self, _=None):
@@ -1134,7 +1167,7 @@ class Tool(BaseGTATool):
         """生产该模型的人物"""
         model = self.get_selected_ped_model()
         if model:
-            self.create_ped(self.get_selected_ped_model())
+            return self.create_ped(self.get_selected_ped_model())
 
     def near_peds_go_away(self, _=None):
         """附近的人吹飞"""
@@ -1152,7 +1185,7 @@ class Tool(BaseGTATool):
 
     def clear_area_of_vehicles(self, _=None):
         """清空区域内的载具"""
-        self.script_call('CLEAR_AREA_OF_VEHICLES', '4f5Q', *self.player.coord, 200, False, False, False, False, False)
+        self.script_call('CLEAR_AREA_OF_VEHICLES', '4f5Q', *self.player.coord, 1000, False, False, False, False, False)
 
     def clear_area_of_peds(self, _=None):
         """清空区域内的角色"""
@@ -1160,8 +1193,43 @@ class Tool(BaseGTATool):
 
     def clear_area_of_cops(self, _=None):
         """清空区域内的警察"""
-        self.script_call('CLEAR_AREA_OF_COPS', '4fQ', *self.player.coord, 200, True)
+        self.script_call('CLEAR_AREA_OF_COPS', '4fQ', *self.player.coord, 1000, True)
 
     def clear_area_of_fire(self, _=None):
         """清空区域内的火焰"""
         self.script_call('STOP_FIRE_IN_RANGE', '4f', *self.player.coord, 100)
+
+    def jump_on_vehicle(self, _=None):
+        with SafeScriptEnv(self):
+            super().jump_on_vehicle()
+
+    def apply_weather(self, _=None, persist=False):
+        """ 应用所选天气
+        :param persist: 是否持久
+        """
+        self.native_call('CLEAR_OVERRIDE_WEATHER', None)
+        index = self.weather_view.index
+        if index != -1:
+            weather = dataset.WEATHER_LIST[index][1]
+            if persist:
+                self.native_call('CLEAR_OVERRIDE_WEATHER', 's', weather)
+            else:
+                self.native_call('SET_WEATHER_TYPE_NOW_PERSIST', 's', weather)
+                self.native_call('CLEAR_WEATHER_TYPE_PERSIST', None)
+
+    def set_wind(self, tb):
+        if tb.checked:
+            self.native_call('SET_WIND', 'f', 1.0)
+            self.native_call('SET_WIND_SPEED', 'f', 11.99)
+            self.native_call('SET_WIND_DIRECTION', 'f', self.entity.heading)
+        else:
+            self.native_call('SET_WIND', 'f', 0)
+            self.native_call('SET_WIND_SPEED', 'f', 0)
+
+    @property
+    def wind_speed(self):
+        return self.native_call('SET_WIND_SPEED', None, ret_type=float)
+
+    @wind_speed.setter
+    def wind_speed(self, value):
+        self.native_call('SET_WIND_SPEED', 'f', float(value))

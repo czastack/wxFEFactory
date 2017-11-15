@@ -25,7 +25,7 @@ public:
 		py::cast(this).inc_ref();
 	}
 
-	void setSize(py::tuple &size)
+	void setSize(py::sequence &size)
 	{
 		m_elem->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
 	}
@@ -39,7 +39,7 @@ public:
 		return ret;
 	}
 
-	void setPosition(py::tuple &point)
+	void setPosition(py::sequence &point)
 	{
 		m_elem->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
 	}

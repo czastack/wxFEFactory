@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField, ModelField, ArrayField
 from lib.lazy import lazy
-from lib.utils import float32
+from lib.utils import float32, tuple2rgb, rgb2tuple
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool
 import math
@@ -286,6 +286,13 @@ class Player(NativeEntity):
             self.native_call('CLEAR_PLAYER_WANTED_LEVEL', 'Q', self.index)
         self.script_call('SET_PLAYER_WANTED_LEVEL_NOW', 'Q', self.index, sync=False)
 
+    def never_wanted(self, toggle):
+        """不被通缉 只是把困难度调大"""
+        if toggle:
+            self.native_call('SET_WANTED_LEVEL_DIFFICULTY', 'Qf', self.index, 1000000)
+        else:
+            self.native_call('RESET_WANTED_LEVEL_DIFFICULTY', 'Q', self.index)
+
     isInVehicle = property(getter('IS_PED_IN_ANY_VEHICLE', bool, 1))
     # 被其他角色忽略
     ignored_by_everyone = player_setter('SET_EVERYONE_IGNORE_PLAYER', bool)
@@ -297,6 +304,8 @@ class Player(NativeEntity):
     keep_bike = property(None, setter('SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE', bool))
     # 产生噪声比例 (默认1.0)
     noise_rate = property(None, player_setter('SET_PLAYER_NOISE_MULTIPLIER', float))
+    # 射击比例
+    shoot_rate = property(None, setter('SET_PED_SHOOT_RATE', float))
 
     def _fast_run(self, toggle=True):
         """快速奔跑"""
@@ -428,7 +437,7 @@ class Player(NativeEntity):
     def get_vehicle_weapon(self):
         """当前车载武器种类"""
         self.script_call('GET_CURRENT_PED_VEHICLE_WEAPON', '2Q', self.handle, self.native_context.get_temp_addr())
-        return self.native_context.get_temp_value(size=8)
+        return self.native_context.get_temp_value(size=4)
 
     def set_vehicle_weapon(self, weapon):
         """设置当前车载武器种类"""
@@ -522,8 +531,8 @@ class Vehicle(NativeEntity):
     @property
     def colors(self):
         ctx = self.native_context
-        self.native_call('GET_CAR_COLOURS', '3Q', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
-        return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
+        self.native_call('GET_VEHICLE_COLOURS', '3Q', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
+        return ctx.get_temp_value(1), ctx.get_temp_value(2)
 
     @colors.setter
     def colors(self, value):
@@ -533,7 +542,7 @@ class Vehicle(NativeEntity):
     def ext_colors(self):
         ctx = self.native_context
         self.native_call('GET_VEHICLE_EXTRA_COLOURS', '3Q', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
-        return float32(ctx.get_temp_value(1)), float32(ctx.get_temp_value(2))
+        return ctx.get_temp_value(1), ctx.get_temp_value(2)
 
     @colors.setter
     def ext_colors(self, value):
@@ -582,6 +591,42 @@ class Vehicle(NativeEntity):
         c1, c2 = self.ext_colors
         c2 = value
         self.ext_colors = c1, c2
+
+    # 自定义颜色1
+    is_primary_color_custom = property(getter("GET_IS_VEHICLE_PRIMARY_COLOUR_CUSTOM", bool))
+
+    @property
+    def custom_primary_color(self):
+        ctx = self.native_context
+        self.native_call('GET_VEHICLE_CUSTOM_PRIMARY_COLOUR', '4Q', self.handle, *ctx.get_temp_addrs(1, 4))
+        return tuple2rgb(tuple(ctx.get_temp_values(1, 4, size=4)))
+
+    @custom_primary_color.setter
+    def custom_primary_color(self, rgb):
+        rgbtuple = rgb2tuple(rgb)
+        self.script_call('SET_VEHICLE_CUSTOM_PRIMARY_COLOUR', '4Q', self.handle, *rgbtuple)
+
+    @custom_primary_color.deleter
+    def custom_primary_color(self):
+        self.script_call('CLEAR_VEHICLE_CUSTOM_PRIMARY_COLOUR', 'Q', self.handle)
+
+    # 自定义颜色2
+    is_secondary_color_custom = property(getter("GET_IS_VEHICLE_SECONDARY_COLOUR_CUSTOM", bool))
+
+    @property
+    def custom_secondary_color(self):
+        ctx = self.native_context
+        self.native_call('GET_VEHICLE_CUSTOM_SECONDARY_COLOUR', '4Q', self.handle, *ctx.get_temp_addrs(1, 4))
+        return tuple2rgb(tuple(ctx.get_temp_values(1, 4, size=4)))
+
+    @custom_secondary_color.setter
+    def custom_secondary_color(self, rgb):
+        rgbtuple = rgb2tuple(rgb)
+        self.script_call('SET_VEHICLE_CUSTOM_SECONDARY_COLOUR', '4Q', self.handle, *rgbtuple)
+
+    @custom_secondary_color.deleter
+    def custom_secondary_color(self):
+        self.script_call('CLEAR_VEHICLE_CUSTOM_SECONDARY_COLOUR', 'Q', self.handle)
 
     def fix(self):
         """修车"""

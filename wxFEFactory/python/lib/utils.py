@@ -45,3 +45,13 @@ def u32bytes(n):
         return n.to_bytes(4, 'little')
     except:
         return struct.pack('L', n)
+
+
+def tuple2rgb(rgbtuple):
+    return rgbtuple[0] << 16 | rgbtuple[1] << 8 | rgbtuple[2]
+
+def rgb2tuple(rgb):
+    return ((rgb >> 16) & 0xff), ((rgb >> 8) & 0xff), (rgb & 0xff)
+
+def rgb2bgr(rgb):
+    return ((rgb & 0xff) << 16 | ((rgb >> 8) & 0xff) << 8 | ((rgb >> 16) & 0xff))
