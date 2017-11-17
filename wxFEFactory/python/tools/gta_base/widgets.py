@@ -1,6 +1,6 @@
 from fefactory_api import ui
 from lib.hack.form import Group, TwoWayWidget, ModelWidget
-from commonstyle import dialog_style
+from styles import dialog_style
 
 
 class WeaponWidget(TwoWayWidget):

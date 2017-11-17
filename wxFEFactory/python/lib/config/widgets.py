@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from lib import extypes
+from styles import btn_xsm_style
 from . import Configurable
 import fefactory_api
 ui = fefactory_api.ui
@@ -95,8 +96,8 @@ class ConfigCtrl(ABC):
         self.set_config_value(self.get_input_value(), False)
 
     def render_btn(self):
-        ui.Button(label="r", style=btn_style, onclick=self.read)
-        ui.Button(label="w", style=btn_style, onclick=self.write)
+        ui.Button(label="r", style=btn_xsm_style, onclick=self.read)
+        ui.Button(label="w", style=btn_xsm_style, onclick=self.write)
 
     def set_help(self, text=None):
         if text is None:
@@ -192,8 +193,3 @@ class SelectConfig(ConfigCtrl):
         else:
             return
         self.view.index = i
-
-
-btn_style = {
-    'width': 36,
-}

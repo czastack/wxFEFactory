@@ -1,6 +1,6 @@
 from ..module import BaseListBoxModuel
 from mainframe import ui
-from commonstyle import dialog_style
+from styles import dialog_style
 from lib import exui
 import fefactory_api
 

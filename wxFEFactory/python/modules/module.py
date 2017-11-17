@@ -1,7 +1,7 @@
 from application import app
 from lib.lazy import lazyclassmethod
 from lib.basescene import BaseScene
-from commonstyle import styles
+from styles import styles
 from . import modules
 import os
 import json

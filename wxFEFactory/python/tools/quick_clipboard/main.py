@@ -1,4 +1,4 @@
-from commonstyle import dialog_style, styles
+from styles import dialog_style, styles
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from fefactory_api import auto
 from ..tool import BaseTool

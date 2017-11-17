@@ -3,7 +3,7 @@ from project import Project
 from modules import modules
 from fe.ferom import FeRomRW
 from lib import exui
-from commonstyle import dialog_style
+from styles import dialog_style
 import os
 import traceback
 import __main__

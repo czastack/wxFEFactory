@@ -3,12 +3,13 @@ from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config import Config
-from commonstyle import styles
+from styles import styles
 from ..tool import BaseTool
 from .models import Pool
 from .native import NativeContext
 import math
 import time
+import traceback
 import fefactory_api
 import fefactory_api
 ui = fefactory_api.ui
@@ -68,7 +69,11 @@ class BaseGTATool(BaseTool):
                     self.attach_status_view = ui.Text("", className="label_left grow")
                     ui.CheckBox("保持最前", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill"):
-                    self.render_main()
+                    try:
+                        self.render_main()
+                    except:
+                        win.close()
+                        raise
 
         return win
 

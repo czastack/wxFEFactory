@@ -1,8 +1,8 @@
 from fefactory_api import ui
 from lib.hack.form import ModelWidget, TwoWayWidget
 from lib.utils import rgb2bgr
+from styles import btn_sm_style
 
-btn_style = {'width': 50}
 
 class WeaponWidget(TwoWayWidget):
     def __init__(self, ped, name, label, weapon, has_ammo=True, callback=None):
@@ -17,8 +17,8 @@ class WeaponWidget(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             if self.has_ammo:
                 self.ammo_view = ui.SpinCtrl(className="fill", min=0, max=9999, initial=0)
-                ui.Button("最大", style=btn_style, onclick=self.max_ammo)
-            ui.Button("移除", style=btn_style, onclick=self.remove_weapon)
+                ui.Button("最大", style=btn_sm_style, onclick=self.max_ammo)
+            ui.Button("移除", style=btn_sm_style, onclick=self.remove_weapon)
             self.render_btn()
 
     @property

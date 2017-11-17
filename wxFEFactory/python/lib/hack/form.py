@@ -33,8 +33,8 @@ class Widget:
         ui.Text(self.label, className="label_left expand")
 
     def render_btn(self):
-        ui.Button(label="r", style=btn_style, onclick=lambda btn: self.read())
-        ui.Button(label="w", style=btn_style, onclick=lambda btn: self.write())
+        ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: self.read())
+        ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: self.write())
 
     def read(self):
         pass
@@ -458,6 +458,6 @@ class ModelSelectWidget(ModelWidget, BaseSelectWidget):
         super().__init__(name, label, ins, prop)
 
 
-btn_style = {
+btn_xsm_style = {
     'width': 36,
 }

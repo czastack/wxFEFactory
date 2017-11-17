@@ -1,6 +1,6 @@
 from ..tool import BaseTool
 from mainframe import ui
-from commonstyle import styles, dialog_style
+from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 
 class Tool(BaseTool):

@@ -5,12 +5,12 @@ from lib.hack.form import (
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from commonstyle import dialog_style, styles
+from styles import dialog_style, styles, btn_md_style
 from . import cheat, address, models
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
-from ..gta_base.main import BaseGTATool
+from ..gta3_base.main import BaseGTA3_VC_SA_Tool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
 import math
 import os
@@ -21,7 +21,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGTATool):
+class Tool(BaseGTA3_VC_SA_Tool):
     CLASS_NAME = 'Grand theft auto San Andreas'
     WINDOW_NAME = 'GTA: San Andreas'
     address = address
@@ -59,8 +59,8 @@ class Tool(BaseGTATool):
                         ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_BP)),
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_FP)),
                     ]
-                    ui.Button("全部", onclick=self.player_special_all)
-                    ui.Button("再次应用", onclick=self.player_special_apply).setToolTip("死亡或者重新读档后需要再次应用")
+                    ui.Button("全部", style=btn_md_style, onclick=self.player_special_all)
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_special_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
@@ -84,8 +84,8 @@ class Tool(BaseGTATool):
                         ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_BP)),
                         ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_FP)),
                     ]
-                    ui.Button("全部", onclick=self.vehicle_special_all)
-                    ui.Button("再次应用", onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
+                    ui.Button("全部", style=btn_md_style, onclick=self.vehicle_special_all)
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
                 self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", COLOR_LIST)
@@ -333,13 +333,6 @@ class Tool(BaseGTATool):
         else:
             self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
-    def spawn_vehicle(self, model_id, coord=None):
-        self.load_model(model_id)
-        self.script_call(0xa5, 'L3fP', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr())
-        vehicle_handle = self.native_context.get_temp_value()
-        if vehicle_handle:
-            return self.vehicle_pool[vehicle_handle >> 8]
-
     def get_wanted_level(self):
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
         return self.handler.read8(ptr + 0x2C)
@@ -393,25 +386,6 @@ class Tool(BaseGTATool):
     def get_camera_rot(self):
         return self.read_vector(address.CAMERA + 0x10)
 
-    EXPLOSION_TYPE_GRENADE = 0
-    EXPLOSION_TYPE_MOLOTOV = 1
-    EXPLOSION_TYPE_ROCKET = 2
-    EXPLOSION_TYPE_ROCKET_WEAK = 3
-    EXPLOSION_TYPE_CAR = 4
-    EXPLOSION_TYPE_CAR_QUICK = 5
-    EXPLOSION_TYPE_BOAT = 6
-    EXPLOSION_TYPE_HELI = 7
-    EXPLOSION_TYPE_MINE = 8
-    EXPLOSION_TYPE_OBJECT = 9
-    EXPLOSION_TYPE_TANK_GRENADE = 10
-    EXPLOSION_TYPE_SMALL = 11
-    EXPLOSION_TYPE_TINY = 12
-    def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, fCameraShake=0.3):
-        """产生爆炸"""
-        # (pExplodingEntity, pOwner, explosionType, vecPosition, uiActivationDelay, bMakeSound, fCamShake, bNoDamage)
-        self.native_call_auto(address.FUNC_AddExplosion, '2LL3fLLfL', 0, 0, explosionType, *coord, 0, 1, fCameraShake, 0)
-        # self.script_call(0x20C, '3fL', *coord, explosionType)
-
     def vehicle_fix(self, vehicle):
         """修车"""
         model_id = vehicle.model_id
@@ -450,8 +424,3 @@ class Tool(BaseGTATool):
             color = blip.color
             if color is 7 and not blip.bright:
                 yield blip.entity
-
-    def enemys_explode(self, _=None):
-        """敌人爆炸"""
-        for e in self.get_enemys():
-            self.create_explosion(e.coord)

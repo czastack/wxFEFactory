@@ -2,7 +2,7 @@ from functools import partial
 from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from commonstyle import dialog_style, styles
+from styles import dialog_style, styles
 from . import address, models
 from .models import Player, Vehicle
 from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST

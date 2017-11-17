@@ -1,5 +1,5 @@
 import fefactory_api
-from commonstyle import styles
+from styles import styles
 
 ui = fefactory_api.layout
 

@@ -5,7 +5,7 @@ from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, Model
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
-from commonstyle import dialog_style, styles
+from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
@@ -49,7 +49,6 @@ class Tool(BaseGTATool):
 
     def __init__(self):
         super().__init__()
-        self.safe_script_env = SafeScriptEnv(self)
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -268,7 +267,7 @@ class Tool(BaseGTATool):
                 setattr(address, name, self.get_addr(addr) if addr else 0)
         
         address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 6)
-        address.BLIP_LIST = self.get_offset_addr(address.BLIP_LIST_BASE)
+        # address.BLIP_LIST = self.get_offset_addr(address.BLIP_LIST_BASE)
 
         # 装载针对当前版本的native_hash
         name = 'hash_%d' % version
@@ -341,6 +340,7 @@ class Tool(BaseGTATool):
 
                         try_count -= 1
 
+                    self.handler.write64(self.ScriptHookHelperCtxPtr, 0)
                     print('获取script_call返回失败，超过尝试次数')
 
     def get_hash_key(self, name):
@@ -702,7 +702,10 @@ class Tool(BaseGTATool):
                 if coord[2] < 3:
                     coord[2] = 1024
                     coord[2] = self.GetGroundZ(coord) or 36
-                self.entity.coord = coord
+                entity = self.entity
+                self.last_coord = Vector3(entity.coord) # 上次瞬移前的坐标
+                self.last_teleport_coord = Vector3(coord) # 上次瞬移后的坐标
+                entity.coord = coord
                 return True
 
     def teleport_to_destination(self, _=None):
@@ -1026,6 +1029,7 @@ class Tool(BaseGTATool):
         for coord in coords:
             coord0 = list(coord)
             coord1 = coord
+            coord0[0] += 0.1
             coord0[2] += height
             self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
@@ -1128,11 +1132,8 @@ class Tool(BaseGTATool):
         if not self.script_call('HAS_WEAPON_ASSET_LOADED', 'Q', weapon):
             self.script_call('REQUEST_WEAPON_ASSET', '3Q', weapon, 31, 0)
 
-    def near_peds_to_front(self, _=None):
-        super().near_peds_to_front(zinc=6)
-
     def near_vehicles_to_front(self, _=None):
-        super().near_vehicles_to_front(zinc=5)
+        super().near_vehicles_to_front(zinc=1)
 
     def recal_markers(self, _=None):
         self._markers = tuple(self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY))
