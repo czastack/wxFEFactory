@@ -61,7 +61,7 @@ WEAPON_LIST = [
 
 
 VEHICLE_LIST = (
-    ("GTA4", (
+    ("GTA4 汽车", (
         ("ADMIRAL", 0x4B5C5320),
         ("AIRTUG", 0x5D0AAC8F),
         ("AMBULANCE", 0x45D56ADA),
@@ -167,6 +167,9 @@ VEHICLE_LIST = (
         ("WASHINGTON", 0x69F06B57),
         ("WILLARD", 0x737DAEC2),
         ("YANKEE", 0xBE6FF06A),
+    )),
+    
+    ("GTA4 摩托车", (
         ("BOBBER", 0x92E56A2C),
         ("FAGGIO", 0x9229E4EB),
         ("HELLFURY", 0x22DC8E7F),
@@ -174,10 +177,16 @@ VEHICLE_LIST = (
         ("PCJ", 0xC9CEAF06),
         ("SANCHEZ", 0x2EF89E46),
         ("ZOMBIEB", 0xDE05FB87),
+    )),
+    
+    ("GTA4 直升机", (
         ("ANNIHILATOR", 0x31F0B376),
         ("MAVERICK", 0x9D0450CA),
         ("POLMAV", 0x1517D4D9),
         ("TOURMAV", 0x78D70477),
+    )),
+    
+    ("GTA4 船", (
         ("DINGHY", 0x3D961290),
         ("JETMAX", 0x33581161),
         ("MARQUIS", 0xC1CE1183),
@@ -186,6 +195,9 @@ VEHICLE_LIST = (
         ("SQUALO", 0x17DF5EC2),
         ("TUGA", 0x3F724E66),
         ("TROPIC", 0x1149422F),
+    )),
+    
+    ("GTA4 列车(开不了)", (
         ("CABLECAR", 0xC6C3242D),
         ("SUBWAY_LO", 0x2FBC4D30),
         ("SUBWAY_HI", 0x8B887FDB),
@@ -236,7 +248,7 @@ VEHICLE_LIST = (
         ("BLADE", 0xB820ED5E),
     )),
     
-    ("TBoGT 汽车", (
+    ("TLAD 汽车", (
         ("GBURRITO", 0x97FA4F36),
         ("SLAMVAN", 0x2B7F9DE3),
         ("TOWTRUCK", 0xB12314E0),
@@ -248,7 +260,7 @@ VEHICLE_LIST = (
         ("TAMPA", 0x39F9C898),
     )),
     
-    ("TBoGT 摩托车", (
+    ("TLAD 摩托车", (
         ("ANGEL", 0xDDF716D8),
         ("BATI", 0xF9300CC5),
         ("BATI2", 0xCADD5D2D),
