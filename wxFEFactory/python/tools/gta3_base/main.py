@@ -1,5 +1,6 @@
 from functools import partial
 from ..gta_base.main import BaseGTATool
+from . import opcodes
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -11,6 +12,21 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
         """执行一条脚本"""
         if self.handler.active:
             return self.script_context.run(command_id, signature, *args)
+
+    @property
+    def ped_id(self):
+        """获取当前角色的句柄"""
+        self.script_call(opcodes.GET_PLAYER_CHAR, 'LP', 0, self.native_context.get_temp_addr())
+        return self.native_context.get_temp_value()
+
+    @property
+    def vehicle_id(self):
+        """获取当前载具的句柄"""
+        self.script_call(opcodes.STORE_CAR_CHAR_IS_IN_NO_SAVE, 'LP', self.ped_id, self.native_context.get_temp_addr())
+        handle = self.native_context.get_temp_value()
+        if handle == 0xfd16e500:
+            return 0
+        return handle
 
     EXPLOSION_TYPE_GRENADE = 0
     EXPLOSION_TYPE_MOLOTOV = 1
@@ -28,7 +44,7 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
         """产生爆炸"""
         # (X, Y, Z, iType, Radius)
         # self.native_call_auto(address.FUNC_AddExplosion, '3fLL', *coord, explosionType, radius)
-        self.script_call(0x20C, '3fL', *coord, explosionType)
+        self.script_call(opcodes.ADD_EXPLOSION, '3fL', *coord, explosionType)
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""
@@ -44,8 +60,20 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
 
     def freeze_timer(self, _=None, freeze=True):
         """停止计时"""
-        self.script_call(0x396, 'L', freeze)
+        self.script_call(opcodes.FREEZE_ONSCREEN_TIMER, 'L', freeze)
 
+    def set_ped_invincible(self, tb):
+        """当前角色无伤"""
+        on = tb.checked
+        self.script_call(opcodes.SET_CHAR_PROOFS, '6L', self.ped_id, on, on, on, on, on)
+
+    def set_vehicle_invincible(self, tb):
+        """当前载具无伤"""
+        vehicle_id = self.vehicle_id
+        if vehicle_id:
+            on = tb.checked
+            self.script_call(opcodes.SET_CAR_PROOFS, '6L', vehicle_id, on, on, on, on, on)
+        
 
 class BaseGTA3Tool(BaseGTA3_VC_SA_Tool):
     """GTA3, VC公共基类"""

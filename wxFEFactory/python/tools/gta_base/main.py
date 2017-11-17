@@ -526,6 +526,10 @@ class BaseGTATool(BaseTool):
             else:
                 vehicle.unlock_door()
 
+    def vehicle_toggle_door(self, tb):
+        """切换锁车状态"""
+        self.vehicle_lock_door(lock=tb.checked)
+
     #----------------------------------------------------------------------
     # MARKER
     #----------------------------------------------------------------------

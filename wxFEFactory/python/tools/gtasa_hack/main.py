@@ -45,12 +45,13 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
-            ui.Text("")
+            ui.Hr()
             with ui.Vertical(className="fill"):
-                with ui.Horizontal(className="expand"):
+                with ui.GridLayout(cols=5, vgap=10, className="expand"):
                     ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                     ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
-                ui.Hr()
+                    ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.player_special_views = [
@@ -70,9 +71,10 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Text("")
             with ui.Vertical(className="fill"):
-                with ui.Horizontal(className="expand"):
+                with ui.GridLayout(cols=5, vgap=10, className="expand"):
                     ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
                     ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
+                    ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
                     ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                     ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
                 ui.Hr()

@@ -43,8 +43,10 @@ class Tool(BaseGTA3Tool):
             self.stamina_view = ModelInputWidget("stamina", "体力")
             self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
             self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
-            ui.Text("")
-            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.Hr()
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
@@ -53,8 +55,12 @@ class Tool(BaseGTA3Tool):
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.vehicle_turn_view = ModelCoordWidget("turn", "Turn")
             self.weight_view = ModelInputWidget("weight", "重量")
-            ui.Text("")
-            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+            ui.Hr()
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
+                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
@@ -66,10 +72,6 @@ class Tool(BaseGTA3Tool):
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
-                    CheckBoxWidget("god1", "角色无伤1", 0x5267DC, (), b'\xEB\x10', b'\x75\x15')
-                    CheckBoxWidget("god2", "角色无伤2", 0x5267D5, (), b'\x90\x90', b'\x75\x1C')
-                    CheckBoxWidget("vehicle_god1", "汽车无伤1", 0x5A9801, (), b'\xc7\x41\x04\x00\x00\x00\x00\xc2\x04', b'\x88\x41\x04\xc2\x04\x00\x00\x00\x00')
-                    CheckBoxWidget("vehicle_god2", "汽车无伤2", 0x588A77, (), b'\x90\x90', b'\x75\x09')
                     CheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                     CheckBoxWidget("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
                     CheckBoxWidget("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')

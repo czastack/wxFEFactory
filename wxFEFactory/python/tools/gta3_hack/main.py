@@ -41,8 +41,10 @@ class Tool(BaseGTA3Tool):
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
-            ui.Text("")
-            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.Hr()
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
@@ -50,9 +52,10 @@ class Tool(BaseGTA3Tool):
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
-            ui.Text("")
-            with ui.Horizontal(className="expand"):
+            ui.Hr()
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
 
