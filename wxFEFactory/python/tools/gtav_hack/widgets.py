@@ -72,9 +72,9 @@ class CustomColorWidget(ModelWidget, TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
-            self.view = ui.ColorPicker(className="vcenter", onchange=lambda v: self.write())
+            self.view = ui.ColorPicker(className="expand", onchange=lambda v: self.write())
             self.render_btn()
-            ui.Button("清除", onclick=self.clear_color)
+            ui.Button("清除", style=btn_sm_style, onclick=self.clear_color)
 
     def clear_color(self, _=None):
         del self.mem_value
