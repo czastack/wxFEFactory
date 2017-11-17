@@ -10,8 +10,8 @@ from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
 from ..gta_base.widgets import ColorWidget
-from . import address, models, data as dataset
-from .data import VEHICLE_LIST
+from . import address, models, datasets
+from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget, CustomColorWidget
@@ -41,7 +41,6 @@ class Tool(BaseGTATool):
     SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
     SLING_SPEED_RATE = 60
-    VEHICLE_LIST = VEHICLE_LIST
     
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
@@ -90,10 +89,10 @@ class Tool(BaseGTATool):
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
             ui.Text("颜色", className="label_left expand")
             with ui.Horizontal(className="fill"):
-                ColorWidget("vehicle_color", "车身", self._vehicle, "color", dataset.COLOR_LIST)
-                ColorWidget("vehicle_specular_color", "条纹", self._vehicle, "specular_color", dataset.COLOR_LIST)
-                ColorWidget("vehicle_feature_color1", "边缘", self._vehicle, "feature_color1", dataset.COLOR_LIST)
-                ColorWidget("vehicle_feature_color2", "轮胎", self._vehicle, "feature_color2", dataset.COLOR_LIST)
+                ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
+                ColorWidget("vehicle_specular_color", "条纹", self._vehicle, "specular_color", datasets.COLOR_LIST)
+                ColorWidget("vehicle_feature_color1", "边缘", self._vehicle, "feature_color1", datasets.COLOR_LIST)
+                ColorWidget("vehicle_feature_color2", "轮胎", self._vehicle, "feature_color2", datasets.COLOR_LIST)
             CustomColorWidget("vehicle_custom_primary_color", "自定义颜色1", self._vehicle, "custom_primary_color")
             CustomColorWidget("vehicle_custom_secondary_color", "自定义颜色2", self._vehicle, "custom_secondary_color")
 
@@ -102,7 +101,7 @@ class Tool(BaseGTATool):
             with ui.Vertical(className="fill container"):
                 self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.weapon_model_book:
-                    for category in dataset.WEAPON_LIST:
+                    for category in datasets.WEAPON_LIST:
                         with ui.Vertical():
                             with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as view:
                                 view.AddGrowableCol(1)
@@ -126,7 +125,7 @@ class Tool(BaseGTATool):
             ModelInputWidget("wind_speed", "风速")
             ui.Text("天气", className="label_left expand")
             with ui.Horizontal(className="fill"):
-                self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in dataset.WEATHER_LIST))
+                self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
                 ui.Button("短暂", onclick=self.apply_weather)
                 ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
                 ui.ToggleButton("起风", onchange=self.set_wind)
@@ -150,7 +149,7 @@ class Tool(BaseGTATool):
             with ui.Horizontal(className="fill container"):
                 self.player_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.player_model_book:
-                    for category in dataset.PLAYER_MODEL:
+                    for category in datasets.PLAYER_MODEL:
                         ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
                 with ui.ScrollView(className="fill container"):
                     ui.Text("1. 切换模型会失去武器")
@@ -218,9 +217,9 @@ class Tool(BaseGTATool):
                 IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
                 IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
                 IntConfig('rocket_damage', '导弹攻击伤害', 250)
-                SelectConfig('shoot_weapon_hash', '射击武器种类', dataset.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
+                SelectConfig('shoot_weapon_hash', '射击武器种类', datasets.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
-                SelectConfig('auto_driving_style', '自动驾驶风格', dataset.DRIVING_STYLE)
+                SelectConfig('auto_driving_style', '自动驾驶风格', datasets.DRIVING_STYLE)
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -345,10 +344,6 @@ class Tool(BaseGTATool):
 
     def get_hash_key(self, name):
         return self.native_call('GET_HASH_KEY', 's', name)
-
-    @property
-    def spawn_vehicle_id_view(self):
-        return self.vehicle_model_book.getPage()
 
     def _player(self):
         """获取当前角色"""
@@ -894,6 +889,17 @@ class Tool(BaseGTATool):
     def max_wanted_level(self, value):
         self.native_call('SET_MAX_WANTED_LEVEL', 'Q', value)
 
+    def get_selected_vehicle_list(self):
+        """当前刷车器活动的载具模型列表"""
+        return VEHICLE_LIST[self.vehicle_model_book.index][1]
+
+    # 兼容继承自BaseGTATool的方法
+    VEHICLE_LIST = property(get_selected_vehicle_list)
+
+    @property
+    def spawn_vehicle_id_view(self):
+        return self.vehicle_model_book.getPage()
+
     def get_selected_vehicle_model(self):
         """获取刷车器选中的载具模型"""
         page_index = self.vehicle_model_book.index
@@ -902,7 +908,7 @@ class Tool(BaseGTATool):
             model_name = VEHICLE_LIST[page_index][1][item_index][1]
             if isinstance(model_name, int):
                 return model_name
-            return self.get_cache('player_model', model_name, self.get_hash_key)
+            return self.get_cache('vehicle_model', model_name, self.get_hash_key)
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
@@ -950,7 +956,7 @@ class Tool(BaseGTATool):
 
     def get_weapon_hash(self, name):
         """通过武器名称获取hash"""
-        for group in dataset.WEAPON_LIST:
+        for group in datasets.WEAPON_LIST:
             for item in group[1]:
                 if item[0] == name:
                     return item[2]
@@ -1155,7 +1161,7 @@ class Tool(BaseGTATool):
         page_index = self.player_model_book.index
         item_index = self.player_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = dataset.PLAYER_MODEL[page_index][1][item_index][1]
+            model_name = datasets.PLAYER_MODEL[page_index][1][item_index][1]
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
     def set_player_model(self, _=None):
@@ -1211,7 +1217,7 @@ class Tool(BaseGTATool):
         self.native_call('CLEAR_OVERRIDE_WEATHER', None)
         index = self.weather_view.index
         if index != -1:
-            weather = dataset.WEATHER_LIST[index][1]
+            weather = datasets.WEATHER_LIST[index][1]
             if persist:
                 self.native_call('CLEAR_OVERRIDE_WEATHER', 's', weather)
             else:

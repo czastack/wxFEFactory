@@ -9,7 +9,7 @@ from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
 from . import address, models
-from .data import VEHICLE_LIST
+from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 import math
@@ -37,9 +37,8 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_SPEED_RATE = 60
     SLING_COORD_UP = 3
-    VEHICLE_LIST = VEHICLE_LIST
 
-    from .data import WEAPON_LIST, SLOT_NO_AMMO
+    from .datasets import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
@@ -88,18 +87,22 @@ class Tool(BaseGTATool):
             # self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
 
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
-                    choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill container"):
-                    self.render_common_text()
-                    ui.Text("大加速: alt+shift+m")
-                    ui.Text("生成选中的载具并进入: alt+shift+v")
-                    ui.Text("当前武器子弹全满: alt+g")
-                    ui.Text("瞬移到标记点: alt+shift+g")
-                    ui.Text("瞬移到目的地: alt+1")
-                    ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
-                    ui.Text("爆破最近的车: alt+o")
+            with ui.ScrollView(className="fill"):
+                self.render_common_text()
+                ui.Text("大加速: alt+shift+m")
+                ui.Text("生成选中的载具并进入: alt+shift+v")
+                ui.Text("当前武器子弹全满: alt+g")
+                ui.Text("瞬移到标记点: alt+shift+g")
+                ui.Text("瞬移到目的地: alt+1")
+                ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
+                ui.Text("爆破最近的车: alt+o")
+
+        with Group(None, "载具模型", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+            with ui.Horizontal(className="fill"):
+                self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
+                with self.vehicle_model_book:
+                    for category in VEHICLE_LIST:
+                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
 
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
@@ -668,6 +671,24 @@ class Tool(BaseGTATool):
     @game_week.setter
     def game_week(self, value):
         return self.handler.write32(address.CClock__DayOfWeek, int(value))
+
+    def get_selected_vehicle_list(self):
+        """当前刷车器活动的载具模型列表"""
+        return VEHICLE_LIST[self.vehicle_model_book.index][1]
+
+    # 兼容继承自BaseGTATool的方法
+    VEHICLE_LIST = property(get_selected_vehicle_list)
+
+    @property
+    def spawn_vehicle_id_view(self):
+        return self.vehicle_model_book.getPage()
+
+    def get_selected_vehicle_model(self):
+        """获取刷车器选中的载具模型"""
+        page_index = self.vehicle_model_book.index
+        item_index = self.vehicle_model_book.getPage(page_index).index
+        if item_index is not -1:
+            return VEHICLE_LIST[page_index][1][item_index][1]
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""

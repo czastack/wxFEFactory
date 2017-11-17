@@ -6,8 +6,8 @@ from lib.hack.form import (
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles, btn_md_style
-from . import cheat, address, models
-from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST, WEATHER_LIST, COLOR_LIST
+from . import cheat, address, models, datasets
+from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
 from ..gta3_base.main import BaseGTA3_VC_SA_Tool
@@ -90,16 +90,16 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
-                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", COLOR_LIST)
-                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color", COLOR_LIST)
-                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color", COLOR_LIST)
-                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color", COLOR_LIST)
+                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", datasets.COLOR_LIST)
+                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color", datasets.COLOR_LIST)
+                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color", datasets.COLOR_LIST)
+                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color", datasets.COLOR_LIST)
 
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(13):
                 self.weapon_views.append(
-                    WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % (i + 1), i, SLOT_NO_AMMO, WEAPON_LIST, self.on_weapon_change)
+                    WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO, datasets.WEAPON_LIST, self.on_weapon_change)
                 )
 
         with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
@@ -127,7 +127,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             InputWidget("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
             InputWidget("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
             InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
-            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), WEATHER_LIST)
+            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), datasets.WEATHER_LIST)
             InputWidget("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
         with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):

@@ -4,7 +4,7 @@ from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
 from . import address, models
-from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
+from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
 from ..gta_base.widgets import WeaponWidget

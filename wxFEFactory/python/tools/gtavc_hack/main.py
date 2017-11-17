@@ -5,7 +5,7 @@ from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
 from . import address, models
 from .models import Player, Vehicle
-from .data import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
+from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from ..gta_base.widgets import WeaponWidget
 from ..gta3_base.main import BaseGTA3Tool
 from ..gta3_base.script import RunningScript
