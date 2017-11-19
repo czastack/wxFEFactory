@@ -1,3 +1,4 @@
+from lib import exui, fileutils
 from lib.utils import float32
 import json
 import types
@@ -245,13 +246,18 @@ class CheckBoxWidget(Widget):
 
 
 class CoordWidget(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), savable=False):
+    def __init__(self, name, label, addr, offsets=(), savable=False, preset=None):
+        """
+        :param saveble: 是否支持存取文件
+        :param preset: 预设坐标模块(要读__file__属性)
+        """
         self.savable = savable
-        super().__init__(name, label, addr, offsets)
-
+        self.preset = preset
         if savable:
             self.data_list = []
             self.lastfile = None
+
+        super().__init__(name, label, addr, offsets)
 
     def onDestroy(self, view):
         super().onDestroy(view)
@@ -289,6 +295,8 @@ class CoordWidget(TwoWayWidget):
                             ui.Button(label="删除", className="button", onclick=self.onDel)
                             ui.Button(label="保存", className="button", onclick=self.onSave)
                             ui.Button(label="载入", className="button", onclick=self.onLoad)
+                            if self.preset:
+                                ui.Button(label="预设", className="button", onclick=self.choosePreset)
                     self.listbox = ui.ListBox(className="expand left_padding", onselect=self.onListBoxSel)
                     self.listbox.setOnKeyDown(self.onListBoxKey)
 
@@ -338,6 +346,11 @@ class CoordWidget(TwoWayWidget):
         for child in self.views:
             child.value = str(next(it))
 
+    def load(self, data_list):
+        self.data_list = data_list
+        self.listbox.clear()
+        self.listbox.appendItems(tuple(data['name'] for data in self.data_list))
+
     def onAdd(self, btn):
         name = self.name_view.value
         if name:
@@ -370,9 +383,26 @@ class CoordWidget(TwoWayWidget):
         if path:
             self.lastfile = path
             with open(path, encoding="utf-8") as file:
-                self.data_list = json.load(file)
-                self.listbox.clear()
-                self.listbox.appendItems(tuple(data['name'] for data in self.data_list))
+                self.load(json.load(file))
+
+    def choosePreset(self, btn):
+        if self.preset:
+            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.onPreset)
+            self.dialog = dialog
+            dialog.showModal()
+
+    def onPreset(self, lb):
+        self.dialog.endModal()
+        del self.dialog
+        coords = self.preset.coords
+        path = fileutils.brother(self.preset.__file__, coords[lb.index][1]) + '.json'
+        with open(path, encoding="utf-8") as file:
+            data = json.load(file)
+            if data and isinstance(data, list):
+                if isinstance(data[0], list):
+                    name = coords[lb.index][0] + '%d'
+                    data = [{'name': name % (i + 1), 'value': data[i]} for i in range(len(data))]
+                self.load(data)
 
     def onListBoxSel(self, lb):
         pos = self.listbox.index

@@ -107,7 +107,7 @@ class Tool(BaseGTATool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
-                ui.Button("缴械", onclick=self.near_peds_remove_weapon)
+                ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
                 ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
                 ui.Button("敌人着火", onclick=self.enemys_make_fire)

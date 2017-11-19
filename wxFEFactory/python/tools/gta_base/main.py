@@ -313,20 +313,20 @@ class BaseGTATool(BaseTool):
     def restore_hp(self, _=None):
         """恢复HP"""
         if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
+            self.vehicle.hp = 1000
             self.vehicle_fix(self.vehicle)
         else:
-            self.hp_view.mem_value = 200
-            self.ap_view.mem_value = 200
+            self.player.hp = 200
+            self.player.ap = 200
 
     def restore_hp_large(self, _=None):
         """恢复大量HP"""
         if self.isInVehicle:
-            self.vehicle_hp_view.mem_value = 2000
+            self.vehicle.hp = 2000
             self.vehicle_fix(self.vehicle)
         else:
-            self.hp_view.mem_value = 999
-            self.ap_view.mem_value = 999
+            self.player.hp = 999
+            self.player.ap = 999
 
     def vehicle_fix(self, vehicle):
         """修车"""
@@ -799,7 +799,7 @@ class BaseGTATool(BaseTool):
 
     def render_common_button(self):
         ui.Button("杀掉附近的人", onclick=self.kill_near_peds)
-        ui.Button("附近的车起火", onclick=self.near_vehicles_boom)
+        ui.Button("附近的车摧毁", onclick=self.near_vehicles_boom)
         ui.Button("附近的车下陷", onclick=self.near_vehicles_down)
         ui.Button("附近的车移到眼前", onclick=self.near_vehicles_to_front)
         ui.Button("附近的人移到眼前", onclick=self.near_peds_to_front)

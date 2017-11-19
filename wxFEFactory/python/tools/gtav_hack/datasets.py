@@ -535,7 +535,7 @@ VEHICLE_LIST = (
         ("乔氏 梅杜莎 (4座)", 0x9C429B6A), # VELUM
         ("乔氏 梅杜莎 (5座)", 0x403820E8), # VELUM2
         ("巨象 都都鸟 水空两栖", 0xCA495705), # DODO
-        ("巨象 九头喷射机 武装", 0x39D6E83F), # HYDRA
+        ("巨象 九头蛇喷射机 武装", 0x39D6E83F), # HYDRA
         ("巨象 泰坦号 运输机", 0x761E2AD3), # TITAN
         ("西部 雀鹰 喷射型", 0x6CBD1D6D), # BESRA
         ("西部 古邦 800", 0xD9927FE3), # CUBAN800
@@ -1438,8 +1438,26 @@ PLAYER_MODEL = (
 )
 
 
+# DRIVING_STYLE FLAG
+# None = 0
+# FollowTraffic = 1
+# YieldToPeds = 2
+# AvoidVehicles = 4
+# AvoidEmptyVehicles = 8
+# AvoidPeds = 16
+# AvoidObjects = 32
+# StopAtTrafficLights = 128
+# UseBlinkers = 256
+# AllowGoingWrongWay = 512
+# Reverse = 1024
+# AllowMedianCrossing = 262144
+# DriveBySight = 4194304
+# IgnorePathFinding = 16777216
+# TryToAvoidHighways = 536870912
+# StopAtDestination = 0x80000000
+
 DRIVING_STYLE = (
-    ("IgnoreLights", 0x2c0025),
+    ("IgnoreLights", 0x802c0025),
     ("Normal (typically used by the game)", 0xc00ab),
     ("Sometimes Overtake traffic", 0x5),
     ("Rushed", 0x400c0025),

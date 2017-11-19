@@ -688,23 +688,22 @@ public:
 		long style = 0L;
 		if (type == wxT("simple"))
 		{
-			style |= wxCB_SIMPLE | wxTE_PROCESS_ENTER;
+			style |= wxCB_SIMPLE;
 		}
 		else if (type == wxT("dropdown"))
 		{
 			style |= wxCB_DROPDOWN;
 		}
-		else if (type == wxT("readonly"))
+		else if (type == wxT("processenter"))
 		{
-			style |= wxCB_READONLY;
+			style |= wxTE_PROCESS_ENTER;
+		}
+		// else if (type == wxT("readonly"))
+		else {
+			style = wxCB_READONLY;
 		}
 		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), style));
 		bindEvt(wxEVT_COMBOBOX, onselect);
-
-		if (!(style & wxCB_READONLY))
-		{
-			ctrl().AutoComplete(ctrl().GetStrings());
-		}
 	}
 
 	wxComboBox& ctrl() const
@@ -730,6 +729,14 @@ public:
 	void setOnEnter(pycref fn)
 	{
 		bindEvt(wxEVT_TEXT_ENTER, fn);
+	}
+
+	void autoComplete()
+	{
+		if (!(ctrl().GetWindowStyle() & wxCB_READONLY))
+		{
+			ctrl().AutoComplete(ctrl().GetStrings());
+		}
 	}
 
 /*

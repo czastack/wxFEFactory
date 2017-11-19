@@ -1,0 +1,402 @@
+# PED Bones
+# int GET_PED_BONE_INDEX(Ped ped, int boneId)
+SKEL_ROOT = 0
+SKEL_Pelvis = 11816
+SKEL_L_Thigh = 58271
+SKEL_L_Calf = 63931
+SKEL_L_Foot = 14201
+SKEL_L_Toe0 = 2108
+IK_L_Foot = 65245
+PH_L_Foot = 57717
+MH_L_Knee = 46078
+SKEL_R_Thigh = 51826
+SKEL_R_Calf = 36864
+SKEL_R_Foot = 52301
+SKEL_R_Toe0 = 20781
+IK_R_Foot = 35502
+PH_R_Foot = 24806
+MH_R_Knee = 16335
+RB_L_ThighRoll = 23639
+RB_R_ThighRoll = 6442
+SKEL_Spine_Root = 57597
+SKEL_Spine0 = 23553
+SKEL_Spine1 = 24816
+SKEL_Spine2 = 24817
+SKEL_Spine3 = 24818
+SKEL_L_Clavicle = 64729
+SKEL_L_UpperArm = 45509
+SKEL_L_Forearm = 61163
+SKEL_L_Hand = 18905
+SKEL_L_Finger00 = 26610
+SKEL_L_Finger01 = 4089
+SKEL_L_Finger02 = 4090
+SKEL_L_Finger10 = 26611
+SKEL_L_Finger11 = 4169
+SKEL_L_Finger12 = 4170
+SKEL_L_Finger20 = 26612
+SKEL_L_Finger21 = 4185
+SKEL_L_Finger22 = 4186
+SKEL_L_Finger30 = 26613
+SKEL_L_Finger31 = 4137
+SKEL_L_Finger32 = 4138
+SKEL_L_Finger40 = 26614
+SKEL_L_Finger41 = 4153
+SKEL_L_Finger42 = 4154
+PH_L_Hand = 60309
+IK_L_Hand = 36029
+RB_L_ForeArmRoll = 61007
+RB_L_ArmRoll = 5232
+MH_L_Elbow = 22711
+SKEL_R_Clavicle = 10706
+SKEL_R_UpperArm = 40269
+SKEL_R_Forearm = 28252
+SKEL_R_Hand = 57005
+SKEL_R_Finger00 = 58866
+SKEL_R_Finger01 = 64016
+SKEL_R_Finger02 = 64017
+SKEL_R_Finger10 = 58867
+SKEL_R_Finger11 = 64096
+SKEL_R_Finger12 = 64097
+SKEL_R_Finger20 = 58868
+SKEL_R_Finger21 = 64112
+SKEL_R_Finger22 = 64113
+SKEL_R_Finger30 = 58869
+SKEL_R_Finger31 = 64064
+SKEL_R_Finger32 = 64065
+SKEL_R_Finger40 = 58870
+SKEL_R_Finger41 = 64080
+SKEL_R_Finger42 = 64081
+PH_R_Hand = 28422
+IK_R_Hand = 6286
+RB_R_ForeArmRoll = 43810
+RB_R_ArmRoll = 37119
+MH_R_Elbow = 2992
+SKEL_Neck_1 = 39317
+SKEL_Head = 31086
+IK_Head = 12844
+FACIAL_facialRoot = 65068
+FB_L_Brow_Out_000 = 58331
+FB_L_Lid_Upper_000 = 45750
+FB_L_Eye_000 = 25260
+FB_L_CheekBone_000 = 21550
+FB_L_Lip_Corner_000 = 29868
+FB_R_Lid_Upper_000 = 43536
+FB_R_Eye_000 = 27474
+FB_R_CheekBone_000 = 19336
+FB_R_Brow_Out_000 = 1356
+FB_R_Lip_Corner_000 = 11174
+FB_Brow_Centre_000 = 37193
+FB_UpperLipRoot_000 = 20178
+FB_UpperLip_000 = 61839
+FB_L_Lip_Top_000 = 20279
+FB_R_Lip_Top_000 = 17719
+FB_Jaw_000 = 46240
+FB_LowerLipRoot_000 = 17188
+FB_LowerLip_000 = 20623
+FB_L_Lip_Bot_000 = 47419
+FB_R_Lip_Bot_000 = 49979
+FB_Tongue_000 = 47495
+RB_Neck_1 = 35731
+IK_Root = 56604
+
+
+# Vehicle Bones name
+wheel_lr
+wheel_rr
+suspension_lf
+suspension_rf
+suspension_lr
+suspension_rr
+hub_lf
+hub_rf
+hub_lr
+hub_rr
+bodyshell
+bumper_f
+wing_rf
+wing_lf
+bonnet
+engine
+overheat
+overheat_2
+steeringwheel
+headlight_l
+headlight_r
+taillight_l
+taillight_r
+indicator_lf
+indicator_rf
+brakelight_m
+neon_l
+neon_r
+neon_f
+neon_b
+interiorlight
+platelight
+dashglow
+doorlight_lf
+doorlight_rf
+dials
+slipstream_l
+slipstream_r
+extra_1
+extra_ten
+extra_12
+chassis_lowlod
+chassis_dummy
+door_dside_f
+door_pside_f
+handle_dside_f
+handle_pside_f
+wheel_lf
+wheel_rf
+bumper_r
+boot
+indicator_lr
+indicator_rr
+brakelight_l
+brakelight_r
+reversinglight_l
+reversinglight_r
+misc_a
+misc_b
+misc_c
+misc_d
+misc_e
+misc_f
+door_dside_r
+door_pside_r
+siren1
+siren2
+siren_glass1
+siren_glass2
+petroltank
+hbgrip_l
+hbgrip_r
+extra_4
+extra_9
+handlebars
+forks_u
+forks_l
+swingarm
+siren3
+siren4
+siren5
+siren6
+siren7
+siren8
+siren9
+siren10
+siren11
+siren12
+siren13
+siren14
+siren15
+siren16
+siren17
+siren18
+siren19
+siren20
+siren_glass3
+handle_dside_r
+handle_pside_r
+weapon_1a
+weapon_1b
+weapon_1c
+weapon_1d
+weapon_1a_rot
+weapon_1b_rot
+weapon_1c_rot
+weapon_1d_rot
+rotor_main
+rotor_rear
+tail
+suspension_lm
+suspension_rm
+transmission_m
+transmission_r
+petroltank_l
+petroltank_r
+legs
+attach_male
+wheel_lm1
+wheel_rm1
+transmission_f
+wheel_lm2
+wheel_rm2
+extra_11
+mod_col_1
+doorlight_lr
+doorlight_rr
+extra_2
+mod_col_2
+mod_col_3
+petrolcap
+attach_female
+extra_3
+extra_5
+extra_6
+extra_7
+spring_rf
+spring_lf
+spring_lr
+prop_1
+prop_2
+elevator_l
+elevator_r
+rudder_l
+rudder_r
+engine_l
+engine_r
+wing_l
+wing_r
+crank
+pedal_r
+pedal_l
+siren_glass4
+mod_col_4
+hub_lm1
+hub_rm1
+hub_lm2
+hub_rm2
+hub_lm3
+hub_rm3
+scoop
+bucket
+weapon_2a
+weapon_2b
+weapon_3a
+turret_1base
+outriggers_l
+outriggers_r
+searchlight_base
+misc_g
+misc_h
+misc_i
+misc_j
+misc_k
+roof
+soft_1
+soft_2
+soft_3
+tow_mount_a
+tow_mount_b
+vehicle_blocker
+extra_8
+rudder
+aileron_l
+aileron_r
+wing_lr
+wing_rr
+wingtip_1
+wingtip_2
+gear_door_fl
+gear_door_fr
+gear_door_rl1
+gear_door_rr1
+gear_door_rl2
+gear_door_rr2
+gear_f
+gear_rl
+gear_rr
+misc_l
+misc_m
+misc_n
+misc_o
+misc_p
+misc_q
+misc_r
+misc_s
+misc_t
+misc_u
+misc_v
+door_hatch_r
+door_hatch_l
+Lookat_UpprPiston_head
+Lookat_LowrPiston_boom
+Boom_Driver
+cutter_driver
+static_prop
+static_prop2
+rudder2
+soft_4
+soft_5
+soft_6
+soft_7
+soft_8
+soft_9
+turret_1barrel
+forks
+carriage
+fork_l
+fork_r
+forks_attach
+freight_cont
+freightgrain_slidedoor
+frame_1
+frame_2
+frame_3
+frame_pickup_1
+frame_pickup_2
+frame_pickup_3
+frame_pickup_4
+wheel_lm3
+wheel_rm3
+airbrake_l
+airbrake_r
+gear_door_rml
+gear_door_rmr
+gear_lm1
+gear_rm1
+break_extra_1
+break_extra_2
+break_extra_3
+break_extra_4
+break_extra_5
+break_extra_6
+rudder_2
+afterburner
+rope_attach_a
+rope_attach_b
+mod_col_5
+siren_glass16
+siren_glass19
+siren_glass5
+soft_10
+soft_11
+soft_12
+siren_glass6
+prop_3
+prop_4
+gear_rm
+soft_13
+tow_arm
+break_extra_7
+break_extra_8
+break_extra_9
+break_extra_10
+arm_1
+arm_2
+pontoon_l
+pontoon_r
+no_ped_col_step_l
+no_ped_col_strut_1_l
+no_ped_col_strut_2_l
+no_ped_col_step_r
+no_ped_col_strut_1_r
+no_ped_col_strut_2_r
+nozzles_f
+nozzles_r
+weapon_2c
+weapon_2d
+ammobelt
+weapon_2a_rot
+weapon_3a_rot
+turret_2base
+turret_2barrel
+turret_3base
+turret_3barrel
+emissives
+spoiler
+struts
+light_cover

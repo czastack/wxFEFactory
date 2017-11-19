@@ -1,11 +1,12 @@
 import fefactory_api
-from styles import styles
-
+from styles import styles, dialog_style
 ui = fefactory_api.layout
+
 
 class ListDialog(ui.StdModalDialog):
     def __init__(self, *args, **kwargs):
         listbox_opt = kwargs.pop('listbox', {})
+        kwargs.setdefault('style', dialog_style)
         super().__init__(*args, **kwargs)
 
         with self:
@@ -23,13 +24,13 @@ class ListDialog(ui.StdModalDialog):
 
 
 class ChoiceDialog(ui.StdModalDialog):
-    def __init__(self, *args, **kwargs):
-        combobox_opt = kwargs.pop('combobox', {})
-        super().__init__(*args, **kwargs)
+    def __init__(self, title, choices, onselect, *args, **kwargs):
+        kwargs.setdefault('style', dialog_style)
+        super().__init__(title, *args, **kwargs)
 
         with self:
             with ui.Vertical(styles=styles, style=styles['class']['fill']):
-                self.combobox = ui.ComboBox(type="simple", className='fill', **combobox_opt)
+                self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
 
 
 class CheckChoiceDialog(ListDialog):

@@ -3,7 +3,6 @@ from project import Project
 from modules import modules
 from fe.ferom import FeRomRW
 from lib import exui
-from styles import dialog_style
 import os
 import traceback
 import __main__
@@ -241,7 +240,7 @@ class MainFrame:
         reader = FeRomRW(rom)
         if not reader.closed:
             print(reader.getRomTitle())
-            dialog = exui.ListDialog("选择执行导入的模块", style=dialog_style, listbox={'choices': self.module_names})
+            dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
             if dialog.showModal():
                 for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
@@ -256,13 +255,9 @@ class MainFrame:
                         traceback.print_exc()
 
     def openTool(self, m):
-        dialog = exui.ChoiceDialog("选择工具", style=dialog_style, combobox={'choices': self.tool_names, 'onselect': self.onToolOpen})
-        dialog.combobox.setOnEnter(self.onToolPanelEnter)
+        dialog = exui.ChoiceDialog("选择工具", self.tool_names, self.onToolOpen)
         self.dialog = dialog
         dialog.showModal()
-
-    def onToolPanelEnter(self, cb):
-        print(cb)
 
     def onToolOpen(self, cb):
         name = tools.tools[cb.index][1]

@@ -299,6 +299,7 @@ void init_layout(py::module &m)
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			type, choices, onselect, className, style)
 		.def("setOnEnter", &ComboBox::setOnEnter)
+		.def("autoComplete", &ComboBox::autoComplete)
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, BaseControlWithItems>(layout, "RadioBox")

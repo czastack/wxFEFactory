@@ -9,9 +9,9 @@ class ToolBarBase : public Layout
 {
 public:
 	template <class... Args>
-	ToolBarBase(long exstyle/*=wxHORIZONTAL|wxTB_TEXT*/, Args ...args) : Layout(args...)
+	ToolBarBase(long wxstyle/*=wxHORIZONTAL|wxTB_TEXT*/, Args ...args) : Layout(args...)
 	{
-		bindElem(new T(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), exstyle));
+		bindElem(new T(*safeActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxstyle));
 		ctrl().Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBarBase::onClick, this);
 	}
 

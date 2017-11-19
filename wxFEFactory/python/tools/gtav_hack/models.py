@@ -83,6 +83,7 @@ class NativeEntity(NativeModel):
     # 是否悬空
     is_in_air = property(getter('IS_ENTITY_IN_AIR'))
     is_on_fire = property(getter('IS_ENTITY_ON_FIRE', bool))
+    is_dead = property(getter('IS_ENTITY_DEAD', bool))
 
     # model hash
     model_id = property(getter('GET_ENTITY_MODEL'))
@@ -133,12 +134,14 @@ class NativeEntity(NativeModel):
     max_speed = property(None, setter('SET_ENTITY_MAX_SPEED', float))
 
     def create_fire(self):
-        self._fire = self.mgr.create_fire(self.coord)
-        return self._fire
+        self.script_call('START_ENTITY_FIRE', 'Q', self.handle)
+        # self._fire = self.mgr.create_fire(self.coord)
+        # return self._fire
 
     def delete_fire(self):
-        if hasattr(self, '_fire'):
-            self.mgr.delete_fire(self._fire)
+        self.script_call('STOP_ENTITY_FIRE', 'Q', self.handle)
+        # if hasattr(self, '_fire'):
+        #     self.mgr.delete_fire(self._fire)
 
     def create_explosion(self, *args, **kwargs):
         self.mgr.create_explosion(self.coord, *args, **kwargs)
@@ -190,8 +193,9 @@ class NativeEntity(NativeModel):
         self.speed = (0, 0, 0)
         self.turn_speed = (0, 0, 0)
 
-    # 冻结位置
-    freeze_position = setter('FREEZE_ENTITY_POSITION', default=True)
+    def freeze_position(self, value=True):
+        """冻结位置"""
+        self.script_call('FREEZE_ENTITY_POSITION', '2Q', self.handle, value)
 
     def add_marker(self):
         """添加标记"""
@@ -447,7 +451,7 @@ class Player(NativeEntity):
 
     def explode_head(self):
         """爆头"""
-        self.script_call('EXPLODE_PED_HEAD', 'Q', self.handle)
+        self.script_call('EXPLODE_PED_HEAD', '2Q', self.handle, 0x1B06D571)
 
     def explode(self, *args, **kwargs):
         """爆炸"""
@@ -464,6 +468,16 @@ class Player(NativeEntity):
     def chase(self, entity):
         """追捕目标"""
         self.script_call('TASK_VEHICLE_CHASE', '2Q', self.handle, entity)
+
+    def get_bone_coord(self, bone_id):
+        """获取角色身体部分的坐标"""
+        bone_index = self.native_call('GET_PED_BONE_INDEX', '2Q', self.handle, bone_id)
+        values = self.native_call_vector('GET_WORLD_POSITION_OF_ENTITY_BONE', '2Q', self.handle, bone_index)
+        return utils.Vector3(values)
+
+    @property
+    def head_coord(self):
+        return self.get_bone_coord(12844) # SKEL_Head
 
     del getter, getter_ptr, setter
 

@@ -10,7 +10,7 @@ from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
 from ..gta_base.widgets import ColorWidget
-from . import address, models, datasets
+from . import address, models, datasets, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
@@ -53,7 +53,7 @@ class Tool(BaseGTATool):
         with Group("player", "角色", self._player, handler=self.handler):
             self.hp_view = ModelInputWidget("hp", "生命")
             self.ap_view = ModelInputWidget("ap", "防弹衣")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             # self.weight_view = ModelInputWidget("gravity", "重量")
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.rot_view = ModelInputWidget("rotation", "旋转")
@@ -77,7 +77,7 @@ class Tool(BaseGTATool):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInputWidget("weight", "重量")
             ui.Hr()
@@ -168,7 +168,8 @@ class Tool(BaseGTATool):
         with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
-                ui.Button("缴械", onclick=self.near_peds_remove_weapon)
+                # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
+                ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
                 ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
                 ui.Button("附近的人下车", onclick=self.near_peds_exit_vehicle)
@@ -204,6 +205,8 @@ class Tool(BaseGTATool):
                 ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
                 ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
                 ui.Button("修复衣服", onclick=self.repair_cloth)
+                ui.Button("洗车", onclick=self.wash_vehicle)
+                ui.Button("进入上一辆载具", onclick=self.into_last_vehicle)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
@@ -328,16 +331,17 @@ class Tool(BaseGTATool):
                 self.handler.write64(self.ScriptHookHelperCtxPtr, self.native_context.addr)
 
                 if sync:
-                    # 在两秒内尝试同步
+                    # 在1秒内尝试同步
                     try_count = 20
+                    time.sleep(0.02)
                     while try_count:
-                        time.sleep(0.1)
                         if self.handler.read64(self.ScriptHookHelperCtxPtr) == 0:
                             if ret_type:
                                 return self.native_context.get_result(ret_type, ret_size)
                             return
 
                         try_count -= 1
+                        time.sleep(0.05)
 
                     self.handler.write64(self.ScriptHookHelperCtxPtr, 0)
                     print('获取script_call返回失败，超过尝试次数')
@@ -348,7 +352,7 @@ class Tool(BaseGTATool):
     def _player(self):
         """获取当前角色"""
         player = getattr(self, '_playerins', None)
-        player_index = self.get_player_index()
+        player_index = self.player_id
 
         if not player:
             player = self._playerins = self.Player(player_index, self.ped_id, self)
@@ -364,36 +368,19 @@ class Tool(BaseGTATool):
     player = property(_player)
     vehicle = property(_vehicle)
 
-    def get_ped_addr(self):
-        """获取当前角色的Ped结构地址"""
-        return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
-
-    def get_player_index(self):
+    @property
+    def player_id(self):
         """获取当前角色的序号"""
         return self.native_call('GET_PLAYER_INDEX', None)
 
-    def get_ped_handle(self, player_index=0):
-        """获取当前角色的句柄"""
-        return self.native_call('GET_PLAYER_PED', 'Q', player_index or self.get_player_index())
+    # def get_ped_handle(self, player_index=0):
+    #     """获取当前角色的句柄"""
+    #     return self.native_call('GET_PLAYER_PED', 'Q', player_index or self.player_id)
 
     @property
     def ped_id(self):
         """获取当前角色的句柄"""
         return self.native_call('PLAYER_PED_ID', None)
-
-    # def ped_index_to_handle(self, index):
-    #     """角色序号转角色句柄"""
-    #     handle = index << 8
-    #     return handle | self.handler.read8(
-    #         self.handler.read32(self.handler.read32(address.PED_POOL) + 4) + index
-    #     )
-
-    # def vehicle_index_to_handle(self, index):
-    #     """载具序号转载具句柄"""
-    #     handle = index << 8
-    #     return handle | self.handler.read8(
-    #         self.handler.read32(self.handler.read32(address.VEHICLE_POOL) + 4) + index
-    #     )
 
     @property
     def ped_pool(self):
@@ -459,6 +446,14 @@ class Tool(BaseGTATool):
             vehicle = Vehicle(handle, self)
             if vehicle.existed:
                 return vehicle
+
+    def restore_hp_large(self, _=None):
+        """恢复大量HP"""
+        if self.isInVehicle:
+            self.vehicle.hp = 1000
+            self.vehicle_fix(self.vehicle)
+        self.player.hp = 200
+        self.player.ap = 200
 
     def to_up(self, _=None):
         """升高(无速度)"""
@@ -554,6 +549,17 @@ class Tool(BaseGTATool):
         for p in self.get_near_peds():
             p.remove_all_weapons()
 
+    def near_vehicles_boom(self, _=None):
+        """摧毁附近的载具"""
+        for v in self.get_near_vehicles():
+            v.hp = 0
+            v.engine_hp = -4000
+
+    def near_vehicles_explode(self, _=None):
+        """附近的车爆炸"""
+        for v in self.get_near_vehicles():
+            v.explode()
+
     def near_peds_make_fire(self, _=None):
         """附近的人着火"""
         for p in self.get_near_peds():
@@ -571,11 +577,17 @@ class Tool(BaseGTATool):
 
     def enemys_explode_head(self, _=None):
         """敌人爆头"""
+        # 0x22D8FE39 穿甲手枪
+        weapon = 0x22D8FE39
+        self.request_weapon_model(weapon)
         for p in self.get_enemys():
-            try:
-                p.explode_head()
-            except:
-                pass
+            if isinstance(p, Player):
+                p.freeze_position()
+                coord0 = p.head_coord
+                coord1 = coord0.clone()
+                coord0.x += 0.1
+                self.shoot_between(coord0, coord1, 250, 0x22D8FE39, self.ped_id, -1.0, False)
+                p.freeze_position(False)
 
     def enemys_explode(self, _=None):
         """敌人爆炸"""
@@ -923,6 +935,12 @@ class Tool(BaseGTATool):
         if vehicle:
             self.player.into_vehicle(vehicle.handle)
 
+    def into_last_vehicle(self, _=None):
+        """进入上一辆载具"""
+        vehicle = self.last_vehicle
+        if vehicle:
+            self.player.into_vehicle(vehicle.handle)
+
     def create_ped(self, model, pedType=21):
         """生成角色"""
         m = models.VModel(model, self)
@@ -1154,7 +1172,7 @@ class Tool(BaseGTATool):
 
     def special_ability_fill_meter(self, _=None):
         """特殊能力能量充满"""
-        self.native_call('SPECIAL_ABILITY_FILL_METER', '2Q', self.get_player_index(), 1)
+        self.native_call('SPECIAL_ABILITY_FILL_METER', '2Q', self.player_id, 1)
 
     def get_selected_ped_model(self):
         """获取选中的角色模型"""
@@ -1189,6 +1207,11 @@ class Tool(BaseGTATool):
     def repair_cloth(self, _=None):
         """修复衣服"""
         self.player.reset_visible_damage()
+
+    def wash_vehicle(self, _=None):
+        """洗车"""
+        self.vehicle.fix()
+        self.vehicle.wash()
 
     def clear_area_of_vehicles(self, _=None):
         """清空区域内的载具"""
