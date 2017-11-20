@@ -79,6 +79,7 @@ WEAPON_LIST = [
         ("FLARE", "信号弹", 0x497FACC3),
     )),
     ("其他", (
+        ("PARACHUTE", "降落伞", 0xFBAB5776),
         ("KNUCKLE", "指节套环", 0xD8DF3C3C),
         ("DIGISCANNER", "串口扫描仪", 0xFDBADCED),
         ("BRIEFCASE_02", "公文包02", 0x01B79F17),

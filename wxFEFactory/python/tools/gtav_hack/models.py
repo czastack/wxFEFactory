@@ -56,6 +56,12 @@ class NativeModel:
                 self.native_call(name, 'Q' + s, self.handle, type_(value))
         return setter
 
+    @staticmethod
+    def make_handle(arg):
+        if isinstance(arg, int):
+            return arg
+        return arg.handle
+
     builders = (getter, getter_ptr, setter)
 
 
@@ -210,6 +216,9 @@ class NativeEntity(NativeModel):
         return coord
 
     get_offset_coord = get_offset_coord_m
+
+    def go_to_entity(entity, speed=10):
+        self.script_call('TASK_GO_TO_ENTITY', '2Ql3fl', self.handle, self.make_handle(entity), -1, 0.1, speed, 1073741824.0, 0)
 
     del getter, getter_ptr, setter
 
@@ -478,6 +487,16 @@ class Player(NativeEntity):
     @property
     def head_coord(self):
         return self.get_bone_coord(12844) # SKEL_Head
+
+    def follow_to_entity(self, entity, speed=2, timeout=-1):
+        """跟着实体"""
+        self.script_call('TASK_FOLLOW_TO_OFFSET_OF_ENTITY', '2Q4flfq', 
+            self.handle, self.make_handle(entity), 1.5, 1.5, 1.5, speed, timeout, 2, 1)
+
+    def go_straight_to_coord(self, coord, speed=2, timeout=-1):
+        """径直走向坐标"""
+        self.script_call('TASK_GO_STRAIGHT_TO_COORD', 'Q4fl2f', 
+            self.handle, *coord, speed, timeout, 0, 0)
 
     del getter, getter_ptr, setter
 
@@ -794,6 +813,14 @@ class Blip(NativeModel):
     @classmethod
     def add_blip_for_entity(cls, entity):
         return cls(entity.script_call('ADD_BLIP_FOR_ENTITY', '2L', entity.handle), entity.mgr)
+
+    def show_number(self, number):
+        """显示数字"""
+        self.native_call('SHOW_NUMBER_ON_BLIP', 'Ql', self.handle, number)
+
+    def hide_number(self, number):
+        """隐藏数字"""
+        self.native_call('HIDE_NUMBER_ON_BLIP', 'Ql', self.handle, number)
 
 
 class NativeRegistration(Model):

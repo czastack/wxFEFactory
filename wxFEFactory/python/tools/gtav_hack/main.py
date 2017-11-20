@@ -36,7 +36,7 @@ class Tool(BaseGTATool):
     RAISE_UP_SPEED = 12
     SAFE_SPEED_RATE = 30
     SAFE_SPEED_UP = 6
-    GO_FORWARD_COORD_RATE = 3
+    GO_FORWARD_COORD_RATE = 8
     FLY_SPEED = 15
     SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
@@ -473,17 +473,26 @@ class Tool(BaseGTATool):
             if self.player.has_weapon(v.weapon):
                 v.max_ammo()
 
-    def player_coord_from_waypoint(self, _=None):
-        # 从标记点读取坐标
+    def get_waypoint_coord(self):
         blip = self.get_first_blip(models.Blip.BLIP_WAYPOINT)
         if blip:
-            self.coord_view.input_value = blip.coord
+            coord = list(blip.coord)
+            if coord[2] < 3:
+                coord[2] = 800.0
+                coord[2] = self.GetGroundZ(coord) or 36
+            return coord
+
+    def player_coord_from_waypoint(self, _=None):
+        # 从标记点读取坐标
+        coord = self.get_waypoint_coord()
+        if coord:
+            self.coord_view.input_value = coord
 
     def vehicle_coord_from_waypoint(self, _=None):
         # 从标记点读取坐标
-        blip = self.get_first_blip(models.Blip.BLIP_WAYPOINT)
-        if blip:
-            self.vehicle_coord_view.input_value = blip.coord
+        coord = self.get_waypoint_coord()
+        if coord:
+            self.vehicle_coord_view.input_value = coord
 
     def set_ped_invincible(self, tb):
         """当前角色无伤"""
@@ -772,8 +781,9 @@ class Tool(BaseGTATool):
 
     def clear_driver_tasks(self, _=None):
         """停止自动驾驶"""
-        if self.vehicle:
-            self.vehicle.clear_driver_tasks()
+        # if self.vehicle:
+        #     self.vehicle.clear_driver_tasks()
+        self.player.clear_tasks()
 
     def get_camera_rot(self):
         """ 获取摄像机朝向参数
@@ -1157,7 +1167,7 @@ class Tool(BaseGTATool):
             self.script_call('REQUEST_WEAPON_ASSET', '3Q', weapon, 31, 0)
 
     def near_vehicles_to_front(self, _=None):
-        super().near_vehicles_to_front(zinc=1)
+        super().near_vehicles_to_front(zinc=2)
 
     def recal_markers(self, _=None):
         self._markers = tuple(self.get_target_blips(models.Blip.BLIP_COLORS_ENEMY))

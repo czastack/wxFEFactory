@@ -303,6 +303,7 @@ class CoordWidget(TwoWayWidget):
                 with ui.ContextMenu() as contextmenu:
                     ui.MenuItem("复制(&C)", onselect=self.onCopy)
                     ui.MenuItem("粘贴(&V)", onselect=self.onPaste)
+                    ui.MenuItem("清空列表(&E)", onselect=self.onClear)
                 root.setContextMenu(contextmenu)
 
         self.views = (x_view, y_view, z_view)
@@ -345,6 +346,11 @@ class CoordWidget(TwoWayWidget):
         it = iter(values)
         for child in self.views:
             child.value = str(next(it))
+
+    def clear(self):
+        self.data_list = []
+        self.listbox.clear()
+        self.lastfile = None
 
     def load(self, data_list):
         self.data_list = data_list
@@ -445,6 +451,9 @@ class CoordWidget(TwoWayWidget):
     def onPaste(self, _=None):
         values = eval(fefactory_api.get_clipboard())
         self.input_value = values
+
+    def onClear(self, _=None):
+        self.clear()
 
 class ModelCoordWidget(ModelWidget, CoordWidget):
     pass
