@@ -27,7 +27,6 @@ VERSION_DEPEND = {
         'GetMoveSpeed'         : 0x0, # TODO
         'SetTurnSpeed'         : 0x0, # TODO
         'GetTurnSpeed'         : 0x0, # TODO
-        'CClock__Hour'         : 0x0, # TODO
     },
     VERSION_107: {
         'PED_POOL'             : 0x018A82AC,
@@ -41,13 +40,6 @@ VERSION_DEPEND = {
         'GetMoveSpeed'         : 0x00A477F0,
         'SetTurnSpeed'         : 0x00A47840,
         'GetTurnSpeed'         : 0x00A478E0,
-        'SetTimeOfDay'         : 0x00821200,
-        'TimeOfDay'            : 0x011E8F0C,
-        'CClock__Hour'         : 0x011D5300,
-        'CClock__Minute'       : 0x011D52FC,
-        'CClock__LockedHour'   : 0x011D5308,
-        'CClock__LockedMinute' : 0x011D52F0,
-        'CClock__DayOfWeek'    : 0x011D5310,
     },
     VERSION_EFLC2: {
         'PED_POOL'             : 0x018219EC,
@@ -63,11 +55,6 @@ VERSION_DEPEND = {
         'GetTurnSpeed'         : 0x00A7C1D0,
         'SetTimeOfDay'         : 0x00846970,
         'TimeOfDay'            : 0x010A4EA8,
-        'CClock__Hour'         : 0x010C9398,
-        'CClock__Minute'       : 0x010C9394,
-        'CClock__LockedHour'   : 0x010C93A0,
-        'CClock__LockedMinute' : 0x010C9388,
-        'CClock__DayOfWeek'    : 0x010C93A8,
     }
 }
 

@@ -771,20 +771,20 @@ class Tool(BaseGTATool):
         if self.vehicle:
             entitys = self.get_enemys()
             if entitys:
-                self.vehicle.drive_follow(entitys[0].handle, self.config.auto_driving_speed, self.config.auto_driving_style)
+                self.vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
 
     def drive_follow_blue(self, _=None):
         """跟着蓝色标记"""
         if self.vehicle:
             entitys = self.get_friends()
             if entitys:
-                self.vehicle.drive_follow(entitys[0].handle, self.config.auto_driving_speed, self.config.auto_driving_style)
+                self.vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
 
     def vehicle_chase(self, _=None):
         """追捕敌人"""
         if self.vehicle:
             enemys = self.get_enemys()
-            enemys and self.vehicle and self.vehicle.chase(enemys[0].handle)
+            enemys and self.vehicle and self.vehicle.chase(enemys[0])
 
     def clear_driver_tasks(self, _=None):
         """停止自动驾驶"""
@@ -950,13 +950,13 @@ class Tool(BaseGTATool):
         """生成选中的载具并进入"""
         vehicle = self.spawn_choosed_vehicle()
         if vehicle:
-            self.player.into_vehicle(vehicle.handle)
+            self.player.into_vehicle(vehicle)
 
     def into_last_vehicle(self, _=None):
         """进入上一辆载具"""
         vehicle = self.last_vehicle
         if vehicle:
-            self.player.into_vehicle(vehicle.handle)
+            self.player.into_vehicle(vehicle)
 
     def create_ped(self, model, pedType=21):
         """生成角色"""

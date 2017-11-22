@@ -58,6 +58,7 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_block_switch_weapons)
                 ui.ToggleButton(label="不会被拽出车", onchange=self.set_ped_can_be_dragged_out_of_vehicle)
                 ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
+                ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
 
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
@@ -83,8 +84,10 @@ class Tool(BaseGTATool):
         with Group("global", "全局", self, handler=self.handler):
             ModelInputWidget("game_hour", "当前小时")
             ModelInputWidget("game_minute", "当前分钟")
-            ModelInputWidget("game_week", "当前星期")
-            # self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
+            ui.Text("日期", className="label_left expand")
+            with ui.Horizontal(className="expand"):
+                ui.Button("回退一天", onclick=self.day_back)
+                ui.Button("前进一天", onclick=self.day_forward)
 
         with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
             with ui.ScrollView(className="fill"):
@@ -126,6 +129,10 @@ class Tool(BaseGTATool):
                 # ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
                 ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
                 ui.Button("修复衣服", onclick=self.repair_cloth)
+                ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
+                ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
+                ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
+                ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
@@ -298,6 +305,11 @@ class Tool(BaseGTATool):
         """载具池"""
         return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
 
+    @property
+    def object_pool(self):
+        """物体池"""
+        return models.Pool(self.address.OBJECT_POOL, self.handler, models.MemObject)
+
     def get_peds(self):
         """获取角色池中的角色列表"""
         pool = self.ped_pool
@@ -412,6 +424,10 @@ class Tool(BaseGTATool):
         vehicle.engine_hp = 1000
         vehicle.fix()
         vehicle.wash()
+
+    def set_never_wanted(self, tb):
+        """不被通缉"""
+        self.native_call('SET_WANTED_MULTIPLIER', 'f', 0 if tb.checked else 1)
 
     def max_cur_weapon(self, _=None):
         """当前武器子弹全满"""
@@ -648,29 +664,28 @@ class Tool(BaseGTATool):
     @property
     def game_hour(self):
         """当前小时"""
-        return self.handler.read32(address.CClock__Hour)
+        return self.native_call('GET_HOURS_OF_DAY', None)
 
     @game_hour.setter
     def game_hour(self, value):
-        return self.handler.write32(address.CClock__Hour, int(value))
+        self.native_call('SET_TIME_OF_DAY', '2L', int(value), self.game_minute)
 
     @property
     def game_minute(self):
         """当前分钟"""
-        return self.handler.read32(address.CClock__Minute)
+        return self.native_call('GET_MINUTES_OF_DAY', None)
 
     @game_minute.setter
     def game_minute(self, value):
-        return self.handler.write32(address.CClock__Minute, int(value))
+        return self.native_call('SET_TIME_OF_DAY', '2L', self.game_hour, int(value))
 
-    @property
-    def game_week(self):
-        """当前星期"""
-        return self.handler.read32(address.CClock__DayOfWeek)
+    def day_back(self, _=None):
+        """回退一天"""
+        return self.native_call('SET_TIME_ONE_DAY_BACK', None)
 
-    @game_week.setter
-    def game_week(self, value):
-        return self.handler.write32(address.CClock__DayOfWeek, int(value))
+    def day_forward(self, _=None):
+        """前进一天"""
+        return self.native_call('TIME_ONE_DAY_FORWARD', None)
 
     def get_selected_vehicle_list(self):
         """当前刷车器活动的载具模型列表"""
@@ -721,6 +736,15 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
+    def create_throwable_object(self, modelHash):
+        self.script_call('CREATE_OBJECT', 'L3f2L', modelHash, *self.get_front_coord(), self.native_context.get_temp_addr(), 1)
+        obj = models.Object(self.native_context.get_temp_value(), self)
+        obj.invincible = False
+        obj.dynamic = True
+        obj.stealable = True
+        obj.collision = True
+        return obj
+
     def activate_save_menu(self, _=None):
         """激活保存菜单"""
         self.native_call('ACTIVATE_SAVE_MENU', None)
@@ -753,3 +777,23 @@ class Tool(BaseGTATool):
     def repair_cloth(self, _=None):
         """修复衣服"""
         self.player.reset_visible_damage()
+
+    def clear_area_of_vehicles(self, _=None):
+        """清空区域内的载具"""
+        self.script_call('CLEAR_AREA_OF_CARS', '4f?', *self.player.coord, 1000, False)
+
+    def clear_area_of_peds(self, _=None):
+        """清空区域内的角色"""
+        self.script_call('CLEAR_AREA_OF_CHARS', '4f', *self.player.coord, 200)
+
+    def clear_area_of_cops(self, _=None):
+        """清空区域内的警察"""
+        self.script_call('CLEAR_AREA_OF_COPS', '4f', *self.player.coord, 1000)
+
+    def clear_area_of_cops(self, _=None):
+        """清空区域内的警察"""
+        self.script_call('CLEAR_AREA_OF_OBJECTS', '4f', *self.player.coord, 1000)
+
+    def clear_area_of_fire(self, _=None):
+        """清空区域内的火焰"""
+        self.script_call('EXTINGUISH_FIRE_AT_POINT', '4f', *self.player.coord, 100)

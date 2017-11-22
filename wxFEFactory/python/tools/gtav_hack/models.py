@@ -2,67 +2,9 @@ from lib.hack.model import Model, Field, CoordField, ModelField, ArrayField
 from lib.lazy import lazy
 from lib.utils import float32, tuple2rgb, rgb2tuple
 from ..gta_base import utils
-from ..gta_base.models import Physicle, Pool
+from ..gta_base.models import Physicle, Pool, NativeModel64 as NativeModel
 import math
 import time
-
-
-class NativeModel:
-    def __init__(self, handle, mgr):
-        self.handle = handle
-        self.mgr = mgr
-
-    @property
-    def native_context(self):
-        return self.mgr.native_context
-
-    @property
-    def native_call(self):
-        return self.mgr.native_call
-
-    @property
-    def native_call_vector(self):
-        return self.mgr.native_call_vector
-
-    @property
-    def script_call(self):
-        return self.mgr.script_call
-
-    def getter(name, ret_type=int, ret_size=4):
-        def getter(self):
-            return self.native_call(name, 'Q', self.handle, ret_type=ret_type, ret_size=ret_size)
-        return getter
-
-    def getter_ptr(name, ret_type=int, ret_size=4):
-        def getter(self):
-            self.native_call(name, '2Q', self.handle, self.native_context.get_temp_addr())
-            return self.native_context.get_temp_value(type=ret_type, size=ret_size)
-        return getter
-
-    def setter(name, type_=int, default=None):
-        if type_ is int:
-            s = 'Q'
-        elif type_ is float:
-            s = 'f'
-        elif type_ is bool:
-            s = '?'
-        else:
-            raise ValueError('not support type: ' + type_.__name__)
-        if default is not None:
-            def setter(self, value=default):
-                self.native_call(name, 'Q' + s, self.handle, type_(value))
-        else:
-            def setter(self, value):
-                self.native_call(name, 'Q' + s, self.handle, type_(value))
-        return setter
-
-    @staticmethod
-    def make_handle(arg):
-        if isinstance(arg, int):
-            return arg
-        return arg.handle
-
-    builders = (getter, getter_ptr, setter)
 
 
 class NativeEntity(NativeModel):
@@ -224,7 +166,6 @@ class NativeEntity(NativeModel):
 
 
 class Player(NativeEntity):
-    # SIZE = 0xf00
     WEAPON_SLOT = 13
 
     getter, getter_ptr, setter = NativeEntity.builders
@@ -368,11 +309,11 @@ class Player(NativeEntity):
 
     def into_vehicle(self, vehicle, seat=-1):
         """进入车辆"""
-        self.script_call('TASK_WARP_PED_INTO_VEHICLE', '2Ql', self.handle, vehicle, seat)
+        self.script_call('TASK_WARP_PED_INTO_VEHICLE', '2Ql', self.handle, self.make_handle(vehicle), seat)
 
     def into_vehicle2(self, vehicle, seat=-1):
         """进入车辆"""
-        self.script_call('SET_PED_INTO_VEHICLE', '2Ql', self.handle, vehicle, seat)
+        self.script_call('SET_PED_INTO_VEHICLE', '2Ql', self.handle, self.make_handle(vehicle), seat)
 
     # ----------------------------------------------------------------------
     # 武器相关
@@ -494,8 +435,6 @@ class Player(NativeEntity):
 
 
 class Vehicle(NativeEntity):
-    # SIZE = 0x20d0
-    
     getter, getter_ptr, setter = NativeEntity.builders
 
     @property
@@ -685,7 +624,7 @@ class Vehicle(NativeEntity):
     def drive_follow(self, entity, speed, driving_style):
         """跟着目标"""
         self.script_call('_TASK_VEHICLE_FOLLOW', '3Qfll', 
-            self.driver.handle, self.handle, entity, speed, driving_style, 10)
+            self.driver.handle, self.handle, self.make_handle(entity), speed, driving_style, 10)
 
     def clear_driver_tasks(self):
         """停止自动驾驶"""
@@ -693,7 +632,7 @@ class Vehicle(NativeEntity):
 
     def chase(self, entity):
         """追捕目标"""
-        self.driver.chase(entity)
+        self.driver.chase(self.make_handle(entity))
 
     def SET_VEHICLE_OUT_OF_CONTROL(self, killDriver=False, explodeOnImpact=False):
         self.native_call('SET_VEHICLE_OUT_OF_CONTROL', '3Q', self.handle, killDriver, explodeOnImpact)

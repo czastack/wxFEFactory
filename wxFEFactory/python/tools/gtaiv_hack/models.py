@@ -2,7 +2,7 @@ from lib.hack.model import Model, Field, CoordField, ModelField
 from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
-from ..gta_base.models import Physicle, Pool
+from ..gta_base.models import Physicle, Pool, NativeModel
 import math
 import time
 
@@ -46,39 +46,6 @@ class MemVehicle(Entity):
     secondaryColor = Field(0x19d, int, 1)
     type = Field(0x284, int, 4)
 
-#     @property
-#     def passengers(self):
-#         offset = 0x1a8
-#         for i in range(4):
-#             yield Player(self.handler.read32(self.addr + offset), self.handler)
-#             offset += 4
-
-#     @property
-#     def driver(self):
-#         addr = self.handler.read32(self.addr + 0x1a4)
-#         if addr:
-#             return Player(addr, self.handler)
-
-#     def stop(self):
-#         self.speed = (0, 0, 0)
-
-#     def flip(self):
-#         self.coord[2] += 0.05
-#         self.dir[0] = -self.dir[0]
-#         self.dir[1] = -self.dir[1]
-
-#     def lock_door(self):
-#         self.door_status = 2
-
-#     def unlock_door(self):
-#         self.door_status = 1
-
-#     def ignoreDamage(self, ignore=True):
-#         if ignore:
-#             self.flags |= 4
-#         else:
-#             self.flags &= (~4 & 0xFFFFFFFF)
-
 
 class MemPlayer(Entity):
     SIZE = 0xf00
@@ -86,64 +53,14 @@ class MemPlayer(Entity):
     hp = Field(0x1f0, float)
     ap = Field(0x2c4, float)
     rotation = Field(0x2dc, float)
-    # stamina = Field(0x600, float)
     isInVehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
     vehicle = ModelField(0x310, MemVehicle)
-    collidingCar = ModelField(0x34c, MemVehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
-#     @lazy
-#     def weapons(self):
-#         return WeaponSet(self.addr + 0x35c, self.handler, 13)
 
-#     @property
-#     def cur_weapon(self):
-#         return self.weapons[self.cur_weapon_slop]
-
-
-class NativeModel:
-    def __init__(self, handle, mgr):
-        self.handle = handle
-        self.mgr = mgr
-
-    @property
-    def native_context(self):
-        return self.mgr.native_context
-
-    @property
-    def native_call(self):
-        return self.mgr.native_call
-
-    @property
-    def script_call(self):
-        return self.mgr.script_call
-
-    def getter(name, ret_type=int, ret_size=4):
-        def getter(self):
-            return self.native_call(name, 'L', self.handle, ret_type=ret_type, ret_size=ret_size)
-        return getter
-
-    def getter_ptr(name, ret_type=int, ret_size=4):
-        def getter(self):
-            self.native_call(name, '2L', self.handle, self.native_context.get_temp_addr())
-            return self.native_context.get_temp_value(type=ret_type, size=ret_size)
-        return getter
-
-    def setter(name, type_=int):
-        if type_ is int:
-            s = 'L'
-        elif type_ is float:
-            s = 'f'
-        elif type_ is bool:
-            s = '?'
-        else:
-            raise ValueError('not support type: ' + type_.__name__)
-        def setter(self, value):
-            self.native_call(name, 'L' + s, self.handle, type_(value))
-        return setter
-
-    builders = (getter, getter_ptr, setter)
+class MemObject(Entity):
+    SIZE = 0x320
 
 
 class NativeEntity(NativeModel):
@@ -212,7 +129,6 @@ class NativeEntity(NativeModel):
 
 
 class Player(NativeEntity):
-    SIZE = 0xf00
     WEAPON_SLOT = 13
 
     getter, getter_ptr, setter = NativeModel.builders
@@ -417,11 +333,23 @@ class Player(NativeEntity):
 
     def clear_tasks(self):
         """清除任务"""
-        self.script_call('CLEAR_CHAR_TASKS', 'Q', self.handle)
+        self.script_call('CLEAR_CHAR_TASKS', 'L', self.handle)
 
     def clear_tasks_now(self):
         """清除任务，会下车"""
-        self.script_call('CLEAR_CHAR_TASKS_IMMEDIATELY', 'Q', self.handle)
+        self.script_call('CLEAR_CHAR_TASKS_IMMEDIATELY', 'L', self.handle)
+
+    def attach_to_object(self, obj):
+        """附上一个物体"""
+        self.script_call('ATTACH_PED_TO_OBJECT', '3L5f2L', self.handle, self.make_handle(obj), 0,-2.5,0.0,0,0,0,0,0)
+
+    def attach_to_vehicle(self, vehicle):
+        """附上一辆车"""
+        self.script_call('ATTACH_PED_TO_CAR', '3L5f2L', self.handle, self.make_handle(vehicle), 0,-2.5,0.0,0,0,0,1,1)
+
+    def create_fire(self):
+        self._fire = self.script_call('START_CHAR_FIRE', 'L', self.handle)
+        return self._fire
 
     del getter, getter_ptr, setter
 
@@ -479,8 +407,6 @@ class WeaponItem:
 
 
 class Vehicle(NativeEntity):
-    SIZE = 0x20d0
-    
     getter, getter_ptr, setter = NativeModel.builders
 
     @property
@@ -689,7 +615,41 @@ class Vehicle(NativeEntity):
         """停止自动驾驶"""
         self.driver.clear_tasks()
 
+    def attach_to_object(self, obj):
+        """附上一个物体"""
+        self.script_call('ATTACH_PED_TO_OBJECT', '3L6f', self.handle, self.make_handle(obj), 0,-2.5,0.0,0,0,0,0)
+
+    def attach_to_vehicle(self, vehicle):
+        """附上一辆车"""
+        self.script_call('ATTACH_PED_TO_CAR', '3L6f', self.handle, self.make_handle(vehicle), 0,-2.5,0.0,0,0,0,0)
+
     del getter, getter_ptr, setter
+
+
+class Object(NativeEntity):
+
+    invincible = property(None, NativeModel.setter('SET_OBJECT_INVINCIBLE', bool))
+    dynamic = property(None, NativeModel.setter('SET_OBJECT_DYNAMIC', bool))
+    stealable = property(None, NativeModel.setter('SET_OBJECT_AS_STEALABLE', bool))
+    collision = property(None, NativeModel.setter('SET_OBJECT_COLLISION', bool))
+    hp = property(NativeModel.getter_ptr('GET_OBJECT_HEALTH', float), NativeModel.setter('SET_OBJECT_HEALTH', float))
+    heading = property(NativeModel.getter_ptr('GET_CAR_HEADING', float), NativeModel.setter('SET_CAR_HEADING', float))
+
+    @property
+    def coord(self):
+        ctx = self.native_context
+        self.native_call('GET_OBJECT_COORDINATES', '4L', self.handle, *ctx.get_temp_addrs(1, 3))
+        values = ctx.get_temp_values(1, 3, float, mapfn=float32)
+        return utils.CoordData(self, values)
+
+    @coord.setter
+    def coord(self, value):
+        pos = tuple(value)
+        self.script_call('SET_OBJECT_COORDINATES', 'L3f', self.handle, *pos, sync=False)
+
+    def freeze_position(self, value=True):
+        """冻结位置"""
+        self.script_call('FREEZE_OBJECT_POSITION', '2L', self.handle, value)
 
 
 class IVModel(NativeModel):

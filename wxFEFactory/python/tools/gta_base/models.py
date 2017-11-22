@@ -97,3 +97,67 @@ class Pool(Model):
         item = self[self._i]
         self._i += 1
         return item
+
+
+class NativeModel:
+    P = 'L'
+
+    def __init__(self, handle, mgr):
+        self.handle = handle
+        self.mgr = mgr
+
+    @property
+    def native_context(self):
+        return self.mgr.native_context
+
+    @property
+    def native_call(self):
+        return self.mgr.native_call
+
+    @property
+    def native_call_vector(self):
+        return self.mgr.native_call_vector
+
+    @property
+    def script_call(self):
+        return self.mgr.script_call
+
+    def getter(name, ret_type=int, ret_size=4):
+        def getter(self):
+            return self.native_call(name, self.P, self.handle, ret_type=ret_type, ret_size=ret_size)
+        return getter
+
+    def getter_ptr(name, ret_type=int, ret_size=4):
+        def getter(self):
+            self.native_call(name, self.P * 2, self.handle, self.native_context.get_temp_addr())
+            return self.native_context.get_temp_value(type=ret_type, size=ret_size)
+        return getter
+
+    def setter(name, type_=int, default=None):
+        if type_ is int:
+            s = None
+        elif type_ is float:
+            s = 'f'
+        elif type_ is bool:
+            s = '?'
+        else:
+            raise ValueError('not support type: ' + type_.__name__)
+        if default is not None:
+            def setter(self, value=default):
+                self.native_call(name, self.P + (s or self.P), self.handle, type_(value))
+        else:
+            def setter(self, value):
+                self.native_call(name, self.P + (s or self.P), self.handle, type_(value))
+        return setter
+
+    @staticmethod
+    def make_handle(arg):
+        if isinstance(arg, int):
+            return arg
+        return arg.handle
+
+    builders = (getter, getter_ptr, setter)
+
+
+class NativeModel64(NativeModel):
+    P = 'Q'
