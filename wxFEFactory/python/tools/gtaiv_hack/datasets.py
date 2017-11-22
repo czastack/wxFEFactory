@@ -61,7 +61,7 @@ WEAPON_LIST = [
 
 
 VEHICLE_LIST = (
-    ("GTA4 汽车", (
+    ("汽车", (
         ("ADMIRAL", 0x4B5C5320),
         ("AIRTUG", 0x5D0AAC8F),
         ("AMBULANCE", 0x45D56ADA),
@@ -169,7 +169,7 @@ VEHICLE_LIST = (
         ("YANKEE", 0xBE6FF06A),
     )),
     
-    ("GTA4 摩托车", (
+    ("摩托车", (
         ("BOBBER", 0x92E56A2C),
         ("FAGGIO", 0x9229E4EB),
         ("HELLFURY", 0x22DC8E7F),
@@ -179,14 +179,14 @@ VEHICLE_LIST = (
         ("ZOMBIEB", 0xDE05FB87),
     )),
     
-    ("GTA4 直升机", (
+    ("直升机", (
         ("ANNIHILATOR", 0x31F0B376),
         ("MAVERICK", 0x9D0450CA),
         ("POLMAV", 0x1517D4D9),
         ("TOURMAV", 0x78D70477),
     )),
     
-    ("GTA4 船", (
+    ("船", (
         ("DINGHY", 0x3D961290),
         ("JETMAX", 0x33581161),
         ("MARQUIS", 0xC1CE1183),
@@ -197,7 +197,7 @@ VEHICLE_LIST = (
         ("TROPIC", 0x1149422F),
     )),
     
-    ("GTA4 列车(开不了)", (
+    ("列车(开不了)", (
         ("CABLECAR", 0xC6C3242D),
         ("SUBWAY_LO", 0x2FBC4D30),
         ("SUBWAY_HI", 0x8B887FDB),

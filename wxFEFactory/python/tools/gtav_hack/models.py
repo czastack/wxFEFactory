@@ -318,7 +318,7 @@ class Player(NativeEntity):
     # 产生噪声比例 (默认1.0)
     noise_rate = property(None, player_setter('SET_PLAYER_NOISE_MULTIPLIER', float))
     # 射击比例
-    shoot_rate = property(None, setter('SET_PED_SHOOT_RATE', float))
+    shoot_rate = property(None, setter('SET_PED_SHOOT_RATE'))
 
     def _fast_run(self, toggle=True):
         """快速奔跑"""
@@ -338,18 +338,6 @@ class Player(NativeEntity):
     def reset_visible_damage(self):
         """修复可见损害"""
         self.native_call('RESET_PED_VISIBLE_DAMAGE', 'Q', self.handle)
-
-    def super_jump(self):
-        self.native_call('SET_SUPER_JUMP_THIS_FRAME', 'Q', self.index)
-
-    def weapon_fire_ammo(self):
-        self.native_call('SET_FIRE_AMMO_THIS_FRAME', 'Q', self.index)
-
-    def weapon_explosive_ammo(self):
-        self.native_call('SET_EXPLOSIVE_AMMO_THIS_FRAME', 'Q', self.index)
-
-    def weapon_explosive_melee(self):
-        self.native_call('SET_EXPLOSIVE_MELEE_THIS_FRAME', 'Q', self.index)
 
     def set_model(self, model):
         """设置模型"""
@@ -497,6 +485,10 @@ class Player(NativeEntity):
         """径直走向坐标"""
         self.script_call('TASK_GO_STRAIGHT_TO_COORD', 'Q4fl2f', 
             self.handle, *coord, speed, timeout, 0, 0)
+
+    def parachute_to(self, coord):
+        """降落到坐标"""
+        self.script_call('TASK_PARACHUTE_TO_TARGET', 'Q3f', self.handle, *coord)
 
     del getter, getter_ptr, setter
 

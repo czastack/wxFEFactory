@@ -382,7 +382,9 @@ class CoordWidget(TwoWayWidget):
         if path:
             self.lastfile = path
             with open(path, 'w', encoding="utf-8") as file:
-                json.dump(self.data_list, file, ensure_ascii=False)
+                # json.dump(self.data_list, file, ensure_ascii=False)
+                content = json.dumps(self.data_list, ensure_ascii=False).replace('{', '\n\t{')[:-1] + '\n]'
+                file.write(content)
 
     def onLoad(self, btn):
         path = fefactory_api.choose_file("选择要读取的文件", file=self.lastfile, wildcard='*.json')

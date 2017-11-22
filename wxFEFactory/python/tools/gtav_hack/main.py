@@ -207,6 +207,8 @@ class Tool(BaseGTATool):
                 ui.Button("修复衣服", onclick=self.repair_cloth)
                 ui.Button("洗车", onclick=self.wash_vehicle)
                 ui.Button("进入上一辆载具", onclick=self.into_last_vehicle)
+                ui.Button("召唤火车", onclick=self.random_train)
+                ui.Button("随机装扮", onclick=self.set_ped_random_component)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
@@ -317,8 +319,9 @@ class Tool(BaseGTATool):
         return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
 
     def native_call_vector(self, *args, **kwargs):
+        fixed = 6 if kwargs.pop('fixed6', True) else -1
         self.native_call(*args, **kwargs)
-        return self.native_context.get_vector_result(8)
+        return self.native_context.get_vector_result(8, fixed)
 
     def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
@@ -732,7 +735,11 @@ class Tool(BaseGTATool):
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
         if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
-            print('无法获取标记坐标')
+            entity = self.entity 
+            coord = entity.coord.values()
+            coord[2] = 1024
+            coord[2] = self.GetGroundZ(coord)
+            entity.coord = coord
 
     def teleport_to_yellow_checkpoint(self, _=None):
         """瞬移到到黄色检查点"""
@@ -1273,3 +1280,9 @@ class Tool(BaseGTATool):
     @wind_speed.setter
     def wind_speed(self, value):
         self.native_call('SET_WIND_SPEED', 'f', float(value))
+
+    def random_train(self, _=None):
+        self.script_call('SET_RANDOM_TRAINS', 'L', 1)
+
+    def set_ped_random_component(self, _=None):
+        self.script_call('SET_PED_RANDOM_COMPONENT_VARIATION', '2Q', self.ped_id, 1)

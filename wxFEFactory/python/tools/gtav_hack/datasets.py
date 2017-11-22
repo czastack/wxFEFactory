@@ -237,7 +237,7 @@ VEHICLE_LIST = (
         ("绝緻 旋风 敞篷 破旧版", 0x86CF7CDD), # TORNADO4
         ("浪子 JB 700", 0x3EAB5555), # JB700
         ("古罗帝 史汀格", 0x5C23AF9B), # STINGER
-        ("古罗帝 史汀格", 0x82E499FA), # STINGERGT
+        ("古罗帝 史汀格 GT", 0x82E499FA), # STINGERGT
         ("非凡 风情经典", 0x3C4E2113), # COQUETTE2
         ("兰帕达提 佳士可", 0x3822BDFE), # CASCO
         ("兰帕达提 皮卡乐", 0x404B6381), # PIGALLE
