@@ -539,7 +539,8 @@ class Tool(BaseGTATool):
 
     def set_never_wanted(self, tb):
         """不被通缉"""
-        self.max_wanted_level = 0 if tb.checked else 5
+        # self.max_wanted_level = 0 if tb.checked else 5
+        self.native_call('SET_WANTED_LEVEL_MULTIPLIER', 'f', 0 if tb.checked else 1)
 
     def vehicle_fix(self, vehicle):
         """修车"""
@@ -911,7 +912,7 @@ class Tool(BaseGTATool):
 
     @property
     def max_wanted_level(self):
-        """当前金钱"""
+        """最大通缉等级"""
         return self.native_call('GET_MAX_WANTED_LEVEL', None)
 
     @max_wanted_level.setter
