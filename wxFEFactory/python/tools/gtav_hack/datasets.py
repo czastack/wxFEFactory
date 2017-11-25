@@ -1439,6 +1439,26 @@ PLAYER_MODEL = (
 )
 
 
+OBJECT_MODEL = (
+    ('易爆物体', (
+        ('气泵a', 'prop_gas_pump_1a'),
+        ('气泵b', 'prop_gas_pump_1b'),
+        ('气泵c', 'prop_gas_pump_1c'),
+        ('气泵d', 'prop_gas_pump_1d'),
+        ('气缸01a', 'prop_gas_tank_01a'),
+        ('气缸02a', 'prop_gas_tank_02a'),
+        ('气缸02b', 'prop_gas_tank_02b'),
+        ('气缸04a', 'prop_gas_tank_04a'),
+        ('气罐01a', 'prop_gascyl_01a'),
+        ('气罐02a', 'prop_gascyl_02a'),
+        ('气罐02b', 'prop_gascyl_02b'),
+        ('气罐03a', 'prop_gascyl_03a'),
+        ('气罐03b', 'prop_gascyl_03b'),
+        ('气罐04a', 'prop_gascyl_04a'),
+    )),
+)
+
+
 # DRIVING_STYLE FLAG
 # None = 0
 # FollowTraffic = 1
@@ -1509,4 +1529,18 @@ COLOR_LIST = (
     0x515756, 0x420632, 0x0F0800, 0x080808, 0x420632, 0x080005, 0x000B6B, 0x101712,
     0x253332, 0x2D353B, 0x566670, 0x2B302B, 0x474341, 0xB59066, 0x1B3947, 0x1B3947,
     0x59D8FF,
+)
+
+
+DIRECTION_FRONT = 0
+DIRECTION_BACK = 1
+DIRECTION_LEFT = 2
+DIRECTION_RIGHT = 3
+DIRECTION_ABOVE = 4
+ATTACH_DIRECTION = (
+    ("前", DIRECTION_FRONT),
+    ("后", DIRECTION_BACK),
+    ("左", DIRECTION_LEFT),
+    ("右", DIRECTION_RIGHT),
+    ("上", DIRECTION_ABOVE),
 )

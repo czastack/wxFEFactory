@@ -69,13 +69,13 @@ class Tool(BaseGTA3Tool):
         with Group("global", "全局", 0, handler=self.handler):
             self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
             
-        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
-        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 self.set_buttons_contextmenu()

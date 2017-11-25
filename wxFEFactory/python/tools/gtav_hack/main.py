@@ -1,7 +1,8 @@
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
-from lib.hack.form import Group, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
+from lib.hack.form import (Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget, 
+    render_tab_list)
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
@@ -40,7 +41,7 @@ class Tool(BaseGTATool):
     FLY_SPEED = 15
     SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
-    SLING_SPEED_RATE = 60
+    SLING_SPEED_RATE = 70
     
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
@@ -130,7 +131,7 @@ class Tool(BaseGTATool):
                 ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
                 ui.ToggleButton("起风", onchange=self.set_wind)
 
-        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
                 self.render_common_text()
                 ui.Text("大加速: alt+shift+m")
@@ -145,27 +146,23 @@ class Tool(BaseGTATool):
                 ui.Text("天降正义(导弹攻击敌人): alt+enter")
                 ui.Text("特殊能力能量充满: alt+capslock")
 
-        with Group(None, "角色模型", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("角色模型"):
             with ui.Horizontal(className="fill container"):
-                self.player_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
-                with self.player_model_book:
-                    for category in datasets.PLAYER_MODEL:
-                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
+                self.player_model_book = render_tab_list(datasets.PLAYER_MODEL)
                 with ui.ScrollView(className="fill container"):
                     ui.Text("1. 切换模型会失去武器")
                     ui.Text("2. 切换动物模型容易引发bug，请慎用")
                     ui.Text("3. 在陆地上切换鱼类模型会突然失去梦想，请注意")
                     ui.Button("切换模型", onclick=self.set_player_model)
-                    ui.Button("生产人物", onclick=self.create_selected_ped)
+                    ui.Button("生成人物", onclick=self.create_selected_ped)
 
-        with Group(None, "载具模型", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
-            with ui.Horizontal(className="fill"):
-                self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
-                with self.vehicle_model_book:
-                    for category in VEHICLE_LIST:
-                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
+        with StaticGroup("载具模型"):
+            self.vehicle_model_book = render_tab_list(datasets.VEHICLE_LIST)
 
-        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("物体模型"):
+            self.object_model_book  = render_tab_list(datasets.OBJECT_MODEL)
+
+        with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
@@ -203,12 +200,21 @@ class Tool(BaseGTATool):
                 ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
                 ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
                 ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
-                ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
+                ui.Button("熄灭区域内的火焰", onclick=self.clear_area_of_fire)
                 ui.Button("修复衣服", onclick=self.repair_cloth)
                 ui.Button("洗车", onclick=self.wash_vehicle)
                 ui.Button("进入上一辆载具", onclick=self.into_last_vehicle)
                 ui.Button("召唤火车", onclick=self.random_train)
+                ui.Button("最近的车附上", onclick=self.nearest_vehicle_attach)
+                ui.Button("附上敌人", onclick=self.attach_to_enemey)
+                ui.Button("附上蓝色标记", onclick=self.attach_to_blue)
+                ui.Button("取消附上", onclick=self.detach_entity)
                 ui.Button("随机装扮", onclick=self.set_ped_random_component)
+                ui.Button("生成所选物体", onclick=self.create_selected_object)
+                ui.Button("生成多个物体", onclick=self.create_selected_objects_caller)
+                ui.Button("发射生成物体", onclick=self.create_launch_object)
+                ui.Button("前面起火", onclick=self.create_fire_at_front)
+                ui.Button("打架", onclick=self.fight_against)
                 self.set_buttons_contextmenu()
 
         with Group(None, "设置", None, hasfootbar=False):
@@ -224,7 +230,11 @@ class Tool(BaseGTATool):
                 IntConfig('rocket_damage', '导弹攻击伤害', 250)
                 SelectConfig('shoot_weapon_hash', '射击武器种类', datasets.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
-                SelectConfig('auto_driving_style', '自动驾驶风格', datasets.DRIVING_STYLE)
+                SelectConfig('attach_direction', '附上目标方向', datasets.ATTACH_DIRECTION)
+                FloatConfig('attach_distance_ped', '步行附上距离', 6).set_help('步行时附上目标距离')
+                FloatConfig('attach_distance_vehilce', '驾车附上距离', 15).set_help('驾车时附上目标距离')
+                IntConfig('create_objects_count', '批量生成物体个数', 5)
+                FloatConfig('create_objects_spcae', '批量生成物体间隔', 5)
             ui.Hr()
             ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
@@ -437,7 +447,7 @@ class Tool(BaseGTATool):
 
     def get_nearest_ped(self, distance=50):
         """获取最近的人"""
-        self.native_call('GET_CLOSEST_PED', '4f3Q', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
+        self.native_call('GET_CLOSEST_PED', '4f3Q3l', *self.entity.coord, distance, 1, 1, self.native_context.get_temp_addr(), 0, 1, -1)
         ped = self.native_context.get_temp_value()
         if ped:
             return Player(0, ped, self)
@@ -540,7 +550,10 @@ class Tool(BaseGTATool):
     def set_never_wanted(self, tb):
         """不被通缉"""
         # self.max_wanted_level = 0 if tb.checked else 5
-        self.native_call('SET_WANTED_LEVEL_MULTIPLIER', 'f', 0 if tb.checked else 1)
+        toggle = tb.checked
+        if toggle:
+            self.clear_wanted_level()
+        self.script_call('SET_WANTED_LEVEL_MULTIPLIER', 'f', 0 if toggle else 1)
 
     def vehicle_fix(self, vehicle):
         """修车"""
@@ -616,7 +629,12 @@ class Tool(BaseGTATool):
     def enemys_freeze_position(self, _=None):
         """敌人定住"""
         for p in self.get_enemys():
-            p.freeze_position()
+            if isinstance(p, Player):
+                vehicle = p.vehicle
+                if vehicle:
+                    vehicle.freeze_position()
+            else:
+                p.freeze_position()
 
     def target_freeze_position(self, _=None):
         """目标定住"""
@@ -769,33 +787,35 @@ class Tool(BaseGTATool):
 
     def drive_follow(self, _=None):
         """跟着敌人"""
-        if self.vehicle:
+        vehicle = self.vehicle
+        if vehicle:
             entitys = self.get_enemys()
             if entitys:
-                self.vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
+                vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
 
     def drive_follow_blue(self, _=None):
         """跟着蓝色标记"""
-        if self.vehicle:
+        vehicle = self.vehicle
+        if vehicle:
             entitys = self.get_friends()
             if entitys:
-                self.vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
+                vehicle.drive_follow(entitys[0], self.config.auto_driving_speed, self.config.auto_driving_style)
 
     def vehicle_chase(self, _=None):
         """追捕敌人"""
-        if self.vehicle:
+        vehicle = self.vehicle
+        if vehicle:
             enemys = self.get_enemys()
-            enemys and self.vehicle and self.vehicle.chase(enemys[0])
+            if enemys:
+                vehicle.chase(enemys[0])
 
     def clear_driver_tasks(self, _=None):
         """停止自动驾驶"""
-        # if self.vehicle:
-        #     self.vehicle.clear_driver_tasks()
         self.player.clear_tasks()
 
     def get_camera_rot(self):
         """ 获取摄像机朝向参数
-        :return: (x分量, y分量, z方位角)
+        :return: (x, y, pitch)
         """
         data = self.native_call_vector('GET_GAMEPLAY_CAM_ROT', 'Q', 2)
         tX = data[0] * 0.0174532924
@@ -811,19 +831,19 @@ class Tool(BaseGTATool):
         """获取摄像机位置"""
         return self.native_call_vector('GET_GAMEPLAY_CAM_COORD', None)
 
-    def get_camera_rotz(self):
+    def get_camera_yaw(self):
         """获取xy面上的旋转量"""
         x, y, z = self.get_camera_rot()
         return math.atan2(-x, y)
 
     def dir_correct(self, _=None):
         """根据摄像机朝向设置当前实体的朝向"""
-        rotz = self.get_camera_rotz()
-        if rotz < 0:
-            rotz += math.pi * 2
+        yaw = self.get_camera_yaw()
+        if yaw < 0:
+            yaw += math.pi * 2
         entity = self.entity
         # entity.coord[2] += 2
-        entity.rotation = rotz
+        entity.rotation = yaw
 
     @property
     def game_hour(self):
@@ -959,20 +979,37 @@ class Tool(BaseGTATool):
         if vehicle:
             self.player.into_vehicle(vehicle)
 
-    def create_ped(self, model, pedType=21):
+    def create_ped(self, model, coord=None, pedType=21):
         """生成角色"""
         m = models.VModel(model, self)
         m.request()
-        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *self.get_front_coord(), self.player.heading, 0, 1)
+        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *(coord or self.get_front_coord()), self.player.heading, 0, 1)
         return Player(0, handle, self)
 
-    def create_fire(self, coord, maxChildren=10, isGasFire=1):
+    def create_object(self, model, coord=None, on_ground=True):
+        """生成物体"""
+        if isinstance(model, str):
+            model = self.get_hash_key(model)
+        m = models.VModel(model, self)
+        m.request()
+        handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model, *(coord or self.get_front_coord()), 0, 1, 0)
+        if handle:
+            obj = models.Object(handle, self)
+            if on_ground:
+                obj.place_on_ground()
+            return obj
+
+    def create_fire(self, coord, maxChildren=20, isGasFire=0):
         """生成火焰"""
         return self.script_call('START_SCRIPT_FIRE', '3f2Q', *coord, maxChildren, isGasFire)
 
     def delete_fire(self, fire):
         """熄灭生成的火焰"""
         self.native_call('REMOVE_SCRIPT_FIRE', 'Q', fire)
+
+    def create_fire_at_front(self, _=None):
+        """前面起火"""
+        self._fire = self.create_fire(self.get_front_coord())
 
     def _create_explosion(self, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=12, bSound=True, bInvisible=False, fCameraShake=0):
         """产生爆炸"""
@@ -1207,20 +1244,51 @@ class Tool(BaseGTATool):
             self.player.set_model(self.get_selected_ped_model())
 
     def create_selected_ped(self, _=None):
-        """生产该模型的人物"""
+        """生成该模型的人物"""
         model = self.get_selected_ped_model()
         if model:
             return self.create_ped(self.get_selected_ped_model())
 
+    def get_selected_object_model(self):
+        """获取选中的物体模型"""
+        page_index = self.object_model_book.index
+        item_index = self.object_model_book.getPage(page_index).index
+        if item_index is not -1:
+            model_name = datasets.OBJECT_MODEL[page_index][1][item_index][1]
+            return self.get_cache('object_model', model_name, self.get_hash_key)
+
+    def create_selected_object(self, _=None):
+        """生成该模型的物体"""
+        model = self.get_selected_object_model()
+        if model:
+            return self.create_object(self.get_selected_object_model())
+
+    def create_launch_object(self, _=None):
+        """生成该模型的物体并发射"""
+        obj = self.create_selected_object()
+        if obj:
+            self.launch_entity(obj)
+
+    def create_selected_objects(self, count, space):
+        """生成多个该模型的物体"""
+        model = self.get_selected_object_model()
+        if model:
+            objs = []
+            for coord in self.iter_cam_dir_coords(count, space):
+                objs.append(self.create_object(model, coord))
+            return objs
+
+    def create_selected_objects_caller(self, _=None):
+        """生成多个该模型的物体"""
+        self.create_selected_objects(self.config.create_objects_count, self.config.create_objects_spcae)
+
     def near_peds_go_away(self, _=None):
         """附近的人吹飞"""
-        with SafeScriptEnv(self, ('SET_ENTITY_VELOCITY',)):
-            self.launch_entity(self.get_near_peds(), False)
+        self.launch_entity(self.get_near_peds(), False)
 
     def near_vehicles_go_away(self, _=None):
         """附近的车吹飞"""
-        with SafeScriptEnv(self, ('SET_ENTITY_VELOCITY',)):
-            self.launch_entity(self.get_near_vehicles(), False)
+        self.launch_entity(self.get_near_vehicles(), False)
 
     def repair_cloth(self, _=None):
         """修复衣服"""
@@ -1244,7 +1312,7 @@ class Tool(BaseGTATool):
         self.script_call('CLEAR_AREA_OF_COPS', '4fQ', *self.player.coord, 1000, True)
 
     def clear_area_of_fire(self, _=None):
-        """清空区域内的火焰"""
+        """熄灭区域内的火焰"""
         self.script_call('STOP_FIRE_IN_RANGE', '4f', *self.player.coord, 100)
 
     def jump_on_vehicle(self, _=None):
@@ -1287,3 +1355,68 @@ class Tool(BaseGTATool):
 
     def set_ped_random_component(self, _=None):
         self.script_call('SET_PED_RANDOM_COMPONENT_VARIATION', '2Q', self.ped_id, 1)
+
+    def entitys_attach(self, entitys, distance):
+        """附上当前实体"""
+        if not hasattr(entitys, '__iter__'):
+            entitys = (entitys,)
+
+        me = self.entity
+        for entity in entitys:
+            entity.attach_to_entity(me, (0, distance, 0))
+
+    def nearest_ped_attach(self, _=None):
+        """最近的角色附上当前角色"""
+        ped = self.get_nearest_ped()
+        if ped:
+            self.entitys_attach(ped, self.config.attach_distance_ped)
+
+    def nearest_vehicle_attach(self, _=None):
+        """最近的车附上当前实体"""
+        vehicle = self.get_nearest_vehicle()
+        if vehicle:
+            self.entitys_attach(vehicle, self.config.attach_distance_vehilce)
+
+    def vehilce_attach_to(self, entity):
+        """当前车附上目标"""
+        distance = self.config.attach_distance_vehilce if isinstance(entity, Vehicle) else self.config.attach_distance_ped
+        direction = self.config.attach_direction
+        if direction is datasets.DIRECTION_FRONT:
+            offset = (0, distance, 0)
+        elif direction is datasets.DIRECTION_BACK:
+            offset = (0, -distance, 0)
+        elif direction is datasets.DIRECTION_LEFT:
+            offset = (-distance, 0, 0)
+        elif direction is datasets.DIRECTION_RIGHT:
+            offset = (distance, 0, 0)
+        elif direction is datasets.DIRECTION_ABOVE:
+            offset = (0, 0, distance)
+        self.vehicle.attach_to_entity(entity, offset)
+
+    def attach_to_enemey(self, _=None):
+        """附上敌人"""
+        vehicle = self.vehicle
+        if vehicle:
+            entitys = self.get_enemys()
+            if entitys:
+                self.vehilce_attach_to(entitys[0])
+
+    def attach_to_blue(self, _=None):
+        """附上蓝色标记"""
+        vehicle = self.vehicle
+        if vehicle:
+            entitys = self.get_friends()
+            if entitys:
+                self.vehilce_attach_to(entitys[0])
+
+    def detach_entity(self, _=None):
+        """取消附上"""
+        vehicle = self.vehicle
+        if vehicle:
+            vehicle.detach_entity()
+
+    def fight_against(self, _=None):
+        """打架"""
+        me = self.ped_id
+        for p in self.get_near_peds():
+            p.fight_against(me)

@@ -69,7 +69,7 @@ class Tool(BaseGTA3Tool):
                     WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self.on_weapon_change)
                 )
 
-        with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                     CheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
@@ -79,7 +79,7 @@ class Tool(BaseGTA3Tool):
                     CheckBoxWidget("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
                     CheckBoxWidget("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
-        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
@@ -87,12 +87,12 @@ class Tool(BaseGTA3Tool):
                     self.render_common_text()
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
 
-        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 self.set_buttons_contextmenu()
 
-        with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
+        with StaticGroup("工具"):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
@@ -112,11 +112,11 @@ class Tool(BaseGTA3Tool):
     def on_weapon_change(self, weapon_view):
         self.load_model(weapon_view.selected_item[1])
 
-    def get_rotz(self):
-        rotz = self.handler.readFloat(address.CAMERA_ROTZ)
+    def get_yaw(self):
+        yaw = self.handler.readFloat(address.CAMERA_ROTZ)
         if not self.isInVehicle:
-            rotz = rotz - math.pi
-        return rotz
+            yaw = yaw - math.pi
+        return yaw
 
     def get_camera_rot(self):
         return self.read_vector(address.CAMERA_FRONT)

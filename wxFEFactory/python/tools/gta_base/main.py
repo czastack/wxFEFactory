@@ -221,30 +221,30 @@ class BaseGTATool(BaseTool):
         """物体池"""
         return self.models.Pool(self.address.OBJECT_POOL, self.handler, self.Object)
 
-    def get_rotz(self):
-        """获取xy面旋转量"""
+    def get_yaw(self):
+        """获取偏航角"""
         PI = math.pi
         HALF_PI = PI / 2
-        rotz = self.rot_view.mem_value
-        rotz += HALF_PI
-        if rotz > PI:
-            rotz += PI * 2
-        return rotz
+        yaw = self.rot_view.mem_value
+        yaw += HALF_PI
+        if yaw > PI:
+            yaw += PI * 2
+        return yaw
 
     def get_camera_rot(self):
-        """获取摄像机朝向参数 (x分量, y分量, z仰角)"""
-        rotz = self.get_rotz()
-        return (math.cos(rotz), math.sin(rotz), 0.1)
+        """获取摄像机朝向参数 (pitch, yaw, roll)"""
+        yaw = self.get_yaw()
+        return (math.cos(yaw), math.sin(yaw), 0.1)
 
     def get_front_coord(self, delta=5):
         """获取前面一点的坐标"""
-        rotz = self.get_rotz()
+        yaw = self.get_yaw()
 
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
+        x = math.cos(yaw)
+        y = math.sin(yaw)
         coord = self.player.coord.values()
-        coord[0] += xVal * delta
-        coord[1] += yVal * delta
+        coord[0] += x * delta
+        coord[1] += y * delta
         return coord
 
     def get_cam_front_coord(self, delta=5):
@@ -259,14 +259,14 @@ class BaseGTATool(BaseTool):
         """前进"""
         rate = rate or self.GO_FORWARD_COORD_RATE
         
-        rotz = self.get_rotz()
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
+        yaw = self.get_yaw()
+        x = math.cos(yaw)
+        y = math.sin(yaw)
 
         entity = self.entity
         coord = entity.coord.values()
-        coord[0] += xVal * rate
-        coord[1] += yVal * rate
+        coord[0] += x * rate
+        coord[1] += y * rate
         
         entity.coord = coord
 
@@ -274,14 +274,14 @@ class BaseGTATool(BaseTool):
         """弹射起步"""
         speed_rate = rate or getattr(self, 'SAFE_SPEED_RATE', 0.5)
 
-        rotz = self.get_rotz()
-        xVal = math.cos(rotz)
-        yVal = math.sin(rotz)
+        yaw = self.get_yaw()
+        x = math.cos(yaw)
+        y = math.sin(yaw)
 
         entity = self.entity
         speed = entity.speed.values()
-        speed[0] += xVal * speed_rate
-        speed[1] += yVal * speed_rate
+        speed[0] += x * speed_rate
+        speed[1] += y * speed_rate
 
         if not self.isInVehicle:
             safe_speed_up = getattr(self, 'SAFE_SPEED_UP', 0.2)
@@ -351,6 +351,20 @@ class BaseGTATool(BaseTool):
         view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
         view.listbox.next()
         view.write()
+
+    def iter_cam_dir_coords(self, count, space, first_double=False):
+        """往视角方向迭代坐标
+        :param first_double: 第一个坐标是否是双倍距离 
+        """
+        cam_x, cam_y, cam_z = self.get_camera_rot()
+        offset = (cam_x * space, cam_y * space, cam_z * space)
+        coord = self.player.get_offset_coord_m(offset)
+        if first_double:
+            coord += offset
+
+        for i in range(count):
+            yield coord
+            coord += offset
 
     def get_peds(self):
         """获取角色池中的角色列表"""
@@ -719,14 +733,7 @@ class BaseGTATool(BaseTool):
     
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
-        cam_x, cam_y, cam_z = self.get_camera_rot()
-        offset = (cam_x * 6, cam_y * 6, cam_z * 6)
-        coord = self.player.get_offset_coord_m(offset)
-
-        for i in range(count):
-            coord[0] += offset[0]
-            coord[1] += offset[1]
-            coord[2] += offset[2]
+        for coord in self.iter_cam_dir_coords(count, 6, True):
             self.create_explosion(coord)
 
     def custom_hotkey(self, _=None):

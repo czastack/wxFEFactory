@@ -160,6 +160,11 @@ class GroupBox(Group):
         self.view = ui.StaticBox(self.label, className="fill container")
 
 
+class StaticGroup(Group):
+    def __init__(self, caption):
+        return Group.__init__(self, None, caption, 0, False, False)
+
+
 class BaseInputWidget(TwoWayWidget):
     def render(self):
         super().render()
@@ -497,6 +502,14 @@ class ModelSelectWidget(ModelWidget, BaseSelectWidget):
     def __init__(self, name, label, ins, prop, choices):
         self.choices = choices
         super().__init__(name, label, ins, prop)
+
+
+def render_tab_list(data):
+    book = ui.Notebook(className="fill", wxstyle=0x0200)
+    with book:
+        for category in data:
+            ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
+    return book
 
 
 btn_xsm_style = {

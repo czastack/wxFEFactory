@@ -130,7 +130,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), datasets.WEATHER_LIST)
             InputWidget("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
-        with Group(None, "作弊", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                     self.cheat_views = [
@@ -150,7 +150,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
                 InputWidget(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
 
-        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
                     choices=(item[0] for item in VEHICLE_LIST))
@@ -163,7 +163,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Text("附近的车大风车: alt+r")
                     ui.Text("附近的人大风车: alt+shift+r")
 
-        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 ui.Button(label="洗衣服", onclick=self.clothes_rebuild)

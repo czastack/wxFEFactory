@@ -89,7 +89,7 @@ class Tool(BaseGTATool):
                 ui.Button("回退一天", onclick=self.day_back)
                 ui.Button("前进一天", onclick=self.day_forward)
 
-        with Group(None, "快捷键", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
                 self.render_common_text()
                 ui.Text("大加速: alt+shift+m")
@@ -100,14 +100,14 @@ class Tool(BaseGTATool):
                 ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
                 ui.Text("爆破最近的车: alt+o")
 
-        with Group(None, "载具模型", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("载具模型"):
             with ui.Horizontal(className="fill"):
                 self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.vehicle_model_book:
                     for category in VEHICLE_LIST:
                         ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
 
-        with Group(None, "测试", 0, handler=self.handler, flexgrid=False, hasfootbar=False):
+        with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="fill container"):
                 self.render_common_button()
                 ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
@@ -644,22 +644,22 @@ class Tool(BaseGTATool):
         :return: (x分量, y分量, z方位角)
         """
         data = self.get_camera_rot_raw()
-        rotz = degreeToRadian(data[2]) + math.pi / 2
-        return (math.cos(rotz), math.sin(rotz), degreeToRadian(data[0]))
+        yaw = degreeToRadian(data[2]) + math.pi / 2
+        return (math.cos(yaw), math.sin(yaw), degreeToRadian(data[0]))
 
-    def get_camera_rotz(self):
+    def get_camera_yaw(self):
         """获取xy面上的旋转量"""
         data = self.get_camera_rot_raw()
         return degreeToRadian(data[2])
 
     def dir_correct(self, _=None):
         """根据摄像机朝向设置当前实体的朝向"""
-        rotz = self.get_camera_rotz()
-        if rotz < 0:
-            rotz += math.pi * 2
+        yaw = self.get_camera_yaw()
+        if yaw < 0:
+            yaw += math.pi * 2
         entity = self.entity
         # entity.coord[2] += 2
-        entity.rotation = rotz
+        entity.rotation = yaw
 
     @property
     def game_hour(self):

@@ -119,10 +119,8 @@ class NativeEntity(NativeModel):
 
     def get_offset_coord_m(self, offset):
         """手动获取偏移后的坐标"""
-        coord = self.coord.values()
-        coord[0] += offset[0]
-        coord[1] += offset[1]
-        coord[2] += offset[2]
+        coord = utils.Vector3(self.coord)
+        coord += offset
         return coord
 
     get_offset_coord = get_offset_coord_m

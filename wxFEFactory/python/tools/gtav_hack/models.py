@@ -32,6 +32,9 @@ class NativeEntity(NativeModel):
     is_in_air = property(getter('IS_ENTITY_IN_AIR'))
     is_on_fire = property(getter('IS_ENTITY_ON_FIRE', bool))
     is_dead = property(getter('IS_ENTITY_DEAD', bool))
+    is_ped = property(getter('IS_ENTITY_A_PED', bool))
+    is_vehicle = property(getter('IS_ENTITY_A_VEHICLE', bool))
+    is_object = property(getter('IS_ENTITY_AN_OBJECT', bool))
 
     # model hash
     model_id = property(getter('GET_ENTITY_MODEL'))
@@ -67,7 +70,7 @@ class NativeEntity(NativeModel):
 
     @speed.setter
     def speed(self, value):
-        self.native_call('SET_ENTITY_VELOCITY', 'Q3f', self.handle, *value)
+        self.script_call('SET_ENTITY_VELOCITY', 'Q3f', self.handle, *value)
 
     @property
     def turn_speed(self):
@@ -81,15 +84,19 @@ class NativeEntity(NativeModel):
 
     max_speed = property(None, setter('SET_ENTITY_MAX_SPEED', float))
 
-    def create_fire(self):
+    def start_fire(self):
         self.script_call('START_ENTITY_FIRE', 'Q', self.handle)
-        # self._fire = self.mgr.create_fire(self.coord)
-        # return self._fire
+
+    def stop_fire(self):
+        self.script_call('STOP_ENTITY_FIRE', 'Q', self.handle)
+
+    def create_fire(self):
+        self._fire = self.mgr.create_fire(self.coord)
+        return self._fire
 
     def delete_fire(self):
-        self.script_call('STOP_ENTITY_FIRE', 'Q', self.handle)
-        # if hasattr(self, '_fire'):
-        #     self.mgr.delete_fire(self._fire)
+        if hasattr(self, '_fire'):
+            self.mgr.delete_fire(self._fire)
 
     def create_explosion(self, *args, **kwargs):
         self.mgr.create_explosion(self.coord, *args, **kwargs)
@@ -119,31 +126,33 @@ class NativeEntity(NativeModel):
 
     @property
     def rotation3f(self):
-        x, y, z, w = self.quaternion
-        pitch = math.atan2(2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
-        yaw   = math.atan2(2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
-        roll  = math.asin(-2.0 * (x*z - w*y))
-
-        return utils.VectorField(self, (pitch, roll, yaw), 'rotation3f')
+        return self.native_call_vector('GET_ENTITY_ROTATION', '2Q', self.handle, 2)
 
     @rotation3f.setter
     def rotation3f(self, value):
-        self.quaternion = utils.Quaternion.from_rotation(utils.Vector3(value))
+        self.native_call('SET_ENTITY_ROTATION', 'Q3f2Q', self.handle, *value, 2, True)
     
     def flip(self):
         """翻转"""
         x, y, z = self.rotation3f
-        x = -x
-        y = -y
+        if y > 90 or y < -90:
+            y = 0
+        else:
+            y = 180
         self.rotation3f = (x, y, z)
 
     def stop(self):
         self.speed = (0, 0, 0)
-        self.turn_speed = (0, 0, 0)
+        # self.turn_speed = (0, 0, 0)
 
     def freeze_position(self, value=True):
         """冻结位置"""
         self.script_call('FREEZE_ENTITY_POSITION', '2Q', self.handle, value)
+
+    def set_proofs(self, bp, fp, ep, cp, mp, un6, un7, dp):
+        """设置实体的免疫 bulletProof, fireProof, explosionProof, collisionProof, meleeProof, p6, p7, drownProof"""
+        self.native_call("SET_ENTITY_PROOFS", '9Q', self.handle, 
+            bp, fp, ep, cp, mp, un6, un7, dp)
 
     def add_marker(self):
         """添加标记"""
@@ -151,16 +160,32 @@ class NativeEntity(NativeModel):
 
     def get_offset_coord_m(self, offset):
         """手动获取偏移后的坐标"""
-        coord = self.coord.values()
-        coord[0] += offset[0]
-        coord[1] += offset[1]
-        coord[2] += offset[2]
+        coord = utils.Vector3(self.coord)
+        coord += offset
         return coord
 
     get_offset_coord = get_offset_coord_m
 
-    def go_to_entity(entity, speed=10):
+    def go_to_entity(self, entity, speed=10):
         self.script_call('TASK_GO_TO_ENTITY', '2Ql3fl', self.handle, self.make_handle(entity), -1, 0.1, speed, 1073741824.0, 0)
+
+    def attach_to_entity(self, entity, offset):
+        """附上实体"""
+        self.script_call('ATTACH_ENTITY_TO_ENTITY', '3Q6f6Q', self.handle, self.make_handle(entity), 0, *offset, 0, 0, 0, False, True, True, True, 0, True)
+
+    def detach_entity(self):
+        self.script_call('DETACH_ENTITY', '3Q', self.handle, False, False)
+
+    @property
+    def entity_attached_to(self):
+        entity = NativeEntity(self.native_call('GET_ENTITY_ATTACHED_TO', 'Q', self.handle), self.mgr)
+        if entity.is_ped:
+            return Player(0, entity.handle, self.mgr)
+        elif entity.is_vehicle:
+            return Vehicle(entity.handle, self.mgr)
+
+    def fight_against(self, ped):
+        self.script_call('TASK_COMBAT_PED', '4Q', self.handle, self.make_handle(ped), 0, 16)
 
     del getter, getter_ptr, setter
 
@@ -285,6 +310,9 @@ class Player(NativeEntity):
         VModel(model, self.mgr).request()
         self.script_call('SET_PLAYER_MODEL', '2Q', self.index, model)
         self.script_call('SET_PED_DEFAULT_COMPONENT_VARIATION', 'Q', self.handle)
+
+    create_fire = NativeEntity.start_fire
+    stop_fire = NativeEntity.stop_fire
 
     # ----------------------------------------------------------------------
     # 载具相关
@@ -609,8 +637,7 @@ class Vehicle(NativeEntity):
         """设置是否不可损坏"""
         not_toggle = not toggle
         self.invincible = toggle
-        self.native_call("SET_ENTITY_PROOFS", '9Q', self.handle, 
-            toggle, toggle, toggle, toggle, toggle, toggle, toggle, toggle)
+        self.set_proofs(toggle, toggle, toggle, toggle, toggle, toggle, toggle, toggle)
         self.tyres_can_burst = not_toggle
         self.wheels_can_break = not_toggle
         self.can_be_damaged = not_toggle
@@ -623,7 +650,7 @@ class Vehicle(NativeEntity):
 
     def drive_follow(self, entity, speed, driving_style):
         """跟着目标"""
-        self.script_call('_TASK_VEHICLE_FOLLOW', '3Qfll', 
+        self.script_call('_TASK_VEHICLE_FOLLOW', '3Qf2Q', 
             self.driver.handle, self.handle, self.make_handle(entity), speed, driving_style, 10)
 
     def clear_driver_tasks(self):
@@ -634,10 +661,15 @@ class Vehicle(NativeEntity):
         """追捕目标"""
         self.driver.chase(self.make_handle(entity))
 
-    def SET_VEHICLE_OUT_OF_CONTROL(self, killDriver=False, explodeOnImpact=False):
+    def out_of_control(self, killDriver=False, explodeOnImpact=False):
         self.native_call('SET_VEHICLE_OUT_OF_CONTROL', '3Q', self.handle, killDriver, explodeOnImpact)
 
     del getter, getter_ptr, setter
+
+
+class Object(NativeEntity):
+    def place_on_ground(self):
+        return self.script_call('PLACE_OBJECT_ON_GROUND_PROPERLY', 'Q', self.handle)
 
 
 class VModel(NativeModel):
