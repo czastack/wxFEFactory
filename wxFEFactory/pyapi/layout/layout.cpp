@@ -9,6 +9,7 @@
 #include "controls.h"
 #include "datacontrols.h"
 #include "aui.h"
+#include "screen.h"
 #include "bars.hpp"
 #include "console.h"
 #include "thread.h"
@@ -47,6 +48,7 @@ void init_layout(py::module &m)
 
 	// 为了方便，setConsoleElem 挂在外层模块，但在这里定义
 	m.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a);
+	m.def("getScreenSize", &Screen::getScreenSize);
 
 	py::class_<View>(layout, "View")
 		.def("setContextMenu", &View::setContextMenu)

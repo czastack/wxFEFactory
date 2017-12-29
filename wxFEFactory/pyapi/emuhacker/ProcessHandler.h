@@ -178,7 +178,7 @@ public:
 	}
 
 	template<typename ListType>
-	addr_t ProcessHandler::readLastAddr(addr_t addr, const ListType &offsets) {
+	addr_t readLastAddr(addr_t addr, const ListType &offsets) {
 		for (auto const offset : offsets) {
 			addr = readAddr(addr);
 			if (!addr)
@@ -193,7 +193,7 @@ public:
 	 * 多级指针读取数据
 	 */
 	template<typename ListType>
-	bool ProcessHandler::ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
+	bool ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
 		addr = readLastAddr(addr, offsets);
 		return addr && read(addr, buffer, size);
 	}
@@ -202,7 +202,7 @@ public:
 	 * 多级指针写入数据
 	 */
 	template<typename ListType>
-	bool ProcessHandler::ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
+	bool ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
 		addr = readLastAddr(addr, offsets);
 		return addr && write(addr, buffer, size);
 	}

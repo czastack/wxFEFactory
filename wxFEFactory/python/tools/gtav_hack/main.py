@@ -230,6 +230,7 @@ class Tool(BaseGTATool):
                 IntConfig('rocket_damage', '导弹攻击伤害', 250)
                 SelectConfig('shoot_weapon_hash', '射击武器种类', datasets.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
+                SelectConfig('auto_driving_style', '自动驾驶风格', datasets.DRIVING_STYLE)
                 SelectConfig('attach_direction', '附上目标方向', datasets.ATTACH_DIRECTION)
                 FloatConfig('attach_distance_ped', '步行附上距离', 6).set_help('步行时附上目标距离')
                 FloatConfig('attach_distance_vehilce', '驾车附上距离', 15).set_help('驾车时附上目标距离')

@@ -145,6 +145,7 @@ bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
 	}
 	onRelease();
 	event.Skip();
+	return true;
 }
 
 void BaseTopLevelWindow::onRelease()
