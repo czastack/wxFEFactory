@@ -138,3 +138,63 @@ View * BookCtrlBase::getPage(int n)
 	}
 	return (View*)ctrl().GetPage(n)->GetClientData();
 }
+
+
+void init_containers(py::module & m)
+{
+	using namespace py::literals;
+
+	auto className = "className"_a = None;
+	auto style = "style"_a = None;
+	auto styles = "styles"_a = None;
+	auto wxstyle = "wxstyle"_a = 0;
+
+	py::class_t<Vertical, Layout>(m, "Vertical")
+		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
+
+	py::class_t<Horizontal, Layout>(m, "Horizontal")
+		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
+
+	py::class_t<GridLayout, Layout>(m, "GridLayout")
+		.def_init(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
+			"rows"_a = 0, "cols"_a = 2, "vgap"_a = 0, "hgap"_a = 0,
+			styles, className, style);
+
+	py::class_t<FlexGridLayout, Layout>(m, "FlexGridLayout")
+		.def_init(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
+			"rows"_a = 0, "cols"_a = 2, "vgap"_a = 0, "hgap"_a = 0,
+			styles, className, style)
+		.def("AddGrowableRow", &FlexGridLayout::AddGrowableRow, "index"_a, "flex"_a = 0)
+		.def("RemoveGrowableRow", &FlexGridLayout::RemoveGrowableRow, "index"_a)
+		.def("AddGrowableCol", &FlexGridLayout::AddGrowableCol, "index"_a, "flex"_a = 0)
+		.def("RemoveGrowableCol", &FlexGridLayout::RemoveGrowableCol, "index"_a)
+		.def_property("flexDirection", &FlexGridLayout::GetFlexibleDirection, &FlexGridLayout::SetFlexibleDirection);
+
+	py::class_t<ScrollView, Layout>(m, "ScrollView")
+		.def_init(py::init<bool, pyobj, pyobj, pyobj>(),
+			"horizontal"_a = false, styles, className, style);
+
+	py::class_t<SplitterWindow, Layout>(m, "SplitterWindow")
+		.def_init(py::init<bool, int, pyobj, pyobj, pyobj>(),
+			"horizontal"_a = false, "sashpos"_a = 0, styles, className, style);
+
+	py::class_t<StaticBox, Layout>(m, "StaticBox")
+		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
+			"label"_a, styles, className, style)
+		.def("getLabel", &StaticBox::getLabel)
+		.def("setLabel", &StaticBox::setLabel)
+		.def_property("label", &StaticBox::getLabel, &StaticBox::setLabel);
+
+	py::class_t<BookCtrlBase, Layout>(m, "BookCtrlBase")
+		.def("getPage", &BookCtrlBase::getPage, "n"_a = -1)
+		.def("getPageCount", &BookCtrlBase::getPageCount)
+		.def("setPageText", &BookCtrlBase::setPageText)
+		.def("getPageText", &BookCtrlBase::getPageText)
+		.def_property("index", &BookCtrlBase::getSelection, &BookCtrlBase::setSelection);
+
+	py::class_t<Notebook, BookCtrlBase>(m, "Notebook")
+		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
+
+	py::class_t<Listbook, BookCtrlBase>(m, "Listbook")
+		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
+}

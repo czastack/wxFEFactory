@@ -199,3 +199,47 @@ void ListView::insertItems(const py::iterable & rows, int pos, bool create)
 		++info.m_itemId;
 	}
 }
+
+void init_datacontrols(py::module &m)
+{
+	using namespace py::literals;
+
+	auto className = "className"_a = None;
+	auto style = "style"_a = None;
+
+	auto &title_arg = "title"_a;
+	auto &name_arg = "name"_a;
+	auto &help_arg = "help"_a = None;
+	auto &value_0 = "value"_a = 0;
+
+	py::class_t<PropertyGrid, Control>(m, "PropertyGrid")
+		.def_init(py::init<pyobj, pyobj, pyobj>(),
+			"data"_a = None, className, style)
+		.def("addCategory", &PropertyGrid::addCategory, title_arg)
+		.def("addStringProperty", &PropertyGrid::addStringProperty, title_arg, name_arg, help_arg, "value"_a = None)
+		.def("addIntProperty", &PropertyGrid::addIntProperty, title_arg, name_arg, help_arg, value_0)
+		.def("addUIntProperty", &PropertyGrid::addUIntProperty, title_arg, name_arg, help_arg, value_0)
+		.def("addHexProperty", &PropertyGrid::addHexProperty, title_arg, name_arg, help_arg, value_0)
+		.def("addFloatProperty", &PropertyGrid::addFloatProperty, title_arg, name_arg, help_arg, value_0)
+		.def("addBoolProperty", &PropertyGrid::addBoolProperty, title_arg, name_arg, help_arg, "value"_a = false)
+		.def("addEnumProperty", &PropertyGrid::addEnumProperty, title_arg, name_arg, help_arg, "labels"_a = None, "values"_a = None, value_0)
+		.def("addFlagsProperty", &PropertyGrid::addFlagsProperty, title_arg, name_arg, help_arg, "labels"_a, "values"_a = None, value_0)
+		.def("addLongStringProperty", &PropertyGrid::addLongStringProperty, title_arg, name_arg, help_arg, "value"_a = None)
+		.def("addArrayStringProperty", &PropertyGrid::addArrayStringProperty, title_arg, name_arg, help_arg, "values"_a)
+		.def("setEnumChoices", &PropertyGrid::setEnumChoices, "name"_a, "labels"_a, "values"_a = None)
+		.def("getValues", &PropertyGrid::getValues, "data"_a = None)
+		.def("setValues", &PropertyGrid::setValues, "data"_a, "all"_a = false)
+		.def("setReadonly", &PropertyGrid::setReadonly)
+		.def("bindData", &PropertyGrid::bindData)
+		.def("setOnChange", &PropertyGrid::setOnChange)
+		.def("setOnHighlight", &PropertyGrid::setOnHighlight)
+		.def("setOnSelected", &PropertyGrid::setOnSelected)
+		.def_readwrite("data", &PropertyGrid::m_data)
+		.def_readwrite("autosave", &PropertyGrid::m_autosave)
+		.def_readwrite("changed", &PropertyGrid::m_changed);
+
+	py::class_t<ListView, Control>(m, "ListView")
+		.def_init(py::init<pyobj, pyobj>(), className, style)
+		.def("appendColumns", &ListView::appendColumns)
+		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a = -1, "create"_a = true);
+}

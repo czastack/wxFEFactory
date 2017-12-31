@@ -25,6 +25,11 @@ def reload(start_option=None, callback=None):
         if not name.startswith('__'):
             del __main__.__dict__[name]
 
+    try:
+        del __builtins__['fpy']
+    except:
+        pass
+
     if start_option:
         from application import app
         app.start_option = start_option
@@ -44,7 +49,9 @@ def executable_name():
 
 
 class Screen:
-    width, height = fefactory_api.getScreenSize()
+    size = fefactory_api.getScreenSize()
+    width, height = size
+
 
 if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     # 重定向标准输出
@@ -71,6 +78,7 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     fefactory_api.confirm_yes = confirm_yes
     fefactory_api.fefactory_inited = True
     __builtins__['input'] = partial(fefactory_api.input, '输入')
-    __builtins__['fpy'] = sys.modules[__name__]
 
+
+__builtins__['fpy'] = sys.modules[__name__]
 import mainframe

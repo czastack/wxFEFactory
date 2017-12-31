@@ -169,3 +169,54 @@ void HotkeyWindow::onRelease()
 	stopHotkey();
 	Window::onRelease();
 }
+
+void init_frames(py::module & m)
+{
+	using namespace py::literals;
+
+	auto className = "className"_a = None;
+	auto style = "style"_a = None;
+	auto styles = "styles"_a = None;
+	auto label = "label"_a;
+	auto base_frame_init = py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>();
+	auto base_frame_wxstyle_a = "wxstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	auto menubar_a = "menubar"_a = nullptr;
+
+	py::class_t<BaseTopLevelWindow, Layout>(m, "BaseTopLevelWindow")
+		.def("close", &BaseTopLevelWindow::close)
+		.def("setOnClose", &BaseTopLevelWindow::setOnClose)
+		.def("setIcon", &BaseTopLevelWindow::setIcon)
+		.def_property("title", &BaseTopLevelWindow::getTitle, &BaseTopLevelWindow::setTitle)
+		.def_property("size", &BaseTopLevelWindow::getSize, &BaseTopLevelWindow::setSize)
+		.def_property("position", &BaseTopLevelWindow::getPosition, &BaseTopLevelWindow::setPosition);
+	py::class_t<BaseFrame, BaseTopLevelWindow>(m, "BaseFrame")
+		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
+		.def_property_readonly("menubar", &Window::getMenuBar)
+		.def_property_readonly("statusbar", &Window::getStatusBar);
+
+	py::class_t<Window, BaseFrame>(m, "Window")
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+
+	py::class_t<MDIParentFrame, BaseFrame>(m, "MDIParentFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+
+	py::class_t<MDIChildFrame, BaseFrame>(m, "MDIChildFrame")
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+
+	py::class_t<HotkeyWindow, Window>(m, "HotkeyWindow")
+		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style)
+		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
+		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
+		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
+		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
+
+	py::class_t<Dialog, BaseTopLevelWindow>(m, "Dialog")
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
+		.def("showModal", &Dialog::showModal)
+		.def("endModal", &Dialog::endModal);
+
+	py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
+		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
+}

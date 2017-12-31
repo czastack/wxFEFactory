@@ -261,3 +261,5 @@ public:
 		bindElem(new wxListbook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxstyle));
 	}
 };
+
+void init_containers(py::module &m);

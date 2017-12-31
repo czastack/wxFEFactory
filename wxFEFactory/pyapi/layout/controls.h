@@ -871,3 +871,5 @@ public:
 		bindEvt(wxEVT_DIRPICKER_CHANGED, fn);
 	}
 };
+
+void init_controls(py::module &m);

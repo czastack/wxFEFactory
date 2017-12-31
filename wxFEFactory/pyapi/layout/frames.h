@@ -1,7 +1,7 @@
 #pragma once
 #include "layoutbase.h"
 #include "menu.h"
-#include "bars.hpp"
+#include "bars.h"
 #include <wx/mdi.h>
 
 
@@ -273,3 +273,5 @@ public:
 		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	}
 };
+
+void init_frames(py::module &m);

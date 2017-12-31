@@ -53,7 +53,7 @@ class MainFrame:
             with ui.Menu("窗口"):
                 ui.MenuItem("保存窗口位置和大小", onselect=self.saveWinOption)
 
-        with ui.Window("火纹工厂", style=winstyle, styles=styles, menubar=menubar) as win:
+        with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
                 toolbar = self.render_toolbar()
                 ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
@@ -301,13 +301,17 @@ class MainFrame:
             'size': self.win.size,
         })
 
+screen_width = fefactory.Screen.width
+if screen_width <= 1366:
+    window_size = (900, 1200)
+elif screen_width <= 1920:
+    window_size = (1200, 960)
+elif screen_width <= 2560:
+    window_size = (1200, 960)
+else: # elif screen_width <= 3840:
+    window_size = (1366, 1800)
 
-winstyle = {
-    # 'width': 1200,
-    # 'height': 960,
-    'width': 900,
-    'height': 1200,
-}
+window_style = {'width': window_size[0], 'height': window_size[1]}
 
 styles = {
     'class': {

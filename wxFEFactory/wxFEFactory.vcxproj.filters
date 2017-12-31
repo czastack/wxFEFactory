@@ -89,6 +89,9 @@
     <ClCompile Include="pyapi\layout\screen.cpp">
       <Filter>pyapi\layout</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\layout\bars.cpp">
+      <Filter>pyapi\layout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myapp.h" />
@@ -116,9 +119,6 @@
     </ClInclude>
     <ClInclude Include="pyapi\functions.h">
       <Filter>pyapi</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\bars.hpp">
-      <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\layout\console.h">
       <Filter>pyapi\layout</Filter>
@@ -205,6 +205,9 @@
       <Filter>pyapi\layout</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\layout\screen.h">
+      <Filter>pyapi\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\layout\bars.h">
       <Filter>pyapi\layout</Filter>
     </ClInclude>
   </ItemGroup>

@@ -177,3 +177,5 @@ public:
 		Layout::__exit__(args);
 	}
 };
+
+void init_aui(py::module &m);

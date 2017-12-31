@@ -180,7 +180,7 @@ public:
 		return wxNoneString;
 	}
 
-	friend void init_layout(py::module &m);
+	friend void init_datacontrols(py::module &m);
 
 protected:
 	pyobj m_data; // py::dict
@@ -215,3 +215,5 @@ public:
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true);
 };
+
+void init_datacontrols(py::module &m);
