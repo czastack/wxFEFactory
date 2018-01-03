@@ -121,6 +121,10 @@ class NativeModel:
     def script_call(self):
         return self.mgr.script_call
 
+    @property
+    def native_call_vector(self):
+        return self.mgr.script_call_vector
+
     def getter(name, ret_type=int, ret_size=4):
         def getter(self):
             return self.native_call(name, self.P, self.handle, ret_type=ret_type, ret_size=ret_size)

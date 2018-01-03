@@ -121,7 +121,7 @@ class NativeContext64(NativeContext):
 
     m_pReturn = Field(0x00, size=8)                                    # void * m_pReturn;              // 00-04
     m_nArgCount = Field(0x08)                                          # unsigned int m_nArgCount;      // 04-08
-    m_pArgs = Field(0x10)                                              # void * m_pArgs;                // 08-0C
+    m_pArgs = Field(0x10, size=8)                                      # void * m_pArgs;                // 08-0C
     m_nDataCount = Field(0x18)                                         # unsigned int m_nArgCount;      // 04-08
     m_TempStack = ArrayField(0x20, ARG_MAX, Field(0, size=8))          # int m_TempStack[16];           // 10-90
 
@@ -195,7 +195,11 @@ class NativeContext64(NativeContext):
                         arg = temp_addr
                         fmt = 'Q'
 
-                    data = struct.pack(fmt, arg)
+                    try:
+                        data = struct.pack(fmt, arg)
+                    except:
+                        print(fmt, arg)
+                        raise
                     data_size = len(data)
                     buff.extend(data)
                     if data_size < 8:
@@ -222,13 +226,13 @@ class SafeScriptEnv:
         self.names = names
 
     def __enter__(self):
-        self._native_call = self.owner.native_call
-        self.owner.native_call = self.hook if self.names else self.owner.script_call
+        self._script_call = self.owner.script_call
+        self.owner.script_call = self.hook if self.names else self.owner.script_hook_call
         return self
 
     def __exit__(self, *args):
-        self.owner.native_call = self._native_call
-        del self._native_call
+        self.owner.script_call = self._script_call
+        del self._script_call
 
     def hook(self, name, *args, **kwargs):
-        return (self.owner.script_call if name in self.names else self._native_call)(name, *args, **kwargs)
+        return (self.owner.script_hook_call if name in self.names else self._script_call)(name, *args, **kwargs)

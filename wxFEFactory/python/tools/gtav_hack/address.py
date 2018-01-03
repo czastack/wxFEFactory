@@ -1,6 +1,8 @@
 VERSION_DEPEND = {
     877: {
         'REGISTRATION_TABLE_BASE': 0x1414B1A4F,
-        'BLIP_LIST_BASE': 0x140177BAC,
+    },
+    1290: {
+        'REGISTRATION_TABLE_BASE': 0x141525DBB,
     },
 }

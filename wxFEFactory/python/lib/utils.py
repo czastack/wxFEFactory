@@ -39,6 +39,9 @@ class HistoryList(list):
 def float32(f):
     return round(f, 6)
 
+def u32(n):
+    return n & 0xFFFFFFFF
+
 def u32bytes(n):
     """32位整型转bytes"""
     try:

@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField, ModelField, ArrayField
 from lib.lazy import lazy
-from lib.utils import float32, tuple2rgb, rgb2tuple
+from lib.utils import float32, u32, tuple2rgb, rgb2tuple
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool, NativeModel64 as NativeModel
 import math
@@ -799,3 +799,36 @@ class NativeRegistration(Model):
                 if hash == registration.hashes[i]:
                     return registration.handlers[i]
             registration.addr = registration.nextRegistration
+
+
+class NativeRegistration1290(Model):
+    """原生函数表 For 1290版本"""
+    nextRegistration1 = Field(0, size=8)
+    nextRegistration2 = Field(8, size=8)
+    handlers = ArrayField(16, 7, Field(0, size=8))
+    numEntries1 = Field(0x48)
+    numEntries2 = Field(0x4C)
+    hashes = Field(0x50, size=8)
+
+    def getNextRegistration(self):
+        v5 = self & 'nextRegistration1'
+        v13 = v5 ^ self.nextRegistration2
+        temp = self.nextRegistration1
+        return (u32(v13 ^ (temp >> 32)) << 32) | u32(v13 ^ u32(temp))
+
+    def getNumEntries(self):
+        return u32((self & 'numEntries1') ^ self.numEntries1 ^ self.numEntries2)
+
+    def getHash(self, index):
+        naddr = 16 * index + (self & 'nextRegistration1') + 0x54
+        v10 = naddr ^ self.handler.read32(naddr + 8)
+        temp = self.handler.read64(naddr)
+        return (u32(v10 ^ (temp >> 32)) << 32) | u32(v10 ^ u32(temp))
+
+    def get_func(self, hash):
+        registration = NativeRegistration1290(self.addr, self.handler)
+        while registration.addr:
+            for i in range(registration.getNumEntries()):
+                if hash == registration.getHash(i):
+                    return registration.handlers[i]
+            registration.addr = registration.getNextRegistration()

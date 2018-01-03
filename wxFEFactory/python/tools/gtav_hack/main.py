@@ -1,7 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
-from lib.hack.form import (Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget, 
+from lib.hack.form import (Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget,
     render_tab_list)
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -42,7 +42,7 @@ class Tool(BaseGTATool):
     SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
     SLING_SPEED_RATE = 70
-    
+
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
 
@@ -263,7 +263,7 @@ class Tool(BaseGTATool):
         return addr - self.MODULE_BASE
 
     def get_offset_addr(self, addr):
-        return addr + self.handler.read32(addr + 3) + 7
+        return addr + self.handler.read32(addr) + 4
 
     def get_version(self):
         """获取版本码"""
@@ -280,24 +280,33 @@ class Tool(BaseGTATool):
             for name in version_depend:
                 addr = version_depend[name]
                 setattr(address, name, self.get_addr(addr) if addr else 0)
-        
-        address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 6)
-        # address.BLIP_LIST = self.get_offset_addr(address.BLIP_LIST_BASE)
+
+            # address.REGISTRATION_TABLE = self.get_offset_addr(address.REGISTRATION_TABLE_BASE + 9)
+            # self.NativeRegistration = models.NativeRegistration1290 if version >= 1290 else models.NativeRegistration
 
         # 装载针对当前版本的native_hash
-        name = 'hash_%d' % version
-        module = getattr(__import__(__package__ + '.native_hash', fromlist=[name]), name)
-        address.NATIVE_HASH = module.NATIVE_HASH
+        # ==>
+        # name = 'hash_%d' % version
+        # module = getattr(__import__(__package__ + '.native_hash', fromlist=[name]), name)
+        # address.NATIVE_HASH = module.NATIVE_HASH
+        # ===
+        from .native_hash.hash_universal import NATIVE_HASH
+        address.NATIVE_HASH = NATIVE_HASH
+        # <==
 
         # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
         # 要在ScriptHook的线程中才能安全运行
-        self.ScriptHookHelper = self.handler.get_module('NativeHelper.asi')
-        if self.ScriptHookHelper:
-            self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x15A90
+        self.script_hook_helper = self.handler.get_module('NativeHelper.asi')
+        if self.script_hook_helper:
+            # ==>
+            # self.script_hook_helper_ctx_ptr = self.script_hook_helper + 0x15A90
+            # ===
+            self.script_call_addr = self.script_hook_helper + 0x1040
+            # <==
 
         # 此次运行的Native Script地址缓存
-        address.NATIVE_ADDRS = {}
-        
+        # address.NATIVE_ADDRS = {}
+
     def init_remote_function(self):
         """初始化远程函数"""
         self.init_addr()
@@ -307,58 +316,83 @@ class Tool(BaseGTATool):
     def free_remote_function(self):
         """释放远程函数"""
         super().free_remote_function()
-        self.handler.free_memory(self.near_entity_buff)    
+        self.handler.free_memory(self.near_entity_buff)
 
-    def get_native_addr(self, name):
-        """根据脚本名称获取装载后原生函数地址"""
-        addr = address.NATIVE_ADDRS.get(name, 0)
-        if addr is 0:
-            # 获取原生函数地址
-            hash = address.NATIVE_HASH[name]
-            registration = models.NativeRegistration(self.handler.read64(address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
-            addr = registration.get_func(hash)
-            if addr:
-                address.NATIVE_ADDRS[name] = addr
-        return addr
+    # ==>
+    # def get_native_addr(self, name):
+    #     """根据脚本名称获取装载后原生函数地址"""
+    #     addr = address.NATIVE_ADDRS.get(name, 0)
+    #     if addr is 0:
+    #         # 获取原生函数地址
+    #         hash = address.NATIVE_HASH[name]
+    #         registration = self.NativeRegistration(self.handler.read64(address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
+    #         addr = registration.get_func(hash)
+    #         if addr:
+    #             print(addr)
+    #             address.NATIVE_ADDRS[name] = addr
+    #     return addr
 
-    def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=8):
-        """ 远程调用GTAIV中的方法
-        :param name: 方法名称，见address.NATIVE_HASH
-        :param arg_sign: 函数签名
-        """
-        addr = self.get_native_addr(name) if isinstance(name, str) else name
-        return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+    # def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=8):
+    #     """ 远程调用GTAIV中的方法
+    #     :param name: 方法名称，见address.NATIVE_HASH
+    #     :param arg_sign: 函数签名
+    #     """
+    #     addr = self.get_native_addr(name) if isinstance(name, str) else name
+    #     if addr:
+    #         return self.native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+    #     else:
+    #         print('函数不存在', name)
 
-    def native_call_vector(self, *args, **kwargs):
+    # def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
+    #     """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
+    #     if self.script_hook_helper:
+    #         with self.native_context:
+    #             fn_addr = self.get_native_addr(name)
+    #             if arg_sign:
+    #                 self.native_context.push(arg_sign, *args)
+    #             self.native_context.push('Q', fn_addr)
+    #             self.handler.write64(self.script_hook_helper_ctx_ptr, self.native_context.addr)
+
+    #             if sync:
+    #                 # 在1秒内尝试同步
+    #                 try_count = 20
+    #                 time.sleep(0.02)
+    #                 while try_count:
+    #                     if self.handler.read64(self.script_hook_helper_ctx_ptr) == 0:
+    #                         
+
+    #                         return
+
+    #                     try_count -= 1
+    #                     time.sleep(0.05)
+
+    #                 self.handler.write64(self.script_hook_helper_ctx_ptr, 0)
+    #                 print('获取script_call返回失败，超过尝试次数')
+    # ===
+
+    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
+        """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
+        if self.script_hook_helper:
+            with self.native_context:
+                hash = address.NATIVE_HASH.get(name, 0)
+                super().native_call(self.script_call_addr, (arg_sign or '') + 'Q', *args, hash)
+                if ret_type:
+                    return self.native_context.get_result(ret_type, ret_size)
+        else:
+            print("script_hook_helper未初始化，是否忘记了添加NativeHelper.asi？")
+
+    native_call = script_call
+    # <==
+
+    def script_call_vector(self, *args, **kwargs):
         fixed = 6 if kwargs.pop('fixed6', True) else -1
         self.native_call(*args, **kwargs)
         return self.native_context.get_vector_result(8, fixed)
 
-    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
-        """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
-        if self.ScriptHookHelper:
-            with self.native_context:
-                fn_addr = self.get_native_addr(name)
-                if arg_sign:
-                    self.native_context.push(arg_sign, *args)
-                self.native_context.push('Q', fn_addr)
-                self.handler.write64(self.ScriptHookHelperCtxPtr, self.native_context.addr)
-
-                if sync:
-                    # 在1秒内尝试同步
-                    try_count = 20
-                    time.sleep(0.02)
-                    while try_count:
-                        if self.handler.read64(self.ScriptHookHelperCtxPtr) == 0:
-                            if ret_type:
-                                return self.native_context.get_result(ret_type, ret_size)
-                            return
-
-                        try_count -= 1
-                        time.sleep(0.05)
-
-                    self.handler.write64(self.ScriptHookHelperCtxPtr, 0)
-                    print('获取script_call返回失败，超过尝试次数')
+    def script_hook_call_vector(self, *args, **kwargs):
+        fixed = 6 if kwargs.pop('fixed6', True) else -1
+        self.script_call(*args, **kwargs)
+        return self.native_context.get_vector_result(8, fixed)
 
     def get_hash_key(self, name):
         return self.native_call('GET_HASH_KEY', 's', name)
@@ -699,7 +733,7 @@ class Tool(BaseGTATool):
 
     def get_yellow_checkpoints(self):
         """获取所有的黄色检查点标记"""
-        return self.get_blips(models.Blip.BLIP_CIRCLE, 
+        return self.get_blips(models.Blip.BLIP_CIRCLE,
             (models.Blip.BLIP_COLOR_YELLOWMISSION, models.Blip.BLIP_COLOR_YELLOWMISSION2, models.Blip.BLIP_COLOR_MISSION))
 
     def get_enemy_blips(self):
@@ -755,7 +789,7 @@ class Tool(BaseGTATool):
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
         if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
-            entity = self.entity 
+            entity = self.entity
             coord = entity.coord.values()
             coord[2] = 1024
             coord[2] = self.GetGroundZ(coord)
@@ -818,7 +852,7 @@ class Tool(BaseGTATool):
         """ 获取摄像机朝向参数
         :return: (x, y, pitch)
         """
-        data = self.native_call_vector('GET_GAMEPLAY_CAM_ROT', 'Q', 2)
+        data = self.script_call_vector('GET_GAMEPLAY_CAM_ROT', 'Q', 2)
         tX = data[0] * 0.0174532924
         tZ = data[2] * 0.0174532924
         absX = abs(math.cos(tX))
@@ -830,7 +864,7 @@ class Tool(BaseGTATool):
 
     def get_camera_pos(self):
         """获取摄像机位置"""
-        return self.native_call_vector('GET_GAMEPLAY_CAM_COORD', None)
+        return self.script_call_vector('GET_GAMEPLAY_CAM_COORD', None)
 
     def get_camera_yaw(self):
         """获取xy面上的旋转量"""
@@ -1016,7 +1050,7 @@ class Tool(BaseGTATool):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
-    def create_owned_explosion(self, ped, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, 
+    def create_owned_explosion(self, ped, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET,
             fRadius=12, bSound=True, bInvisible=False, fCameraShake=0):
         """产生有所有者的爆炸"""
         self.script_call('ADD_OWNED_EXPLOSION', 'Q3fLfLLf', ped, *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)

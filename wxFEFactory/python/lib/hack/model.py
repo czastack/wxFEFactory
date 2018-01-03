@@ -13,6 +13,21 @@ class Model:
     def clone(self):
         return self.__class__(self.addr, self.handler)
 
+    def addrof(self, field):
+        return self.addr + self.offsetof(field)
+
+    def offsetof(self, field):
+        if isinstance(field, str):
+            field = self.__class__.__dict__[field]
+
+        if isinstance(field, Field):
+            return field.offset
+        else:
+            raise TypeError('expected a Field object, got ' + str(field))
+
+    def __and__(self, field):
+        return self.addrof(field)
+
 
 class Field:
     def __init__(self, offset, type_=int, size=4):
