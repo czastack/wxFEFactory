@@ -1,0 +1,1578 @@
+Epsilon Tracts
+Epsilon Vehicles
+For Sale Signs
+Hidden Packages
+Letter Scraps
+Monkey Mosaics
+Nuclear Waste
+Peyotes
+Spaceship Parts
+Stunt Jumps
+Submarine Pieces
+Under the Bridges
+
+import struct
+def fn(src):
+    data = struct.unpack('3fL', eval(src))
+    return [round(data[0], 6), round(data[1], 6), round(data[2], 6)]
+an.temp = fn
+
+
+start: 0000000180037CD0
+end: 000000018003A08F
+
+"Submarine Piece 1"
+b'\xA6\xAB\x64\xC4\x7B\xE4\xCF\x45\xC1\xA8\x00\xC2\x14\x3E\x99\x43'
+
+"Submarine Piece 2"
+b'\xB2\x35\x76\xC4\x66\x64\xD1\x45\x78\xBA\x23\xC2\x46\xB6\x38\x43'
+
+"Submarine Piece 3"
+b'\xB8\xBE\x81\xC4\x1F\x63\xD2\x45\x88\xE5\xC5\xC2\x64\x92\x10\x41'
+
+"Submarine Piece 4"
+b'\x71\x75\x4A\x45\xF6\x8E\xCA\x45\x1B\xDE\x28\xC2\x6F\x22\xB2\x43'
+
+"Submarine Piece 5"
+b'\xE1\x92\x4C\x45\x33\xA1\xC8\x45\x5B\x02\x48\xC2\x71\x5D\xA1\x42'
+
+"Submarine Piece 6"
+b'\xEC\x41\x45\x45\x60\xE5\x82\xC3\xC2\x86\xDE\xC1\x25\xC6\x36\x43'
+
+"Submarine Piece 7"
+b'\xF6\x20\x46\x45\x5E\x7A\x98\xC3\x7C\x72\xCF\xC1\xAA\xE1\xAE\x43'
+
+"Submarine Piece 8"
+b'\xF6\xC4\x47\x45\x83\x00\xC2\xC3\x5C\x0F\xFD\xC1\xBE\x7F\x9B\x43'
+
+"Submarine Piece 9"
+b'\xEC\x6D\x48\x45\xFC\xB9\xCD\xC3\x3D\x1B\xE8\xC1\x7B\x54\x39\x43'
+
+"Submarine Piece 10"
+b'\x5C\xD7\xE4\x44\xC3\x4D\x36\xC5\xB7\x22\x12\xC2\xB0\x32\xFD\x42'
+
+"Submarine Piece 11"
+b'\x1F\xBD\xDD\x44\x1F\x5D\x39\xC5\xE0\x3E\x32\xC2\x4A\x4C\xB3\x42'
+
+"Submarine Piece 12"
+b'\x14\xD6\xDC\x44\xD7\x4F\x3B\xC5\x5D\x7E\x46\xC2\xD5\x48\x86\x43'
+
+"Submarine Piece 13"
+b'\x5C\x07\xA7\x44\xA4\x24\x3E\xC5\xAE\xB6\x90\xC1\x50\x6D\x7E\x43'
+
+"Submarine Piece 14"
+b'\xF6\x68\x90\x44\xA4\x38\x33\xC5\xCE\x08\x94\xC1\x30\xCC\x35\x42'
+
+"Submarine Piece 15"
+b'\x39\xE4\x6F\x44\xB8\x26\x32\xC5\x3D\x1B\xAA\xC1\x3F\x57\xDD\x41'
+
+"Submarine Piece 16"
+b'\x4C\x2F\x44\x44\x85\xA7\x33\xC5\x77\x95\x1F\xC1\x25\x35\xC2\x42'
+
+"Submarine Piece 17"
+b'\xAC\xBC\x64\x44\xC3\x01\x59\xC5\x93\x98\x8A\xC1\xB1\x81\xC4\x42'
+
+"Submarine Piece 18"
+b'\xC9\xFE\x2B\x44\xA4\x78\x57\xC5\xE0\x1C\xD5\xC1\xBA\xC9\x37\x43'
+
+"Submarine Piece 19"
+b'\x85\x4B\xB7\x43\xAE\x9F\x49\xC5\x31\x08\x9C\xC1\x04\xD6\x80\x43'
+
+"Submarine Piece 20"
+b'\x1B\x7F\x11\x44\x1F\xB5\x1A\xC5\x21\x3C\x14\xC1\x31\x5F\xE7\x40'
+
+"Submarine Piece 21"
+b'\xAC\x64\x1E\x44\x5C\x4B\x0A\xC5\xBA\xA0\xEF\xC0\xB6\xD3\x6F\x43'
+
+"Submarine Piece 22"
+b'\x98\xEE\x36\x43\xAE\x17\x0D\xC5\xDE\x3C\xFD\xBF\x6A\x9E\x35\x42'
+
+"Submarine Piece 23"
+b'\xA6\xE3\x2C\xC4\xCD\x1C\x31\xC5\x77\xBE\x6F\xC1\x29\xFC\x37\x43'
+
+"Submarine Piece 24"
+b'\x0A\xEB\x46\xC5\x8F\x12\x3C\x45\x70\xCE\x18\xC2\x8B\x7C\x90\x43'
+
+"Submarine Piece 25"
+b'\x00\xC4\x46\xC5\x8F\x9E\x3E\x45\x2C\x25\x1A\xC2\x56\x4E\x4B\x43'
+
+"Submarine Piece 26"
+b'\xC3\x01\x44\xC5\xC3\xA1\x62\x45\x5B\xB1\xD0\xC1\x52\xB8\x99\x42'
+
+"Submarine Piece 27"
+b'\x33\x53\x4B\xC5\xA4\x94\x65\x45\x02\xAB\x06\xC2\xC6\xCD\xC2\x42'
+
+"Submarine Piece 28"
+b'\x85\x3F\x4D\xC5\x14\xFE\x65\x45\x12\xC5\xA1\xC2\xE5\xB0\xA0\x43'
+
+"Submarine Piece 29"
+b'\x52\x00\x52\xC5\xE1\xC6\x67\x45\x2E\x9F\xBC\xC2\x27\xB1\x95\x43'
+
+"Submarine Piece 30"
+b'\xD7\x93\x54\xC5\xB8\x6E\x68\x45\xDC\xE6\xA7\xC2\x08\xCC\x7B\x43'
+
+
+"Epsilon Tract 1"
+b'\xCF\x57\xF9\x43\x52\x2C\xAF\x45\x3D\x7A\x47\x44\x46\x56\x71\x43'
+
+"Epsilon Tract 2"
+b'\x29\x30\x26\x45\x29\xE4\xA9\xC4\x42\x3E\x9D\xC1\x04\x16\x19\x43'
+
+"Epsilon Tract 3"
+b'\x8A\x30\xCE\x41\x1F\xEB\xEE\x45\x43\xAD\x96\x41\x22\x6E\xC7\x42'
+
+"Epsilon Tract 4"
+b'\x85\xCB\x82\xC3\x71\xDB\x93\x45\xC9\xF6\x08\x43\x44\x0B\x04\x43'
+
+"Epsilon Tract 5"
+b'\x5C\xF7\x40\xC4\x8B\x94\x2A\xC4\x60\xF6\xEE\x41\x10\xD8\x36\x43'
+
+"Epsilon Tract 6"
+b'\x14\xB6\xC8\xC4\x71\x5B\xA4\x45\x30\xBB\x05\x40\xFC\x29\x40\x43'
+
+"Epsilon Tract 7"
+b'\x52\x58\xE1\xC4\xF0\x77\xC8\x43\x9A\x99\xE1\x42\xE9\xC8\xD6\x41'
+
+"Epsilon Tract 8"
+b'\x89\x11\xF3\x43\x48\x7D\xAF\x45\x8D\x3F\x45\x44\xB8\x5E\x08\x42'
+
+"Epsilon Tract 9"
+b'\x51\xBA\x9C\xC2\xC9\x6E\x4C\xC4\x66\x16\xA3\x43\x35\xFE\x6F\x43'
+
+"Epsilon Tract 10"
+b'\xA4\x98\xD7\xC4\x93\xD8\x3A\xC3\x20\xA3\x68\x42\xAA\xD1\x2F\x43'
+
+
+"Peyote 1"
+b'\x48\x51\xA6\x44\x50\x25\x18\xC4\x26\x04\x95\x42\x00\x11\x26\x42'
+
+"Peyote 2"
+b'\x29\xBC\xB1\x44\xE1\x56\x23\xC5\x6A\xCD\x3E\x42\x8F\x02\x51\x43'
+
+"Peyote 3"
+b'\xB0\xFA\x0C\xC4\xC3\x31\x1B\xC5\x01\xDE\x86\xC1\xA0\x6A\xAD\x43'
+
+"Peyote 4"
+b'\xC3\xA5\x9F\xC3\x00\x58\xCE\xC4\x92\xCB\xFE\x41\x62\x30\x10\x43'
+
+"Peyote 5"
+b'\x29\x74\x91\xC4\x00\xB0\xF9\xC4\x00\x91\x52\x41\xCD\xCC\x65\x43'
+
+"Peyote 6"
+b'\x00\xB0\xA6\xC4\x48\x11\x85\xC4\x7E\x8C\x47\x41\x96\xE3\x13\x43'
+
+"Peyote 7"
+b'\xCD\xCC\xE6\xC4\x5C\x2F\x9D\xC4\xAC\x8B\xB4\xC1\x77\x6E\x98\x43'
+
+"Peyote 8"
+b'\x48\x61\xBA\xC2\x58\xE9\xA0\x43\x58\x99\x0E\x43\x56\xDD\x9F\x42'
+
+"Peyote 9"
+b'\x1B\x5F\xDB\x43\xF6\xF8\x43\x44\x68\x71\x41\x43\x8F\x62\x06\x43'
+
+"Peyote 10"
+b'\xFC\xA9\xE6\xC2\xE1\x82\xB2\x44\x0C\x42\x93\x43\x13\x81\x8D\x42'
+
+"Peyote 11"
+b'\xE1\xFA\x81\xC4\x66\x96\x5C\x44\x0E\xED\x21\x43\xE3\xE5\x5C\x43'
+
+"Peyote 12"
+b'\x0A\x17\xCA\xC4\x71\x75\x01\x45\x44\xE9\x9C\x42\x35\x5E\xA8\x43'
+
+"Peyote 13"
+b'\xB8\x7A\x33\xC5\x3D\x2E\x22\x45\x5E\x80\x1A\xC1\x1B\xAF\xD4\x42'
+
+"Peyote 14"
+b'\x85\x43\xFA\xC4\xE1\x0A\x5C\x45\xB1\x21\x65\x42\xA0\x1A\x42\x43'
+
+"Peyote 15"
+b'\x06\x71\x04\xC4\x71\xD5\x82\x45\x56\x4E\x40\x43\x88\x9D\x2F\x40'
+
+"Peyote 16"
+b'\xCD\xBB\xB2\x42\xA4\xDC\x86\x45\xB3\xEA\xAB\x41\xA7\x19\x89\x42'
+
+"Peyote 17"
+b'\x66\x96\x7A\xC4\x71\xA3\x8C\x45\xCF\xF7\x1D\x43\x9E\x6F\xCA\x42'
+
+"Peyote 18"
+b'\x3D\xCA\xFA\x43\xB8\x12\xAC\x45\x8D\xA7\x41\x44\x62\x30\x73\x43'
+
+"Peyote 19"
+b'\x52\xE8\x42\xC4\x48\xE3\xCE\x45\xED\x1E\x95\xC1\xE5\x50\xD7\x42'
+
+"Peyote 20"
+b'\x10\x18\x0F\x43\x85\x95\xD6\x45\x8C\xB9\xE2\x41\x9A\xF9\x09\x43'
+
+"Peyote 21"
+b'\xF6\x68\xB9\x44\xA4\x60\xBC\x45\x4C\xF7\x9B\x43\xAC\xCC\xB1\x43'
+
+"Peyote 22"
+b'\x0A\x07\x22\x45\x33\x57\xC0\x45\x35\xFE\x25\x43\x69\x00\x60\x41'
+
+"Peyote 23"
+b'\x48\x33\x82\x45\x9A\x1D\x5F\x45\xD7\x74\x40\xC2\x6B\x8B\xC6\x42'
+
+"Peyote 24"
+b'\x14\xB6\x12\x45\x8F\x5A\x1F\x45\xBA\xAB\x3A\x42\xC8\x24\x97\x3F'
+
+"Peyote 25"
+b'\xB0\xA2\x00\x44\xC3\x11\x3C\x45\x88\x23\x23\x42\xC3\x75\x3B\x42'
+
+"Peyote 26"
+b'\xA4\x20\xA3\x44\x5C\x87\x03\x45\x43\x8D\xA5\x42\x85\x7B\x9E\x43'
+
+"Peyote 27"
+b'\x48\x99\x50\x45\x00\xC0\x89\xC3\x37\x71\xA0\x40\xD9\x5D\x87\x42'
+
+
+"For Sale Sign 1"
+b'\x52\xB8\xC4\xC4\xB6\x73\xE0\x43\x48\xA1\xD7\x42\x52\xD8\x55\x43'
+
+"For Sale Sign 2"
+b'\x33\x03\xA9\xC4\x9A\xE1\x17\x44\xB6\xF3\x05\x43\x7F\x5A\xB1\x43'
+
+"For Sale Sign 3"
+b'\xD7\xFB\xB7\xC4\x85\x08\xF3\xC0\xD0\xF3\x58\x42\x85\x6B\x91\x43'
+
+"For Sale Sign 4"
+b'\x9A\xB9\xCB\xC4\xB4\xB8\xCF\xC3\x16\x3B\x20\x42\x6C\xB8\x46\x42'
+
+"For Sale Sign 5"
+b'\x71\xC5\xDC\xC4\xFA\x8E\xD5\xC3\x60\xE5\x29\x42\x4E\xB2\xAD\x43'
+
+"For Sale Sign 6"
+b'\x35\x0E\xC0\xC3\xC1\x0A\xD3\x43\x2F\xDD\xDB\x42\xD7\x83\x9E\x43'
+
+"For Sale Sign 7"
+b'\xAE\x07\x20\xC3\xEC\x51\x75\x44\x93\x38\x6B\x43\x24\x97\x4A\x41'
+
+"For Sale Sign 8"
+b'\xA6\x4B\xF7\xC3\xD5\x10\x14\x44\x81\xD5\xF6\x42\x89\xA1\x40\x43'
+
+"For Sale Sign 9"
+b'\xEC\xA9\x4B\xC4\x6A\xAC\xD9\x43\x37\x49\xB3\x42\x3C\x4E\xB9\x42'
+
+"For Sale Sign 10"
+b'\xD5\x88\x62\xC4\x60\xFD\x44\x44\xD5\x78\x39\x43\x5C\x0F\xD4\x42'
+
+"For Sale Sign 11"
+b'\x87\x36\x4E\xC4\xB4\xD9\xB5\xC1\x60\x65\x1D\x42\x93\xB8\x2C\x43'
+
+"For Sale Sign 12"
+b'\xB8\xF6\x88\xC4\x8B\xAC\x14\x44\x48\x21\xCE\x42\x44\x8B\x02\x43'
+
+"For Sale Sign 13"
+b'\xCD\x64\x9C\xC4\x00\x70\xF2\x43\xF0\x05\xBC\x42\x3B\x01\x29\x41'
+
+"For Sale Sign 14"
+b'\x00\x40\x1D\x43\x7B\x64\xF4\x43\x42\x00\x10\x43\x29\x7C\x6F\x43'
+
+"For Sale Sign 15"
+b'\xAE\x27\x91\xC4\xDD\x24\xA1\x43\x0F\xBC\x89\x42\xE1\x1A\x0B\x43'
+
+
+"Under the Bridge 1"
+b'\x5C\x4F\x30\x45\xAE\xA7\x9B\x45\xBF\x3D\x7E\x42\x0C\xD2\xB3\x43'
+
+"Under the Bridge 2"
+b'\x00\x90\x27\x45\xAE\x47\x97\x45\x5E\x0B\x33\x42\x47\xCA\x66\x3F'
+
+"Under the Bridge 3"
+b'\x33\x93\xF3\x44\x52\xB4\xC2\x45\x6E\x34\x31\x42\x74\xA4\xE8\x41'
+
+"Under the Bridge 4"
+b'\xD7\xF3\x86\xC4\xEC\xB7\x95\x45\x46\x76\x63\x43\x6D\x07\xB3\x43'
+
+"Under the Bridge 5"
+b'\x71\xB5\xEE\xC4\x14\x06\x90\x45\x37\x8E\xEC\x3F\xE3\xB6\xCC\x41'
+
+"Under the Bridge 6"
+b'\x39\xE4\x06\xC4\x9A\x73\x8A\x45\x6E\xA3\xF0\x41\xB8\x40\x26\x40'
+
+"Under the Bridge 7"
+b'\x14\x4E\x41\xC3\xF6\xDC\x83\x45\x4D\xF3\x33\x42\x91\x09\x08\x3E'
+
+"Under the Bridge 8"
+b'\xFC\xE9\x09\x43\x66\x7E\x55\x45\x72\xCA\x22\x42\xCF\xD7\xB3\x43'
+
+"Under the Bridge 9"
+b'\x72\xD9\xB5\x42\x48\xD1\x50\x45\x52\xC9\x0C\x42\x0C\x62\xB3\x43'
+
+"Under the Bridge 10"
+b'\x8D\x87\xD1\xC3\xB8\x0A\x39\x45\xCC\xDD\xF8\x41\xD7\x43\xB3\x43'
+
+"Under the Bridge 11"
+b'\x89\x01\x3D\xC3\x66\x32\x32\x45\x9B\x55\x03\x42\x74\xD2\x8B\x40'
+
+"Under the Bridge 12"
+b'\xC3\xC5\xB8\xC4\x48\x31\x26\x45\xD4\xD4\x1E\x40\xCD\xDC\xB3\x43'
+
+"Under the Bridge 13"
+b'\x14\x0E\xBC\xC4\x71\x09\x16\x45\x03\x09\xD3\x41\x58\x99\xB3\x43'
+
+"Under the Bridge 14"
+b'\x29\x30\x26\xC5\xCD\x50\x26\x45\xB9\x53\x86\x3F\x68\xA1\xB3\x43'
+
+"Under the Bridge 15"
+b'\x85\x0F\x41\xC5\x75\x43\x39\x44\xD1\x22\xA9\x41\x48\x61\xB3\x43'
+
+"Under the Bridge 16"
+b'\x68\xB1\x33\xC4\xB8\x66\xC0\xC4\x8A\xE3\x60\x3F\x93\x3A\xA9\x3F'
+
+"Under the Bridge 17"
+b'\x4A\x4C\x24\xC4\xCD\x04\xBD\xC4\xA5\x6B\xA6\x3F\x6F\x12\xAE\x43'
+
+"Under the Bridge 18"
+b'\x8F\x42\x13\xC4\x29\x24\xBA\xC4\xA4\x70\xC7\x40\x91\xDD\xB3\x43'
+
+"Under the Bridge 19"
+b'\x68\x81\xE5\xC3\x85\x9B\xC6\xC4\x6F\x12\x9B\x3F\xA8\xA6\xB3\x43'
+
+"Under the Bridge 20"
+b'\x68\x81\xBD\xC3\x5C\x9F\xD0\xC4\xA5\x14\xA0\x3F\xC7\xFB\xB3\x43'
+
+"Under the Bridge 21"
+b'\x2F\xFD\x32\xC3\xAE\x1F\xE2\xC4\x06\x47\xF5\x3F\xFA\x7E\xB3\x43'
+
+"Under the Bridge 22"
+b'\x0D\xF1\xF7\x41\x29\x10\x00\xC5\x8E\x75\x92\x41\x2F\xDD\xB3\x43'
+
+"Under the Bridge 23"
+b'\xD1\x52\x1D\xC4\x00\x58\x0A\xC5\x74\xD2\xC3\x40\x96\xB1\x65\x3F'
+
+"Under the Bridge 24"
+b'\x39\x34\x4C\x43\x7B\xA4\x12\xC5\xF3\x1F\xB0\x40\xE1\x1A\x73\x43'
+
+"Under the Bridge 25"
+b'\x29\xEC\xB4\x43\x7B\x8C\x0B\xC5\xDD\xB5\x2C\x41\x6D\xC7\x37\x43'
+
+"Under the Bridge 26"
+b'\x79\xE9\x10\x44\x0A\x7B\x1C\xC5\x22\x8E\x86\x41\xD9\xAE\x7C\x43'
+
+"Under the Bridge 27"
+b'\xF8\x8B\x13\x44\xE1\x26\x22\xC5\x3F\x57\xC6\x40\x3D\xCA\x5B\x43'
+
+"Under the Bridge 28"
+b'\x7D\xAF\x37\x44\x5C\xC7\x21\xC5\x5B\x53\x96\x41\x8D\xD7\xEB\x42'
+
+"Under the Bridge 29"
+b'\x54\xF3\x56\x44\xCD\xD4\x22\xC5\x3B\x70\x85\x40\x5A\x84\x5F\x43'
+
+"Under the Bridge 30"
+b'\xB8\x3E\x1B\x44\x0A\x0F\x00\xC5\xFE\x43\xEC\x41\xE1\xEA\xB3\x43'
+
+"Under the Bridge 31"
+b'\x73\x40\x25\x44\xF6\x60\xD9\xC4\x4C\xB7\xEB\x41\x9F\x02\x80\x3F'
+
+"Under the Bridge 32"
+b'\x87\xBE\x1D\x44\x14\x1E\xB5\xC4\x35\x6F\xF3\x41\xC5\x70\x69\x3F'
+
+"Under the Bridge 33"
+b'\xAE\x5F\x10\x44\x8F\x02\x96\xC4\xF9\x71\x28\x42\x81\x95\xB2\x43'
+
+"Under the Bridge 34"
+b'\xBE\x5F\x0E\x44\xB8\x9E\x7F\xC4\x38\x78\x14\x42\xBE\x5F\xB0\x43'
+
+"Under the Bridge 35"
+b'\xAA\xE1\x13\x44\xC7\x63\x54\xC4\xF2\xD2\x25\x42\x39\x84\x9A\x43'
+
+"Under the Bridge 36"
+b'\x79\xC1\x18\x44\x4C\x3F\x0E\xC4\xE7\x4C\x10\x42\x24\x0F\xC4\x3E'
+
+"Under the Bridge 37"
+b'\x5E\xC2\x31\x44\xE1\x8A\xE0\xC3\x87\x67\x1B\x42\xD2\x1A\x23\x3F'
+
+"Under the Bridge 38"
+b'\xEC\xE1\x94\x44\x48\x29\x91\xC4\x5B\x82\x4E\x42\xD8\x64\xA9\x3F'
+
+"Under the Bridge 39"
+b'\xAA\xC1\x72\x44\x2D\xC2\x51\xC4\xDD\xF5\x06\x42\xC3\xD5\xB3\x43'
+
+"Under the Bridge 40"
+b'\xE1\xDA\x80\x44\xBC\x2C\x74\xC4\x74\x64\x2D\x42\xB8\xAF\xEC\x41'
+
+"Under the Bridge 41"
+b'\x8F\xE2\x78\x44\x7F\x7A\xAC\xC3\xFD\xC7\x3E\x42\x2D\x32\xA8\x43'
+
+"Under the Bridge 42"
+b'\x9A\xA1\x84\x44\x93\xF8\x5A\xC3\x84\x2D\x8C\x42\x1B\xD8\xE6\x3F'
+
+"Under the Bridge 43"
+b'\xEC\x01\xEC\x44\x17\xA9\x37\xC4\x6D\xE5\xA9\x42\xD3\xED\x20\x43'
+
+"Under the Bridge 44"
+b'\x14\xFA\x13\x45\x7D\xFF\xDC\xC3\xF9\x8F\x91\x42\x1D\x38\x16\x42'
+
+"Under the Bridge 45"
+b'\x14\x46\x39\x45\xCD\x7C\x3D\x44\x5E\xBA\xE5\x3F\x9C\xD4\xB3\x43'
+
+"Under the Bridge 46"
+b'\xD7\x4F\x12\x45\x1F\x5D\x92\x44\x75\x42\x6F\x42\x64\x75\x33\x3F'
+
+"Under the Bridge 47"
+b'\x52\xF0\x0D\x45\xE1\x5A\x8D\x44\x23\x7B\x87\x42\xD2\x51\xF6\x3E'
+
+"Under the Bridge 48"
+b'\x33\x23\xE3\x44\xA4\x28\x00\x45\x64\xDD\x5F\x42\x2D\xF2\xA6\x43'
+
+"Under the Bridge 49"
+b'\xF6\x34\x20\x45\x48\xC5\x07\x45\xF7\x75\x98\x41\x42\x10\xAA\x43'
+
+"Under the Bridge 50"
+b'\xAE\xAF\x16\x45\xD7\x4F\x35\x45\x4A\xBB\x45\x42\x3B\xC7\xA0\x3F'
+
+
+"Stunt Jump 1"
+b'\x2B\xD8\x38\x42\x33\x3F\xCC\x45\xC0\x5B\xF7\x41\xA8\xA6\x19\x43'
+
+"Stunt Jump 2"
+b'\xBE\xDF\x37\xC3\x1F\xE9\xCC\x45\xB0\x72\x28\x41\xAC\xEC\x9D\x43'
+
+"Stunt Jump 3"
+b'\xF4\x7D\xF3\x43\x52\xBA\x86\x45\xA5\x3D\x5D\x42\xF5\x0A\x54\x42'
+
+"Stunt Jump 4"
+b'\x0A\x37\x6F\xC4\x9A\x47\x82\x45\xBA\xE9\x07\x43\x5D\xDC\x36\x42'
+
+"Stunt Jump 5"
+b'\x94\xBC\xEA\x3F\x5C\x27\xD5\x44\x21\x30\x62\x43\x0A\x47\xA0\x43'
+
+"Stunt Jump 6"
+b'\xE1\xFA\xB4\xC4\x4A\x7C\xD0\x43\x12\xC3\xDA\x42\x1D\x3A\x3D\x43'
+
+"Stunt Jump 7"
+b'\x7B\x5C\x87\xC4\x4E\xD1\x43\x41\x6D\x67\x49\x42\x48\xB1\x81\x43'
+
+"Stunt Jump 8"
+b'\x1F\xD5\xF9\xC4\xCF\x97\xA0\xC3\x8D\xE8\x3E\x42\xFE\x23\x83\x42'
+
+"Stunt Jump 9"
+b'\x9A\xD1\x31\xC4\x39\xD6\x40\xC2\x52\x78\x15\x42\x27\xB1\xEA\x42'
+
+"Stunt Jump 10"
+b'\x4E\x9A\x14\xC4\x44\xCB\xCA\xC2\xA3\xD2\x27\x42\xB0\xD2\x1E\x43'
+
+"Stunt Jump 11"
+b'\x10\x38\x6A\xC3\xD9\xAE\x52\xC3\xF5\xCA\x42\x42\xF2\xF2\x95\x42'
+
+"Stunt Jump 12"
+b'\x35\xBE\xDD\xC3\x27\x81\x0A\xC4\x19\x04\xCD\x41\x7D\x2F\xB3\x43'
+
+"Stunt Jump 13"
+b'\x11\x67\x9B\xC2\x9E\x7F\x06\xC4\xB7\x22\x1F\x42\x8A\xFF\x94\x42'
+
+"Stunt Jump 14"
+b'\xAE\x67\xC6\xC4\xC9\xA6\x3B\xC4\xBA\xDA\xA6\x41\x16\x7B\x81\x42'
+
+"Stunt Jump 15"
+b'\xFA\x86\x5A\xC4\xB6\x03\x54\xC4\x6D\x45\x96\x41\x9C\x84\xE2\x42'
+
+"Stunt Jump 16"
+b'\xF0\x77\x8F\xC3\x87\x96\x3F\xC4\xA1\x78\x53\x42\xE9\x86\x79\x43'
+
+"Stunt Jump 17"
+b'\xFE\x34\x1A\xC4\xAE\x4F\x86\xC4\x97\xFF\xAF\x41\x28\xFE\xA9\x42'
+
+"Stunt Jump 18"
+b'\x2B\xB7\xDB\xC3\xB8\x56\x93\xC4\xFA\xAD\x53\x42\x77\xDE\x27\x43'
+
+"Stunt Jump 19"
+b'\x21\x30\xE2\xC3\x9A\x69\xAC\xC4\x59\x17\xF1\x41\xC5\x80\x39\x43'
+
+"Stunt Jump 20"
+b'\x37\x41\x05\xC4\x29\x44\xB9\xC4\x53\x96\x36\x41\x21\x60\x81\x43'
+
+"Stunt Jump 21"
+b'\x21\x90\x0F\xC4\x3D\xAA\xBF\xC4\xF4\x70\x4E\x3F\xF7\xE6\x96\x42'
+
+"Stunt Jump 22"
+b'\x77\x1E\xD4\xC3\xEC\x79\xC3\xC4\x3A\x12\xC8\x41\x35\xBE\xAE\x43'
+
+"Stunt Jump 23"
+b'\x4E\xD2\x74\xC4\x7B\xAC\x1B\xC5\xB8\x40\x5C\x41\x3F\x75\x1C\x43'
+
+"Stunt Jump 24"
+b'\x62\x48\x57\xC4\x9A\xA5\x20\xC5\xCA\x32\x5A\x41\x93\x58\xAA\x43'
+
+"Stunt Jump 25"
+b'\x46\x96\x6F\xC4\xC3\xE5\x2C\xC5\x4A\x0C\x59\x41\x8F\x82\x17\x43'
+
+"Stunt Jump 26"
+b'\x8F\x02\xE1\x42\x85\x3B\x31\xC5\x01\xDE\xB3\x40\xDB\x85\xB4\x40'
+
+"Stunt Jump 27"
+b'\xE3\x65\xF2\x42\x8F\x6A\x37\xC5\xC6\xDC\xB3\x40\x79\x89\x3D\x43'
+
+"Stunt Jump 28"
+b'\xEC\xD1\xD8\x42\xAE\xE3\x47\xC5\xCA\xE0\xB3\x40\xCD\x6C\x3E\x43'
+
+"Stunt Jump 29"
+b'\xF2\x52\x27\x43\x29\xFC\x39\xC5\x09\x6D\xB0\x40\x7A\xA5\x5D\x41'
+
+"Stunt Jump 30"
+b'\x04\x96\x25\x43\x14\x66\x2E\xC5\xCA\xE0\xB3\x40\xEE\x0C\x9C\x43'
+
+"Stunt Jump 31"
+b'\x7B\x24\x91\x43\xD7\x27\x3D\xC5\x6D\x73\xB0\x40\xE7\x1D\x77\x41'
+
+"Stunt Jump 32"
+b'\xD9\x4E\x25\x44\x1F\xE5\x3B\xC5\x93\x52\xB5\x40\xEE\x7C\x86\x43'
+
+"Stunt Jump 33"
+b'\x98\x46\x47\x44\xE1\xDA\x35\xC5\xE5\xB3\xB0\x40\x2E\x70\xB9\x42'
+
+"Stunt Jump 34"
+b'\x66\xC6\xAF\x43\xC3\xC1\x24\xC5\x27\xF7\xBA\x40\x58\x39\x87\x43'
+
+"Stunt Jump 35"
+b'\xD1\xF2\xB2\x43\x1F\xF1\x1D\xC5\xB4\x59\xB1\x40\x54\x93\x92\x43'
+
+"Stunt Jump 36"
+b'\xF9\xF1\xC0\x42\x5C\xEF\x08\xC5\xD8\xF0\xB3\x40\x44\xEB\xB3\x42'
+
+"Stunt Jump 37"
+b'\x02\x82\xFD\x3F\xEC\xE9\x81\xC4\x59\x17\x17\x42\x32\xD5\x8F\x42'
+
+"Stunt Jump 38"
+b'\x10\x48\xC4\x43\x66\x0E\xD0\xC4\x5B\xB1\x3F\x42\xB6\x13\xA1\x43'
+
+"Stunt Jump 39"
+b'\xE1\x02\xBA\x44\xCD\x24\x0A\xC5\xFC\x78\x9A\x42\x9E\x2F\xFC\x42'
+
+"Stunt Jump 40"
+b'\x1F\x25\xDD\x43\xF6\x30\xAB\xC4\xE5\xB2\x2C\x42\x89\x41\x69\x43'
+
+"Stunt Jump 41"
+b'\x21\xC0\xBE\x43\xD7\x63\x90\xC4\x64\x4C\xE7\x41\xB2\x5D\xD3\x42'
+
+"Stunt Jump 42"
+b'\xC2\xC6\x2A\x42\x5A\xB4\x42\xC4\xB1\x10\x2F\x42\xDD\xA4\x77\x43'
+
+"Stunt Jump 43"
+b'\x52\x98\x97\x43\xF0\x97\x1A\xC4\x1D\x49\x2C\x42\x9A\x19\x7A\x43'
+
+"Stunt Jump 44"
+b'\x68\xA9\x0C\x44\x42\xC0\x11\xC4\xF3\x9F\x2F\x42\xEE\x9C\x40\x43'
+
+"Stunt Jump 45"
+b'\x33\x53\xF9\x44\xA4\xE8\xF0\x44\x62\x70\xB7\x42\x87\x47\x98\x42'
+
+"Stunt Jump 46"
+b'\xD7\xE3\xDE\x44\x33\x93\x00\x45\x73\xC8\x83\x42\xF4\x5D\x47\x43'
+
+"Stunt Jump 47"
+b'\xF6\xA8\xD1\x44\x8F\x56\x11\x45\x4A\x9B\x96\x42\x46\xEB\x4A\x40'
+
+"Stunt Jump 48"
+b'\xE1\x3A\xD2\x44\x3D\x8E\x44\x45\x18\xE6\x2D\x42\x52\xB8\xB6\x41'
+
+"Stunt Jump 49"
+b'\xCD\xD4\xCC\x44\xC3\x71\x61\x45\xB8\x5E\x0C\x42\x83\x40\xEE\x42'
+
+"Stunt Jump 50"
+b'\x14\xF6\x50\x45\xD7\xFD\xA0\x45\x71\x3D\x93\x41\xF0\x17\x8D\x43'
+
+
+"Pegassi Vacca"
+b'\x27\x42\x9D\xC2\x66\x56\xF8\x43\xFE\x74\x10\x43\x6F\x32\x6F\x43'
+
+"Benefactor Surano"
+b'\xAD\xDA\x82\xC2\xEE\x8C\x5D\x44\x91\xCD\x6B\x43\x1D\xB8\xD3\x41'
+
+"Declasse Tornado"
+b'\x9A\x41\x04\x44\x60\xE5\x27\xC3\xD9\x7D\x5C\x42\xEE\x2C\x83\x43'
+
+"Enus Super Diamond"
+b'\x0E\x8D\x35\xC4\x68\x51\xCA\xC3\x44\x0B\x0C\x42\xF0\xE7\x21\x43'
+
+"Dinka Double T"
+b'\x3D\xAA\xA5\xC4\x6F\x02\x83\x43\x67\x15\x7A\x42\x83\xF0\x86\x43'
+
+
+"Hidden Package 1"
+b'\x0E\x1D\x79\xC4\xCD\x54\xCC\x45\xC0\xEC\xF4\xC1\xBB\x27\xAA\x42'
+
+"Hidden Package 2"
+b'\xCD\xC4\x4A\xC5\xA4\x50\x65\x45\xAA\xE0\xFB\xC1\x85\x4B\x62\x43'
+
+"Hidden Package 3"
+b'\xD7\xBB\x46\xC5\x5C\x13\x3E\x45\xF1\x23\x0B\xC2\x9C\xA4\x35\x43'
+
+"Hidden Package 4"
+b'\xCD\x18\x31\xC5\xCF\x27\xE8\xC3\xE7\x0C\x9D\xC1\xFA\x1E\x15\x43'
+
+"Hidden Package 5"
+b'\x1F\x85\x04\xC3\xE1\x5E\x33\xC5\xC2\x17\xA2\xC1\xD9\x0E\xCE\x42'
+
+"Hidden Package 6"
+b'\x14\xAE\x84\x43\x00\x48\x0E\xC5\x46\x99\xA2\xC0\xA8\x06\x02\x43'
+
+"Hidden Package 7"
+b'\x66\x96\xDE\x44\x9A\x9D\x3A\xC5\x6A\x3C\x41\xC2\xF0\x56\x5D\x42'
+
+"Hidden Package 8"
+b'\x00\x2C\x28\x45\xA4\xB8\xAF\xC4\x87\xA7\xAA\xC1\x9E\x2F\x0E\x43'
+
+"Hidden Package 9"
+b'\x48\xE5\x45\x45\x5E\xCA\x9B\xC3\x68\x22\x43\xC1\x0C\x1F\xE1\x3F'
+
+"Hidden Package 10"
+b'\xE1\xA6\x84\x45\x14\x36\x61\x45\x9F\x3C\x2F\xC2\x6F\xD2\x10\x43'
+
+"Hidden Package 11"
+b'\xCD\x10\x4C\x45\x1F\x49\xC8\x45\x01\xDE\x41\xC2\xF8\x93\x80\x43'
+
+"Hidden Package 12"
+b'\x48\x29\x8F\xC4\x29\x78\x99\x45\x10\xF8\x5C\x43\xCD\x0C\x30\x43'
+
+"Hidden Package 13"
+b'\xC3\xC5\x86\xC4\xE1\x16\x99\x45\x60\x45\x56\x43\xC9\xB6\x85\x43'
+
+
+"Letter Scrap 1"
+b'\xAE\xC7\x7F\x44\x71\x21\x3D\xC5\x71\x3D\x65\x41\x10\x78\x87\x43'
+
+"Letter Scrap 2"
+b'\x5C\xA7\x82\xC4\x0A\xD3\x2A\xC5\x24\x97\x5C\x41\xD3\x4D\xC8\x42'
+
+"Letter Scrap 3"
+b'\x8D\x77\x9E\xC2\x1F\x6D\x2A\xC5\xDC\xD7\x0B\x41\xDB\x6A\x84\x42'
+
+"Letter Scrap 4"
+b'\x66\x16\x66\xC4\xD7\xD3\x1D\xC5\x6F\x92\xBA\x41\x7B\xB4\x73\x43'
+
+"Letter Scrap 5"
+b'\xAE\x77\x3B\x44\x29\x5C\x0F\xC5\xD2\xEF\xA6\x41\x6D\x27\x1C\x43'
+
+"Letter Scrap 6"
+b'\xEC\xB9\xBC\x44\x9A\xED\x04\xC5\x78\x7C\x98\x42\x58\x90\x86\x3F'
+
+"Letter Scrap 7"
+b'\xB6\xB3\x95\x42\xCD\xAC\xF6\xC4\x93\xBA\xA6\x41\xAA\xF1\xA6\x43'
+
+"Letter Scrap 8"
+b'\x5D\xE0\x0A\xBF\xEC\xF9\xD8\xC4\x7B\x94\xFA\x41\x33\x13\xA0\x43'
+
+"Letter Scrap 9"
+b'\x29\xF4\xAC\xC4\x52\xC8\xAF\xC4\xD3\xD9\x33\x40\xA0\x2A\x95\x43'
+
+"Letter Scrap 10"
+b'\xCD\x1C\x33\x45\xAE\x0F\xAC\xC4\x9E\xB5\x17\x40\x19\x73\xD1\x41'
+
+"Letter Scrap 11"
+b'\x8F\xA2\x81\xC4\x0A\xCF\x9E\xC4\x12\x6B\xF1\x3F\x79\x29\x3B\x43'
+
+"Letter Scrap 12"
+b'\x52\x40\xE3\xC4\x0A\x2F\x96\xC4\x1A\x51\x99\x41\x7F\x2A\xB5\x42'
+
+"Letter Scrap 13"
+b'\x64\xA3\x20\x44\x33\x03\x81\xC4\x3C\xCE\x12\x42\x04\x96\x36\x43'
+
+"Letter Scrap 14"
+b'\x5C\x8F\xF1\xC2\x08\x7C\x74\xC4\xCD\x2C\x98\x43\x5A\xF4\x8C\x43'
+
+"Letter Scrap 15"
+b'\x33\x23\x9B\xC4\x77\xAE\xFE\xC3\x58\x68\x1A\x42\xBE\x6F\x95\x43'
+
+"Letter Scrap 16"
+b'\x7D\xF0\xA9\x42\xF8\x73\xDA\xC3\x83\x00\x10\x42\xC7\x6B\xA7\x43'
+
+"Letter Scrap 17"
+b'\xCD\x64\x89\x44\xF2\xD2\x51\xC3\xF5\xCA\x5F\x42\x3D\xCA\xCE\x42'
+
+"Letter Scrap 18"
+b'\x5C\xDF\xD7\xC4\xC5\x40\x46\xC3\x46\x76\x67\x42\xF4\x9D\x9C\x43'
+
+"Letter Scrap 19"
+b'\xFC\xE9\x85\x43\x06\x61\x45\xC3\x9B\x26\x77\x42\xC5\xC0\x01\x43'
+
+"Letter Scrap 20"
+b'\xD7\xB7\x3C\xC5\x9C\xF3\x15\x42\x82\xE2\x21\x41\x7E\x9D\x3D\x42'
+
+"Letter Scrap 21"
+b'\x17\x79\xAD\xC3\xD0\xC4\x50\x42\x93\xE9\x57\x42\x0E\x1D\xAC\x43'
+
+"Letter Scrap 22"
+b'\xF6\xC8\x83\x44\x98\xEE\x29\x43\x16\x7B\xB1\x42\xC9\x96\x0A\x43'
+
+"Letter Scrap 23"
+b'\x9A\xCD\x0F\xC5\x25\x86\x5A\x43\x1D\x9A\x27\x43\xE3\xA5\xE5\x42'
+
+"Letter Scrap 24"
+b'\xCF\xB7\x0C\xC3\x56\x5E\x58\x44\xB0\xB2\x68\x43\x17\xB9\x9F\x43'
+
+"Letter Scrap 25"
+b'\x7F\xFA\x2A\x44\xCD\x94\x96\x44\x9A\xA9\xAC\x43\xCC\xFF\x95\x42'
+
+"Letter Scrap 26"
+b'\x52\x98\xC1\xC4\xD7\xD3\xAC\x44\x75\x13\xFC\x42\x56\x6E\x26\x43'
+
+"Letter Scrap 27"
+b'\x17\x89\xD7\xC3\x00\xF0\xC7\x44\xD1\x42\xB2\x43\x98\x6E\x26\x43'
+
+"Letter Scrap 28"
+b'\x00\xCC\x40\x45\x14\x36\xCE\x44\xFD\xBC\x47\x40\xCD\x4C\xE9\x42'
+
+"Letter Scrap 29"
+b'\x77\x66\x15\xC4\xF6\xC8\x02\x45\xBA\x69\x03\x43\x4E\xC2\x79\x43'
+
+"Letter Scrap 30"
+b'\xA4\x80\x3F\x45\xF6\x88\x0A\x45\xAE\xF5\x49\x40\xD9\x2E\x2B\x43'
+
+"Letter Scrap 31"
+b'\xA2\x65\x36\x43\x1F\x55\x0D\x45\x7A\xF6\xB7\x42\xB4\xD9\xEC\x41'
+
+"Letter Scrap 32"
+b'\x5E\xFA\x67\x44\x0A\xE7\x18\x45\x64\x3B\x48\x42\x68\x11\x41\x43'
+
+"Letter Scrap 33"
+b'\xD7\xBF\x14\xC5\xA4\xB8\x25\x45\xD6\xAD\xC2\x3F\x7B\x14\xB0\x43'
+
+"Letter Scrap 34"
+b'\x54\xFB\x56\xC4\x33\x3F\x2C\x45\xD0\xD5\x5B\x41\xC3\x55\x15\x43'
+
+"Letter Scrap 35"
+b'\x83\xC0\x8F\xC3\x5C\x3F\x32\x45\x6B\x9A\x57\x42\x33\xD3\x1E\x43'
+
+"Letter Scrap 36"
+b'\xC7\x5B\x86\x43\x00\x30\x33\x45\x72\x59\x94\x42\x7F\xAA\xC8\x42'
+
+"Letter Scrap 37"
+b'\xCD\x4C\xA1\x44\x0A\x9F\x3B\x45\xB8\x6F\x64\x42\x6D\xA7\x83\x43'
+
+"Letter Scrap 38"
+b'\xB8\x2E\xC4\x44\xB8\x7A\x5F\x45\xA7\x68\x03\x42\xB2\x5D\xFA\x42'
+
+"Letter Scrap 39"
+b'\xCD\xDC\xC8\xC4\x5C\x7B\x85\x45\x1D\xDA\xD1\x42\x89\xF1\xB3\x43'
+
+"Letter Scrap 40"
+b'\x51\x14\xA9\xC0\x85\x6D\x87\x45\x25\x86\xFC\x41\x23\x5B\x90\x43'
+
+"Letter Scrap 41"
+b'\x8F\x6A\xA7\x44\x85\xAF\x86\x45\x78\x4B\x18\x42\x8D\x37\x0C\x43'
+
+"Letter Scrap 42"
+b'\xA6\xB3\x79\xC4\xA4\x98\x97\x45\x91\x4D\x89\x43\xA0\xFA\x95\x42'
+
+"Letter Scrap 43"
+b'\xAE\xDF\xEA\x44\x1F\xC3\x9E\x45\x6C\x89\x4C\x42\x33\x33\x0E\x43'
+
+"Letter Scrap 44"
+b'\xE1\xB2\x56\x45\x52\xE2\xA1\x45\x7E\x3A\xEC\x40\x31\xA8\x45\x43'
+
+"Letter Scrap 45"
+b'\xD9\x1E\x10\xC4\x00\x08\xAB\x45\x98\x6E\x70\x42\x31\xE8\x02\x43'
+
+"Letter Scrap 46"
+b'\x3F\x15\xE0\x43\xD7\x23\xAE\x45\x19\x4C\x43\x44\x22\x8E\xC1\x42'
+
+"Letter Scrap 47"
+b'\x35\x2E\xCB\xC3\x8F\x6C\xC5\x45\x21\xDF\x00\x42\x54\xB3\x98\x43'
+
+"Letter Scrap 48"
+b'\xAE\xE7\xB3\x44\x9A\x15\xC6\x45\x5B\xC2\xBF\x41\xB8\xBE\x32\x43'
+
+"Letter Scrap 49"
+b'\x66\x46\xB7\x44\x52\xC2\xCC\x45\x5B\x42\x5F\x41\xCF\x57\x80\x43'
+
+"Letter Scrap 50"
+b'\x61\xE3\x80\x42\x1F\x49\xD0\x45\x92\x4B\xFE\x41\x52\xF8\x62\x43'
+
+
+"Spaceship Part 1"
+b'\xD7\xFB\x97\xC4\x7B\x80\x5A\xC5\x0F\x0B\x5F\x41\x1B\x6F\xBF\x42'
+
+"Spaceship Part 2"
+b'\xDD\xFC\x1F\x44\x7B\x08\x4A\xC5\x0F\x9C\x7F\xC1\x73\xA8\xBA\x42'
+
+"Spaceship Part 3"
+b'\x1F\x65\xC6\x44\x29\xAC\x2F\xC5\xB5\x89\x53\x40\x1B\x9F\x87\x43'
+
+"Spaceship Part 4"
+b'\x06\x41\xA9\x43\x48\xDD\x2C\xC5\x94\x87\x2E\x42\xBC\xA3\xB0\x3D'
+
+"Spaceship Part 5"
+b'\x33\xCB\x8D\x44\x3D\x06\x23\xC5\x53\x05\x7A\x41\xA6\x5B\xB0\x43'
+
+"Spaceship Part 6"
+b'\x89\xA1\xB8\x43\x3D\x7E\x04\xC5\x69\xEF\x82\x41\x66\x36\xAA\x43'
+
+"Spaceship Part 7"
+b'\x3D\xBA\xD9\x44\xF6\xD8\xCA\xC4\x81\xD5\xE0\x42\xE9\x9D\x4A\x3F'
+
+"Spaceship Part 8"
+b'\xC5\x30\x91\x43\x14\x56\xB4\xC4\xBA\x09\x3A\x42\x93\xD8\x00\x43'
+
+"Spaceship Part 9"
+b'\xBA\x6B\x5F\x41\xB8\xC6\x97\xC4\x4E\xE2\xEA\x41\x25\xE6\x8B\x43'
+
+"Spaceship Part 10"
+b'\xEE\x7C\x61\xC4\x14\x4E\x91\xC4\xD8\x01\x03\x42\x04\x96\x50\x43'
+
+"Spaceship Part 11"
+b'\x66\xD6\x99\x44\x14\xF6\x89\xC4\x56\x3D\x0D\x42\x39\x24\x9B\x43'
+
+"Spaceship Part 12"
+b'\x97\xF0\xA7\x42\x33\x7B\x4B\x44\x7F\x4A\x56\x43\xE8\xCA\x93\x42'
+
+"Spaceship Part 13"
+b'\x9A\xF9\xED\xC4\xF6\x98\xAD\x44\xAE\xC7\x5A\x43\x5B\x53\xA7\x42'
+
+"Spaceship Part 14"
+b'\x50\x4D\xE9\x43\x77\x9E\x36\xC4\xC9\xE5\xDA\x41\x4C\x17\x84\x43'
+
+"Spaceship Part 15"
+b'\x5E\x5A\x4D\x43\xD7\x6B\x0E\xC4\x0A\x17\x01\x43\x70\x0E\xAB\x42'
+
+"Spaceship Part 16"
+b'\xD9\xAE\x20\x43\x0A\x5F\x0C\xC4\x16\xFB\xAF\x41\xF2\x92\x04\x43'
+
+"Spaceship Part 17"
+b'\x85\xC3\x93\xC4\x4A\xD4\x02\xC4\xE7\x3B\x23\x42\x8F\x22\x1F\x43'
+
+"Spaceship Part 18"
+b'\x8F\x42\x62\xC3\x9E\x4F\x6E\xC3\xAC\xED\x48\x42\x20\xE3\x10\x42'
+
+"Spaceship Part 19"
+b'\x96\xC3\xCB\xC3\x7D\x7F\x15\xC3\x6F\x12\x81\x42\x52\xB8\x29\x43'
+
+"Spaceship Part 20"
+b'\x3D\xB2\x92\xC4\x17\x37\x81\xC2\xA8\x75\x36\x42\x91\xAD\x05\x43'
+
+"Spaceship Part 21"
+b'\xAE\x1F\xD3\x44\xCB\x90\x21\x42\x4A\xEC\x1A\x43\x08\xAC\xDB\x42'
+
+"Spaceship Part 22"
+b'\x0A\x8F\xF5\x44\xE5\x40\x0A\x44\xC5\x80\x21\x43\x35\x0E\xA9\x43'
+
+"Spaceship Part 23"
+b'\x86\xDA\xB3\x41\x50\x2D\x20\x44\x44\x8B\x3E\x43\xFC\x29\x24\x43'
+
+"Spaceship Part 24"
+b'\xEC\x79\x35\x45\xDD\x9C\x47\x44\x30\xBB\x6D\x40\x96\x63\x1C\x43'
+
+"Spaceship Part 25"
+b'\x14\x66\xBF\xC4\x87\x4E\x59\x44\x33\xB3\x35\x43\x2A\xBA\x87\x41'
+
+"Spaceship Part 26"
+b'\x52\x18\xCC\xC3\xA4\xC0\x89\x44\x5A\x44\xA6\x43\xE5\x50\x7B\x43'
+
+"Spaceship Part 27"
+b'\x29\x70\x2F\xC5\x48\x49\xB5\x44\x73\xA8\xC9\x42\x56\xCE\xE8\x42'
+
+"Spaceship Part 28"
+b'\x1F\x55\x44\x45\xEC\xA9\x08\x45\xEF\x20\xB6\xC0\x02\x8B\x47\x43'
+
+"Spaceship Part 29"
+b'\xB0\x8A\x4C\x44\xB8\x6E\xE7\x44\x5A\x64\xF3\x42\xA2\x85\xCC\x42'
+
+"Spaceship Part 30"
+b'\x3D\x42\xF3\xC4\xA4\xA0\xF2\x44\x56\x2E\x24\x43\x68\xB1\x88\x43'
+
+"Spaceship Part 31"
+b'\xE1\x52\xB3\xC4\xAE\x4F\x05\x45\xC5\xFE\xDB\x41\x3F\x15\x04\x43'
+
+"Spaceship Part 32"
+b'\xA4\x00\xAB\x44\x14\x72\x08\x45\x4E\x71\xC3\x42\x73\x28\x2C\x43'
+
+"Spaceship Part 33"
+b'\x25\x06\x2A\x43\x48\x99\x0A\x45\x34\xA2\xB4\x42\x98\x5E\xA4\x43'
+
+"Spaceship Part 34"
+b'\xA2\xED\x5E\x44\x00\x6C\x33\x45\x53\xC5\x60\x42\x6A\xBC\xDE\x42'
+
+"Spaceship Part 35"
+b'\xD7\x83\xF5\x44\xC3\x85\x36\x45\x3B\x30\x66\x42\x8F\x53\x91\x41'
+
+"Spaceship Part 36"
+b'\xCF\xC7\xC2\xC3\xD7\x5B\x39\x45\x79\xD8\x94\x41\x00\x00\x1A\x43'
+
+"Spaceship Part 37"
+b'\x0C\xA2\x93\x42\x1F\xFD\x4C\x45\xB3\x0C\xFA\x41\xF4\x3D\xD5\x42'
+
+"Spaceship Part 38"
+b'\x85\xBB\xF0\x44\xF6\x14\x59\x45\x29\x4B\x4B\x42\x9E\xAF\xF4\x42'
+
+"Spaceship Part 39"
+b'\xD7\xFB\x11\xC4\x14\xA2\x5F\x45\x2D\x22\x85\x43\xE7\xAB\xAE\x43'
+
+"Spaceship Part 40"
+b'\x1F\x69\x1D\x45\xB8\xB2\x6C\x45\x78\x7A\x5A\x42\xBC\x74\xC8\x41'
+
+"Spaceship Part 41"
+b'\x3D\xC2\xB8\x44\x5C\x3B\x71\x45\x4D\x73\xC5\x41\xB0\x72\x7A\x43'
+
+"Spaceship Part 42"
+b'\x71\xC5\x03\xC4\x1F\xB5\x8A\x45\x5F\x58\x00\x42\x35\xDE\x02\x42'
+
+"Spaceship Part 43"
+b'\x3D\xAA\x6E\x45\x9A\xE1\x8A\x45\xD2\x3A\x34\x40\x3D\x8A\x5B\x43'
+
+"Spaceship Part 44"
+b'\x52\x20\xF3\xC4\xD7\x39\x8F\x45\xB0\x03\x40\x42\x98\x7E\x9B\x43'
+
+"Spaceship Part 45"
+b'\x14\x6A\x18\x45\x33\x71\x95\x45\xDE\x31\x0A\x42\x3F\x75\x10\x43'
+
+"Spaceship Part 46"
+b'\x48\xE1\xB3\xC4\xD7\x41\xA9\x45\x02\x9A\xC2\x41\x8B\xEC\xF4\x42'
+
+"Spaceship Part 47"
+b'\x00\x54\x09\x45\x3D\x00\xAF\x45\x1B\x9E\x56\x42\x8B\xEC\xF4\x42'
+
+"Spaceship Part 48"
+b'\x9C\x64\xFC\xC3\x1F\x03\xB1\x45\xBB\xE7\x44\x42\x2B\xA7\x9D\x43'
+
+"Spaceship Part 49"
+b'\x1F\x85\xBD\xC3\xE1\x3C\xBE\x45\xA8\x75\x1E\x42\x7F\x6A\xEA\x42'
+
+"Spaceship Part 50"
+b'\x42\xB0\xDB\x43\xC3\xED\xC9\x45\x35\xEF\xE5\x41\x77\x5E\x55\x43'
+
+
+"Monkey Mosaic 1"
+b'\x6A\x5C\x1E\x43\x14\x1E\x92\xC4\x21\x9F\xEA\x41\x56\xCE\x30\x43'
+
+"Monkey Mosaic 2"
+b'\xAE\xE7\x14\x43\xF6\x50\x94\xC4\xFE\xE5\xFA\x41\x4E\x12\xAA\x43'
+
+"Monkey Mosaic 3"
+b'\xD1\x12\xED\x43\xB8\x0E\xB8\xC4\x49\x5D\x0C\x42\xE2\xD8\xD9\x41'
+
+"Monkey Mosaic 4"
+b'\xB2\xDD\x4B\x43\x00\xC8\xFD\xC4\x8C\x5B\x92\x41\xE1\x2A\xA7\x43'
+
+"Monkey Mosaic 5"
+b'\x5C\x1F\x3D\x44\x66\x36\xE8\xC4\xB3\x2A\x45\x42\x89\x21\x13\x43'
+
+"Monkey Mosaic 6"
+b'\x52\xA0\xC4\x44\x52\x28\x05\xC5\xDE\x22\x9B\x42\xD7\x23\xD1\x42'
+
+"Monkey Mosaic 7"
+b'\xA4\x78\x9B\x44\x71\x69\x4F\xC5\x9A\xEB\xC0\x40\xBA\x49\xAA\x42'
+
+"Monkey Mosaic 8"
+b'\x73\xA8\x7A\x43\x29\x1C\x4F\xC5\x38\x4A\xB9\x40\x7A\xA5\x42\x41'
+
+"Monkey Mosaic 9"
+b'\x33\x23\xAC\xC3\xC3\x41\x0E\xC5\x36\x76\xF3\x40\xFF\x12\x80\x42'
+
+"Monkey Mosaic 10"
+b'\xB4\x68\x49\xC4\x66\xDE\x2B\xC5\x43\x1C\x5F\x41\xA2\x85\x8B\x42'
+
+"Monkey Mosaic 11"
+b'\x8F\x3A\x92\xC4\xB8\x86\xFE\xC4\x17\xB7\x58\x41\x0A\xC7\xA1\x43'
+
+"Monkey Mosaic 12"
+b'\x8B\x3C\xE8\xC3\x00\x18\xB5\xC4\xB5\x26\xA6\x41\x51\x5A\x54\x42'
+
+"Monkey Mosaic 13"
+b'\x29\xDC\x4B\xC4\x5C\x2F\x9D\xC4\x2E\x04\xB2\x40\x25\xB6\x9D\x43'
+
+"Monkey Mosaic 14"
+b'\x8F\x2A\xA0\xC4\xAE\xEF\xC9\xC4\xAD\xFA\x82\x40\xAE\xB7\xA5\x43'
+
+"Monkey Mosaic 15"
+b'\x42\x00\x6F\xC4\xAC\x74\x41\xC4\x74\x46\x84\x41\xC7\x8B\x1F\x43'
+
+"Monkey Mosaic 16"
+b'\x25\x46\xBE\xC2\x87\x1E\x3A\xC4\xE5\x61\x15\x42\x9C\x44\xF8\x42'
+
+"Monkey Mosaic 17"
+b'\x8F\xD2\x8C\x43\x29\x3C\xEE\xC3\x94\x76\x0A\x42\xA8\xA6\x5E\x43'
+
+"Monkey Mosaic 18"
+b'\x4E\x82\x0C\x44\xCD\x0C\x0A\xC4\xFB\x4B\xC6\x41\xAC\x8D\x9C\x42'
+
+"Monkey Mosaic 19"
+b'\x1F\x35\x8F\x44\x39\xAC\x26\xC4\x95\x54\x64\x42\x20\xA1\xB9\x42'
+
+"Monkey Mosaic 20"
+b'\x00\x40\x8C\x44\x71\x55\x9F\xC4\x08\x2C\xA6\x41\xFC\x39\x9F\x43'
+
+"Monkey Mosaic 21"
+b'\xCD\x08\x1F\x45\xE1\xAA\xC5\x43\xE7\x3B\xD9\x42\xDB\xC9\x81\x43'
+
+"Monkey Mosaic 22"
+b'\x9E\xA7\x13\x44\x21\x90\x0C\x43\x83\x80\xD0\x42\xD5\x28\xA3\x43'
+
+"Monkey Mosaic 23"
+b'\x54\xC3\xAB\x43\x0C\x12\xAD\x43\x87\x96\xD2\x42\x2A\x7A\xB4\x42'
+
+"Monkey Mosaic 24"
+b'\x30\x0A\xAF\x42\x79\x89\x54\x43\x85\x6B\xEC\x42\x78\x8B\x85\x42'
+
+"Monkey Mosaic 25"
+b'\x06\xA1\x12\xC3\x75\x93\x67\x43\x12\xE5\xBD\x42\x17\xF9\x29\x43'
+
+"Monkey Mosaic 26"
+b'\x0A\xD7\xE8\xC3\x24\x17\x93\xC1\xBD\xE3\x51\x42\x0E\x0D\x85\x43'
+
+"Monkey Mosaic 27"
+b'\x87\x96\xF8\xC3\xBA\x79\xE4\xC3\x3A\xE3\x00\x42\xC5\x20\x86\x43'
+
+"Monkey Mosaic 28"
+b'\xC3\x9D\x81\xC4\x75\xD3\x1F\xC3\xE0\x9C\x18\x42\xB2\xDD\x74\x43'
+
+"Monkey Mosaic 29"
+b'\x3D\x7A\xAC\xC4\x33\xD3\xB4\xC3\xDF\xCF\x28\x42\xC1\xDA\x99\x43'
+
+"Monkey Mosaic 30"
+b'\xE1\x72\xAB\xC4\x62\x50\x03\xC4\x39\xC5\xF2\x41\xEE\x2C\x9A\x43'
+
+"Monkey Mosaic 31"
+b'\x3D\x92\xAC\xC4\x1F\xC5\x61\xC4\x7A\xC7\x45\x41\x56\x8E\x0B\x43'
+
+"Monkey Mosaic 32"
+b'\x71\x7D\xE4\xC4\xE1\x82\x9E\xC4\x6F\xE4\x09\x41\x96\x43\x4B\x42'
+
+"Monkey Mosaic 33"
+b'\xF6\x48\xF2\xC4\x62\x80\xCB\xC3\x3A\xE3\x19\x42\x9A\x39\x08\x43'
+
+"Monkey Mosaic 34"
+b'\x8F\x7A\xD5\xC4\xE1\xDA\x83\xC3\xC0\xAC\x4F\x42\x17\x79\x4B\x43'
+
+"Monkey Mosaic 35"
+b'\xA4\xA8\xD1\xC4\x50\xED\x2C\x43\xFC\xD8\x78\x42\x5C\x0F\xFD\x41'
+
+"Monkey Mosaic 36"
+b'\x58\xD9\x6A\xC4\x39\xB4\xA7\x43\xF5\x39\x8F\x42\x19\x04\x1A\x43'
+
+"Monkey Mosaic 37"
+b'\xC7\x0B\xD3\xC3\xC3\x6D\x88\x44\x39\x44\xA6\x43\x48\x81\x6A\x43'
+
+"Monkey Mosaic 38"
+b'\xD7\x23\xF8\xC4\x71\x51\x8D\x45\x82\x73\x96\x41\x0C\x42\xE3\x42'
+
+"Monkey Mosaic 39"
+b'\x00\xD8\x89\xC4\x48\x6D\x2A\x45\x38\x67\x96\x41\x4A\xCC\x08\x43'
+
+"Monkey Mosaic 40"
+b'\xB2\xF5\x0A\x44\xAE\x2B\x2F\x45\xD9\x0E\x29\x42\xC3\x35\x3E\x43'
+
+"Monkey Mosaic 41"
+b'\x60\x65\xB1\x43\x14\x42\x54\x45\x15\x9D\x11\x42\xC9\x65\x80\x41'
+
+"Monkey Mosaic 42"
+b'\x17\x59\x5F\x44\x71\x11\x62\x45\xFB\x4B\x03\x42\xDB\xE9\xAB\x43'
+
+"Monkey Mosaic 43"
+b'\x33\x1B\xBD\x44\xD7\x0F\x5F\x45\x2D\xF2\x1A\x42\x60\x85\x04\x43'
+
+"Monkey Mosaic 44"
+b'\xC3\x0D\xEF\x44\xB8\x66\x69\x45\x92\x5C\x02\x42\xAE\x47\x95\x43'
+
+"Monkey Mosaic 45"
+b'\xAE\xD3\x15\x45\x48\x59\x44\x45\x42\xA0\x40\x42\xDA\x4C\x8A\x42'
+
+"Monkey Mosaic 46"
+b'\xC3\x8D\x55\x45\x14\xF2\x6B\x45\x5C\xCF\x05\x42\xF8\x53\x51\x43'
+
+"Monkey Mosaic 47"
+b'\x5C\xEF\xD7\x44\x66\x62\x95\x45\x52\xB8\x27\x42\x47\x72\x95\x42'
+
+"Monkey Mosaic 48"
+b'\x5C\xF7\xD0\x44\x66\x8A\x9B\x45\x27\x42\x29\x42\x1D\x1A\x51\x43'
+
+"Monkey Mosaic 49"
+b'\x02\x6B\x21\x43\x1F\x23\xD0\x45\xB7\x51\xFB\x41\xE3\x05\x06\x43'
+
+"Monkey Mosaic 50"
+b'\x48\xA1\x7A\xC3\xD7\xD3\xC2\x45\x4B\xEA\xFB\x41\x98\x4C\xD2\x41'
+
+
+"Nuclear Waste 1"
+b'\x8F\x2A\xB4\xC4\x14\x56\xB4\x45\xFA\x6D\xBA\xC1\x4E\x32\x9F\x43'
+
+"Nuclear Waste 2"
+b'\x0A\x7F\x9F\xC4\xCD\x94\xC3\x45\x7A\xC7\x03\xC2\x83\x70\x88\x43'
+
+"Nuclear Waste 3"
+b'\xF0\xCF\x41\xC4\x66\x08\xD2\x45\xB4\x48\xE3\xC1\xD3\xBC\xCC\x41'
+
+"Nuclear Waste 4"
+b'\x00\x00\x9B\x44\xA4\x62\xDD\x45\xAA\x51\x07\xC3\xDB\x39\x08\x43'
+
+"Nuclear Waste 5"
+b'\x00\x78\xB0\x44\x0A\x99\xD6\x45\xD6\x16\x01\xC2\xB4\x48\x5E\x43'
+
+"Nuclear Waste 6"
+b'\x85\xC3\xD4\x44\x14\x5A\xDA\x45\x5A\x84\x08\xC3\x8D\x97\x54\x42'
+
+"Nuclear Waste 7"
+b'\x8F\x0E\x1B\x45\xAE\xDF\xDA\x45\xBA\x09\x0E\xC3\xC9\x36\x79\x43'
+
+"Nuclear Waste 8"
+b'\xF6\x2C\x29\x45\x00\x82\xD9\x45\x6F\x72\x18\xC3\xCB\x01\x7B\x43'
+
+"Nuclear Waste 9"
+b'\x5C\xAF\x37\x45\x52\x58\xCC\x45\xE1\x8B\xC5\xC1\x73\x28\x7A\x43'
+
+"Nuclear Waste 10"
+b'\x3D\x66\x3E\x45\x1F\xDD\xCC\x45\xE6\xAE\xFF\xC1\x7B\x14\xFA\x42'
+
+"Nuclear Waste 11"
+b'\x0A\x6B\x73\x45\x14\x4E\x6D\x45\xF8\xC2\xB6\xC1\xCD\x6C\xB3\x42'
+
+"Nuclear Waste 12"
+b'\x52\x18\x6F\x45\xF6\xAC\x69\x45\x2C\xD4\x53\xC1\x35\x1E\x25\x43'
+
+"Nuclear Waste 13"
+b'\x14\x76\x81\x45\x0A\x9F\x6F\x45\x2C\xE5\x0F\xC2\xFC\x69\x48\x43'
+
+"Nuclear Waste 14"
+b'\x71\x6D\x2C\x45\x8F\xBA\x96\xC4\x68\x91\x8E\xC1\x96\xC3\x02\x43'
+
+"Nuclear Waste 15"
+b'\xA4\x7C\x47\x45\x8F\x9A\xCF\xC4\xDD\x84\x0D\xC3\x37\x49\x1E\x43'
+
+"Nuclear Waste 16"
+b'\x00\xE8\x06\x45\x71\xA5\x30\xC5\x19\x22\x3E\xC2\x7D\xF0\xB8\x42'
+
+"Nuclear Waste 17"
+b'\x66\xEE\xEA\x44\xAE\x43\x3C\xC5\x00\xEF\x36\xC2\x9D\x20\xAC\x42'
+
+"Nuclear Waste 18"
+b'\x33\x0F\x20\x45\x29\x94\x14\xC5\xC9\xF6\xE7\xC2\xC3\x53\x86\x42'
+
+"Nuclear Waste 19"
+b'\x00\xE8\xE5\xC4\x52\x88\x9E\xC4\xD2\x80\xAA\xC1\x91\x6D\xF4\x41'
+
+"Nuclear Waste 20"
+b'\x48\x69\xF3\xC4\x33\x63\x8C\xC4\x86\xB8\x03\xC2\x02\x6B\xE9\x42'
+
+"Nuclear Waste 21"
+b'\xA4\xC4\x10\xC5\x52\xB0\x83\xC4\xC5\x3E\x83\xC2\xE5\xB2\x28\x42'
+
+"Nuclear Waste 22"
+b'\xA4\xCC\x21\xC5\x04\x56\xEE\xC3\xF2\x30\xDF\xC1\x4A\x0C\x7C\x41'
+
+"Nuclear Waste 23"
+b'\xAE\xBB\x3E\xC5\x81\x75\x55\xC3\x61\x32\xAC\xC1\x5E\x9A\x8B\x43'
+
+"Nuclear Waste 24"
+b'\x00\x68\x55\xC5\x23\x63\x51\x44\x09\x8A\x11\xC1\x81\xD5\x31\x43'
+
+"Nuclear Waste 25"
+b'\xCD\x24\x47\xC5\xC3\x4D\x06\x45\xC6\x6D\xE5\xC1\x73\x28\x96\x43'
+
+"Nuclear Waste 26"
+b'\x33\x4F\x3C\xC5\xE1\x46\x34\x45\xD7\xA3\xDC\xC1\xA6\x7B\x67\x43'
+
+"Nuclear Waste 27"
+b'\x00\x04\x57\xC5\xEC\x75\x3F\x45\x6C\xC9\x4F\xC2\x75\xE3\xAA\x43'
+
+"Nuclear Waste 28"
+b'\xD7\x53\x51\xC5\xAE\x67\x5D\x45\x6E\x63\x67\xC2\xEE\xCC\xA1\x43'
+
+"Nuclear Waste 29"
+b'\x00\x98\x35\xC5\x00\x2E\x83\x45\x8D\xD7\xD8\xC2\xD0\x0A\xAE\x40'
+
+"Nuclear Waste 30"
+b'\xF6\xBC\x33\xC5\xEC\xE3\x85\x45\x9C\x84\x15\xC3\x14\x4E\x40\x43'
+
+
+
+{"name": "Submarine Piece 1", "values": [-914.682007, 6652.560059, -32.164799]},
+{"name": "Submarine Piece 2", "values": [-984.838989, 6700.549805, -40.932098]},
+{"name": "Submarine Piece 3", "values": [-1037.959961, 6732.390137, -98.948303]},
+{"name": "Submarine Piece 4", "values": [3239.340088, 6481.870117, -42.2169]},
+{"name": "Submarine Piece 5", "values": [3273.179932, 6420.149902, -50.0023]},
+{"name": "Submarine Piece 6", "values": [3156.120117, -261.791992, -27.8158]},
+{"name": "Submarine Piece 7", "values": [3170.060059, -304.955994, -25.930901]},
+{"name": "Submarine Piece 8", "values": [3196.310059, -388.003998, -31.6325]},
+{"name": "Submarine Piece 9", "values": [3206.870117, -411.453003, -29.0133]},
+{"name": "Submarine Piece 10", "values": [1830.72998, -2916.860107, -36.533901]},
+{"name": "Submarine Piece 11", "values": [1773.910034, -2965.820068, -44.561401]},
+{"name": "Submarine Piece 12", "values": [1766.689941, -2996.98999, -49.623402]},
+{"name": "Submarine Piece 13", "values": [1336.22998, -3042.290039, -18.089199]},
+{"name": "Submarine Piece 14", "values": [1155.280029, -2867.540039, -18.504299]},
+{"name": "Submarine Piece 15", "values": [959.565979, -2850.419922, -21.2633]},
+{"name": "Submarine Piece 16", "values": [784.739014, -2874.469971, -9.97399]},
+{"name": "Submarine Piece 17", "values": [914.947998, -3472.110107, -17.324499]},
+{"name": "Submarine Piece 18", "values": [687.981018, -3447.540039, -26.639099]},
+{"name": "Submarine Piece 19", "values": [366.589996, -3225.97998, -19.504]},
+{"name": "Submarine Piece 20", "values": [581.986023, -2475.320068, -9.26468]},
+{"name": "Submarine Piece 21", "values": [633.572998, -2212.709961, -7.48837]},
+{"name": "Submarine Piece 22", "values": [182.932007, -2257.47998, -1.97842]},
+{"name": "Submarine Piece 23", "values": [-691.557007, -2833.800049, -14.984]},
+{"name": "Submarine Piece 24", "values": [-3182.689941, 3009.159912, -38.201599]},
+{"name": "Submarine Piece 25", "values": [-3180.25, 3049.909912, -38.536301]},
+{"name": "Submarine Piece 26", "values": [-3136.110107, 3626.110107, -26.086599]},
+{"name": "Submarine Piece 27", "values": [-3253.199951, 3673.290039, -33.667]},
+{"name": "Submarine Piece 28", "values": [-3283.969971, 3679.879883, -80.884903]},
+{"name": "Submarine Piece 29", "values": [-3360.02002, 3708.429932, -94.310898]},
+{"name": "Submarine Piece 30", "values": [-3401.23999, 3718.919922, -83.950897]},
+
+
+{"name": "Epsilon Tract 1", "values": [498.686005, 5605.540039, 797.909973]},
+{"name": "Epsilon Tract 2", "values": [2659.01001, -1359.130005, -19.655399]},
+{"name": "Epsilon Tract 3", "values": [25.773701, 7645.390137, 18.8346]},
+{"name": "Epsilon Tract 4", "values": [-261.589996, 4731.430176, 136.964005]},
+{"name": "Epsilon Tract 5", "values": [-771.86499, -682.320984, 29.8703]},
+{"name": "Epsilon Tract 6", "values": [-1605.689941, 5259.430176, 2.08955]},
+{"name": "Epsilon Tract 7", "values": [-1802.76001, 400.937012, 112.800003]},
+{"name": "Epsilon Tract 8", "values": [486.136993, 5615.660156, 788.992981]},
+{"name": "Epsilon Tract 9", "values": [-78.363899, -817.731018, 326.174988]},
+{"name": "Epsilon Tract 10", "values": [-1724.77002, -186.845993, 58.159302]},
+
+
+{"name": "Peyote 1", "values": [1330.540039, -608.583008, 74.508102]},
+{"name": "Peyote 2", "values": [1421.880005, -2613.429932, 47.7006]},
+{"name": "Peyote 3", "values": [-563.916992, -2483.110107, -16.8584]},
+{"name": "Peyote 4", "values": [-319.295013, -1650.75, 31.8494]},
+{"name": "Peyote 5", "values": [-1163.630005, -1997.5, 13.1604]},
+{"name": "Peyote 6", "values": [-1333.5, -1064.540039, 12.4718]},
+{"name": "Peyote 7", "values": [-1846.400024, -1257.47998, -22.568199]},
+{"name": "Peyote 8", "values": [-93.190002, 321.822998, 142.598999]},
+{"name": "Peyote 9", "values": [438.743011, 783.890015, 193.442993]},
+{"name": "Peyote 10", "values": [-115.332001, 1428.089966, 294.515991]},
+{"name": "Peyote 11", "values": [-1039.839966, 882.349976, 161.925995]},
+{"name": "Peyote 12", "values": [-1616.719971, 2071.340088, 78.455597]},
+{"name": "Peyote 13", "values": [-2871.669922, 2594.889893, -9.65634]},
+{"name": "Peyote 14", "values": [-2002.109985, 3520.679932, 57.282902]},
+{"name": "Peyote 15", "values": [-529.765991, 4186.680176, 192.306]},
+{"name": "Peyote 16", "values": [89.366798, 4315.580078, 21.489599]},
+{"name": "Peyote 17", "values": [-1002.349976, 4500.430176, 157.968002]},
+{"name": "Peyote 18", "values": [501.579987, 5506.339844, 774.617981]},
+{"name": "Peyote 19", "values": [-779.630005, 6620.410156, -18.6401]},
+{"name": "Peyote 20", "values": [143.093994, 6866.689941, 28.340599]},
+{"name": "Peyote 21", "values": [1483.280029, 6028.080078, 311.932007]},
+{"name": "Peyote 22", "values": [2592.439941, 6154.899902, 165.992996]},
+{"name": "Peyote 23", "values": [4166.410156, 3569.850098, -48.114101]},
+{"name": "Peyote 24", "values": [2347.379883, 2549.659912, 46.667702]},
+{"name": "Peyote 25", "values": [514.541992, 3009.110107, 40.784698]},
+{"name": "Peyote 26", "values": [1305.02002, 2104.459961, 82.775902]},
+{"name": "Peyote 27", "values": [3337.580078, -275.5, 5.01382]},
+
+
+{"name": "For Sale Sign 1", "values": [-1573.76001, 448.903992, 107.815002]},
+{"name": "For Sale Sign 2", "values": [-1352.099976, 607.525024, 133.951996]},
+{"name": "For Sale Sign 3", "values": [-1471.869995, -7.59479, 54.238098]},
+{"name": "For Sale Sign 4", "values": [-1629.800049, -415.442993, 40.057701]},
+{"name": "For Sale Sign 5", "values": [-1766.170044, -427.117004, 42.473999]},
+{"name": "For Sale Sign 6", "values": [-384.110992, 422.084015, 109.931999]},
+{"name": "For Sale Sign 7", "values": [-160.029999, 981.280029, 235.220993]},
+{"name": "For Sale Sign 8", "values": [-494.591003, 592.263, 123.417]},
+{"name": "For Sale Sign 9", "values": [-814.655029, 435.346985, 89.642998]},
+{"name": "For Sale Sign 10", "values": [-906.138, 787.958984, 185.472]},
+{"name": "For Sale Sign 11", "values": [-824.85199, -22.7313, 39.348999]},
+{"name": "For Sale Sign 12", "values": [-1095.709961, 594.695984, 103.065002]},
+{"name": "For Sale Sign 13", "values": [-1251.150024, 484.875, 94.011597]},
+{"name": "For Sale Sign 14", "values": [157.25, 488.785004, 144.001007]},
+{"name": "For Sale Sign 15", "values": [-1161.23999, 322.287994, 68.867302]},
+
+
+{"name": "Under the Bridge 1", "values": [2820.959961, 4980.959961, 63.560299]},
+{"name": "Under the Bridge 2", "values": [2681.0, 4840.959961, 44.761101]},
+{"name": "Under the Bridge 3", "values": [1948.599976, 6230.540039, 44.301201]},
+{"name": "Under the Bridge 4", "values": [-1079.619995, 4790.990234, 227.462006]},
+{"name": "Under the Bridge 5", "values": [-1909.670044, 4608.759766, 1.84809]},
+{"name": "Under the Bridge 6", "values": [-539.565979, 4430.450195, 30.0798]},
+{"name": "Under the Bridge 7", "values": [-193.304993, 4219.620117, 44.987598]},
+{"name": "Under the Bridge 8", "values": [137.914001, 3415.899902, 40.697701]},
+{"name": "Under the Bridge 9", "values": [90.924698, 3341.080078, 35.196602]},
+{"name": "Under the Bridge 10", "values": [-419.05899, 2960.669922, 31.108299]},
+{"name": "Under the Bridge 11", "values": [-189.005997, 2851.149902, 32.833599]},
+{"name": "Under the Bridge 12", "values": [-1478.180054, 2659.080078, 2.48174]},
+{"name": "Under the Bridge 13", "values": [-1504.439941, 2400.590088, 26.3794]},
+{"name": "Under the Bridge 14", "values": [-2659.01001, 2661.050049, 1.04943]},
+{"name": "Under the Bridge 15", "values": [-3088.969971, 741.054016, 21.142]},
+{"name": "Under the Bridge 16", "values": [-718.771973, -1539.209961, 0.878472]},
+{"name": "Under the Bridge 17", "values": [-657.192017, -1512.150024, 1.30016]},
+{"name": "Under the Bridge 18", "values": [-589.039978, -1489.130005, 6.2325]},
+{"name": "Under the Bridge 19", "values": [-459.010986, -1588.859985, 1.2115]},
+{"name": "Under the Bridge 20", "values": [-379.010986, -1668.97998, 1.25063]},
+{"name": "Under the Bridge 21", "values": [-178.988998, -1808.98999, 1.91623]},
+{"name": "Under the Bridge 22", "values": [30.992701, -2049.01001, 18.3074]},
+{"name": "Under the Bridge 23", "values": [-629.294006, -2213.5, 6.11944]},
+{"name": "Under the Bridge 24", "values": [204.203995, -2346.280029, 5.5039]},
+{"name": "Under the Bridge 25", "values": [361.845001, -2232.780029, 10.7944]},
+{"name": "Under the Bridge 26", "values": [579.64801, -2503.689941, 16.819401]},
+{"name": "Under the Bridge 27", "values": [590.187012, -2594.429932, 6.19815]},
+{"name": "Under the Bridge 28", "values": [734.742004, -2588.459961, 18.790701]},
+{"name": "Under the Bridge 29", "values": [859.802002, -2605.300049, 4.16995]},
+{"name": "Under the Bridge 30", "values": [620.97998, -2048.939941, 29.533199]},
+{"name": "Under the Bridge 31", "values": [661.007019, -1739.030029, 29.4645]},
+{"name": "Under the Bridge 32", "values": [630.97699, -1448.939941, 30.4293]},
+{"name": "Under the Bridge 33", "values": [577.494995, -1200.079956, 42.111301]},
+{"name": "Under the Bridge 34", "values": [569.495972, -1022.47998, 37.117401]},
+{"name": "Under the Bridge 35", "values": [591.526001, -849.559021, 41.456001]},
+{"name": "Under the Bridge 36", "values": [611.02301, -568.989014, 36.0751]},
+{"name": "Under the Bridge 37", "values": [711.036987, -449.084991, 38.851101]},
+{"name": "Under the Bridge 38", "values": [1191.060059, -1161.290039, 51.6273]},
+{"name": "Under the Bridge 39", "values": [971.026001, -839.033997, 33.740101]},
+{"name": "Under the Bridge 40", "values": [1030.839966, -976.698975, 43.348099]},
+{"name": "Under the Bridge 41", "values": [995.539978, -344.957001, 47.695301]},
+{"name": "Under the Bridge 42", "values": [1061.050049, -218.970993, 70.088898]},
+{"name": "Under the Bridge 43", "values": [1888.060059, -734.642029, 84.948097]},
+{"name": "Under the Bridge 44", "values": [2367.629883, -441.996002, 72.781197]},
+{"name": "Under the Bridge 45", "values": [2964.379883, 757.950012, 1.79475]},
+{"name": "Under the Bridge 46", "values": [2340.98999, 1170.910034, 59.814899]},
+{"name": "Under the Bridge 47", "values": [2271.02002, 1130.839966, 67.740501]},
+{"name": "Under the Bridge 48", "values": [1817.099976, 2050.540039, 55.966202]},
+{"name": "Under the Bridge 49", "values": [2563.310059, 2172.330078, 19.0576]},
+{"name": "Under the Bridge 50", "values": [2410.97998, 2900.98999, 49.432899]},
+
+
+{"name": "Stunt Jump 1", "values": [46.211102, 6535.899902, 30.9198]},
+{"name": "Stunt Jump 2", "values": [-183.873993, 6557.140137, 10.528]},
+{"name": "Stunt Jump 3", "values": [486.984009, 4311.290039, 55.3102]},
+{"name": "Stunt Jump 4", "values": [-956.859985, 4168.950195, 135.912994]},
+{"name": "Stunt Jump 5", "values": [1.83388, 1705.22998, 226.188004]},
+{"name": "Stunt Jump 6", "values": [-1447.839966, 416.971008, 109.380997]},
+{"name": "Stunt Jump 7", "values": [-1082.890015, 12.2386, 50.351002]},
+{"name": "Stunt Jump 8", "values": [-1998.660034, -321.186005, 47.7271]},
+{"name": "Stunt Jump 9", "values": [-711.275024, -48.209202, 37.3675]},
+{"name": "Stunt Jump 10", "values": [-594.411011, -101.397003, 41.9557]},
+{"name": "Stunt Jump 11", "values": [-234.218994, -210.682999, 48.6982]},
+{"name": "Stunt Jump 12", "values": [-443.485992, -554.018005, 25.627001]},
+{"name": "Stunt Jump 13", "values": [-77.701302, -537.994019, 39.783901]},
+{"name": "Stunt Jump 14", "values": [-1587.23999, -750.606018, 20.8568]},
+{"name": "Stunt Jump 15", "values": [-874.109009, -848.057983, 18.783899]},
+{"name": "Stunt Jump 16", "values": [-286.937012, -766.35199, 52.867802]},
+{"name": "Stunt Jump 17", "values": [-616.828003, -1074.48999, 21.9998]},
+{"name": "Stunt Jump 18", "values": [-439.431, -1178.709961, 52.919899]},
+{"name": "Stunt Jump 19", "values": [-452.376007, -1379.300049, 30.1364]},
+{"name": "Stunt Jump 20", "values": [-533.018982, -1482.130005, 11.4117]},
+{"name": "Stunt Jump 21", "values": [-574.252014, -1533.319946, 0.806411]},
+{"name": "Stunt Jump 22", "values": [-424.238007, -1563.810059, 25.0089]},
+{"name": "Stunt Jump 23", "values": [-979.286011, -2490.780029, 13.7658]},
+{"name": "Stunt Jump 24", "values": [-861.130981, -2570.350098, 13.6374]},
+{"name": "Stunt Jump 25", "values": [-958.348022, -2766.360107, 13.5655]},
+{"name": "Stunt Jump 26", "values": [112.504997, -2835.719971, 5.62085]},
+{"name": "Stunt Jump 27", "values": [121.198997, -2934.659912, 5.6207]},
+{"name": "Stunt Jump 28", "values": [108.410004, -3198.22998, 5.62119]},
+{"name": "Stunt Jump 29", "values": [167.324005, -2975.76001, 5.51331]},
+{"name": "Stunt Jump 30", "values": [165.585999, -2790.379883, 5.62119]},
+{"name": "Stunt Jump 31", "values": [290.285004, -3026.48999, 5.51409]},
+{"name": "Stunt Jump 32", "values": [661.231995, -3006.320068, 5.66633]},
+{"name": "Stunt Jump 33", "values": [797.103027, -2909.679932, 5.52196]},
+{"name": "Stunt Jump 34", "values": [351.549988, -2636.110107, 5.84267]},
+{"name": "Stunt Jump 35", "values": [357.897003, -2527.070068, 5.5422]},
+{"name": "Stunt Jump 36", "values": [96.472603, -2190.959961, 5.62315]},
+{"name": "Stunt Jump 37", "values": [1.98053, -1039.310059, 37.7728]},
+{"name": "Stunt Jump 38", "values": [392.562988, -1664.449951, 47.923199]},
+{"name": "Stunt Jump 39", "values": [1488.089966, -2210.300049, 77.236298]},
+{"name": "Stunt Jump 40", "values": [442.290009, -1369.530029, 43.174702]},
+{"name": "Stunt Jump 41", "values": [381.501007, -1155.119995, 28.9123]},
+{"name": "Stunt Jump 42", "values": [42.694099, -778.817993, 43.7663]},
+{"name": "Stunt Jump 43", "values": [303.190002, -618.374023, 43.0714]},
+{"name": "Stunt Jump 44", "values": [562.646973, -583.004028, 43.9062]},
+{"name": "Stunt Jump 45", "values": [1994.599976, 1927.27002, 91.719498]},
+{"name": "Stunt Jump 46", "values": [1783.119995, 2057.199951, 65.891502]},
+{"name": "Stunt Jump 47", "values": [1677.280029, 2325.409912, 75.303299]},
+{"name": "Stunt Jump 48", "values": [1681.839966, 3144.889893, 43.474701]},
+{"name": "Stunt Jump 49", "values": [1638.650024, 3607.110107, 35.092499]},
+{"name": "Stunt Jump 50", "values": [3343.379883, 5151.72998, 18.405001]},
+
+
+{"name": "Pegassi Vacca", "values": [-78.629204, 496.674988, 144.457001]},
+{"name": "Benefactor Surano", "values": [-65.427101, 886.202026, 235.802994]},
+{"name": "Declasse Tornado", "values": [529.025024, -167.895996, 55.122898]},
+{"name": "Enus Super Diamond", "values": [-726.203979, -404.635986, 35.011002]},
+{"name": "Dinka Double T", "values": [-1325.319946, 262.019012, 62.520901]},
+
+
+{"name": "Hidden Package 1", "values": [-996.453979, 6538.600098, -30.615601]},
+{"name": "Hidden Package 2", "values": [-3244.300049, 3669.040039, -31.484699]},
+{"name": "Hidden Package 3", "values": [-3179.73999, 3041.209961, -34.785099]},
+{"name": "Hidden Package 4", "values": [-2833.550049, -464.311005, -19.6313]},
+{"name": "Hidden Package 5", "values": [-132.520004, -2869.929932, -20.2616]},
+{"name": "Hidden Package 6", "values": [265.359985, -2276.5, -5.08121]},
+{"name": "Hidden Package 7", "values": [1780.699951, -2985.850098, -48.308998]},
+{"name": "Hidden Package 8", "values": [2690.75, -1405.77002, -21.3318]},
+{"name": "Hidden Package 9", "values": [3166.330078, -311.580994, -12.1959]},
+{"name": "Hidden Package 10", "values": [4244.859863, 3603.379883, -43.8092]},
+{"name": "Hidden Package 11", "values": [3265.050049, 6409.140137, -48.466801]},
+{"name": "Hidden Package 12", "values": [-1145.290039, 4911.02002, 220.968994]},
+{"name": "Hidden Package 13", "values": [-1078.180054, 4898.859863, 214.270996]},
+
+
+{"name": "Letter Scrap 1", "values": [1023.119995, -3026.090088, 14.3275]},
+{"name": "Letter Scrap 2", "values": [-1045.22998, -2733.189941, 13.7869]},
+{"name": "Letter Scrap 3", "values": [-79.233498, -2726.820068, 8.7402]},
+{"name": "Letter Scrap 4", "values": [-920.349976, -2525.23999, 23.321501]},
+{"name": "Letter Scrap 5", "values": [749.869995, -2293.76001, 20.8671]},
+{"name": "Letter Scrap 6", "values": [1509.810059, -2126.850098, 76.243103]},
+{"name": "Letter Scrap 7", "values": [74.850998, -1973.400024, 20.841101]},
+{"name": "Letter Scrap 8", "values": [-0.542486, -1735.810059, 31.3225]},
+{"name": "Letter Scrap 9", "values": [-1383.630005, -1406.26001, 2.81017]},
+{"name": "Letter Scrap 10", "values": [2865.800049, -1376.48999, 2.37046]},
+{"name": "Letter Scrap 11", "values": [-1037.079956, -1270.469971, 1.88608]},
+{"name": "Letter Scrap 12", "values": [-1818.01001, -1201.469971, 19.1646]},
+{"name": "Letter Scrap 13", "values": [642.552979, -1032.099976, 36.701401]},
+{"name": "Letter Scrap 14", "values": [-120.779999, -977.937988, 304.350006]},
+{"name": "Letter Scrap 15", "values": [-1241.099976, -509.363007, 38.601898]},
+{"name": "Letter Scrap 16", "values": [84.969704, -436.906006, 36.0005]},
+{"name": "Letter Scrap 17", "values": [1099.150024, -209.824005, 55.9482]},
+{"name": "Letter Scrap 18", "values": [-1726.97998, -198.253006, 57.865501]},
+{"name": "Letter Scrap 19", "values": [267.828003, -197.378998, 61.787701]},
+{"name": "Letter Scrap 20", "values": [-3019.48999, 37.4879, 10.1178]},
+{"name": "Letter Scrap 21", "values": [-346.946014, 52.1922, 53.9781]},
+{"name": "Letter Scrap 22", "values": [1054.280029, 169.932007, 88.740402]},
+{"name": "Letter Scrap 23", "values": [-2300.850098, 218.524002, 167.602005]},
+{"name": "Letter Scrap 24", "values": [-140.718002, 865.473999, 232.697998]},
+{"name": "Letter Scrap 25", "values": [683.914001, 1204.650024, 345.325012]},
+{"name": "Letter Scrap 26", "values": [-1548.76001, 1382.619995, 126.038002]},
+{"name": "Letter Scrap 27", "values": [-431.071014, 1599.5, 356.522003]},
+{"name": "Letter Scrap 28", "values": [3084.75, 1649.689941, 3.12091]},
+{"name": "Letter Scrap 29", "values": [-597.601013, 2092.560059, 131.412994]},
+{"name": "Letter Scrap 30", "values": [3064.040039, 2216.560059, 3.15562]},
+{"name": "Letter Scrap 31", "values": [182.397003, 2261.320068, 91.9814]},
+{"name": "Letter Scrap 32", "values": [927.911987, 2446.439941, 50.057999]},
+{"name": "Letter Scrap 33", "values": [-2379.98999, 2651.540039, 1.52093]},
+{"name": "Letter Scrap 34", "values": [-859.927002, 2755.949951, 13.7397]},
+{"name": "Letter Scrap 35", "values": [-287.503998, 2851.959961, 53.900799]},
+{"name": "Letter Scrap 36", "values": [268.71701, 2867.0, 74.174698]},
+{"name": "Letter Scrap 37", "values": [1290.400024, 3001.939941, 57.1091]},
+{"name": "Letter Scrap 38", "values": [1569.459961, 3575.669922, 32.8522]},
+{"name": "Letter Scrap 39", "values": [-1606.900024, 4271.419922, 104.926003]},
+{"name": "Letter Scrap 40", "values": [-5.28373, 4333.689941, 31.5655]},
+{"name": "Letter Scrap 41", "values": [1339.329956, 4309.939941, 38.0737]},
+{"name": "Letter Scrap 42", "values": [-998.807007, 4851.080078, 274.605988]},
+{"name": "Letter Scrap 43", "values": [1878.98999, 5080.390137, 51.134201]},
+{"name": "Letter Scrap 44", "values": [3435.179932, 5180.290039, 7.38214]},
+{"name": "Letter Scrap 45", "values": [-576.481995, 5473.0, 60.108002]},
+{"name": "Letter Scrap 46", "values": [448.165985, 5572.47998, 781.189026]},
+{"name": "Letter Scrap 47", "values": [-406.360992, 6317.569824, 32.217899]},
+{"name": "Letter Scrap 48", "values": [1439.23999, 6338.700195, 23.9699]},
+{"name": "Letter Scrap 49", "values": [1466.199951, 6552.290039, 13.9537]},
+{"name": "Letter Scrap 50", "values": [64.444099, 6665.140137, 31.7869]},
+
+
+{"name": "Spaceship Part 1", "values": [-1215.869995, -3496.030029, 13.9402]},
+{"name": "Spaceship Part 2", "values": [639.950989, -3232.530029, -15.9756]},
+{"name": "Spaceship Part 3", "values": [1587.160034, -2810.76001, 3.30528]},
+{"name": "Spaceship Part 4", "values": [338.507996, -2765.830078, 43.632401]},
+{"name": "Spaceship Part 5", "values": [1134.349976, -2608.389893, 15.6263]},
+{"name": "Spaceship Part 6", "values": [369.261993, -2119.889893, 16.366899]},
+{"name": "Spaceship Part 7", "values": [1741.819946, -1622.780029, 112.417]},
+{"name": "Spaceship Part 8", "values": [290.381012, -1442.689941, 46.509499]},
+{"name": "Spaceship Part 9", "values": [13.9638, -1214.209961, 29.3605]},
+{"name": "Spaceship Part 10", "values": [-901.952026, -1162.439941, 32.751801]},
+{"name": "Spaceship Part 11", "values": [1230.699951, -1103.689941, 35.309898]},
+{"name": "Spaceship Part 12", "values": [83.969902, 813.924988, 214.291]},
+{"name": "Spaceship Part 13", "values": [-1903.800049, 1388.780029, 218.779999]},
+{"name": "Spaceship Part 14", "values": [466.604004, -730.476013, 27.3622]},
+{"name": "Spaceship Part 15", "values": [205.352997, -569.684998, 129.089996]},
+{"name": "Spaceship Part 16", "values": [160.682999, -561.484985, 21.997601]},
+{"name": "Spaceship Part 17", "values": [-1182.109985, -523.317017, 40.808498]},
+{"name": "Spaceship Part 18", "values": [-226.259995, -238.311005, 50.232101]},
+{"name": "Spaceship Part 19", "values": [-407.528015, -149.498001, 64.536003]},
+{"name": "Spaceship Part 20", "values": [-1173.569946, -64.607597, 45.614899]},
+{"name": "Spaceship Part 21", "values": [1688.98999, 40.391399, 154.923004]},
+{"name": "Spaceship Part 22", "values": [1964.469971, 553.013977, 161.503006]},
+{"name": "Spaceship Part 23", "values": [22.481701, 640.708008, 190.544006]},
+{"name": "Spaceship Part 24", "values": [2903.620117, 798.450989, 3.71455]},
+{"name": "Spaceship Part 25", "values": [-1531.189941, 869.22699, 181.699997]},
+{"name": "Spaceship Part 26", "values": [-408.190002, 1102.02002, 332.533997]},
+{"name": "Spaceship Part 27", "values": [-2807.01001, 1450.290039, 100.829002]},
+{"name": "Spaceship Part 28", "values": [3141.320068, 2186.620117, -5.69152]},
+{"name": "Spaceship Part 29", "values": [818.166992, 1851.459961, 121.695999]},
+{"name": "Spaceship Part 30", "values": [-1946.069946, 1941.02002, 164.181]},
+{"name": "Spaceship Part 31", "values": [-1434.589966, 2132.97998, 27.499399]},
+{"name": "Spaceship Part 32", "values": [1368.02002, 2183.129883, 97.721298]},
+{"name": "Spaceship Part 33", "values": [170.024002, 2217.580078, 90.316803]},
+{"name": "Spaceship Part 34", "values": [891.713013, 2870.75, 56.192699]},
+{"name": "Spaceship Part 35", "values": [1964.119995, 2920.360107, 57.5471]},
+{"name": "Spaceship Part 36", "values": [-389.561005, 2965.73999, 18.6057]},
+{"name": "Spaceship Part 37", "values": [73.816498, 3279.820068, 31.256201]},
+{"name": "Spaceship Part 38", "values": [1925.859985, 3473.310059, 50.823399]},
+{"name": "Spaceship Part 39", "values": [-583.934998, 3578.129883, 266.266998]},
+{"name": "Spaceship Part 40", "values": [2518.570068, 3787.169922, 54.619598]},
+{"name": "Spaceship Part 41", "values": [1478.069946, 3859.709961, 24.681299]},
+{"name": "Spaceship Part 42", "values": [-527.085022, 4438.640137, 32.0863]},
+{"name": "Spaceship Part 43", "values": [3818.639893, 4444.200195, 2.81609]},
+{"name": "Spaceship Part 44", "values": [-1945.01001, 4583.22998, 48.003601]},
+{"name": "Spaceship Part 45", "values": [2438.629883, 4782.149902, 34.548698]},
+{"name": "Spaceship Part 46", "values": [-1439.040039, 5416.22998, 24.325199]},
+{"name": "Spaceship Part 47", "values": [2197.25, 5600.029785, 53.6544]},
+{"name": "Spaceship Part 48", "values": [-504.786011, 5664.390137, 49.226299]},
+{"name": "Spaceship Part 49", "values": [-379.040009, 6087.609863, 39.614899]},
+{"name": "Spaceship Part 50", "values": [439.377014, 6461.720215, 28.7418]},
+
+
+{"name": "Monkey Mosaic 1", "values": [158.360992, -1168.939941, 29.3277]},
+{"name": "Monkey Mosaic 2", "values": [148.904999, -1186.530029, 31.362301]},
+{"name": "Monkey Mosaic 3", "values": [474.147003, -1472.459961, 35.091099]},
+{"name": "Monkey Mosaic 4", "values": [203.865997, -2030.25, 18.294701]},
+{"name": "Monkey Mosaic 5", "values": [756.48999, -1857.699951, 49.291698]},
+{"name": "Monkey Mosaic 6", "values": [1573.01001, -2130.52002, 77.5681]},
+{"name": "Monkey Mosaic 7", "values": [1243.77002, -3318.590088, 6.02876]},
+{"name": "Monkey Mosaic 8", "values": [250.658005, -3313.76001, 5.79031]},
+{"name": "Monkey Mosaic 9", "values": [-344.274994, -2276.110107, 7.60818]},
+{"name": "Monkey Mosaic 10", "values": [-805.635986, -2749.899902, 13.9444]},
+{"name": "Monkey Mosaic 11", "values": [-1169.829956, -2036.209961, 13.5447]},
+{"name": "Monkey Mosaic 12", "values": [-464.472992, -1448.75, 20.7689]},
+{"name": "Monkey Mosaic 13", "values": [-815.440002, -1257.47998, 5.56301]},
+{"name": "Monkey Mosaic 14", "values": [-1281.329956, -1615.48999, 4.0931]},
+{"name": "Monkey Mosaic 15", "values": [-956.004028, -773.822998, 16.534401]},
+{"name": "Monkey Mosaic 16", "values": [-95.137001, -744.47699, 37.3456]},
+{"name": "Monkey Mosaic 17", "values": [281.644989, -476.470001, 34.615799]},
+{"name": "Monkey Mosaic 18", "values": [562.036011, -552.200012, 24.7871]},
+{"name": "Monkey Mosaic 19", "values": [1145.660034, -666.690979, 57.0826]},
+{"name": "Monkey Mosaic 20", "values": [1122.0, -1274.670044, 20.7715]},
+{"name": "Monkey Mosaic 21", "values": [2544.550049, 395.334991, 108.616997]},
+{"name": "Monkey Mosaic 22", "values": [590.619019, 140.563004, 104.250999]},
+{"name": "Monkey Mosaic 23", "values": [343.526001, 346.140991, 105.293999]},
+{"name": "Monkey Mosaic 24", "values": [87.519897, 212.537003, 118.209999]},
+{"name": "Monkey Mosaic 25", "values": [-146.628998, 231.576004, 94.947403]},
+{"name": "Monkey Mosaic 26", "values": [-465.679993, -18.386299, 52.472401]},
+{"name": "Monkey Mosaic 27", "values": [-497.175995, -456.950989, 32.221901]},
+{"name": "Monkey Mosaic 28", "values": [-1036.930054, -159.826004, 38.153198]},
+{"name": "Monkey Mosaic 29", "values": [-1379.819946, -361.649994, 42.202999]},
+{"name": "Monkey Mosaic 30", "values": [-1371.589966, -525.255981, 30.3463]},
+{"name": "Monkey Mosaic 31", "values": [-1380.569946, -903.080017, 12.3612]},
+{"name": "Monkey Mosaic 32", "values": [-1827.920044, -1268.089966, 8.61827]},
+{"name": "Monkey Mosaic 33", "values": [-1938.280029, -407.002991, 38.471901]},
+{"name": "Monkey Mosaic 34", "values": [-1707.829956, -263.709991, 51.918701]},
+{"name": "Monkey Mosaic 35", "values": [-1677.27002, 172.927002, 62.211899]},
+{"name": "Monkey Mosaic 36", "values": [-939.395996, 335.40799, 71.613197]},
+{"name": "Monkey Mosaic 37", "values": [-422.09201, 1091.430054, 332.53299]},
+{"name": "Monkey Mosaic 38", "values": [-1985.119995, 4522.180176, 18.8064]},
+{"name": "Monkey Mosaic 39", "values": [-1102.75, 2726.830078, 18.8004]},
+{"name": "Monkey Mosaic 40", "values": [555.838989, 2802.72998, 42.2645]},
+{"name": "Monkey Mosaic 41", "values": [354.791992, 3396.129883, 36.4034]},
+{"name": "Monkey Mosaic 42", "values": [893.392029, 3617.090088, 32.8242]},
+{"name": "Monkey Mosaic 43", "values": [1512.849976, 3568.98999, 38.7365]},
+{"name": "Monkey Mosaic 44", "values": [1912.430054, 3734.419922, 32.590401]},
+{"name": "Monkey Mosaic 45", "values": [2397.22998, 3141.580078, 48.156502]},
+{"name": "Monkey Mosaic 46", "values": [3416.860107, 3775.129883, 33.452499]},
+{"name": "Monkey Mosaic 47", "values": [1727.47998, 4780.299805, 41.93]},
+{"name": "Monkey Mosaic 48", "values": [1671.72998, 4977.299805, 42.314602]},
+{"name": "Monkey Mosaic 49", "values": [161.417999, 6660.390137, 31.4149]},
+{"name": "Monkey Mosaic 50", "values": [-250.630005, 6234.47998, 31.489401]},
+
+
+{"name": "Nuclear Waste 1", "values": [-1441.329956, 5770.759766, -23.303699]},
+{"name": "Nuclear Waste 2", "values": [-1275.969971, 6258.600098, -32.944801]},
+{"name": "Nuclear Waste 3", "values": [-775.249023, 6721.049805, -28.4105]},
+{"name": "Nuclear Waste 4", "values": [1240.0, 7084.330078, -135.319]},
+{"name": "Nuclear Waste 5", "values": [1411.75, 6867.129883, -32.272301]},
+{"name": "Nuclear Waste 6", "values": [1702.109985, 6987.259766, -136.516998]},
+{"name": "Nuclear Waste 7", "values": [2480.909912, 7003.959961, -142.037994]},
+{"name": "Nuclear Waste 8", "values": [2706.810059, 6960.25, -152.447006]},
+{"name": "Nuclear Waste 9", "values": [2938.959961, 6539.040039, -24.6933]},
+{"name": "Nuclear Waste 10", "values": [3046.389893, 6555.640137, -31.9604]},
+{"name": "Nuclear Waste 11", "values": [3894.689941, 3796.879883, -22.8452]},
+{"name": "Nuclear Waste 12", "values": [3825.52002, 3738.810059, -13.2393]},
+{"name": "Nuclear Waste 13", "values": [4142.759766, 3833.939941, -35.973801]},
+{"name": "Nuclear Waste 14", "values": [2758.840088, -1205.829956, -17.820999]},
+{"name": "Nuclear Waste 15", "values": [3191.790039, -1660.829956, -141.518997]},
+{"name": "Nuclear Waste 16", "values": [2158.5, -2826.340088, -47.533298]},
+{"name": "Nuclear Waste 17", "values": [1879.449951, -3012.22998, -45.733398]},
+{"name": "Nuclear Waste 18", "values": [2560.949951, -2377.26001, -115.982002]},
+{"name": "Nuclear Waste 19", "values": [-1839.25, -1268.26001, -21.312901]},
+{"name": "Nuclear Waste 20", "values": [-1947.290039, -1123.099976, -32.930199]},
+{"name": "Nuclear Waste 21", "values": [-2316.290039, -1053.51001, -65.622597]},
+{"name": "Nuclear Waste 22", "values": [-2588.790039, -476.671997, -27.898899]},
+{"name": "Nuclear Waste 23", "values": [-3051.72998, -213.459, -21.524599]},
+{"name": "Nuclear Waste 24", "values": [-3414.5, 837.549011, -9.0962]},
+{"name": "Nuclear Waste 25", "values": [-3186.300049, 2148.860107, -28.6786]},
+{"name": "Nuclear Waste 26", "values": [-3012.949951, 2884.429932, -27.58]},
+{"name": "Nuclear Waste 27", "values": [-3440.25, 3063.370117, -51.946701]},
+{"name": "Nuclear Waste 28", "values": [-3349.23999, 3542.47998, -57.847099]},
+{"name": "Nuclear Waste 29", "values": [-2905.5, 4197.75, -108.420998]},
+{"name": "Nuclear Waste 30", "values": [-2875.810059, 4284.490234, -149.518005]},

@@ -182,7 +182,7 @@ VEHICLE_LIST = (
     )),
     ("跑车", (
         ("古罗帝 汗血宝马 硬顶敞篷版", 0x7B8AB45F), # CARBONIZZARE
-        ("亚班尼 爱快", 0x2DB8D1AA), # ALPHA
+        ("亚班尼 阿尔法", 0x2DB8D1AA), # ALPHA
         ("爱尼仕 輓歌 RH8", 0xDE3D9D22), # ELEGY2
         ("贝飞特 飞特者", 0x8911B9F5), # FELTZER2
         ("贝飞特 史瓦泽", 0xD37B7976), # SCHWARZER

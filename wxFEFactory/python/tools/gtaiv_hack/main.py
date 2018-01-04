@@ -183,9 +183,9 @@ class Tool(BaseGTATool):
 
         # 检查是否加载了ScriptHook的帮助模块，因为部分script直接远程调用会crash
         # 要在ScriptHook的线程中才能安全运行
-        self.ScriptHookHelper = self.handler.get_module('NativeHelper.asi')
-        if self.ScriptHookHelper:
-            self.ScriptHookHelperCtxPtr = self.ScriptHookHelper + 0x141EC
+        self.script_hook_helper = self.handler.get_module('NativeHelper.asi')
+        if self.script_hook_helper:
+            self.script_call_addr = self.script_hook_helper + 0x10A0
 
         # 此次运行的Native Script地址缓存
         address.NATIVE_ADDRS = {}
@@ -219,27 +219,14 @@ class Tool(BaseGTATool):
 
     def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=4, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
-        if self.ScriptHookHelper:
+        if self.script_hook_helper:
             with self.native_context:
                 fn_addr = self.get_native_addr(name)
-                if arg_sign:
-                    self.native_context.push(arg_sign, *args)
-                self.native_context.push('L', fn_addr)
-                self.handler.write32(self.ScriptHookHelperCtxPtr, self.native_context.addr)
-
-                if sync:
-                    # 在两秒内尝试同步
-                    try_count = 20
-                    while try_count:
-                        time.sleep(0.1)
-                        if self.handler.read32(self.ScriptHookHelperCtxPtr) == 0:
-                            if ret_type:
-                                return self.native_context.get_result(ret_type, ret_size)
-                            return
-
-                        try_count -= 1
-
-                    print('获取script_call返回失败，超过尝试次数')
+                super().native_call(self.script_call_addr, (arg_sign or '') + 'L', *args, fn_addr)
+                if ret_type:
+                    return self.native_context.get_result(ret_type, ret_size)
+        else:
+            print("script_hook_helper未初始化，是否忘记了添加NativeHelper.asi？")
 
     def _player(self):
         """获取当前角色"""
@@ -599,7 +586,11 @@ class Tool(BaseGTATool):
     def teleport_to_waypoint(self, _=None):
         """瞬移到标记点"""
         if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
-            print('无法获取标记坐标')
+            entity = self.entity
+            coord = entity.coord.values()
+            coord[2] = 1024
+            coord[2] = self.GetGroundZ(coord)
+            entity.coord = coord
 
     def teleport_to_destination(self, _=None):
         """瞬移到目的地"""
