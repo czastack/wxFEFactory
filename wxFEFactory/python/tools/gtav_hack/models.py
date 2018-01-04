@@ -373,7 +373,7 @@ class Player(NativeEntity):
         """获取指定武器的最大弹药数"""
         ctx = self.native_context
         self.native_call('GET_MAX_AMMO', '3Q', self.handle, weapon, ctx.get_temp_addr())
-        return ctx.get_temp_value()
+        return ctx.get_temp_value(size=4)
 
     def has_weapon(self, weapon):
         return self.native_call('HAS_PED_GOT_WEAPON', '3Q', self.handle, weapon, 0)
