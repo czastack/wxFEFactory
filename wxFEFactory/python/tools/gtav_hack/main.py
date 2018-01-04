@@ -1034,6 +1034,12 @@ class Tool(BaseGTATool):
                 obj.place_on_ground()
             return obj
 
+    def create_pickup(self, type, coord=None, value=100, model=0):
+        """生成可拾取物
+        :param type: PICKUP_TYPE
+        """
+        self.script_call('CREATE_PICKUP', 'Q3f4Q', type, *(coord or self.get_front_coord()), 0, value, True, model)
+
     def create_fire(self, coord, maxChildren=20, isGasFire=0):
         """生成火焰"""
         return self.script_call('START_SCRIPT_FIRE', '3f2Q', *coord, maxChildren, isGasFire)
