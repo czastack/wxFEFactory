@@ -42,6 +42,7 @@ class Tool(BaseGTATool):
     SLING_COORD_DELTA = 10
     SLING_COORD_UP = 3
     SLING_SPEED_RATE = 70
+    EXPLODE_DISTANCE_VEHICLE = 10
 
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
@@ -52,192 +53,206 @@ class Tool(BaseGTATool):
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
-            self.hp_view = ModelInputWidget("hp", "生命")
-            self.ap_view = ModelInputWidget("ap", "防弹衣")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            # self.weight_view = ModelInputWidget("gravity", "重量")
-            self.speed_view = ModelCoordWidget("speed", "速度")
-            self.rot_view = ModelInputWidget("rotation", "旋转")
-            self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
-            ui.Hr()
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
-                ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_can_switch_weapons)
-                ui.ToggleButton(label="不能被拽出载具", onchange=self.set_ped_canot_be_dragged_out)
-                ui.ToggleButton(label="不能在车中被射击", onchange=self.set_ped_can_be_shot_in_vehicle)
-                ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
-                ui.ToggleButton(label="切换无限弹药", onchange=self.set_ped_infinite_ammo_clip)
-                ui.ToggleButton(label="不被警察注意", onchange=self.set_ped_ignored_by_police)
-                ui.ToggleButton(label="快速奔跑", onchange=self.set_player_fast_run)
-                ui.ToggleButton(label="快速游泳", onchange=self.set_player_fast_swim)
-                ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
+            self.render_player()
 
-        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
-            self.vehicle_hp_view = ModelInputWidget("hp", "HP")
-            self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
-            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInputWidget("weight", "重量")
-            ui.Hr()
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
-                ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
-                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
-                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-            ui.Text("颜色", className="label_left expand")
-            with ui.Horizontal(className="fill"):
-                ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
-                ColorWidget("vehicle_specular_color", "条纹", self._vehicle, "specular_color", datasets.COLOR_LIST)
-                ColorWidget("vehicle_feature_color1", "边缘", self._vehicle, "feature_color1", datasets.COLOR_LIST)
-                ColorWidget("vehicle_feature_color2", "轮胎", self._vehicle, "feature_color2", datasets.COLOR_LIST)
-            CustomColorWidget("vehicle_custom_primary_color", "自定义颜色1", self._vehicle, "custom_primary_color")
-            CustomColorWidget("vehicle_custom_secondary_color", "自定义颜色2", self._vehicle, "custom_secondary_color")
+        self.lazy_group(Group("vehicle", "汽车", self._vehicle, handler=self.handler), self.render_vehicle)
+        self.lazy_group(Group("weapon", "武器槽", None, handler=self.handler, flexgrid=False), self.render_weapon)
+        self.lazy_group(Group("global", "全局", self, handler=self.handler), self.render_global)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
+        self.lazy_group(StaticGroup("角色模型"), self.render_ped_model)
+        self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
+        self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
+        self.lazy_group(StaticGroup("测试"), self.render_functions)
+        self.lazy_group(Group(None, "设置", None, hasfootbar=False), self.render_config)
 
-        with Group("weapon", "武器槽", None, handler=self.handler, flexgrid=False):
-            self.weapon_views = []
-            with ui.Vertical(className="fill container"):
-                self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
-                with self.weapon_model_book:
-                    for category in datasets.WEAPON_LIST:
-                        with ui.Vertical():
-                            with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as view:
-                                view.AddGrowableCol(1)
-                                for item in category[1]:
-                                    self.weapon_views.append(WeaponWidget(self._player, *item))
-                        ui.Item(view.parent, caption=category[0])
+    def render_player(self):
+        self.hp_view = ModelInputWidget("hp", "生命")
+        self.ap_view = ModelInputWidget("ap", "防弹衣")
+        self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        # self.weight_view = ModelInputWidget("gravity", "重量")
+        self.speed_view = ModelCoordWidget("speed", "速度")
+        self.rot_view = ModelInputWidget("rotation", "旋转")
+        self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
+        ui.Hr()
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+            ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_can_switch_weapons)
+            ui.ToggleButton(label="不能被拽出载具", onchange=self.set_ped_canot_be_dragged_out)
+            ui.ToggleButton(label="不能在车中被射击", onchange=self.set_ped_can_be_shot_in_vehicle)
+            ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
+            ui.ToggleButton(label="切换无限弹药", onchange=self.set_ped_infinite_ammo_clip)
+            ui.ToggleButton(label="不被警察注意", onchange=self.set_ped_ignored_by_police)
+            ui.ToggleButton(label="快速奔跑", onchange=self.set_player_fast_run)
+            ui.ToggleButton(label="快速游泳", onchange=self.set_player_fast_swim)
+            ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
+            ui.ToggleButton(label="没有噪声", onchange=self.set_no_noise)
 
-                with ui.Horizontal():
-                    ui.Button(label="全部武器", onclick=self.give_all_weapon)
-                    ui.Button(label="一键最大", onclick=self.weapon_max)
+    def render_vehicle(self):
+        self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+        self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
+        self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+        self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
+        self.weight_view = ModelInputWidget("weight", "重量")
+        ui.Hr()
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+            ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
+            ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
+            ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+            ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+        ui.Text("颜色", className="label_left expand")
+        with ui.Horizontal(className="fill"):
+            ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
+            ColorWidget("vehicle_specular_color", "条纹", self._vehicle, "specular_color", datasets.COLOR_LIST)
+            ColorWidget("vehicle_feature_color1", "边缘", self._vehicle, "feature_color1", datasets.COLOR_LIST)
+            ColorWidget("vehicle_feature_color2", "轮胎", self._vehicle, "feature_color2", datasets.COLOR_LIST)
+        CustomColorWidget("vehicle_custom_primary_color", "自定义颜色1", self._vehicle, "custom_primary_color")
+        CustomColorWidget("vehicle_custom_secondary_color", "自定义颜色2", self._vehicle, "custom_secondary_color")
 
-        with Group("global", "全局", self, handler=self.handler):
-            ModelInputWidget("game_hour", "当前小时")
-            ModelInputWidget("game_minute", "当前分钟")
-            ModelInputWidget("game_seconds", "当前秒数")
-            ModelInputWidget("game_day", "当前日期")
-            ModelInputWidget("game_month", "当前月份")
-            ModelInputWidget("game_year", "当前年份")
-            ModelInputWidget("money", "金钱")
+    def render_weapon(self):
+        self.weapon_views = []
+        with ui.Vertical(className="fill container"):
+            self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
+            with self.weapon_model_book:
+                for category in datasets.WEAPON_LIST:
+                    with ui.Vertical():
+                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as view:
+                            view.AddGrowableCol(1)
+                            for item in category[1]:
+                                self.weapon_views.append(WeaponWidget(self._player, *item))
+                    ui.Item(view.parent, caption=category[0])
 
-            ModelInputWidget("wind_speed", "风速")
-            ui.Text("天气", className="label_left expand")
-            with ui.Horizontal(className="fill"):
-                self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
-                ui.Button("短暂", onclick=self.apply_weather)
-                ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
-                ui.ToggleButton("起风", onchange=self.set_wind)
+            with ui.Horizontal():
+                ui.Button(label="全部武器", onclick=self.give_all_weapon)
+                ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                self.render_common_text()
-                ui.Text("大加速: alt+shift+m")
-                ui.Text("生成选中的载具并进入: alt+shift+v")
-                ui.Text("当前武器子弹全满: alt+g")
-                ui.Text("瞬移到标记点: alt+shift+g")
-                ui.Text("瞬移到目的地: alt+1")
-                ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
-                ui.Text("爆破最近的车: alt+o")
-                ui.Text("发射车载火箭: alt+r")
-                ui.Text("发射多枚车载火箭: alt+shift+r")
-                ui.Text("天降正义(导弹攻击敌人): alt+enter")
-                ui.Text("特殊能力能量充满: alt+capslock")
+    def render_global(self):
+        ModelInputWidget("game_hour", "当前小时")
+        ModelInputWidget("game_minute", "当前分钟")
+        ModelInputWidget("game_seconds", "当前秒数")
+        ModelInputWidget("game_day", "当前日期")
+        ModelInputWidget("game_month", "当前月份")
+        ModelInputWidget("game_year", "当前年份")
+        ModelInputWidget("money", "金钱")
 
-        with StaticGroup("角色模型"):
-            with ui.Horizontal(className="fill container"):
-                self.player_model_book = render_tab_list(datasets.PLAYER_MODEL)
-                with ui.ScrollView(className="fill container"):
-                    ui.Text("1. 切换模型会失去武器")
-                    ui.Text("2. 切换动物模型容易引发bug，请慎用")
-                    ui.Text("3. 在陆地上切换鱼类模型会突然失去梦想，请注意")
-                    ui.Button("切换模型", onclick=self.set_player_model)
-                    ui.Button("生成人物", onclick=self.create_selected_ped)
+        ModelInputWidget("wind_speed", "风速")
+        ui.Text("天气", className="label_left expand")
+        with ui.Horizontal(className="fill"):
+            self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
+            ui.Button("短暂", onclick=self.apply_weather)
+            ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
+            ui.ToggleButton("起风", onchange=self.set_wind)
 
-        with StaticGroup("载具模型"):
-            self.vehicle_model_book = render_tab_list(datasets.VEHICLE_LIST)
+    def render_hotkey(self):
+        with ui.ScrollView(className="fill"):
+            self.render_common_text()
+            ui.Text("大加速: alt+shift+m")
+            ui.Text("生成选中的载具并进入: alt+shift+v")
+            ui.Text("当前武器子弹全满: alt+g")
+            ui.Text("瞬移到标记点: alt+shift+g")
+            ui.Text("瞬移到目的地: alt+1")
+            ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
+            ui.Text("爆破最近的车: alt+o")
+            ui.Text("发射车载火箭: alt+r")
+            ui.Text("发射多枚车载火箭: alt+shift+r")
+            ui.Text("天降正义(导弹攻击敌人): alt+enter")
+            ui.Text("特殊能力能量充满: alt+capslock")
 
-        with StaticGroup("物体模型"):
-            self.object_model_book  = render_tab_list(datasets.OBJECT_MODEL)
+    def render_ped_model(self):
+        with ui.Horizontal(className="fill container"):
+            self.player_model_book = render_tab_list(datasets.PLAYER_MODEL)
+            with ui.ScrollView(className="fill container"):
+                ui.Text("1. 切换模型会失去武器")
+                ui.Text("2. 切换动物模型容易引发bug，请慎用")
+                ui.Text("3. 在陆地上使用鱼类模型会突然失去梦想，请注意")
+                ui.Button("切换模型", onclick=self.set_player_model)
+                ui.Button("生成人物", onclick=self.create_selected_ped)
 
-        with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
-                self.render_common_button()
-                # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
-                ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
-                ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
-                ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
-                ui.Button("附近的人下车", onclick=self.near_peds_exit_vehicle)
-                ui.Button("敌人着火", onclick=self.enemys_make_fire)
-                ui.Button("敌人爆头", onclick=self.enemys_explode_head)
-                ui.Button("敌人爆炸", onclick=self.enemys_explode)
-                ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
-                ui.Button("敌人定住", onclick=self.enemys_freeze_position)
-                ui.Button("圆形标记定住", onclick=self.target_freeze_position)
-                ui.Button("保存菜单", onclick=self.activate_save_menu)
-                ui.Button("导弹攻击敌人", onclick=self.rocket_attack_enemy)
-                ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
-                ui.Button("导弹攻击警察", onclick=self.rocket_attack_police)
-                ui.Button("导弹攻击警用载具", onclick=self.rocket_attack_police_and_helicopter)
-                ui.Button("导弹射向敌人", onclick=self.rocket_shoot_enemy)
-                ui.Button("导弹射向所有标记", onclick=self.rocket_shoot_target)
-                ui.Button("导弹射向警察", onclick=self.rocket_shoot_police)
-                ui.Button("导弹射向警用载具", onclick=self.rocket_shoot_police_and_helicopter)
-                ui.Button("停止计时", onclick=self.freeze_timer)
-                ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
-                ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
-                ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
-                ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
-                ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
-                ui.Button("驾驶到到黄色检查点", onclick=self.drive_to_yellow_checkpoint)
-                ui.Button("瞬移到到黄色检查点", onclick=self.teleport_to_yellow_checkpoint)
-                ui.Button("跟着敌人", onclick=self.drive_follow)
-                ui.Button("追捕敌人", onclick=self.vehicle_chase)
-                ui.Button("跟着蓝色标记", onclick=self.drive_follow_blue)
-                ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
-                ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
-                ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
-                ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
-                ui.Button("熄灭区域内的火焰", onclick=self.clear_area_of_fire)
-                ui.Button("修复衣服", onclick=self.repair_cloth)
-                ui.Button("洗车", onclick=self.wash_vehicle)
-                ui.Button("进入上一辆载具", onclick=self.into_last_vehicle)
-                ui.Button("召唤火车", onclick=self.random_train)
-                ui.Button("最近的车附上", onclick=self.nearest_vehicle_attach)
-                ui.Button("附上敌人", onclick=self.attach_to_enemey)
-                ui.Button("附上蓝色标记", onclick=self.attach_to_blue)
-                ui.Button("取消附上", onclick=self.detach_entity)
-                ui.Button("随机装扮", onclick=self.set_ped_random_component)
-                ui.Button("生成所选物体", onclick=self.create_selected_object)
-                ui.Button("生成多个物体", onclick=self.create_selected_objects_caller)
-                ui.Button("发射生成物体", onclick=self.create_launch_object)
-                ui.Button("前面起火", onclick=self.create_fire_at_front)
-                ui.Button("打架", onclick=self.fight_against)
-                self.set_buttons_contextmenu()
+    def render_vehicle_model(self):
+        self.vehicle_model_book = render_tab_list(datasets.VEHICLE_LIST)
 
-        with Group(None, "设置", None, hasfootbar=False):
-            with ConfigGroup(self.config):
-                BoolConfig('mark_police_as_enemy', '把警察标记为敌人').set_help('对敌人的操作也会对警察有效')
-                BoolConfig('explode_no_owner', '生成爆炸时不设置所有者(不会被通缉，但某些任务敌人打不死)')
-                BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉，但某些任务敌人打不死)')
-                FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
-                FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
-                IntConfig('rocket_shoot_count_little', '导弹发射对数(少)', 1)
-                IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
-                IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
-                IntConfig('rocket_damage', '导弹攻击伤害', 250)
-                SelectConfig('shoot_weapon_hash', '射击武器种类', datasets.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
-                FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
-                SelectConfig('auto_driving_style', '自动驾驶风格', datasets.DRIVING_STYLE)
-                SelectConfig('attach_direction', '附上目标方向', datasets.ATTACH_DIRECTION)
-                FloatConfig('attach_distance_ped', '步行附上距离', 6).set_help('步行时附上目标距离')
-                FloatConfig('attach_distance_vehilce', '驾车附上距离', 15).set_help('驾车时附上目标距离')
-                IntConfig('create_objects_count', '批量生成物体个数', 5)
-                FloatConfig('create_objects_spcae', '批量生成物体间隔', 5)
-            ui.Hr()
-            ui.Button("放弃本次配置修改", onclick=self.discard_config)
+    def render_object_model(self):
+        self.object_model_book  = render_tab_list(datasets.OBJECT_MODEL)
+
+    def render_functions(self):
+        with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            self.render_common_button()
+            # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
+            ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
+            ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
+            ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
+            ui.Button("附近的人下车", onclick=self.near_peds_exit_vehicle)
+            ui.Button("敌人着火", onclick=self.enemys_make_fire)
+            ui.Button("敌人爆头", onclick=self.enemys_explode_head)
+            ui.Button("敌人爆炸", onclick=self.enemys_explode)
+            ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
+            ui.Button("敌人定住", onclick=self.enemys_freeze_position)
+            ui.Button("圆形标记定住", onclick=self.target_freeze_position)
+            ui.Button("保存菜单", onclick=self.activate_save_menu)
+            ui.Button("导弹攻击敌人", onclick=self.rocket_attack_enemy)
+            ui.Button("导弹攻击所有标记", onclick=self.rocket_attack_target)
+            ui.Button("导弹攻击警察", onclick=self.rocket_attack_police)
+            ui.Button("导弹攻击警用载具", onclick=self.rocket_attack_police_and_helicopter)
+            ui.Button("导弹射向敌人", onclick=self.rocket_shoot_enemy)
+            ui.Button("导弹射向所有标记", onclick=self.rocket_shoot_target)
+            ui.Button("导弹射向警察", onclick=self.rocket_shoot_police)
+            ui.Button("导弹射向警用载具", onclick=self.rocket_shoot_police_and_helicopter)
+            ui.Button("停止计时", onclick=self.freeze_timer)
+            ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+            ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
+            ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
+            ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
+            ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
+            ui.Button("驾驶到到黄色检查点", onclick=self.drive_to_yellow_checkpoint)
+            ui.Button("瞬移到到黄色检查点", onclick=self.teleport_to_yellow_checkpoint)
+            ui.Button("跟着敌人", onclick=self.drive_follow)
+            ui.Button("追捕敌人", onclick=self.vehicle_chase)
+            ui.Button("跟着蓝色标记", onclick=self.drive_follow_blue)
+            ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
+            ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
+            ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
+            ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
+            ui.Button("熄灭区域内的火焰", onclick=self.clear_area_of_fire)
+            ui.Button("修复衣服", onclick=self.repair_cloth)
+            ui.Button("洗车", onclick=self.wash_vehicle)
+            ui.Button("进入上一辆载具", onclick=self.into_last_vehicle)
+            ui.Button("召唤火车", onclick=self.random_train)
+            ui.Button("最近的车附上", onclick=self.nearest_vehicle_attach)
+            ui.Button("附上敌人", onclick=self.attach_to_enemey)
+            ui.Button("附上蓝色标记", onclick=self.attach_to_blue)
+            ui.Button("取消附上", onclick=self.detach_entity)
+            ui.Button("随机装扮", onclick=self.set_ped_random_component)
+            ui.Button("生成所选物体", onclick=self.create_selected_object)
+            ui.Button("生成多个物体", onclick=self.create_selected_objects_caller)
+            ui.Button("发射生成物体", onclick=self.create_launch_object)
+            ui.Button("前面起火", onclick=self.create_fire_at_front)
+            ui.Button("打架", onclick=self.fight_against)
+            self.set_buttons_contextmenu()
+
+    def render_config(self):
+        with ConfigGroup(self.config):
+            BoolConfig('mark_police_as_enemy', '把警察标记为敌人').set_help('对敌人的操作也会对警察有效')
+            BoolConfig('explode_no_owner', '生成爆炸时不设置所有者(不会被通缉，但某些任务敌人打不死)')
+            BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉，但某些任务敌人打不死)')
+            FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
+            FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
+            IntConfig('rocket_shoot_count_little', '导弹发射对数(少)', 1)
+            IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
+            IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
+            IntConfig('rocket_damage', '导弹攻击伤害', 250)
+            SelectConfig('shoot_weapon_hash', '射击武器种类', datasets.SHOOT_WEAPON_CHOICES).set_help('默认为上述的"导弹"')
+            FloatConfig('auto_driving_speed', '自动驾驶速度', 300)
+            SelectConfig('auto_driving_style', '自动驾驶风格', datasets.DRIVING_STYLE)
+            SelectConfig('attach_direction', '附上目标方向', datasets.ATTACH_DIRECTION)
+            FloatConfig('attach_distance_ped', '步行附上距离', 6).set_help('步行时附上目标距离')
+            FloatConfig('attach_distance_vehilce', '驾车附上距离', 15).set_help('驾车时附上目标距离')
+            IntConfig('create_objects_count', '批量生成物体个数', 5)
+            FloatConfig('create_objects_spcae', '批量生成物体间隔', 5)
+        ui.Hr()
+        ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
     def get_hotkeys(self):
         return (
@@ -328,7 +343,6 @@ class Tool(BaseGTATool):
     #         registration = self.NativeRegistration(self.handler.read64(address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
     #         addr = registration.get_func(hash)
     #         if addr:
-    #             print(addr)
     #             address.NATIVE_ADDRS[name] = addr
     #     return addr
 
@@ -339,7 +353,7 @@ class Tool(BaseGTATool):
     #     """
     #     addr = self.get_native_addr(name) if isinstance(name, str) else name
     #     if addr:
-    #         return self.native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
+    #         return super().native_call(addr, arg_sign, *args, ret_type=ret_type, ret_size=ret_size)
     #     else:
     #         print('函数不存在', name)
 
@@ -370,12 +384,17 @@ class Tool(BaseGTATool):
     #                 print('获取script_call返回失败，超过尝试次数')
     # ===
 
-    def script_call(self, name, arg_sign, *args, ret_type=int, ret_size=8, sync=True):
+    def script_call(self, name, arg_sign, *args, loop=1, ret_type=int, ret_size=8, sync=True):
         """通过ScriptHook的帮助模块远程调用脚本函数，通过计时器轮询的方式实现同步"""
+        context = self.native_context
         if self.script_hook_helper:
-            with self.native_context:
-                hash = address.NATIVE_HASH.get(name, 0)
-                super().native_call(self.script_call_addr, (arg_sign or '') + 'Q', *args, hash)
+            with context:
+                if arg_sign:
+                    context.push(arg_sign, *args)
+                context.push('Q', address.NATIVE_HASH.get(name, 0))
+                if loop > 1:
+                    context.push('L', 0xC0000000 | loop)
+                self.handler.remote_call(self.script_call_addr, context.addr)
                 if ret_type:
                     return self.native_context.get_result(ret_type, ret_size)
         else:
@@ -420,10 +439,6 @@ class Tool(BaseGTATool):
     def player_id(self):
         """获取当前角色的序号"""
         return self.native_call('GET_PLAYER_INDEX', None)
-
-    # def get_ped_handle(self, player_index=0):
-    #     """获取当前角色的句柄"""
-    #     return self.native_call('GET_PLAYER_PED', 'Q', player_index or self.player_id)
 
     @property
     def ped_id(self):
@@ -589,6 +604,10 @@ class Tool(BaseGTATool):
         if toggle:
             self.clear_wanted_level()
         self.script_call('SET_WANTED_LEVEL_MULTIPLIER', 'f', 0 if toggle else 1)
+
+    def set_no_noise(self, tb):
+        """不发出噪声"""
+        self.player.noise_rate = 0 if tb.checked else 1.0
 
     def vehicle_fix(self, vehicle):
         """修车"""

@@ -15,7 +15,6 @@ void log_message(wxcstr text)
 }
 
 
-
 void alert(wxcstr title, wxcstr msg)
 {
 	wxMessageBox(msg, title);

@@ -27,20 +27,6 @@ public:
 
 	void reLayout() override
 	{
-		/*
-		int flex, flag, padding;
-		wxSizerItem *item;
-		wxSizer *sizer = m_elem->GetSizer();
-		for (auto &child : m_children)
-		{
-			View * pChild = py::cast<View*>(child);
-			item = sizer->GetItem(*pChild);
-			getBoxArg(*pChild, &flex, &flag, &padding);
-
-			item->SetProportion(flex);
-			item->SetFlag(flag);
-			item->SetBorder(padding);
-		}*/
 		layout();
 	}
 
@@ -238,6 +224,8 @@ public:
 	}
 
 	View* getPage(int n = -1);
+
+	virtual void setOnPageChange(pycref fn, bool reset = true) = 0;
 };
 
 
@@ -249,6 +237,11 @@ public:
 	{
 		bindElem(new wxNotebook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxstyle));
 	}
+
+	void setOnPageChange(pycref fn, bool reset = true) override
+	{
+		bindEvt(wxEVT_NOTEBOOK_PAGE_CHANGED, fn, reset);
+	}
 };
 
 
@@ -259,6 +252,11 @@ public:
 	Listbook(long wxstyle, Args ...args) : BookCtrlBase(args...)
 	{
 		bindElem(new wxListbook(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), wxstyle));
+	}
+
+	void setOnPageChange(pycref fn, bool reset = true) override
+	{
+		bindEvt(wxEVT_LISTBOOK_PAGE_CHANGED, fn, reset);
 	}
 };
 

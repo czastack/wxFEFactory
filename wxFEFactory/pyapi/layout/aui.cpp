@@ -81,10 +81,10 @@ void AuiManager::doAdd(View & child)
 
 		py::cast(item).dec_ref();
 	}
-	else
+	/*else
 	{
 		log_message(wxString::Format("Child of %s must be AuiItem.", "AuiManager"));
-	}
+	}*/
 }
 
 void AuiManager::__exit__(py::args & args)
@@ -116,10 +116,10 @@ void AuiNotebook::doAdd(View & child)
 
 		py::cast(item).dec_ref();
 	}
-	else
+	/*else
 	{
 		log_message(wxString::Format("Child of %s must be AuiItem.", "AuiNotebook"));
-	}
+	}*/
 }
 
 bool AuiNotebook::canPageClose(int n)

@@ -68,7 +68,8 @@ class BaseGTATool(BaseTool):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
                     self.attach_status_view = ui.Text("", className="label_left grow")
                     ui.CheckBox("保持最前", onchange=self.swith_keeptop)
-                with ui.Notebook(className="fill"):
+                with ui.Notebook(className="fill") as book:
+                    book.setOnPageChange(self.onNotePageChange)
                     try:
                         self.render_main()
                     except:
@@ -106,6 +107,27 @@ class BaseGTATool(BaseTool):
             self.free_remote_function()
         self.config.write()
         return super().onClose(*args)
+
+    def lazy_group(self, group, fn):
+        groups = getattr(self, 'lazy_groups', None)
+        if groups is None:
+            self.lazy_groups = groups = {}
+
+        groups[group.root] = group, fn
+
+    def onNotePageChange(self, book):
+        groups = getattr(self, 'lazy_groups', None)
+        if groups:
+            root = book.getPage()
+            item = groups.get(root, None)
+            if item:
+                group, fn = item
+                with group:
+                    fn()
+                if not group.flexgrid:
+                    # ScrollView
+                    root.children[0].reLayout()
+                del groups[root]
 
     def discard_config(self, _=None):
         self.config.cancel_change()
@@ -733,7 +755,8 @@ class BaseGTATool(BaseTool):
     
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
-        for coord in self.iter_cam_dir_coords(count, 6, True):
+        distance = getattr(self, 'EXPLODE_DISTANCE_VEHICLE', 8) if self.isInVehicle else getattr(self, 'EXPLODE_DISTANCE', 6)
+        for coord in self.iter_cam_dir_coords(count, distance, True):
             self.create_explosion(coord)
 
     def custom_hotkey(self, _=None):

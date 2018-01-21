@@ -12,7 +12,7 @@ class BaseTool(BaseScene):
     nested = False
 
     def __del__(self):
-        # print(self.getName(), '析构')
+        print(self.getName(), '析构')
         pass
 
     def attach(self, frame):

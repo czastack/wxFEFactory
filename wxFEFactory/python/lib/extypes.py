@@ -28,18 +28,12 @@ def append_or(dic, key, value):
     else:
         dic[key] = [value]
 
-def make_tuple(*args):
-    return args
-
-def make_list(*args):
-    return list(args)
-
 
 class Map(dict):
     __slots__ = ()
 
     def __getattr__(self, name):
-        return self[name] if name in self else None
+        return self.get(name, None)
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -47,7 +41,8 @@ class Map(dict):
     def __delattr__(self, name):
         del self[name]
 
-    __puts__ = puts
+    puts = puts
+    append_or = append_or
 
 
 class Dict:
@@ -58,7 +53,7 @@ class Dict:
     """
     __slots__ = ('_data',)
 
-    def __init__(self, obj = None):
+    def __init__(self, obj=None):
         self._attr('_data', obj)
 
     def _attr(self, name, value):
@@ -105,6 +100,7 @@ class Dict:
             return __class__({key: self.__getattr__(key) for key in keys})
 
     puts = puts
+    append_or = append_or
 
 
 class Dicts:
@@ -114,22 +110,22 @@ class Dicts:
     for data in datas:
         print(data.a)
     """
-    __slots__ = ('__ref', 'data')
+    __slots__ = ('_ref', 'data')
 
     def __init__(self, array):
-        if isinstance(key, (list, tuple)):
-            self.__ref = None
+        if isinstance(array, (list, tuple)):
+            self._ref = None
             self.data = array
         else:
             raise TypeError('array must be a list or tuple')
 
     def __iter__(self):
-        if not self.__ref:
-            self.__ref = Dict()
+        if not self._ref:
+            self._ref = Dict()
         
         for item in self.data:
-            self.__ref.__init__(item)
-            yield self.__ref
+            self._ref.__init__(item)
+            yield self._ref
 
 
 class INum:

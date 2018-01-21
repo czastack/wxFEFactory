@@ -60,7 +60,7 @@ protected:
 	pyobj m_class;
 	pyobj m_contextmenu;
 	py::dict m_event_table;
-	bool m_added = false;
+	// bool m_added = false;
 
 	static wxVector<Layout*> LAYOUTS;
 
@@ -92,7 +92,7 @@ public:
 	/**
 	 * 在Layout的onAdd中__exit__先被调用，返回false将不被onAdd(child)
 	 */
-	bool beforeAdded()
+	/*bool beforeAdded()
 	{
 		if (!m_added)
 		{
@@ -100,7 +100,7 @@ public:
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 	void setForeground(uint rgb)
 	{
@@ -360,14 +360,15 @@ class Layout : public View
 {
 public:
 	template <class... Args>
-	Layout(pycref styles = None, Args ...args) : View(args...), m_styles(styles)
+	Layout(pycref styles = None, Args ...args) : View(args...), m_styles(styles), tmp_styles_list(nullptr)
 	{
 
 	}
 
 	Layout(Layout &proxyed) :
 		View(proxyed.m_elem),
-		m_children(proxyed.m_children), m_styles(None)
+		m_children(proxyed.m_children), m_styles(None),
+		tmp_styles_list(nullptr)
 	{
 
 	}
@@ -377,9 +378,7 @@ public:
 		m_children.release();
 	}
 
-	void add(View &child) {
-		m_children.append(py::cast(&child));
-	}
+	void add(View &child);
 
 	virtual void doAdd(View &child) {}
 
@@ -424,11 +423,7 @@ public:
 	{
 	}
 
-	void __init()
-	{
-		m_view.ptr()->SetClientData(this);
-		py::cast(this).inc_ref();
-	}
+	void __init();
 
 	View* getView()
 	{

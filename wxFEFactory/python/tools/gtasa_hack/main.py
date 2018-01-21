@@ -101,6 +101,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                 self.weapon_views.append(
                     WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO, datasets.WEAPON_LIST, self.on_weapon_change)
                 )
+            ui.Button(label="一键最大", onclick=self.weapon_max)
 
         with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
             self.weapon_prop_views = [
@@ -289,6 +290,15 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3
+
+    def weapon_max(self, _=None):
+        """武器子弹数最大"""
+        recommends = (-1, 6, 2, 2, 2, 1, 2, 1, 4)
+        for idx, view in zip(recommends, self.weapon_views):
+            if idx != -1:
+                view.id_view.index = idx
+                if view.has_ammo:
+                    view.ammo_view.value = 9999
 
     def get_cheat_config(self):
         return cheat.version_config['V1.0']

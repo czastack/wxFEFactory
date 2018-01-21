@@ -60,6 +60,7 @@ void init_controls(py::module & m)
 	auto label = "label"_a;
 	auto type = "type"_a = wxEmptyString;
 	auto wxstyle = "wxstyle"_a = 0;
+	auto evt_fn = "fn"_a;
 	auto evt_reset = "reset"_a = true;
 
 	py::class_t<Button, Control>(m, "Button")
@@ -99,7 +100,7 @@ void init_controls(py::module & m)
 	py::class_t<TextInput, Control>(m, "TextInput")
 		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, type, "readonly"_a = false, "multiline"_a = false, wxstyle, className, style)
-		.def("setOnEnter", &TextInput::setOnEnter)
+		.def("setOnEnter", &TextInput::setOnEnter, evt_fn, evt_reset)
 		.def("appendText", &TextInput::appendText)
 		.def("writeText", &TextInput::writeText)
 		.def("selectAll", &TextInput::selectAll)
@@ -110,8 +111,8 @@ void init_controls(py::module & m)
 	py::class_t<SearchCtrl, Control>(m, "SearchCtrl")
 		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, "search_button"_a = true, "cancel_button"_a = true, wxstyle, className, style)
-		.def("setOnSubmit", &SearchCtrl::setOnSubmit)
-		.def("setOnCancel", &SearchCtrl::setOnCancel)
+		.def("setOnSubmit", &SearchCtrl::setOnSubmit, evt_fn, evt_reset)
+		.def("setOnCancel", &SearchCtrl::setOnCancel, evt_fn, evt_reset)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
 
 	py::class_t<SpinCtrl, Control>(m, "SpinCtrl")
@@ -180,7 +181,7 @@ void init_controls(py::module & m)
 	py::class_t<ComboBox, ControlWithItems>(m, "ComboBox")
 		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			type, choices, onselect, className, style)
-		.def("setOnEnter", &ComboBox::setOnEnter)
+		.def("setOnEnter", &ComboBox::setOnEnter, evt_fn, evt_reset)
 		.def("autoComplete", &ComboBox::autoComplete)
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
@@ -196,7 +197,7 @@ void init_controls(py::module & m)
 		.def_init(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a = wxEmptyString, "msg"_a = wxEmptyString, "wildcard"_a = (const char*)wxFileSelectorDefaultWildcardStr,
 			"wxstyle"_a = (long)(wxFLP_DEFAULT_STYLE | wxFLP_SMALL), className, style)
-		.def("setOnChange", &FilePickerCtrl::setOnChange)
+		.def("setOnChange", &FilePickerCtrl::setOnChange, evt_fn, evt_reset)
 		.def_property("path", &FilePickerCtrl::getPath, &FilePickerCtrl::setPath)
 		.ptr();
 
@@ -212,7 +213,7 @@ void init_controls(py::module & m)
 	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(m, "DirPickerCtrl")
 		.def_init(py::init<wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a = wxEmptyString, "msg"_a = wxEmptyString, "wxstyle"_a = (long)(wxDIRP_DEFAULT_STYLE | wxDIRP_SMALL), className, style)
-		.def("setOnChange", &DirPickerCtrl::setOnChange)
+		.def("setOnChange", &DirPickerCtrl::setOnChange, evt_fn, evt_reset)
 		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)
 		.ptr();
 

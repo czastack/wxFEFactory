@@ -118,6 +118,10 @@ class Group(Widget):
         super().__del__()
         self.children.clear()
 
+    def onDestroy(self, view):
+        super().onDestroy(view)
+        del self.root
+
     def render(self):
         with ui.Vertical() as root:
             with ui.ScrollView(className="fill container"):
@@ -132,6 +136,7 @@ class Group(Widget):
                     ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
                     ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
         ui.Item(root, caption=self.label)
+        self.root = root
 
     def appendChild(self, child):
         self.children.append(child)

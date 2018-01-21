@@ -77,7 +77,7 @@ public:
 
 	void setOnChange(pyobj &fn, bool reset=true)
 	{
-		bindEvt(wxEVT_TOGGLEBUTTON, fn);
+		bindEvt(wxEVT_TOGGLEBUTTON, fn, reset);
 	}
 };
 
@@ -126,7 +126,7 @@ public:
 
 	void setOnChange(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_CHECKBOX, fn);
+		bindEvt(wxEVT_CHECKBOX, fn, reset);
 	}
 };
 
@@ -195,9 +195,9 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void setOnEnter(pycref fn)
+	void setOnEnter(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_TEXT_ENTER, fn);
+		bindEvt(wxEVT_TEXT_ENTER, fn, reset);
 	}
 
 	void appendText(wxcstr text)
@@ -269,14 +269,14 @@ public:
 		return ctrl().GetValue();
 	}
 
-	void setOnSubmit(pycref fn)
+	void setOnSubmit(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_SEARCHCTRL_SEARCH_BTN, fn);
+		bindEvt(wxEVT_SEARCHCTRL_SEARCH_BTN, fn, reset);
 	}
 
-	void setOnCancel(pycref fn)
+	void setOnCancel(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_SEARCHCTRL_CANCEL_BTN, fn);
+		bindEvt(wxEVT_SEARCHCTRL_CANCEL_BTN, fn, reset);
 	}
 };
 
@@ -347,7 +347,7 @@ public:
 
 	void setOnChange(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_COLOURPICKER_CHANGED, fn);
+		bindEvt(wxEVT_COLOURPICKER_CHANGED, fn, reset);
 	}
 
 	void setColor(uint rgb)
@@ -726,9 +726,9 @@ public:
 		ctrl().SetValue(value);
 	}
 
-	void setOnEnter(pycref fn)
+	void setOnEnter(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_TEXT_ENTER, fn);
+		bindEvt(wxEVT_TEXT_ENTER, fn, reset);
 	}
 
 	void autoComplete()
@@ -835,9 +835,9 @@ public:
 		ctrl().SetPath(path);
 	}
 
-	void setOnChange(pycref fn)
+	void setOnChange(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_FILEPICKER_CHANGED, fn);
+		bindEvt(wxEVT_FILEPICKER_CHANGED, fn, reset);
 	}
 };
 
@@ -866,9 +866,9 @@ public:
 		ctrl().SetPath(path);
 	}
 
-	void setOnChange(pycref fn)
+	void setOnChange(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_DIRPICKER_CHANGED, fn);
+		bindEvt(wxEVT_DIRPICKER_CHANGED, fn, reset);
 	}
 };
 

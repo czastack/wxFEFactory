@@ -344,10 +344,20 @@ bool View::handleEvent(wxEvent & event)
 	return true;
 }
 
+void Layout::add(View & child) {
+	m_children.append(py::cast(&child));
+	child.applyStyle();
+	doAdd(child);
+}
+
 pyobj Layout::__enter__() {
 	LAYOUTS.push_back(this);
 
-	tmp_styles_list = new wxVector<PyObject*>;
+	if (tmp_styles_list == nullptr)
+	{
+		tmp_styles_list = new wxVector<PyObject*>;
+	}
+	
 	Layout *parent = getParent();
 
 	if (!parent)
@@ -378,11 +388,11 @@ pyobj Layout::__enter__() {
 			{
 				for (auto &e : parent->m_styles)
 				{
-					if (e != None)
+					if (!e.is_none())
 						tmp_styles_list->push_back(e.ptr());
 				}
 			}
-			else if (parent->m_styles != None)
+			else if (!parent->m_styles.is_none())
 			{
 				tmp_styles_list->push_back(parent->m_styles.ptr());
 			}
@@ -400,7 +410,7 @@ pyobj Layout::__enter__() {
 void Layout::__exit__(py::args & args) {
 	LAYOUTS.pop_back();
 
-	for (auto &e : m_children)
+	/*for (auto &e : m_children)
 	{
 		View &child = *py::cast<View*>(e);
 		if (!child.beforeAdded())
@@ -410,7 +420,7 @@ void Layout::__exit__(py::args & args) {
 
 		child.applyStyle();
 		doAdd(child);
-	}
+	}*/
 
 	// 释放临时样式表
 	delete tmp_styles_list;
@@ -429,4 +439,16 @@ void Layout::setStyles(pycref styles)
 		}
 	}
 	reLayout();
+}
+
+void Item::__init()
+{
+	m_view.ptr()->SetClientData(this);
+	py::cast(this).inc_ref();
+
+	Layout* pLayout = View::getActiveLayout();
+	if (pLayout)
+	{
+		pLayout->doAdd(m_view);
+	}
 }

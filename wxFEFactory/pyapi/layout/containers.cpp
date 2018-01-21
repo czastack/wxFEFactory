@@ -124,10 +124,10 @@ void BookCtrlBase::doAdd(View & child)
 
 		py::cast(item).dec_ref();
 	}
-	else
+	/*else
 	{
 		log_message(wxString::Format("Child of %s must be Item.", "Notebook"));
-	}
+	}*/
 }
 
 View * BookCtrlBase::getPage(int n)
@@ -148,6 +148,7 @@ void init_containers(py::module & m)
 	auto style = "style"_a = None;
 	auto styles = "styles"_a = None;
 	auto wxstyle = "wxstyle"_a = 0;
+	auto evt_reset = "reset"_a = true;
 
 	py::class_t<Vertical, Layout>(m, "Vertical")
 		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
@@ -190,6 +191,7 @@ void init_containers(py::module & m)
 		.def("getPageCount", &BookCtrlBase::getPageCount)
 		.def("setPageText", &BookCtrlBase::setPageText)
 		.def("getPageText", &BookCtrlBase::getPageText)
+		.def("setOnPageChange", &BookCtrlBase::setOnPageChange, "fn"_a, evt_reset)
 		.def_property("index", &BookCtrlBase::getSelection, &BookCtrlBase::setSelection);
 
 	py::class_t<Notebook, BookCtrlBase>(m, "Notebook")
