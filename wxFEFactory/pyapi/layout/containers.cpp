@@ -93,7 +93,6 @@ void SplitterWindow::__exit__(py::args & args)
 		log_message("SplitterWindow 不支持大于2个子元素");
 		return;
 	}
-	Layout::__exit__(args);
 	if (len == 1)
 	{
 		View &child = *py::cast<View*>(m_children[0]);
@@ -108,6 +107,7 @@ void SplitterWindow::__exit__(py::args & args)
 		else
 			ctrl().SplitVertically(child1, child2, m_sashpos);
 	}
+	Layout::__exit__(args);
 }
 
 

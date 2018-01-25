@@ -36,8 +36,8 @@ public:
 
 	void __exit__(py::args &args) override
 	{
-		Layout::__exit__(args);
 		layout();
+		Layout::__exit__(args);
 	}
 };
 

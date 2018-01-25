@@ -105,7 +105,6 @@ pyobj StdModalDialog::__enter__()
 
 void StdModalDialog::__exit__(py::args & args)
 {
-	Layout::__exit__(args);
 
 	wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
 	buttonSizer->AddButton(new wxButton(m_elem, wxID_OK));
@@ -114,6 +113,7 @@ void StdModalDialog::__exit__(py::args & args)
 
 	wxSizer* topsizer = m_elem->GetSizer();
 	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
+	Layout::__exit__(args);
 }
 
 bool BaseTopLevelWindow::setIcon(wxcstr path)

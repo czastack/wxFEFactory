@@ -18,11 +18,11 @@ public:
 
 	void __exit__(py::args &args) override
 	{
-		Layout::__exit__(args);
 		m_elem->Show();
 		
 		// 引用加一
 		py::cast(this).inc_ref();
+		Layout::__exit__(args);
 	}
 
 	void setSize(py::sequence &size)

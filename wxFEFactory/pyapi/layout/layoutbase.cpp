@@ -352,6 +352,7 @@ void Layout::add(View & child) {
 
 pyobj Layout::__enter__() {
 	LAYOUTS.push_back(this);
+	m_elem->Freeze();
 
 	if (tmp_styles_list == nullptr)
 	{
@@ -409,18 +410,7 @@ pyobj Layout::__enter__() {
 
 void Layout::__exit__(py::args & args) {
 	LAYOUTS.pop_back();
-
-	/*for (auto &e : m_children)
-	{
-		View &child = *py::cast<View*>(e);
-		if (!child.beforeAdded())
-		{
-			continue;
-		}
-
-		child.applyStyle();
-		doAdd(child);
-	}*/
+	m_elem->Thaw();
 
 	// 释放临时样式表
 	delete tmp_styles_list;

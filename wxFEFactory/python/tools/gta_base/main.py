@@ -124,9 +124,6 @@ class BaseGTATool(BaseTool):
                 group, fn = item
                 with group:
                     fn()
-                if not group.flexgrid:
-                    # ScrollView
-                    root.children[0].reLayout()
                 del groups[root]
 
     def discard_config(self, _=None):

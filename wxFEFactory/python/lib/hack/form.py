@@ -1,5 +1,6 @@
 from lib import exui, fileutils
 from lib.utils import float32
+from styles import btn_xsm_style
 import json
 import types
 import fefactory_api
@@ -124,12 +125,12 @@ class Group(Widget):
 
     def render(self):
         with ui.Vertical() as root:
-            with ui.ScrollView(className="fill container"):
+            with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
                     self.view = ui.FlexGridLayout(cols=2, vgap=10, className="fill")
                     self.view.AddGrowableCol(1)
                 else:
-                    self.view = ui.Vertical(className="fill")
+                    self.view = content
 
             if self.hasfootbar:
                 with ui.Horizontal(className="container"):
@@ -515,8 +516,3 @@ def render_tab_list(data):
         for category in data:
             ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
     return book
-
-
-btn_xsm_style = {
-    'width': 36,
-}

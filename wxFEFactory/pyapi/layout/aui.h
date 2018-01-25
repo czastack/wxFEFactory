@@ -171,11 +171,6 @@ public:
 		bindElem(new wxAuiMDIChildFrame(parent, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		init();
 	}
-
-	void __exit__(py::args &args) override
-	{
-		Layout::__exit__(args);
-	}
 };
 
 void init_aui(py::module &m);
