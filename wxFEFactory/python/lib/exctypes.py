@@ -1,4 +1,5 @@
 from .lazy import lazy
+from functools import partialmethod
 import ctypes
 _SimpleCData = ctypes._SimpleCData
 
@@ -6,7 +7,6 @@ _SimpleCData = ctypes._SimpleCData
 class CArray:
     def __init__(self, size):
         self.array = (self.TYPE * size)()
-        self.__getitem__ = None
 
     @property
     def array_t(self):
@@ -63,76 +63,22 @@ class cint:
     def __hex__(self):
         return hex(self.value)
 
-    def __add__(self, other):
-        return self.__class__(self.value.__add__(ival(other)))
+    def _newfn(self, name, other):
+        type_ = self.__class__
+        if isinstance(other, cint):
+            if other.MAX > self.MAX:
+                type_ = other.__class__
+            other = other.value
+        return type_(self.value.__add__(other))
 
-    def __sub__(self, other):
-        return self.__class__(self.value.__sub__(ival(other)))
-
-    def __mul__(self, other):
-        return self.__class__(self.value.__mul__(ival(other)))
-
-    def __floordiv__(self, other):
-        return self.__class__(self.value.__floordiv__(ival(other)))
-
-    __truediv__ = __floordiv__
-
-    def __mod__(self, other):
-        return self.__class__(self.value.__mod__(ival(other)))
-
-    def __pow__(self, other):
-        return self.__class__(self.value.__pow__(ival(other)))
-
-    def __lshift__(self, other):
-        return self.__class__(self.value.__lshift__(ival(other)))
-
-    def __rshift__(self, other):
-        return self.__class__(self.value.__rshift__(ival(other)))
-
-    def __and__(self, other):
-        return self.__class__(self.value.__and__(ival(other)))
-
-    def __or__(self, other):
-        return self.__class__(self.value.__or__(ival(other)))
-
-    def __xor__(self, other):
-        return self.__class__(self.value.__xor__(ival(other)))
-
-    def __rsub__(self, other):
-        return self.__class__(self.value.__rsub__(ival(other)))
-
-    def __rmul__(self, other):
-        return self.__class__(self.value.__rmul__(ival(other)))
-
-    def __rmul__(self, other):
-        return self.__class__(self.value.__rmul__(ival(other)))
-
-    def __rfloordiv__(self, other):
-        return self.__class__(self.value.__rfloordiv__(ival(other)))
-
-    def __rdiv__(self, other):
-        return self.__class__(self.value.__rdiv__(ival(other)))
-
-    def __rmod__(self, other):
-        return self.__class__(self.value.__rmod__(ival(other)))
-
-    def __rdivmod__(self, other):
-        return self.__class__(self.value.__rdivmod__(ival(other)))
-
-    def __rpow__(self, other):
-        return self.__class__(self.value.__rpow__(ival(other)))
-
-    def __rlshift__(self, other):
-        return self.__class__(self.value.__rlshift__(ival(other)))
-
-    def __rrshift__(self, other):
-        return self.__class__(self.value.__rrshift__(ival(other)))
-
-    def __ror__(self, other):
-        return self.__class__(self.value.__ror__(ival(other)))
-
-    def __rxor__(self, other):
-        return self.__class__(self.value.__rxor__(ival(other)))
+    local = locals()
+    for name in ('__add__', '__sub__', '__mul__', '__floordiv__', '__mod__', '__pow__', '__lshift__', '__rshift__',
+            '__and__', '__or__', '__xor__', '__rsub__', '__rmul__', '__rmul__', '__rfloordiv__', '__rmod__',
+            '__rdivmod__', '__rpow__', '__rlshift__', '__rrshift__', '__ror__', '__rxor__'):
+        local[name] = partialmethod(_newfn, name)
+    local['__truediv__'] = local['__floordiv__']
+    local['__rtruediv__'] = local['__rfloordiv__']
+    del local, name
 
     def __iadd__(self, other):
         self.value += ival(other)
@@ -171,25 +117,25 @@ class cint:
 
 
 class int8(ctypes.c_int8, cint):
-    pass
+    MAX = 127
 
 class int16(ctypes.c_int16, cint):
-    pass
+    MAX = 32767
 
 class int32(ctypes.c_int32, cint):
-    pass
+    MAX = 2147483647
 
 class int64(ctypes.c_int64, cint):
-    pass
+    MAX = 9223372036854775807
 
 class u8(ctypes.c_uint8, cint):
-    pass
+    MAX = 255
 
 class u16(ctypes.c_uint16, cint):
-    pass
+    MAX = 65535
 
 class u32(ctypes.c_uint32, cint):
-    pass
+    MAX = 4294967295
 
 class u64(ctypes.c_uint64, cint):
-    pass
+    MAX = 18446744073709551615
