@@ -83,7 +83,7 @@ class BaseGTA3Tool(BaseGTA3_VC_SA_Tool):
         
         script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
         self.script_context = self.RunningScript(script_ctx_addr, self, 
-            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript_ProcessOneCommand)
+            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init, self.address.FUNC_CRunningScript__ProcessOneCommand)
 
     def free_remote_function(self):
         super().free_remote_function()

@@ -36,15 +36,6 @@ class RunningScript(BaseRunningScript):
     curIP = model.Field(0x14)
     m_aLVars = model.ArrayField(0x3c, 32, model.Field(0))
 
-    def __init__(self, addr, context, script_space_base, process_addr, init_addr, buff_size=255):
-        """
-        :param init_addr: 初始化的原生函数地址
-        :param process_addr: 执行一条脚本的原生函数地址
-        """
-        super().__init__(addr, context, script_space_base, process_addr, buff_size)
-        self.init_addr = init_addr
-        self.context.native_call_auto(self.init_addr, None, this=self.addr)
-
     def run(self, command_id, signature, *args):
         self.IsCustom = self.missionFlag = self.MissionCleanUpFlag = False
         self.notFlag = (command_id >> 15) & 1

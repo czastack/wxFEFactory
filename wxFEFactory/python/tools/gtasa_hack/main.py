@@ -190,13 +190,6 @@ class Tool(BaseGTA3_VC_SA_Tool):
             ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
         ) + self.get_common_hotkeys()
 
-    def init_remote_function(self):
-        super().init_remote_function()
-        
-        script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
-        self.script_context = self.RunningScript(script_ctx_addr, self, 
-            address.SCRIPT_SPACE_BASE, address.FUNC_CRunningScript__ProcessOneCommand, address.FUNC_CRunningScript__Init)
-
     def free_remote_function(self):
         super().free_remote_function()
         del self.script_context

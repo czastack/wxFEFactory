@@ -24,8 +24,8 @@ class ArgType:
         0x4c: INT32,   # L
         0x66: FLOAT,   # f
         0x64: FLOAT,   # d
-        # 0x50: LOCAL_I, # P
-        0x50: GLOBAL_I, # P
+        0x50: LOCAL_I, # P
+        # 0x50: GLOBAL_I, # P
         
         0x70: STRING,  # p
         0x73: STRING,  # s
@@ -37,7 +37,7 @@ class ArgType:
 class BaseRunningScript(ManagedModel):
     m_szName = model.StringField(0x08, 8)
 
-    def __init__(self, addr, context, script_space_base, process_addr, buff_size=255):
+    def __init__(self, addr, context, script_space_base, init_addr, process_addr, buff_size=255):
         """
         :param process_addr: 执行一条脚本的原生函数地址
         """
@@ -50,6 +50,8 @@ class BaseRunningScript(ManagedModel):
 
         self.m_szName = 'an-scr'
         self.buff_addr = self.handler.alloc_memory(buff_size)
+        self.init_addr = init_addr
+        self.context.native_call_auto(self.init_addr, None, this=self.addr)
 
     def __del__(self):
         self.handler.free_memory(self.buff_addr)

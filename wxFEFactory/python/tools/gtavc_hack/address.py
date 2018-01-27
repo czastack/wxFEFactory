@@ -15,7 +15,8 @@ FUNC_CStreaming__HasModelLoaded = 0x4044C0
 FUNC_CStreaming__RequestModel = 0x40E310
 FUNC_LoadAllRequestedModels = 0X40B5F0
 
-FUNC_CRunningScript_ProcessOneCommand = 0x44FBE0
+FUNC_CRunningScript__Init = 0x450CF0
+FUNC_CRunningScript__ProcessOneCommand = 0x44FBE0
 SCRIPT_SPACE_BASE = 0x821280
 
 FUNC_IsCarModel = 0x55F510

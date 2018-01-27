@@ -7,7 +7,8 @@ BLIP_LIST = 0x6ED5E0
 CAMERA_FRONT = 0x6FAFDC
 FUNC_SetWantedLevel = 0x4F3190
 
-FUNC_CRunningScript_ProcessOneCommand = 0x439500
+FUNC_CRunningScript__Init = 0x4386C0
+FUNC_CRunningScript__ProcessOneCommand = 0x439500
 SCRIPT_SPACE_BASE = 0x74B248
 
 FUNC_IsBoatModel = 0x50BB90
