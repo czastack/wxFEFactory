@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ModelField
+from lib.hack.model import Model, Field, CoordField, ManagedModelField
 from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
@@ -55,7 +55,7 @@ class MemPlayer(Entity):
     rotation = Field(0x2dc, float)
     isInVehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
-    vehicle = ModelField(0x310, MemVehicle)
+    vehicle = ManagedModelField(0x310, MemVehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
 
@@ -75,32 +75,32 @@ class NativeEntity(NativeModel):
 
     @property
     def speed(self):
-        values = self.mgr.get_move_speed(self.addr)
+        values = self.context.get_move_speed(self.addr)
         return utils.VectorField(self, values, 'speed')
 
     @speed.setter
     def speed(self, value):
-        self.mgr.set_move_speed(self.addr, value)
+        self.context.set_move_speed(self.addr, value)
 
     @property
     def turn_speed(self):
-        values = self.mgr.get_move_turn_speed(self.addr)
+        values = self.context.get_move_turn_speed(self.addr)
         return utils.VectorField(self, values, 'turn_speed')
 
     @turn_speed.setter
     def turn_speed(self, value):
-        self.mgr.set_move_speed(self.addr, value)
+        self.context.set_move_speed(self.addr, value)
 
     def create_fire(self):
-        self._fire = self.mgr.create_fire(self.coord)
+        self._fire = self.context.create_fire(self.coord)
         return self._fire
 
     def delete_fire(self):
         if hasattr(self, '_fire'):
-            self.mgr.delete_fire(self._fire)
+            self.context.delete_fire(self._fire)
 
     def create_explosion(self, *args, **kwargs):
-        self.mgr.create_explosion(self.coord, *args, **kwargs)
+        self.context.create_explosion(self.coord, *args, **kwargs)
 
     @property
     def rotation(self):
@@ -131,8 +131,8 @@ class Player(NativeEntity):
 
     getter, getter_ptr, setter = NativeModel.builders
 
-    def __init__(self, index, handle, mgr):
-        super().__init__(handle, mgr)
+    def __init__(self, index, handle, context):
+        super().__init__(handle, context)
         self.index = index
 
     def player_getter(name, ret_type=int, ret_size=4):
@@ -165,11 +165,11 @@ class Player(NativeEntity):
 
     @property
     def addr(self):
-        return self.mgr.ped_pool.addr_at(self.ped_index)
+        return self.context.ped_pool.addr_at(self.ped_index)
 
     @property
     def memobj(self):
-        return MemPlayer(self.addr, self.mgr.handler)
+        return MemPlayer(self.addr, self.context)
 
     existed = property(getter('DOES_CHAR_EXIST', bool))
     hp = property(getter_ptr('GET_CHAR_HEALTH'), setter('SET_CHAR_HEALTH'))
@@ -243,13 +243,13 @@ class Player(NativeEntity):
     def vehicle(self):
         handle = self.get_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.mgr)
+            return Vehicle(handle, self.context)
 
     @property
     def last_vehicle(self):
         handle = self.get_last_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.mgr)
+            return Vehicle(handle, self.context)
 
     def reset_visible_damage(self):
         """修复可见损害"""
@@ -413,11 +413,11 @@ class Vehicle(NativeEntity):
 
     @property
     def addr(self):
-        return self.mgr.vehicle_pool.addr_at(self.index)
+        return self.context.vehicle_pool.addr_at(self.index)
 
     @property
     def memobj(self):
-        return MemVehicle(self.addr, self.mgr.handler)
+        return MemVehicle(self.addr, self.context)
 
     hp = property(getter_ptr('GET_CAR_HEALTH'), setter('SET_CAR_HEALTH'))
     engine_hp = property(getter('GET_ENGINE_HEALTH', float), setter('SET_ENGINE_HEALTH', float))
@@ -426,7 +426,7 @@ class Vehicle(NativeEntity):
 
     @property
     def model(self):
-        return IVModel(self.model_id, self.mgr)
+        return IVModel(self.model_id, self.context)
 
     existed = property(getter('DOES_VEHICLE_EXIST', bool))
 
@@ -461,7 +461,7 @@ class Vehicle(NativeEntity):
     @coord.setter
     def coord(self, value):
         pos = tuple(value)
-        mycar = self.mgr.player.get_vehicle_handle()
+        mycar = self.context.player.get_vehicle_handle()
         if self.handle == mycar:
             self.script_call('SET_CAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
         else:
@@ -513,12 +513,12 @@ class Vehicle(NativeEntity):
     def driver(self):
         self.native_call('GET_DRIVER_OF_CAR', '2L', self.handle, self.native_context.get_temp_addr())
         ped_handle = self.native_context.get_temp_value()
-        return Player(0, ped_handle, self.mgr) if ped_handle else None
+        return Player(0, ped_handle, self.context) if ped_handle else None
 
     @property
     def name(self):
         addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'L', self.model_id)
-        data = self.mgr.handler.read(addr, bytes, 16)
+        data = self.context.handler.read(addr, bytes, 16)
         return data[:data.find(b'\x00')].decode()
 
     @property
@@ -724,16 +724,16 @@ class Blip(NativeModel):
     def entity(self):
         blipType = self.blipType
         if blipType is self.BLIP_TYPE_CAR:
-            return Vehicle(self.car_index, self.mgr)
+            return Vehicle(self.car_index, self.context)
         elif blipType is self.BLIP_TYPE_CHAR:
-            return Player(0, self.ped_index, self.mgr)
+            return Player(0, self.ped_index, self.context)
 
     @classmethod
     def add_blip_for_car(cls, vehicle):
         vehicle.script_call('ADD_BLIP_FOR_CAR', '2L', vehicle.handle, vehicle.native_context.get_temp_addr())
-        return cls(vehicle.native_context.get_temp_value(), vehicle.mgr)
+        return cls(vehicle.native_context.get_temp_value(), vehicle.context)
 
     @classmethod
     def add_blip_for_char(cls, ped):
         ped.script_call('ADD_BLIP_FOR_CHAR', '2L', ped.handle, ped.native_context.get_temp_addr())
-        return cls(ped.native_context.get_temp_value(), ped.mgr)
+        return cls(ped.native_context.get_temp_value(), ped.context)

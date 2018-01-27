@@ -285,17 +285,17 @@ class Tool(BaseGTATool):
     @property
     def ped_pool(self):
         """角色池"""
-        return models.Pool(self.address.PED_POOL, self.handler, models.MemPlayer)
+        return models.Pool(self.address.PED_POOL, self, models.MemPlayer)
 
     @property
     def vehicle_pool(self):
         """载具池"""
-        return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
+        return models.Pool(self.address.VEHICLE_POOL, self, models.MemVehicle)
 
     @property
     def object_pool(self):
         """物体池"""
-        return models.Pool(self.address.OBJECT_POOL, self.handler, models.MemObject)
+        return models.Pool(self.address.OBJECT_POOL, self, models.MemObject)
 
     def get_peds(self):
         """获取角色池中的角色列表"""

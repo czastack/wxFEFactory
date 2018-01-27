@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field
+from lib.hack.model import Model, ManagedModel, Field
 from . import utils
 import math
 
@@ -12,13 +12,7 @@ def distance(p1, p2):
     )
 
 
-class ManagedModel(Model):
-    def __init__(self, addr, mgr):
-        super().__init__(addr, mgr.handler)
-        self.mgr = mgr
-
-
-class Physicle(Model):
+class Physicle(ManagedModel):
     def distance(self, obj):
         return distance(self.coord, obj if hasattr(obj, '__iter__') else obj.coord)
 
@@ -67,12 +61,13 @@ class WeaponItem(Model):
             self.id, self.ammo = other
 
 
-class Pool(Model):
+class Pool(ManagedModel):
     _start = Field(0)
+    _handle_table = Field(4)
     _size = Field(8)
 
-    def __init__(self, ptr, handler, item_class=None):
-        super().__init__(handler.read32(ptr), handler)
+    def __init__(self, ptr, context, item_class=None):
+        super().__init__(context.handler.read32(ptr), context)
         self.item_class = item_class
         self._i = 0
         self.start = self._start
@@ -80,10 +75,23 @@ class Pool(Model):
 
     def __getitem__(self, i):
         if self.item_class:
-            return self.item_class(self.addr_at(i), self.handler)
+            return self.item_class(self.addr_at(i), self.context)
 
     def addr_at(self, i):
         return self.start + i * self.item_class.SIZE
+
+    def handle_at(self, i):
+        offset = i << 8
+        return offset | self.handler.read8(self._handle_table + i)
+
+    def addr_to_handle(self, addr):
+        index = (addr - self.start) // self.item_class.SIZE
+        if index >= 0:
+            return self.handle_at((addr - self.start) // self.item_class.SIZE)
+        return 0
+
+    def handle_to_addr(self, handle):
+        return self.addr_at(handle >> 8)
 
     def __iter__(self):
         self._i = 0
@@ -101,29 +109,29 @@ class Pool(Model):
 class NativeModel:
     P = 'L'
 
-    def __init__(self, handle, mgr):
-        self.handle = handle
-        self.mgr = mgr
+    def __init__(self, context):
+        self.context = context
+        self.handle = context.handle
 
     @property
     def native_context(self):
-        return self.mgr.native_context
+        return self.context.native_context
 
     @property
     def native_call(self):
-        return self.mgr.native_call
+        return self.context.native_call
 
     @property
     def native_call_vector(self):
-        return self.mgr.native_call_vector
+        return self.context.native_call_vector
 
     @property
     def script_call(self):
-        return self.mgr.script_call
+        return self.context.script_call
 
     @property
     def native_call_vector(self):
-        return self.mgr.script_call_vector
+        return self.context.script_call_vector
 
     def getter(name, ret_type=int, ret_size=4):
         def getter(self):

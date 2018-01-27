@@ -448,13 +448,11 @@ class Tool(BaseGTATool):
     @property
     def ped_pool(self):
         """角色池"""
-        # return models.Pool(self.address.PED_POOL, self.handler, models.MemPlayer)
         pass
 
     @property
     def vehicle_pool(self):
         """载具池"""
-        # return models.Pool(self.address.VEHICLE_POOL, self.handler, models.MemVehicle)
         pass
 
     def get_peds(self, count=20):

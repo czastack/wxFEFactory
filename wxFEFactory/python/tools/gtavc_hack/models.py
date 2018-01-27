@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField
-from ..gta_base.models import Physicle, WeaponSet, Pool
-from ..gta3_base.models import BaseBlip
+from ..gta_base.models import Physicle, WeaponSet, Pool, NativeModel
+from ..gta3_base.models import BaseBlip, GTA3Vehicle
 import math
 
 
@@ -50,17 +50,17 @@ class Player(Entity):
     @property
     def vehicle(self):
         ptr = self.handler.read32(self.addr + 0x3a8)
-        return Vehicle(ptr, self.handler) if ptr else None
+        return Vehicle(ptr, self.context) if ptr else None
 
     @property
     def nearPersons(self):
         offset = 0x56c
         for i in range(10):
-            yield Player(self.handler.read32(self.addr + offset), self.handler)
+            yield Player(self.handler.read32(self.addr + offset), self.context)
             offset += 4
 
 
-class Vehicle(Entity):
+class Vehicle(Entity, GTA3Vehicle):
     SIZE = 0x5dc
 
     hp = Field(0x204, float)
@@ -80,14 +80,14 @@ class Vehicle(Entity):
     def passengers(self):
         offset = 0x1ac
         for i in range(4):
-            yield Player(self.handler.read32(self.addr + offset), self.handler)
+            yield Player(self.handler.read32(self.addr + offset), self.context)
             offset += 4
 
     @property
     def driver(self):
         addr = self.handler.read32(self.addr + 0x1a8)
         if addr:
-            return Player(addr, self.handler)
+            return Player(addr, self.context)
 
     def stop(self):
         self.speed = (0, 0, 0)

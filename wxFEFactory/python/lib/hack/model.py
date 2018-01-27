@@ -29,6 +29,15 @@ class Model:
         return self.addrof(field)
 
 
+class ManagedModel(Model):
+    def __init__(self, addr, context):
+        super().__init__(addr, context.handler)
+        self.context = context
+
+    def clone(self):
+        return self.__class__(self.addr, self.context)
+
+
 class Field:
     def __init__(self, offset, type_=int, size=4):
         self.offset = offset
@@ -94,6 +103,11 @@ class ModelField(Field):
         raise AttributeError("can't set attribute")
 
 
+class ManagedModelField(ModelField):
+    def __get__(self, obj, type=None):
+        return self.modelClass(super().__get__(obj, type), obj.context)
+
+
 class CoordField:
     size = 12
     length = 3
@@ -153,6 +167,12 @@ class CoordData:
             self._pos += 1
             return ret
         raise StopIteration
+
+    def __str__(self):
+        return str(self.values())
+
+    def __repr__(self):
+        return self.__class__.__name__ + str(tuple(self.values()))
 
 
 class ArrayField(Field):

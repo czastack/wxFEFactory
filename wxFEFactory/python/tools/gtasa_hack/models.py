@@ -62,13 +62,13 @@ class Player(Entity):
     @property
     def vehicle(self):
         ptr = self.handler.read32(self.addr + 0x58c)
-        return Vehicle(ptr, self.handler) if ptr else None
+        return Vehicle(ptr, self.context) if ptr else None
 
     @property
     def vehicle_on(self):
         """当前玩家站在其上的载具"""
         ptr = self.handler.read32(self.addr + 0x584)
-        return Vehicle(ptr, self.handler) if ptr else None
+        return Vehicle(ptr, self.context) if ptr else None
 
     @property
     def isInVehicle(self):
@@ -124,19 +124,19 @@ class Vehicle(Entity):
     def passengers(self):
         offset = 0x460
         for i in range(9):
-            yield Player(self.handler.read32(self.addr + offset), self.handler)
+            yield Player(self.handler.read32(self.addr + offset), self.context)
             offset += 4
 
     @property
     def driver(self):
         addr = self.handler.read32(self.addr + 0x460)
         if addr:
-            return Player(addr, self.handler)
+            return Player(addr, self.context)
 
     @property
     def trailer(self):
         ptr = self._tranler
-        return Vehicle(ptr, self.handler) if ptr else None
+        return Vehicle(ptr, self.context) if ptr else None
 
     def lock_door(self):
         self.door_status = 2
@@ -186,8 +186,8 @@ class Marker(ManagedModel):
         blipType = self.blipType
         index = self.entity_handle >> 8
         if blipType is __class__.MARKER_TYPE_CAR:
-            return self.mgr.vehicle_pool[index]
+            return self.context.vehicle_pool[index]
         elif blipType is __class__.MARKER_TYPE_PED:
-            return self.mgr.ped_pool[index]
+            return self.context.ped_pool[index]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
-            return self.mgr.object_pool[index]
+            return self.context.object_pool[index]

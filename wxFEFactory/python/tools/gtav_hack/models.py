@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ModelField, ArrayField
+from lib.hack.model import Model, Field, CoordField, ArrayField
 from lib.lazy import lazy
 from lib.utils import float32, u32, tuple2rgb, rgb2tuple
 from ..gta_base import utils
@@ -41,7 +41,7 @@ class NativeEntity(NativeModel):
 
     @property
     def model(self):
-        return VModel(self.model_id, self.mgr)
+        return VModel(self.model_id, self.context)
 
     @hp.setter
     def hp(self, value):
@@ -91,15 +91,15 @@ class NativeEntity(NativeModel):
         self.script_call('STOP_ENTITY_FIRE', 'Q', self.handle)
 
     def create_fire(self):
-        self._fire = self.mgr.create_fire(self.coord)
+        self._fire = self.context.create_fire(self.coord)
         return self._fire
 
     def delete_fire(self):
         if hasattr(self, '_fire'):
-            self.mgr.delete_fire(self._fire)
+            self.context.delete_fire(self._fire)
 
     def create_explosion(self, *args, **kwargs):
-        self.mgr.create_explosion(self.coord, *args, **kwargs)
+        self.context.create_explosion(self.coord, *args, **kwargs)
 
     @property
     def rotation(self):
@@ -178,11 +178,11 @@ class NativeEntity(NativeModel):
 
     @property
     def entity_attached_to(self):
-        entity = NativeEntity(self.native_call('GET_ENTITY_ATTACHED_TO', 'Q', self.handle), self.mgr)
+        entity = NativeEntity(self.native_call('GET_ENTITY_ATTACHED_TO', 'Q', self.handle), self.context)
         if entity.is_ped:
-            return Player(0, entity.handle, self.mgr)
+            return Player(0, entity.handle, self.context)
         elif entity.is_vehicle:
-            return Vehicle(entity.handle, self.mgr)
+            return Vehicle(entity.handle, self.context)
 
     def fight_against(self, ped):
         self.script_call('TASK_COMBAT_PED', '4Q', self.handle, self.make_handle(ped), 0, 16)
@@ -195,8 +195,8 @@ class Player(NativeEntity):
 
     getter, getter_ptr, setter = NativeEntity.builders
 
-    def __init__(self, index, handle, mgr):
-        super().__init__(handle, mgr)
+    def __init__(self, index, handle, context):
+        super().__init__(handle, context)
         self.index = index
 
     def player_getter(name, ret_type=int, ret_size=4):
@@ -233,7 +233,7 @@ class Player(NativeEntity):
 
     @property
     def addr(self):
-        return self.mgr.ped_pool.addr_at(self.ped_index)
+        return self.context.ped_pool.addr_at(self.ped_index)
 
     is_player = property(getter('IS_PED_A_PLAYER'))
     type = property(getter('GET_PED_TYPE'))
@@ -307,7 +307,7 @@ class Player(NativeEntity):
 
     def set_model(self, model):
         """设置模型"""
-        VModel(model, self.mgr).request()
+        VModel(model, self.context).request()
         self.script_call('SET_PLAYER_MODEL', '2Q', self.index, model)
         self.script_call('SET_PED_DEFAULT_COMPONENT_VARIATION', 'Q', self.handle)
 
@@ -327,13 +327,13 @@ class Player(NativeEntity):
     def vehicle(self):
         handle = self.get_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.mgr)
+            return Vehicle(handle, self.context)
 
     @property
     def last_vehicle(self):
         handle = self.get_last_vehicle_handle()
         if handle:
-            return Vehicle(handle, self.mgr)
+            return Vehicle(handle, self.context)
 
     def into_vehicle(self, vehicle, seat=-1):
         """进入车辆"""
@@ -471,7 +471,7 @@ class Vehicle(NativeEntity):
 
     @property
     def addr(self):
-        return self.mgr.vehicle_pool.addr_at(self.index)
+        return self.context.vehicle_pool.addr_at(self.index)
 
     vehicle_class = property(getter('GET_VEHICLE_CLASS'))
     engine_hp = property(getter('GET_VEHICLE_ENGINE_HEALTH', float), setter('SET_VEHICLE_ENGINE_HEALTH', float))
@@ -512,12 +512,12 @@ class Vehicle(NativeEntity):
     @property
     def driver(self):
         ped_handle = self.native_call('GET_PED_IN_VEHICLE_SEAT', 'Ql', self.handle, -1)
-        return Player(0, ped_handle, self.mgr) if ped_handle else None
+        return Player(0, ped_handle, self.context) if ped_handle else None
 
     @property
     def name(self):
         addr = self.native_call('GET_DISPLAY_NAME_FROM_VEHICLE_MODEL', 'Q', self.model_id)
-        data = self.mgr.handler.read(addr, bytes, 16)
+        data = self.context.handler.read(addr, bytes, 16)
         return data[:data.find(b'\x00')].decode()
 
     @property
@@ -769,13 +769,13 @@ class Blip(NativeModel):
     def entity(self):
         blipType = self.blipType
         if blipType is self.BLIP_TYPE_CAR:
-            return Vehicle(self.entity_index, self.mgr)
+            return Vehicle(self.entity_index, self.context)
         elif blipType is self.BLIP_TYPE_CHAR:
-            return Player(0, self.entity_index, self.mgr)
+            return Player(0, self.entity_index, self.context)
 
     @classmethod
     def add_blip_for_entity(cls, entity):
-        return cls(entity.script_call('ADD_BLIP_FOR_ENTITY', '2L', entity.handle), entity.mgr)
+        return cls(entity.script_call('ADD_BLIP_FOR_ENTITY', '2L', entity.handle), entity.context)
 
     def show_number(self, number):
         """显示数字"""

@@ -359,7 +359,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
         self.handler.write8(ptr + 0x2C, level)
 
     def get_objects(self):
-        pool = models.Pool(address.OBJECT_POOL, self.handler, models.Object)
+        pool = models.Pool(address.OBJECT_POOL, self, models.Object)
         return iter(pool)
 
     def get_near_objects(self, distance=100):

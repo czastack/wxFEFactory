@@ -1,4 +1,5 @@
 from ..gta_base.models import ManagedModel
+from . import opcodes
 
 
 class BaseBlip(ManagedModel):
@@ -22,8 +23,20 @@ class BaseBlip(ManagedModel):
         blipType = self.blipType
         index = self.entity_handle >> 8
         if blipType is __class__.MARKER_TYPE_CAR:
-            return self.mgr.vehicle_pool[index]
+            return self.context.vehicle_pool[index]
         elif blipType is __class__.MARKER_TYPE_PED:
-            return self.mgr.ped_pool[index]
+            return self.context.ped_pool[index]
         elif blipType is __class__.MARKER_TYPE_OBJECT:
-            return self.mgr.object_pool[index]
+            return self.context.object_pool[index]
+
+
+class GTA3Vehicle:
+    @property
+    def handle(self):
+        return self.context.vehicle_pool.addr_to_handle(self.addr)
+
+    def explode(self):
+        self.context.script_call(opcodes.EXPLODE_CAR, 'L', self.handle)
+
+    def set_speed(self, speed):
+        self.context.script_call(opcodes.SET_CAR_FORWARD_SPEED, 'Lf', self.handle, speed)

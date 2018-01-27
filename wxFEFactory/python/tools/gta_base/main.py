@@ -200,13 +200,15 @@ class BaseGTATool(BaseTool):
             return None
         player = getattr(self, '_playerins', None)
         if not player:
-            player = self._playerins = self.Player(player_addr, self.handler)
+            player = self._playerins = self.Player(player_addr, self)
         elif player.addr != player_addr:
             player.addr = player_addr
         return player
 
     def _vehicle(self):
-        return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self.handler)
+        addr = self.handler.read32(self.address.VEHICLE_PTR)
+        if addr >= self.vehicle_pool.start:
+            return self.Vehicle(self.handler.read32(self.address.VEHICLE_PTR), self) or None
 
     player = property(_player)
     vehicle = property(_vehicle)
@@ -228,17 +230,17 @@ class BaseGTATool(BaseTool):
     @property
     def ped_pool(self):
         """角色池"""
-        return self.models.Pool(self.address.PED_POOL, self.handler, self.Player)
+        return self.models.Pool(self.address.PED_POOL, self, self.Player)
 
     @property
     def vehicle_pool(self):
         """载具池"""
-        return self.models.Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
+        return self.models.Pool(self.address.VEHICLE_POOL, self, self.Vehicle)
 
     @property
     def object_pool(self):
         """物体池"""
-        return self.models.Pool(self.address.OBJECT_POOL, self.handler, self.Object)
+        return self.models.Pool(self.address.OBJECT_POOL, self, self.Object)
 
     def get_yaw(self):
         """获取偏航角"""
@@ -387,8 +389,7 @@ class BaseGTATool(BaseTool):
 
     def get_peds(self):
         """获取角色池中的角色列表"""
-        pool = Pool(self.address.PED_POOL, self.handler, self.Player)
-        return iter(pool)
+        return iter(self.ped_pool)
 
     def get_near_peds(self, distance=100):
         """获取附近的人"""
@@ -400,8 +401,7 @@ class BaseGTATool(BaseTool):
 
     def get_vehicles(self):
         """载具池中的载具列表"""
-        pool = Pool(self.address.VEHICLE_POOL, self.handler, self.Vehicle)
-        return iter(pool)
+        return iter(self.vehicle_pool)
 
     def get_near_vehicles(self, distance=100):
         """获取附近的载具"""
@@ -732,8 +732,10 @@ class BaseGTATool(BaseTool):
         vehicle = self.next_collected_vehicle(recollect=recollect)
         if vehicle:
             self.launch_entity(vehicle)
+            self._last_launch_vehicle = vehicle
 
     def spawn_and_launch(self, _=None, recreate=False):
+        """生产载具并发射"""
         vehicle = None
         if not recreate:
             vehicle = getattr(self, '_last_spawn_and_launch_vehicle', None)
@@ -745,6 +747,13 @@ class BaseGTATool(BaseTool):
             self._last_spawn_and_launch_vehicle = vehicle
         if vehicle:
             self.launch_entity(vehicle)
+            self._last_launch_vehicle = vehicle
+
+    def explode_last_launch_vehicle(self, _=None):
+        """爆破上次发射的载具"""
+        vehicle = getattr(self, '_last_launch_vehicle', None)
+        if vehicle:
+            vehicle.explode()
 
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
@@ -868,6 +877,8 @@ class BaseGTATool(BaseTool):
         ui.Text("上一辆车解锁: alt+shift+l")
         ui.Text("载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d")
         ui.Text("载具发射台(重新扫描): alt+shift+d")
+        ui.Text("生产载具并发射: alt+a")
+        ui.Text("爆破上次发射的载具: alt+shift+a")
         ui.Text("把一辆车移到眼前: alt+b")
         ui.Text("清除通缉等级: alt+0")
         ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
@@ -904,6 +915,7 @@ class BaseGTATool(BaseTool):
             ('sling', MOD_ALT, getVK('d'), self.sling),
             ('resling', MOD_ALT | MOD_SHIFT, getVK('d'), partial(self.sling, recollect=True)),
             ('spawn_and_launch', MOD_ALT, getVK('a'), self.spawn_and_launch),
+            ('explode_last_launch_vehicle', MOD_ALT | MOD_SHIFT, getVK('a'), self.explode_last_launch_vehicle),
             ('bring_one_vehicle', MOD_ALT, getVK('b'), self.bring_one_vehicle),
             ('clear_wanted_level', MOD_ALT, getVK('0'), self.clear_wanted_level),
             ('explode_art', MOD_ALT, getVK('`'), self.explode_art),

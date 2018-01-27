@@ -37,11 +37,11 @@ class ArgType:
 class BaseRunningScript(ManagedModel):
     m_szName = model.StringField(0x08, 8)
 
-    def __init__(self, addr, mgr, script_space_base, process_addr, buff_size=255):
+    def __init__(self, addr, context, script_space_base, process_addr, buff_size=255):
         """
         :param process_addr: 执行一条脚本的原生函数地址
         """
-        super().__init__(addr, mgr)
+        super().__init__(addr, context)
         self.script_space_base = script_space_base
         self.process_addr = process_addr
         self.buff_size = buff_size
@@ -180,6 +180,6 @@ class RunningScript(BaseRunningScript):
 
         self.m_nIp = self.buff_addr - self.script_space_base
 
-        self.mgr.native_call_auto(self.process_addr, None, this=self.addr)
+        self.context.native_call_auto(self.process_addr, None, this=self.addr)
         self.save_variables()
         return self.m_nCondResult
