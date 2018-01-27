@@ -190,10 +190,6 @@ class Tool(BaseGTA3_VC_SA_Tool):
             ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
         ) + self.get_common_hotkeys()
 
-    def free_remote_function(self):
-        super().free_remote_function()
-        del self.script_context
-
     def script_call(self, command_id, signature, *args):
         """执行一条脚本"""
         if self.handler.active:
@@ -429,3 +425,9 @@ class Tool(BaseGTA3_VC_SA_Tool):
             color = blip.color
             if color is 7 and not blip.bright:
                 yield blip.entity
+
+    def add_bullet(self, creator, weaponType, coord, velocity):
+        self.native_call_auto(address.FUNC_AddBullet, '2L6f', creator, 0x13, *coord, *velocity)
+
+    def shoot_bullet(self):
+        pass

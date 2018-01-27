@@ -8,6 +8,17 @@ ui = fefactory_api.ui
 class BaseGTA3_VC_SA_Tool(BaseGTATool):
     """GTA3, VC, SA公共基类"""
 
+    def init_remote_function(self):
+        super().init_remote_function()
+        
+        script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
+        self.script_context = self.RunningScript(script_ctx_addr, self, 
+            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init, self.address.FUNC_CRunningScript__ProcessOneCommand)
+
+    def free_remote_function(self):
+        super().free_remote_function()
+        del self.script_context
+
     def script_call(self, command_id, signature, *args):
         """执行一条脚本"""
         if self.handler.active:
@@ -77,17 +88,6 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
 
 class BaseGTA3Tool(BaseGTA3_VC_SA_Tool):
     """GTA3, VC公共基类"""
-
-    def init_remote_function(self):
-        super().init_remote_function()
-        
-        script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
-        self.script_context = self.RunningScript(script_ctx_addr, self, 
-            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init, self.address.FUNC_CRunningScript__ProcessOneCommand)
-
-    def free_remote_function(self):
-        super().free_remote_function()
-        del self.script_context
 
     def render_common_button(self):
         Marker = self.models.Marker

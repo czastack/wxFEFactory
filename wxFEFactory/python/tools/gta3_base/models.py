@@ -71,7 +71,7 @@ class GTA3Vehicle(NativeModel):
     @property
     def coord_s(self):
         self.script_call(opcodes.GET_CAR_COORDINATES, 'L3P', self.handle, *self.context.native_context.get_temp_addrs(1, 3))
-        return utils.CoordData(self, self.context.native_context.get_temp_values(1, 3, float))
+        return utils.CoordData(self, self.context.native_context.get_temp_values(1, 3, float), 'coord_s')
 
     @coord_s.setter
     def coord_s(self, value):

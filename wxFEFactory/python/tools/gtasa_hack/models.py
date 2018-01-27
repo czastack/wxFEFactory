@@ -1,8 +1,8 @@
 from lib.hack.model import Model, Field, CoordField
 from lib.lazy import lazy
 from .datasets import VEHICLE_LIST
-from ..gta_base.models import Physicle, WeaponSet, Pool
-from ..gta_base.models import ManagedModel
+from ..gta_base.models import Physicle, WeaponSet, Pool, ManagedModel
+from ..gta3_base.models import GTA3Player, GTA3Vehicle
 from . import address
 import math
 
@@ -49,7 +49,7 @@ class Entity(Physicle):
             self.special &= ~(1 << 1)
 
 
-class Player(Entity):
+class Player(Entity, GTA3Player):
     SIZE = 0x7c4
 
     hp = Field(0x540, float)
@@ -89,7 +89,7 @@ class Player(Entity):
         return self.weapons[self.cur_weapon_slop]
 
 
-class Vehicle(Entity):
+class Vehicle(Entity, GTA3Vehicle):
     SIZE = 0xa18
 
     hp = Field(0x4c0, float)
