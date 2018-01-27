@@ -1,6 +1,6 @@
 from lib.hack.model import Model, Field, CoordField, ManagedModelField
 from ..gta_base.models import Physicle, WeaponSet, Pool
-from ..gta3_base.models import BaseBlip
+from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 from . import address
 import math
 
@@ -12,7 +12,7 @@ class Entity(Physicle):
     model_id = Field(0x5c, int, 1)
 
 
-class Vehicle(Entity):
+class Vehicle(Entity, GTA3Vehicle):
     SIZE = 0x5a8
 
     hp = Field(0x200, float)
@@ -60,7 +60,7 @@ class Vehicle(Entity):
             self.flags &= (~4 & 0xFFFFFFFF)
 
 
-class Player(Entity):
+class Player(Entity, GTA3Player):
     SIZE = 0x5f0
 
     hp = Field(0x2c0, float)

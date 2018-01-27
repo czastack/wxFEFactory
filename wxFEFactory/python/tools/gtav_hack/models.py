@@ -459,6 +459,11 @@ class Player(NativeEntity):
         """降落到坐标"""
         self.script_call('TASK_PARACHUTE_TO_TARGET', 'Q3f', self.handle, *coord)
 
+    def reset_stamina(self):
+        self.script_call('RESET_PLAYER_STAMINA', 'Q', self.index)
+
+    stamina = property(player_getter('GET_PLAYER_SPRINT_STAMINA_REMAINING', float), player_setter('RESTORE_PLAYER_STAMINA', float))
+
     del getter, getter_ptr, setter
 
 

@@ -41,7 +41,8 @@ class Entity(Physicle):
         self.speed = (0, 0, 0)
         self.turn_speed = (0, 0, 0)
 
-    def setSpecial(self, on, bitindex):
+    def set_proof(self, on, bitindex):
+        # 设置免疫属性
         if on:
             self.special |= 1 << bitindex
         else:

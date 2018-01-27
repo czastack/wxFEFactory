@@ -54,14 +54,14 @@ class Tool(BaseGTA3_VC_SA_Tool):
 
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
-                    self.player_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setPlayerSpecial, bitindex=Player.SPECIAL_FP)),
+                    self.player_proof_views = [
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_FP)),
                     ]
-                    ui.Button("全部", style=btn_md_style, onclick=self.player_special_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_special_apply).setToolTip("死亡或者重新读档后需要再次应用")
+                    ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInputWidget("hp", "HP")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
@@ -80,14 +80,14 @@ class Tool(BaseGTA3_VC_SA_Tool):
                 ui.Hr()
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
-                    self.vehicle_special_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.setVehicleSpecial, bitindex=Vehicle.SPECIAL_FP)),
+                    self.vehicle_proof_views = [
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_FP)),
                     ]
-                    ui.Button("全部", style=btn_md_style, onclick=self.vehicle_special_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_special_apply).setToolTip("切换载具后需要再次应用")
+                    ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
                 self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", datasets.COLOR_LIST)
@@ -247,32 +247,32 @@ class Tool(BaseGTA3_VC_SA_Tool):
         coord[0] = self.handler.readFloat(address.MAP_X_ADDR)
         coord[1] = self.handler.readFloat(address.MAP_Y_ADDR)
 
-    def setPlayerSpecial(self, checkbox, bitindex):
-        """设置玩家特殊属性"""
-        self.player.setSpecial(checkbox.checked, bitindex)
+    def set_player_proof(self, checkbox, bitindex):
+        """设置玩家免疫"""
+        self.player.set_proof(checkbox.checked, bitindex)
 
-    def setVehicleSpecial(self, checkbox, bitindex):
-        """设置当前汽车特殊属性"""
-        self.last_vehicle.setSpecial(checkbox.checked, bitindex)
+    def set_vehicle_proof(self, checkbox, bitindex):
+        """设置当前汽车免疫"""
+        self.last_vehicle.set_proof(checkbox.checked, bitindex)
 
-    def player_special_all(self, _=None):
-        for cb in self.player_special_views:
+    def player_proof_all(self, _=None):
+        for cb in self.player_proof_views:
             if not cb.checked:
                 cb.checked = True
             cb.onchange(cb)
 
-    def player_special_apply(self, _=None):
-        for cb in self.player_special_views:
+    def player_proof_apply(self, _=None):
+        for cb in self.player_proof_views:
             if cb.checked:
                 cb.onchange(cb)
 
-    def vehicle_special_apply(self, _=None):
-        for cb in self.vehicle_special_views:
+    def vehicle_proof_apply(self, _=None):
+        for cb in self.vehicle_proof_views:
             if cb.checked:
                 cb.onchange(cb)
 
-    def vehicle_special_all(self, _=None):
-        for cb in self.vehicle_special_views:
+    def vehicle_proof_all(self, _=None):
+        for cb in self.vehicle_proof_views:
             if not cb.checked:
                 cb.checked = True
             cb.onchange(cb)

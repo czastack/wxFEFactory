@@ -73,7 +73,7 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
         if vehicle_id:
             on = tb.checked
             self.script_call(opcodes.SET_CAR_PROOFS, '6L', vehicle_id, on, on, on, on, on)
-        
+
 
 class BaseGTA3Tool(BaseGTA3_VC_SA_Tool):
     """GTA3, VC公共基类"""

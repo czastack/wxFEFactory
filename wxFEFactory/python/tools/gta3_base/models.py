@@ -1,4 +1,5 @@
-from ..gta_base.models import ManagedModel
+from ..gta_base.models import ManagedModel, NativeModel
+from ..gta_base import utils
 from . import opcodes
 
 
@@ -30,7 +31,26 @@ class BaseBlip(ManagedModel):
             return self.context.object_pool[index]
 
 
-class GTA3Vehicle:
+class GTA3Player(NativeModel):
+    @property
+    def handle(self):
+        return self.context.ped_pool.addr_to_handle(self.addr)
+
+    def set_proof(self, bullets, fire, explosions, collisions, melee):
+        self.context.script_call(opcodes.SET_CHAR_PROOFS, '6L', self.handle, 
+            bullets, fire, explosions, collisions, melee)
+
+    @property
+    def coord_s(self):
+        self.script_call(opcodes.GET_CHAR_COORDINATES, 'L3P', self.handle, *self.context.native_context.get_temp_addrs(1, 3))
+        return utils.CoordData(self, self.context.native_context.get_temp_values(1, 3, float))
+
+    @coord_s.setter
+    def coord_s(self, value):
+        self.script_call(opcodes.SET_CHAR_COORDINATES, 'L3f', self.handle, *value)
+
+
+class GTA3Vehicle(NativeModel):
     @property
     def handle(self):
         return self.context.vehicle_pool.addr_to_handle(self.addr)
@@ -40,3 +60,19 @@ class GTA3Vehicle:
 
     def set_speed(self, speed):
         self.context.script_call(opcodes.SET_CAR_FORWARD_SPEED, 'Lf', self.handle, speed)
+
+    def goto(self, coord):
+        self.context.script_call(opcodes.CAR_GOTO_COORDINATES, 'L3f', self.handle, *coord)
+
+    def set_proof(self, bullets, fire, explosions, collisions, melee):
+        self.context.script_call(opcodes.SET_CAR_PROOFS, '6L', self.handle, 
+            bullets, fire, explosions, collisions, melee)
+
+    @property
+    def coord_s(self):
+        self.script_call(opcodes.GET_CAR_COORDINATES, 'L3P', self.handle, *self.context.native_context.get_temp_addrs(1, 3))
+        return utils.CoordData(self, self.context.native_context.get_temp_values(1, 3, float))
+
+    @coord_s.setter
+    def coord_s(self, value):
+        self.script_call(opcodes.SET_CAR_COORDINATES, 'L3f', self.handle, *value)

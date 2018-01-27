@@ -109,9 +109,9 @@ class Pool(ManagedModel):
 class NativeModel:
     P = 'L'
 
-    def __init__(self, context):
+    def __init__(self, handle, context):
+        self.handle = handle
         self.context = context
-        self.handle = context.handle
 
     @property
     def native_context(self):
