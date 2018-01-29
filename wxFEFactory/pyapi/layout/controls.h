@@ -200,6 +200,14 @@ public:
 		bindEvt(wxEVT_TEXT_ENTER, fn, reset);
 	}
 
+	void setOnChar(pycref fn, bool reset = true)
+	{
+		py::dict arg;
+		arg["callback"] = fn;
+		arg["arg_event"] = py::bool_(true);
+		bindEvt(wxEVT_CHAR, arg, reset);
+	}
+
 	void appendText(wxcstr text)
 	{
 		ctrl().AppendText(text);

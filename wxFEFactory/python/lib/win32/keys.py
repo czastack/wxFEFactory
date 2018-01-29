@@ -7,123 +7,167 @@ MOD_RIGHT    = 0x4000
 MOD_ON_KEYUP = 0x0800
 
 VK_CODE = {
-    'backspace': 0x08,
-    'tab': 0x09,
-    'clear': 0x0C,
-    'enter': 0x0D,
-    'shift': 0x10,
-    'ctrl': 0x11,
-    'alt': 0x12,
-    'pause': 0x13,
-    'capslock': 0x14,
-    'esc': 0x1B,
-    'space': 0x20,
-    ' ': 0x20,
-    'pageup': 0x21,
-    'pagedown': 0x22,
-    'end': 0x23,
-    'home': 0x24,
-    'left': 0x25,
-    'up': 0x26,
-    'right': 0x27,
-    'down': 0x28,
-    'select': 0x29,
-    'print': 0x2A,
-    'execute': 0x2B,
-    'print_screen': 0x2C,
-    'ins': 0x2D,
-    'del': 0x2E,
-    'help': 0x2F,
-    'lwin': 0x5B,
-    'rwin': 0x5C,
-    'numpad_0': 0x60,
-    'numpad_1': 0x61,
-    'numpad_2': 0x62,
-    'numpad_3': 0x63,
-    'numpad_4': 0x64,
-    'numpad_5': 0x65,
-    'numpad_6': 0x66,
-    'numpad_7': 0x67,
-    'numpad_8': 0x68,
-    'numpad_9': 0x69,
-    'multiply': 0x6A,
-    'add': 0x6B,
-    'separator': 0x6C,
-    'subtract': 0x6D,
-    'decimal': 0x6E,
-    'divide': 0x6F,
-    'F1': 0x70,
-    'F2': 0x71,
-    'F3': 0x72,
-    'F4': 0x73,
-    'F5': 0x74,
-    'F6': 0x75,
-    'F7': 0x76,
-    'F8': 0x77,
-    'F9': 0x78,
-    'F10': 0x79,
-    'F11': 0x7A,
-    'F12': 0x7B,
-    'F13': 0x7C,
-    'F14': 0x7D,
-    'F15': 0x7E,
-    'F16': 0x7F,
-    'F17': 0x80,
-    'F18': 0x81,
-    'F19': 0x82,
-    'F20': 0x83,
-    'F21': 0x84,
-    'F22': 0x85,
-    'F23': 0x86,
-    'F24': 0x87,
-    'numlock': 0x90,
-    'scroll_lock': 0x91,
-    'lshift': 0xA0,
-    'rshift ': 0xA1,
-    'lcontrol': 0xA2,
-    'rcontrol': 0xA3,
-    'lmenu': 0xA4,
-    'rmenu': 0xA5,
-    'browser_back': 0xA6,
-    'browser_forward': 0xA7,
-    'browser_refresh': 0xA8,
-    'browser_stop': 0xA9,
-    'browser_search': 0xAA,
-    'browser_favorites': 0xAB,
-    'browser_start_and_home': 0xAC,
-    'volume_mute': 0xAD,
-    'volume_Down': 0xAE,
-    'volume_up': 0xAF,
-    'next_track': 0xB0,
-    'previous_track': 0xB1,
-    'stop_media': 0xB2,
-    'play/ pause_media':0xB3,
-    'start_mail': 0xB4,
-    'select_media': 0xB5,
-    'start_application_1': 0xB6,
-    'start_application_2': 0xB7,
-    'attn_key': 0xF6,
-    'crsel_key': 0xF7,
-    'exsel_key': 0xF8,
-    'play_key': 0xFA,
-    'zoom_key': 0xFB,
-    'clear_key': 0xFE,
-    '+': 0xBB,
-    ',': 0xBC,
-    '-': 0xBD,
-    '.': 0xBE,
-    '/': 0xBF,
-    '`': 0xC0,
-    ';': 0xBA,
-    '[': 0xDB,
-    '\\': 0xDC,
-     ']': 0xDD,
-    "'": 0xDE,
-    '`': 0xC0 
+    'BACK': 8,
+    'TAB': 9,
+    'ENTER': 13,
+    'RETURN': 13,
+    'CAPSLOCK': 20,
+    'ESCAPE': 27,
+    'SPACE': 32,
+    ' ': 32,
+    'PAGEUP': 33,
+    'PAGEDOWN': 34,
+    'END': 35,
+    'HOME': 36,
+    'LEFT': 37,
+    'UP': 38,
+    'RIGHT': 39,
+    'DOWN': 40,
+    'PRINT_SCREEN': 44,
+    'INS': 45,
+    'DEL': 46,
+    'LWIN': 91,
+    'RWIN': 92,
+    'NUMPAD0': 96,
+    'NUMPAD1': 97,
+    'NUMPAD2': 98,
+    'NUMPAD3': 99,
+    'NUMPAD4': 100,
+    'NUMPAD5': 101,
+    'NUMPAD6': 102,
+    'NUMPAD7': 103,
+    'NUMPAD8': 104,
+    'NUMPAD9': 105,
+    'MULTIPLY': 106,
+    'ADD': 107,
+    'SEPARATOR': 108,
+    'SUBTRACT': 109,
+    'DECIMAL': 110,
+    'DIVIDE': 111,
+    'F1': 112,
+    'F2': 113,
+    'F3': 114,
+    'F4': 115,
+    'F5': 116,
+    'F6': 117,
+    'F7': 118,
+    'F8': 119,
+    'F9': 120,
+    'F10': 121,
+    'F11': 122,
+    'F12': 123,
+    'NUMLOCK': 144,
+    '+': 187,
+    ',': 188,
+    '-': 189,
+    '.': 190,
+    '/': 191,
+    '`': 192,
+    ';': 186,
+    '[': 219,
+    '\\': 220,
+     ']': 221,
+    "'": 222,
+    '`': 192 
+}
+
+
+WXK_CODE = {
+    'BACK': 8,
+    'TAB': 9,
+    'SPACE': 32,
+    'DELETE': 127,
+    'ENTER': 13,
+    'RETUEN': 13,
+    'ESCAPE': 27,
+    'LBUTTON': 301,
+    'RBUTTON': 302,
+    'CANCEL': 303,
+    'MBUTTON': 304,
+    'CLEAR': 305,
+    'SHIFT': 306,
+    'ALT': 307,
+    'CONTROL': 308,
+    'MENU': 309,
+    'PAUSE': 310,
+    'CAPITAL': 311,
+    'END': 312,
+    'HOME': 313,
+    'LEFT': 314,
+    'UP': 315,
+    'RIGHT': 316,
+    'DOWN': 317,
+    'SELECT': 318,
+    'PRINT': 319,
+    'EXECUTE': 320,
+    'SNAPSHOT': 321,
+    'INSERT': 322,
+    'HELP': 323,
+    'NUMPAD0': 324,
+    'NUMPAD1': 325,
+    'NUMPAD2': 326,
+    'NUMPAD3': 327,
+    'NUMPAD4': 328,
+    'NUMPAD5': 329,
+    'NUMPAD6': 330,
+    'NUMPAD7': 331,
+    'NUMPAD8': 332,
+    'NUMPAD9': 333,
+    'MULTIPLY': 334,
+    'ADD': 335,
+    'SEPARATOR': 336,
+    'SUBTRACT': 337,
+    'DECIMAL': 338,
+    'DIVIDE': 339,
+    'F1': 340,
+    'F2': 341,
+    'F3': 342,
+    'F4': 343,
+    'F5': 344,
+    'F6': 345,
+    'F7': 346,
+    'F8': 347,
+    'F9': 348,
+    'F10': 349,
+    'F11': 350,
+    'F12': 351,
+    'NUMLOCK': 364,
+    'SCROLL': 365,
+    'PAGEUP': 366,
+    'PAGEDOWN': 367,
+    'NUMPAD_SPACE': 368,
+    'NUMPAD_TAB': 369,
+    'NUMPAD_ENTER': 370,
+    'NUMPAD_F1': 371,
+    'NUMPAD_F2': 372,
+    'NUMPAD_F3': 373,
+    'NUMPAD_F4': 374,
+    'NUMPAD_HOME': 375,
+    'NUMPAD_LEFT': 376,
+    'NUMPAD_UP': 377,
+    'NUMPAD_RIGHT': 378,
+    'NUMPAD_DOWN': 379,
+    'NUMPAD_PAGEUP': 380,
+    'NUMPAD_PAGEDOWN': 381,
+    'NUMPAD_END': 382,
+    'NUMPAD_BEGIN': 383,
+    'NUMPAD_INSERT': 384,
+    'NUMPAD_DELETE': 385,
+    'NUMPAD_EQUAL': 386,
+    'NUMPAD_MULTIPLY': 387,
+    'NUMPAD_ADD': 388,
+    'NUMPAD_SEPARATOR': 389,
+    'NUMPAD_SUBTRACT': 390,
+    'NUMPAD_DECIMAL': 391,
+    'NUMPAD_DIVIDE': 392,
+    'WINDOWS_LEFT': 393,
+    'WINDOWS_RIGHT': 394,
+    'WINDOWS_MENU' : 395,
 }
 
 
 def getVK(name):
+    """根据名称获取windows的keyCode"""
     if len(name) == 1:
         code = ord(name)
         # 0~9, A~Z
@@ -132,4 +176,68 @@ def getVK(name):
         # a~z
         elif 97 <= code <= 122:
             return code - 32
-    return VK_CODE.get(name, 0)
+    return VK_CODE.get(name.upper(), 0)
+
+
+def getVKName(code, mod=None):
+    """根据windows的keyCode和modifiers得到名称"""
+    # 0~9, A~Z
+    if 48 <= code <= 57 or 65 <= code <= 90:
+        name = chr(code)
+    else:
+        for key in VK_CODE:
+            if VK_CODE[key] == code:
+                name = key
+        else:
+            return ''
+    if mod:
+        if mod & MOD_ALT:
+            name = 'alt+' + name
+        if mod & MOD_SHIFT:
+            name = 'shift+' + name
+        if mod & MOD_CONTROL:
+            name = 'ctrl+' + name
+        if mod & MOD_WIN:
+            name = 'win+' + name
+    return name
+
+
+def isWXKMod(code):
+    """判断一个keyCode是否是ctrl, shift, alt"""
+    return code == WXK_CODE['SHIFT'] or code == WXK_CODE['ALT'] or code == WXK_CODE['CONTROL']
+
+
+def getWXK(name):
+    """根据名称获取onKeyDown时wxWidgets的的keyCode"""
+    if len(name) == 1:
+        code = ord(name)
+        # 0~9, A~Z
+        if 33 <= code <= 126:
+            return code
+        # a~z
+        elif 97 <= code <= 122:
+            return code - 32
+    return WXK_CODE.get(name.upper(), 0)
+
+
+def getWXKName(code, mod=None):
+    """根据wxWidgets的keyCode和modifiers得到名称"""
+    if 33 <= code <= 126:
+        name = chr(code)
+    else:
+        for key in WXK_CODE:
+            if WXK_CODE[key] == code:
+                name = key
+                break
+        else:
+            return ''
+    if mod and not isWXKMod(code):
+        if mod & MOD_ALT:
+            name = 'alt+' + name
+        if mod & MOD_SHIFT:
+            name = 'shift+' + name
+        if mod & MOD_CONTROL:
+            name = 'ctrl+' + name
+        if mod & MOD_WIN:
+            name = 'win+' + name
+    return name

@@ -61,6 +61,7 @@ class MainFrame:
                 self.book = ui.AuiNotebook()
                 ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(className="console-bar") as console:
+                    exui.HotkeyCtrl(className='expand')
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
                         self.console_input = ui.TextInput(wxstyle=0x0400, className="expand console-input")

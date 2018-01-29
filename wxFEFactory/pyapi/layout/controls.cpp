@@ -101,6 +101,7 @@ void init_controls(py::module & m)
 		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, type, "readonly"_a = false, "multiline"_a = false, wxstyle, className, style)
 		.def("setOnEnter", &TextInput::setOnEnter, evt_fn, evt_reset)
+		.def("setOnChar", &TextInput::setOnChar, evt_fn, evt_reset)
 		.def("appendText", &TextInput::appendText)
 		.def("writeText", &TextInput::writeText)
 		.def("selectAll", &TextInput::selectAll)

@@ -90,8 +90,7 @@ void init_layout(py::module &m)
 		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); })
 		.def("getWXK", [](wxKeyEvent &event, wxChar *keystr) {
 			int ch = keystr[0];
-			if ('0' <= ch && ch <= '9' || 'A' <= ch && ch <= 'Z') {
-				// 0~9, A~Z
+			if (33 <= ch && ch <= 126) {
 				return ch;
 			}
 			else if ('a' <= ch && ch <= 'z')
