@@ -78,7 +78,6 @@ class CheckChoiceDialog(ListDialog):
 class HotkeyCtrl(ui.TextInput):
 
     def __init__(self, *args, **kwargs):
-        # kwargs['readonly'] = Tr ue
         kwargs['wxstyle'] = 0x0400
         super().__init__(*args, **kwargs)
         self.setOnKeyDown(self.onKey)

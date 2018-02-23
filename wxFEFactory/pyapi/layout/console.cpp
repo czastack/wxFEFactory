@@ -71,7 +71,7 @@ void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
 			{
 				i = text.size();
 			}
-			line = text.substr(start, i);
+			line = text.SubString(start, i - 1);
 
 			if (i < text.size())
 			{
