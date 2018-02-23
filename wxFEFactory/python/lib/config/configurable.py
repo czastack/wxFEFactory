@@ -14,6 +14,9 @@ class Configurable(ABC):
     def __del__(self):
         self.writeConfig()
 
+    def __str__(self):
+        return '{}("{}")'.format(self.__class__.__name__, self.config_file)
+
     def getConfig(self, name, defval=None):
         return self.config.get(name, defval)
 

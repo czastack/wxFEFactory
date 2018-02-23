@@ -132,7 +132,7 @@ class MainFrame:
         bitmap = ui.Bitmap()
         toolbar = ui.AuiToolBar()
         for item in tools.toolbar_tools:
-            bitmap.loadIcon('python/tools/%s/icon.ico' % item[1])
+            bitmap.loadIcon('python/tools/%s/icon.ico' % item[1].replace('.', '/'))
             toolbar.addTool(item[0], "", bitmap, self.onToolbarToolClick)
 
         return toolbar.realize()
@@ -317,7 +317,7 @@ styles = {
     'class': {
         'fill': {'flex': 1},
         'expand': {'expand': True},
-        'console-bar': {'height': 150},
+        'console-bar': {'height': 160},
         'console-output': {'expand': True, 'flex': 1},
         'console-input': {'expand': True, 'flex': 1},
         'console-input-bar': {'showPadding': '1 0 0 0'},

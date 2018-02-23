@@ -4,7 +4,7 @@ from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config import Config
 from styles import styles
-from ..tool import BaseTool
+from ...tool import BaseTool
 from .models import Pool
 from .native import NativeContext
 import math

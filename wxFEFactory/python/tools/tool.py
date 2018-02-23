@@ -59,7 +59,8 @@ class BaseTool(BaseScene):
     @lazyclassmethod_indict
     def getName(class_):
         """模块名称，即模块文件夹名"""
-        return class_.__module__.split('.')[1]
+        module = class_.__module__
+        return module[module.find('.') + 1: module.rfind('.')]
 
     def reload(self, _=None):
         from mainframe import frame
