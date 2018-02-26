@@ -17,5 +17,12 @@ class Tool(BaseDolphinHack):
     
     def render_main(self):
         with Group("player", "角色", self._ram, handler=self.handler):
-            self.hp_view = ModelInputWidget("hp", "生命")
-            self.max_hp_view = ModelInputWidget("max_hp", "最大生命")
+            ModelInputWidget("level", "等级(1+)")
+            ModelInputWidget("hp", "生命")
+            ModelInputWidget("max_hp", "最大生命")
+            ModelInputWidget("money", "金钱")
+            ModelInputWidget("power", "力")
+            ModelInputWidget("stamina", "体力")
+            ModelInputWidget("energy", "气力")
+            ModelInputWidget("soul", "魂")
+            ModelInputWidget("exp", "经验")

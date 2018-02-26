@@ -12,8 +12,8 @@ class BigendHandler(ProcessHandler):
             return struct.unpack('>f', data)[0]
         elif type is bool:
             return bool(self.read8(addr))
-        elif _type is bytes:
-            return ProcessHandler.read(self, addr, bytes, size)[::-1]
+        else:
+            return ProcessHandler.read(self, addr, type, size)
 
     def write(self, addr, data, size):
         _type = type(data)
@@ -23,8 +23,8 @@ class BigendHandler(ProcessHandler):
             ProcessHandler.write(self, addr, struct.pack('>f', data), size if size else 4)
         elif _type is bool:
             return self.write8(addr, data)
-        elif _type is bytes:
-            return ProcessHandler.read(self, addr, data[::-1], size)
+        else:
+            return ProcessHandler.write(self, addr, data, size)
 
     def readUint(self, addr, size):
         return int.from_bytes(ProcessHandler.read(self, addr, bytes, size), 'big')
