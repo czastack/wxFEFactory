@@ -47,6 +47,10 @@ def executable_name():
     path = executable_file()
     return os.path.splitext(os.path.basename(path))[0]
 
+def execfile(path, encoding="utf-8"):
+    with open(path, encoding=encoding) as f:
+        exec(f.read())
+
 
 class Screen:
     size = fefactory_api.getScreenSize()

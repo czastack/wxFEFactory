@@ -1,7 +1,9 @@
 #include "../pyutils.h"
 #include "graph.h"
+#include "myapp.h"
 #include <wx/image.h>
 #include <wx/palette.h>
+#include "pyapi/layout/dialogs.h"
 
 
 class FeImage: wxImage
@@ -83,9 +85,11 @@ public:
 	{
 		if (IsOk())
 		{
-			/*MainFrame *win = wxGetApp().GetWin();
-			wxStaticBitmap *bpView = new wxStaticBitmap(win, wxID_ANY, wxBitmap(*this));
-			win->getAreaRight()->AddPage(bpView, title);*/
+			wxWindow *win = wxGetApp().GetTopWindow();
+			SimpleDialog *dialog = new SimpleDialog(title, true, false, win);
+			wxStaticBitmap *bpView = new wxStaticBitmap(dialog, wxID_ANY, wxBitmap(*this));
+			dialog->setContentView(bpView, 8);
+			dialog->Show();
 		}
 	}
 

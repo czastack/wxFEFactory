@@ -2,146 +2,38 @@ from functools import partial
 from fefactory_api.emuhacker import ProcessHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.config import Config
-from styles import styles
-from ...tool import BaseTool
+from ...hacktool import BaseHackTool
 from .models import Pool
 from .native import NativeContext
+import base64
 import math
 import time
 import traceback
 import fefactory_api
-import fefactory_api
 ui = fefactory_api.ui
 
-win_style = {
-    'width': 700,
-    'height': 820,
-    # 'width': 640,
-    # 'height': 700,
-}
 
-
-class BaseGTATool(BaseTool):
-    nested = True
+class BaseGTATool(BaseHackTool):
     NativeContext = NativeContext
     RAISE_UP_SPEED = 1.0
     GO_DOWN_SPEED = 0.5
     TO_UP_DELTA = 10
     TO_DOWN_DELTA = 6
 
-    FUNCTION_NATIVE_CALL = (
-        b'\x55\x8B\xEC\x83\xEC\x0C\x56\x8B\x75\x08\x57\x8B\x56\x08\x8B\x02\x8B\x7A\x04\x83\x46\x04\xFE\x8B\x4E\x04\x41\x89\x45'
-        b'\xF4\x89\x7D\xF8\x83\xF9\x01\x7E\x0F\x8B\x04\x8A\x89\x45\xFC\xFF\x75\xFC\x49\x83\xF9\x01\x7F\xF1\x85\xFF\x74\x03\x8B'
-        b'\x4D\xF8\xFF\x55\xF4\x89\x45\x08\x85\xFF\x75\x0C\x8B\x46\x04\xC1\xE0\x02\x89\x45\xF4\x03\x65\xF4\x8B\x0E\x8B\x45\x08'
-        b'\x5F\x5E\x89\x01\x8B\xE5\x5D\xC3'
-    )
+    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GF/3QDi034/1X0iUUIhf91DItGBMHgAolF9ANl9IsOi0UIX16JAYvlXcM=')
 
     # x64 native_call
-    FUNCTION_NATIVE_CALL_64 = (
-        b'\x4C\x8B\xDC\x49\x89\x5B\x18\x49\x89\x6B\x20\x56\x57\x41\x56\x48\x83\xEC\x30\x48\x8B\x71\x10\x4C\x8B\xF1\x48\x8B\x3E\x48'
-        b'\x8B\x6E\x08\x48\x83\xC6\x10\x49\x89\x7B\xD8\x48\x8B\x16\x83\x41\x08\xFD\x8B\x59\x08\x48\x85\xD2\x74\x0C\xFF\xC3\x48\xC1'
-        b'\xE7\x08\x49\x89\x7B\xD8\xEB\x04\x48\x83\xC6\x08\x48\x33\xFF\x83\xFB\x05\x7C\x44\x48\x83\xC6\x20\x48\x83\xEB\x04\x4C\x8D'
-        b'\x14\xDD\x20\x00\x00\x00\x49\x8B\xC2\x48\x83\xE0\x0F\x48\x85\xC0\x74\x04\x49\x83\xC2\x08\x49\x2B\xE2\x48\x8B\xFC\x48\x83'
-        b'\xC7\x20\x48\x33\xC9\x8B\xCB\xF3\x48\xA5\x49\x8B\xFA\x83\xC3\x04\x49\x2B\xF2\x48\x85\xC0\x74\x04\x48\x83\xC6\x08\x83\xFB'
-        b'\x01\x0F\x8C\x84\x00\x00\x00\x41\x8A\x43\xD8\x3C\x00\x74\x10\x3C\x01\x74\x06\xF2\x0F\x10\x06\xEB\x09\xF3\x0F\x10\x06\xEB'
-        b'\x03\x48\x8B\x0E\x83\xFB\x02\x7C\x64\x41\x8A\x43\xD9\x3C\x00\x74\x12\x3C\x01\x74\x07\xF2\x0F\x10\x4E\x08\xEB\x0B\xF3\x0F'
-        b'\x10\x4E\x08\xEB\x04\x48\x8B\x56\x08\x83\xFB\x03\x7C\x41\x41\x8A\x43\xDA\x3C\x00\x74\x12\x3C\x01\x74\x07\xF2\x0F\x10\x56'
-        b'\x10\xEB\x0B\xF3\x0F\x10\x56\x10\xEB\x04\x4C\x8B\x46\x10\x83\xFB\x04\x7C\x1E\x41\x8A\x43\xDB\x3C\x00\x74\x12\x3C\x01\x74'
-        b'\x07\xF2\x0F\x10\x5E\x18\xEB\x0B\xF3\x0F\x10\x5E\x18\xEB\x04\x4C\x8B\x4E\x18\xFF\xD5\x49\x8B\x0E\x48\x89\x01\xF3\x0F\x11'
-        b'\x41\x08\xF2\x0F\x11\x41\x10\x48\x85\xFF\x74\x03\x48\x03\xE7\x48\x83\xC4\x30\x41\x5E\x5F\x5E\xC3'
+    FUNCTION_NATIVE_CALL_64 = base64.b64decode(
+        b'TIvcSYlbGEmJayBWV0FWSIPsMEiLcRBMi/FIiz5Ii24ISIPGEEmJe9hIixaDQQj9i1kISIXSdAz/w0jB5whJiXvY6wRIg8YISDP/g/sFfERIg8YgSIPrBEyNFN0gAAAASYvCSIPgD0iFwHQESYPCCEkr4kiL/EiDxyBIM8mLy/NIpUmL+oPDBEkr8kiFwHQESIPGCIP7AQ+MhAAAAEGKQ9g8AHQQPAF0BvIPEAbrCfMPEAbrA0iLDoP7AnxkQYpD2TwAdBI8AXQH8g8QTgjrC/MPEE4I6wRIi1YIg/sDfEFBikPaPAB0EjwBdAfyDxBWEOsL8w8QVhDrBEyLRhCD+wR8HkGKQ9s8AHQSPAF0B/IPEF4Y6wvzDxBeGOsETItOGP/VSYsOSIkB8w8RQQjyDxFBEEiF/3QDSAPnSIPEMEFeX17D'
     )
 
     def __init__(self):
         super().__init__()
         self.handler = ProcessHandler()
-        self.config = Config(self.getName() + '_config.json')
-
-    def attach(self, frame):
-        super().attach(frame)
-        self.check_attach()
-
-    def render(self):
-        with self.render_win() as win:
-            with ui.Vertical():
-                with ui.Horizontal(className="expand container"):
-                    ui.Button("检测", className="vcenter", onclick=self.check_attach)
-                    self.attach_status_view = ui.Text("", className="label_left grow")
-                    ui.CheckBox("保持最前", onchange=self.swith_keeptop)
-                with ui.Notebook(className="fill") as book:
-                    book.setOnPageChange(self.onNotePageChange)
-                    try:
-                        self.render_main()
-                    except:
-                        win.close()
-                        raise
-
-        return win
-
-    def render_win(self):
-        menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=menubar, wxstyle=0x80804)
-        self.win.position = (70, 4)
-        return self.win
-
-    def check_attach(self, _=None):
-        """检查运行GTA主程序状态"""
-        if self.handler.active:
-            self.free_remote_function()
-
-        if self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
-            self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
-
-            if not self.win.hotkeys:
-                self.win.RegisterHotKeys(self.get_hotkeys())
-            self.init_remote_function()
-        else:
-            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME
 
     def get_hotkeys(self):
         """重写这个函数，返回要注册的热键列表"""
         return self.get_common_hotkeys()
-
-    def onClose(self, *args):
-        if self.handler.active:
-            self.free_remote_function()
-        self.config.write()
-        return super().onClose(*args)
-
-    def lazy_group(self, group, fn):
-        groups = getattr(self, 'lazy_groups', None)
-        if groups is None:
-            self.lazy_groups = groups = {}
-
-        groups[group.root] = group, fn
-
-    def onNotePageChange(self, book):
-        groups = getattr(self, 'lazy_groups', None)
-        if groups:
-            root = book.getPage()
-            item = groups.get(root, None)
-            if item:
-                group, fn = item
-                with group:
-                    fn()
-                del groups[root]
-
-    def discard_config(self, _=None):
-        self.config.cancel_change()
-
-    def swith_keeptop(self, cb):
-        if self.nested:
-            from __main__ import win
-        else:
-            win = self.win
-        win.keeptop = cb.checked
-
-    def read_vector(self, addr):
-        """ 在addr读三个float类型
-        :return: (x, y, z)
-        """
-        r = self.handler.readFloat
-        return (r(addr), r(addr + 4), r(addr + 8))
 
     def init_remote_function(self):
         """初始化远程函数"""
@@ -765,33 +657,6 @@ class BaseGTATool(BaseTool):
         for coord in self.iter_cam_dir_coords(count, distance, True):
             self.create_explosion(coord)
 
-    def custom_hotkey(self, _=None):
-        """用于自定义的临时热键功能"""
-        fn = getattr(self, 'cfn', None)
-        if fn:
-            fn()
-
-    def toggle_setting(self, name, default=False):
-        """切换设置"""
-        toggle = not getattr(self, name, default)
-        setattr(self, name, toggle)
-        return toggle
-
-    def get_cache(self, name, key, fn):
-        """ 获取缓存的内容
-        :param fn: 缓存不存在时通过fn(key)获取
-        """
-        cache_name = '_cache_' + name
-        cache = getattr(self, cache_name, None)
-        if cache is None:
-            cache = {}
-            setattr(self, cache_name, cache)
-
-        value = cache.get(key, None)
-        if value is None:
-            value = cache[key] = fn(key)
-        return value
-
     def g3l2json(self, _=None):
         """g3l坐标转json"""
         path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
@@ -822,16 +687,6 @@ class BaseGTATool(BaseTool):
                 json.dump(datas, file, ensure_ascii=False)
 
             fefactory_api.alert('转换成功: ' + jsonpath)
-
-    def set_cfn(self, btn, m=None):
-        self.cfn = btn.click
-
-    def set_buttons_contextmenu(self):
-        parent = ui.View.get_active_layout()
-        with ui.ContextMenu(onselect=self.set_cfn) as contextmenu:
-            ui.MenuItem("设为alt+c快捷键(&C)")
-        for btn in parent.children:
-            btn.setContextMenu(contextmenu)
 
     def render_common_button(self):
         ui.Button("杀掉附近的人", onclick=self.kill_near_peds)

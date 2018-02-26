@@ -7,6 +7,7 @@ tools = [
     ("GTAIV Hack", "gta.gtaiv_hack"),
     ("GTAIV-EFLC Hack", "gta.gtaiv_eflc_hack"),
     ("GTAV Hack", "gta.gtav_hack"),
+    ("胧村正妖刀传", "dolphin.rsfj99"),
     ("快速剪切板", "quick_clipboard"),
 ]
 

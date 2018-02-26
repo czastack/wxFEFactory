@@ -35,18 +35,18 @@ public:
 	pyobj process_read(addr_t addr, pycref type, size_t size)
 	{
 		const auto &builtin = py::module::import("builtins");
-		if (type == builtin.attr("float"))
+		if (type == builtin.attr("int"))
+		{
+			size_t data = readUint(addr, size ? size : getPtrSize());
+			return py::cast(data);
+		}
+		else if (type == builtin.attr("float"))
 		{
 			return py::cast(read<float>(addr));
 		}
 		else if (type == builtin.attr("bool"))
 		{
 			return py::cast(read<bool>(addr));
-		}
-		else if (type == builtin.attr("int"))
-		{
-			size_t data = readUint(addr, size ? size : getPtrSize());
-			return py::cast(data);
 		}
 		else if (size)
 		{
@@ -62,17 +62,17 @@ public:
 
 	bool process_write(addr_t addr, pycref data, size_t size)
 	{
-		if (PY_IS_TYPE(data, PyFloat))
+		if (PY_IS_TYPE(data, PyLong))
+		{
+			writeUint(addr, data.cast<size_t>(), size ? size : getPtrSize());
+		}
+		else if (PY_IS_TYPE(data, PyFloat))
 		{
 			return write(addr, data.cast<float>());
 		}
 		else if (PY_IS_TYPE(data, PyBool))
 		{
 			return write(addr, data.cast<bool>());
-		}
-		else if (PY_IS_TYPE(data, PyLong))
-		{
-			writeUint(addr, data.cast<size_t>(), size ? size : getPtrSize());
 		}
 		else if (PY_IS_TYPE(data, PyBytes))
 		{
