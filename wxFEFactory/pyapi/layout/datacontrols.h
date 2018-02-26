@@ -211,6 +211,11 @@ public:
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true);
 
+	int getItemCount() const
+	{
+		return ctrl().GetItemCount();
+	}
+
 	void enableCheckboxes(bool enabled)
 	{
 		ctrl().EnableCheckboxes(enabled);
@@ -224,6 +229,32 @@ public:
 	void checkItem(int item, bool checked)
 	{
 		ctrl().CheckItem(item, checked);
+	}
+
+	bool isItemSelected(int item)
+	{
+		return ctrl().IsSelected(item);
+	}
+
+	void selectItem(int item, bool selected)
+	{
+		ctrl().Select(item, selected);
+	}
+
+	void checkAll(bool checked)
+	{
+		for (int i = 0; i < getItemCount(); i++)
+		{
+			checkItem(i, checked);
+		}
+	}
+
+	void selectAll(bool selected)
+	{
+		for (int i = 0; i < getItemCount(); i++)
+		{
+			selectItem(i, selected);
+		}
 	}
 
 	void setOnItemSelected(pyobj &fn, bool reset = true)

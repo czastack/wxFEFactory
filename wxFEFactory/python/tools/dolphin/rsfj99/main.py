@@ -34,8 +34,8 @@ class Tool(BaseDolphinHack):
             li.enableCheckboxes()
             li.appendColumns(('姓名', '编号', 'R键说明'), (300, 150, 200))
             li.insertItems([('艾希', '01', '少女'), ('赛思', 12, '圣骑士'), ('赛思', 12, '圣骑士')])
-            # li.insertItems([('艾希', '01', '少女')], 1, False)
             li.setOnItemSelected({'arg_event': True, 'callback': self.onListSelect})
+            self.li = li
 
 
     def onListSelect(self, view, event):
