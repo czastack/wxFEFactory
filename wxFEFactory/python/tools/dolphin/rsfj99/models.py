@@ -12,9 +12,10 @@ class Ram(Model):
     soul = Field(0x00E464F4) # 魂
     exp = Field(0x00E464EC) # 经验
 
-    potion = 0x00E0609D # 回复道具
-    consumer = 0x00E060B0 # 消费道具
-    blade = 0x00E06159 # 刀具
-    decorator = 0x00E060C2 # 装饰
-    food = 0x00E060B8 # 食物
-    book = 0x00E060DB # 书物
+    potion = 0x00D850FC # 回复道具 (19个普通回复药+44个料理, 值为数量)
+    consumer = 0x00D85110 # 消费道具 (8个, 值为数量)
+    food = 0x00D85118 # 食材 (10个, 值为数量)
+    decorator = 0x00D85122 # 装饰1 (25个, 值为1)
+    book = 0x00D8513B # 书物 (37个, 值为1)
+    blade = 0x00D8518D # 刀 (108个可装备刀+BOSS鬼助/百姬不可装备刀, 值为1)
+    decorator2 = 0x00D851FF # 装饰2 (30个, 值为1)

@@ -1,6 +1,8 @@
 from ..base import BaseDolphinHack
 from . import models
 from lib.hack.form import Group, StaticGroup, InputWidget, CheckBoxWidget, ModelInputWidget
+import fefactory_api
+ui = fefactory_api.ui
 
 
 class Tool(BaseDolphinHack):
@@ -26,3 +28,16 @@ class Tool(BaseDolphinHack):
             ModelInputWidget("energy", "气力")
             ModelInputWidget("soul", "魂")
             ModelInputWidget("exp", "经验")
+
+        with StaticGroup("刀"):
+            li = ui.ListView(className="fill")
+            li.enableCheckboxes()
+            li.appendColumns(('姓名', '编号', 'R键说明'), (300, 150, 200))
+            li.insertItems([('艾希', '01', '少女'), ('赛思', 12, '圣骑士'), ('赛思', 12, '圣骑士')])
+            # li.insertItems([('艾希', '01', '少女')], 1, False)
+            li.setOnItemSelected({'arg_event': True, 'callback': self.onListSelect})
+
+
+    def onListSelect(self, view, event):
+        index = event.index
+        view.checkItem(index, not view.isItemChecked(index))

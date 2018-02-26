@@ -68,13 +68,6 @@ void init_layout(py::module &m)
 		.def("findFocus", &Layout::findFocus)
 		.def_readonly("children", &Layout::m_children);
 
-	init_frames(layout);
-	init_containers(layout);
-	init_controls(layout);
-	init_aui(layout);
-	init_bars(layout);
-	init_datacontrols(layout);
-
 	py::class_<PyThread>(layout, "Thread")
 		.def(py::init<pyobj, DWORD>(), "fn"_a, "delay"_a=0)
 		.def("Run", &PyThread::Run);
@@ -168,7 +161,10 @@ void init_layout(py::module &m)
 	ATTR_KEYCODE(WINDOWS_MENU);
 #undef ATTR_KEYCODE
 
-
-	ATTR_INT(layout.ptr(), VERTICAL, wx),
-	ATTR_INT(layout.ptr(), HORIZONTAL, wx);
+	init_frames(layout);
+	init_containers(layout);
+	init_controls(layout);
+	init_aui(layout);
+	init_bars(layout);
+	init_datacontrols(layout);
 }

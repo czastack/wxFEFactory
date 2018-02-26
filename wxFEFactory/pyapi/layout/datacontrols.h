@@ -205,15 +205,46 @@ public:
 		return *(wxListView*)m_elem;
 	}
 
-	void appendColumns(py::iterable columns)
-	{
-		wxString text;
-		for (auto &item : columns) {
-			ctrl().AppendColumn(pystrcpy(text, item));
-		}
-	}
+	void appendColumns(py::iterable columns, pycref widths);
+
+	auto &appendColumn(wxString &text, int align = wxLIST_FORMAT_LEFT, int width = -1);
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true);
+
+	void enableCheckboxes(bool enabled)
+	{
+		ctrl().EnableCheckboxes(enabled);
+	}
+
+	bool isItemChecked(int item)
+	{
+		return ctrl().IsItemChecked(item);
+	}
+
+	void checkItem(int item, bool checked)
+	{
+		ctrl().CheckItem(item, checked);
+	}
+
+	void setOnItemSelected(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_LIST_ITEM_SELECTED, fn, reset);
+	}
+
+	void setOnItemDeselected(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_LIST_ITEM_DESELECTED, fn, reset);
+	}
+
+	void setOnItemChecked(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_LIST_ITEM_CHECKED, fn, reset);
+	}
+
+	void setOnItemUnchecked(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_LIST_ITEM_UNCHECKED, fn, reset);
+	}
 };
 
 void init_datacontrols(py::module &m);

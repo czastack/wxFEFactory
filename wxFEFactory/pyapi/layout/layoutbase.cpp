@@ -323,7 +323,7 @@ bool View::handleEvent(wxEvent & event)
 			callback = py::reinterpret_borrow<py::object>(e);
 			if (isPyDict(callback))
 			{
-				if (callback.contains("arg_event"))
+				if (pyDictGet(callback, "arg_event", false))
 				{
 					ret = pyCall(callback["callback"], this, &event);
 				}

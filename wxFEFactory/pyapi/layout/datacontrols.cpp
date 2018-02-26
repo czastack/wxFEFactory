@@ -178,6 +178,24 @@ void PropertyGrid::setValues(pycref data, bool all)
 	}
 }
 
+void ListView::appendColumns(py::iterable columns, pycref widths)
+{
+	wxString text;
+	int width_len = widths.is_none() ? 0 : py::len(widths);
+	const py::sequence &width_list = width_len ? py::reinterpret_borrow<py::sequence>(widths) : None;
+	int i = 0;
+	for (auto &item : columns) {
+		ctrl().AppendColumn(pystrcpy(text, item), wxLIST_FORMAT_LEFT, i < width_len ? width_list[i].cast<int>(): -1);
+		i++;
+	}
+}
+
+auto &ListView::appendColumn(wxString &text, int align, int width)
+{
+	ctrl().AppendColumn(text, (wxListColumnFormat)align, width);
+	return *this;
+}
+
 void ListView::insertItems(const py::iterable & rows, int pos, bool create)
 {
 	wxListItem info;
@@ -191,7 +209,7 @@ void ListView::insertItems(const py::iterable & rows, int pos, bool create)
 		info.m_col = 0;
 		if (create)
 			li.InsertItem(info);
-		for (auto &item : py::reinterpret_steal<py::iterable>(cols)) {
+		for (auto &item : cols) {
 			pystrcpy(info.m_text, item);
 			li.SetItem(info);
 			++info.m_col;
@@ -211,6 +229,7 @@ void init_datacontrols(py::module &m)
 	auto &name_arg = "name"_a;
 	auto &help_arg = "help"_a = None;
 	auto &value_0 = "value"_a = 0;
+	auto evt_reset = "reset"_a = true;
 
 	py::class_t<PropertyGrid, Control>(m, "PropertyGrid")
 		.def_init(py::init<pyobj, pyobj, pyobj>(),
@@ -238,8 +257,25 @@ void init_datacontrols(py::module &m)
 		.def_readwrite("autosave", &PropertyGrid::m_autosave)
 		.def_readwrite("changed", &PropertyGrid::m_changed);
 
-	py::class_t<ListView, Control>(m, "ListView")
+	auto pyListView = py::class_t<ListView, Control>(m, "ListView")
 		.def_init(py::init<pyobj, pyobj>(), className, style)
-		.def("appendColumns", &ListView::appendColumns)
-		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a = -1, "create"_a = true);
+		.def("appendColumns", &ListView::appendColumns, "columns"_a, "widths"_a=None)
+		.def("appendColumn", &ListView::appendColumn, "text"_a, "align"_a=(int)wxLIST_FORMAT_LEFT, "width"_a=-1)
+		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a=-1, "create"_a=true)
+		.def("enableCheckboxes", &ListView::enableCheckboxes, "enabled"_a=true)
+		.def("isItemChecked", &ListView::isItemChecked, "item"_a)
+		.def("checkItem", &ListView::checkItem, "item"_a, "checked"_a=true)
+		.def("setOnItemSelected", &ListView::setOnItemSelected, "onselect"_a, evt_reset)
+		.def("setOnItemDeselected", &ListView::setOnItemDeselected, "ondeselect"_a, evt_reset)
+		.def("setOnItemChecked", &ListView::setOnItemChecked, "oncheck"_a, evt_reset)
+		.def("setOnItemUnchecked", &ListView::setOnItemUnchecked, "onuncheck"_a, evt_reset);
+	
+	ATTR_INT(pyListView.ptr(), LEFT, wxLIST_FORMAT_),
+	ATTR_INT(pyListView.ptr(), RIGHT, wxLIST_FORMAT_),
+	ATTR_INT(pyListView.ptr(), CENTER, wxLIST_FORMAT_);
+
+	py::class_<wxListEvent, wxEvent>(m, "ListEvent")
+		.def_property_readonly("keycode", &wxListEvent::GetKeyCode)
+		.def_property_readonly("index", &wxListEvent::GetIndex)
+		.def_property_readonly("column", &wxListEvent::GetColumn);
 }

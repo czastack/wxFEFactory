@@ -13,8 +13,6 @@ wxString& pystrcpy(wxString &text, const py::handle &h) {
 	wxStringBufferLength buff(text, length);
 	PyUnicode_AsWideChar(temp, buff, length);
 	buff.SetLength(length);
-	if (temp != h.ptr())
-		Py_XDECREF(temp);
 	return text;
 }
 
