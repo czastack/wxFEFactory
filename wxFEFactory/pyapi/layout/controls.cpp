@@ -118,7 +118,7 @@ void init_controls(py::module & m)
 
 	py::class_t<SpinCtrl, Control>(m, "SpinCtrl")
 		.def_init(py::init<wxcstr, int, int, int, pyobj, pyobj>(),
-			"value"_a = wxEmptyString, "min"_a, "max"_a, "initial"_a, className, style)
+			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, className, style)
 		.def_property("value", &SpinCtrl::getValue, &SpinCtrl::setValue)
 		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
 		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);

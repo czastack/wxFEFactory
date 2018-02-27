@@ -190,7 +190,7 @@ void ListView::appendColumns(py::iterable columns, pycref widths)
 	}
 }
 
-auto &ListView::appendColumn(wxString &text, int align, int width)
+auto &ListView::appendColumn(wxcstr text, int align, int width)
 {
 	ctrl().AppendColumn(text, (wxListColumnFormat)align, width);
 	return *this;
@@ -216,6 +216,29 @@ void ListView::insertItems(const py::iterable & rows, int pos, bool create)
 		}
 		++info.m_itemId;
 	}
+}
+
+py::list ListView::getCheckedList()
+{
+	py::list result;
+	for (int i = 0; i < getItemCount(); ++i)
+	{
+		if (isItemChecked(i))
+		{
+			result.append(py::int_(i));
+		}
+	}
+	return result;
+}
+
+py::list ListView::getSelectedList()
+{
+	py::list result;
+	for (int i = ctrl().GetFirstSelected(); i != -1; i = ctrl().GetNextSelected(i))
+	{
+		result.append(py::int_(i));
+	}
+	return result;
 }
 
 void init_datacontrols(py::module &m)
@@ -262,7 +285,9 @@ void init_datacontrols(py::module &m)
 		.def("appendColumns", &ListView::appendColumns, "columns"_a, "widths"_a=None)
 		.def("appendColumn", &ListView::appendColumn, "text"_a, "align"_a=(int)wxLIST_FORMAT_LEFT, "width"_a=-1)
 		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a=-1, "create"_a=true)
+		.def("setItem", &ListView::setItem, "index"_a, "col"_a, "text"_a)
 		.def("getItemCount", &ListView::getItemCount)
+		.def("getColumnCount", &ListView::getColumnCount)
 		.def("checkAll", &ListView::checkAll, "checked"_a = true)
 		.def("selectAll", &ListView::selectAll, "selected"_a = true)
 		.def("enableCheckboxes", &ListView::enableCheckboxes, "enabled"_a=true)
@@ -270,6 +295,8 @@ void init_datacontrols(py::module &m)
 		.def("checkItem", &ListView::checkItem, "item"_a, "checked"_a=true)
 		.def("isItemSelected", &ListView::isItemSelected, "item"_a)
 		.def("selectItem", &ListView::selectItem, "item"_a, "selected"_a = true)
+		.def("getCheckedList", &ListView::getCheckedList)
+		.def("getSelectedList", &ListView::getSelectedList)
 		.def("setOnItemSelected", &ListView::setOnItemSelected, "onselect"_a, evt_reset)
 		.def("setOnItemDeselected", &ListView::setOnItemDeselected, "ondeselect"_a, evt_reset)
 		.def("setOnItemChecked", &ListView::setOnItemChecked, "oncheck"_a, evt_reset)

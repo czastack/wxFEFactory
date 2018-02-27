@@ -207,13 +207,23 @@ public:
 
 	void appendColumns(py::iterable columns, pycref widths);
 
-	auto &appendColumn(wxString &text, int align = wxLIST_FORMAT_LEFT, int width = -1);
+	auto &appendColumn(wxcstr text, int align = wxLIST_FORMAT_LEFT, int width = -1);
 
 	void insertItems(const py::iterable &rows, int pos = -1, bool create = true);
+
+	void setItem(long index, int col, wxcstr text)
+	{
+		ctrl().SetItem(index, col, text);
+	}
 
 	int getItemCount() const
 	{
 		return ctrl().GetItemCount();
+	}
+
+	int getColumnCount() const
+	{
+		return ctrl().GetColumnCount();
 	}
 
 	void enableCheckboxes(bool enabled)
@@ -256,6 +266,9 @@ public:
 			selectItem(i, selected);
 		}
 	}
+
+	py::list getCheckedList();
+	py::list getSelectedList();
 
 	void setOnItemSelected(pyobj &fn, bool reset = true)
 	{
