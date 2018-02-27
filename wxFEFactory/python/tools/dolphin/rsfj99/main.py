@@ -96,7 +96,8 @@ class Tool(BaseDolphinHack):
         # 不选中表示移除该物品
         uncheck_as_no = uncheck_action.checked
         checked = view.getCheckedList()
-        count_data = self.count_data[group['name']]
+        if hascount:
+            count_data = self.count_data[group['name']]
         for i in range(len(group['items'])):
             if i in checked:
                 data[i] = count_data[i] if hascount else 1
