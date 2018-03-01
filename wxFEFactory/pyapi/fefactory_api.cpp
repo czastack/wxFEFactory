@@ -1,3 +1,4 @@
+#include <pybind11/embed.h>
 #include <wx/wx.h>
 #include "pyutils.h"
 #include "fefactory_api.h"
@@ -19,18 +20,11 @@ void reloadFefactory()
 {
 	if (fefactory)
 	{
-		if (!PyImport_ReloadModule(fefactory.ptr()))
-			PyErr_Print();
+		fefactory.reload();
 	} 
 	else
 	{
-		PyObject *module = PyImport_ImportModule("fefactory");
-		if (module) {
-			fefactory = py::reinterpret_borrow<py::module>(module);
-		}
-		else
-			PyErr_Print();
-		/*try
+		try
 		{
 			fefactory = py::module::import("fefactory");
 		}
@@ -38,7 +32,7 @@ void reloadFefactory()
 		{
 			e.restore();
 			PyErr_Print();
-		}*/
+		}
 	}
 }
 
@@ -48,11 +42,8 @@ void setOnAppExit(pycref fn)
 }
 
 
-PyObject *fefactory_api() {
+PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 	using namespace py::literals;
-
-	py::module m("fefactory_api");
-
 	m
 		.def("log_message", log_message)
 		.def("alert", alert, "title"_a, "msg"_a)
@@ -76,15 +67,11 @@ PyObject *fefactory_api() {
 	init_auto(m);
 	init_emuhacker(m);
 #endif
-	return m.ptr();
 }
 
-
-void initPyEnv() {
-	PyImport_AppendInittab("fefactory_api", &fefactory_api);
-	SetEnvironmentVariable(L"PYTHONPATH", L"python");
-	Py_Initialize();
-
+void initPyEnv()
+{
+	py::module::import("fefactory_api");
 	auto &app = wxGetApp();
 	auto &args = app.argv.GetArguments();
 	const wchar_t ** argv = new const wchar_t *[app.argc];
@@ -94,7 +81,7 @@ void initPyEnv() {
 	}
 	PySys_SetArgv(app.argc, (wchar_t **)argv);
 	delete[] argv;
-	
+
 	reloadFefactory();
 }
 
@@ -104,5 +91,4 @@ void destroyPyEnv()
 	{
 		pyCall(onAppExit);
 	}
-	Py_Finalize();
 }

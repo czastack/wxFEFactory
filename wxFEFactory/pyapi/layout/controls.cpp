@@ -5,7 +5,7 @@ long Text::getAlignStyle()
 {
 	pyobj style = getStyle(STYLE_TEXTALIGN);
 	long wxstyle = 0;
-	if (style != None)
+	if (!style.is(None))
 	{
 		wxcstr align = style.cast<wxString>();
 		if (align != wxNoneString) {
@@ -33,7 +33,7 @@ void RadioBox::applyStyle()
 	pyobj style;
 
 	style = getStyle(STYLE_FLEXDIRECTION);
-	if (style != None)
+	if (!style.is(None))
 	{
 		wxcstr dir = style.cast<wxString>();
 		if (dir != wxNoneString) {

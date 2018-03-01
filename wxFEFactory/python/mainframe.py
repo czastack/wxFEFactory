@@ -56,7 +56,7 @@ class MainFrame:
         with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
                 toolbar = self.render_toolbar()
-                ui.AuiItem(toolbar.realize(), direction="top", captionVisible=False)
+                ui.AuiItem(toolbar, direction="top", captionVisible=False)
                 # ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
                 self.book = ui.AuiNotebook()
                 ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)

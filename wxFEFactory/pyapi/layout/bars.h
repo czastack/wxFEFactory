@@ -18,7 +18,6 @@ public:
 	virtual ~ToolBarBase()
 	{
 		m_listeners.clear();
-		m_listeners = None;
 	}
 
 	T& ctrl() const
@@ -49,7 +48,7 @@ public:
 		}
 		auto *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
 		toolid = tool->GetId();
-		if (onclick != None)
+		if (!onclick.is(None))
 		{
 			m_listeners[py::cast(toolid)] = onclick;
 		}
@@ -60,7 +59,7 @@ public:
 	{
 		auto *tool = ctrl().AddControl((wxControl*)view.ptr(), label);
 		int toolid = tool->GetId();
-		if (onclick != None)
+		if (!onclick.is(None))
 		{
 			m_listeners[py::cast(tool->GetId())] = onclick;
 		}

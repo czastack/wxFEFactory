@@ -81,11 +81,7 @@ public:
 		m_elem = pElem;
 	}
 
-	void __init()
-	{
-		m_elem->SetClientData(this);
-		addToParent();
-	}
+	void __init();
 
 	void addToParent();
 

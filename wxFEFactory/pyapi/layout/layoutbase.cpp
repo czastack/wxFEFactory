@@ -36,6 +36,12 @@ View::~View() {
 	}
 }
 
+void View::__init()
+{
+	m_elem->SetClientData(this);
+	addToParent();
+}
+
 void View::addToParent() {
 	Layout* pLayout = getActiveLayout();
 	if (pLayout)
@@ -130,7 +136,7 @@ bool View::hasStyle(pyobj & key)
 	{
 		for (auto &e : m_style)
 		{
-			if (e != None && e.contains(key))
+			if (!e.is(None) && e.contains(key))
 			{
 				return true;
 			}
@@ -138,7 +144,7 @@ bool View::hasStyle(pyobj & key)
 
 		return false;
 	}
-	return m_style != None && m_style.contains(key);
+	return !m_style.is(None) && m_style.contains(key);
 }
 
 /**
@@ -181,7 +187,7 @@ void View::applyStyle()
 	pyobj style;
 
 	style = getStyle(STYLE_BACKGROUND);
-	if (style != None)
+	if (!style.is(None))
 	{
 		if (py::isinstance<py::str>(style))
 		{
@@ -193,7 +199,7 @@ void View::applyStyle()
 	}
 
 	style = getStyle(STYLE_COLOR);
-	if (style != None)
+	if (!style.is(None))
 	{
 		if (py::isinstance<py::str>(style))
 		{
@@ -205,7 +211,7 @@ void View::applyStyle()
 	}
 
 	style = getStyle(STYLE_FONTSIZE);
-	if (style != None)
+	if (!style.is(None))
 	{
 		wxFont font = m_elem->GetFont();
 		font.SetPointSize(style.cast<int>());
@@ -213,7 +219,7 @@ void View::applyStyle()
 	}
 
 	style = getStyle(STYLE_FONT);
-	if (style != None)
+	if (!style.is(None))
 	{
 		wxFont font = m_elem->GetFont();
 
@@ -251,10 +257,10 @@ void View::applyStyle()
 	{
 		wxSize size = m_elem->GetMinSize();
 		style = getStyle(STYLE_MINWIDTH);
-		if (style != None)
+		if (!style.is(None))
 			size.SetWidth(style.cast<int>());
 		style = getStyle(STYLE_MINHEIGHT);
-		if (style != None)
+		if (!style.is(None))
 			size.SetHeight(style.cast<int>());
 		m_elem->SetMinSize(size);
 	}
@@ -263,10 +269,10 @@ void View::applyStyle()
 	{
 		wxSize size = m_elem->GetMaxSize();
 		style = getStyle(STYLE_MAXWIDTH);
-		if (style != None)
+		if (!style.is(None))
 			size.SetWidth(style.cast<int>());
 		style = getStyle(STYLE_MAXHEIGHT);
-		if (style != None)
+		if (!style.is(None))
 			size.SetHeight(style.cast<int>());
 		m_elem->SetMaxSize(size);
 	}
@@ -345,7 +351,7 @@ bool View::handleEvent(wxEvent & event)
 }
 
 void Layout::add(View & child) {
-	m_children.append(py::cast(&child));
+	m_children.append(&child);
 	child.applyStyle();
 	doAdd(child);
 }

@@ -228,7 +228,7 @@ public:
 
 	void enableCheckboxes(bool enabled)
 	{
-		ctrl().EnableCheckboxes(enabled);
+		ctrl().EnableCheckBoxes(enabled);
 	}
 
 	bool isItemChecked(int item)

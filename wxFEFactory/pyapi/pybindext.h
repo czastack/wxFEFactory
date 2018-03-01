@@ -4,39 +4,6 @@
 #include "utils/utils.h"
 
 namespace pybind11 {
-	/*class wstr : public str {
-	public:
-		using str::str;
-
-		wstr() : str(){}
-
-		wstr(const wchar_t *c, ssize_t n)
-			: str(PyUnicode_FromWideChar(c, n), stolen) {
-			if (!m_ptr) pybind11_fail("Could not allocate string object!");
-		}
-
-		wstr(const std::wstring &s) : wstr(s.data(), s.size()) { }
-
-		operator std::wstring() const {
-			object temp;
-			if (!PyUnicode_Check(ptr())) {
-				temp = reinterpret_steal<object>(PyUnicode_FromObject(ptr()));
-			}
-			else {
-				temp = *this;
-			}
-			ssize_t length = -1;
-			wchar_t *buffer = PyUnicode_AsWideCharString(temp.ptr(), &length);
-			std::wstring value = std::wstring(buffer, length);
-			PyMem_Free(buffer);
-			return value;
-		}
-
-		operator class wxString() const {
-			return operator wxStringImpl();
-		}
-	};
-*/
 	
 	namespace detail {
 #if wxUSE_UNICODE_WCHAR && wxUSE_STL_BASED_WXSTRING
@@ -106,43 +73,25 @@ namespace pybind11 {
 		};
 	}
 
-
-
-	/*template <typename... options>
-	class class_cza : public class_<options...>
-	{
-	public:
-		using class_::class_;
-		using init_t = void (type::*)();
-
-		template <typename... Args, typename... Extra>
-		class_ &def_init(init_t initfn, const detail::init<Args...> &init, const Extra&... extra)
-		{
-			def("__init__", [initfn](type *self_, Args... args) { (new (self_) type(args...)->*initfn)(); }, extra...);
-			return *this;
-		}
-	};*/
-
 	
-	template <typename... options>
-	class class_t : public class_<options...>
+	template <typename type_, typename... options>
+	class class_t : public class_<type_, options...>
 	{
 	public:
 		using class_::class_;
-		using init_t = void (type::*)();
 
 		template <typename... Args, typename... Extra>
-		auto &def_init(const detail::init<Args...> &init, const Extra&... extra)
+		class_ &def_init(const detail::initimpl::constructor<Args...> &init, const Extra&... extra)
 		{
-			def("__init__", [](type *self_, Args... args) { (new (self_) type(args...)->*(&type::__init))(); }, extra...);
+			using namespace detail::initimpl;
+			def("__init__", [](detail::value_and_holder &v_h, Args... args) {
+				type_ *ins = construct_or_initialize<type_, Args...>(std::forward<Args>(args)...);
+				v_h.value_ptr() = ins;
+				v_h.set_holder_constructed();
+				(ins->*(&type_::__init))();
+			}, detail::is_new_style_constructor(), extra...);
+
 			return *this;
 		}
-
-/*
-		auto &def_alias(const char *alias, const char *origin)
-		{
-			py::setattr(*this, alias, this->attr(origin));
-			return *this;
-		}*/
 	};
 }

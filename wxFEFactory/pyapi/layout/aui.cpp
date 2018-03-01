@@ -15,13 +15,13 @@ void AuiManager::doAdd(View & child)
 		pyobj data;
 
 		data = pyDictGet(item->m_kwargs, wxT("name"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.Name(data.cast<wxString>());
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("direction"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			wxcstr direction = data.cast<wxString>();
 
@@ -38,7 +38,7 @@ void AuiManager::doAdd(View & child)
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("caption"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.Caption(data.cast<wxString>());
 		}
@@ -49,25 +49,25 @@ void AuiManager::doAdd(View & child)
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("maximizeButton"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.MaximizeButton(data.cast<bool>());
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("minimizeButton"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.MinimizeButton(data.cast<bool>());
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("captionVisible"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.CaptionVisible(data.cast<bool>());
 		}
 
 		data = pyDictGet(item->m_kwargs, wxT("row"));
-		if (data != None)
+		if (!data.is(None))
 		{
 			info.Row(data.cast<int>());
 		}
@@ -109,7 +109,7 @@ void AuiNotebook::doAdd(View & child)
 		ctrl().AddPage(child, caption);
 
 		pycref onclose = pyDictGet(item->m_kwargs, wxT("onclose"));
-		if (onclose != None)
+		if (!onclose.is(None))
 		{
 			m_close_listeners[py::cast(&child)] = onclose;
 		}
@@ -135,7 +135,7 @@ bool AuiNotebook::canPageClose(int n)
 	pyobj page = py::cast(getPage(n));
 	pyobj onclose = pyDictGet(m_close_listeners, page);
 
-	if (onclose != None)
+	if (!onclose.is(None))
 	{
 		ret = PyObject_IsTrue(pyCall(onclose).ptr()) != 0;
 		if (ret)

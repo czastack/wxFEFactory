@@ -12,46 +12,44 @@
 #include <psapi.h>
 
 
-class PyProcessHandler : public ProcessHandler {
-public:
-	friend void init_emuhacker(py::module &m);
+namespace emuhacker {
 
-	auto read8(addr_t addr) { return readUint(addr, sizeof(u8)); }
-	auto read16(addr_t addr) { return readUint(addr, sizeof(u16)); }
-	auto read32(addr_t addr) { return readUint(addr, sizeof(u32)); }
-	auto read64(addr_t addr) { return readUint(addr, sizeof(UINT64)); }
-	auto readPtr(addr_t addr) { return readUint(addr, getPtrSize()); }
-	auto readFloat(addr_t addr) { return read<float>(addr); }
-	auto readDouble(addr_t addr) { return read<double>(addr); }
-	bool write8(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u8)); }
-	bool write16(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u16)); }
-	bool write32(addr_t addr, size_t data) { return writeUint(addr, data, sizeof(u32)); }
-	bool write64(addr_t addr, UINT64 data) { return writeUint(addr, data, sizeof(UINT64)); }
-	bool writePtr(addr_t addr, size_t data) { return writeUint(addr, data, getPtrSize()); }
-	bool writeFloat(addr_t addr, float value) { return write(addr, value); }
-	bool writeDouble(addr_t addr, double value) { return write(addr, value); }
+	auto read8(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u8)); }
+	auto read16(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u16)); }
+	auto read32(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u32)); }
+	auto read64(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(UINT64)); }
+	auto readPtr(ProcessHandler &self, addr_t addr) { return self.readUint(addr, self.getPtrSize()); }
+	auto readFloat(ProcessHandler &self, addr_t addr) { return self.read<float>(addr); }
+	auto readDouble(ProcessHandler &self, addr_t addr) { return self.read<double>(addr); }
+	bool write8(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u8)); }
+	bool write16(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u16)); }
+	bool write32(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u32)); }
+	bool write64(ProcessHandler &self, addr_t addr, UINT64 data) { return self.writeUint(addr, data, sizeof(UINT64)); }
+	bool writePtr(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, self.getPtrSize()); }
+	bool writeFloat(ProcessHandler &self, addr_t addr, float value) { return self.write(addr, value); }
+	bool writeDouble(ProcessHandler &self, addr_t addr, double value) { return self.write(addr, value); }
 
 
-	pyobj process_read(addr_t addr, pycref type, size_t size)
+	pyobj process_read(ProcessHandler &self, addr_t addr, pycref type, size_t size)
 	{
 		const auto &builtin = py::module::import("builtins");
-		if (type == builtin.attr("int"))
+		if (type.is(builtin.attr("int")))
 		{
-			size_t data = readUint(addr, size ? size : getPtrSize());
+			size_t data = self.readUint(addr, size ? size : self.getPtrSize());
 			return py::cast(data);
 		}
-		else if (type == builtin.attr("float"))
+		else if (type.is(builtin.attr("float")))
 		{
-			return py::cast(read<float>(addr));
+			return py::cast(self.read<float>(addr));
 		}
-		else if (type == builtin.attr("bool"))
+		else if (type.is(builtin.attr("bool")))
 		{
-			return py::cast(read<bool>(addr));
+			return py::cast(self.read<bool>(addr));
 		}
 		else if (size)
 		{
 			char *buf = new char[size];
-			read(addr, buf, size);
+			self.read(addr, buf, size);
 			py::bytes ret(buf, size);
 			delete buf;
 			return ret;
@@ -60,95 +58,97 @@ public:
 	}
 
 
-	bool process_write(addr_t addr, pycref data, size_t size)
+	bool process_write(ProcessHandler &self, addr_t addr, pycref data, size_t size)
 	{
 		if (PY_IS_TYPE(data, PyLong))
 		{
-			writeUint(addr, data.cast<size_t>(), size ? size : getPtrSize());
+			self.writeUint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
 		}
 		else if (PY_IS_TYPE(data, PyFloat))
 		{
-			return write(addr, data.cast<float>());
+			return self.write(addr, data.cast<float>());
 		}
 		else if (PY_IS_TYPE(data, PyBool))
 		{
-			return write(addr, data.cast<bool>());
+			return self.write(addr, data.cast<bool>());
 		}
 		else if (PY_IS_TYPE(data, PyBytes))
 		{
 			if (size == 0)
 				size = py::len(data);
-			return write(addr, bytesGetBuff(data), size);
+			return self.write(addr, bytesGetBuff(data), size);
 		}
 		else if (PY_IS_TYPE(data, PyByteArray))
 		{
 			if (size == 0)
 				size = py::len(data);
-			return write(addr, PyByteArray_AsString(data.ptr()), size);
+			return self.write(addr, PyByteArray_AsString(data.ptr()), size);
 		}
 
 		return false;
 	}
 
 
-	addr_t readLastAddr(addr_t addr, py::iterable &args)
+	addr_t readLastAddr(ProcessHandler &self, addr_t addr, py::iterable &args)
 	{
 		wxArrayInt offsets = py::cast<wxArrayInt>(args);
-		return ProcessHandler::readLastAddr(addr, offsets);
+		return self.readLastAddr(addr, offsets);
 	}
 
 
-	auto ptrRead(addr_t addr, u32 offset, pycref type, pycref size) {
-		addr = readAddr(addr);
+	auto ptrRead(ProcessHandler &self, addr_t addr, u32 offset, pycref type, pycref size) {
+		addr = self.readAddr(addr);
 		if (addr)
 		{
-			return process_read(addr + offset, type, size.cast<size_t>());
+			return process_read(self, addr + offset, type, size.cast<size_t>());
 		}
 		return py::cast(false);
 	}
 
-	auto ptrWrite(addr_t addr, u32 offset, pycref data, pycref size) {
-		addr = readAddr(addr);
+	auto ptrWrite(ProcessHandler &self, addr_t addr, u32 offset, pycref data, pycref size) {
+		addr = self.readAddr(addr);
 		if (addr)
 		{
-			return process_write(addr + offset, data, size.cast<size_t>());
+			return process_write(self, addr + offset, data, size.cast<size_t>());
 		}
 		return false;
 	}
 
-	auto ptrsRead(addr_t addr, py::iterable &args, pycref type, pycref size) {
-		addr = readLastAddr(addr, args);
+	auto ptrsRead(ProcessHandler &self, addr_t addr, py::iterable &args, pycref type, pycref size) {
+		wxArrayInt &&offsets = py::cast<wxArrayInt>(args);
+		addr = self.readLastAddr(addr, offsets);
 		if (addr)
 		{
-			return process_read(addr, type, size.cast<size_t>());
+			return process_read(self, addr, type, size.cast<size_t>());
 		}
 		return py::cast(false);
 	}
 
-	auto ptrsWrite(addr_t addr, py::iterable &args, pycref data, pycref size) {
-		addr = readLastAddr(addr, args);
+	auto ptrsWrite(ProcessHandler &self, addr_t addr, py::iterable &args, pycref data, pycref size) {
+		wxArrayInt &&offsets = py::cast<wxArrayInt>(args);
+		addr = self.readLastAddr(addr, offsets);
 		if (addr)
 		{
-			return process_write(addr, data, size.cast<size_t>());
+			return process_write(self, addr, data, size.cast<size_t>());
 		}
 		return false;
 	}
 
-	auto write_function(py::bytes buf) {
+	auto write_function(ProcessHandler &self, py::bytes buf) {
 		char *buff;
 		ssize_t size;
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
-		return ProcessHandler::write_function(buff, size);
+		return self.write_function(buff, size);
 	}
 
-	wxString getModuleFile(addr_t module=0)
+	wxString getModuleFile(ProcessHandler &self, addr_t module = 0)
 	{
 		wxChar buff[MAX_PATH];
 		if (module == 0)
 		{
-			module = getProcessBaseAddress();
+			module = self.getProcessBaseAddress();
 		}
-		DWORD result = GetModuleFileNameEx(mProcess, (HMODULE)module, buff, sizeof(buff) / sizeof(wxChar));
+		DWORD result = GetModuleFileNameEx(self.getProcess(), (HMODULE)module, buff, sizeof(buff) / sizeof(wxChar));
 		if (result)
 		{
 			return wxString(buff, result);
@@ -156,10 +156,10 @@ public:
 		return wxNoneString;
 	}
 
-	py::tuple getModuleVersion()
+	py::tuple getModuleVersion(ProcessHandler &self)
 	{
 		DWORD dwInfoSize, dwHandle;
-		wxcstr path = getModuleFile();
+		wxcstr path = getModuleFile(self);
 		dwInfoSize = ::GetFileVersionInfoSize(path, &dwHandle);
 		wxChar* pData = new wxChar[dwInfoSize];
 		void *lpBuffer;
@@ -175,6 +175,30 @@ public:
 		}
 		return result;
 	}
+
+	BOOL CALLBACK _enumWindow(HWND hWnd, LPARAM lParam)
+	{
+		TCHAR szWindowName[64];
+		DWORD cchWindowName;
+		BOOL  bContinue = TRUE;
+
+		cchWindowName = GetWindowText(hWnd, szWindowName, 64);
+		py::object ret = pyCall(*(pyobj*)lParam, (LPARAM)hWnd, szWindowName);
+		return PyObject_IsTrue(ret.ptr());
+	}
+
+	void enumWindows(ProcessHandler &self, pycref callback)
+	{
+		EnumWindows(_enumWindow, reinterpret_cast<LPARAM>(&callback));
+	}
+};
+
+
+class PyProcessHandler: public ProcessHandler
+{
+public:
+	using ProcessHandler::m_is64os;
+	using ProcessHandler::m_is32process;
 };
 
 
@@ -190,7 +214,7 @@ void init_emuhacker(pybind11::module & m)
 	auto data_a = "data"_a;
 	auto type_a = "type"_a;
 
-	py::class_<ProcessHandler, PyProcessHandler>(emuhacker, "ProcessHandler")
+	py::class_<ProcessHandler>(emuhacker, "ProcessHandler")
 		.def(py::init<>())
 		.def("attach", &ProcessHandler::attach)
 		.def("attachByWindowName", &ProcessHandler::attachByWindowName)
@@ -198,33 +222,33 @@ void init_emuhacker(pybind11::module & m)
 		.def("writeUint", &ProcessHandler::writeUint)
 		.def("readInt", &ProcessHandler::readInt)
 		.def("writeInt", &ProcessHandler::writeInt)
-		.def("read8", &PyProcessHandler::read8)
-		.def("read16", &PyProcessHandler::read16)
-		.def("read32", &PyProcessHandler::read32)
-		.def("read64", &PyProcessHandler::read64)
-		.def("write8", &PyProcessHandler::write8)
-		.def("write16", &PyProcessHandler::write16)
-		.def("write32", &PyProcessHandler::write32)
-		.def("write64", &PyProcessHandler::write64)
-		.def("readPtr", &PyProcessHandler::readPtr)
-		.def("writePtr", &PyProcessHandler::writePtr)
-		.def("read", &PyProcessHandler::process_read, addr_a, type_a, "size"_a=0)
-		.def("write", &PyProcessHandler::process_write, addr_a, data_a, "size"_a=0)
+		.def("read8", &emuhacker::read8)
+		.def("read16", &emuhacker::read16)
+		.def("read32", &emuhacker::read32)
+		.def("read64", &emuhacker::read64)
+		.def("write8", &emuhacker::write8)
+		.def("write16", &emuhacker::write16)
+		.def("write32", &emuhacker::write32)
+		.def("write64", &emuhacker::write64)
+		.def("readPtr", &emuhacker::readPtr)
+		.def("writePtr", &emuhacker::writePtr)
+		.def("read", &emuhacker::process_read, addr_a, type_a, "size"_a = 0)
+		.def("write", &emuhacker::process_write, addr_a, data_a, "size"_a = 0)
 		.def("readAddr", &ProcessHandler::readAddr)
-		.def("readFloat", &PyProcessHandler::readFloat)
-		.def("writeFloat", &PyProcessHandler::writeFloat)
-		.def("readDouble", &PyProcessHandler::readDouble)
-		.def("writeDouble", &PyProcessHandler::writeDouble)
-		.def("ptrRead", &PyProcessHandler::ptrRead, addr_a, offsets_a, type_a, "size"_a=4)
-		.def("ptrWrite", &PyProcessHandler::ptrWrite, addr_a, offsets_a, data_a, "size"_a=4)
-		.def("readLastAddr", &PyProcessHandler::readLastAddr, addr_a, offsets_a)
-		.def("ptrsRead", &PyProcessHandler::ptrsRead, addr_a, offsets_a, type_a, "size"_a=4)
-		.def("ptrsWrite", &PyProcessHandler::ptrsWrite, addr_a, offsets_a, data_a, "size"_a=4)
+		.def("readFloat", &emuhacker::readFloat)
+		.def("writeFloat", &emuhacker::writeFloat)
+		.def("readDouble", &emuhacker::readDouble)
+		.def("writeDouble", &emuhacker::writeDouble)
+		.def("ptrRead", &emuhacker::ptrRead, addr_a, offsets_a, type_a, "size"_a = 4)
+		.def("ptrWrite", &emuhacker::ptrWrite, addr_a, offsets_a, data_a, "size"_a = 4)
+		.def("readLastAddr", &emuhacker::readLastAddr, addr_a, offsets_a)
+		.def("ptrsRead", &emuhacker::ptrsRead, addr_a, offsets_a, type_a, "size"_a = 4)
+		.def("ptrsWrite", &emuhacker::ptrsWrite, addr_a, offsets_a, data_a, "size"_a = 4)
 		.def("add", &ProcessHandler::add)
-		.def("get_module", &PyProcessHandler::getModuleHandle)
-		.def("get_module_file", &PyProcessHandler::getModuleFile, "module"_a=0)
-		.def("get_module_version", &PyProcessHandler::getModuleVersion)
-		.def("write_function", &PyProcessHandler::write_function)
+		.def("get_module", &ProcessHandler::getModuleHandle)
+		.def("get_module_file", &emuhacker::getModuleFile, "module"_a = 0)
+		.def("get_module_version", &emuhacker::getModuleVersion)
+		.def("write_function", &emuhacker::write_function)
 		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a)
 		.def("free_memory", &ProcessHandler::free_memory)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)

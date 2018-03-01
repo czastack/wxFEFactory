@@ -1,8 +1,8 @@
-#include <wx/wx.h>
+#include <pybind11/embed.h>
 #include <wx/imagpng.h>
+#include "myapp.h"
 #include "types.h"
 #include "pyapi/fefactory_api.h"
-#include "myapp.h"
 
 const wxString wxNoneString = wxEmptyString;
 
@@ -15,6 +15,8 @@ bool MyApp::OnInit()
 
 	wxImage::AddHandler(new wxPNGHandler);
 
+	SetEnvironmentVariable(L"PYTHONPATH", L"python");
+	m_guard = new pybind11::scoped_interpreter;
 	initPyEnv();
 
 	return true;
@@ -23,5 +25,6 @@ bool MyApp::OnInit()
 int MyApp::OnExit()
 {
 	destroyPyEnv();
+	delete m_guard;
 	return 0;
 }

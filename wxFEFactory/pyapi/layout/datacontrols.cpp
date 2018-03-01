@@ -9,7 +9,7 @@ void PropertyGrid::OnChange(wxPropertyGridEvent & event)
 		auto p = event.GetProperty();
 		pycref name = py::cast(p->GetName());
 		pycref value = getValue(event.GetValue());
-		if (m_onchange != None)
+		if (!m_onchange.is(None))
 		{
 			pycref ret = pyCall(m_onchange, this, name, value);
 			if (ret.ptr() == Py_False)
