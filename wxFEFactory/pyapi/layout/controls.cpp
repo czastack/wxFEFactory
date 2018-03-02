@@ -64,7 +64,7 @@ void init_controls(py::module & m)
 	auto evt_reset = "reset"_a = true;
 
 	py::class_t<Button, Control>(m, "Button")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, pyobj, pyobj, pyobj>(),
 			label, "onclick"_a = None, className, style)
 		.def("setOnClick", &Button::setOnClick, "onclick"_a, evt_reset)
 		.def("getLabel", &Button::getLabel)
@@ -73,7 +73,7 @@ void init_controls(py::module & m)
 		.def_property("label", &Button::getLabel, &Button::setLabel);
 
 	py::class_t<ToggleButton, Control>(m, "ToggleButton")
-		.def_init(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "onchange"_a = None, className, style)
 		.def("getLabel", &ToggleButton::getLabel)
 		.def("setLabel", &ToggleButton::setLabel)
@@ -83,7 +83,7 @@ void init_controls(py::module & m)
 		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked);
 
 	py::class_t<CheckBox, Control>(m, "CheckBox")
-		.def_init(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "alignRight"_a = false, "onchange"_a = None, className, style)
 		.def("getLabel", &CheckBox::getLabel)
 		.def("setLabel", &CheckBox::setLabel)
@@ -92,13 +92,13 @@ void init_controls(py::module & m)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked);
 
 	py::class_t<Text, Control>(m, "Text")
-		.def_init(py::init<wxcstr, pyobj, pyobj>(), label, className, style)
+		.def(py::init<wxcstr, pyobj, pyobj>(), label, className, style)
 		.def("getLabel", &Text::getLabel)
 		.def("setLabel", &Text::setLabel)
 		.def_property("label", &Text::getLabel, &Text::setLabel);
 
 	py::class_t<TextInput, Control>(m, "TextInput")
-		.def_init(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
+		.def(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, type, "readonly"_a = false, "multiline"_a = false, wxstyle, className, style)
 		.def("setOnEnter", &TextInput::setOnEnter, evt_fn, evt_reset)
 		.def("setOnChar", &TextInput::setOnChar, evt_fn, evt_reset)
@@ -110,21 +110,21 @@ void init_controls(py::module & m)
 		.def_property("selection", &TextInput::getSelection, &TextInput::setSelection);
 
 	py::class_t<SearchCtrl, Control>(m, "SearchCtrl")
-		.def_init(py::init<wxcstr, bool, bool, long, pyobj, pyobj>(),
+		.def(py::init<wxcstr, bool, bool, long, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, "search_button"_a = true, "cancel_button"_a = true, wxstyle, className, style)
 		.def("setOnSubmit", &SearchCtrl::setOnSubmit, evt_fn, evt_reset)
 		.def("setOnCancel", &SearchCtrl::setOnCancel, evt_fn, evt_reset)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
 
 	py::class_t<SpinCtrl, Control>(m, "SpinCtrl")
-		.def_init(py::init<wxcstr, int, int, int, pyobj, pyobj>(),
+		.def(py::init<wxcstr, int, int, int, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, className, style)
 		.def_property("value", &SpinCtrl::getValue, &SpinCtrl::setValue)
 		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
 		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);
 
 	py::class_t<ColorPicker, Control>(m, "ColorPicker")
-		.def_init(py::init<uint, pyobj, pyobj, pyobj>(),
+		.def(py::init<uint, pyobj, pyobj, pyobj>(),
 			"color"_a = 0, "onchange"_a = None, className, style)
 		.def_property("color", &ColorPicker::getColor, &ColorPicker::setColor);
 
@@ -158,11 +158,11 @@ void init_controls(py::module & m)
 		.def("clear", &ControlWithItems::clear);
 
 	py::class_t<ListBox, ControlWithItems>(m, "ListBox")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),
 			choices, onselect, className, style);
 
 	py::class_t<CheckListBox, ListBox>(m, "CheckListBox")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),
 			choices, onselect, className, style)
 		.def("getCheckedItems", &CheckListBox::getCheckedItems)
 		.def("setCheckedItems", &CheckListBox::setCheckedItems)
@@ -170,32 +170,32 @@ void init_controls(py::module & m)
 		.def("reverseCheck", &CheckListBox::reverseCheck);
 
 	py::class_t<RearrangeList, CheckListBox>(m, "RearrangeList")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			choices, "order"_a = py::list(), onselect, className, style)
 		.def("moveUp", &RearrangeList::moveUp)
 		.def("moveDown", &RearrangeList::moveDown);
 
 	py::class_t<Choice, ControlWithItems>(m, "Choice")
-		.def_init(py::init<pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),
 			choices, onselect, className, style);
 
 	py::class_t<ComboBox, ControlWithItems>(m, "ComboBox")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			type, choices, onselect, className, style)
 		.def("setOnEnter", &ComboBox::setOnEnter, evt_fn, evt_reset)
 		.def("autoComplete", &ComboBox::autoComplete)
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, BaseControlWithItems>(m, "RadioBox")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, choices, onselect, className, style);
 
 	py::class_t<Hr, Control>(m, "Hr")
-		.def_init(py::init<bool, pyobj, pyobj>(),
+		.def(py::init<bool, pyobj, pyobj>(),
 			"vertical"_a = false, className, style);
 
 	auto pyFilePickerCtrl = py::class_t<FilePickerCtrl, Control>(m, "FilePickerCtrl")
-		.def_init(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj>(),
+		.def(py::init<wxcstr, wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a = wxEmptyString, "msg"_a = wxEmptyString, "wildcard"_a = (const char*)wxFileSelectorDefaultWildcardStr,
 			"wxstyle"_a = (long)(wxFLP_DEFAULT_STYLE | wxFLP_SMALL), className, style)
 		.def("setOnChange", &FilePickerCtrl::setOnChange, evt_fn, evt_reset)
@@ -212,7 +212,7 @@ void init_controls(py::module & m)
 #undef ATTR_FLP_STYLE
 
 	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(m, "DirPickerCtrl")
-		.def_init(py::init<wxcstr, wxcstr, long, pyobj, pyobj>(),
+		.def(py::init<wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a = wxEmptyString, "msg"_a = wxEmptyString, "wxstyle"_a = (long)(wxDIRP_DEFAULT_STYLE | wxDIRP_SMALL), className, style)
 		.def("setOnChange", &DirPickerCtrl::setOnChange, evt_fn, evt_reset)
 		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)

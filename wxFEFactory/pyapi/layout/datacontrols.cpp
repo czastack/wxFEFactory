@@ -255,7 +255,7 @@ void init_datacontrols(py::module &m)
 	auto evt_reset = "reset"_a = true;
 
 	py::class_t<PropertyGrid, Control>(m, "PropertyGrid")
-		.def_init(py::init<pyobj, pyobj, pyobj>(),
+		.def(py::init<pyobj, pyobj, pyobj>(),
 			"data"_a = None, className, style)
 		.def("addCategory", &PropertyGrid::addCategory, title_arg)
 		.def("addStringProperty", &PropertyGrid::addStringProperty, title_arg, name_arg, help_arg, "value"_a = None)
@@ -281,7 +281,7 @@ void init_datacontrols(py::module &m)
 		.def_readwrite("changed", &PropertyGrid::m_changed);
 
 	auto pyListView = py::class_t<ListView, Control>(m, "ListView")
-		.def_init(py::init<pyobj, pyobj>(), className, style)
+		.def(py::init<pyobj, pyobj>(), className, style)
 		.def("appendColumns", &ListView::appendColumns, "columns"_a, "widths"_a=None)
 		.def("appendColumn", &ListView::appendColumn, "text"_a, "align"_a=(int)wxLIST_FORMAT_LEFT, "width"_a=-1)
 		.def("insertItems", &ListView::insertItems, "data"_a, "pos"_a=-1, "create"_a=true)

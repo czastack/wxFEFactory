@@ -16,42 +16,15 @@ public:
 		m_elem->Bind(wxEVT_CLOSE_WINDOW, &BaseTopLevelWindow::_onClose, this);
 	}
 
-	void __exit__(py::args &args) override
-	{
-		m_elem->Show();
-		
-		// 引用加一
-		py::cast(this).inc_ref();
-		Layout::__exit__(args);
-	}
+	void __exit__(py::args &args) override;
 
-	void setSize(py::sequence &size)
-	{
-		m_elem->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
-	}
+	void setSize(py::sequence &size);
 
-	pyobj getSize()
-	{
-		py::tuple ret = py::tuple(2);
-		const wxSize &sz = m_elem->GetSize();
-		ret[0] = sz.GetWidth();
-		ret[1] = sz.GetHeight();
-		return ret;
-	}
+	pyobj getSize();
 
-	void setPosition(py::sequence &point)
-	{
-		m_elem->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
-	}
+	void setPosition(py::sequence &point);
 
-	pyobj getPosition()
-	{
-		py::tuple ret = py::tuple(2);
-		const wxPoint &pt = m_elem->GetPosition();
-		ret[0] = pt.x;
-		ret[1] = pt.y;
-		return ret;
-	}
+	pyobj getPosition();
 
 	wxString getTitle()
 	{

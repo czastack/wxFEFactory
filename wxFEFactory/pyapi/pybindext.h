@@ -78,20 +78,24 @@ namespace pybind11 {
 	class class_t : public class_<type_, options...>
 	{
 	public:
-		using class_::class_;
+		template <typename... Extra>
+		class_t(handle scope, const char *name, const Extra &... extra): class_(scope, name, extra...) {
+			auto &internals = detail::get_internals();
+			auto *tinfo = internals.registered_types_cpp[std::type_index(typeid(type_))];
+			tinfo->init_instance = init_instance;
+		}
 
-		template <typename... Args, typename... Extra>
-		class_ &def_init(const detail::initimpl::constructor<Args...> &init, const Extra&... extra)
-		{
-			using namespace detail::initimpl;
-			def("__init__", [](detail::value_and_holder &v_h, Args... args) {
-				type_ *ins = construct_or_initialize<type_, Args...>(std::forward<Args>(args)...);
-				v_h.value_ptr() = ins;
-				v_h.set_holder_constructed();
-				(ins->*(&type_::__init))();
-			}, detail::is_new_style_constructor(), extra...);
-
-			return *this;
+		static void init_instance(detail::instance *inst, const void *holder_ptr) {
+			auto v_h = inst->get_value_and_holder(detail::get_type_info(typeid(type)));
+			if (!v_h.instance_registered()) {
+				detail::register_instance(inst, v_h.value_ptr(), v_h.type);
+				v_h.set_instance_registered();
+			}
+			class_::init_holder(inst, v_h, (const holder_type *)holder_ptr, v_h.value_ptr<type>());
+			if (v_h.holder_constructed())
+			{
+				(v_h.value_ptr<type_>()->*(&type_::__init))();
+			}
 		}
 	};
 }

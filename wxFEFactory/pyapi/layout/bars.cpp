@@ -11,7 +11,7 @@ void init_bars(py::module & m)
 	auto n = "n"_a;
 
 	py::class_t<ToolBar, Layout>(m, "ToolBar")
-		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a = (long)wxHORIZONTAL | wxTB_TEXT, styles, className, style)
+		.def(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a = (long)wxHORIZONTAL | wxTB_TEXT, styles, className, style)
 		.def("addTool", &ToolBar::addTool,
 			"label"_a, "shortHelp"_a = wxEmptyString, "bitmap"_a = None, "onclick"_a = None, "toolid"_a = -1, "kind"_a = wxEmptyString)
 		.def("addControl", &ToolBar::addControl, "view"_a, "label"_a = wxNoneString, "onclick"_a = None)
@@ -21,7 +21,7 @@ void init_bars(py::module & m)
 		.def("setToolBitmapSize", &ToolBar::setToolBitmapSize);
 
 	py::class_t<AuiToolBar, Layout>(m, "AuiToolBar")
-		.def_init(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a = (long)wxAUI_TB_HORIZONTAL | wxAUI_TB_TEXT, styles, className, style)
+		.def(py::init<long, pyobj, pyobj, pyobj>(), "wxstyle"_a = (long)wxAUI_TB_HORIZONTAL | wxAUI_TB_TEXT, styles, className, style)
 		.def("addTool", &AuiToolBar::addTool,
 			"label"_a, "shortHelp"_a = wxEmptyString, "bitmap"_a = None, "onclick"_a = None, "toolid"_a = -1, "kind"_a = wxEmptyString)
 		.def("addControl", &AuiToolBar::addControl, "view"_a, "label"_a = wxNoneString, "onclick"_a = None)
@@ -31,7 +31,7 @@ void init_bars(py::module & m)
 		.def("setToolBitmapSize", &AuiToolBar::setToolBitmapSize);
 
 	py::class_t<StatusBar, Control>(m, "StatusBar")
-		.def_init(py::init<pyobj, pyobj>(), className, style)
+		.def(py::init<pyobj, pyobj>(), className, style)
 		.def("getText", &StatusBar::getText, n)
 		.def("setText", &StatusBar::setText, "text"_a, n)
 		.def("setFieldsCount", &StatusBar::setFieldsCount, "list"_a)

@@ -11,9 +11,9 @@ class BaseTool(BaseScene):
     # 窗口嵌套
     nested = False
 
-    def __del__(self):
-        # print(self.getName(), '析构')
-        pass
+    # def __del__(self):
+    #     print(self.getName(), '析构')
+    #     pass
 
     def attach(self, frame):
         try:

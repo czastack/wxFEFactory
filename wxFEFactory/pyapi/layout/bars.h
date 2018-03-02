@@ -18,6 +18,7 @@ public:
 	virtual ~ToolBarBase()
 	{
 		m_listeners.clear();
+		m_listeners.release();
 	}
 
 	T& ctrl() const

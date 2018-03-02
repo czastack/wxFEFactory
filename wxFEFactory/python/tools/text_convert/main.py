@@ -3,6 +3,7 @@ from mainframe import ui
 from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 
+
 class Tool(BaseTool):
     def render(self):
         input_style = {

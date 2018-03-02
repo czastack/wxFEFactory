@@ -85,6 +85,13 @@ void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPaddi
 	*pPadding = child.getStyle(STYLE_PADDING, 5);
 }
 
+void SizerLayout::doAdd(View & child)
+{
+	int flex, flag, padding;
+	getBoxArg(child, &flex, &flag, &padding);
+	m_elem->GetSizer()->Add(child, flex, flag, padding);
+}
+
 void SplitterWindow::__exit__(py::args & args)
 {
 	int len = m_children.size();
@@ -151,18 +158,18 @@ void init_containers(py::module & m)
 	auto evt_reset = "reset"_a = true;
 
 	py::class_t<Vertical, Layout>(m, "Vertical")
-		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
+		.def(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
 
 	py::class_t<Horizontal, Layout>(m, "Horizontal")
-		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
+		.def(py::init<pyobj, pyobj, pyobj>(), styles, className, style);
 
 	py::class_t<GridLayout, Layout>(m, "GridLayout")
-		.def_init(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
+		.def(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
 			"rows"_a = 0, "cols"_a = 2, "vgap"_a = 0, "hgap"_a = 0,
 			styles, className, style);
 
 	py::class_t<FlexGridLayout, Layout>(m, "FlexGridLayout")
-		.def_init(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
+		.def(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
 			"rows"_a = 0, "cols"_a = 2, "vgap"_a = 0, "hgap"_a = 0,
 			styles, className, style)
 		.def("AddGrowableRow", &FlexGridLayout::AddGrowableRow, "index"_a, "flex"_a = 0)
@@ -172,15 +179,15 @@ void init_containers(py::module & m)
 		.def_property("flexDirection", &FlexGridLayout::GetFlexibleDirection, &FlexGridLayout::SetFlexibleDirection);
 
 	py::class_t<ScrollView, Layout>(m, "ScrollView")
-		.def_init(py::init<bool, pyobj, pyobj, pyobj>(),
+		.def(py::init<bool, pyobj, pyobj, pyobj>(),
 			"horizontal"_a = false, styles, className, style);
 
 	py::class_t<SplitterWindow, Layout>(m, "SplitterWindow")
-		.def_init(py::init<bool, int, pyobj, pyobj, pyobj>(),
+		.def(py::init<bool, int, pyobj, pyobj, pyobj>(),
 			"horizontal"_a = false, "sashpos"_a = 0, styles, className, style);
 
 	py::class_t<StaticBox, Layout>(m, "StaticBox")
-		.def_init(py::init<wxcstr, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, pyobj, pyobj, pyobj>(),
 			"label"_a, styles, className, style)
 		.def("getLabel", &StaticBox::getLabel)
 		.def("setLabel", &StaticBox::setLabel)
@@ -195,8 +202,8 @@ void init_containers(py::module & m)
 		.def_property("index", &BookCtrlBase::getSelection, &BookCtrlBase::setSelection);
 
 	py::class_t<Notebook, BookCtrlBase>(m, "Notebook")
-		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
+		.def(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
 
 	py::class_t<Listbook, BookCtrlBase>(m, "Listbook")
-		.def_init(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
+		.def(py::init<int, pyobj, pyobj, pyobj>(), wxstyle, styles, className, style);
 }

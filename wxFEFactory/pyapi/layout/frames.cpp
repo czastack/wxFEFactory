@@ -2,6 +2,97 @@
 #include "frames.h"
 
 
+void BaseTopLevelWindow::__exit__(py::args & args)
+{
+	m_elem->Show();
+
+	// 引用加一
+	py::cast(this).inc_ref();
+	Layout::__exit__(args);
+}
+
+void BaseTopLevelWindow::setSize(py::sequence & size)
+{
+	m_elem->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
+}
+
+pyobj BaseTopLevelWindow::getSize()
+{
+	py::tuple ret = py::tuple(2);
+	const wxSize &sz = m_elem->GetSize();
+	ret[0] = sz.GetWidth();
+	ret[1] = sz.GetHeight();
+	return ret;
+}
+
+void BaseTopLevelWindow::setPosition(py::sequence & point)
+{
+	m_elem->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
+}
+
+pyobj BaseTopLevelWindow::getPosition()
+{
+	py::tuple ret = py::tuple(2);
+	const wxPoint &pt = m_elem->GetPosition();
+	ret[0] = pt.x;
+	ret[1] = pt.y;
+	return ret;
+}
+
+bool BaseTopLevelWindow::setIcon(wxcstr path)
+{
+	wxIcon icon;
+	wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
+	if (type)
+	{
+		icon.LoadFile(path, type);
+		((wxTopLevelWindow*)m_elem)->SetIcon(icon);
+		return true;
+	}
+	return false;
+}
+
+void BaseTopLevelWindow::_onClose(wxCloseEvent & event) {
+	onClose(event);
+}
+
+bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
+{
+	if (hasEventHandler(event))
+	{
+		if (!handleEvent(event))
+		{
+			event.Veto();
+			return false;
+		}
+	}
+	onRelease();
+	event.Skip();
+	return true;
+}
+
+void BaseTopLevelWindow::onRelease()
+{
+	// 引用减一，销毁对象
+	py::cast(this).dec_ref();
+}
+
+void BaseFrame::onRelease()
+{
+	auto menubar = getMenuBar();
+
+	if (menubar)
+		py::cast(menubar).dec_ref();
+
+	BaseTopLevelWindow::onRelease();
+}
+
+void HotkeyWindow::onRelease()
+{
+	stopHotkey();
+	Window::onRelease();
+}
+
 bool HotkeyWindow::prepareHotkey(pyobj & hotkeyId, WORD & int_hotkeyId)
 {
 	if (PY_IS_TYPE(hotkeyId, PyUnicode))
@@ -116,60 +207,6 @@ void StdModalDialog::__exit__(py::args & args)
 	Layout::__exit__(args);
 }
 
-bool BaseTopLevelWindow::setIcon(wxcstr path)
-{
-	wxIcon icon;
-	wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
-	if (type)
-	{
-		icon.LoadFile(path, type);
-		((wxTopLevelWindow*)m_elem)->SetIcon(icon);
-		return true;
-	}
-	return false;
-}
-
-void BaseTopLevelWindow::_onClose(wxCloseEvent & event) {
-	onClose(event);
-}
-
-bool BaseTopLevelWindow::onClose(wxCloseEvent & event)
-{
-	if (hasEventHandler(event))
-	{
-		if (!handleEvent(event))
-		{
-			event.Veto();
-			return false;
-		}
-	}
-	onRelease();
-	event.Skip();
-	return true;
-}
-
-void BaseTopLevelWindow::onRelease()
-{
-	// 引用减一，销毁对象
-	py::cast(this).dec_ref();
-}
-
-void BaseFrame::onRelease()
-{
-	auto menubar = getMenuBar();
-
-	if (menubar)
-		py::cast(menubar).dec_ref();
-
-	BaseTopLevelWindow::onRelease();
-}
-
-void HotkeyWindow::onRelease()
-{
-	stopHotkey();
-	Window::onRelease();
-}
-
 void init_frames(py::module & m)
 {
 	using namespace py::literals;
@@ -195,28 +232,28 @@ void init_frames(py::module & m)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
 
 	py::class_t<Window, BaseFrame>(m, "Window")
-		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+		.def(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<MDIParentFrame, BaseFrame>(m, "MDIParentFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+		.def(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<MDIChildFrame, BaseFrame>(m, "MDIChildFrame")
-		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
+		.def(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<HotkeyWindow, Window>(m, "HotkeyWindow")
-		.def_init(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style)
+		.def(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style)
 		.def("RegisterHotKey", &HotkeyWindow::RegisterHotKey, "hotkeyId"_a, "mod"_a, "keycode"_a, "onhotkey"_a)
 		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
 		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
 
 	py::class_t<Dialog, BaseTopLevelWindow>(m, "Dialog")
-		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
 			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
 		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal);
 
 	py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
-		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
 			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
 }

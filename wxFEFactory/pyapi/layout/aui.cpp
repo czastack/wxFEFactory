@@ -236,25 +236,25 @@ void init_aui(py::module & m)
 	auto base_frame_wxstyle_a = "wxstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
 	py::class_t<AuiMDIParentFrame, BaseFrame>(m, "AuiMDIParentFrame")
-		.def_init(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(), label, "menubar"_a = nullptr, base_frame_wxstyle_a, styles, className, style);
+		.def(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(), label, "menubar"_a = nullptr, base_frame_wxstyle_a, styles, className, style);
 
 	py::class_t<AuiMDIChildFrame, BaseTopLevelWindow>(m, "AuiMDIChildFrame")
-		.def_init(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_wxstyle_a, styles, className, style);
+		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_wxstyle_a, styles, className, style);
 
-	py::class_t<AuiManager, Layout>(m, "AuiManager")
+	py::class_<AuiManager, Layout>(m, "AuiManager")
 		.def(py::init<>())
 		.def("showPane", &AuiManager::showPane, "name"_a, "show"_a = true)
 		.def("hidePane", &AuiManager::hidePane)
 		.def("togglePane", &AuiManager::togglePane);
 
 	auto pyItem = py::class_t<Item>(m, "Item")
-		.def_init(py::init<View&, py::kwargs>(), "view"_a)
+		.def(py::init<View&, py::kwargs>(), "view"_a)
 		.def("getView", &AuiItem::getView);
 
 	setattr(m, "AuiItem", pyItem);
 
 	py::class_t<AuiNotebook, Layout>(m, "AuiNotebook")
-		.def_init(py::init<pyobj, pyobj, pyobj>(), styles, className, style)
+		.def(py::init<pyobj, pyobj, pyobj>(), styles, className, style)
 		.def("getPage", &AuiNotebook::getPage, "n"_a = -1)
 		.def("closePage", &AuiNotebook::closePage, "n"_a = -1)
 		.def("closeAllPage", &AuiNotebook::closeAllPage)

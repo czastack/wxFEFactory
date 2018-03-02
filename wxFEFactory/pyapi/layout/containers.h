@@ -17,13 +17,7 @@ public:
 	*/
 	void getBoxArg(View &child, int *pFlex, int *pFlag, int *pPadding);
 
-	void doAdd(View &child) override
-	{
-		// Layout::add(child);
-		int flex, flag, padding;
-		getBoxArg(child, &flex, &flag, &padding);
-		m_elem->GetSizer()->Add(child, flex, flag, padding);
-	}
+	void doAdd(View &child) override;
 
 	void reLayout() override
 	{

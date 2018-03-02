@@ -120,7 +120,7 @@ void init_menu(py::module &m)
 		.def(py::init<pyobj>(), "onselect"_a = None);
 
 	py::class_t<MenuItem, BaseMenu>(m, "MenuItem")
-		.def_init(py::init<wxcstr, wxcstr, wxcstr, int, bool, pyobj>(),
+		.def(py::init<wxcstr, wxcstr, wxcstr, int, bool, pyobj>(),
 			"text"_a, "helpStr"_a = wxEmptyString, "kind"_a = wxEmptyString,
 			"id"_a = -1, "sep"_a = false, "onselect"_a = None)
 		.def("getId", &MenuItem::getId)

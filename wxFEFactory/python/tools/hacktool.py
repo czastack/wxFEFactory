@@ -59,7 +59,7 @@ class BaseHackTool(BaseTool):
             if not self.win.hotkeys:
                 hotkeys = self.get_hotkeys()
                 if hotkeys:
-                    self.win.RegisterHotKeys()
+                    self.win.RegisterHotKeys(hotkeys)
             self.init_remote_function()
             return True
         else:

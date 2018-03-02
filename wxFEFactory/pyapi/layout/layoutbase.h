@@ -60,7 +60,6 @@ protected:
 	pyobj m_class;
 	pyobj m_contextmenu;
 	py::dict m_event_table;
-	// bool m_added = false;
 
 	static wxVector<Layout*> LAYOUTS;
 
@@ -84,19 +83,6 @@ public:
 	void __init();
 
 	void addToParent();
-
-	/**
-	 * 在Layout的onAdd中__exit__先被调用，返回false将不被onAdd(child)
-	 */
-	/*bool beforeAdded()
-	{
-		if (!m_added)
-		{
-			m_added = true;
-			return true;
-		}
-		return false;
-	}*/
 
 	void setForeground(uint rgb)
 	{
