@@ -69,7 +69,7 @@ void prepareOptions(pyobj& options, pyobj& values, bool rangeIfNone)
 		}
 		else if (rangeIfNone && values.is_none())
 		{
-			values = py::module::import("builtins").attr("range")(py::len(options));
+			values = py::handle((PyObject*)&PyRange_Type)(py::len(options));
 		}
 	}
 }

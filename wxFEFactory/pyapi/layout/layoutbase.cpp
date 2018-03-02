@@ -112,12 +112,10 @@ pyobj View::getStyle(wxcstr key)
 {
 	if (py::isinstance<py::list>(m_style))
 	{
-		static auto reversed = py::module::import("builtins").attr("reversed");
-		auto tmp = reversed(m_style);
 		pyobj pykey = py::str(key);
 		PyObject* ret;
 
-		for (auto &e : tmp)
+		for (auto &e : py::handle((PyObject*)&PyReversed_Type)(m_style))
 		{
 			ret = PyDict_GetItem(e.ptr(), pykey.ptr());
 			if (ret)

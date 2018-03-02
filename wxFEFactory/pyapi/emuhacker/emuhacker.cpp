@@ -33,17 +33,16 @@ namespace emuhacker {
 
 	pyobj process_read(ProcessHandler &self, addr_t addr, pycref type, size_t size)
 	{
-		const auto &builtin = py::module::import("builtins");
-		if (type.is(builtin.attr("int")))
+		if (type.ptr() == (PyObject*)&PyLong_Type)
 		{
 			size_t data = self.readUint(addr, size ? size : self.getPtrSize());
 			return py::cast(data);
 		}
-		else if (type.is(builtin.attr("float")))
+		else if (type.ptr() == (PyObject*)&PyFloat_Type)
 		{
 			return py::cast(self.read<float>(addr));
 		}
-		else if (type.is(builtin.attr("bool")))
+		else if (type.ptr() == (PyObject*)&PyBool_Type)
 		{
 			return py::cast(self.read<bool>(addr));
 		}
@@ -61,25 +60,25 @@ namespace emuhacker {
 
 	bool process_write(ProcessHandler &self, addr_t addr, pycref data, size_t size)
 	{
-		if (PY_IS_TYPE(data, PyLong))
+		if (PyLong_Check(data.ptr()))
 		{
 			self.writeUint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
 		}
-		else if (PY_IS_TYPE(data, PyFloat))
+		else if (PyFloat_Check(data.ptr()))
 		{
 			return self.write(addr, data.cast<float>());
 		}
-		else if (PY_IS_TYPE(data, PyBool))
+		else if (PyBool_Check(data.ptr()))
 		{
 			return self.write(addr, data.cast<bool>());
 		}
-		else if (PY_IS_TYPE(data, PyBytes))
+		else if (PyBytes_Check(data.ptr()))
 		{
 			if (size == 0)
 				size = py::len(data);
 			return self.write(addr, bytesGetBuff(data), size);
 		}
-		else if (PY_IS_TYPE(data, PyByteArray))
+		else if (PyByteArray_Check(data.ptr()))
 		{
 			if (size == 0)
 				size = py::len(data);
