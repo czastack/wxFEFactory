@@ -17,7 +17,7 @@ class BaseDolphinHack(BaseHackTool):
         self.handler = BigendHandler()
 
     def _enum_window(self, hwnd, title):
-        if len(title) < 20:
+        if len(title) < 20 and title[8].isdigit():
             self.window_name = title
             self.hwnd = hwnd 
             return False
@@ -33,7 +33,11 @@ class BaseDolphinHack(BaseHackTool):
             if self.handler.attachByWindowHandle(self.hwnd):
                 offset = OFFSET_MAP.get(self.window_name[8:], None)
                 if offset:
-                    self.ramaddr = self.handler.readAddr(self.handler.base + offset)
+                    self.ram_addr = self.handler.readAddr(self.handler.base + offset)
+                    try:
+                        self._ram.addr = self.ram_addr
+                    except:
+                        pass
                     self.attach_status_view.label = self.window_name + ' 正在运行'
                     if not self.win.hotkeys:
                         hotkeys = self.get_hotkeys()

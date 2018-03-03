@@ -68,6 +68,16 @@ class PtrField(Field):
         return ret
 
 
+class ByteField(Field):
+    def __init__(self, offset):
+        super().__init__(offset, int, 1)
+
+
+class ShortField(Field):
+    def __init__(self, offset):
+        super().__init__(offset, int, 2)
+
+
 class SignedField(Field):
     def __get__(self, obj, type=None):
         return obj.handler.readInt(obj.addr + self.offset, self.type, self.size)
@@ -91,21 +101,37 @@ class OffsetsField(Field):
         obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], value, self.size)
 
 
-class ModelField(Field):
-    def __init__(self, offset, modelClass):
-        super().__init__(offset)
+class ModelPtrField(PtrField):
+    """模型指针字段"""
+    def __init__(self, offset, modelClass, size=0):
+        super().__init__(offset, size)
         self.modelClass = modelClass
 
     def __get__(self, obj, type=None):
         return self.modelClass(super().__get__(obj, type), obj.handler)
 
     def __set__(self, obj, value):
-        raise AttributeError("can't set attribute")
+        if isinstance(value, Model):
+            super().__set__(obj, value.addr)
 
 
-class ManagedModelField(ModelField):
+class ManagedModelPtrField(ModelPtrField):
+    """托管模型指针字段"""
     def __get__(self, obj, type=None):
         return self.modelClass(super().__get__(obj, type), obj.context)
+
+
+class ModelField(Field):
+    """模型字段"""
+    def __init__(self, offset, modelClass, size=0):
+        super().__init__(offset, size or modelClass.SIZE)
+        self.modelClass = modelClass
+
+    def __get__(self, obj, type=None):
+        return self.modelClass(obj.addr + self.offset, obj.handler)
+
+    def __set__(self, obj, value):
+        raise AttributeError("can't set attribute")
 
 
 class CoordField:

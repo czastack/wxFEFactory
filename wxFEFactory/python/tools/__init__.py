@@ -1,5 +1,6 @@
 tools = [
     ("文本转换", "text_convert"),
+    ("快速剪切板", "quick_clipboard"),
     ("GTA3 Hack", "gta.gta3_hack"),
     ("罪恶都市Hack", "gta.gtavc_hack"),
     ("圣安地列斯Hack", "gta.gtasa_hack"),
@@ -7,8 +8,8 @@ tools = [
     ("GTAIV Hack", "gta.gtaiv_hack"),
     ("GTAIV-EFLC Hack", "gta.gtaiv_eflc_hack"),
     ("GTAV Hack", "gta.gtav_hack"),
-    ("胧村正妖刀传", "dolphin.rsfj99"),
-    ("快速剪切板", "quick_clipboard"),
+    ("wii:胧村正妖刀传", "dolphin.RSFJ99"),
+    ("wii:晓之女神", "dolphin.RFEJ01"),
 ]
 
 toolbar_tools = (

@@ -20,7 +20,7 @@ class BigendHandler(ProcessHandler):
         if _type is int:
             return self.writeUint(addr, data, size if size else self.ptr_size)
         elif _type is float:
-            ProcessHandler.write(self, addr, struct.pack('>f', data), size if size else 4)
+            return ProcessHandler.write(self, addr, struct.pack('>f', data), size if size else 4)
         elif _type is bool:
             return self.write8(addr, data)
         else:
@@ -49,3 +49,9 @@ class BigendHandler(ProcessHandler):
 
     def write64(self, addr, data):
         return self.writeUint(addr, data, 8)
+
+    def readFloat(self, addr):
+        return self.read(addr, float, 4)
+
+    def writeFloat(self, addr, data):
+        return self.write(addr, float(data), 4)

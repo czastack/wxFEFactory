@@ -12,12 +12,6 @@ class Tool(BaseDolphinHack):
         super().__init__()
         self._ram = models.Ram(0, self.handler)
         self.count_data = {}
-
-    def check_attach(self, _=None):
-        if super().check_attach():
-            self._ram.addr = self.ramaddr
-            return True
-        return False
     
     def render_main(self):
         with Group("player", "角色", self._ram, handler=self.handler):

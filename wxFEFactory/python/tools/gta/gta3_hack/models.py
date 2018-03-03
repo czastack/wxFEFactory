@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ManagedModelField
+from lib.hack.model import Model, Field, CoordField, ManagedModelPtrField
 from ..gta_base.models import Physicle, WeaponSet, Pool
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 from . import address
@@ -69,8 +69,8 @@ class Player(Entity, GTA3Player):
     # stamina = Field(0x600, float)
     isInVehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
-    vehicle = ManagedModelField(0x310, Vehicle)
-    collidingCar = ManagedModelField(0x34c, Vehicle)
+    vehicle = ManagedModelPtrField(0x310, Vehicle)
+    collidingCar = ManagedModelPtrField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)
     wanted_ptr = Field(0x53c)
 

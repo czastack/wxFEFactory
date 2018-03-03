@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ManagedModelField
+from lib.hack.model import Model, Field, CoordField, ManagedModelPtrField
 from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils
@@ -55,7 +55,7 @@ class MemPlayer(Entity):
     rotation = Field(0x2dc, float)
     isInVehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
-    vehicle = ManagedModelField(0x310, MemVehicle)
+    vehicle = ManagedModelPtrField(0x310, MemVehicle)
     cur_weapon_slop = Field(0x498, int, 1)
 
 
