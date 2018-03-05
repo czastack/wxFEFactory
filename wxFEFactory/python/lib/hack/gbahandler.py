@@ -30,7 +30,6 @@ class GbaEmuHandler(MemHandler):
             addr &= 0x00FFFFFF
 
             if (addr + size <= GBA_MEMORY_SIZE[index]):
-                print('123', self.ptr_table[index] + addr)
                 return self.ptr_table[index] + addr
         return False
 

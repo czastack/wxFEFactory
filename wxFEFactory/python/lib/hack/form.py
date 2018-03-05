@@ -10,11 +10,12 @@ ui = fefactory_api.ui
 class Widget:
     GROUPS = []
 
-    def __init__(self, name, label, addr, offsets=()):
+    def __init__(self, name, label, addr, offsets=(), readonly=False):
         self.name = name
         self.label = label
         self.addr = addr
         self.offsets = offsets
+        self.readonly = readonly
 
         parent = self.GROUPS[-1] if len(self.GROUPS) else None
         if parent:
@@ -36,7 +37,8 @@ class Widget:
 
     def render_btn(self):
         ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: self.read())
-        ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: self.write())
+        if not self.readonly:
+            ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: self.write())
 
     def read(self):
         pass
@@ -58,6 +60,8 @@ class TwoWayWidget(Widget):
             self.input_value = self.mem_value
 
     def write(self):
+        if self.readonly:
+            return
         self.mem_value = self.input_value
 
 
@@ -104,15 +108,31 @@ class ModelWidget:
                 delattr(ins, prop)
             else:
                 prop.__delete__(ins, value)
+
+
+class OffsetsModel:
+    @property
+    def mem_value(self):
+        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        if self.type is float:
+            ret = float32(ret)
+        return ret
+
+    @mem_value.setter
+    def mem_value(self, value):
+        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
     
 
 class Group(Widget):
+    cols = 2
 
-    def __init__(self, name, label, addr, flexgrid=True, hasfootbar=True, handler=None):
+    def __init__(self, name, label, addr, flexgrid=True, hasfootbar=True, handler=None, cols=None):
         self.flexgrid = flexgrid
         self.hasfootbar = hasfootbar
         self.children = []
         self.handler = handler
+        if cols:
+            self.cols = cols
         super().__init__(name, label, addr)
 
     def __del__(self):
@@ -127,8 +147,9 @@ class Group(Widget):
         with ui.Vertical() as root:
             with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
-                    self.view = ui.FlexGridLayout(cols=2, vgap=10, className="fill")
-                    self.view.AddGrowableCol(1)
+                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
+                    for i in range(self.cols >> 1):
+                        self.view.AddGrowableCol((i << 1) + 1)
                 else:
                     self.view = content
 
@@ -175,7 +196,7 @@ class BaseInputWidget(TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
-            self.view = ui.TextInput(className="fill", wxstyle=0x0400)
+            self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()
 
             self.view.setOnKeyDown(self.onKey)
@@ -201,22 +222,15 @@ class BaseInputWidget(TwoWayWidget):
         event.Skip()
 
 
-class InputWidget(BaseInputWidget):
+class InputWidget(BaseInputWidget, OffsetsModel):
     def __init__(self, name, label, addr, offsets=(), type_=int, size=4):
         super().__init__(name, label, addr, offsets)
         self.type = type_
         self.size = size
 
-    @property
-    def mem_value(self):
-        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
-        if self.type is float:
-            ret = float32(ret)
-        return ret
 
-    @mem_value.setter
-    def mem_value(self, value):
-        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+class ModelInputWidget(ModelWidget, BaseInputWidget):
+    pass
 
 
 class ProxyInputWidget(BaseInputWidget):
@@ -232,10 +246,6 @@ class ProxyInputWidget(BaseInputWidget):
     @mem_value.setter
     def mem_value(self, value):
         self.doWrite(value)
-
-
-class ModelInputWidget(ModelWidget, BaseInputWidget):
-    pass
 
 
 class SimpleCheckBoxWidget(Widget):
@@ -283,18 +293,8 @@ class BaseCheckBoxWidget(TwoWayWidget):
             self.checked = False
 
 
-class CheckBoxWidget(BaseCheckBoxWidget):
-
-    @property
-    def mem_value(self):
-        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
-        if self.type is float:
-            ret = float32(ret)
-        return ret
-
-    @mem_value.setter
-    def mem_value(self, value):
-        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+class CheckBoxWidget(BaseCheckBoxWidget, OffsetsModel):
+    pass
 
 
 class ModelCheckBoxWidget(ModelWidget, CheckBoxWidget):
@@ -526,32 +526,27 @@ class BaseSelectWidget(TwoWayWidget):
 
     @property
     def input_value(self):
-        return self.view.index
+        index = self.view.index
+        return self.values[index] if self.values else index
 
     @input_value.setter
     def input_value(self, value):
-        self.view.index = value
+        self.view.index = self.values.index(value) if self.values else value
 
 
-class SelectWidget(BaseSelectWidget):
-    def __init__(self, name, label, addr, offsets, choices, type_=int, size=4):
+class SelectWidget(BaseSelectWidget, OffsetsModel):
+    def __init__(self, name, label, addr, offsets, choices, values=None, type_=int, size=4):
         self.choices = choices
+        self.values = values
         self.type = type_
         self.size = size
         super().__init__(name, label, addr, offsets)
 
-    @property
-    def mem_value(self):
-        return self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
-
-    @mem_value.setter
-    def mem_value(self, value):
-        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
-
 
 class ModelSelectWidget(ModelWidget, BaseSelectWidget):
-    def __init__(self, name, label, ins, prop, choices):
+    def __init__(self, name, label, ins, prop, choices, values=None):
         self.choices = choices
+        self.values = values
         super().__init__(name, label, ins, prop)
 
 

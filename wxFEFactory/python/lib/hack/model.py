@@ -28,6 +28,10 @@ class Model:
     def __and__(self, field):
         return self.addrof(field)
 
+    @property
+    def addr_hex(self):
+        return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
+
 
 class ManagedModel(Model):
     def __init__(self, addr, context):
