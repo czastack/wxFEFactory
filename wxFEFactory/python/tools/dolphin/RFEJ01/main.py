@@ -49,15 +49,21 @@ class Tool(BaseDolphinHack):
         self.lazy_group(Group("items", "角色物品", self._person, handler=self.handler), self.render_items)
 
     def render_skills(self):
-        skill_values = self.get_skill_values()
+        skill_values = (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
         for i in range(18):
             ModelSelectWidget("skills.%d" % i, "技能%d" % (i + 1), None, None, datasets.SKILLS, skill_values)
 
     def render_items(self):
-        item_values = self.get_item_values()
+        item_values = (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS) - 1))
         for i in range(7):
             ModelSelectWidget("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS, item_values)
             ModelInputWidget("items_count.%d" % i, "数量")
+
+    def get_hotkeys(self):
+        return (
+            ('continue_move', MOD_ALT, getVK('m'), self.continue_move),
+            ('move_to_cursor', MOD_ALT, getVK('g'), self.move_to_cursor),
+        )
 
     def _person(self):
         pedid = self._ram.pedid
@@ -65,18 +71,6 @@ class Tool(BaseDolphinHack):
             return self._ram.persons[pedid]
 
     person = property(_person)
-
-    def get_skill_values(self):
-        return (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
-
-    def get_item_values(self):
-        return (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS) - 1))
-
-    def get_hotkeys(self):
-        return (
-            ('continue_move', MOD_ALT, getVK('m'), self.continue_move),
-            ('move_to_cursor', MOD_ALT, getVK('g'), self.move_to_cursor),
-        )
 
     def continue_move(self, _=None):
         """再移动"""
