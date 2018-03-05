@@ -2,6 +2,7 @@ from functools import partial
 from ..base import BaseDolphinHack
 from . import models, datasets
 from lib.hack.form import Group, StaticGroup, InputWidget, ModelCheckBoxWidget, ModelInputWidget, ModelSelectWidget
+from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -25,8 +26,8 @@ class Tool(BaseDolphinHack):
         with Group("player", "角色", self._person, handler=self.handler, cols=4):
             ModelInputWidget("addr_hex", "地址", readonly=True)
             ModelInputWidget("no", "角色编号", readonly=True)
-            ModelSelectWidget("prof", "职业", None, None, datasets.PROFESSION, 
-                tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSION))))
+            ModelSelectWidget("prof", "职业", None, None, datasets.PROFESSIONS, 
+                tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
             ModelInputWidget("hp", "当前HP")
             ModelInputWidget("level", "等级")
             ModelInputWidget("exp", "经验")
@@ -42,14 +43,18 @@ class Tool(BaseDolphinHack):
             ModelInputWidget("lucky_add", "幸运+")
             ModelInputWidget("defensive_add", "守备+")
             ModelInputWidget("magicdef_add", "魔防+")
-            ui.Text("  行动状态 ")
-            ModelCheckBoxWidget("moved", "已行动", enableData=1, disableData=0)
-            # ui.Hr()
-            # ui.Hr()
-            # ui.Hr()
-            # ui.Hr()
-            # for i in range(12):
-            #     ModelInputWidget("skills", "技能%d" % (i + 1))
+            self.m = ModelCheckBoxWidget("moved", "已行动", enableData=1, disableData=0)
+
+        with Group("player", "角色技能", self._person, handler=self.handler):
+            skill_values = self.get_skill_values()
+            for i in range(18):
+                ModelSelectWidget("skills.%d" % i, "技能%d" % (i + 1), None, None, ("无",) + datasets.SKILLS, skill_values)
+
+        with Group("player", "角色物品", self._person, handler=self.handler):
+            item_values = self.get_item_values()
+            for i in range(7):
+                ModelSelectWidget("items.%d" % i, "物品%d" % (i + 1), None, None, ("无",) + datasets.ITEMS, item_values)
+                ModelInputWidget("items_count.%d" % i, "数量")
 
 
     def _person(self):
@@ -58,3 +63,25 @@ class Tool(BaseDolphinHack):
             return self._ram.persons[pedid]
 
     person = property(_person)
+
+    def get_skill_values(self):
+        return (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS)))
+
+    def get_item_values(self):
+        return (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS)))
+
+    def get_hotkeys(self):
+        return (
+            ('continue_move', MOD_ALT, getVK('m'), self.continue_move),
+            ('move_to_cursor', MOD_ALT, getVK('g'), self.move_to_cursor),
+        )
+
+    def continue_move(self, _=None):
+        """再移动"""
+        self.person.moved = False
+
+    def move_to_cursor(self, _=None):
+        person = self.person
+        ram = self._ram
+        person.posx = ram.curx
+        person.posy = ram.cury

@@ -279,7 +279,10 @@ class BaseCheckBoxWidget(TwoWayWidget):
         self.type = type(enableData)
 
     def render(self):
-        self.view = ui.CheckBox(self.label)
+        super().render()
+        with ui.Horizontal(className="fill"):
+            self.view = ui.CheckBox("", className="fill")
+            self.render_btn()
 
     @property
     def input_value(self):
@@ -288,9 +291,9 @@ class BaseCheckBoxWidget(TwoWayWidget):
     @input_value.setter
     def input_value(self, value):
         if value == self.enableData:
-            self.checked = True
+            self.view.checked = True
         elif self.disableData is None or value == self.disableData:
-            self.checked = False
+            self.view.checked = False
 
 
 class CheckBoxWidget(BaseCheckBoxWidget, OffsetsModel):
@@ -531,7 +534,10 @@ class BaseSelectWidget(TwoWayWidget):
 
     @input_value.setter
     def input_value(self, value):
-        self.view.index = self.values.index(value) if self.values else value
+        try:
+            self.view.index = self.values.index(value) if self.values else value
+        except ValueError:
+            print(hex(value), "不在%s的可选值中" % self.label)
 
 
 class SelectWidget(BaseSelectWidget, OffsetsModel):
