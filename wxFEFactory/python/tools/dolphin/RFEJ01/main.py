@@ -26,7 +26,7 @@ class Tool(BaseDolphinHack):
             ModelInputWidget("addr_hex", "地址", readonly=True)
             ModelInputWidget("no", "角色编号", readonly=True)
             ModelSelectWidget("prof", "职业", None, None, datasets.PROFESSION, 
-                tuple(0x1D10 + i * 0x11C for i in range(len(datasets.PROFESSION))))
+                tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSION))))
             ModelInputWidget("hp", "当前HP")
             ModelInputWidget("level", "等级")
             ModelInputWidget("exp", "经验")

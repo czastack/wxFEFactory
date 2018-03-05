@@ -32,7 +32,8 @@ class BaseDolphinHack(BaseHackTool):
         self.handler.enumWindows(self._enum_window, 'Dolphin ')
         if self.window_name:
             if self.handler.attachByWindowHandle(self.hwnd):
-                offset = OFFSET_MAP.get(self.window_name[8:], None)
+                self.version = self.window_name[8:]
+                offset = OFFSET_MAP.get(self.version, None)
                 if offset:
                     self.ram_addr = self.handler.readAddr(self.handler.base + offset)
                     try:

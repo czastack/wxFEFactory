@@ -1,6 +1,5 @@
-
 # 职业
-# start: 4.0: 0x80AF1D10 5.0: 0x8098A7C0
+# start: 4.0: 0x80AF1D10 5.0: 0x80989A70
 # step: 0x11C
 PROFESSION = (
     "勇者",
