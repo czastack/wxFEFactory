@@ -144,14 +144,6 @@
   <ItemGroup>
     <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
-    <ClCompile Include="pyapi\emuhacker\gba\gba.cpp" />
-    <ClCompile Include="pyapi\emuhacker\gba\GbaEmuHandler.cpp" />
-    <ClCompile Include="pyapi\emuhacker\gba\NogbaHandler.cpp" />
-    <ClCompile Include="pyapi\emuhacker\gba\VbaHandler.cpp" />
-    <ClCompile Include="pyapi\emuhacker\nds\DeSmuMEHandler.cpp" />
-    <ClCompile Include="pyapi\emuhacker\nds\nds.cpp" />
-    <ClCompile Include="pyapi\emuhacker\nds\NdsEmuHandler.cpp" />
-    <ClCompile Include="pyapi\emuhacker\nds\NogbaNdsHandler.cpp" />
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp" />
     <ClCompile Include="myapp.cpp" />
     <ClCompile Include="pyapi\fe\fe.cpp" />
@@ -177,14 +169,6 @@
   <ItemGroup>
     <ClInclude Include="pyapi\auto\auto.h" />
     <ClInclude Include="pyapi\emuhacker\emuhacker.h" />
-    <ClInclude Include="pyapi\emuhacker\gba\gba.h" />
-    <ClInclude Include="pyapi\emuhacker\gba\GbaEmuHandler.h" />
-    <ClInclude Include="pyapi\emuhacker\gba\NogbaHandler.h" />
-    <ClInclude Include="pyapi\emuhacker\gba\VbaHandler.h" />
-    <ClInclude Include="pyapi\emuhacker\nds\DeSmuMEHandler.h" />
-    <ClInclude Include="pyapi\emuhacker\nds\nds.h" />
-    <ClInclude Include="pyapi\emuhacker\nds\NdsEmuHandler.h" />
-    <ClInclude Include="pyapi\emuhacker\nds\NogbaNdsHandler.h" />
     <ClInclude Include="pyapi\emuhacker\ProcessHandler.h" />
     <ClInclude Include="myapp.h" />
     <ClInclude Include="pyapi\fe\fe.h" />

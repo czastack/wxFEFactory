@@ -2,7 +2,71 @@ from fefactory_api.emuhacker import ProcessHandler
 import struct
 
 
-class BigendHandler(ProcessHandler):
+class MemHandler(ProcessHandler):
+    _raw_addr = False
+
+    def prepareAddr(self, addr, size):
+        return addr
+
+    def read16(self, addr):
+        return self.readUint(addr, 1)
+
+    def read16(self, addr):
+        return self.readUint(addr, 2)
+
+    def read32(self, addr):
+        return self.readUint(addr, 4)
+
+    def read64(self, addr):
+        return self.readUint(addr, 8)
+
+    def write8(self, addr, data):
+        return self.writeUint(addr, data, 1)
+
+    def write16(self, addr, data):
+        return self.writeUint(addr, data, 2)
+
+    def write32(self, addr, data):
+        return self.writeUint(addr, data, 4)
+
+    def write64(self, addr, data):
+        return self.writeUint(addr, data, 8)
+
+    def readFloat(self, addr):
+        return self.read(addr, float, 4)
+
+    def writeFloat(self, addr, data):
+        return self.write(addr, float(data), 4)
+
+    def ptrRead(addr, offset, type, size):
+        addr = self.readAddr(addr)
+        if (addr):
+            return self.read(addr + offset, type, size)
+        return False
+
+    def ptrWrite(addr, offset, data, size):
+        addr = self.readAddr(addr)
+        if (addr):
+            return self.write(addr + offset, data, size)
+        return False
+
+    def ptrsRead(addr, offsets, type, size):
+        addr = self.readLastAddr(addr, offsets)
+        if (addr):
+            return self.read(addr + offset, type, size)
+        return False
+
+    def ptrsWrite(addr, offsets, data, size):
+        addr = self.readLastAddr(addr, offsets)
+        if (addr):
+            return self.write(addr + offset, data, size)
+        return False
+
+    def raw_env(self):
+        return _RawEnv(self)
+
+
+class BigendHandler(MemHandler):
     """大端处理器"""
     def read(self, addr, type, size):
         if type is int:
@@ -32,26 +96,14 @@ class BigendHandler(ProcessHandler):
     def writeUint(self, addr, data, size):
         return ProcessHandler.write(self, addr, data.to_bytes(size, 'big'), size)
 
-    def read16(self, addr):
-        return self.readUint(addr, 2)
 
-    def read32(self, addr):
-        return self.readUint(addr, 4)
+class _RawEnv:
+    def __init__(self, owner):
+        self.owner = owner
 
-    def read64(self, addr):
-        return self.readUint(addr, 8)
+    def __enter__(self):
+        self.owner._raw_addr = True
+        return self
 
-    def write16(self, addr, data):
-        return self.writeUint(addr, data, 2)
-
-    def write32(self, addr, data):
-        return self.writeUint(addr, data, 4)
-
-    def write64(self, addr, data):
-        return self.writeUint(addr, data, 8)
-
-    def readFloat(self, addr):
-        return self.read(addr, float, 4)
-
-    def writeFloat(self, addr, data):
-        return self.write(addr, float(data), 4)
+    def __exit__(self, *args):
+        self.owner._raw_addr = False

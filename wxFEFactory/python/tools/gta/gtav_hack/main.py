@@ -1,7 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
-from lib.hack.form import (Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget,
+from lib.hack.form import (Group, StaticGroup, InputWidget, CoordWidget, ModelInputWidget, ModelCoordWidget,
     render_tab_list)
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK

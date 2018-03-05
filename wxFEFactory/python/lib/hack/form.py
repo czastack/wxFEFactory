@@ -238,7 +238,8 @@ class ModelInputWidget(ModelWidget, BaseInputWidget):
     pass
 
 
-class CheckBoxWidget(Widget):
+class SimpleCheckBoxWidget(Widget):
+    """采用切换事件的立即模式"""
     def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
         """
         :param enableData: 激活时写入的数据
@@ -254,6 +255,50 @@ class CheckBoxWidget(Widget):
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
         self.handler.ptrsWrite(self.addr, self.offsets, data, len(data))
+
+
+class BaseCheckBoxWidget(TwoWayWidget):
+    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
+        """
+        :param enableData: 激活时写入的数据
+        :param disableData: 关闭时写入的数据
+        """
+        super().__init__(name, label, addr, offsets)
+        self.enableData = enableData
+        self.disableData = disableData
+        self.type = type(enableData)
+
+    def render(self):
+        self.view = ui.CheckBox(self.label)
+
+    @property
+    def input_value(self):
+        return self.enableData if self.view.checked else self.disableData
+
+    @input_value.setter
+    def input_value(self, value):
+        if value == self.enableData:
+            self.checked = True
+        elif self.disableData is None or value == self.disableData:
+            self.checked = False
+
+
+class CheckBoxWidget(BaseCheckBoxWidget):
+
+    @property
+    def mem_value(self):
+        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        if self.type is float:
+            ret = float32(ret)
+        return ret
+
+    @mem_value.setter
+    def mem_value(self, value):
+        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+
+
+class ModelCheckBoxWidget(ModelWidget, CheckBoxWidget):
+    pass
 
 
 class CoordWidget(TwoWayWidget):

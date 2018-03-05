@@ -3,6 +3,7 @@ from ..hacktool import BaseHackTool
 
 
 OFFSET_MAP = {
+    '4.0.2': 0x4968938,
     '5.0': 0x1193320,
     '5.0-6372': 0x139DC88,
 }

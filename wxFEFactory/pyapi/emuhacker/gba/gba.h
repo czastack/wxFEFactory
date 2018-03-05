@@ -1,3 +1,0 @@
-
-typedef u32 GBA_MEM_TABLE[9];
-extern GBA_MEM_TABLE GBA_MEMORY_SIZE;

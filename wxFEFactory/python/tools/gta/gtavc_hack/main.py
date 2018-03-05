@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.form import Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
+from lib.hack.form import Group, StaticGroup, InputWidget, SimpleCheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
@@ -72,12 +72,12 @@ class Tool(BaseGTA3Tool):
         with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
-                    CheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
-                    CheckBoxWidget("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-                    CheckBoxWidget("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
-                    CheckBoxWidget("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
-                    CheckBoxWidget("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
-                    CheckBoxWidget("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
+                    SimpleCheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
+                    SimpleCheckBoxWidget("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
+                    SimpleCheckBoxWidget("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
+                    SimpleCheckBoxWidget("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
+                    SimpleCheckBoxWidget("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
+                    SimpleCheckBoxWidget("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):

@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.form import Group, StaticGroup, InputWidget, CheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
+from lib.hack.form import Group, StaticGroup, InputWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles

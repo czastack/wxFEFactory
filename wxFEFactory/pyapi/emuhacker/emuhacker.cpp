@@ -1,34 +1,18 @@
 #ifdef _WIN32
 
 #include <wx/wx.h>
-#include "emuhacker.h"
 #include "../pyutils.h"
 #include "../functions.h"
-#include "gba/VbaHandler.h"
-#include "gba/NogbaHandler.h"
-#include "nds/NogbaNdsHandler.h"
-#include "nds/DeSmuMEHandler.h"
+#include "emuhacker.h"
+#include "ProcessHandler.h"
 #include <windows.h>
 #include <psapi.h>
 #include <tuple>
 
 
 namespace emuhacker {
-
-	auto read8(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u8)); }
-	auto read16(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u16)); }
-	auto read32(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(u32)); }
-	auto read64(ProcessHandler &self, addr_t addr) { return self.readUint(addr, sizeof(UINT64)); }
 	auto readPtr(ProcessHandler &self, addr_t addr) { return self.readUint(addr, self.getPtrSize()); }
-	auto readFloat(ProcessHandler &self, addr_t addr) { return self.read<float>(addr); }
-	auto readDouble(ProcessHandler &self, addr_t addr) { return self.read<double>(addr); }
-	bool write8(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u8)); }
-	bool write16(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u16)); }
-	bool write32(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, sizeof(u32)); }
-	bool write64(ProcessHandler &self, addr_t addr, UINT64 data) { return self.writeUint(addr, data, sizeof(UINT64)); }
 	bool writePtr(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, self.getPtrSize()); }
-	bool writeFloat(ProcessHandler &self, addr_t addr, float value) { return self.write(addr, value); }
-	bool writeDouble(ProcessHandler &self, addr_t addr, double value) { return self.write(addr, value); }
 
 
 	pyobj process_read(ProcessHandler &self, addr_t addr, pycref type, size_t size)
@@ -93,45 +77,6 @@ namespace emuhacker {
 	{
 		wxArrayInt offsets = py::cast<wxArrayInt>(args);
 		return self.readLastAddr(addr, offsets);
-	}
-
-
-	auto ptrRead(ProcessHandler &self, addr_t addr, u32 offset, pycref type, pycref size) {
-		addr = self.readAddr(addr);
-		if (addr)
-		{
-			return process_read(self, addr + offset, type, size.cast<size_t>());
-		}
-		return py::cast(false);
-	}
-
-	auto ptrWrite(ProcessHandler &self, addr_t addr, u32 offset, pycref data, pycref size) {
-		addr = self.readAddr(addr);
-		if (addr)
-		{
-			return process_write(self, addr + offset, data, size.cast<size_t>());
-		}
-		return false;
-	}
-
-	auto ptrsRead(ProcessHandler &self, addr_t addr, py::iterable &args, pycref type, pycref size) {
-		wxArrayInt &&offsets = py::cast<wxArrayInt>(args);
-		addr = self.readLastAddr(addr, offsets);
-		if (addr)
-		{
-			return process_read(self, addr, type, size.cast<size_t>());
-		}
-		return py::cast(false);
-	}
-
-	auto ptrsWrite(ProcessHandler &self, addr_t addr, py::iterable &args, pycref data, pycref size) {
-		wxArrayInt &&offsets = py::cast<wxArrayInt>(args);
-		addr = self.readLastAddr(addr, offsets);
-		if (addr)
-		{
-			return process_write(self, addr, data, size.cast<size_t>());
-		}
-		return false;
 	}
 
 	auto write_function(ProcessHandler &self, py::bytes buf) {
@@ -217,6 +162,24 @@ class PyProcessHandler: public ProcessHandler
 public:
 	using ProcessHandler::m_is64os;
 	using ProcessHandler::m_is32process;
+
+	bool attach() override {
+		PYBIND11_OVERLOAD_PURE(
+			bool,                /* Return type */
+			ProcessHandler,      /* Parent class */
+			attach,              /* Name of function in C++ (must match Python name) */
+		);
+	}
+
+	addr_t prepareAddr(addr_t addr, size_t size) override {
+		PYBIND11_OVERLOAD_PURE(
+			addr_t,              /* Return type */
+			ProcessHandler,      /* Parent class */
+			prepareAddr,         /* Name of function in C++ (must match Python name) */
+			addr,                /* Argument(s) */
+			size
+		);
+	};
 };
 
 
@@ -232,37 +195,21 @@ void init_emuhacker(pybind11::module & m)
 	auto data_a = "data"_a;
 	auto type_a = "type"_a;
 
-	py::class_<ProcessHandler>(emuhacker, "ProcessHandler")
+	py::class_<ProcessHandler, PyProcessHandler>(emuhacker, "ProcessHandler")
 		.def(py::init<>())
 		.def("attach", &ProcessHandler::attach)
 		.def("attachByWindowName", &ProcessHandler::attachByWindowName)
 		.def("attachByWindowHandle", &emuhacker::attachByWindowHandle)
+		.def("prepareAddr", &ProcessHandler::prepareAddr)
 		.def("readUint", &ProcessHandler::readUint)
 		.def("writeUint", &ProcessHandler::writeUint)
 		.def("readInt", &ProcessHandler::readInt)
 		.def("writeInt", &ProcessHandler::writeInt)
-		.def("read8", &emuhacker::read8)
-		.def("read16", &emuhacker::read16)
-		.def("read32", &emuhacker::read32)
-		.def("read64", &emuhacker::read64)
-		.def("write8", &emuhacker::write8)
-		.def("write16", &emuhacker::write16)
-		.def("write32", &emuhacker::write32)
-		.def("write64", &emuhacker::write64)
 		.def("readPtr", &emuhacker::readPtr)
 		.def("writePtr", &emuhacker::writePtr)
 		.def("read", &emuhacker::process_read, addr_a, type_a, "size"_a = 0)
 		.def("write", &emuhacker::process_write, addr_a, data_a, "size"_a = 0)
 		.def("readAddr", &ProcessHandler::readAddr)
-		.def("readFloat", &emuhacker::readFloat)
-		.def("writeFloat", &emuhacker::writeFloat)
-		.def("readDouble", &emuhacker::readDouble)
-		.def("writeDouble", &emuhacker::writeDouble)
-		.def("ptrRead", &emuhacker::ptrRead, addr_a, offsets_a, type_a, "size"_a = 4)
-		.def("ptrWrite", &emuhacker::ptrWrite, addr_a, offsets_a, data_a, "size"_a = 4)
-		.def("readLastAddr", &emuhacker::readLastAddr, addr_a, offsets_a)
-		.def("ptrsRead", &emuhacker::ptrsRead, addr_a, offsets_a, type_a, "size"_a = 4)
-		.def("ptrsWrite", &emuhacker::ptrsWrite, addr_a, offsets_a, data_a, "size"_a = 4)
 		.def("add", &ProcessHandler::add)
 		.def("get_module", &ProcessHandler::getModuleHandle)
 		.def("get_module_file", &emuhacker::getModuleFile, "module"_a = 0)
@@ -277,15 +224,6 @@ void init_emuhacker(pybind11::module & m)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process);
-
-	py::class_<VbaHandler, ProcessHandler>(emuhacker, "VbaHandler")
-		.def(py::init<>());
-	py::class_<NogbaHandler, ProcessHandler>(emuhacker, "NogbaHandler")
-		.def(py::init<>());
-	py::class_<NogbaNdsHandler, ProcessHandler>(emuhacker, "NogbaNdsHandler")
-		.def(py::init<>());
-	py::class_<DeSmuMEHandler, ProcessHandler>(emuhacker, "DeSmuMEHandler")
-		.def(py::init<>());
 }
 
 #endif

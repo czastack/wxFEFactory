@@ -124,7 +124,7 @@ class ManagedModelPtrField(ModelPtrField):
 class ModelField(Field):
     """模型字段"""
     def __init__(self, offset, modelClass, size=0):
-        super().__init__(offset, size or modelClass.SIZE)
+        super().__init__(offset, None, size or modelClass.SIZE)
         self.modelClass = modelClass
 
     def __get__(self, obj, type=None):

@@ -1,3 +1,0 @@
-
-typedef u32 NDS_MEM_TABLE[0xA];
-extern NDS_MEM_TABLE NDS_MEMORY_SIZE;

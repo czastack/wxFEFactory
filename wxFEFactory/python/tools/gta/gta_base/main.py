@@ -1,5 +1,5 @@
 from functools import partial
-from fefactory_api.emuhacker import ProcessHandler
+from lib.hack.handler import MemHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from ...hacktool import BaseHackTool
@@ -29,7 +29,7 @@ class BaseGTATool(BaseHackTool):
 
     def __init__(self):
         super().__init__()
-        self.handler = ProcessHandler()
+        self.handler = MemHandler()
 
     def get_hotkeys(self):
         """重写这个函数，返回要注册的热键列表"""
