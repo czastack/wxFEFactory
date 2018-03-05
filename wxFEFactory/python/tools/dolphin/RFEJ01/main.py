@@ -45,17 +45,19 @@ class Tool(BaseDolphinHack):
             ModelInputWidget("magicdef_add", "魔防+")
             self.m = ModelCheckBoxWidget("moved", "已行动", enableData=1, disableData=0)
 
-        with Group("player", "角色技能", self._person, handler=self.handler):
-            skill_values = self.get_skill_values()
-            for i in range(18):
-                ModelSelectWidget("skills.%d" % i, "技能%d" % (i + 1), None, None, ("无",) + datasets.SKILLS, skill_values)
+        self.lazy_group(Group("skills", "角色技能", self._person, handler=self.handler), self.render_skills)
+        self.lazy_group(Group("items", "角色物品", self._person, handler=self.handler), self.render_items)
 
-        with Group("player", "角色物品", self._person, handler=self.handler):
-            item_values = self.get_item_values()
-            for i in range(7):
-                ModelSelectWidget("items.%d" % i, "物品%d" % (i + 1), None, None, ("无",) + datasets.ITEMS, item_values)
-                ModelInputWidget("items_count.%d" % i, "数量")
+    def render_skills(self):
+        skill_values = self.get_skill_values()
+        for i in range(18):
+            ModelSelectWidget("skills.%d" % i, "技能%d" % (i + 1), None, None, datasets.SKILLS, skill_values)
 
+    def render_items(self):
+        item_values = self.get_item_values()
+        for i in range(7):
+            ModelSelectWidget("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS, item_values)
+            ModelInputWidget("items_count.%d" % i, "数量")
 
     def _person(self):
         pedid = self._ram.pedid
@@ -65,10 +67,10 @@ class Tool(BaseDolphinHack):
     person = property(_person)
 
     def get_skill_values(self):
-        return (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS)))
+        return (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
 
     def get_item_values(self):
-        return (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS)))
+        return (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS) - 1))
 
     def get_hotkeys(self):
         return (
