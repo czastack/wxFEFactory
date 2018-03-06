@@ -17,6 +17,7 @@ class Tool(BaseGbaHack):
         with Group("global", "全局", self._global, handler=self.handler):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
+            ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS, datasets.CHAPTER_VALUES)
 
         with Group("player", "角色", self._person, handler=self.handler, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
@@ -42,10 +43,17 @@ class Tool(BaseGbaHack):
             for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
                 ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip("E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
 
-        with Group("items", "角色物品", self._person, handler=self.handler):
+        with Group("items", "角色物品", self._person, handler=self.handler, cols=4):
             for i in range(5):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS, datasets.ITEM_VALUES)
                 ModelInput("items_count.%d" % i, "数量")
+
+        self.lazy_group(Group("train_items", "运输队", self._global, handler=self.handler, cols=4), self.render_train_items)
+
+    def render_train_items(self):
+        for i in range(100):
+            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), None, None, datasets.ITEMS, datasets.ITEM_VALUES)
+            ModelInput("train_items_count.%d" % i, "数量")
 
     def get_hotkeys(self):
         return (

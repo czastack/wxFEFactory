@@ -5,6 +5,7 @@ class ItemSlot(Model):
     SIZE = 0x2
     item = ByteField(0)
     count = ByteField(1)
+    value = ShortField(0)
 
 
 class Person(Model):
@@ -63,8 +64,27 @@ class Global(Model):
     money = Field(0x0202BCF4)
     turns = ShortField(0x0202AA58)
     chapter = ByteField(0x0202BCFA)
-    extra_flag = ShortField(0x02024F72)
+    extra_flag = ShortField(0x02024F72) # 附加项
     person_addr = Field(0x02003c08)
     curx = ShortField(0x0202bcc0)
     cury = ShortField(0x0202bcc2)
     persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
+    train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot)) # 运输队
+
+    def __getattr__(self, name):
+        if name.startswith('train_items.'):
+            index = int(name[12:])
+            return self.train_items[index].item
+        elif name.startswith('train_items_count.'):
+            index = int(name[18:])
+            return self.train_items[index].count
+
+    def __setattr__(self, name, value):
+        if name.startswith('train_items.'):
+            index = int(name[12:])
+            self.train_items[index].item = value
+        elif name.startswith('train_items_count.'):
+            index = int(name[18:])
+            self.train_items[index].count = value
+        else:
+            super().__setattr__(name, value)
