@@ -255,7 +255,7 @@ class MainFrame:
                         traceback.print_exc()
 
     def openTool(self, m):
-        dialog = exui.ChoiceDialog("选择工具", self.tool_names, self.onToolOpen)
+        dialog = exui.ChoiceDialog("选择工具", self.tool_names, self.onToolOpen, style={'width': 600, 'height': 800})
         self.dialog = dialog
         dialog.showModal()
 

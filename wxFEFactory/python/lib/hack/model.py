@@ -10,6 +10,9 @@ class Model:
         self.addr += self.SIZE
         return self
 
+    def to_bytes(self):
+        return self.handler.read(self.addr, bytes, self.SIZE)
+
     def clone(self):
         return self.__class__(self.addr, self.handler)
 
@@ -18,7 +21,7 @@ class Model:
 
     def offsetof(self, field):
         if isinstance(field, str):
-            field = self.__class__.__dict__[field]
+            field = self.field(field)
 
         if isinstance(field, Field):
             return field.offset
@@ -27,6 +30,10 @@ class Model:
 
     def __and__(self, field):
         return self.addrof(field)
+
+    @classmethod
+    def field(cls, name):
+        return cls.__dict__[name]
 
     @property
     def addr_hex(self):
@@ -58,6 +65,11 @@ class Field:
         if not isinstance(value, self.type):
             value = self.type(value)
         obj.handler.write(obj.addr + self.offset, value, self.size)
+
+    def __str__(self):
+        return "{}(offset={}, size={})".format(self.__class__.__name__, self.offset, self.size)
+
+    __repr__ = __str__
 
 
 class PtrField(Field):

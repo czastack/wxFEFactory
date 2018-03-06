@@ -79,6 +79,6 @@ class Tool(BaseGbaHack):
 
     def move_to_cursor(self, _=None):
         person = self.person
-        ram = self._global
-        person.posx = ram.curx
-        person.posy = ram.cury
+        _global = self._global
+        person.posx = _global.curx
+        person.posy = _global.cury
