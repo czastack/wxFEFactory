@@ -107,3 +107,17 @@ class _RawEnv:
 
     def __exit__(self, *args):
         self.owner._raw_addr = False
+
+
+class ProxyHandler():
+    def __init__(self, handler=None):
+        self.handler = handler
+
+    def __getattr__(self, name):
+        if self.handler:
+            return getattr(self.handler, name)
+        else:
+            raise ValueError("handler未初始化")
+
+    def set(self, handler):
+        self.handler = handler

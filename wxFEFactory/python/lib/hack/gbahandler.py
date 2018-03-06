@@ -60,9 +60,10 @@ class GbaEmuHandler(MemHandler):
 # };
 class VbaHandler(GbaEmuHandler):
     MAP_ADDR = 0x00604230
+    WINDOW_NAME = 'VisualBoyAdvance'
 
     def attach(self):
-        self.enumWindows(self._enum_window, 'VisualBoyAdvance-')
+        self.enumWindows(self._enum_window, self.WINDOW_NAME + '-')
         succeed = self.attachByWindowHandle(self.hwnd)
         if succeed:
             with self.raw_env():
@@ -81,6 +82,7 @@ class VbaHandler(GbaEmuHandler):
 class NogbaHandler(GbaEmuHandler):
     PTR_TABLE_BASE = 0x4C3B38
     PTR_TABLE_OFFSET = 0x8E28
+    WINDOW_NAME = 'No$gba'
 
     def attach(self):
         succeed = self.attachByWindowName("No$dlgClass", "No$gba Debugger (Fullversion)");

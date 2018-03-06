@@ -110,7 +110,7 @@ class ModelWidget:
                 prop.__delete__(ins, value)
 
 
-class OffsetsModel:
+class OffsetsWidget:
     @property
     def mem_value(self):
         ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
@@ -192,7 +192,7 @@ class StaticGroup(Group):
         return Group.__init__(self, None, caption, 0, False, False)
 
 
-class BaseInputWidget(TwoWayWidget):
+class BaseInput(TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
@@ -222,18 +222,18 @@ class BaseInputWidget(TwoWayWidget):
         event.Skip()
 
 
-class InputWidget(BaseInputWidget, OffsetsModel):
+class Input(BaseInput, OffsetsWidget):
     def __init__(self, name, label, addr, offsets=(), type_=int, size=4):
         super().__init__(name, label, addr, offsets)
         self.type = type_
         self.size = size
 
 
-class ModelInputWidget(ModelWidget, BaseInputWidget):
+class ModelInput(ModelWidget, BaseInput):
     pass
 
 
-class ProxyInputWidget(BaseInputWidget):
+class ProxyInput(BaseInput):
     def __init__(self, name, label, read, write):
         super().__init__(name, label, None, None)
         self.doRead = read
@@ -248,7 +248,7 @@ class ProxyInputWidget(BaseInputWidget):
         self.doWrite(value)
 
 
-class SimpleCheckBoxWidget(Widget):
+class SimpleCheckBox(Widget):
     """采用切换事件的立即模式"""
     def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
         """
@@ -267,7 +267,7 @@ class SimpleCheckBoxWidget(Widget):
         self.handler.ptrsWrite(self.addr, self.offsets, data, len(data))
 
 
-class BaseCheckBoxWidget(TwoWayWidget):
+class BaseCheckBox(TwoWayWidget):
     def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
         """
         :param enableData: 激活时写入的数据
@@ -296,11 +296,11 @@ class BaseCheckBoxWidget(TwoWayWidget):
             self.view.checked = False
 
 
-class CheckBoxWidget(BaseCheckBoxWidget, OffsetsModel):
+class CheckBox(BaseCheckBox, OffsetsWidget):
     pass
 
 
-class ModelCheckBoxWidget(ModelWidget, CheckBoxWidget):
+class ModelCheckBox(ModelWidget, CheckBox):
     pass
 
 
@@ -520,7 +520,7 @@ class ModelCoordWidget(ModelWidget, CoordWidget):
     pass
 
 
-class BaseSelectWidget(TwoWayWidget):
+class BaseSelect(TwoWayWidget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
@@ -540,7 +540,7 @@ class BaseSelectWidget(TwoWayWidget):
             print(hex(value), "不在%s的可选值中" % self.label)
 
 
-class SelectWidget(BaseSelectWidget, OffsetsModel):
+class Select(BaseSelect, OffsetsWidget):
     def __init__(self, name, label, addr, offsets, choices, values=None, type_=int, size=4):
         self.choices = choices
         self.values = values
@@ -549,7 +549,7 @@ class SelectWidget(BaseSelectWidget, OffsetsModel):
         super().__init__(name, label, addr, offsets)
 
 
-class ModelSelectWidget(ModelWidget, BaseSelectWidget):
+class ModelSelect(ModelWidget, BaseSelect):
     def __init__(self, name, label, ins, prop, choices, values=None):
         self.choices = choices
         self.values = values

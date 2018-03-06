@@ -1,7 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
-from lib.hack.form import (Group, StaticGroup, InputWidget, CoordWidget, ModelInputWidget, ModelCoordWidget,
+from lib.hack.form import (Group, StaticGroup, Input, CoordWidget, ModelInput, ModelCoordWidget,
     render_tab_list)
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -66,13 +66,13 @@ class Tool(BaseGTATool):
         self.lazy_group(Group(None, "设置", None, hasfootbar=False), self.render_config)
 
     def render_player(self):
-        self.hp_view = ModelInputWidget("hp", "生命")
-        self.ap_view = ModelInputWidget("ap", "防弹衣")
+        self.hp_view = ModelInput("hp", "生命")
+        self.ap_view = ModelInput("ap", "防弹衣")
         self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-        # self.weight_view = ModelInputWidget("gravity", "重量")
+        # self.weight_view = ModelInput("gravity", "重量")
         self.speed_view = ModelCoordWidget("speed", "速度")
-        self.rot_view = ModelInputWidget("rotation", "旋转")
-        self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
+        self.rot_view = ModelInput("rotation", "旋转")
+        self.wanted_level_view = ModelInput("wanted_level", "通缉等级")
         ui.Hr()
         with ui.GridLayout(cols=4, vgap=10, className="expand"):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
@@ -90,12 +90,12 @@ class Tool(BaseGTATool):
             ui.ToggleButton(label="没有噪声", onchange=self.set_no_noise)
 
     def render_vehicle(self):
-        self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+        self.vehicle_hp_view = ModelInput("hp", "HP")
         self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
         self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
         self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
         self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-        self.weight_view = ModelInputWidget("weight", "重量")
+        self.weight_view = ModelInput("weight", "重量")
         ui.Hr()
         with ui.GridLayout(cols=4, vgap=10, className="expand"):
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
@@ -130,15 +130,15 @@ class Tool(BaseGTATool):
                 ui.Button(label="一键最大", onclick=self.weapon_max)
 
     def render_global(self):
-        ModelInputWidget("game_hour", "当前小时")
-        ModelInputWidget("game_minute", "当前分钟")
-        ModelInputWidget("game_seconds", "当前秒数")
-        ModelInputWidget("game_day", "当前日期")
-        ModelInputWidget("game_month", "当前月份")
-        ModelInputWidget("game_year", "当前年份")
-        ModelInputWidget("money", "金钱")
+        ModelInput("game_hour", "当前小时")
+        ModelInput("game_minute", "当前分钟")
+        ModelInput("game_seconds", "当前秒数")
+        ModelInput("game_day", "当前日期")
+        ModelInput("game_month", "当前月份")
+        ModelInput("game_year", "当前年份")
+        ModelInput("money", "金钱")
 
-        ModelInputWidget("wind_speed", "风速")
+        ModelInput("wind_speed", "风速")
         ui.Text("天气", className="label_left expand")
         with ui.Horizontal(className="fill"):
             self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))

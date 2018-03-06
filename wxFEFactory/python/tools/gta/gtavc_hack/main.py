@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.form import Group, StaticGroup, InputWidget, SimpleCheckBoxWidget, CoordWidget, ModelInputWidget, ModelCoordWidget
+from lib.hack.form import Group, StaticGroup, Input, SimpleCheckBox, CoordWidget, ModelInput, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
@@ -34,27 +34,27 @@ class Tool(BaseGTA3Tool):
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
-            self.hp_view = ModelInputWidget("hp", "生命")
-            self.ap_view = ModelInputWidget("ap", "防弹衣")
-            self.rot_view = ModelInputWidget("rotation", "旋转")
+            self.hp_view = ModelInput("hp", "生命")
+            self.ap_view = ModelInput("ap", "防弹衣")
+            self.rot_view = ModelInput("rotation", "旋转")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInputWidget("weight", "重量")
-            self.stamina_view = ModelInputWidget("stamina", "体力")
-            self.wanted_level_view = ModelInputWidget("wanted_level", "通缉等级")
-            self.money_view = InputWidget("money", "金钱", address.MONEY, (), int)
+            self.weight_view = ModelInput("weight", "重量")
+            self.stamina_view = ModelInput("stamina", "体力")
+            self.wanted_level_view = ModelInput("wanted_level", "通缉等级")
+            self.money_view = Input("money", "金钱", address.MONEY, (), int)
             ui.Hr()
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
-            self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+            self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.vehicle_turn_view = ModelCoordWidget("turn", "Turn")
-            self.weight_view = ModelInputWidget("weight", "重量")
+            self.weight_view = ModelInput("weight", "重量")
             ui.Hr()
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
@@ -72,12 +72,12 @@ class Tool(BaseGTA3Tool):
         with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
                 with ui.GridLayout(cols=4, vgap=10, className="fill container"):
-                    SimpleCheckBoxWidget("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
-                    SimpleCheckBoxWidget("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-                    SimpleCheckBoxWidget("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
-                    SimpleCheckBoxWidget("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
-                    SimpleCheckBoxWidget("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
-                    SimpleCheckBoxWidget("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
+                    SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
+                    SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
+                    SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
+                    SimpleCheckBox("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
+                    SimpleCheckBox("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
+                    SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):

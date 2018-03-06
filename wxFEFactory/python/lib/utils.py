@@ -58,3 +58,9 @@ def rgb2tuple(rgb):
 
 def rgb2bgr(rgb):
     return ((rgb & 0xff) << 16 | ((rgb >> 8) & 0xff) << 8 | ((rgb >> 16) & 0xff))
+
+def gen_values(items):
+    return tuple(range(len(items)))
+
+def gen_flag(items):
+    return tuple(1 << i for i in range(len(items)))

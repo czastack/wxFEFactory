@@ -26,9 +26,6 @@ class BaseDolphinHack(BaseHackTool):
         return True
 
     def check_attach(self, _=None):
-        if self.handler.active:
-            self.free_remote_function()
-
         self.window_name = None
         self.handler.enumWindows(self._enum_window, 'Dolphin ')
         if self.window_name:
@@ -46,7 +43,6 @@ class BaseDolphinHack(BaseHackTool):
                         hotkeys = self.get_hotkeys()
                         if hotkeys:
                             self.win.RegisterHotKeys(hotkeys)
-                    self.init_remote_function()
                     return True
                 else:
                     self.attach_status_view.label = '绑定失败, 不支持的版本: %s' % self.window_name

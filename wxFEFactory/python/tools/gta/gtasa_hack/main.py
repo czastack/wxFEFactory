@@ -1,7 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.hack.form import (
-    Group, StaticGroup, InputWidget, ProxyInputWidget, SelectWidget, ModelInputWidget, ModelCoordWidget
+    Group, StaticGroup, Input, ProxyInput, Select, ModelInput, ModelCoordWidget
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
@@ -37,14 +37,14 @@ class Tool(BaseGTA3_VC_SA_Tool):
 
     def render_main(self):
         with Group("player", "角色", self._player, handler=self.handler):
-            self.hp_view = ModelInputWidget("hp", "生命")
-            self.maxhp_view = ModelInputWidget("maxhp", "最大生命")
-            self.ap_view = ModelInputWidget("ap", "防弹衣")
-            self.rot_view = ModelInputWidget("rotation", "旋转")
+            self.hp_view = ModelInput("hp", "生命")
+            self.maxhp_view = ModelInput("maxhp", "最大生命")
+            self.ap_view = ModelInput("ap", "防弹衣")
+            self.rot_view = ModelInput("rotation", "旋转")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInputWidget("weight", "重量")
-            self.wanted_level_view = ProxyInputWidget("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
+            self.weight_view = ModelInput("weight", "重量")
+            self.wanted_level_view = ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
             ui.Hr()
             with ui.Vertical(className="fill"):
                 with ui.GridLayout(cols=5, vgap=10, className="expand"):
@@ -63,12 +63,12 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
                     ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
-            self.vehicle_hp_view = ModelInputWidget("hp", "HP")
+            self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
             self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInputWidget("weight", "重量")
+            self.weight_view = ModelInput("weight", "重量")
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.GridLayout(cols=5, vgap=10, className="expand"):
@@ -105,31 +105,31 @@ class Tool(BaseGTA3_VC_SA_Tool):
 
         with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
             self.weapon_prop_views = [
-                ProxyInputWidget("weapon_prop_%d" % i, label, 
+                ProxyInput("weapon_prop_%d" % i, label, 
                     partial(self.get_weapon_prop, index=i), partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
                         '手枪', '消音手枪', '沙漠之鹰', '霰弹枪', '短管霰弹枪', '战斗霰弹枪', 'MP5', 'Tech9', 'AK47', 'M4',
                     ))
             ]
             
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = InputWidget("money", "金钱", address.MONEY)
-            InputWidget("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
-            InputWidget("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
-            InputWidget("fat_stat", "肥胖度", address.FAT_STAT_ADDR, (), float)
-            InputWidget("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, (), float)
-            InputWidget("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, (), float)
-            InputWidget("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
-            InputWidget("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
-            InputWidget("car_prof", "驾驶技术", address.CAR_PROF_ADDR)
-            InputWidget("bike_prof", "摩托车技术", address.BIKE_PROF_ADDR)
-            InputWidget("cycle_prof", "自行车技术", address.CYCLE_PROF_ADDR)
-            InputWidget("cycle_prof", "飞机技术", address.FLYING_PROF_ADDR)
-            InputWidget("days_in_game", "天数", address.DAYS_IN_GAME_ADDR)
-            InputWidget("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
-            InputWidget("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
-            InputWidget("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
-            SelectWidget("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), datasets.WEATHER_LIST)
-            InputWidget("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
+            self.money_view = Input("money", "金钱", address.MONEY)
+            Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
+            Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
+            Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, (), float)
+            Input("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, (), float)
+            Input("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, (), float)
+            Input("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
+            Input("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
+            Input("car_prof", "驾驶技术", address.CAR_PROF_ADDR)
+            Input("bike_prof", "摩托车技术", address.BIKE_PROF_ADDR)
+            Input("cycle_prof", "自行车技术", address.CYCLE_PROF_ADDR)
+            Input("cycle_prof", "飞机技术", address.FLYING_PROF_ADDR)
+            Input("days_in_game", "天数", address.DAYS_IN_GAME_ADDR)
+            Input("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
+            Input("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
+            Input("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
+            Select("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), datasets.WEATHER_LIST)
+            Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
         with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
@@ -149,7 +149,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             # TODO
             address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
             for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
-                InputWidget(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
+                Input(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
 
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
