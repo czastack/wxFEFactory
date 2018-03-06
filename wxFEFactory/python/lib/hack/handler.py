@@ -8,7 +8,7 @@ class MemHandler(ProcessHandler):
     def prepareAddr(self, addr, size):
         return addr
 
-    def read16(self, addr):
+    def read8(self, addr):
         return self.readUint(addr, 1)
 
     def read16(self, addr):
