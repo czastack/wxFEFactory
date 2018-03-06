@@ -17,6 +17,7 @@ class Tool(BaseGbaHack):
         with Group("global", "全局", self._global, handler=self.handler):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
+            ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
             ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS, datasets.CHAPTER_VALUES)
 
         with Group("player", "角色", self._person, handler=self.handler, cols=4):
