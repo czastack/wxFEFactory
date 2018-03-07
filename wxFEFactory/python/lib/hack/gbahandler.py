@@ -63,8 +63,9 @@ class VbaHandler(GbaEmuHandler):
     WINDOW_NAME = 'VisualBoyAdvance'
 
     def attach(self):
+        self.hwnd = None
         self.enumWindows(self._enum_window, self.WINDOW_NAME + '-')
-        succeed = self.attachByWindowHandle(self.hwnd)
+        succeed = self.hwnd and self.attachByWindowHandle(self.hwnd) or False
         if succeed:
             with self.raw_env():
                 ptr_table = self.read(self.MAP_ADDR, bytes, 72)

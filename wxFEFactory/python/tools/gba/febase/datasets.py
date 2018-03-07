@@ -1,0 +1,2 @@
+PROFICIENCYS = ('S级', 'A级', 'B级', 'C级', 'D级', 'E级', '-级')
+PROFICIENCY_VALUES = (0xFB, 0xC9, 0x79, 0x47, 0x1F, 0x01, 0x00)

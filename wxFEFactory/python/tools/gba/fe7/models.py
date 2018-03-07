@@ -30,12 +30,11 @@ class Person(BasePerson):
 
 
 class Global(BaseGlobal):
-    money = Field(0x0202BCF4)
-    chapter = ByteField(0x0202BCFA)
-    turns = ShortField(0x0202BCFC)
-    extra_flag = ShortField(0x02024F72) # 附加项
-    person_addr = Field(0x02003c08)
-    curx = ShortField(0x0202bcc0)
-    cury = ShortField(0x0202bcc2)
+    money = Field(0x0202BBFC)
+    turns = ShortField(0x0202BC04)
+    chapter = ByteField(0x0202BC02)
+    person_addr = Field(0x02003118)
+    curx = ShortField(0x0202BBC8)
+    cury = ShortField(0x0202BBCA)
     persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot)) # 运输队

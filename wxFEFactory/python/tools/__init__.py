@@ -10,6 +10,8 @@ tools = [
     ("GTAV Hack", "gta.gtav_hack"),
     ("wii:胧村正妖刀传", "dolphin.RSFJ99"),
     ("wii:晓之女神", "dolphin.RFEJ01"),
+    ("GBA:火焰之纹章 封印之剑", "gba.fe6"),
+    ("GBA:火焰之纹章 烈火之剑", "gba.fe7"),
     ("GBA:火焰之纹章 圣魔之光石", "gba.fe8"),
 ]
 

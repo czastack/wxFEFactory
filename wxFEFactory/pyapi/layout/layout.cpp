@@ -83,12 +83,12 @@ void init_layout(py::module &m)
 		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); })
 		.def("getWXK", [](wxKeyEvent &event, wxChar *keystr) {
 			int ch = keystr[0];
-			if (33 <= ch && ch <= 126) {
-				return ch;
-			}
-			else if ('a' <= ch && ch <= 'z')
+			if ('a' <= ch && ch <= 'z')
 			{
 				return ch - 32;
+			}
+			else if (33 <= ch && ch <= 126) {
+				return ch;
 			}
 			return 0;
 		}).ptr();

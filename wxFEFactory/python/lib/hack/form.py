@@ -40,6 +40,18 @@ class Widget:
         if not self.readonly:
             ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: self.write())
 
+    def onKey(self, v, event):
+        mod = event.GetModifiers()
+        code = event.GetKeyCode()
+        if mod == 0:
+            if code == event.getWXK('r'):
+                self.read()
+                return True
+            elif code == event.getWXK('w'):
+                self.write()
+                return True
+        event.Skip()
+
     def read(self):
         pass
 
@@ -198,7 +210,6 @@ class BaseInput(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()
-
             self.view.setOnKeyDown(self.onKey)
 
     @property
@@ -208,18 +219,6 @@ class BaseInput(TwoWayWidget):
     @input_value.setter
     def input_value(self, value):
         self.view.value = str(value)
-
-    def onKey(self, v, event):
-        mod = event.GetModifiers()
-        code = event.GetKeyCode()
-        if mod == 0:
-            if code == event.getWXK('r'):
-                self.read()
-                return True
-            elif code == event.getWXK('w'):
-                self.write()
-                return True
-        event.Skip()
 
 
 class Input(BaseInput, OffsetsWidget):
@@ -526,6 +525,7 @@ class BaseSelect(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.Choice(className="fill", choices=self.choices)
             self.render_btn()
+            self.view.setOnKeyDown(self.onKey)
 
     @property
     def input_value(self):
