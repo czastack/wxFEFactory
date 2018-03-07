@@ -222,7 +222,7 @@ CHAPTER_VALUES = gen_values(CHAPTERS)
 PROFESSIONS = (
     "领主(艾利乌德)",
     "领主(琳)",
-    "领主(海克托耳)",
+    "领主(赫克托耳)",
     "利西亚骑士",
     "利西亚剑士",
     "利西亚重骑士",

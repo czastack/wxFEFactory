@@ -37,4 +37,4 @@ class Global(BaseGlobal):
     curx = ShortField(0x0202BBC8)
     cury = ShortField(0x0202BBCA)
     persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
-    train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot)) # 运输队
+    train_items = ArrayField(0x0203A71C, 100, ModelField(0, ItemSlot)) # 运输队
