@@ -1,8 +1,4 @@
-from lib.utils import gen_values, gen_flag
-
-
 STATUS = ('无', '毒', '睡', '沉默', '狂暴')
-STATUS_VALUE = gen_values(STATUS)
 
 ITEMS = (
     "无",
@@ -134,7 +130,6 @@ ITEMS = (
     "(B)锁链枪",
     "(A)回旋斧",
 )
-ITEM_VALUES = gen_values(ITEMS)
 
 CHAPTERS = (
     "教学模式（易错误）",
@@ -183,7 +178,6 @@ CHAPTERS = (
     "训练模式——西方三岛2",
     "训练模式——密斯尔半岛",
 )
-CHAPTER_VALUES = gen_values(CHAPTERS)
 
 PROFESSIONS = (
     "领主",

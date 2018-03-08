@@ -1,8 +1,4 @@
-from lib.utils import gen_values, gen_flag
-
-
 STATUS = ('无', '毒', '睡', '沉默', '狂暴')
-STATUS_VALUE = gen_values(STATUS)
 
 ITEMS = (
     "无",
@@ -165,7 +161,6 @@ ITEMS = (
     "舞蹈",
     "演奏",
 )
-ITEM_VALUES = gen_values(ITEMS)
 
 CHAPTERS = (
     "序章　草原的少女",
@@ -217,7 +212,6 @@ CHAPTERS = (
     "终章　光",
     "终章　光",
 )
-CHAPTER_VALUES = gen_values(CHAPTERS)
 
 PROFESSIONS = (
     "领主(艾利乌德)",

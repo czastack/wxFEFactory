@@ -1,8 +1,4 @@
-from lib.utils import gen_values, gen_flag
-
-
 STATUS = ('无', '毒', '睡', '沉默', '狂暴')
-STATUS_VALUE = gen_values(STATUS)
 
 ITEMS = (
     "无",
@@ -195,7 +191,6 @@ ITEMS = (
     "黑色宝玉",
     "金色宝玉",
 )
-ITEM_VALUES = gen_values(ITEMS)
 
 CHAPTERS = (
     "序章　鲁内斯陷落",
@@ -255,7 +250,6 @@ CHAPTERS = (
     "拉格特遗迹　9层",
     "拉格特遗迹　10层",
 )
-CHAPTER_VALUES = gen_values(CHAPTERS)
 
 PROFESSIONS = (
     "领主(男)",

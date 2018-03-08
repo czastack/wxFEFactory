@@ -12,7 +12,7 @@ class Person(BasePerson):
     posx = ByteField(14)
     posy = ByteField(15)
     hpmax = ByteField(16)
-    hp = ByteField(19)
+    hp = ByteField(17)
     power = ByteField(18)
     skill = ByteField(19)
     speed = ByteField(20)
@@ -37,4 +37,4 @@ class Global(BaseGlobal):
     curx = ShortField(0x0202AA1C)
     cury = ShortField(0x0202AA1E)
     persons = ArrayField(0x202AB78, 0xff, ModelField(0, Person))
-    train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot)) # 运输队
+    train_items = ArrayField(0x02039430, 100, ModelField(0, ItemSlot)) # 运输队

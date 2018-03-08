@@ -17,7 +17,7 @@ class FeTool(BaseGbaHack):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
             ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
-            ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS, datasets.CHAPTER_VALUES)
+            ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS)
 
         with Group("player", "角色", self._person, handler=self.handler, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
@@ -38,14 +38,14 @@ class FeTool(BaseGbaHack):
             ModelInput("lucky", "幸运")
             ModelInput("physical_add", "体格+")
             ModelInput("move_add", "移动+")
-            ModelSelect("status", "状态种类", None, None, datasets.STATUS, datasets.STATUS_VALUE)
+            ModelSelect("status", "状态种类", None, None, datasets.STATUS)
             ModelInput("status_turn", "状态持续")
             for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
                 ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip("E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
 
         with Group("items", "角色物品", self._person, handler=self.handler, cols=4):
             for i in range(5):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS, datasets.ITEM_VALUES)
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
         self.lazy_group(Group("train_items", "运输队", self._global, handler=self.handler, cols=4), self.render_train_items)
@@ -53,7 +53,7 @@ class FeTool(BaseGbaHack):
     def render_train_items(self):
         datasets = self.datasets
         for i in range(100):
-            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), None, None, datasets.ITEMS, datasets.ITEM_VALUES)
+            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), None, None, datasets.ITEMS)
             ModelInput("train_items_count.%d" % i, "数量")
 
     def get_hotkeys(self):
