@@ -25,8 +25,6 @@ void init_layout(py::module &m)
 	using namespace py::literals;
 
 	py::module layout = m.def_submodule("layout");
-	init_menu(layout);
-	init_bitmap(layout);
 	setattr(m, "ui", layout);
 
 	// wx const
@@ -162,9 +160,11 @@ void init_layout(py::module &m)
 #undef ATTR_KEYCODE
 
 	init_frames(layout);
+	init_menu(layout);
 	init_containers(layout);
 	init_controls(layout);
 	init_aui(layout);
 	init_bars(layout);
 	init_datacontrols(layout);
+	init_bitmap(layout);
 }
