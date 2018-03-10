@@ -1,6 +1,7 @@
 from lib import exui, fileutils
 from lib.utils import float32
-from styles import btn_xsm_style
+from styles import btn_xsm_style, dialog_style, styles
+from __main__ import win as main_win
 import json
 import types
 import fefactory_api
@@ -135,12 +136,12 @@ class OffsetsWidget:
         self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
     
 
-class Group(Widget):
+class BaseGroup(Widget):
     cols = 2
 
-    def __init__(self, name, label, addr, flexgrid=True, hasfootbar=True, handler=None, cols=None):
+    def __init__(self, name, label, addr, flexgrid=True, hasfooter=True, handler=None, cols=None):
         self.flexgrid = flexgrid
-        self.hasfootbar = hasfootbar
+        self.hasfooter = hasfooter
         self.children = []
         self.handler = handler
         if cols:
@@ -153,24 +154,9 @@ class Group(Widget):
 
     def onDestroy(self, view):
         super().onDestroy(view)
+        if hasattr(self, 'footer'):
+            del self.footer
         del self.root
-
-    def render(self):
-        with ui.Vertical() as root:
-            with ui.ScrollView(className="fill container") as content:
-                if self.flexgrid:
-                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
-                    for i in range(self.cols >> 1):
-                        self.view.AddGrowableCol((i << 1) + 1)
-                else:
-                    self.view = content
-
-            if self.hasfootbar:
-                with ui.Horizontal(className="container"):
-                    ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
-                    ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
-        ui.Item(root, caption=self.label)
-        self.root = root
 
     def appendChild(self, child):
         self.children.append(child)
@@ -194,14 +180,73 @@ class Group(Widget):
             field.write()
 
 
-class GroupBox(Group):
+class Group(BaseGroup):
+    cols = 2
+
     def render(self):
-        self.view = ui.StaticBox(self.label, className="fill container")
+        with ui.Vertical() as root:
+            with ui.ScrollView(className="fill container") as content:
+                if self.flexgrid:
+                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
+                    for i in range(self.cols >> 1):
+                        self.view.AddGrowableCol((i << 1) + 1)
+                else:
+                    self.view = content
+
+            if self.hasfooter:
+                with ui.Horizontal(className="container") as footer:
+                    ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
+                    ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
+                self.footer = footer
+        ui.Item(root, caption=self.label)
+        self.root = root
 
 
 class StaticGroup(Group):
     def __init__(self, caption):
         return Group.__init__(self, None, caption, 0, False, False)
+
+
+class GroupBox(BaseGroup):
+    def render(self):
+        with ui.StaticBox(self.label, className="fill") as root:
+            self.view = ui.ScrollView(className="fill container")
+
+        self.root = root
+
+
+class DialogGroup(BaseGroup):
+    def __init__(self, *args, **kwargs):
+        self.dialog_style = kwargs.pop('dialog_style', None)
+        super().__init__(*args, **kwargs)
+
+    def onRelease(self):
+        main_win.removeChild(self.root)
+        self.root = None
+
+    def render(self):
+        ui.Button(label=self.label, onclick=self.show)
+        style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
+        with main_win:
+            with ui.StdModalDialog(self.label, style=style, styles=styles) as root:
+                with ui.Vertical(className="fill"):
+                    with ui.ScrollView(className="fill container") as content:
+                        if self.flexgrid:
+                            self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
+                            for i in range(self.cols >> 1):
+                                self.view.AddGrowableCol((i << 1) + 1)
+                        else:
+                            self.view = content
+
+                    if self.hasfooter:
+                        with ui.Horizontal(className="container"):
+                            ui.Button(label="读取", onclick=lambda btn: self.read())
+                            ui.Button(label="写入", onclick=lambda btn: self.write())
+
+        self.root = root
+
+    def show(self, _=None):
+        self.root.show()
 
 
 class BaseInput(TwoWayWidget):

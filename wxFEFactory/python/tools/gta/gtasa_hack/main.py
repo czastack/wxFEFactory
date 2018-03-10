@@ -175,7 +175,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                 ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
                 self.set_buttons_contextmenu()
                 
-        with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
+        with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 

@@ -141,6 +141,11 @@ public:
 		return ptr()->IsShown();
 	}
 
+	void destroy()
+	{
+		ptr()->Destroy();
+	}
+
 	void setContextMenu(ContextMenu &menu);
 
 	void onPopMenu(wxContextMenuEvent& event);

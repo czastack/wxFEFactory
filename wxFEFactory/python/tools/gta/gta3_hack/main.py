@@ -80,7 +80,7 @@ class Tool(BaseGTA3Tool):
                 self.render_common_button()
                 self.set_buttons_contextmenu()
 
-        with Group(None, "工具", 0, flexgrid=False, hasfootbar=False):
+        with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 

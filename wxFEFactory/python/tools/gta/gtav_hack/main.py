@@ -63,7 +63,7 @@ class Tool(BaseGTATool):
         self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
         self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
         self.lazy_group(StaticGroup("测试"), self.render_functions)
-        self.lazy_group(Group(None, "设置", None, hasfootbar=False), self.render_config)
+        self.lazy_group(Group(None, "设置", None, hasfooter=False), self.render_config)
 
     def render_player(self):
         self.hp_view = ModelInput("hp", "生命")

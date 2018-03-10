@@ -196,7 +196,6 @@ pyobj StdModalDialog::__enter__()
 
 void StdModalDialog::__exit__(py::args & args)
 {
-
 	wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
 	buttonSizer->AddButton(new wxButton(m_elem, wxID_OK));
 	buttonSizer->AddButton(new wxButton(m_elem, wxID_CANCEL));

@@ -47,6 +47,12 @@ class BaseTool(BaseScene):
 
         return menubar
 
+    def add_close_callback(self, callback):
+        close_callbacks = getattr(self, '_close_callbacks', None)
+        if not close_callbacks:
+            close_callbacks = self._close_callbacks = []
+        close_callbacks.append(callback)
+
     @lazyclassmethod_indict
     def doGetTitle(class_):
         """获取原始标题，显示在标签页标题和菜单栏"""
@@ -102,6 +108,12 @@ class BaseTool(BaseScene):
             # 第一种情况阻止关闭
             fefactory_api.alert('请通过菜单过Tab上的关闭按钮关闭')
             return False
+
+        close_callbacks = getattr(self, '_close_callbacks', None)
+        if close_callbacks:
+            for callback in close_callbacks:
+                callback()
+            close_callbacks.clear()
 
         super().onClose()
 

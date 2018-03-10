@@ -121,3 +121,6 @@ class ProxyHandler():
 
     def set(self, handler):
         self.handler = handler
+
+    def active(self):
+        return self.handler and self.handler.active

@@ -36,68 +36,56 @@ public:
 };
 
 
-class LinearLayout : public SizerLayout
+class SizerPanel : public SizerLayout
 {
 public:
 	template <class... Args>
-	LinearLayout(Args ...args) : SizerLayout(args...)
+	SizerPanel(Args ...args) : SizerLayout(args...)
 	{
 		bindElem(new wxPanel(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
 	}
-
-	pyobj __enter__() override
-	{
-		auto ret = Layout::__enter__();
-		m_elem->SetSizer(new wxBoxSizer(getDirection()));
-		return ret;
-	}
-protected:
-	virtual wxOrientation getDirection() = 0;
 };
 
 
-class Vertical : public LinearLayout
-{
-public:
-	using LinearLayout::LinearLayout;
-	wxOrientation getDirection() override
-	{
-		return wxVERTICAL;
-	}
-};
-
-
-class Horizontal : public LinearLayout
-{
-public:
-	using LinearLayout::LinearLayout;
-	wxOrientation getDirection() override
-	{
-		return wxHORIZONTAL;
-	}
-};
-
-
-class GridLayout : public SizerLayout
+class Vertical : public SizerPanel
 {
 public:
 	template <class... Args>
-	GridLayout(int rows, int cols, int vgap, int hgap, Args ...args) : SizerLayout(args...)
+	Vertical(Args ...args) : SizerPanel(args...)
 	{
-		bindElem(new wxPanel(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
+		m_elem->SetSizer(new wxBoxSizer(wxVERTICAL));
+	}
+};
+
+
+class Horizontal : public SizerPanel
+{
+public:
+	template <class... Args>
+	Horizontal(Args ...args) : SizerPanel(args...)
+	{
+		m_elem->SetSizer(new wxBoxSizer(wxHORIZONTAL));
+	}
+};
+
+
+class GridLayout : public SizerPanel
+{
+public:
+	template <class... Args>
+	GridLayout(int rows, int cols, int vgap, int hgap, Args ...args) : SizerPanel(args...)
+	{
 		m_elem->SetSizer(new wxGridSizer(rows, cols, vgap, hgap));
 	}
 };
 
 
-class FlexGridLayout : public SizerLayout
+class FlexGridLayout : public SizerPanel
 {
 public:
 	template <class... Args>
-	FlexGridLayout(int rows, int cols, int vgap, int hgap, Args ...args) : SizerLayout(args...)
+	FlexGridLayout(int rows, int cols, int vgap, int hgap, Args ...args) : SizerPanel(args...)
 	{
-		bindElem(new wxPanel(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize()));
-		
 		wxFlexGridSizer* sizer = new wxFlexGridSizer(rows, cols, vgap, hgap);
 		sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 		m_elem->SetSizer(sizer);

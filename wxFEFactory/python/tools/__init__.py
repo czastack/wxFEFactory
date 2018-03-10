@@ -13,6 +13,7 @@ tools = [
     ("GBA:火焰之纹章 封印之剑", "gba.fe6"),
     ("GBA:火焰之纹章 烈火之剑", "gba.fe7"),
     ("GBA:火焰之纹章 圣魔之光石", "gba.fe8"),
+    ("GBA:热血物语EX", "gba.downtownex"),
 ]
 
 toolbar_tools = (

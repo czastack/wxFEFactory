@@ -135,7 +135,7 @@ class Tool(BaseGTATool):
                 ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
                 self.set_buttons_contextmenu()
 
-        with Group(None, "设置", None, hasfootbar=False):
+        with Group(None, "设置", None, hasfooter=False):
             with ConfigGroup(self.config):
                 FloatConfig('auto_driving_speed', '自动驾驶速度', 10)
             ui.Hr()
