@@ -64,7 +64,7 @@ namespace pybind11 {
 			}
 
 			static handle cast(const ArrayType &src, return_value_policy /* policy */, handle /* parent */) {
-				return asPyList(src).inc_ref();
+				return asPyList(src);
 			}
 
 			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArray"));

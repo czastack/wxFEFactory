@@ -26,6 +26,128 @@ long Text::getAlignStyle()
 	return wxstyle;
 }
 
+
+/**
+ * handle 是否触发事件处理
+ */
+
+auto ItemContainer::setSelection(int n, bool handle)
+{
+	doSetSelection(n);
+	if (handle)
+	{
+		triggerSelectEvent();
+	}
+	return this;
+}
+
+wxString ItemContainer::getText(int pos)
+{
+	if (pos == -1)
+	{
+		pos = getSelection();
+	}
+	if (pos != -1)
+	{
+		return doGetText(pos);
+	}
+	return wxNoneString;
+}
+
+void ItemContainer::setText(wxcstr text, int pos)
+{
+	if (pos == -1)
+	{
+		pos = getSelection();
+	}
+	if (pos != -1)
+	{
+		doSetText(pos, text);
+	}
+}
+
+pyobj ItemContainer::getTexts()
+{
+	const wxArrayString &textArray = ctnr().GetStrings();
+	py::list list;
+	for (wxcstr text : textArray)
+	{
+		list.append(text);
+	}
+	return list;
+}
+
+void ItemContainer::prev(bool handle)
+{
+	if (!getCount())
+	{
+		return;
+	}
+
+	int pos = getSelection();
+	if (pos == 0)
+	{
+		pos = getCount();
+	}
+
+	setSelection(pos - 1, handle);
+}
+
+void ItemContainer::next(bool handle)
+{
+	if (!getCount())
+	{
+		return;
+	}
+
+	int pos = getSelection();
+	if (pos == getCount() - 1)
+	{
+		pos = -1;
+	}
+
+	setSelection(pos + 1, handle);
+}
+
+
+pyobj CheckListBox::getCheckedItems()
+{
+	wxArrayInt items;
+	ctrl().GetCheckedItems(items);
+	return asPyList(items);
+}
+
+void CheckListBox::setCheckedItems(pyobj list)
+{
+	auto &el = ctrl();
+	for (uint i = 0; i < el.GetCount(); ++i)
+	{
+		el.Check(i, false);
+	}
+	for (auto &item : list) {
+		el.Check(item.cast<int>(), true);
+	}
+}
+
+void CheckListBox::checkAll(bool checked)
+{
+	auto &el = ctrl();
+	for (uint i = 0; i < el.GetCount(); ++i)
+	{
+		el.Check(i, checked);
+	}
+}
+
+void CheckListBox::reverseCheck()
+{
+	auto &el = ctrl();
+	for (uint i = 0; i < el.GetCount(); ++i)
+	{
+		el.Check(i, !el.IsChecked(i));
+	}
+}
+
+
 void RadioBox::applyStyle()
 {
 	View::applyStyle();
@@ -131,23 +253,23 @@ void init_controls(py::module & m)
 	auto choices = "choices"_a = None,
 		onselect = "onselect"_a = None;
 
-	py::class_<BaseControlWithItems, Control>(m, "BaseControlWithItems")
-		.def("getText", &BaseControlWithItems::getText, "pos"_a = -1)
-		.def("getTexts", &BaseControlWithItems::getTexts)
-		.def("setText", &BaseControlWithItems::setText, "text"_a, "pos"_a = -1)
-		.def("getSelection", &BaseControlWithItems::getSelection)
-		.def("setSelection", &BaseControlWithItems::setSelection, "pos"_a, "handle"_a = false)
-		.def("getCount", &BaseControlWithItems::getCount)
-		.def("__getitem__", &BaseControlWithItems::__getitem__)
-		.def("__setitem__", &BaseControlWithItems::__setitem__)
-		.def("__len__", &BaseControlWithItems::getCount)
-		.def("prev", &BaseControlWithItems::prev, "handle"_a = true)
-		.def("next", &BaseControlWithItems::next, "handle"_a = true)
-		.def_property("text", &BaseControlWithItems::getText1, &BaseControlWithItems::setText1)
-		.def_property("index", &BaseControlWithItems::getSelection, &BaseControlWithItems::doSetSelection)
-		.def_property_readonly("count", &BaseControlWithItems::getCount);
+	py::class_<ItemContainer, Control>(m, "ItemContainer")
+		.def("getText", &ItemContainer::getText, "pos"_a = -1)
+		.def("getTexts", &ItemContainer::getTexts)
+		.def("setText", &ItemContainer::setText, "text"_a, "pos"_a = -1)
+		.def("getSelection", &ItemContainer::getSelection)
+		.def("setSelection", &ItemContainer::setSelection, "pos"_a, "handle"_a = false)
+		.def("getCount", &ItemContainer::getCount)
+		.def("__getitem__", &ItemContainer::__getitem__)
+		.def("__setitem__", &ItemContainer::__setitem__)
+		.def("__len__", &ItemContainer::getCount)
+		.def("prev", &ItemContainer::prev, "handle"_a = true)
+		.def("next", &ItemContainer::next, "handle"_a = true)
+		.def_property("text", &ItemContainer::getText1, &ItemContainer::setText1)
+		.def_property("index", &ItemContainer::getSelection, &ItemContainer::doSetSelection)
+		.def_property_readonly("count", &ItemContainer::getCount);
 
-	py::class_<ControlWithItems, BaseControlWithItems>(m, "ControlWithItems")
+	py::class_<ControlWithItems, ItemContainer>(m, "ControlWithItems")
 		.def("append", &ControlWithItems::append, "text"_a)
 		.def("insert", &ControlWithItems::insert, "text"_a, "pos"_a)
 		.def("appendItems", &ControlWithItems::appendItems, "choices"_a)
@@ -186,7 +308,7 @@ void init_controls(py::module & m)
 		.def("autoComplete", &ComboBox::autoComplete)
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
-	py::class_t<RadioBox, BaseControlWithItems>(m, "RadioBox")
+	py::class_t<RadioBox, ItemContainer>(m, "RadioBox")
 		.def(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			label, choices, onselect, className, style);
 
