@@ -64,20 +64,20 @@ void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPaddi
 
 	if (align != wxNoneString)
 	{
-		if (vertical == wxT("left"))
+		if (align == wxT("left"))
 		{
 			flag |= wxALIGN_LEFT;
 		}
-		else if (vertical == wxT("right"))
+		else if (align == wxT("right"))
 		{
 			flag |= wxALIGN_RIGHT;
 		}
-		else if (vertical == wxT("center"))
+		else if (align == wxT("center"))
 		{
 			flag |= wxALIGN_CENTER_HORIZONTAL;
 		}
 		else {
-			log_message(wxString::Format(wxT("%s: %s not available"), STYLE_ALIGN, vertical));
+			log_message(wxString::Format(wxT("%s: %s not available"), STYLE_ALIGN, align));
 		}
 	}
 	*pFlag = flag;

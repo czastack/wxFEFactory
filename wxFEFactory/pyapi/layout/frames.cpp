@@ -4,7 +4,7 @@
 
 void BaseTopLevelWindow::__exit__(py::args & args)
 {
-	m_elem->Show();
+	show();
 
 	// 引用加一
 	py::cast(this).inc_ref();
@@ -182,6 +182,28 @@ void HotkeyWindow::onHotkey(wxKeyEvent & event)
 }
 
 
+void Dialog::__exit__(py::args & args)
+{
+	Layout::__exit__(args);
+	if (getActiveLayout() == nullptr)
+	{
+		py::cast(this).inc_ref();
+	}
+}
+
+void Dialog::dismiss(bool ok)
+{
+	if (isModal())
+	{
+		endModal(ok);
+	}
+	else
+	{
+		close();
+	}
+}
+
+
 pyobj StdModalDialog::__enter__()
 {
 	long style = m_elem->GetWindowStyle();
@@ -203,7 +225,7 @@ void StdModalDialog::__exit__(py::args & args)
 
 	wxSizer* topsizer = m_elem->GetSizer();
 	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
-	Layout::__exit__(args);
+	Dialog::__exit__(args);
 }
 
 void init_frames(py::module & m)
@@ -250,7 +272,9 @@ void init_frames(py::module & m)
 		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
 			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
 		.def("showModal", &Dialog::showModal)
-		.def("endModal", &Dialog::endModal);
+		.def("endModal", &Dialog::endModal, "ok"_a=true)
+		.def("isModal", &Dialog::isModal)
+		.def("dismiss", &Dialog::dismiss);
 
 	py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
 		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),

@@ -7,6 +7,7 @@ styles = {
         'grow': {'flex': 1},
         'expand': {'expand': True},
         'vcenter': {'verticalAlign': 'middle'},
+        'right': {'align': 'right'},
         'button': {
             'flex': 1,
             'width': 50,

@@ -214,6 +214,8 @@ public:
 		return *(wxDialog*)m_elem;
 	}
 
+	void __exit__(py::args &args) override;
+
 	virtual ~Dialog()
 	{
 		win().Destroy();
@@ -224,11 +226,17 @@ public:
 		return win().ShowModal() == wxID_OK;
 	}
 
-	void endModal()
+	void endModal(bool ok = true)
 	{
-		win().EndModal(wxID_OK);
+		win().EndModal(ok ? wxID_OK: wxID_CANCEL);
 	}
 
+	bool isModal()
+	{
+		return win().IsModal();
+	}
+
+	void dismiss(bool ok = true);
 };
 
 

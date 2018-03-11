@@ -130,7 +130,7 @@ public:
 		m_elem->SetLabel(label);
 	}
 
-	View& show(bool show_)
+	View& show(bool show_=true)
 	{
 		ptr()->Show(show_);
 		return *this;

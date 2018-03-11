@@ -1,7 +1,35 @@
-import fefactory_api
 from styles import styles, dialog_style
 from lib.win32.keys import getWXK, getWXKName, isWXKMod
+import fefactory_api
 ui = fefactory_api.layout
+
+
+class StdDialog(ui.Dialog):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('style', dialog_style)
+        kwargs.setdefault('styles', styles)
+        super().__init__(*args, **kwargs)
+
+        super().__enter__()
+        with ui.Vertical(className="fill"):
+            self.view = ui.ScrollView(className="fill container")
+
+            with ui.Horizontal(className="container right") as footer:
+                ui.Button(label="取消", onclick=lambda btn: self.dismiss(False))
+                ui.Button(label="确定", onclick=lambda btn: self.dismiss(True))
+            self.footer = footer
+        super().__exit__()
+
+    def __enter__(self):
+        self.view.__enter__()
+        return self
+
+    def __exit__(self, *args):
+        self.view.__exit__(*args)
+
+    def release(self):
+        self.removeChild(self.children[0])
+        self.__dict__.clear()
 
 
 class ListDialog(ui.StdModalDialog):
