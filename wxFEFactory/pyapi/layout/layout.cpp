@@ -63,6 +63,7 @@ void init_layout(py::module &m)
 		.def("__exit__", &Layout::__exit__)
 		.def("styles", &Layout::setStyles)
 		.def("removeChild", &Layout::removeChild)
+		.def("clearChildren", &Layout::clearChildren)
 		.def("reLayout", &Layout::reLayout)
 		.def("findFocus", &Layout::findFocus)
 		.def_readonly("children", &Layout::m_children);

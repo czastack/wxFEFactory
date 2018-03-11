@@ -382,17 +382,11 @@ public:
 
 	virtual void reLayout() {}
 
-	void removeChild(View &child)
-	{
-		m_elem->RemoveChild(child);
-		m_children.attr("remove")(child);
-	}
+	void removeChild(View &child);
 
-	View* findFocus()
-	{
-		auto pChild = m_elem->FindFocus();
-		return pChild ? (View*)pChild->GetClientData() : nullptr;
-	}
+	void clearChildren();
+
+	View* findFocus();
 
 	friend void init_layout(py::module &m);
 protected:

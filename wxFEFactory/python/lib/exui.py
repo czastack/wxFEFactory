@@ -28,7 +28,7 @@ class StdDialog(ui.Dialog):
         self.view.__exit__(*args)
 
     def release(self):
-        self.removeChild(self.children[0])
+        self.clearChildren()
         self.__dict__.clear()
 
 

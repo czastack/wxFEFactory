@@ -435,6 +435,27 @@ void Layout::setStyles(pycref styles)
 	reLayout();
 }
 
+void Layout::removeChild(View & child)
+{
+	m_elem->RemoveChild(child);
+	m_children.attr("remove")(child);
+}
+
+void Layout::clearChildren()
+{
+	for (auto child: m_elem->GetChildren())
+	{
+		m_elem->RemoveChild(child);
+	}
+	m_children.attr("clear")();
+}
+
+View * Layout::findFocus()
+{
+	auto pChild = m_elem->FindFocus();
+	return pChild ? (View*)pChild->GetClientData() : nullptr;
+}
+
 void Item::__init()
 {
 	m_view.ptr()->SetClientData(this);
