@@ -1,4 +1,4 @@
-tools = [
+tools = (
     ("文本转换", "text_convert"),
     ("快速剪切板", "quick_clipboard"),
     ("GTA3 Hack", "gta.gta3_hack"),
@@ -14,7 +14,8 @@ tools = [
     ("GBA:火焰之纹章 烈火之剑", "gba.fe7"),
     ("GBA:火焰之纹章 圣魔之光石", "gba.fe8"),
     ("GBA:热血物语EX", "gba.downtownex"),
-]
+    ("GBA:热血物语EX2007", "gba.downtownex2007"),
+)
 
 toolbar_tools = (
     ("GTA3 Hack", "gta.gta3_hack"),

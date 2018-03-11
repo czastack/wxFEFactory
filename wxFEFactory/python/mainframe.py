@@ -258,12 +258,15 @@ class MainFrame:
         dialog = exui.ChoiceDialog("选择工具", self.tool_names, self.onToolOpen, style={'width': 600, 'height': 800})
         self.dialog = dialog
         dialog.showModal()
+        del self.dialog
 
     def onToolOpen(self, cb):
         name = tools.tools[cb.index][1]
-        self.openToolByName(name)
-        self.dialog.endModal()
-        del self.dialog
+        if isinstance(name, str):
+            self.openToolByName(name)
+            self.dialog.endModal()
+        # elif isinstance(name, tuple):
+        #     self.dialog.listbox.setItems(('',))
 
     def openToolByName(self, name):
         Tool = self.getTool(name)
@@ -274,7 +277,7 @@ class MainFrame:
 
     def attachEmu(self, m):
         if m.checked:
-            from fefactory_api.emuhacker import VbaHandler, NogbaHandler
+            from lib.hack.gbahandler import VbaHandler, NogbaHandler
             from fe.ferom import FeEmuRW
             
             attached = False
