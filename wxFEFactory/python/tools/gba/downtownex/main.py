@@ -47,7 +47,6 @@ class Tool(BaseGbaHack):
                     ("skillkeys", "技能按键", datasets.SKILLKEYS, None)
                 ):
                 with DialogGroup(name, label, self._person, handler=self.handler, cols=4, dialog_style=dialog_style) as dialog_group:
-                    self.add_close_callback(dialog_group.onRelease)
                     for i in indexs:
                         ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), None, None, choices, values)
 

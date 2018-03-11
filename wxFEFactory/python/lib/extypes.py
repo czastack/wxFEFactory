@@ -1,32 +1,10 @@
+from types import MethodType
+import weakref
+
+
 def astr(text):
     """确保是字符串类型"""
     return text if isinstance(text, str) else str(text)
-
-def list_re(li, fn):
-    """列表元素映射"""
-    for i in range(len(li)):
-        li[i] = fn(li[i])
-
-def list_find(li, fn):
-    """列表查找第一个匹配的元素"""
-    for x in li:
-        if fn(x):
-            return x;
-
-def puts(dst, src, keys=None):
-    """
-    更新dict全部或指定字段
-    dst: 模板dict, src: 来源dict
-    """
-    for key in keys or src:
-        dst[key] = src[key]
-
-
-def append_or(dic, key, value):
-    if key in dic:
-        dic[key].append(value)
-    else:
-        dic[key] = [value]
 
 
 class Map(dict):
@@ -40,9 +18,6 @@ class Map(dict):
 
     def __delattr__(self, name):
         del self[name]
-
-    puts = puts
-    append_or = append_or
 
 
 class Dict:
@@ -99,9 +74,6 @@ class Dict:
         if isinstance(key, (list, tuple)):
             return __class__({key: self.__getattr__(key) for key in keys})
 
-    puts = puts
-    append_or = append_or
-
 
 class Dicts:
     """
@@ -146,8 +118,14 @@ class INum:
     __index__ = __int__
 
 
-def empty_method(self):
-    pass
+class WeakBinder:
+    __slots__ = ('ref',)
 
-def empty_function():
-    pass
+    def __init__(self, obj):
+        self.ref = weakref.proxy(obj)
+
+    def __getattr__(self, name):
+        attr = getattr(self.ref, name)
+        if isinstance(attr, MethodType):
+            return MethodType(attr.__func__, self.ref)
+        return attr

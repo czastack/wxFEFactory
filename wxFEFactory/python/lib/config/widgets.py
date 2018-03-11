@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from lib import extypes
 from styles import btn_xsm_style
 from . import Configurable
+from lib.extypes import WeakBinder
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -96,8 +97,9 @@ class ConfigCtrl(ABC):
         self.set_config_value(self.get_input_value(), False)
 
     def render_btn(self):
-        ui.Button(label="r", style=btn_xsm_style, onclick=self.read)
-        ui.Button(label="w", style=btn_xsm_style, onclick=self.write)
+        this = WeakBinder(self)
+        ui.Button(label="r", style=btn_xsm_style, onclick=this.read)
+        ui.Button(label="w", style=btn_xsm_style, onclick=this.write)
 
     def set_help(self, text=None):
         if text is None:
@@ -108,10 +110,6 @@ class ConfigCtrl(ABC):
             self.help = text
         return self
 
-    def onDestroy(self, view):
-        """如果self.view有引用本类的函数，必须注册destroy事件以免循环引用"""
-        del self.view
-
 
 class BoolConfig(ConfigCtrl):
     def __init__(self, name, label, default=False):
@@ -119,7 +117,7 @@ class BoolConfig(ConfigCtrl):
 
     def render(self):
         ui.Hr()
-        self.view = ui.CheckBox(self.label, onchange=self.write)
+        self.view = ui.CheckBox(self.label, onchange=WeakBinder(self).write)
 
     def get_input_value(self):
         return self.view.checked
@@ -138,8 +136,7 @@ class InputConfig(ConfigCtrl):
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", wxstyle=0x0400)
             self.render_btn()
-        self.view.setOnKeyDown(self.onKey)
-        self.view.setOnDestroy(self.onDestroy)
+        self.view.setOnKeyDown(WeakBinder(self).onKey)
 
     def get_input_value(self):
         return self.type(self.view.value)
@@ -179,8 +176,7 @@ class SelectConfig(ConfigCtrl):
 
     def render(self):
         self.render_lable()
-        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=self.write)
-        self.view.setOnDestroy(self.onDestroy)
+        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=WeakBinder(self).write)
         self.view.setSelection(0, True)
 
     def get_input_value(self):

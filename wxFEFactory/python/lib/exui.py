@@ -1,5 +1,6 @@
 from styles import styles, dialog_style
 from lib.win32.keys import getWXK, getWXKName, isWXKMod
+from lib.extypes import WeakBinder
 import fefactory_api
 ui = fefactory_api.layout
 
@@ -9,14 +10,15 @@ class StdDialog(ui.Dialog):
         kwargs.setdefault('style', dialog_style)
         kwargs.setdefault('styles', styles)
         super().__init__(*args, **kwargs)
+        this = WeakBinder(self)
 
         super().__enter__()
         with ui.Vertical(className="fill"):
             self.view = ui.ScrollView(className="fill container")
 
             with ui.Horizontal(className="container right") as footer:
-                ui.Button(label="取消", onclick=lambda btn: self.dismiss(False))
-                ui.Button(label="确定", onclick=lambda btn: self.dismiss(True))
+                ui.Button(label="取消", onclick=lambda btn: this.dismiss(False))
+                ui.Button(label="确定", onclick=lambda btn: this.dismiss(True))
             self.footer = footer
         super().__exit__()
 
@@ -27,23 +29,20 @@ class StdDialog(ui.Dialog):
     def __exit__(self, *args):
         self.view.__exit__(*args)
 
-    def release(self):
-        self.clearChildren()
-        self.__dict__.clear()
-
 
 class ListDialog(ui.StdModalDialog):
     def __init__(self, *args, **kwargs):
         listbox_opt = kwargs.pop('listbox', {})
         kwargs.setdefault('style', dialog_style)
         super().__init__(*args, **kwargs)
+        this = WeakBinder(self)
 
         with self:
             with ui.Vertical(styles=styles, style=styles['class']['fill']):
                 self.listbox = ui.CheckListBox(className='fill', **listbox_opt)
                 with ui.Horizontal(className="expand"):
-                    ui.Button(label="全选", className="button", onclick=self.checkAll)
-                    ui.Button(label="反选", className="button", onclick=self.reverseCheck)
+                    ui.Button(label="全选", className="button", onclick=this.checkAll)
+                    ui.Button(label="反选", className="button", onclick=this.reverseCheck)
 
     def checkAll(self, btn):
         self.listbox.checkAll()

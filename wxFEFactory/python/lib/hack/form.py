@@ -2,6 +2,7 @@ from lib import exui, fileutils
 from lib.utils import float32
 from styles import btn_xsm_style, dialog_style, styles
 from __main__ import win as main_win
+from lib.extypes import WeakBinder
 import json
 import types
 import fefactory_api
@@ -27,19 +28,15 @@ class Widget:
             if parent.handler:
                 self.handler = parent.handler
         self.render()
-        if hasattr(self, 'view'):
-            self.view.setOnDestroy(self.onDestroy)
-
-    def __del__(self):
-        pass
 
     def render(self):
         ui.Text(self.label, className="label_left expand")
 
     def render_btn(self):
-        ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: self.read())
+        this = WeakBinder(self)
+        ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: this.read())
         if not self.readonly:
-            ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: self.write())
+            ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: this.write())
 
     def onKey(self, v, event):
         mod = event.GetModifiers()
@@ -58,9 +55,6 @@ class Widget:
 
     def write(self):
         pass
-
-    def onDestroy(self, view):
-        del self.view
 
     def __repr__(self):
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
@@ -149,14 +143,7 @@ class BaseGroup(Widget):
         super().__init__(name, label, addr)
 
     def __del__(self):
-        super().__del__()
         self.children.clear()
-
-    def onDestroy(self, view):
-        super().onDestroy(view)
-        if hasattr(self, 'footer'):
-            del self.footer
-        del self.root
 
     def appendChild(self, child):
         self.children.append(child)
@@ -184,6 +171,7 @@ class Group(BaseGroup):
     cols = 2
 
     def render(self):
+        this = WeakBinder(self)
         with ui.Vertical() as root:
             with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
@@ -195,8 +183,8 @@ class Group(BaseGroup):
 
             if self.hasfooter:
                 with ui.Horizontal(className="container") as footer:
-                    ui.Button(label="读取", className="button", onclick=lambda btn: self.read())
-                    ui.Button(label="写入", className="button", onclick=lambda btn: self.write())
+                    ui.Button(label="读取", className="button", onclick=lambda btn: this.read())
+                    ui.Button(label="写入", className="button", onclick=lambda btn: this.write())
                 self.footer = footer
         ui.Item(root, caption=self.label)
         self.root = root
@@ -220,12 +208,9 @@ class DialogGroup(BaseGroup):
         self.dialog_style = kwargs.pop('dialog_style', None)
         super().__init__(*args, **kwargs)
 
-    def onRelease(self):
-        main_win.removeChild(self.root)
-        self.root = None
-
     def render(self):
-        ui.Button(label=self.label, onclick=self.show)
+        this = WeakBinder(self)
+        ui.Button(label=self.label, onclick=this.show)
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
             with ui.StdModalDialog(self.label, style=style, styles=styles) as root:
@@ -240,8 +225,8 @@ class DialogGroup(BaseGroup):
 
                     if self.hasfooter:
                         with ui.Horizontal(className="container"):
-                            ui.Button(label="读取", onclick=lambda btn: self.read())
-                            ui.Button(label="写入", onclick=lambda btn: self.write())
+                            ui.Button(label="读取", onclick=lambda btn: this.read())
+                            ui.Button(label="写入", onclick=lambda btn: this.write())
 
         self.root = root
 
@@ -255,7 +240,7 @@ class BaseInput(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()
-            self.view.setOnKeyDown(self.onKey)
+            self.view.setOnKeyDown(WeakBinder(self).onKey)
 
     @property
     def input_value(self):
@@ -304,7 +289,7 @@ class SimpleCheckBox(Widget):
         self.disableData = disableData
 
     def render(self):
-        self.view = ui.CheckBox(self.label, onchange=self.onChange)
+        self.view = ui.CheckBox(self.label, onchange=WeakBinder(self).onChange)
 
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
@@ -362,13 +347,8 @@ class CoordWidget(TwoWayWidget):
 
         super().__init__(name, label, addr, offsets)
 
-    def onDestroy(self, view):
-        super().onDestroy(view)
-        del self.views
-        if self.savable:
-            del self.listbox
-
     def render(self):
+        this = WeakBinder(self)
         super().render()
         if not self.savable:
             with ui.Horizontal(className="expand"):
@@ -393,20 +373,20 @@ class CoordWidget(TwoWayWidget):
                             self.name_view = ui.TextInput(className="fill")
                         with ui.Horizontal(className="container"):
                             self.render_btn()
-                            ui.Button(label="添加", className="button", onclick=self.onAdd)
-                            ui.Button(label="更新", className="button", onclick=self.onUpdate)
-                            ui.Button(label="删除", className="button", onclick=self.onDel)
-                            ui.Button(label="保存", className="button", onclick=self.onSave)
-                            ui.Button(label="载入", className="button", onclick=self.onLoad)
+                            ui.Button(label="添加", className="button", onclick=this.onAdd)
+                            ui.Button(label="更新", className="button", onclick=this.onUpdate)
+                            ui.Button(label="删除", className="button", onclick=this.onDel)
+                            ui.Button(label="保存", className="button", onclick=this.onSave)
+                            ui.Button(label="载入", className="button", onclick=this.onLoad)
                             if self.preset:
-                                ui.Button(label="预设", className="button", onclick=self.choosePreset)
-                    self.listbox = ui.ListBox(className="expand left_padding", onselect=self.onListBoxSel)
-                    self.listbox.setOnKeyDown(self.onListBoxKey)
+                                ui.Button(label="预设", className="button", onclick=this.choosePreset)
+                    self.listbox = ui.ListBox(className="expand left_padding", onselect=this.onListBoxSel)
+                    self.listbox.setOnKeyDown(this.onListBoxKey)
 
                 with ui.ContextMenu() as contextmenu:
-                    ui.MenuItem("复制(&C)", onselect=self.onCopy)
-                    ui.MenuItem("粘贴(&V)", onselect=self.onPaste)
-                    ui.MenuItem("清空列表(&E)", onselect=self.onClear)
+                    ui.MenuItem("复制(&C)", onselect=this.onCopy)
+                    ui.MenuItem("粘贴(&V)", onselect=this.onPaste)
+                    ui.MenuItem("清空列表(&E)", onselect=this.onClear)
                 root.setContextMenu(contextmenu)
 
         self.views = (x_view, y_view, z_view)
@@ -498,7 +478,7 @@ class CoordWidget(TwoWayWidget):
 
     def choosePreset(self, btn):
         if self.preset:
-            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.onPreset)
+            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=WeakBinder(self).onPreset)
             self.dialog = dialog
             dialog.showModal()
 
@@ -570,7 +550,7 @@ class BaseSelect(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.Choice(className="fill", choices=self.choices)
             self.render_btn()
-            self.view.setOnKeyDown(self.onKey)
+            self.view.setOnKeyDown(WeakBinder(self).onKey)
 
     @property
     def input_value(self):
