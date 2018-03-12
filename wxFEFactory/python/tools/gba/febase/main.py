@@ -13,13 +13,14 @@ class FeTool(BaseGbaHack):
     
     def render_main(self):
         datasets = self.datasets
-        with Group("global", "全局", self._global, handler=self.handler):
+        
+        with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
             ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
             ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS)
 
-        with Group("player", "角色", self._person, handler=self.handler, cols=4):
+        with Group("player", "角色", self._person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "序号")
             ModelSelect("prof", "职业", None, None, datasets.PROFESSIONS, datasets.PROFESSION_VALUES)
@@ -43,12 +44,12 @@ class FeTool(BaseGbaHack):
             for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
                 ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip("E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
 
-        with Group("items", "角色物品", self._person, handler=self.handler, cols=4):
+        with Group("items", "角色物品", self._person, cols=4):
             for i in range(5):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
-        self.lazy_group(Group("train_items", "运输队", self._global, handler=self.handler, cols=4), self.render_train_items)
+        self.lazy_group(Group("train_items", "运输队", self._global, cols=4), self.render_train_items)
 
     def render_train_items(self):
         datasets = self.datasets

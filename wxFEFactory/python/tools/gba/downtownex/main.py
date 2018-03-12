@@ -1,6 +1,7 @@
 from ..base import BaseGbaHack
 from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.extypes import WeakBinder
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -16,11 +17,12 @@ class Tool(BaseGbaHack):
     
     def render_main(self):
         datasets = self.datasets
-        with Group("global", "全局", self._global, handler=self.handler):
+        person = WeakBinder(self)._person
+        with Group("global", "全局", self._global):
             ModelInput("partner_count", "我方人数")
             ModelInput("enemy_count", "敌方人数")
 
-        with Group("player", "角色", self._person, handler=self.handler, cols=4) as group:
+        with Group("player", "角色", person, cols=4) as group:
             # ModelInput("addr_hex", "地址", readonly=True)
             ui.Text("角色", className="label_left expand")
             with ui.Horizontal(className="fill"):
@@ -46,7 +48,7 @@ class Tool(BaseGbaHack):
                     ("skills", "技能", datasets.SKILLS, datasets.SKILL_VALUES),
                     ("skillkeys", "技能按键", datasets.SKILLKEYS, None)
                 ):
-                with DialogGroup(name, label, self._person, handler=self.handler, cols=4, dialog_style=dialog_style) as dialog_group:
+                with DialogGroup(name, label, person, cols=4, dialog_style=dialog_style) as dialog_group:
                     for i in indexs:
                         ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), None, None, choices, values)
 

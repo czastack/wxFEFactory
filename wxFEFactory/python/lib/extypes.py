@@ -1,4 +1,4 @@
-from types import MethodType
+import types
 import weakref
 
 
@@ -125,7 +125,13 @@ class WeakBinder:
         self.ref = weakref.proxy(obj)
 
     def __getattr__(self, name):
-        attr = getattr(self.ref, name)
-        if isinstance(attr, MethodType):
-            return MethodType(attr.__func__, self.ref)
-        return attr
+        attr = getattr(self.ref.__class__, name, None)
+        if isinstance(attr, types.FunctionType):
+            return types.MethodType(attr, self.ref)
+        return getattr(self.ref, name)
+
+
+def weakmethod(method):
+    if isinstance(method, types.MethodType):
+        method = types.MethodType(method.__func__, weakref.proxy(method.__self__))
+    return method

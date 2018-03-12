@@ -23,7 +23,7 @@ class Widget:
         if parent:
             parent.appendChild(self)
             if self.addr is None:
-                self.addr = parent.addr
+                self.addr = getattr(parent, 'addr', None)
 
             if parent.handler:
                 self.handler = parent.handler

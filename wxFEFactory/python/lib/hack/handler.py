@@ -38,28 +38,28 @@ class MemHandler(ProcessHandler):
     def writeFloat(self, addr, data):
         return self.write(addr, float(data), 4)
 
-    def ptrRead(addr, offset, type, size):
+    def ptrRead(self, addr, offset, type, size):
         addr = self.readAddr(addr)
-        if (addr):
+        if addr:
             return self.read(addr + offset, type, size)
         return False
 
-    def ptrWrite(addr, offset, data, size):
+    def ptrWrite(self, addr, offset, data, size):
         addr = self.readAddr(addr)
-        if (addr):
+        if addr:
             return self.write(addr + offset, data, size)
         return False
 
-    def ptrsRead(addr, offsets, type, size):
+    def ptrsRead(self, addr, offsets, type, size):
         addr = self.readLastAddr(addr, offsets)
-        if (addr):
-            return self.read(addr + offset, type, size)
+        if addr:
+            return self.read(addr, type, size)
         return False
 
-    def ptrsWrite(addr, offsets, data, size):
+    def ptrsWrite(self, addr, offsets, data, size):
         addr = self.readLastAddr(addr, offsets)
-        if (addr):
-            return self.write(addr + offset, data, size)
+        if addr:
+            return self.write(addr, data, size)
         return False
 
     def raw_env(self):

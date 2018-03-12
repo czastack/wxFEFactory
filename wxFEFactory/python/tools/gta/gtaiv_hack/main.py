@@ -4,6 +4,7 @@ from lib.hack.form import Group, StaticGroup, Input, CoordWidget, ModelInput, Mo
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
+from lib.extypes import WeakBinder
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
@@ -41,7 +42,10 @@ class Tool(BaseGTATool):
     from .datasets import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
-        with Group("player", "角色", self._player, handler=self.handler):
+        this = WeakBinder(self)
+        player = this._player
+        vehicle = this._vehicle
+        with Group("player", "角色", player):
             self.hp_view = ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
@@ -60,7 +64,7 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
                 ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
 
-        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
+        with Group("vehicle", "汽车", vehicle):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
@@ -74,14 +78,14 @@ class Tool(BaseGTATool):
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
 
-        with Group("weapon", "武器槽", None, handler=self.handler):
+        with Group("weapon", "武器槽", None):
             self.weapon_views = []
             for i in range(1, len(self.WEAPON_LIST)):
-                self.weapon_views.append(WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST))
+                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        with Group("global", "全局", self, handler=self.handler):
+        with Group("global", "全局", self):
             ModelInput("game_hour", "当前小时")
             ModelInput("game_minute", "当前分钟")
             ui.Text("日期", className="label_left expand")

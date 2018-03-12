@@ -2,6 +2,7 @@ from functools import partial
 from lib.hack.form import Group, StaticGroup, Input, CoordWidget, ModelInput, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
+from lib.extypes import WeakBinder
 from styles import dialog_style, styles
 from . import address, models
 from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
@@ -33,7 +34,9 @@ class Tool(BaseGTA3Tool):
     VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
-        with Group("player", "角色", self._player, handler=self.handler):
+        player = WeakBinder(self)._player
+        vehicle = WeakBinder(self)._vehicle
+        with Group("player", "角色", player, handler=self.handler):
             self.hp_view = ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")
             self.rot_view = ModelInput("rotation", "旋转")
@@ -45,7 +48,7 @@ class Tool(BaseGTA3Tool):
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
-        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
+        with Group("vehicle", "汽车", vehicle, handler=self.handler):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
@@ -62,7 +65,7 @@ class Tool(BaseGTA3Tool):
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(1, 13):
-                self.weapon_views.append(WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST))
+                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 

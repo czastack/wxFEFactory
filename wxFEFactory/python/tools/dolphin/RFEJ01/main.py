@@ -14,7 +14,8 @@ class Tool(BaseDolphinHack):
         self._ram = models.Ram(0, self.handler)
     
     def render_main(self):
-        with Group("global", "全局", self._ram, handler=self.handler):
+        person = self._person
+        with Group("global", "全局", self._ram):
             ModelInput("money1", "小队1金钱")
             ModelInput("money2", "小队2金钱")
             ModelInput("money3", "小队3金钱")
@@ -22,7 +23,7 @@ class Tool(BaseDolphinHack):
             ModelInput("exp2", "据点2分配经验值")
             ModelInput("exp3", "据点3分配经验值")
 
-        with Group("player", "角色", self._person, handler=self.handler, cols=4):
+        with Group("player", "角色", person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "角色编号", readonly=True)
             ModelSelect("prof", "职业", None, None, datasets.PROFESSIONS, 
@@ -44,8 +45,8 @@ class Tool(BaseDolphinHack):
             ModelInput("magicdef_add", "魔防+")
             ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
 
-        self.lazy_group(Group("skills", "角色技能", self._person, handler=self.handler), self.render_skills)
-        self.lazy_group(Group("items", "角色物品", self._person, handler=self.handler), self.render_items)
+        self.lazy_group(Group("skills", "角色技能", person), self.render_skills)
+        self.lazy_group(Group("items", "角色物品", person, handler=self.handler), self.render_items)
 
     def render_skills(self):
         skill_values = (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))

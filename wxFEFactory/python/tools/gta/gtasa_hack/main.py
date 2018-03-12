@@ -5,6 +5,7 @@ from lib.hack.form import (
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
+from lib.extypes import WeakBinder
 from styles import dialog_style, styles, btn_md_style
 from . import cheat, address, models, datasets
 from .datasets import VEHICLE_LIST
@@ -36,7 +37,10 @@ class Tool(BaseGTA3_VC_SA_Tool):
     RunningScript = RunningScript
 
     def render_main(self):
-        with Group("player", "角色", self._player, handler=self.handler):
+        this = WeakBinder(self)
+        player = this._player
+        vehicle = this._vehicle
+        with Group("player", "角色", player):
             self.hp_view = ModelInput("hp", "生命")
             self.maxhp_view = ModelInput("maxhp", "最大生命")
             self.ap_view = ModelInput("ap", "防弹衣")
@@ -62,7 +66,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ]
                     ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
                     ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip("死亡或者重新读档后需要再次应用")
-        with Group("vehicle", "汽车", self._vehicle, handler=self.handler):
+        with Group("vehicle", "汽车", vehicle):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
             self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
@@ -90,20 +94,20 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip("切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
-                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", self._vehicle, "body_color", datasets.COLOR_LIST)
-                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", self._vehicle, "body2_color", datasets.COLOR_LIST)
-                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", self._vehicle, "stripe_color", datasets.COLOR_LIST)
-                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", self._vehicle, "stripe2_color", datasets.COLOR_LIST)
+                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color", datasets.COLOR_LIST)
+                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color", datasets.COLOR_LIST)
+                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", vehicle, "stripe_color", datasets.COLOR_LIST)
+                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", vehicle, "stripe2_color", datasets.COLOR_LIST)
 
-        with Group("weapon", "武器槽", None, handler=self.handler):
+        with Group("weapon", "武器槽", None):
             self.weapon_views = []
             for i in range(13):
                 self.weapon_views.append(
-                    WeaponWidget(self._player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO, datasets.WEAPON_LIST, self.on_weapon_change)
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO, datasets.WEAPON_LIST, self.on_weapon_change)
                 )
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        with Group("weapon_prop", "武器熟练度", None, handler=self.handler):
+        with Group("weapon_prop", "武器熟练度", None):
             self.weapon_prop_views = [
                 ProxyInput("weapon_prop_%d" % i, label, 
                     partial(self.get_weapon_prop, index=i), partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
@@ -111,7 +115,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ))
             ]
             
-        with Group("global", "全局", 0, handler=self.handler):
+        with Group("global", "全局", 0):
             self.money_view = Input("money", "金钱", address.MONEY)
             Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
             Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
@@ -145,7 +149,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                 with ui.Horizontal(className="container"):
                     ui.Button("同步", onclick=self.cheat_sync)
 
-        with Group(None, "女友进度", 0, handler=self.handler):
+        with Group(None, "女友进度", 0):
             # TODO
             address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
             for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):

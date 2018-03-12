@@ -1,6 +1,7 @@
 from .tool import BaseTool
 from lib.config import Config
 from styles import styles
+from lib.hack.form import Widget, BaseGroup
 import traceback
 import fefactory_api
 ui = fefactory_api.ui
@@ -34,11 +35,13 @@ class BaseHackTool(BaseTool):
                     ui.CheckBox("保持最前", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill") as book:
                     book.setOnPageChange(self.onNotePageChange)
+                    self.begin_group()
                     try:
                         self.render_main()
                     except:
                         win.close()
                         raise
+                    self.end_group()
 
         return win
 
@@ -93,6 +96,20 @@ class BaseHackTool(BaseTool):
                 with group:
                     fn()
                 del groups[root]
+
+    def begin_group(self):
+        Widget.GROUPS.append(self)
+        self.groups = []
+
+    def appendChild(self, child):
+        if isinstance(child, BaseGroup):
+            self.groups.append(child)
+        else:
+            raise ValueError("Group层级校验失败")
+
+    def end_group(self):
+        while Widget.GROUPS.pop() is not self:
+            pass
 
     def discard_config(self, _=None):
         self.config.cancel_change()
