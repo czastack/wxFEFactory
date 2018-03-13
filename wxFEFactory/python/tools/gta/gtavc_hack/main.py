@@ -2,7 +2,6 @@ from functools import partial
 from lib.hack.form import Group, StaticGroup, Input, SimpleCheckBox, CoordWidget, ModelInput, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.extypes import WeakBinder
 from styles import dialog_style, styles
 from . import address, models
 from .models import Player, Vehicle
@@ -34,9 +33,8 @@ class Tool(BaseGTA3Tool):
     VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
-        this = WeakBinder(self)
-        player = this._player
-        vehicle = this._vehicle
+        player = self.weak._player
+        vehicle = self.weak._vehicle
         with Group("player", "角色", player):
             ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")

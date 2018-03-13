@@ -1,3 +1,4 @@
+from lib.extypes import WeakBinder
 
 
 class BaseScene:
@@ -20,6 +21,7 @@ class BaseScene:
         except ValueError:
             self.index = len(ins)
             ins.append(self)
+        self.weak = WeakBinder(self)
 
     def onClose(self, _=None):
         ins = self.__class__.INS

@@ -12,8 +12,12 @@ ui = fefactory_api.ui
 
 DUMP_INDENT = app.getConfig('json_indent', 4)
 
+
 class BaseModule(BaseScene):
     menu = None
+
+    # def __del__(self):
+    #     print(self.getName(), '析构')
 
     def attach(self, frame):
         """模块加载完毕后调用，用于添加视图到主窗口"""
@@ -28,6 +32,9 @@ class BaseModule(BaseScene):
 
         if self.menu:
             __main__.win.menubar.remove(self.menu)
+
+        if getattr(__main__, 'module', None) == self:
+            del __main__.module
 
         return True
 
@@ -92,45 +99,46 @@ class BaseModule(BaseScene):
 class BaseListBoxModuel(BaseModule):
     """
     列表模块基类
-    左侧显示一个ListBox，右侧显示主视图（重载 render_right 方法 ）
+    左侧显示一个ListBox，右侧显示主视图（重载 render_main 方法 ）
     """
     def render(self):
+        self.weak = this
         with ui.SplitterWindow(False, 220, styles=styles) as panel:
             with ui.Vertical():
-                self.listbox = ui.RearrangeList(className="fill", onselect=self.onListSelect)
+                self.listbox = ui.RearrangeList(className="fill", onselect=this.onListSelect)
                 with ui.Horizontal(className="expand"):
                     ui.Text("Ctrl+↑↓ 上移/下移当前项")
                 with ui.Horizontal(className="expand"):
-                    ui.Button(label="添加", className="button", onclick=self.onAdd)
-                    ui.Button(label="删除", className="button", onclick=self.onDel)
+                    ui.Button(label="添加", className="button", onclick=this.onAdd)
+                    ui.Button(label="删除", className="button", onclick=this.onDel)
             with ui.Vertical():
-                self.render_right()
-        ui.AuiItem(panel, caption=self.getTitle(), onclose=self.onClose)
+                self.render_main()
+        ui.AuiItem(panel, caption=self.getTitle(), onclose=this.onClose)
 
         with ui.ContextMenu() as listmenu:
-            ui.MenuItem("重命名", onselect=self.onRename)
+            ui.MenuItem("重命名", onselect=this.onRename)
 
-        self.listbox.setOnKeyDown(self.onListBoxKey)
+        self.listbox.setOnKeyDown(this.onListBoxKey)
 
         contextmenu = self.render_contextmenu()
         if contextmenu:
             self.listbox.setContextMenu(contextmenu)
         return panel
 
-    def render_right(self):
+    def render_main(self):
         """渲染右侧主视图"""
         pass
 
     def render_contextmenu(self):
         """ListBox右键菜单"""
         with ui.ContextMenu() as contextmenu:
-            ui.MenuItem("重命名", onselect=self.onRename)
+            ui.MenuItem("重命名", onselect=self.weak.onRename)
 
         return contextmenu
 
     def getMenu(self):
         with ui.Menu(self.getTitle()) as menu:
-            ui.MenuItem("清空", onselect=self.onClear)
+            ui.MenuItem("清空", onselect=self.weak.onClear)
         return menu
 
     def onClear(self, m):

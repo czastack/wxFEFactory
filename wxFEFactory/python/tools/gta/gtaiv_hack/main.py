@@ -4,7 +4,6 @@ from lib.hack.form import Group, StaticGroup, Input, CoordWidget, ModelInput, Mo
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
-from lib.extypes import WeakBinder
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
@@ -42,9 +41,8 @@ class Tool(BaseGTATool):
     from .datasets import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
-        this = WeakBinder(self)
-        player = this._player
-        vehicle = this._vehicle
+        player = self.weak._player
+        vehicle = self.weak._vehicle
         with Group("player", "角色", player):
             self.hp_view = ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")

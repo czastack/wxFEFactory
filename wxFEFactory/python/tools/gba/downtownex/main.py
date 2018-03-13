@@ -1,7 +1,6 @@
 from ..base import BaseGbaHack
 from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-from lib.extypes import WeakBinder
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -17,7 +16,7 @@ class Tool(BaseGbaHack):
     
     def render_main(self):
         datasets = self.datasets
-        person = WeakBinder(self)._person
+        person = self.weak._person
         with Group("global", "全局", self._global):
             ModelInput("partner_count", "我方人数")
             ModelInput("enemy_count", "敌方人数")

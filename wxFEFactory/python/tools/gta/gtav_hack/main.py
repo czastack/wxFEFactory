@@ -6,7 +6,6 @@ from lib.hack.form import (Group, StaticGroup, Input, CoordWidget, ModelInput, M
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
-from lib.extypes import WeakBinder
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
@@ -53,10 +52,10 @@ class Tool(BaseGTATool):
         super().__init__()
 
     def render_main(self):
-        with Group("player", "角色", WeakBinder(self)._player):
+        with Group("player", "角色", self.weak._player):
             self.render_player()
 
-        self.lazy_group(Group("vehicle", "汽车", WeakBinder(self)._vehicle), self.render_vehicle)
+        self.lazy_group(Group("vehicle", "汽车", self.weak._vehicle), self.render_vehicle)
         self.lazy_group(Group("weapon", "武器槽", None, flexgrid=False), self.render_weapon)
         self.lazy_group(Group("global", "全局", self), self.render_global)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
@@ -91,7 +90,7 @@ class Tool(BaseGTATool):
             ui.ToggleButton(label="没有噪声", onchange=self.set_no_noise)
 
     def render_vehicle(self):
-        vehicle = WeakBinder(self)._vehicle
+        vehicle = self.weak._vehicle
         self.vehicle_hp_view = ModelInput("hp", "HP")
         self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
         self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
@@ -116,7 +115,7 @@ class Tool(BaseGTATool):
 
     def render_weapon(self):
         self.weapon_views = []
-        player = WeakBinder(self)._player
+        player = self.weak._player
         with ui.Vertical(className="fill container"):
             self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
             with self.weapon_model_book:

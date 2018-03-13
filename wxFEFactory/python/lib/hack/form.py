@@ -1,8 +1,8 @@
 from lib import exui, fileutils
 from lib.utils import float32
+from lib.extypes import WeakBinder
 from styles import btn_xsm_style, dialog_style, styles
 from __main__ import win as main_win
-from lib.extypes import WeakBinder
 import json
 import types
 import fefactory_api
@@ -13,6 +13,7 @@ class Widget:
     GROUPS = []
 
     def __init__(self, name, label, addr, offsets=(), readonly=False):
+        self.weak = WeakBinder(self)
         self.name = name
         self.label = label
         self.addr = addr
@@ -33,7 +34,7 @@ class Widget:
         ui.Text(self.label, className="label_left expand")
 
     def render_btn(self):
-        this = WeakBinder(self)
+        this = self.weak
         ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: this.read())
         if not self.readonly:
             ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: this.write())
@@ -171,7 +172,7 @@ class Group(BaseGroup):
     cols = 2
 
     def render(self):
-        this = WeakBinder(self)
+        this = self.weak
         with ui.Vertical() as root:
             with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
@@ -209,7 +210,7 @@ class DialogGroup(BaseGroup):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        this = WeakBinder(self)
+        this = self.weak
         ui.Button(label=self.label, onclick=this.show)
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
@@ -240,7 +241,7 @@ class BaseInput(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()
-            self.view.setOnKeyDown(WeakBinder(self).onKey)
+            self.view.setOnKeyDown(self.weak.onKey)
 
     @property
     def input_value(self):
@@ -289,7 +290,7 @@ class SimpleCheckBox(Widget):
         self.disableData = disableData
 
     def render(self):
-        self.view = ui.CheckBox(self.label, onchange=WeakBinder(self).onChange)
+        self.view = ui.CheckBox(self.label, onchange=self.weak.onChange)
 
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
@@ -348,7 +349,7 @@ class CoordWidget(TwoWayWidget):
         super().__init__(name, label, addr, offsets)
 
     def render(self):
-        this = WeakBinder(self)
+        this = self.weak
         super().render()
         if not self.savable:
             with ui.Horizontal(className="expand"):
@@ -478,7 +479,7 @@ class CoordWidget(TwoWayWidget):
 
     def choosePreset(self, btn):
         if self.preset:
-            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=WeakBinder(self).onPreset)
+            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.weak.onPreset)
             self.dialog = dialog
             dialog.showModal()
 
@@ -550,7 +551,7 @@ class BaseSelect(TwoWayWidget):
         with ui.Horizontal(className="fill"):
             self.view = ui.Choice(className="fill", choices=self.choices)
             self.render_btn()
-            self.view.setOnKeyDown(WeakBinder(self).onKey)
+            self.view.setOnKeyDown(self.weak.onKey)
 
     @property
     def input_value(self):

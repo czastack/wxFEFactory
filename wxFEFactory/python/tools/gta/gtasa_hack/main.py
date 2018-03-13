@@ -5,7 +5,6 @@ from lib.hack.form import (
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from lib.extypes import WeakBinder
 from styles import dialog_style, styles, btn_md_style
 from . import cheat, address, models, datasets
 from .datasets import VEHICLE_LIST
@@ -37,9 +36,8 @@ class Tool(BaseGTA3_VC_SA_Tool):
     RunningScript = RunningScript
 
     def render_main(self):
-        this = WeakBinder(self)
-        player = this._player
-        vehicle = this._vehicle
+        player = self.weak._player
+        vehicle = self.weak._vehicle
         with Group("player", "角色", player):
             self.hp_view = ModelInput("hp", "生命")
             self.maxhp_view = ModelInput("maxhp", "最大生命")

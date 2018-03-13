@@ -19,7 +19,7 @@ class Module(BaseListBoxModuel):
             super().doAdd(name)
             count += 1
 
-    def render_right(self):
+    def render_main(self):
         with ui.FlexGridLayout(cols=2, vgap=10, className="expand container") as infobar:
             ui.Text("地址", className="vcenter label_left")
             self.addr_view = ui.TextInput(readonly=True, className="expand")

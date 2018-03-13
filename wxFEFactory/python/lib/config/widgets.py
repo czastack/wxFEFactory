@@ -56,6 +56,7 @@ class ConfigCtrl(ABC):
         if not parent:
             raise TypeError('Config Widget must put within ConfigGroup')
         
+        self.weak = WeakBinder(self)
         self.name = name
         self.label = label
         self.default = default
@@ -97,7 +98,7 @@ class ConfigCtrl(ABC):
         self.set_config_value(self.get_input_value(), False)
 
     def render_btn(self):
-        this = WeakBinder(self)
+        this = self.weak
         ui.Button(label="r", style=btn_xsm_style, onclick=this.read)
         ui.Button(label="w", style=btn_xsm_style, onclick=this.write)
 
@@ -117,7 +118,7 @@ class BoolConfig(ConfigCtrl):
 
     def render(self):
         ui.Hr()
-        self.view = ui.CheckBox(self.label, onchange=WeakBinder(self).write)
+        self.view = ui.CheckBox(self.label, onchange=self.weak.write)
 
     def get_input_value(self):
         return self.view.checked
@@ -136,7 +137,7 @@ class InputConfig(ConfigCtrl):
         with ui.Horizontal(className="fill"):
             self.view = ui.TextInput(className="fill", wxstyle=0x0400)
             self.render_btn()
-        self.view.setOnKeyDown(WeakBinder(self).onKey)
+        self.view.setOnKeyDown(self.weak.onKey)
 
     def get_input_value(self):
         return self.type(self.view.value)
@@ -176,7 +177,7 @@ class SelectConfig(ConfigCtrl):
 
     def render(self):
         self.render_lable()
-        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=WeakBinder(self).write)
+        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=self.weak.write)
         self.view.setSelection(0, True)
 
     def get_input_value(self):

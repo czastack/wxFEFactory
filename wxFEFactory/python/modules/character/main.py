@@ -1,8 +1,9 @@
 from ..module import BaseListBoxModuel
-from mainframe import ui
 from . import forms
 from . import config
+from mainframe import ui
 import fefactory_api
+
 
 class Module(BaseListBoxModuel):
 
@@ -20,10 +21,11 @@ class Module(BaseListBoxModuel):
             self.data_map[item['name']] = item
             self.doAdd(item['name'])
 
-    def render_right(self):
+    def render_main(self):
+        this = self.weak
         with ui.Horizontal(className="container expand") as infobar:
             ui.ComboBox(type="readonly", choices=('地址预览', *(key for key in config.ADDR_MAP)), 
-                onselect=self.onPreviewAddrChoiceChange).setSelection(0, True)
+                onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
             ui.Text("地址", className="vcenter label_left")
             self.addr_view = ui.TextInput(readonly=True)
             ui.Text("说明", className="vcenter label_left")
@@ -31,13 +33,13 @@ class Module(BaseListBoxModuel):
 
         self.pg = ui.PropertyGrid(className="fill")
         with ui.Horizontal(className="expand"):
-            ui.CheckBox(label="自动保存", checked=True, onchange=self.onSwichAutoSave, className="vcenter")
-            ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
-            ui.Button(label="保存文件", className="button", onclick=self.onSave)
+            ui.CheckBox(label="自动保存", checked=True, onchange=this.onSwichAutoSave, className="vcenter")
+            ui.Button(label="保存该项", className="button", onclick=this.onSaveIt)
+            ui.Button(label="保存文件", className="button", onclick=this.onSave)
 
         self.pg.autosave = True
-        self.pg.setOnChange(self.onPgChange)
-        self.pg.setOnSelected(self.onFieldSelect)
+        self.pg.setOnChange(this.onPgChange)
+        self.pg.setOnSelected(this.onFieldSelect)
 
     def doGetTitle(self):
         return self.form.title

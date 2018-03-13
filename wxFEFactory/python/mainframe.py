@@ -110,7 +110,7 @@ class MainFrame:
             Module = self.getModule(name)
             m = Module()
             m.attach(self)
-            __main__.m = m
+            __main__.module = m
         except Exception:
             print('加载模块%s失败' % name)
             traceback.print_exc()
