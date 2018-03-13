@@ -15,6 +15,7 @@ tools = (
     ("GBA:火焰之纹章 圣魔之光石", "gba.fe8"),
     ("GBA:热血物语EX", "gba.downtownex"),
     ("GBA:热血物语EX2007", "gba.downtownex2007"),
+    ("NDS:AR金手指分析", "nds.ar_analyse"),
     ("NDS:新·纹章之谜 光与影的英雄", "nds.fe12"),
 )
 

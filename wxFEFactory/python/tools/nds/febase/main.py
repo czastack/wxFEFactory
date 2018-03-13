@@ -14,11 +14,33 @@ class FeTool(BaseNdsHack):
     def render_main(self):
         datasets = self.datasets
         
-        with Group("global", "全局", self._global):
+        with Group("global", "全局", self._global, cols=4):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
+            ModelCheckBox("ourturn", "总是我方回合", enableData=0xE3A01001, disableData=0xE5D01000)
+            ModelCheckBox("control_enemy", "可控制敌人", enableData=0xE1500000, disableData=0xE1510000)
+            ModelCheckBox("upgrade_max", "升级能力值最大", enableData=0xB1A06004, disableData=0xB2866001)
+            ModelCheckBox("upgrade_all", "升级全能力提升", enableData=0xE1A00000, disableData=0xAA000009)
+            ModelCheckBox("lv1_can_transfer", "Lv1即可转职", enableData=0x00000001, disableData=0xE350000A)
+            ModelCheckBox("can_train", "都可用运输队", enableData=0xE3A00002, disableData=0xEBF98E8F)
+            ModelCheckBox("can_visit", "都可访问村庄", enableData=0xE3A00002, disableData=0xEBF98B4C)
+            ModelCheckBox("can_holddown", "都可压制", enableData=0xE3A00002, disableData=0xEBF98F1B)
+            ModelCheckBox("use_enemy_prof", "使用敌专用兵种不死机", enableData=0xEA000022, disableData=0x1A000022)
+            ModelCheckBox("infinite_refine", "武器屋炼成无限次", enableData=0, disableData=0xE3)
+            ModelCheckBox("item_consume", "道具耐久不减", enableData=0x12400000, disableData=0x12400001)
+            ModelCheckBox("item_consume", "敌人全道具掉落", enableData=0xE3500000E1D006B0, disableData=0xE3100020E5D00063)
+            ModelSelect("exp_rate", "经验值倍数", None, None, datasets.RATE, datasets.EXP_RATE_VALUES)
+            ModelSelect("pro_rate", "熟练度倍数", None, None, datasets.RATE, datasets.PRO_RATE_VALUES)
             # ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
             # ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS)
+
+        with Group("player", "配置", self._config, cols=4):
+            ModelSelect("difficulty", "难易度", None, None, datasets.DIFFICULTY, datasets.DIFFICULTY_VALUES)
+            ModelSelect("character_gender", "主人公性别", None, None, datasets.CHARACTER_GENDER)
+            ModelSelect("character_hair_style", "主人公发色", None, None, datasets.CHARACTER_HAIR_STYLE)
+            ModelSelect("character_hair_color", "主人公发型", None, None, datasets.CHARACTER_HAIR_COLOR)
+            ModelSelect("character_eye", "主人公眼睛", None, None, datasets.CHARACTER_EYE)
+            ModelSelect("character_cloth", "主人公服装", None, None, datasets.CHARACTER_CLOTH)
 
         with Group("player", "角色", self._person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
@@ -72,6 +94,9 @@ class FeTool(BaseNdsHack):
             elif person.addr != person_addr:
                 person.addr = person_addr
             return person
+
+    def _config(self):
+        return self._global.config
 
     person = property(_person)
 
