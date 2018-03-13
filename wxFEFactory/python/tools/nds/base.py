@@ -3,7 +3,7 @@ from lib.hack.ndshandler import DeSmuMEHandler, NogbaHandler
 from ..hacktool import BaseHackTool
 
 
-class BaseGbaHack(BaseHackTool):
+class BaseNdsHack(BaseHackTool):
     def __init__(self):
         super().__init__()
         self.handler = ProxyHandler()

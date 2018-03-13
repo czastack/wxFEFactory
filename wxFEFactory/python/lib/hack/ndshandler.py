@@ -1,3 +1,7 @@
+from .handler import MemHandler
+import struct
+
+
 NDS_MEMORY_SIZE = (
     0x00003FFF,  # 0X Instruction TCM (32KB)
     0x00000003,  # 1X UNUSED_RAM
@@ -23,6 +27,7 @@ class NdsEmuHandler(MemHandler):
         if self._raw_addr:
             return addr
 
+        addr &= 0xFFFFFFFF
         if addr < 0x0A000000:
             index = (addr & 0x0F000000) >> 24
             if (index > 8):
@@ -35,26 +40,32 @@ class NdsEmuHandler(MemHandler):
 
 
 class DeSmuMEHandler(NdsEmuHandler):
-    BASE_ADDR = 0x1451E8B90
+    # DeSmuME_0.9.10?: 0x51E8B90
+    WINDOW_NAME = "DeSmuME"
 
     def attach(self):
-        return self.attachByWindowName("DeSmuME", 0)
+        succeed = self.attachByWindowName(self.WINDOW_NAME, None)
+        if succeed:
+            self.base_addr = self.base + 0x5411250
+        return succeed
 
     def prepareAddr(self, addr, size):
         if self._raw_addr:
             return addr
 
+        addr &= 0xFFFFFFFF
         if addr < 0x0A000000:
             addr &= 0x00FFFFFF
 
             if addr + size <= NDS_MEMORY_SIZE[2]:
-                return self.BASE_ADDR + addr
+                return self.base_addr + addr
         return False
 
 
 class NogbaHandler(NdsEmuHandler):
     PTR_TABLE_BASE = 0x4C3B38
     PTR_TABLE_OFFSET = 0x8E28
+    WINDOW_NAME = "No$gba"
 
     def attach(self):
         succeed = self.attachByWindowName("No$dlgClass", "No$gba Debugger (Fullversion)");
