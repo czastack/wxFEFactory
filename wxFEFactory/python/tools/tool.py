@@ -1,5 +1,6 @@
 from lib.basescene import BaseScene
 from lib.lazy import lazyclassmethod_indict
+from styles import styles
 from . import tools
 import traceback
 import fefactory_api
@@ -125,3 +126,13 @@ class BaseTool(BaseScene):
 
         self.__dict__.clear()
         return True
+
+
+class NestedTool(BaseTool):
+    nested = True
+
+    def render_win(self):
+        menubar = self.render_menu()
+        self.win = ui.HotkeyWindow(self.doGetTitle(), styles=styles, menubar=menubar, wxstyle=0x80804)
+        self.win.position = (70, 4)
+        return self.win

@@ -1,23 +1,12 @@
-from .tool import BaseTool
+from .tool import NestedTool
 from lib.config import Config
-from styles import styles
 from lib.hack.form import Widget, BaseGroup
 import traceback
 import fefactory_api
 ui = fefactory_api.ui
 
 
-win_style = {
-    'width': 700,
-    'height': 820,
-    # 'width': 640,
-    # 'height': 700,
-}
-
-
-class BaseHackTool(BaseTool):
-    nested = True
-
+class BaseHackTool(NestedTool):
     def __init__(self):
         super().__init__()
         self.config = Config(self.getName() + '_config.json')
@@ -44,12 +33,6 @@ class BaseHackTool(BaseTool):
                     self.end_group()
 
         return win
-
-    def render_win(self):
-        menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=menubar, wxstyle=0x80804)
-        self.win.position = (70, 4)
-        return self.win
 
     def check_attach(self, _=None):
         """检查运行目标程序状态"""
