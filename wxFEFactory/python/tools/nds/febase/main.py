@@ -10,6 +10,7 @@ class FeTool(BaseNdsHack):
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
+        self.item_index = 1
     
     def render_main(self):
         datasets = self.datasets
@@ -64,12 +65,32 @@ class FeTool(BaseNdsHack):
             # ModelSelect("status", "状态种类", None, None, datasets.STATUS)
             # ModelInput("status_turn", "状态持续")
             for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
-                ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip("E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
+                ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
 
         with Group("items", "角色物品", self._person, cols=4):
             for i in range(5):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
+
+        with Group("weapons", "武器属性", self._weapon):
+            ui.Text("物品", className="label_left expand")
+            with ui.Horizontal(className="fill"):
+                ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
+            ModelInput("name_ptr", "名称指针", hex=True)
+            ModelInput("icon", "图标序号")
+            ModelSelect("type", "类型", None, None, datasets.WEAPONTYPES)
+            ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
+            ModelInput("power", "威力")
+            ModelInput("hit", "命中")
+            ModelInput("kill", "必杀")
+            ModelInput("weight", "重量")
+            ModelInput("range_min", "最小射程")
+            ModelInput("range_max", "最大射程")
+            ui.Text("复制属性", className="label_left expand")
+            with ui.Horizontal(className="fill"):
+                self.copy_weapon_view = ui.Choice(className="fill", choices=datasets.ITEMS)
+                ui.Button("复制", onclick=self.copy_weapon)
+            
 
         self.lazy_group(Group("train_items", "运输队", self._global, cols=4), self.render_train_items)
 
@@ -95,10 +116,23 @@ class FeTool(BaseNdsHack):
                 person.addr = person_addr
             return person
 
+    person = property(_person)
+
     def _config(self):
         return self._global.config
 
-    person = property(_person)
+    def on_item_change(self, lb):
+        self.item_index = lb.index
+
+    def _weapon(self):
+        if self.item_index > 0:
+            return self._global.weapons[self.item_index - 1]
+
+    def copy_weapon(self, _=None):
+        index = self.copy_weapon_view.index
+        if index > 0:
+            item_from = self._global.weapons[index - 1]
+            self.handler.write(self._global.weapons.addr_at(self.item_index - 1), item_from.to_bytes())
 
     def continue_move(self, _=None):
         """再移动"""

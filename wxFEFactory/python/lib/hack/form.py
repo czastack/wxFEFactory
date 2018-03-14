@@ -236,27 +236,39 @@ class DialogGroup(BaseGroup):
 
 
 class BaseInput(TwoWayWidget):
+    def __init__(self, *args, hex=False, spin=False, size=4, **kwargs):
+        """size: hex为True时有用"""
+        self.hex = hex and not spin
+        self.spin = spin
+        self.size = size
+        super().__init__(*args, **kwargs)
+
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
-            self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
+            if self.spin:
+                self.view = ui.SpinCtrl(className="fill")
+            else:
+                self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
 
     @property
     def input_value(self):
-        return self.view.value
+        value = self.view.value
+        if self.hex:
+            value = int(value, 16)
+        return value
 
     @input_value.setter
     def input_value(self, value):
-        self.view.value = str(value)
+        self.view.value = ("0x%0*X" % (self.size << 1, value)) if self.hex else str(value)
 
 
 class Input(BaseInput, OffsetsWidget):
-    def __init__(self, name, label, addr, offsets=(), type_=int, size=4):
-        super().__init__(name, label, addr, offsets)
+    def __init__(self, *args, type_=int, **kwargs):
         self.type = type_
-        self.size = size
+        super().__init__(*args, **kwargs)
 
 
 class ModelInput(ModelWidget, BaseInput):

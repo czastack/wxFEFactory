@@ -357,8 +357,8 @@ PROFESSIONS = (
 PROFESSION_VALUES = tuple(0x022A976C + i * 0x50 for i in range(len(PROFESSIONS)))
 
 PROFICIENCYS = ('S级', 'A级', 'B级', 'C级', 'D级', 'E级', '-级')
-PROFICIENCY_VALUES = (0xFB, 0xC9, 0x79, 0x47, 0x1F, 0x01, 0x00)
-
+PROFICIENCY_VALUES = (0xFB, 0xC9, 0x88, 0x4C, 0x1F, 0x01, 0x00)
+PROFICIENCY_HINT = "00: -, 01: E, 1F: D, 4C: C, 88: B"
 
 DIFFICULTY = ('正常', '难(1星)', '很难(2星)', '超难(3星)', '隐藏难度(4星)')
 DIFFICULTY_VALUES = (0, 3, 4, 5, 6)
@@ -369,3 +369,5 @@ CHARACTER_HAIR_STYLE = ('样式1', '样式2', '样式3', '样式4', '样式5', '
 CHARACTER_HAIR_COLOR = ('样式1', '样式2', '样式3', '样式4', '样式5', '样式6', '样式7', '样式8', '样式9', '样式10')
 CHARACTER_EYE = ('样式1', '样式2', '样式3', '样式4', '样式5', '样式6', '样式7', '样式8', '样式9', '样式10', '样式11 蝴蝶面具')
 CHARACTER_CLOTH = ('重铠', '轻铠', '轻装')
+
+WEAPONTYPES = ("剑", "枪", "斧", "弓", "魔", "杖", "龙石", "弩车")

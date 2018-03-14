@@ -23,7 +23,7 @@ class Person(BasePerson):
     # together = ByteField(27) # 同行人物序号
     move_add = ByteField(0x5D)
     items = ArrayField(0x60, 5, ModelField(0, ItemSlot))
-    proficiency = ArrayField(0x74, 6, ByteField(0)) # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (E级:01 D级:1F C级:47 B级:79 A级:B5 S级:FB)
+    proficiency = ArrayField(0x74, 6, ByteField(0)) # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
     # status = ByteField(48) # 状态种类
     # status_turn = ByteField(49) # 状态持续回合数
     # support = ArrayField(50, 10, ByteField(0)) # 支援等级
@@ -38,6 +38,20 @@ class Config(Model):
     character_cloth = ByteField(0x02A0)
 
 
+class Weapon(Model):
+    SIZE = 0x3C
+    name_ptr = Field(0x04) # 名称指针
+    icon = ByteField(0x0C) # 图标序号
+    type = ByteField(0x10) # 类型 0: 剑, 枪, 斧, 弓, 魔, 杖, 龙石, 弩车
+    level = ByteField(0x12) # 要求熟练度 00: -, 01: E, 1F: D, 4C: C, 88: B
+    power = ByteField(0x15) # 威力
+    hit = ByteField(0x16) # 命中
+    kill = ByteField(0x17) # 必杀
+    weight = ByteField(0x18) # 重量
+    range_min = ByteField(0x19) # 最小射程
+    range_max = ByteField(0x1A) # 最大射程
+
+
 class Global(BaseGlobal):
     money = OffsetsField((0x021BD44C, 0x0194))
     # chapter = ByteField(0x0202BCFA)
@@ -46,7 +60,7 @@ class Global(BaseGlobal):
     curx = ByteField(0x02272EA4)
     cury = ByteField(0x02272EA5)
     # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
-    # train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot)) # 运输队
+    train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot)) # 运输队
     ourturn = Field(0x021CC278)
     control_enemy = Field(0x021D5674)
     upgrade_max = Field(0x02050AC0)
@@ -62,3 +76,10 @@ class Global(BaseGlobal):
     can_holddown = Field(0x021EBBD8)
     use_enemy_prof = Field(0x021D4CEC)
     config = ModelPtrField(0x021BD44C, Config, 4)
+    weapon_base = Field(0x0227A748)
+    _weapons = ArrayField(0, 0xff, ModelField(0, Weapon))
+
+    @property
+    def weapons(self):
+        self.field('_weapons').offset = self.weapon_base
+        return self._weapons
