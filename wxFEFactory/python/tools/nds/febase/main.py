@@ -77,6 +77,7 @@ class FeTool(BaseNdsHack):
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
             ModelInput("name_ptr", "名称指针", hex=True)
+            ModelInput("desc_ptr", "介绍文本", hex=True)
             ModelInput("icon", "图标序号")
             ModelSelect("type", "类型", None, None, datasets.WEAPONTYPES)
             ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
@@ -101,9 +102,14 @@ class FeTool(BaseNdsHack):
             ModelInput("train_items_count.%d" % i, "数量")
 
     def get_hotkeys(self):
+        this = self.weak
         return (
-            ('continue_move', MOD_ALT, getVK('m'), self.continue_move),
-            ('move_to_cursor', MOD_ALT, getVK('g'), self.move_to_cursor),
+            ('continue_move', MOD_ALT, getVK('m'), this.continue_move),
+            ('move_to_cursor', MOD_ALT, getVK('g'), this.move_to_cursor),
+            ('move_left', MOD_ALT, getVK('left'), this.move_left),
+            ('move_right', MOD_ALT, getVK('right'), this.move_right),
+            ('move_up', MOD_ALT, getVK('up'), this.move_up),
+            ('move_down', MOD_ALT, getVK('down'), this.move_down),
         )
 
     def _person(self):
@@ -143,3 +149,15 @@ class FeTool(BaseNdsHack):
         _global = self._global
         person.posx = _global.curx
         person.posy = _global.cury
+
+    def move_left(self, _=None):
+        self.person.posx -= 1
+
+    def move_right(self, _=None):
+        self.person.posx += 1
+
+    def move_up(self, _=None):
+        self.person.posy -= 1
+
+    def move_down(self, _=None):
+        self.person.posy += 1

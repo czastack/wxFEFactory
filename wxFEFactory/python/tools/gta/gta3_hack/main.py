@@ -69,7 +69,7 @@ class Tool(BaseGTA3Tool):
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = Input("money", "金钱", address.MONEY, (), int)
+            self.money_view = Input("money", "金钱", address.MONEY)
             
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):

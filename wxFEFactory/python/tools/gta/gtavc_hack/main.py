@@ -44,7 +44,7 @@ class Tool(BaseGTA3Tool):
             self.weight_view = ModelInput("weight", "重量")
             self.stamina_view = ModelInput("stamina", "体力")
             self.wanted_level_view = ModelInput("wanted_level", "通缉等级")
-            self.money_view = Input("money", "金钱", address.MONEY, (), int)
+            self.money_view = Input("money", "金钱", address.MONEY)
             ui.Hr()
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)

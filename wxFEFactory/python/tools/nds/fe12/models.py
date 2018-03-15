@@ -41,6 +41,7 @@ class Config(Model):
 class Weapon(Model):
     SIZE = 0x3C
     name_ptr = Field(0x04) # 名称指针
+    desc_ptr = Field(0x08) # 介绍文本指针
     icon = ByteField(0x0C) # 图标序号
     type = ByteField(0x10) # 类型 0: 剑, 枪, 斧, 弓, 魔, 杖, 龙石, 弩车
     level = ByteField(0x12) # 要求熟练度 00: -, 01: E, 1F: D, 4C: C, 88: B
@@ -57,8 +58,8 @@ class Global(BaseGlobal):
     # chapter = ByteField(0x0202BCFA)
     # turns = ShortField(0x0202BCFC)
     person_addr = Field(0x021BED30)
-    curx = ByteField(0x02272EA4)
-    cury = ByteField(0x02272EA5)
+    curx = ByteField(0x02273BD4) # 0x02272EA4
+    cury = ByteField(0x02273BD5) # 0x02272EA5
     # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot)) # 运输队
     ourturn = Field(0x021CC278)
