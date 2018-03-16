@@ -31,7 +31,7 @@ class Widget:
         self.render()
 
     def render(self):
-        ui.Text(self.label, className="label_left expand")
+        ui.Text(self.label, className="input_label expand")
 
     def render_btn(self):
         this = self.weak
@@ -376,13 +376,13 @@ class CoordWidget(TwoWayWidget):
                     with ui.Vertical(className="fill"):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
-                            ui.Text("X坐标", className="label_left expand")
+                            ui.Text("X坐标", className="input_label expand")
                             x_view = ui.TextInput(className="fill")
-                            ui.Text("Y坐标", className="label_left expand")
+                            ui.Text("Y坐标", className="input_label expand")
                             y_view = ui.TextInput(className="fill")
-                            ui.Text("Z坐标", className="label_left expand")
+                            ui.Text("Z坐标", className="input_label expand")
                             z_view = ui.TextInput(className="fill")
-                            ui.Text("名称", className="label_left expand")
+                            ui.Text("名称", className="input_label expand")
                             self.name_view = ui.TextInput(className="fill")
                         with ui.Horizontal(className="container"):
                             self.render_btn()
@@ -558,6 +558,11 @@ class ModelCoordWidget(ModelWidget, CoordWidget):
 
 
 class BaseSelect(TwoWayWidget):
+    def __init__(self, *args, choices=None, values=None, **kwargs):
+        self.choices = choices
+        self.values = values
+        super().__init__(*args, **kwargs)
+
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
@@ -579,19 +584,57 @@ class BaseSelect(TwoWayWidget):
 
 
 class Select(BaseSelect, OffsetsWidget):
-    def __init__(self, name, label, addr, offsets, choices, values=None, type_=int, size=4):
-        self.choices = choices
-        self.values = values
+    def __init__(self, *args, type_=int, size=4, **kwargs):
         self.type = type_
         self.size = size
-        super().__init__(name, label, addr, offsets)
+        super().__init__(*args, **kwargs)
 
 
 class ModelSelect(ModelWidget, BaseSelect):
-    def __init__(self, name, label, ins, prop, choices, values=None):
-        self.choices = choices
-        self.values = values
-        super().__init__(name, label, ins, prop)
+    pass
+
+
+class BaseFlagWidget(TwoWayWidget):
+    def __init__(self, *args, labels=None, values=None, **kwargs):
+        """size: hex为True时有用"""
+        self.labels = labels
+        self.values = values or tuple(1 << i for i in range(len(labels)))
+        super().__init__(*args, **kwargs)
+
+    def render(self):
+        ui.Text(self.label, className="from_label expand")
+        with ui.Horizontal(className="fill"):
+            with ui.Horizontal(className="fill") as view:
+                self.views = tuple(
+                    ui.CheckBox(label) for label in self.labels
+                )
+            self.render_btn()
+        self.view = view
+
+    @property
+    def input_value(self):
+        value = 0
+        for i in range(len(self.labels)):
+            if self.views[i].checked:
+                value |= self.values[i]
+            
+        return value
+
+    @input_value.setter
+    def input_value(self, value):
+        for i in range(len(self.labels)):
+            self.views[i].checked = value & self.values[i]
+
+
+class FlagWidget(BaseFlagWidget, OffsetsWidget):
+    def __init__(self, *args, type_=int, size=4, **kwargs):
+        self.type = type_
+        self.size = size
+        super().__init__(*args, **kwargs)
+
+
+class ModelFlagWidget(ModelWidget, BaseFlagWidget):
+    pass
 
 
 def render_tab_list(data):

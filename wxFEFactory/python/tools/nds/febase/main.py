@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 import fefactory_api
 ui = fefactory_api.ui
@@ -30,23 +30,23 @@ class FeTool(BaseNdsHack):
             ModelCheckBox("infinite_refine", "武器屋炼成无限次", enableData=0, disableData=0xE3)
             ModelCheckBox("item_consume", "道具耐久不减", enableData=0x12400000, disableData=0x12400001)
             ModelCheckBox("item_consume", "敌人全道具掉落", enableData=0xE3500000E1D006B0, disableData=0xE3100020E5D00063)
-            ModelSelect("exp_rate", "经验值倍数", None, None, datasets.RATE, datasets.EXP_RATE_VALUES)
-            ModelSelect("pro_rate", "熟练度倍数", None, None, datasets.RATE, datasets.PRO_RATE_VALUES)
+            ModelSelect("exp_rate", "经验值倍数", choices=datasets.RATE, values=datasets.EXP_RATE_VALUES)
+            ModelSelect("pro_rate", "熟练度倍数", choices=datasets.RATE, values=datasets.PRO_RATE_VALUES)
             # ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
-            # ModelSelect("chapter", "章节", None, None, datasets.CHAPTERS)
+            # ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
 
         with Group("player", "配置", self._config, cols=4):
-            ModelSelect("difficulty", "难易度", None, None, datasets.DIFFICULTY, datasets.DIFFICULTY_VALUES)
-            ModelSelect("character_gender", "主人公性别", None, None, datasets.CHARACTER_GENDER)
-            ModelSelect("character_hair_style", "主人公发色", None, None, datasets.CHARACTER_HAIR_STYLE)
-            ModelSelect("character_hair_color", "主人公发型", None, None, datasets.CHARACTER_HAIR_COLOR)
-            ModelSelect("character_eye", "主人公眼睛", None, None, datasets.CHARACTER_EYE)
-            ModelSelect("character_cloth", "主人公服装", None, None, datasets.CHARACTER_CLOTH)
+            ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
+            ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
+            ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
+            ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
+            ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
+            ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
 
         with Group("player", "角色", self._person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "序号")
-            ModelSelect("prof", "职业", None, None, datasets.PROFESSIONS, datasets.PROFESSION_VALUES)
+            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
             ModelInput("level", "等级")
             ModelInput("exp", "经验")
             ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
@@ -62,24 +62,24 @@ class FeTool(BaseNdsHack):
             ModelInput("lucky", "幸运+")
             ModelInput("physical_add", "体格+")
             ModelInput("move_add", "移动+")
-            # ModelSelect("status", "状态种类", None, None, datasets.STATUS)
+            # ModelSelect("status", "状态种类", choices=datasets.STATUS)
             # ModelInput("status_turn", "状态持续")
             for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
                 ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
 
         with Group("items", "角色物品", self._person, cols=4):
             for i in range(5):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS)
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
         with Group("weapons", "武器属性", self._weapon):
-            ui.Text("物品", className="label_left expand")
+            ui.Text("物品", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
             ModelInput("name_ptr", "名称指针", hex=True)
             ModelInput("desc_ptr", "介绍文本", hex=True)
             ModelInput("icon", "图标序号")
-            ModelSelect("type", "类型", None, None, datasets.WEAPONTYPES)
+            ModelSelect("type", "类型", choices=datasets.WEAPONTYPES)
             ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
             ModelInput("power", "威力")
             ModelInput("hit", "命中")
@@ -87,18 +87,24 @@ class FeTool(BaseNdsHack):
             ModelInput("weight", "重量")
             ModelInput("range_min", "最小射程")
             ModelInput("range_max", "最大射程")
-            ui.Text("复制属性", className="label_left expand")
+            ui.Text("复制属性", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 self.copy_weapon_view = ui.Choice(className="fill", choices=datasets.ITEMS)
                 ui.Button("复制", onclick=self.copy_weapon)
             
+            i = 0
+            for item in datasets.ITEM_ATTRS:
+                hint, labels = item
+                i += 1
+                ModelFlagWidget("attr%d" % i, hint or "属性%d" % i, labels=labels)
+
 
         self.lazy_group(Group("train_items", "运输队", self._global, cols=4), self.render_train_items)
 
     def render_train_items(self):
         datasets = self.datasets
         for i in range(100):
-            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), None, None, datasets.ITEMS)
+            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), choices=datasets.ITEMS)
             ModelInput("train_items_count.%d" % i, "数量")
 
     def get_hotkeys(self):

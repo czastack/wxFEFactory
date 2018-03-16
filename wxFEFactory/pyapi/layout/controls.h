@@ -8,6 +8,7 @@
 #include <wx/statline.h>
 #include <wx/filepicker.h>
 #include <wx/clrpicker.h>
+#include <wx/treectrl.h>
 #include "wxpatch.h"
 
 
@@ -767,6 +768,53 @@ public:
 	{
 		bindEvt(wxEVT_DIRPICKER_CHANGED, fn, reset);
 	}
+};
+
+
+class TreeCtrl : public Control
+{
+public:
+	template <class... Args>
+	TreeCtrl(long wxstyle, Args ...args) : Control(args...)
+	{
+		bindElem(new wxTreeCtrl(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(),
+			wxstyle ? wxstyle: (wxTR_HAS_BUTTONS | wxTR_SINGLE)));
+	}
+
+	wxTreeCtrl& ctrl() const
+	{
+		return *(wxTreeCtrl*)ptr();
+	}
+};
+
+
+class PyTreeItemData : public wxTreeItemData
+{
+public:
+	PyTreeItemData(pycref obj) : m_data(obj) { }
+	pycref GetData() const { return m_data; }
+private:
+	pycref m_data;
+};
+
+namespace pybind11 {
+	namespace detail {
+		template <> class type_caster<wxTreeItemId> {
+		public:
+			bool load(handle src, bool) {
+				value.m_pItem = (void*)pybind11::cast<size_t>(src);
+				return true;
+			}
+
+			static handle cast(const wxTreeItemId &src, return_value_policy /* policy */, handle /* parent */) {
+				return pybind11::cast((size_t)src.GetID());
+			}
+
+			PYBIND11_TYPE_CASTER(wxTreeItemId, (_)("wxTreeItemId"));
+		protected:
+			bool success = false;
+		};
+	};
 };
 
 void init_controls(py::module &m);

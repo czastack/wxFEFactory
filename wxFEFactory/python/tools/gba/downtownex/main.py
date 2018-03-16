@@ -23,7 +23,7 @@ class Tool(BaseGbaHack):
 
         with Group("player", "角色", person, cols=4) as group:
             # ModelInput("addr_hex", "地址", readonly=True)
-            ui.Text("角色", className="label_left expand")
+            ui.Text("角色", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=("国夫", "阿力"), onselect=self.on_person_change).setSelection(0)
             ModelInput("punch", "拳")
@@ -49,7 +49,7 @@ class Tool(BaseGbaHack):
                 ):
                 with DialogGroup(name, label, person, cols=4, dialog_style=dialog_style) as dialog_group:
                     for i in indexs:
-                        ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), None, None, choices, values)
+                        ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)
 
     def on_person_change(self, lb):
         self.person_index = lb.index

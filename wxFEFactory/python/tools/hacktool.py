@@ -20,7 +20,7 @@ class BaseHackTool(NestedTool):
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
-                    self.attach_status_view = ui.Text("", className="label_left grow")
+                    self.attach_status_view = ui.Text("", className="input_label grow")
                     ui.CheckBox("保持最前", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill") as book:
                     book.setOnPageChange(self.onNotePageChange)

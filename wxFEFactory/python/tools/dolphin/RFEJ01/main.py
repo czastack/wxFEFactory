@@ -26,7 +26,7 @@ class Tool(BaseDolphinHack):
         with Group("player", "角色", person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "角色编号", readonly=True)
-            ModelSelect("prof", "职业", None, None, datasets.PROFESSIONS, 
+            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, 
                 tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
             ModelInput("hp", "当前HP")
             ModelInput("level", "等级")
@@ -51,12 +51,12 @@ class Tool(BaseDolphinHack):
     def render_skills(self):
         skill_values = (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
         for i in range(18):
-            ModelSelect("skills.%d" % i, "技能%d" % (i + 1), None, None, datasets.SKILLS, skill_values)
+            ModelSelect("skills.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS, values=skill_values)
 
     def render_items(self):
         item_values = (0,) + tuple(0x80995870 + i * 0x50 for i in range(len(datasets.ITEMS) - 1))
         for i in range(7):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), None, None, datasets.ITEMS, item_values)
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS, values=item_values)
             ModelInput("items_count.%d" % i, "数量")
 
     def get_hotkeys(self):

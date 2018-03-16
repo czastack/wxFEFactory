@@ -89,7 +89,7 @@ class ConfigCtrl(ABC):
         pass
 
     def render_lable(self):
-        return ui.Text(self.label, className="label_left expand")
+        return ui.Text(self.label, className="input_label expand")
 
     def read(self, _=None):
         self.set_input_value(self.get_config_value())

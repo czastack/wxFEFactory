@@ -345,4 +345,63 @@ void init_controls(py::module & m)
 		ATTR_DIRP_STYLE(SMALL),
 		ATTR_DIRP_STYLE(USE_TEXTCTRL);
 #undef ATTR_FLP_STYLE
+
+	auto text = "text"_a;
+	auto image = "image"_a = -1,
+		selectedImage = "selectedImage"_a = -1,
+		data = "data"_a = None,
+		pos = "pos"_a = -1;
+
+	py::class_t<TreeCtrl, Control>(m, "TreeCtrl")
+		.def(py::init<long, pyobj, pyobj>(),
+			"wxstyle"_a=0, className, style)
+		.def("AssignImageList", [](TreeCtrl &self, wxImageList *imageList) {
+			self.ctrl().AssignImageList(imageList);
+		})
+		.def("AddRoot", [](TreeCtrl &self, wxcstr text, int image, int selectedImage, pycref data) {
+			return self.ctrl().AddRoot(text, image, selectedImage, data.is_none() ? NULL: new PyTreeItemData(data));
+		}, text, image, selectedImage, data)
+		.def("InsertItem", [](TreeCtrl &self, size_t parent, wxcstr text, int image, int selectedImage, pycref data, int pos) {
+			return self.ctrl().InsertItem(wxTreeItemId((void*)parent), pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
+		}, "parent"_a, text, image, selectedImage, data, pos)
+
+		.def("GetItemData", [](TreeCtrl &self, const wxTreeItemId& item) { 
+			PyTreeItemData *data = (PyTreeItemData*)self.ctrl().GetItemData(item);
+			return data ? data->GetData(): None;
+		})
+
+		.def("Delete", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Delete(item); })
+		.def("DeleteChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().DeleteChildren(item); })
+		.def("DeleteAllItems", [](TreeCtrl &self) { self.ctrl().DeleteAllItems(); })
+
+		.def("Expand", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Expand(item); })
+		.def("ExpandAllChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().ExpandAllChildren(item); })
+		.def("ExpandAll", [](TreeCtrl &self) { self.ctrl().ExpandAll(); })
+		.def("Collapse", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Collapse(item); })
+		.def("CollapseAllChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().CollapseAllChildren(item); })
+		.def("CollapseAll", [](TreeCtrl &self) { self.ctrl().CollapseAll(); })
+		.def("CollapseAndReset", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().CollapseAndReset(item); })
+		.def("Toggle", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Toggle(item); })
+
+		.def("Unselect", [](TreeCtrl &self) { self.ctrl().Unselect(); })
+		.def("UnselectAll", [](TreeCtrl &self) { self.ctrl().UnselectAll(); })
+		.def("SelectItem", [](TreeCtrl &self, const wxTreeItemId& item, bool select = true) { self.ctrl().SelectItem(item, select); }, "item"_a, "select"_a=true)
+		.def("SelectChildren", [](TreeCtrl &self, const wxTreeItemId& parent) { self.ctrl().SelectChildren(parent); })
+		.def("ToggleItemSelection", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().ToggleItemSelection(item); })
+
+		/*.def("GetCount", [](TreeCtrl &self) { return self.ctrl().GetCount(); })
+		.def("GetIndent", [](TreeCtrl &self) { return self.ctrl().GetIndent(); })
+		.def("SetIndent", [](TreeCtrl &self, unsigned int indent) { self.ctrl().SetIndent(indent); })
+		.def("GetSpacing", [](TreeCtrl &self) { return self.ctrl().GetSpacing(); })
+		.def("SetSpacing", [](TreeCtrl &self, unsigned int spacing) { self.ctrl().SetSpacing(spacing); })*/
+		
+		.def_property_readonly("count", [](TreeCtrl &self) { return self.ctrl().GetCount(); })
+		.def_property("indent", 
+			[](TreeCtrl &self) { return self.ctrl().GetIndent(); },
+			[](TreeCtrl &self, unsigned int indent) { self.ctrl().SetIndent(indent); }
+		)
+		.def_property("spacing",
+			[](TreeCtrl &self) { return self.ctrl().GetSpacing(); },
+			[](TreeCtrl &self, unsigned int spacing) { self.ctrl().SetSpacing(spacing); }
+		);
 }

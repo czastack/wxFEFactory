@@ -51,6 +51,27 @@ class Weapon(Model):
     weight = ByteField(0x18) # 重量
     range_min = ByteField(0x19) # 最小射程
     range_max = ByteField(0x1A) # 最大射程
+    move_add = ByteField(0x1B)
+    hp_add = ByteField(0x1C)
+    power_add = ByteField(0x1D)
+    magic_add = ByteField(0x1E)
+    skill_add = ByteField(0x1F)
+    speed_add = ByteField(0x20)
+    lucky_add = ByteField(0x21)
+    defensive_add = ByteField(0x22)
+    magicdef_add = ByteField(0x23)
+    attr1 = ByteField(0x24)
+    attr2 = ByteField(0x25)
+    attr3 = ByteField(0x26)
+    attr4 = ByteField(0x27)
+    attr5 = ByteField(0x28)
+    attr6 = ByteField(0x29)
+    attr7 = ByteField(0x2A)
+    attr8 = ByteField(0x2B)
+    attr9 = ByteField(0x2C)
+    attr10 = ByteField(0x2D)
+    attr11 = ByteField(0x2E)
+    attr12 = ByteField(0x2F)
 
 
 class Global(BaseGlobal):

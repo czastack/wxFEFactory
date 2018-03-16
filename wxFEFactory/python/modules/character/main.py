@@ -26,9 +26,9 @@ class Module(BaseListBoxModuel):
         with ui.Horizontal(className="container expand") as infobar:
             ui.ComboBox(type="readonly", choices=('地址预览', *(key for key in config.ADDR_MAP)), 
                 onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
-            ui.Text("地址", className="vcenter label_left")
+            ui.Text("地址", className="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True)
-            ui.Text("说明", className="vcenter label_left")
+            ui.Text("说明", className="vcenter input_label")
             self.help_view = ui.TextInput(readonly=True, className="fill")
 
         self.pg = ui.PropertyGrid(className="fill")

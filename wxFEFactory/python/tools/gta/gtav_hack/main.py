@@ -104,7 +104,7 @@ class Tool(BaseGTATool):
             ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
             ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-        ui.Text("颜色", className="label_left expand")
+        ui.Text("颜色", className="input_label expand")
         with ui.Horizontal(className="fill"):
             ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
             ColorWidget("vehicle_specular_color", "条纹", vehicle, "specular_color", datasets.COLOR_LIST)
@@ -141,7 +141,7 @@ class Tool(BaseGTATool):
         ModelInput("money", "金钱")
 
         ModelInput("wind_speed", "风速")
-        ui.Text("天气", className="label_left expand")
+        ui.Text("天气", className="input_label expand")
         with ui.Horizontal(className="fill"):
             self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
             ui.Button("短暂", onclick=self.apply_weather)

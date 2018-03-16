@@ -16,9 +16,14 @@ styles = {
             'padding': 10,
             'showPadding': '1',
         },
-        'label_left': {
+        'input_label': {
             'padding': 8,
             'showPadding': '1 1 0 1',
+            'textAlign': 'right',
+        },
+        'from_label': {
+            'padding': 8,
+            'showPadding': '0 1 0 1',
             'textAlign': 'right',
         },
         'top_padding': {'padding': 10, 'showPadding': '1 0 0 0'},

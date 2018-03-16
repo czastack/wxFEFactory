@@ -21,9 +21,9 @@ class Module(BaseListBoxModuel):
 
     def render_main(self):
         with ui.FlexGridLayout(cols=2, vgap=10, className="expand container") as infobar:
-            ui.Text("地址", className="vcenter label_left")
+            ui.Text("地址", className="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True, className="expand")
-            ui.Text("代码", className="vcenter label_left")
+            ui.Text("代码", className="vcenter input_label")
             self.code_view = ui.TextInput(readonly=True, multiline=True, className="expand")
 
             infobar.AddGrowableCol(1)

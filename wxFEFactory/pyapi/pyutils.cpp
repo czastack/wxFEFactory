@@ -1,4 +1,5 @@
 #include <wx/arrstr.h>
+#include <wx/colour.h>
 #include "pyutils.h"
 #include "pybindext.h"
 

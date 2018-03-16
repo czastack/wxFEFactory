@@ -130,7 +130,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             Input("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
             Input("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
             Input("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
-            Select("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, (), datasets.WEATHER_LIST)
+            Select("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, choices=datasets.WEATHER_LIST)
             Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
         with StaticGroup("作弊"):

@@ -68,7 +68,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
 
     def render(self):
         super().render()
-        self.view = ui.Text("", style=self.view_style, className="label_left")
+        self.view = ui.Text("", style=self.view_style, className="input_label")
         self.view.background = 0xaabccc
         self.view.setOnDoubleClick(self.onDoubleClick)
         self.view.setOnClick(self.onClick)

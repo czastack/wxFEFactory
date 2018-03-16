@@ -86,7 +86,7 @@ class Tool(BaseGTATool):
         with Group("global", "全局", self):
             ModelInput("game_hour", "当前小时")
             ModelInput("game_minute", "当前分钟")
-            ui.Text("日期", className="label_left expand")
+            ui.Text("日期", className="input_label expand")
             with ui.Horizontal(className="expand"):
                 ui.Button("回退一天", onclick=self.day_back)
                 ui.Button("前进一天", onclick=self.day_forward)
