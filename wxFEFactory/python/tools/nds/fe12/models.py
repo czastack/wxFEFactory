@@ -14,6 +14,7 @@ class Person(BasePerson):
     hpmax = ByteField(0x50)
     hp = ByteField(0x5C)
     power = ByteField(0x51)
+    magic = ByteField(0x52)
     skill = ByteField(0x53)
     speed = ByteField(0x54)
     defensive = ByteField(0x56)
@@ -30,6 +31,7 @@ class Person(BasePerson):
 
 
 class Config(Model):
+    money = Field(0x0194)
     difficulty = ByteField(0x01A9)
     character_gender = ByteField(0x0298)
     character_hair_style = ByteField(0x029D)
@@ -38,7 +40,7 @@ class Config(Model):
     character_cloth = ByteField(0x02A0)
 
 
-class Weapon(Model):
+class ItemInfo(Model):
     SIZE = 0x3C
     name_ptr = Field(0x04) # 名称指针
     desc_ptr = Field(0x08) # 介绍文本指针
@@ -51,7 +53,7 @@ class Weapon(Model):
     weight = ByteField(0x18) # 重量
     range_min = ByteField(0x19) # 最小射程
     range_max = ByteField(0x1A) # 最大射程
-    move_add = ByteField(0x1B)
+    move_add = ByteField(0x1B) # 属性增加效果
     hp_add = ByteField(0x1C)
     power_add = ByteField(0x1D)
     magic_add = ByteField(0x1E)
@@ -75,7 +77,6 @@ class Weapon(Model):
 
 
 class Global(BaseGlobal):
-    money = OffsetsField((0x021BD44C, 0x0194))
     # chapter = ByteField(0x0202BCFA)
     # turns = ShortField(0x0202BCFC)
     person_addr = Field(0x021BED30)
@@ -98,10 +99,14 @@ class Global(BaseGlobal):
     can_holddown = Field(0x021EBBD8)
     use_enemy_prof = Field(0x021D4CEC)
     config = ModelPtrField(0x021BD44C, Config, 4)
-    weapon_base = Field(0x0227A748)
-    _weapons = ArrayField(0, 0xff, ModelField(0, Weapon))
+    # iteminfo_base = Field(0x0227A748)
+    _iteminfos = ArrayField(0x022AA97C, 0xff, ModelField(0, ItemInfo))
 
     @property
-    def weapons(self):
-        self.field('_weapons').offset = self.weapon_base
-        return self._weapons
+    def _offset(self):
+        return self.handler.read32(0x021BD44C) - 0x022BEAA0
+
+    @property
+    def iteminfos(self):
+        self.field('_iteminfos').offset = self.handler.read32(0x0227A748 + self._offset)
+        return self._iteminfos

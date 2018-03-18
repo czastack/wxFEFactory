@@ -133,14 +133,27 @@ class OffsetsWidget:
 
 class BaseGroup(Widget):
     cols = 2
+    cachable = True
 
-    def __init__(self, name, label, addr, flexgrid=True, hasfooter=True, handler=None, cols=None):
+    def __init__(self, name, label, addr, flexgrid=True, hasfooter=True, handler=None, cols=None, cachable=True):
+        """
+        :param cachable: 子元素是ModelWidget时有用
+        """
         self.flexgrid = flexgrid
         self.hasfooter = hasfooter
         self.children = []
         self.handler = handler
         if cols:
             self.cols = cols
+        if not cachable:
+            self.cachable = False
+
+        if cachable and callable(addr):
+            self._ins_getter = addr
+            self._ins_cached = False
+            self._ins = None
+            addr = self.cached_ins_getter
+
         super().__init__(name, label, addr)
 
     def __del__(self):
@@ -159,13 +172,35 @@ class BaseGroup(Widget):
         if self.GROUPS.pop() is not self:
             raise ValueError('GROUPS层次校验失败')
 
+    def cached_ins_getter(self):
+        if self._ins_cached:
+            if self._ins is None:
+                # 获取Model实例并缓存
+                self._ins = self._ins_getter()
+            return self._ins
+
+        return self._ins_getter()
+
+    def start_ins_cache(self):
+        if self.cachable:
+            self._ins_cached = True
+
+    def end_ins_cache(self):
+        if self.cachable:
+            self._ins_cached = False
+            self._ins = None
+
     def read(self):
+        self.start_ins_cache()
         for field in self.children:
             field.read()
+        self.end_ins_cache()
 
     def write(self):
+        self.start_ins_cache()
         for field in self.children:
             field.write()
+        self.end_ins_cache()
 
 
 class Group(BaseGroup):

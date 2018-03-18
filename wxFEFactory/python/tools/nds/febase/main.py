@@ -16,7 +16,7 @@ class FeTool(BaseNdsHack):
         datasets = self.datasets
         
         with Group("global", "全局", self._global, cols=4):
-            ModelInput("money", "金钱")
+            ModelInput("money", "金钱", ins=self._config)
             ModelInput("turns", "回合")
             ModelCheckBox("ourturn", "总是我方回合", enableData=0xE3A01001, disableData=0xE5D01000)
             ModelCheckBox("control_enemy", "可控制敌人", enableData=0xE1500000, disableData=0xE1510000)
@@ -55,6 +55,7 @@ class FeTool(BaseNdsHack):
             ModelInput("hpmax", "HP上限+")
             ModelInput("hp", "ＨＰ")
             ModelInput("power", "力量+")
+            ModelInput("magic", "魔力+")
             ModelInput("skill", "技术+")
             ModelInput("speed", "速度+")
             ModelInput("defensive", "守备+")
@@ -72,10 +73,15 @@ class FeTool(BaseNdsHack):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
-        with Group("weapons", "武器属性", self._weapon):
+        with Group("iteminfos", "武器属性", self._iteminfo):
             ui.Text("物品", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
+            ui.Text("复制属性", className="input_label expand")
+            with ui.Horizontal(className="fill"):
+                self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)
+                ui.Button("复制", onclick=self.copy_iteminfo)
+            ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("name_ptr", "名称指针", hex=True)
             ModelInput("desc_ptr", "介绍文本", hex=True)
             ModelInput("icon", "图标序号")
@@ -87,10 +93,15 @@ class FeTool(BaseNdsHack):
             ModelInput("weight", "重量")
             ModelInput("range_min", "最小射程")
             ModelInput("range_max", "最大射程")
-            ui.Text("复制属性", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                self.copy_weapon_view = ui.Choice(className="fill", choices=datasets.ITEMS)
-                ui.Button("复制", onclick=self.copy_weapon)
+            ModelInput("move_add", "移动+")
+            ModelInput("hp_add", "HP+")
+            ModelInput("power_add", "力量+")
+            ModelInput("magic_add", "魔力+")
+            ModelInput("skill_add", "技巧+")
+            ModelInput("speed_add", "速度+")
+            ModelInput("lucky_add", "幸运+")
+            ModelInput("defensive_add", "防御+")
+            ModelInput("magicdef_add", "魔防+")
             
             i = 0
             for item in datasets.ITEM_ATTRS:
@@ -136,15 +147,15 @@ class FeTool(BaseNdsHack):
     def on_item_change(self, lb):
         self.item_index = lb.index
 
-    def _weapon(self):
+    def _iteminfo(self):
         if self.item_index > 0:
-            return self._global.weapons[self.item_index - 1]
+            return self._global.iteminfos[self.item_index - 1]
 
-    def copy_weapon(self, _=None):
-        index = self.copy_weapon_view.index
+    def copy_iteminfo(self, _=None):
+        index = self.copy_iteminfo_view.index
         if index > 0:
-            item_from = self._global.weapons[index - 1]
-            self.handler.write(self._global.weapons.addr_at(self.item_index - 1), item_from.to_bytes())
+            item_from = self._global.iteminfos[index - 1]
+            self.handler.write(self._global.iteminfos.addr_at(self.item_index - 1), item_from.to_bytes())
 
     def continue_move(self, _=None):
         """再移动"""
