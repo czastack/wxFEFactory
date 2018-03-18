@@ -6,7 +6,7 @@ from lib.hack.form import (
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles, btn_md_style
-from . import cheat, address, models, datasets
+from . import cheat, address, models, datasets, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
@@ -43,7 +43,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.maxhp_view = ModelInput("maxhp", "最大生命")
             self.ap_view = ModelInput("ap", "防弹衣")
             self.rot_view = ModelInput("rotation", "旋转")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInput("weight", "重量")
             self.wanted_level_view = ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
@@ -68,7 +68,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
             self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInput("weight", "重量")
             ui.Text("")
@@ -117,9 +117,9 @@ class Tool(BaseGTA3_VC_SA_Tool):
             self.money_view = Input("money", "金钱", address.MONEY)
             Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
             Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
-            Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, (), float)
-            Input("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, (), float)
-            Input("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, (), float)
+            Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, type_=float)
+            Input("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, type_=float)
+            Input("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, type_=float)
             Input("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
             Input("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
             Input("car_prof", "驾驶技术", address.CAR_PROF_ADDR)

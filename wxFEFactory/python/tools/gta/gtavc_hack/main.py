@@ -3,7 +3,7 @@ from lib.hack.form import Group, StaticGroup, Input, SimpleCheckBox, CoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
-from . import address, models
+from . import address, models, coords
 from .models import Player, Vehicle
 from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from ..gta_base.widgets import WeaponWidget
@@ -39,7 +39,7 @@ class Tool(BaseGTA3Tool):
             ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")
             self.rot_view = ModelInput("rotation", "旋转")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInput("weight", "重量")
             self.stamina_view = ModelInput("stamina", "体力")
@@ -53,7 +53,7 @@ class Tool(BaseGTA3Tool):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.vehicle_turn_view = ModelCoordWidget("turn", "Turn")
             self.weight_view = ModelInput("weight", "重量")

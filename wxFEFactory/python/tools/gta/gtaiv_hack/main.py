@@ -8,7 +8,7 @@ from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
-from . import address, models
+from . import address, models, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
@@ -46,7 +46,7 @@ class Tool(BaseGTATool):
         with Group("player", "角色", player):
             self.hp_view = ModelInput("hp", "生命")
             self.ap_view = ModelInput("ap", "防弹衣")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             # self.weight_view = ModelInput("gravity", "重量")
             self.speed_view = ModelCoordWidget("speed", "速度")
             self.rot_view = ModelInput("rotation", "旋转")
@@ -66,7 +66,7 @@ class Tool(BaseGTATool):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
             self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True)
+            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
             self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
             self.weight_view = ModelInput("weight", "重量")
             ui.Text("")
