@@ -13,13 +13,13 @@ void BaseTopLevelWindow::__exit__(py::args & args)
 
 void BaseTopLevelWindow::setSize(py::sequence & size)
 {
-	m_elem->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
+	ptr()->SetSize({ size[0].cast<int>(), size[1].cast<int>() });
 }
 
 pyobj BaseTopLevelWindow::getSize()
 {
 	py::tuple ret = py::tuple(2);
-	const wxSize &sz = m_elem->GetSize();
+	const wxSize &sz = ptr()->GetSize();
 	ret[0] = sz.GetWidth();
 	ret[1] = sz.GetHeight();
 	return ret;
@@ -27,13 +27,13 @@ pyobj BaseTopLevelWindow::getSize()
 
 void BaseTopLevelWindow::setPosition(py::sequence & point)
 {
-	m_elem->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
+	ptr()->SetPosition({ point[0].cast<int>(), point[1].cast<int>() });
 }
 
 pyobj BaseTopLevelWindow::getPosition()
 {
 	py::tuple ret = py::tuple(2);
-	const wxPoint &pt = m_elem->GetPosition();
+	const wxPoint &pt = ptr()->GetPosition();
 	ret[0] = pt.x;
 	ret[1] = pt.y;
 	return ret;
@@ -46,7 +46,7 @@ bool BaseTopLevelWindow::setIcon(wxcstr path)
 	if (type)
 	{
 		icon.LoadFile(path, type);
-		((wxTopLevelWindow*)m_elem)->SetIcon(icon);
+		((wxTopLevelWindow*)ptr())->SetIcon(icon);
 		return true;
 	}
 	return false;
@@ -124,7 +124,7 @@ void HotkeyWindow::RegisterHotKey(pyobj hotkeyId, int modifiers, int virtualKeyC
 			py::print(origin_hotkey_id, "已经在使用了");
 			return;
 		}
-		if (m_elem->RegisterHotKey(_hotkeyId, modifiers, virtualKeyCode))
+		if (ptr()->RegisterHotKey(_hotkeyId, modifiers, virtualKeyCode))
 		{
 			m_hotkey_map[hotkeyId] = onhotkey;
 		}
@@ -150,7 +150,7 @@ void HotkeyWindow::UnregisterHotKey(pyobj hotkeyId, bool force)
 	{
 		if (force || m_hotkey_map.contains(hotkeyId))
 		{
-			m_elem->UnregisterHotKey(_hotkeyId);
+			ptr()->UnregisterHotKey(_hotkeyId);
 		}
 	}
 }
@@ -167,7 +167,7 @@ void HotkeyWindow::stopHotkey()
 		{
 			GlobalDeleteAtom(hotkeyId);
 		}
-		m_elem->UnregisterHotKey(hotkeyId);
+		ptr()->UnregisterHotKey(hotkeyId);
 	}
 }
 
@@ -206,24 +206,24 @@ void Dialog::dismiss(bool ok)
 
 pyobj StdModalDialog::__enter__()
 {
-	long style = m_elem->GetWindowStyle();
+	long style = ptr()->GetWindowStyle();
 	style |= wxRESIZE_BORDER | wxCLIP_CHILDREN;
-	m_elem->SetWindowStyle(style);
+	ptr()->SetWindowStyle(style);
 
 	auto ret = Layout::__enter__();
 	wxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
-	m_elem->SetSizer(topsizer);
+	ptr()->SetSizer(topsizer);
 	return ret;
 }
 
 void StdModalDialog::__exit__(py::args & args)
 {
 	wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
-	buttonSizer->AddButton(new wxButton(m_elem, wxID_OK));
-	buttonSizer->AddButton(new wxButton(m_elem, wxID_CANCEL));
+	buttonSizer->AddButton(new wxButton(ptr(), wxID_OK));
+	buttonSizer->AddButton(new wxButton(ptr(), wxID_CANCEL));
 	buttonSizer->Realize();
 
-	wxSizer* topsizer = m_elem->GetSizer();
+	wxSizer* topsizer = ptr()->GetSizer();
 	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
 	Dialog::__exit__(args);
 }
