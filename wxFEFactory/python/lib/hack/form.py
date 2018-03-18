@@ -65,12 +65,14 @@ class TwoWayWidget(Widget):
     def read(self):
         value = self.mem_value
         if value is not None:
-            self.input_value = self.mem_value
+            self.input_value = value
 
     def write(self):
         if self.readonly:
             return
-        self.mem_value = self.input_value
+        value = self.input_value
+        if value is not None:
+            self.mem_value = value
 
 
 class ModelWidget:
@@ -291,6 +293,8 @@ class BaseInput(TwoWayWidget):
     @property
     def input_value(self):
         value = self.view.value
+        if value == '':
+            return None
         if self.hex:
             value = int(value, 16)
         return value
@@ -608,6 +612,8 @@ class BaseSelect(TwoWayWidget):
     @property
     def input_value(self):
         index = self.view.index
+        if index is -1:
+            return None
         return self.values[index] if self.values else index
 
     @input_value.setter
