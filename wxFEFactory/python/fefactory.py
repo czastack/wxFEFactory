@@ -55,6 +55,8 @@ def execfile(path, encoding="utf-8"):
 class Screen:
     size = fefactory_api.getScreenSize()
     width, height = size
+    dpi = fefactory_api.getDpi()
+    dpix, dpiy = dpi
 
 
 if getattr(fefactory_api, 'fefactory_inited', False) is not True:

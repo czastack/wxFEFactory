@@ -412,7 +412,7 @@ class CoordWidget(TwoWayWidget):
         else:
             with ui.Vertical(className="fill") as root:
                 with ui.Horizontal(className="fill"):
-                    with ui.Vertical(className="fill"):
+                    with ui.Vertical(style={'flex': 2}):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
                             ui.Text("X坐标", className="input_label expand")
@@ -432,7 +432,7 @@ class CoordWidget(TwoWayWidget):
                             ui.Button(label="载入", className="button", onclick=this.onLoad)
                             if self.preset:
                                 ui.Button(label="预设", className="button", onclick=this.choosePreset)
-                    self.listbox = ui.ListBox(className="expand left_padding", onselect=this.onListBoxSel)
+                    self.listbox = ui.ListBox(className="fill left_padding", onselect=this.onListBoxSel)
                     self.listbox.setOnKeyDown(this.onListBoxKey)
 
                 with ui.ContextMenu() as contextmenu:

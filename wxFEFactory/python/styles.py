@@ -1,3 +1,30 @@
+import fefactory
+
+screen_width = fefactory.Screen.width
+
+if screen_width <= 1920:
+    btn_width = 50
+    btn_xsm_width = 36
+    btn_sm_width = 50
+    btn_md_width = 80
+    dialog_width = 640
+    dialog_height = 480
+elif screen_width <= 2560:
+    btn_width = 80
+    btn_xsm_width = 50
+    btn_sm_width = 80
+    btn_md_width = 100
+    dialog_width = 800
+    dialog_height = 600
+else: # elif screen_width <= 3840:
+    btn_width = 100
+    btn_xsm_width = 60
+    btn_sm_width = 100
+    btn_md_width = 120
+    dialog_width = 900
+    dialog_height = 640
+
+
 styles = {
     'class': {
         'fill': {
@@ -10,7 +37,7 @@ styles = {
         'right': {'align': 'right'},
         'button': {
             'flex': 1,
-            'width': 50,
+            'width': btn_width,
         },
         'container': {
             'padding': 10,
@@ -31,16 +58,16 @@ styles = {
     }
 }
 
-dialog_style = {'width': 640, 'height': 480}
+dialog_style = {'width': dialog_width, 'height': dialog_height}
 
 btn_xsm_style = {
-    'width': 36,
+    'width': btn_xsm_width,
 }
 
 btn_sm_style = {
-    'width': 50,
+    'width': btn_sm_width,
 }
 
 btn_md_style = {
-    'width': 80,
+    'width': btn_md_width,
 }

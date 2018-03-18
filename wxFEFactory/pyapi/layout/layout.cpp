@@ -32,8 +32,9 @@ void init_layout(py::module &m)
 	ATTR_INT(layout.ptr(), VERTICAL, wx);
 
 	// 为了方便，setConsoleElem 挂在外层模块，但在这里定义
-	m.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a);
-	m.def("getScreenSize", &Screen::getScreenSize);
+	m.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
+		.def("getScreenSize", &Screen::getScreenSize)
+		.def("getDpi", &Screen::getDpi);
 
 	py::class_<View>(layout, "View")
 		.def("isShow", &View::isShow)
