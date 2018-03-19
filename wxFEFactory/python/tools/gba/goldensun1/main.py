@@ -26,16 +26,16 @@ class Tool(BaseGbaHack):
             ModelInput("battlein", "遇敌率")
 
         with Group("player", "角色", person, cols=4):
-            # ModelInput("addr_hex", "地址", readonly=True)
             ui.Text("角色", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("level", "等级")
             ModelInput("exp", "经验")
             ModelInput("hp", "HP")
-            ModelInput("ep", "HP上限")
-            ModelInput("hpmax", "EP上限")
-            ModelInput("epmax", "EP")
+            ModelInput("hpmax", "HP上限")
+            ModelInput("ep", "EP")
+            ModelInput("epmax", "EP上限")
             ModelInput("atk", "攻击")
             ModelInput("defensive", "防御")
             ModelInput("speed", "速度")
