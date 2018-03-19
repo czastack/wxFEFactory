@@ -14,9 +14,10 @@ class FeTool(BaseNdsHack):
     
     def render_main(self):
         datasets = self.datasets
+        weak = self.weak
         
         with Group("global", "全局", self._global, cols=4):
-            ModelInput("money", "金钱", ins=self._config)
+            ModelInput("money", "金钱", ins=weak._config)
             ModelInput("turns", "回合")
             ModelCheckBox("ourturn", "总是我方回合", enableData=0xE3A01001, disableData=0xE5D01000)
             ModelCheckBox("control_enemy", "可控制敌人", enableData=0xE1500000, disableData=0xE1510000)
@@ -35,7 +36,7 @@ class FeTool(BaseNdsHack):
             # ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
             # ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
 
-        with Group("player", "配置", self._config, cols=4):
+        with Group("player", "配置", weak._config, cols=4):
             ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
             ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
             ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
@@ -43,7 +44,7 @@ class FeTool(BaseNdsHack):
             ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
             ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
 
-        with Group("player", "角色", self._person, cols=4):
+        with Group("player", "角色", weak._person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "序号")
             ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
@@ -68,12 +69,12 @@ class FeTool(BaseNdsHack):
             for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
                 ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
 
-        with Group("items", "角色物品", self._person, cols=4):
+        with Group("items", "角色物品", weak._person, cols=4):
             for i in range(5):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
-        with Group("iteminfos", "武器属性", self._iteminfo):
+        with Group("iteminfos", "武器属性", weak._iteminfo):
             ui.Text("物品", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)

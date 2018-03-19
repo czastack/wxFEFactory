@@ -151,16 +151,19 @@ class BaseGroup(Widget):
         self.handler = handler
         if cols:
             self.cols = cols
+        cachable = cachable and callable(addr)
         if not cachable:
             self.cachable = False
 
-        if cachable and callable(addr):
+        if cachable:
             self._ins_getter = addr
             self._ins_cached = False
             self._ins = None
-            addr = self.cached_ins_getter
-
+            
         super().__init__(name, label, addr)
+
+        if cachable:
+            self.addr = self.weak.cached_ins_getter
 
     def __del__(self):
         self.children.clear()
