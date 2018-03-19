@@ -25,6 +25,21 @@ else: # elif screen_width <= 3840:
     dialog_height = 640
 
 
+dialog_style = {'width': dialog_width, 'height': dialog_height}
+
+btn_xsm_style = {
+    'width': btn_xsm_width,
+}
+
+btn_sm_style = {
+    'width': btn_sm_width,
+}
+
+btn_md_style = {
+    'width': btn_md_width,
+}
+
+
 styles = {
     'class': {
         'fill': {
@@ -48,26 +63,15 @@ styles = {
             'showPadding': '1 1 0 1',
             'textAlign': 'right',
         },
-        'from_label': {
+        'form_label': {
             'padding': 8,
             'showPadding': '0 1 0 1',
             'textAlign': 'right',
         },
         'top_padding': {'padding': 10, 'showPadding': '1 0 0 0'},
         'left_padding': {'padding': 10, 'showPadding': '0 0 0 1'},
+        'btn_xsm': btn_xsm_style,
+        'btn_sm': btn_sm_style,
+        'btn_md': btn_md_style,
     }
-}
-
-dialog_style = {'width': dialog_width, 'height': dialog_height}
-
-btn_xsm_style = {
-    'width': btn_xsm_width,
-}
-
-btn_sm_style = {
-    'width': btn_sm_width,
-}
-
-btn_md_style = {
-    'width': btn_md_width,
 }

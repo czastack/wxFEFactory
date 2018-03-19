@@ -20,7 +20,7 @@ class Widget:
         self.offsets = offsets
         self.readonly = readonly
 
-        parent = self.GROUPS[-1] if len(self.GROUPS) else None
+        parent = self.active_group()
         if parent:
             parent.appendChild(self)
             if self.addr is None:
@@ -29,6 +29,10 @@ class Widget:
             if parent.handler:
                 self.handler = parent.handler
         self.render()
+
+    @classmethod
+    def active_group(cls):
+        return cls.GROUPS[-1] if len(cls.GROUPS) else None
 
     def render(self):
         ui.Text(self.label, className="input_label expand")
@@ -220,9 +224,9 @@ class Group(BaseGroup):
                     self.view = content
 
             if self.hasfooter:
-                with ui.Horizontal(className="container") as footer:
-                    ui.Button(label="读取", className="button", onclick=lambda btn: this.read())
-                    ui.Button(label="写入", className="button", onclick=lambda btn: this.write())
+                with ui.Horizontal(className="expand container") as footer:
+                    ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
+                    ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
                 self.footer = footer
         ui.Item(root, caption=self.label)
         self.root = root
@@ -423,7 +427,7 @@ class CoordWidget(TwoWayWidget):
                             z_view = ui.TextInput(className="fill")
                             ui.Text("名称", className="input_label expand")
                             self.name_view = ui.TextInput(className="fill")
-                        with ui.Horizontal(className="container"):
+                        with ui.Horizontal(className="expand container"):
                             self.render_btn()
                             ui.Button(label="添加", className="button", onclick=this.onAdd)
                             ui.Button(label="更新", className="button", onclick=this.onUpdate)
@@ -643,7 +647,7 @@ class BaseFlagWidget(TwoWayWidget):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        ui.Text(self.label, className="from_label expand")
+        ui.Text(self.label, className="form_label expand")
         with ui.Horizontal(className="fill"):
             with ui.Horizontal(className="fill") as view:
                 self.views = tuple(

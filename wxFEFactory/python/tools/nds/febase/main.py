@@ -1,8 +1,8 @@
 from ..base import BaseNdsHack
 from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-import fefactory_api
-ui = fefactory_api.ui
+from lib.exui.components import Pagination
+from fefactory_api import ui
 
 
 class FeTool(BaseNdsHack):
@@ -110,13 +110,16 @@ class FeTool(BaseNdsHack):
                 ModelFlagWidget("attr%d" % i, hint or "属性%d" % i, labels=labels)
 
 
-        self.lazy_group(Group("train_items", "运输队", self._global, cols=4), self.render_train_items)
+        self.iteminfos_group = Group("train_items", "运输队", self._global, cols=4)
+        self.lazy_group(self.iteminfos_group, self.render_train_items)
 
     def render_train_items(self):
         datasets = self.datasets
-        for i in range(100):
-            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), choices=datasets.ITEMS)
+        for i in range(10):
+            ModelSelect("train_items.%d" % i, "", choices=datasets.ITEMS)
             ModelInput("train_items_count.%d" % i, "数量")
+        with Group.active_group().footer:
+            Pagination(self.on_train_items_page, 20)
 
     def get_hotkeys(self):
         this = self.weak
@@ -178,3 +181,7 @@ class FeTool(BaseNdsHack):
 
     def move_down(self, _=None):
         self.person.posy += 1
+
+    def on_train_items_page(self, page):
+        self._global.train_items_page = page
+        self.iteminfos_group.read()

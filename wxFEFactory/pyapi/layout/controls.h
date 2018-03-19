@@ -306,34 +306,9 @@ public:
 		return *(wxSpinCtrl*)m_elem;
 	}
 
-	void setValue(int value)
+	void setOnChange(pycref fn, bool reset = true)
 	{
-		ctrl().SetValue(value);
-	}
-
-	int getValue() const
-	{
-		return ctrl().GetValue();
-	}
-
-	void setMin(int min)
-	{
-		ctrl().SetMin(min);
-	}
-
-	int getMin() const
-	{
-		return ctrl().GetMin();
-	}
-
-	void setMax(int max)
-	{
-		ctrl().SetMax(max);
-	}
-
-	int getMax()
-	{
-		return ctrl().GetMax();
+		bindEvt(wxEVT_SPINCTRL, fn, reset);
 	}
 };
 

@@ -241,9 +241,16 @@ void init_controls(py::module & m)
 	py::class_t<SpinCtrl, Control>(m, "SpinCtrl")
 		.def(py::init<wxcstr, int, int, int, pyobj, pyobj>(),
 			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, className, style)
-		.def_property("value", &SpinCtrl::getValue, &SpinCtrl::setValue)
-		.def_property("min", &SpinCtrl::getMin, &SpinCtrl::setMin)
-		.def_property("max", &SpinCtrl::getMax, &SpinCtrl::setMax);
+		.def("setOnChange", &SpinCtrl::setOnChange, evt_fn, evt_reset)
+		.def_property("value", 
+			[](SpinCtrl &self) { return self.ctrl().GetValue(); },
+			[](SpinCtrl &self, int value) { return self.ctrl().SetValue(value); })
+		.def_property("min",
+			[](SpinCtrl &self) { return self.ctrl().GetMin(); },
+			[](SpinCtrl &self, int value) { return self.ctrl().SetMin(value); })
+		.def_property("max",
+			[](SpinCtrl &self) { return self.ctrl().GetMax(); },
+			[](SpinCtrl &self, int value) { return self.ctrl().SetMax(value); });
 
 	py::class_t<ColorPicker, Control>(m, "ColorPicker")
 		.def(py::init<uint, pyobj, pyobj, pyobj>(),
