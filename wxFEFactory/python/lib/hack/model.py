@@ -33,7 +33,10 @@ class Model:
 
     @classmethod
     def field(cls, name):
-        return cls.__dict__[name]
+        for base in cls.__mro__:
+            field = base.__dict__.get(name, None)
+            if field:
+                return field
 
     @property
     def addr_hex(self):
