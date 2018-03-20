@@ -393,11 +393,15 @@ class ModelCheckBox(ModelWidget, CheckBox):
 
 
 class CoordWidget(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), savable=False, preset=None):
+    def __init__(self, name, label, addr, offsets=(), length=3, type_=float, size=4, savable=False, preset=None):
         """
+        :param length: 坐标维数
         :param saveble: 是否支持存取文件
         :param preset: 预设坐标模块(要读__file__属性)
         """
+        self.length = length
+        self.type = type_
+        self.size = size
         self.savable = savable
         self.preset = preset
         if savable:
@@ -411,23 +415,19 @@ class CoordWidget(TwoWayWidget):
         super().render()
         if not self.savable:
             with ui.Horizontal(className="expand"):
-                x_view = ui.TextInput(className="fill")
-                y_view = ui.TextInput(className="fill")
-                z_view = ui.TextInput(className="fill")
+                self.views = tuple(ui.TextInput(className="fill") for i in range(self.length))
                 self.render_btn()
 
         else:
+            views = []
             with ui.Vertical(className="fill") as root:
                 with ui.Horizontal(className="fill"):
                     with ui.Vertical(style={'flex': 2}):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
-                            ui.Text("X坐标", className="input_label expand")
-                            x_view = ui.TextInput(className="fill")
-                            ui.Text("Y坐标", className="input_label expand")
-                            y_view = ui.TextInput(className="fill")
-                            ui.Text("Z坐标", className="input_label expand")
-                            z_view = ui.TextInput(className="fill")
+                            for i, v in zip(range(self.length), ('X', 'Y', 'Z')):
+                                ui.Text("%s坐标" % v, className="input_label expand")
+                                views.append(ui.TextInput(className="fill"))
                             ui.Text("名称", className="input_label expand")
                             self.name_view = ui.TextInput(className="fill")
                         with ui.Horizontal(className="expand container"):
@@ -447,41 +447,47 @@ class CoordWidget(TwoWayWidget):
                     ui.MenuItem("粘贴(&V)", onselect=this.onPaste)
                     ui.MenuItem("清空列表(&E)", onselect=this.onClear)
                 root.setContextMenu(contextmenu)
-
-        self.views = (x_view, y_view, z_view)
-        self.view = x_view
+            self.views = tuple(views)
+        self.view = self.views[0]
 
     @property
     def mem_value(self):
         offsets = list(self.offsets)
+        addr = self.addr
         ret = []
         for child in self.views:
             if offsets:
-                value = self.handler.ptrsRead(self.addr, offsets, float)
-                offsets[-1] += 4
+                value = self.handler.ptrsRead(addr, offsets, self.type, self.size)
+                offsets[-1] += self.size
             else:
-                value = float32(self.handler.readFloat(self.addr))
+                if self.type is float:
+                    value = float32(self.handler.readFloat(addr))
+                else:
+                    value = self.handler.read(addr, self.type, self.size)
+                addr += self.size
             ret.append(value)
         return ret
 
     @mem_value.setter
     def mem_value(self, values):
         offsets = list(self.offsets)
+        addr = self.addr
         it = iter(values)
         for child in self.views:
             value = next(it)
             if value is None or value == '':
                 continue
-            value = float(value)
+            value = self.type(value)
             if offsets:
-                self.handler.ptrsWrite(self.addr, offsets, value)
-                offsets[-1] += 4
+                self.handler.ptrsWrite(addr, offsets, value, self.size)
+                offsets[-1] += self.size
             else:
-                self.handler.writeFloat(self.addr, value)
+                self.handler.write(addr, value, self.size)
+                addr += self.size
 
     @property
     def input_value(self):
-        return map(lambda v: v.value and float(v.value), self.views)
+        return map(lambda v: v.value and self.type(v.value), self.views)
 
     @input_value.setter
     def input_value(self, values):
@@ -598,6 +604,7 @@ class CoordWidget(TwoWayWidget):
 
     def onClear(self, _=None):
         self.clear()
+
 
 class ModelCoordWidget(ModelWidget, CoordWidget):
     pass

@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 import fefactory_api
@@ -7,7 +7,7 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGbaHack):
-    from . import models, datasets
+    from . import models, datasets, coords
     PERSON_ADDR_START = 0x02000500
 
     def __init__(self):
@@ -24,6 +24,8 @@ class Tool(BaseGbaHack):
             ModelInput("get_money", "战后金钱")
             ModelInput("get_exp", "战后经验")
             ModelInput("battlein", "遇敌率")
+            ModelCoordWidget("town_pos", "城镇坐标", length=2, type_=int, savable=True, preset=self.coords)
+            ModelCoordWidget("map_pos", "地图坐标", length=2, type_=int, savable=True, preset=self.coords)
 
         with Group("player", "角色", person, cols=4):
             ui.Text("角色", className="input_label expand")
@@ -53,6 +55,15 @@ class Tool(BaseGbaHack):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
+    def get_hotkeys(self):
+        this = self.weak
+        return (
+            ('move_left', MOD_ALT, getVK('left'), this.move_left),
+            ('move_right', MOD_ALT, getVK('right'), this.move_right),
+            ('move_up', MOD_ALT, getVK('up'), this.move_up),
+            ('move_down', MOD_ALT, getVK('down'), this.move_down),
+        )
+
     def on_person_change(self, lb):
         self.person_index = lb.index
 
@@ -71,3 +82,15 @@ class Tool(BaseGbaHack):
     def on_skills_page(self, page):
         self.person.skills_page = page
         self.skills_group.read()
+
+    def move_left(self, _=None):
+        self._global.town_x -= 10
+
+    def move_right(self, _=None):
+        self._global.town_x += 10
+
+    def move_up(self, _=None):
+        self._global.town_y -= 10
+
+    def move_down(self, _=None):
+        self._global.town_y += 10

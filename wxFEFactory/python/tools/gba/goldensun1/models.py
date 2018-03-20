@@ -93,3 +93,26 @@ class Global(Model):
     get_money = Field(0x0203057C)
     get_exp = Field(0x02030580)
     battlein = ShortField(0x0200047A)
+
+    # 城镇中坐标
+    town_x = ShortField(0x02030EC6)
+    town_y = ShortField(0x02030ECE)
+    # 世界地图中坐标
+    map_x = ShortField(0x02030DB6)
+    map_y = ShortField(0x02030DAE)
+
+    @property
+    def town_pos(self):
+        return (self.town_x, self.town_y)
+
+    @town_pos.setter
+    def town_pos(self, value):
+        self.town_x, self.town_y = value
+
+    @property
+    def map_pos(self):
+        return (self.map_x, self.map_y)
+
+    @map_pos.setter
+    def map_pos(self, value):
+        self.map_x, self.map_y = value
