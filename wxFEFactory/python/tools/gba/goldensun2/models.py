@@ -9,9 +9,9 @@ class Person(BasePerson):
 class Global(BaseGlobal):
     time = Field(0x02041C9C)
     money = Field(0x02000250)
-    get_money = Field(0x0203057C)
-    get_exp = Field(0x02030580)
-    battlein = ShortField(0x0200047A)
+    get_money = Field(0x0203059C)
+    get_exp = Field(0x020305A0)
+    battlein = ShortField(0x02000498)
 
     # 城镇中坐标
     town_x = ShortField(0x02030EC6)

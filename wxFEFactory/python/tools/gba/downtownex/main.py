@@ -12,6 +12,7 @@ class Tool(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
+        self._personins = self.models.Person(0, self.handler)
         self.person_index = 0
     
     def render_main(self):
@@ -57,12 +58,8 @@ class Tool(BaseGbaHack):
     def _person(self):
         person_addr = self.PERSON_ADDR_START + self.person_index * 0x9c
         if person_addr:
-            person = getattr(self, '_personins', None)
-            if not person:
-                person = self._personins = self.models.Person(person_addr, self.handler)
-            elif person.addr != person_addr:
-                person.addr = person_addr
-            return person
+            self._personins.addr = person_addr
+            return self._personins
 
     person = property(_person)
 
