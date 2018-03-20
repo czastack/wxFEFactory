@@ -69,6 +69,7 @@ class BaseGSTool(BaseGbaHack):
             ('move_right', MOD_ALT, getVK('right'), this.move_right),
             ('move_up', MOD_ALT, getVK('up'), this.move_up),
             ('move_down', MOD_ALT, getVK('down'), this.move_down),
+            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
         )
 
     def on_person_change(self, lb):
@@ -78,6 +79,12 @@ class BaseGSTool(BaseGbaHack):
         person_addr = self.PERSON_ADDR_START + self.person_index * self.models.Person.SIZE
         self._personins.addr = person_addr
         return self._personins
+
+    def persons(self):
+        person = self.models.Person(0, self.handler)
+        for i in range(len(self.datasets.PERSONS)):
+            person.addr = self.PERSON_ADDR_START + i * self.models.Person.SIZE
+            yield person
 
     person = property(_person)
 
@@ -96,3 +103,7 @@ class BaseGSTool(BaseGbaHack):
 
     def move_down(self, _=None):
         self._global.town_y += 10
+
+    def pull_through(self, _=None):
+        for person in self.persons():
+            person.hp = person.hpmax
