@@ -1,7 +1,7 @@
 from lib import exui, fileutils
 from lib.utils import float32
 from lib.extypes import WeakBinder
-from styles import btn_xsm_style, dialog_style, styles
+from styles import styles, dialog_style, btn_xsm_style
 from __main__ import win as main_win
 import json
 import types
@@ -302,7 +302,7 @@ class BaseInput(TwoWayWidget):
         value = self.view.value
         if value == '':
             return None
-        if self.hex:
+        if self.hex or value.startswith('0x'):
             value = int(value, 16)
         return value
 
@@ -650,10 +650,12 @@ class ModelSelect(ModelWidget, BaseSelect):
 
 
 class BaseFlagWidget(TwoWayWidget):
-    def __init__(self, *args, labels=None, values=None, **kwargs):
+    def __init__(self, *args, labels=None, helps=None, values=None, checkbtn=False, **kwargs):
         """size: hex为True时有用"""
         self.labels = labels
+        self.helps = helps
         self.values = values or tuple(1 << i for i in range(len(labels)))
+        self.checkbtn = checkbtn
         super().__init__(*args, **kwargs)
 
     def render(self):
@@ -663,6 +665,12 @@ class BaseFlagWidget(TwoWayWidget):
                 self.views = tuple(
                     ui.CheckBox(label) for label in self.labels
                 )
+                if self.helps:
+                    for view, help in zip(self.views, self.helps):
+                        view.setToolTip(help)
+            if self.checkbtn:
+                ui.Button(label="全选", style=btn_xsm_style, onclick=self.weak.check_all)
+                ui.Button(label="不选", style=btn_xsm_style, onclick=self.weak.uncheck_all)
             self.render_btn()
         self.view = view
 
@@ -679,6 +687,14 @@ class BaseFlagWidget(TwoWayWidget):
     def input_value(self, value):
         for i in range(len(self.labels)):
             self.views[i].checked = value & self.values[i]
+
+    def check_all(self, _=None):
+        for view in self.views:
+            view.checked = True
+
+    def uncheck_all(self, _=None):
+        for view in self.views:
+            view.checked = False
 
 
 class FlagWidget(BaseFlagWidget, OffsetsWidget):

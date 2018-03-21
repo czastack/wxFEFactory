@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
+from lib.hack.form import Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 import fefactory_api
@@ -41,14 +41,9 @@ class BaseGSTool(BaseGbaHack):
             ModelInput("defensive", "防御")
             ModelInput("speed", "速度")
             ModelInput("lucky", "好运")
-            ModelInput("ground_power", "地力量")
-            ModelInput("ground_defensive", "地抗性")
-            ModelInput("water_power", "水力量")
-            ModelInput("water_defensive", "水抗性")
-            ModelInput("fire_power", "火力量")
-            ModelInput("fire_defensive", "火抗性")
-            ModelInput("wind_power", "风力量")
-            ModelInput("wind_defensive", "风抗性")
+            for tlabel, tname in datasets.ELEMENT_TYPES:
+                ModelInput("%s_power" % tname, "%s力量" % tlabel)
+                ModelInput("%s_defensive" % tname, "%s抗性" % tlabel)
 
         with Group("skills", "角色精神力", person) as skills_group:
             for i in range(5):
@@ -61,6 +56,15 @@ class BaseGSTool(BaseGbaHack):
             for i in range(15):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
+
+        self.lazy_group(Group("djinnis", "角色精灵", person), self.render_djinnis)
+
+    def render_djinnis(self):
+        for (tlable, tname), (labels, helps) in zip(self.datasets.ELEMENT_TYPES, self.datasets.DJINNIS):
+            ModelFlagWidget("djinni_%s" % tname, "%s精灵" % tlable, labels=labels, helps=helps, checkbtn=True)
+            ModelFlagWidget("djinni_%s_on" % tname, "附身", labels=labels, helps=helps, checkbtn=True)
+            ModelInput("djinni_%s_count" % tname, "拥有数量").view.setToolTip("至少一个角色精灵数量大于0才会显示精灵菜单")
+            ModelInput("djinni_%s_on_count" % tname, "附身数量")
 
     def get_hotkeys(self):
         this = self.weak
@@ -93,16 +97,28 @@ class BaseGSTool(BaseGbaHack):
         self.skills_group.read()
 
     def move_left(self, _=None):
-        self._global.town_x -= 10
+        if self._global.map_x is 0:
+            self._global.town_x -= 10
+        else:
+            self._global.map_x -= 10
 
     def move_right(self, _=None):
-        self._global.town_x += 10
+        if self._global.map_x is 0:
+            self._global.town_x += 10
+        else:
+            self._global.map_x += 10
 
     def move_up(self, _=None):
-        self._global.town_y -= 10
+        if self._global.map_x is 0:
+            self._global.town_y -= 10
+        else:
+            self._global.map_y -= 10
 
     def move_down(self, _=None):
-        self._global.town_y += 10
+        if self._global.map_x is 0:
+            self._global.town_y += 10
+        else:
+            self._global.map_y += 10
 
     def pull_through(self, _=None):
         for person in self.persons():

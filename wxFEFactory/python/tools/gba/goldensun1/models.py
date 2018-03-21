@@ -17,5 +17,5 @@ class Global(BaseGlobal):
     town_x = ShortField(0x02030EC6)
     town_y = ShortField(0x02030ECE)
     # 世界地图中坐标
-    map_x = ShortField(0x02030DB6)
-    map_y = ShortField(0x02030DAE)
+    map_x = ShortField(0x02030DAE)
+    map_y = ShortField(0x02030DB6)
