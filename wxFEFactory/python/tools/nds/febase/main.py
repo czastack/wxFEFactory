@@ -112,8 +112,8 @@ class FeTool(BaseNdsHack):
                 ModelFlagWidget("attr%d" % i, hint or "属性%d" % i, labels=labels)
 
 
-        self.iteminfos_group = Group("train_items", "运输队", self._global, cols=4)
-        self.lazy_group(self.iteminfos_group, self.render_train_items)
+        self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
+        self.lazy_group(self.train_items_group, self.render_train_items)
 
     def render_train_items(self):
         datasets = self.datasets
@@ -182,4 +182,4 @@ class FeTool(BaseNdsHack):
 
     def on_train_items_page(self, page):
         self._global.train_items_page = page
-        self.iteminfos_group.read()
+        self.train_items_group.read()

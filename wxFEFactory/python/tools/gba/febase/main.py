@@ -1,6 +1,7 @@
 from ..base import BaseGbaHack
 from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.exui.components import Pagination
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -50,13 +51,16 @@ class FeTool(BaseGbaHack):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items_count.%d" % i, "数量")
 
-        self.lazy_group(Group("train_items", "运输队", self._global, cols=4), self.render_train_items)
+        self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
+        self.lazy_group(self.train_items_group, self.render_train_items)
 
     def render_train_items(self):
         datasets = self.datasets
-        for i in range(100):
-            ModelSelect("train_items.%d" % i, "物品%03d" % (i + 1), choices=datasets.ITEMS)
+        for i in range(10):
+            ModelSelect("train_items.%d" % i, "", choices=datasets.ITEMS)
             ModelInput("train_items_count.%d" % i, "数量")
+        with Group.active_group().footer:
+            Pagination(self.on_train_items_page, 10)
 
     def get_hotkeys(self):
         return (
@@ -81,3 +85,7 @@ class FeTool(BaseGbaHack):
         _global = self._global
         person.posx = _global.curx
         person.posy = _global.cury
+
+    def on_train_items_page(self, page):
+        self._global.train_items_page = page
+        self.train_items_group.read()
