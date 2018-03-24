@@ -4,21 +4,21 @@ screen_width = fefactory.Screen.width
 
 if screen_width <= 1920:
     btn_width = 50
-    btn_xsm_width = 36
+    btn_xs_width = 36
     btn_sm_width = 50
     btn_md_width = 80
     dialog_width = 640
     dialog_height = 480
 elif screen_width <= 2560:
     btn_width = 80
-    btn_xsm_width = 50
+    btn_xs_width = 50
     btn_sm_width = 80
     btn_md_width = 100
     dialog_width = 800
     dialog_height = 600
 else: # elif screen_width <= 3840:
     btn_width = 100
-    btn_xsm_width = 60
+    btn_xs_width = 60
     btn_sm_width = 100
     btn_md_width = 120
     dialog_width = 900
@@ -27,8 +27,8 @@ else: # elif screen_width <= 3840:
 
 dialog_style = {'width': dialog_width, 'height': dialog_height}
 
-btn_xsm_style = {
-    'width': btn_xsm_width,
+btn_xs_style = {
+    'width': btn_xs_width,
 }
 
 btn_sm_style = {
@@ -70,7 +70,7 @@ styles = {
         },
         'top_padding': {'padding': 10, 'showPadding': '1 0 0 0'},
         'left_padding': {'padding': 10, 'showPadding': '0 0 0 1'},
-        'btn_xsm': btn_xsm_style,
+        'btn_xs': btn_xs_style,
         'btn_sm': btn_sm_style,
         'btn_md': btn_md_style,
     }

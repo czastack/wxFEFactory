@@ -1,3 +1,6 @@
+from functools import partial
+
+
 class FileRW:
 	__slots__ = ('_file', 'addrmask')
 
@@ -30,19 +33,22 @@ class FileRW:
 	def read(self, addr, type, size=1):
 		return self.pos(addr).rawRead(size)
 
-	def readInt(self, pos, size):
+	def _readInt(self, pos, size, signed=False):
 		if pos is not None:
 			self.pos(pos)
-		return int.from_bytes(self._file.read(size), byteorder='little')
+		return int.from_bytes(self._file.read(size), byteorder='little', signed=signed)
+
+	readInt = partial(_readInt, signed=True)
+	readUint = _readInt
 
 	def read8(self, pos=None):
-		return self.readInt(pos, 1)
+		return self.readUint(pos, 1)
 
 	def read16(self, pos=None):
-		return self.readInt(pos, 2)
+		return self.readUint(pos, 2)
 
 	def read32(self, pos=None):
-		return self.readInt(pos, 4)
+		return self.readUint(pos, 4)
 
 	def rawWrite(self, data):
 		return self._file.write(data)
@@ -52,21 +58,24 @@ class FileRW:
 			data = data[:size]
 		return self.pos(addr).rawWrite(data)
 
-	def writeInt(self, pos, val, size):
+	def _writeInt(self, pos, val, size, signed=False):
 		if val is None:
 			val = pos
 		elif pos is not None:
 			self.pos(pos)
-		return self._file.write(val.to_bytes(size, byteorder='little'))
+		return self._file.write(val.to_bytes(size, byteorder='little', signed=signed))
+
+	writeInt = partial(_writeInt, signed=True)
+	writeUint = _writeInt
 
 	def write8(self, pos, val=None):
-		return self.writeInt(pos, val, 1)
+		return self.writeUint(pos, val, 1)
 
 	def write16(self, pos, val=None):
-		return self.writeInt(pos, val, 2)
+		return self.writeUint(pos, val, 2)
 
 	def write32(self, pos, val=None):
-		return self.writeInt(pos, val, 4)
+		return self.writeUint(pos, val, 4)
 
 	def patchFile(self, addr, file, offset=0, size=-1):
 		with open(file, 'rb') as f:

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from lib import extypes
-from styles import btn_xsm_style
+from styles import btn_xs_style
 from . import Configurable
 from lib.extypes import WeakBinder
 import fefactory_api
@@ -99,8 +99,8 @@ class ConfigCtrl(ABC):
 
     def render_btn(self):
         this = self.weak
-        ui.Button(label="r", style=btn_xsm_style, onclick=this.read)
-        ui.Button(label="w", style=btn_xsm_style, onclick=this.write)
+        ui.Button(label="r", style=btn_xs_style, onclick=this.read)
+        ui.Button(label="w", style=btn_xs_style, onclick=this.write)
 
     def set_help(self, text=None):
         if text is None:

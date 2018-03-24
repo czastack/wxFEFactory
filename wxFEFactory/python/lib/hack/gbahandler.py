@@ -33,6 +33,12 @@ class GbaEmuHandler(MemHandler):
                 return self.ptr_table[index] + addr
         return False
 
+    def getRomTitle(self):
+        return self.read(0x080000A0, bytes, 12).decode()
+
+    def getRomCode(self):
+        return self.read(0x080000AC, bytes, 4).decode()
+
 
 # struct VBA_PtrEntry
 # {

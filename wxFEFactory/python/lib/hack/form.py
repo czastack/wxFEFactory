@@ -1,7 +1,7 @@
 from lib import exui, fileutils
 from lib.utils import float32
 from lib.extypes import WeakBinder
-from styles import styles, dialog_style, btn_xsm_style
+from styles import styles, dialog_style, btn_xs_style
 from __main__ import win as main_win
 import json
 import types
@@ -39,9 +39,9 @@ class Widget:
 
     def render_btn(self):
         this = self.weak
-        ui.Button(label="r", style=btn_xsm_style, onclick=lambda btn: this.read())
+        ui.Button(label="r", style=btn_xs_style, onclick=lambda btn: this.read())
         if not self.readonly:
-            ui.Button(label="w", style=btn_xsm_style, onclick=lambda btn: this.write())
+            ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write())
 
     def onKey(self, v, event):
         mod = event.GetModifiers()
@@ -669,8 +669,8 @@ class BaseFlagWidget(TwoWayWidget):
                     for view, help in zip(self.views, self.helps):
                         view.setToolTip(help)
             if self.checkbtn:
-                ui.Button(label="全选", style=btn_xsm_style, onclick=self.weak.check_all)
-                ui.Button(label="不选", style=btn_xsm_style, onclick=self.weak.uncheck_all)
+                ui.Button(label="全选", style=btn_xs_style, onclick=self.weak.check_all)
+                ui.Button(label="不选", style=btn_xs_style, onclick=self.weak.uncheck_all)
             self.render_btn()
         self.view = view
 
