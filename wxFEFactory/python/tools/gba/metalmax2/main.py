@@ -8,9 +8,6 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGbaHack):
-    PERSON_ADDR_START = 0x03003C2F
-    CHARIOT_ADDR_START = 0x03003C78
-
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
@@ -121,25 +118,25 @@ class Tool(BaseGbaHack):
         self.storage_group.read()
 
     def _person(self):
-        person_addr = self.PERSON_ADDR_START + self.person_index * models.Person.SIZE
+        person_addr = self.person_index * models.Person.SIZE
         self._personins.addr = person_addr
         return self._personins
 
     def persons(self):
         person = models.Person(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.addr = self.PERSON_ADDR_START + i * models.Person.SIZE
+            person.addr = i * models.Person.SIZE
             yield person
 
     def _chariot(self):
-        chariot_addr = self.CHARIOT_ADDR_START + self.chariot_index * models.Chariot.SIZE
+        chariot_addr = self.chariot_index * models.Chariot.SIZE
         self._chariotins.addr = chariot_addr
         return self._chariotins
 
     def chariots(self):
         chariot = models.chariot(0, self.handler)
         for i in range(len(datasets.CHARIOTS)):
-            chariot.addr = self.CHARIOT_ADDR_START + i * models.chariot.SIZE
+            chariot.addr = i * models.chariot.SIZE
             yield chariot
 
     person = property(_person)
