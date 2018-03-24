@@ -17,6 +17,7 @@ tools = (
     ("GBA:热血物语EX2007", "gba.downtownex2007"),
     ("GBA:黄金太阳-开启的封印", "gba.goldensun1"),
     ("GBA:黄金太阳-失落的时代", "gba.goldensun2"),
+    ("GBA:重装机兵2改", "gba.metalmax2"),
     ("NDS:AR金手指分析", "nds.ar_analyse"),
     ("NDS:新·纹章之谜 光与影的英雄", "nds.fe12"),
 )

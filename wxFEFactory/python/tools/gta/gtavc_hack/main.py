@@ -49,6 +49,7 @@ class Tool(BaseGTA3Tool):
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+
         with Group("vehicle", "汽车", vehicle):
             self.vehicle_hp_view = ModelInput("hp", "HP")
             self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
