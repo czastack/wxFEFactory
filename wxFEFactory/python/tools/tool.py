@@ -1,7 +1,6 @@
 from lib.basescene import BaseScene
 from lib.lazy import lazyclassmethod_indict
 from styles import styles
-from . import tools
 import traceback
 import fefactory_api
 ui = fefactory_api.ui
@@ -54,18 +53,15 @@ class BaseTool(BaseScene):
         close_callbacks.append(callback)
 
     @lazyclassmethod_indict
-    def doGetTitle(class_):
+    def doGetTitle(cls):
         """获取原始标题，显示在标签页标题和菜单栏"""
-        name = class_.getName()
-        for item in tools:
-            if item[1] == name:
-                return item[0]
-        return name
+        module = cls.__module__
+        return __import__(module[:module.rfind('.')], fromlist='__init__').name
 
     @lazyclassmethod_indict
-    def getName(class_):
+    def getName(cls):
         """模块名称，即模块文件夹名"""
-        module = class_.__module__
+        module = cls.__module__
         return module[module.find('.') + 1: module.rfind('.')]
 
     def reload(self, _=None):

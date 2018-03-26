@@ -3,7 +3,7 @@
 #include "myapp.h"
 #include <wx/image.h>
 #include <wx/palette.h>
-#include "pyapi/layout/dialogs.h"
+#include "pyapi/ui/dialogs.h"
 
 
 class FeImage: wxImage

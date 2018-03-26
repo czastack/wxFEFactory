@@ -5,7 +5,7 @@ from fefactory_api import ui
 
 
 class StdDialog(ui.Dialog):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, cancel=True, ok=True, **kwargs):
         kwargs.setdefault('style', dialog_style)
         kwargs.setdefault('styles', styles)
         super().__init__(*args, **kwargs)
@@ -16,8 +16,10 @@ class StdDialog(ui.Dialog):
             self.view = ui.ScrollView(className="fill container")
 
             with ui.Horizontal(className="container right") as footer:
-                ui.Button(label="取消", onclick=lambda btn: this.dismiss(False))
-                ui.Button(label="确定", onclick=lambda btn: this.dismiss(True))
+                if cancel:
+                    ui.Button(label="取消").id = ui.ID_CANCEL
+                if ok:
+                    ui.Button(label="确定").id = ui.ID_OK
             self.footer = footer
         super().__exit__()
 
@@ -29,7 +31,7 @@ class StdDialog(ui.Dialog):
         self.view.__exit__(*args)
 
 
-class ListDialog(ui.StdModalDialog):
+class ListDialog(StdDialog):
     def __init__(self, *args, **kwargs):
         listbox_opt = kwargs.pop('listbox', {})
         kwargs.setdefault('style', dialog_style)
@@ -50,14 +52,13 @@ class ListDialog(ui.StdModalDialog):
         self.listbox.reverseCheck()
 
 
-class ChoiceDialog(ui.StdModalDialog):
+class ChoiceDialog(StdDialog):
     def __init__(self, title, choices, onselect, *args, **kwargs):
         kwargs.setdefault('style', dialog_style)
         super().__init__(title, *args, **kwargs)
 
         with self:
-            with ui.Vertical(styles=styles, style=styles['class']['fill']):
-                self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
+            self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
 
 
 class CheckChoiceDialog(ListDialog):

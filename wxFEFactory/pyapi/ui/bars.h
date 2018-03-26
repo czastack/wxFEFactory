@@ -1,7 +1,7 @@
 #pragma once
 #include <wx/sharedptr.h>
 #include <wx/artprov.h>
-#include "layoutbase.h"
+#include "uibase.h"
 #include "wx/aui/auibar.h"
 
 template <class T>

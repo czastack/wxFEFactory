@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.h"
+#include "uibase.h"
 #include <wx/button.h>
 #include <wx/tglbtn.h>
 #include <wx/stattext.h>
@@ -760,6 +760,11 @@ public:
 	{
 		return *(wxTreeCtrl*)ptr();
 	}
+
+	void setOnItemActivated(pycref fn, bool reset = true)
+	{
+		bindEvt(wxEVT_TREE_ITEM_ACTIVATED, fn, reset);
+	}
 };
 
 
@@ -769,7 +774,7 @@ public:
 	PyTreeItemData(pycref obj) : m_data(obj) { }
 	pycref GetData() const { return m_data; }
 private:
-	pycref m_data;
+	pyobj m_data;
 };
 
 namespace pybind11 {
@@ -777,12 +782,12 @@ namespace pybind11 {
 		template <> class type_caster<wxTreeItemId> {
 		public:
 			bool load(handle src, bool) {
-				value.m_pItem = (void*)pybind11::cast<size_t>(src);
+				value.m_pItem = (void*)(size_t)src.cast<pybind11::int_>();
 				return true;
 			}
 
 			static handle cast(const wxTreeItemId &src, return_value_policy /* policy */, handle /* parent */) {
-				return pybind11::cast((size_t)src.GetID());
+				return PyLong_FromUnsignedLongLong((size_t)src.GetID());
 			}
 
 			PYBIND11_TYPE_CASTER(wxTreeItemId, (_)("wxTreeItemId"));

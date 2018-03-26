@@ -77,12 +77,12 @@ namespace pybind11 {
 		template <> class type_caster<wxColour> {
 		public:
 			bool load(handle src, bool) {
-				value.SetRGB(pybind11::cast<uint>(src));
+				value.SetRGB((wxUint32)src.cast<pybind11::int_>());
 				return true;
 			}
 
 			static handle cast(const wxColour &src, return_value_policy /* policy */, handle /* parent */) {
-				return pybind11::cast(src.GetRGB());
+				return PyLong_FromUnsignedLong(src.GetRGB());
 			}
 
 			PYBIND11_TYPE_CASTER(wxColour, (_)("wxColor"));

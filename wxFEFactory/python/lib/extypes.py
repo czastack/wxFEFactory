@@ -135,3 +135,29 @@ def weakmethod(method):
     if isinstance(method, types.MethodType):
         method = types.MethodType(method.__func__, weakref.proxy(method.__self__))
     return method
+
+
+class BaseDataClass:
+    __slots__ = ()
+
+    def __init__(self, *args, **kwargs):
+        for field, arg in zip(self.__slots__, args):
+            setattr(self, field, arg)
+        for field in kwargs:
+            setattr(self, field, kwargs[field])
+
+    def to_dict(self):
+        return {field: getattr(self, field) for field in self.__slots__}
+
+    def to_tuple(self):
+        return tuple(getattr(self, field) for field in self.__slots__)
+
+    def __str__(self):
+        return str(self.to_tuple())
+
+    def __repr__(self):
+        return self.__class__.__name__ + self.__str__()
+
+
+def DataClass(name, fields):
+    return type(name, (BaseDataClass,), {'__slots__': tuple(fields)})

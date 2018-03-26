@@ -368,8 +368,8 @@ void init_controls(py::module & m)
 		.def("AddRoot", [](TreeCtrl &self, wxcstr text, int image, int selectedImage, pycref data) {
 			return self.ctrl().AddRoot(text, image, selectedImage, data.is_none() ? NULL: new PyTreeItemData(data));
 		}, text, image, selectedImage, data)
-		.def("InsertItem", [](TreeCtrl &self, size_t parent, wxcstr text, int image, int selectedImage, pycref data, int pos) {
-			return self.ctrl().InsertItem(wxTreeItemId((void*)parent), pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
+		.def("InsertItem", [](TreeCtrl &self, const wxTreeItemId& parent, wxcstr text, int image, int selectedImage, pycref data, int pos) {
+			return self.ctrl().InsertItem(parent, pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
 		}, "parent"_a, text, image, selectedImage, data, pos)
 
 		.def("GetItemData", [](TreeCtrl &self, const wxTreeItemId& item) { 
@@ -395,6 +395,7 @@ void init_controls(py::module & m)
 		.def("SelectItem", [](TreeCtrl &self, const wxTreeItemId& item, bool select = true) { self.ctrl().SelectItem(item, select); }, "item"_a, "select"_a=true)
 		.def("SelectChildren", [](TreeCtrl &self, const wxTreeItemId& parent) { self.ctrl().SelectChildren(parent); })
 		.def("ToggleItemSelection", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().ToggleItemSelection(item); })
+		.def("setOnItemActivated", &TreeCtrl::setOnItemActivated, evt_fn, evt_reset)
 
 		/*.def("GetCount", [](TreeCtrl &self) { return self.ctrl().GetCount(); })
 		.def("GetIndent", [](TreeCtrl &self) { return self.ctrl().GetIndent(); })
@@ -411,4 +412,7 @@ void init_controls(py::module & m)
 			[](TreeCtrl &self) { return self.ctrl().GetSpacing(); },
 			[](TreeCtrl &self, unsigned int spacing) { self.ctrl().SetSpacing(spacing); }
 		);
+
+		py::class_<wxTreeEvent, wxEvent>(m, "TreeEvent")
+			.def_property_readonly("item", &wxTreeEvent::GetItem);
 }

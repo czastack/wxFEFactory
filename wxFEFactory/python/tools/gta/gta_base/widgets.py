@@ -1,4 +1,5 @@
 from fefactory_api import ui
+from lib import exui
 from lib.hack.form import Group, TwoWayWidget, ModelWidget
 from styles import dialog_style
 
@@ -86,7 +87,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
         dialog = getattr(cls, '_dialog', None)
 
         if not dialog:
-            with ui.StdModalDialog("选择颜色", style=dialog_style) as dialog:
+            with exui.StdDialog("选择颜色", style=dialog_style) as dialog:
                 with ui.GridLayout(cols=13, vgap=10, className="fill container"):
                     for color in self.color_list:
                         view = ui.Text("", style=cls.color_item_style)

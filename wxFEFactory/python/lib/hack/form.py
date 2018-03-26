@@ -258,7 +258,7 @@ class DialogGroup(BaseGroup):
         ui.Button(label=self.label, onclick=this.show)
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
-            with ui.StdModalDialog(self.label, style=style, styles=styles) as root:
+            with exui.StdDialog(self.label, style=style, styles=styles) as root:
                 with ui.Vertical(className="fill"):
                     with ui.ScrollView(className="fill container") as content:
                         if self.flexgrid:

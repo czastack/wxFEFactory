@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.h"
+#include "uibase.h"
 #include "frames.h"
 #include <wx/aui/aui.h>
 #include <wx/aui/tabmdi.h>

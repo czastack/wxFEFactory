@@ -11,11 +11,11 @@
     <ClCompile Include="pyapi\functions.cpp">
       <Filter>pyapi</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\console.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\console.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\dialogs.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\dialogs.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp">
       <Filter>pyapi\emuhacker</Filter>
@@ -26,8 +26,8 @@
     <ClCompile Include="wxpatch.cpp">
       <Filter>wx</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\layout.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\layout.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\fe\graph.cpp">
       <Filter>pyapi\fe</Filter>
@@ -35,38 +35,41 @@
     <ClCompile Include="pyapi\fe\fe.cpp">
       <Filter>pyapi\fe</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\layoutbase.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\menu.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\menu.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\datacontrols.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\datacontrols.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\controls.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\controls.cpp">
-      <Filter>pyapi\layout</Filter>
-    </ClCompile>
-    <ClCompile Include="pyapi\layout\aui.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\aui.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\auto\auto.cpp">
       <Filter>pyapi\auto</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\bitmap.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\bitmap.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\frames.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\frames.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\containers.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\containers.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\screen.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\screen.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\layout\bars.cpp">
-      <Filter>pyapi\layout</Filter>
+    <ClCompile Include="pyapi\ui\bars.cpp">
+      <Filter>pyapi\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\ui\events.cpp">
+      <Filter>pyapi\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="pyapi\ui\uibase.cpp">
+      <Filter>pyapi\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,11 +99,11 @@
     <ClInclude Include="pyapi\functions.h">
       <Filter>pyapi</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\console.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\console.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\dialogs.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\dialogs.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\emuhacker\emuhacker.h">
       <Filter>pyapi\emuhacker</Filter>
@@ -108,14 +111,14 @@
     <ClInclude Include="pyapi\emuhacker\ProcessHandler.h">
       <Filter>pyapi\emuhacker</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\layout.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\layout.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="wxpatch.h">
       <Filter>wx</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\drop.hpp">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\drop.hpp">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\fe\graph.h">
       <Filter>pyapi\fe</Filter>
@@ -126,41 +129,44 @@
     <ClInclude Include="pyapi\fe\fe.h">
       <Filter>pyapi\fe</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\layoutbase.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\menu.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\menu.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\datacontrols.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\datacontrols.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\controls.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\controls.h">
-      <Filter>pyapi\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\layout\aui.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\aui.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\auto\auto.h">
       <Filter>pyapi\auto</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\bitmap.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\bitmap.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\thread.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\thread.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\frames.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\frames.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\containers.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\containers.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\screen.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\screen.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\layout\bars.h">
-      <Filter>pyapi\layout</Filter>
+    <ClInclude Include="pyapi\ui\bars.h">
+      <Filter>pyapi\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\ui\events.h">
+      <Filter>pyapi\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\ui\uibase.h">
+      <Filter>pyapi\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -169,9 +175,6 @@
     </Filter>
     <Filter Include="pyapi">
       <UniqueIdentifier>{aafbb4f5-a597-43a0-9d6a-19376a3ba782}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="pyapi\layout">
-      <UniqueIdentifier>{dc497cd4-3323-4626-9f43-15e74060bff4}</UniqueIdentifier>
     </Filter>
     <Filter Include="wx">
       <UniqueIdentifier>{b58b684b-307b-4b12-8dcb-0dab4b9021d3}</UniqueIdentifier>
@@ -184,6 +187,9 @@
     </Filter>
     <Filter Include="pyapi\auto">
       <UniqueIdentifier>{e6f09b6c-d7a1-43f5-b392-87a13ae38b9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pyapi\ui">
+      <UniqueIdentifier>{dc497cd4-3323-4626-9f43-15e74060bff4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

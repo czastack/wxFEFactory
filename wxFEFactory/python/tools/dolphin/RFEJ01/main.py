@@ -27,7 +27,7 @@ class Tool(BaseDolphinHack):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "角色编号", readonly=True)
             ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, 
-                tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
+                values=tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
             ModelInput("hp", "当前HP")
             ModelInput("level", "等级")
             ModelInput("exp", "经验")

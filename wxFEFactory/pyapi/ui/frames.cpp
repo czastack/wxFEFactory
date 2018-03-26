@@ -204,7 +204,7 @@ void Dialog::dismiss(bool ok)
 }
 
 
-pyobj StdModalDialog::__enter__()
+/*pyobj StdModalDialog::__enter__()
 {
 	long style = ptr()->GetWindowStyle();
 	style |= wxRESIZE_BORDER | wxCLIP_CHILDREN;
@@ -226,7 +226,8 @@ void StdModalDialog::__exit__(py::args & args)
 	wxSizer* topsizer = ptr()->GetSizer();
 	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
 	Dialog::__exit__(args);
-}
+}*/
+
 
 void init_frames(py::module & m)
 {
@@ -270,13 +271,13 @@ void init_frames(py::module & m)
 
 	py::class_t<Dialog, BaseTopLevelWindow>(m, "Dialog")
 		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
-			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style)
+			label, "wxstyle"_a = 0, styles, className, style)
 		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal, "ok"_a=true)
 		.def("isModal", &Dialog::isModal)
 		.def("dismiss", &Dialog::dismiss);
 
-	py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
-		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
-			label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
+	//py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
+	//	.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
+	//		label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
 }

@@ -1,5 +1,5 @@
 #include <wx/wx.h>
-#include "layoutbase.h"
+#include "uibase.h"
 
 
 wxVector<Layout*> View::LAYOUTS;

@@ -1,10 +1,12 @@
+from collections import namedtuple
 from application import app
 from project import Project
 from modules import modules
 from fe.ferom import FeRomRW
-from lib import exui
+from lib import exui, extypes
 import os
 import traceback
+import types
 import __main__
 import fefactory_api
 import fefactory
@@ -13,8 +15,18 @@ Path = os.path
 ui = fefactory_api.ui
 
 
+"""
+:param name: 工具文件夹名
+:param label: 工具名称
+:param packae: 是否是工具集(有子工具)
+:param children: 子工具元组
+"""
+ToolTreeItem = extypes.DataClass("ToolTreeItem", ("module", "label", "package", "children", "id"))
+
+
 class MainFrame:
     def __init__(self, start_option=None):
+        self.weak = extypes.WeakBinder(self)
         self.render()
 
         if start_option:
@@ -75,7 +87,7 @@ class MainFrame:
             ui.StatusBar()
             # 尝试加载图标
             icon_name = fefactory.executable_name() + '.ico'
-            if os.path.exists(icon_name):
+            if Path.exists(icon_name):
                 win.setIcon(icon_name)
         
         win.setOnClose(self.onClose)
@@ -100,7 +112,8 @@ class MainFrame:
         return module.Module
 
     def getTool(self, name):
-        module = __import__('tools.' + name, fromlist=['main']).main
+        name = name.__name__ if isinstance(name, types.ModuleType) else 'tools.' + name
+        module = __import__(name, fromlist=['main']).main
         return module.Tool
         
     def onNav(self, listbox):
@@ -255,18 +268,43 @@ class MainFrame:
                         traceback.print_exc()
 
     def openTool(self, m):
-        dialog = exui.ChoiceDialog("选择工具", self.tool_names, self.onToolOpen, style={'width': 600, 'height': 800})
-        self.dialog = dialog
-        dialog.showModal()
-        del self.dialog
+        dialog = getattr(self, 'tool_dialog', None)
+        if dialog is None:
+            with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
+                # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
+                tree = ui.TreeCtrl(className="fill", wxstyle=0x2C05)
+                root = tree.AddRoot("")
+                self.root_tools = self.get_sub_tools(tools)
+                
+                for item in self.root_tools:
+                    item.id = tree.InsertItem(root, item.label, data=item)
 
-    def onToolOpen(self, cb):
-        name = tools.tools[cb.index][1]
-        if isinstance(name, str):
-            self.openToolByName(name)
-            self.dialog.endModal()
-        # elif isinstance(name, tuple):
-        #     self.dialog.listbox.setItems(('',))
+                tree.setOnItemActivated({'callback': self.weak.on_tool_sel, 'arg_event': True})
+            self.tool_dialog = dialog
+        dialog.showModal()
+
+    def get_sub_tools(self, parent):
+        dir_path = Path.dirname(parent.__file__)
+        files = os.listdir(dir_path)
+        result = []
+        for file in files:
+            if not file.startswith('__') and Path.isdir(Path.join(dir_path, file)):
+                m = __import__(parent.__name__ + '.' + file, fromlist=file)
+                name = getattr(m, 'name', None)
+                if name is not None:
+                    result.append(ToolTreeItem(m, m.name, getattr(m, 'package', False), None, None))
+        return result
+
+    def on_tool_sel(self, tree, event):
+        item = tree.GetItemData(event.item)
+        if item.package:
+            if not item.children:
+                item.children = self.get_sub_tools(item.module)
+                for child in item.children:
+                    child.id = tree.InsertItem(item.id, child.label, data=child)
+        else:
+            self.openToolByName(item.module)
+            self.tool_dialog.endModal()
 
     def openToolByName(self, name):
         Tool = self.getTool(name)

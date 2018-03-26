@@ -4,8 +4,8 @@
 #include "fefactory_api.h"
 #include "myapp.h"
 #include "functions.h"
-#include "layout/console.h"
-#include "layout/layout.h"
+#include "ui/console.h"
+#include "ui/layout.h"
 #include "fe/fe.h"
 #ifdef __WXMSW__
 #include "auto/auto.h"

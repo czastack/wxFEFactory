@@ -1,6 +1,6 @@
 #pragma once
 #include <wx/thread.h>
-#include "layoutbase.h"
+#include "uibase.h"
 
 
 class PyThread : public wxThread

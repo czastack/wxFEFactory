@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.h"
+#include "uibase.h"
 #include "menu.h"
 #include "bars.h"
 #include <wx/mdi.h>
@@ -205,7 +205,8 @@ public:
 	template <class... Args>
 	Dialog(wxcstr title, long wxstyle/*=wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX*/, Args ...args) : BaseTopLevelWindow(args...)
 	{
-		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
+		bindElem(new wxDialog(safeActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), 
+			wxstyle ? wxstyle : wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX | wxRESIZE_BORDER | wxCLIP_CHILDREN));
 		init();
 	}
 
@@ -240,7 +241,7 @@ public:
 };
 
 
-class StdModalDialog : public Dialog
+/*class StdModalDialog : public Dialog
 {
 public:
 	using Dialog::Dialog;
@@ -253,6 +254,6 @@ public:
 	{
 		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	}
-};
+};*/
 
 void init_frames(py::module &m);

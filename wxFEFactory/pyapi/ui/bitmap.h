@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.h"
+#include "uibase.h"
 #include <wx/bitmap.h>
 
 

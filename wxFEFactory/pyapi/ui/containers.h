@@ -1,5 +1,5 @@
 #pragma once
-#include "layoutbase.h"
+#include "uibase.h"
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/splitter.h>
