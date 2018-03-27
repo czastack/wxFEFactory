@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.form import Group, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
+from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 import fefactory_api
@@ -54,10 +54,18 @@ class BaseGSTool(BaseGbaHack):
 
         with Group("skills", "角色物品", person, cols=4):
             for i in range(15):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items_count.%d" % i, "数量")
+                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
 
         self.lazy_group(Group("djinnis", "角色精灵", person), self.render_djinnis)
+
+        with StaticGroup("快捷键"):
+            with ui.ScrollView(className="fill"):
+                ui.Text("左移: alt+left")
+                ui.Text("右移: alt+right")
+                ui.Text("上移: alt+up")
+                ui.Text("下移: alt+right")
+                ui.Text("恢复HP: alt+h")
 
     def render_djinnis(self):
         for (tlable, tname), (labels, helps) in zip(self.datasets.ELEMENT_TYPES, self.datasets.DJINNIS):

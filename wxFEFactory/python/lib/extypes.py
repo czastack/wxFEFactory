@@ -158,6 +158,9 @@ class BaseDataClass:
     def __repr__(self):
         return self.__class__.__name__ + self.__str__()
 
+    def __getattr__(self, name):
+        return self.default
 
-def DataClass(name, fields):
-    return type(name, (BaseDataClass,), {'__slots__': tuple(fields)})
+
+def DataClass(name, fields, default=None):
+    return type(name, (BaseDataClass,), {'__slots__': tuple(fields), 'default': default})

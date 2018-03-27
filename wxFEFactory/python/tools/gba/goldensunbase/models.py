@@ -95,31 +95,25 @@ class BasePerson(Model):
     djinni_wind_on_count = Field(0x11F)
 
     def __getattr__(self, name):
-        if name.startswith('items.'):
-            index = int(name[6:])
-            return self.items[index].item
-        elif name.startswith('items_count.'):
-            index = int(name[12:])
-            return self.items[index].count
-        elif name.startswith('skills.'):
-            index = int(name[7:]) + self.skills_offset
-            if index < self.field('skills').length:
-                return self.skills[index].value
-            return 0
+        data = self.test_comlex_attr(name)
+        if data:
+            if data.name == 'skills':
+                index = data.index + self.skills_offset
+                if index < self.field('skills').length:
+                    return self.skills[index].value
+                return 0
+        return super().__getattr__(name)
 
     def __setattr__(self, name, value):
-        if name.startswith('items.'):
-            index = int(name[6:])
-            self.items[index].item = value
-        elif name.startswith('items_count.'):
-            index = int(name[12:])
-            self.items[index].count = value
-        elif name.startswith('skills.'):
-            index = int(name[7:]) + self.skills_offset
-            if index < self.field('skills').length:
-                self.skills[index].value = value
-        else:
-            super().__setattr__(name, value)
+        data = self.test_comlex_attr(name)
+        if data:
+            if data.name == 'skills':
+                index = int(name[7:]) + self.skills_offset
+                if index < self.field('skills').length:
+                    self.skills[index].value = value
+            return
+
+        super().__setattr__(name, value)
 
     @property
     def skills_offset(self):

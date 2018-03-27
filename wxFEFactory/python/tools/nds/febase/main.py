@@ -72,8 +72,8 @@ class FeTool(BaseNdsHack):
 
         with Group("items", "角色物品", weak._person, cols=4):
             for i in range(5):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items_count.%d" % i, "数量")
+                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
 
         with Group("iteminfos", "武器属性", weak._iteminfo):
             ui.Text("物品", className="input_label expand")
@@ -118,8 +118,8 @@ class FeTool(BaseNdsHack):
     def render_train_items(self):
         datasets = self.datasets
         for i in range(10):
-            ModelSelect("train_items.%d" % i, "", choices=datasets.ITEMS)
-            ModelInput("train_items_count.%d" % i, "数量")
+            ModelSelect("train_items.%d.item+train_items_offset" % i, "", choices=datasets.ITEMS)
+            ModelInput("train_items.%d.count+train_items_offset" % i, "数量")
         with Group.active_group().footer:
             Pagination(self.on_train_items_page, 20)
 

@@ -1,8 +1,8 @@
 from lib.hack.model import Model, Field, ByteField, ArrayField, ModelField, OffsetsField, ModelPtrField
-from ..febase.models import BasePerson, ItemSlot, BaseGlobal
+from ..febase.models import ItemSlot, BaseGlobal
 
 
-class Person(BasePerson):
+class Person(Model):
     SIZE = 0xA0
     prof = Field(0x44)
     level = ByteField(0x5A)

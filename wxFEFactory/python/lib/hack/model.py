@@ -1,4 +1,5 @@
 from lib.utils import float32
+from lib.extypes import DataClass
 
 
 class Model:
@@ -30,6 +31,41 @@ class Model:
 
     def __and__(self, field):
         return self.addrof(field)
+
+    def __getattr__(self, name):
+        data = test_comlex_attr(name)
+        if data is not None:
+            item = getattr(self, data.name)
+            index = data.index
+            # 计算偏移量(多用于分页)
+            if index is not None and data.offset:
+                index += getattr(self, data.offset)
+            if index is not None:
+                item = item[index]
+            if data.attr:
+                item = getattr(item, data.attr)
+            return item
+
+    def __setattr__(self, name, value):
+        data = test_comlex_attr(name)
+        if data is not None:
+            item = getattr(self, data.name)
+            index = data.index
+            # 计算偏移量(多用于分页)
+            if index is not None and data.offset:
+                index += getattr(self, data.offset)
+            if index is not None and not data.attr:
+                item[index] = value
+            else:
+                if index is not None:
+                    item = item[index]
+                if data.attr:
+                    setattr(item, data.attr, value)
+        else:
+            super().__setattr__(name, value)
+
+    def test_comlex_attr(self, name):
+        return test_comlex_attr(name)
 
     @classmethod
     def field(cls, name):
@@ -225,9 +261,17 @@ class ArrayField(Field):
         self.offset = offset
         self.length = length
         self.field = field
+        self.key = None
 
     def __get__(self, obj, type):
-        return ArrayData(obj, self.offset, self.length, self.field)
+        ins = None
+        if self.key:
+            ins = getattr(obj, self.key, None)
+        if ins is None:
+            ins = ArrayData(obj, self.offset, self.length, self.field)
+            if self.key:
+                setattr(obj, self.key, ins)
+        return ins
 
     def __set__(self, obj, value):
         data = self.__get__(obj, type(obj))
@@ -237,6 +281,9 @@ class ArrayField(Field):
             if item is None or item == '':
                 continue
             data[i] = item
+
+    def __set_name__(self, owner, name):
+        self.key = '_' + name
 
 
 class ArrayData:
@@ -300,3 +347,55 @@ class StringField(Field):
         if value[-1] != 0:
             value += b'\x00'
         super().__set__(obj, value)
+
+
+"""
+复杂字段名(多用于ArrayField)
+:param name: 字段名称
+:param index: 下标
+:param attr: 下一层的属性
+:param offset 偏移字段名: str
+"""
+CAttr = DataClass("CAttr", ("name", "index", "attr", "offset"))
+
+COMLEX_ATTR_MAP = {}
+
+def test_comlex_attr(text):
+    """
+    检查字段名是否是能构造CAttr的字符串
+    格式: {name}.{index} 或 {name}.{index}.{attr} 或 {name}.{attr}
+    若是，返回对应的CAttr实例，否则返回None
+    """
+    it = COMLEX_ATTR_MAP.get(text, None)
+    if it is None:
+        n = text.find('.')
+        if n is not -1:
+            index = None
+            attr = None
+            offset = None
+
+            p = text.rfind('+')
+            if p is not -1:
+                offset = text[p + 1:]
+            else:
+                p = None
+
+            name = text[:n]
+            index = text[n + 1:p]
+
+            m = index.find('.')
+            if m is not -1:
+                # {name}.{index}.{attr}
+                attr = index[m + 1:]
+                index = index[:m]
+            elif not index.isdigit():
+                # {name}.{attr}
+                attr = index
+            if index.isdigit():
+                index = int(index)
+            else:
+                # {name}.{attr}
+                index = None
+            it = CAttr(name, index, attr, offset)
+            COMLEX_ATTR_MAP[text] = it
+    return it

@@ -1,2 +1,2 @@
-name = "nds游戏修改"
+name = "NDS游戏修改"
 package = True

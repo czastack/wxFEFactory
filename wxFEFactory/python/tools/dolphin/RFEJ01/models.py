@@ -41,31 +41,15 @@ class Person(Model):
     support = ArrayField(0x210, 72, ByteField(0)) # 支援等级 72个字节 C级=32, B级=64, A级=96
     biorhythm = Field(0x288, size=2) # 生理节律，01是当前状态大好，08是曲线类型
 
-    def __getattr__(self, name):
-        if name.startswith('skills.'):
-            index = int(name[7:])
-            return self.skills[index].skill
-        elif name.startswith('items.'):
-            index = int(name[6:])
-            return self.items[index].item
-        elif name.startswith('items_count.'):
-            index = int(name[12:])
-            return self.items[index].count
-
     def __setattr__(self, name, value):
-        if name.startswith('skills.'):
-            index = int(name[7:])
-            skill = self.skills[index]
-            skill.skill = value
-            skill.spec = 0x0002
-        elif name.startswith('items.'):
-            index = int(name[6:])
-            self.items[index].item = value
-        elif name.startswith('items_count.'):
-            index = int(name[12:])
-            self.items[index].count = value
-        else:
-            super().__setattr__(name, value)
+        data = self.test_comlex_attr(name)
+        if data:
+            if data.name == 'skills'
+                skill = self.skills[data.index]
+                skill.skill = value
+                skill.spec = 0x0002
+                return
+        super().__setattr__(name, value)
 
 
 

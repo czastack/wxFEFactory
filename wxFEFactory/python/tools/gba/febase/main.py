@@ -48,8 +48,8 @@ class FeTool(BaseGbaHack):
 
         with Group("items", "角色物品", self._person, cols=4):
             for i in range(5):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items_count.%d" % i, "数量")
+                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
@@ -57,8 +57,8 @@ class FeTool(BaseGbaHack):
     def render_train_items(self):
         datasets = self.datasets
         for i in range(10):
-            ModelSelect("train_items.%d" % i, "", choices=datasets.ITEMS)
-            ModelInput("train_items_count.%d" % i, "数量")
+            ModelSelect("train_items.%d.item+train_items_offset" % i, "", choices=datasets.ITEMS)
+            ModelInput("train_items.%d.count+train_items_offset" % i, "数量")
         with Group.active_group().footer:
             Pagination(self.on_train_items_page, 10)
 

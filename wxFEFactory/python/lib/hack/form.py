@@ -97,31 +97,19 @@ class ModelWidget:
     def mem_value(self):
         ins = self.ins
         if ins:
-            prop = self.offsets
-            return (
-                getattr(ins, prop) if isinstance(prop, str) else 
-                prop.__get__(ins, ins.__class__)
-            )
+            return getattr(ins, self.offsets)
 
     @mem_value.setter
     def mem_value(self, value):
         ins = self.ins
         if ins:
-            prop = self.offsets
-            if isinstance(prop, str):
-                setattr(ins, prop, value)
-            else:
-                prop.__set__(ins, value)
+            setattr(ins, self.offsets, value)
 
     @mem_value.deleter
     def mem_value(self):
         ins = self.ins
         if ins:
-            prop = self.offsets
-            if isinstance(prop, str):
-                delattr(ins, prop)
-            else:
-                prop.__delete__(ins, value)
+            delattr(ins, self.offsets)
 
 
 class OffsetsWidget:

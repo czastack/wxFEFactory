@@ -76,11 +76,12 @@ class Tool(BaseGbaHack):
         self.lazy_group(self.storage_group, self.render_storage)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill container"):
+            with ui.ScrollView(className="fill"):
                 ui.Text("左移: alt+left")
                 ui.Text("右移: alt+right")
                 ui.Text("上移: alt+up")
                 ui.Text("下移: alt+right")
+                ui.Text("恢复HP: alt+h")
 
     def render_storage(self):
         choices = datasets.HUMAN_EQUIPS + datasets.HUMAN_ITEMS + datasets.CHARIOT_EQUIPS + datasets.CHARIOT_ITEMS
@@ -91,7 +92,7 @@ class Tool(BaseGbaHack):
             tuple((0x0300 | i) for i in range(len(datasets.CHARIOT_EQUIPS)))
         )
         for i in range(10):
-            ModelSelect("storage.%d" % i, "", choices=choices, values=values)
+            ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values)
         with Group.active_group().footer:
             Pagination(self.on_storage_page, 10)
 
