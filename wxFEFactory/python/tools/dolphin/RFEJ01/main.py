@@ -11,11 +11,11 @@ class Tool(BaseDolphinHack):
 
     def __init__(self):
         super().__init__()
-        self._ram = models.Ram(0, self.handler)
+        self._global = models.Global(0, self.handler)
     
     def render_main(self):
         person = self._person
-        with Group("global", "全局", self._ram):
+        with Group("global", "全局", self._global):
             ModelInput("money1", "小队1金钱")
             ModelInput("money2", "小队2金钱")
             ModelInput("money3", "小队3金钱")
@@ -66,9 +66,9 @@ class Tool(BaseDolphinHack):
         )
 
     def _person(self):
-        pedid = self._ram.pedid
+        pedid = self._global.pedid
         if pedid:
-            return self._ram.persons[pedid]
+            return self._global.persons[pedid]
 
     person = property(_person)
 
@@ -78,6 +78,6 @@ class Tool(BaseDolphinHack):
 
     def move_to_cursor(self, _=None):
         person = self.person
-        ram = self._ram
+        ram = self._global
         person.posx = ram.curx
         person.posy = ram.cury

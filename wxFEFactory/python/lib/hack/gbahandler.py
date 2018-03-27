@@ -19,7 +19,7 @@ GBA_MEMORY_SIZE = (
 
 
 class GbaEmuHandler(MemHandler):
-    def prepareAddr(self, addr, size):
+    def prepareAddr(self, addr, size=4):
         if self._raw_addr:
             return addr
 

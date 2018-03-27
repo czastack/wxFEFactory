@@ -288,7 +288,7 @@ class MainFrame:
         files = os.listdir(dir_path)
         result = []
         for file in files:
-            if not file.startswith('__') and Path.isdir(Path.join(dir_path, file)):
+            if not file.startswith('__') and file.find('.') is -1 and Path.isdir(Path.join(dir_path, file)):
                 m = __import__(parent.__name__ + '.' + file, fromlist=file)
                 name = getattr(m, 'name', None)
                 if name is not None:

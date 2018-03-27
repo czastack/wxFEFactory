@@ -1,7 +1,7 @@
 from lib.hack.model import Model, Field, ArrayField
 
 
-class Ram(Model):
+class Global(Model):
     level = Field(0x00E464FC, size=1) # 等级
     hp = Field(0x00E464D8) # 生命
     max_hp = Field(0x00E464DC) # 最大生命

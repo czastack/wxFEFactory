@@ -10,11 +10,11 @@ class Tool(BaseDolphinHack):
 
     def __init__(self):
         super().__init__()
-        self._ram = models.Ram(0, self.handler)
+        self._global = models.Global(0, self.handler)
         self.count_data = {}
     
     def render_main(self):
-        with Group("player", "角色", self._ram, handler=self.handler):
+        with Group("player", "角色", self._global, handler=self.handler):
             ModelInput("level", "等级(1+)")
             ModelInput("hp", "生命")
             ModelInput("max_hp", "最大生命")
@@ -66,7 +66,7 @@ class Tool(BaseDolphinHack):
         view.checkAll(False)
 
     def list_view_read(self, _, view, group):
-        field = getattr(self._ram, group['name'])
+        field = getattr(self._global, group['name'])
         data = self.handler.read(field.addr, bytes, field.size)
         hascount = group['hascount']
 
@@ -84,7 +84,7 @@ class Tool(BaseDolphinHack):
 
 
     def list_view_write(self, _, view, group, uncheck_action):
-        field = getattr(self._ram, group['name'])
+        field = getattr(self._global, group['name'])
         data = bytearray(self.handler.read(field.addr, bytes, field.size))
         hascount = group['hascount']
         # 不选中表示移除该物品

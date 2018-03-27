@@ -69,7 +69,7 @@ class Person(Model):
 
 
 
-class Ram(Model):
+class Global(Model):
     # 角色指针起始
     # 4.0.2: 9: 0x00914EC0-0x3F0*9
     # 5.x 9: 0x00930C80-0x3F0*9
