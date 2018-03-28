@@ -39,9 +39,15 @@ class Tool(BaseGbaHack):
                 ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items.%d.count" % i, "数量")
 
+        with Group("event_items", "事件道具", self._global):
+            for i, labels in enumerate(datasets.EVENT_ITEMS):
+                ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS, checkbtn=True)
+
         with Group("person_battles", "战斗中", self._global, cols=4):
-            for i in range(6):
-                ModelInput("person_battles.%d.hp" % i, "人物%dHP" % (i + 1))
+            for i in range(3):
+                ModelInput("person_battles.%d.hp" % i, "我方单位%dHP" % (i + 1))
+            for i in range(3):
+                ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
         with Group("player", "角色", person, cols=4):
             ui.Text("角色", className="input_label expand")

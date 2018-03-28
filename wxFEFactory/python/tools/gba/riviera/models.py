@@ -36,3 +36,4 @@ class Global(Model):
     kill_slot = ShortField(0x020028E2)
     rage = ShortField(0x020028EC)
     person_battles = ArrayField(0, 6, ModelField(0, PersonBattle)) # 战斗中人物信息
+    event_items = ArrayField(0x02008170, 10, ShortField(0)) # 事件道具
