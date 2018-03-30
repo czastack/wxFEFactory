@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ShortField, ArrayField, ModelField
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
 from ..goldensunbase.models import ItemSlot, BasePerson, BaseGlobal
 
 
@@ -11,11 +11,11 @@ class Global(BaseGlobal):
     money = Field(0x02000250)
     get_money = Field(0x0203059C)
     get_exp = Field(0x020305A0)
-    battlein = ShortField(0x02000498)
+    battlein = WordField(0x02000498)
 
     # 城镇中坐标
-    town_x = ShortField(0x02030EC6)
-    town_y = ShortField(0x02030ECE)
+    town_x = WordField(0x02030EC6)
+    town_y = WordField(0x02030ECE)
     # 世界地图中坐标
-    map_x = ShortField(0x02030DB6)
-    map_y = ShortField(0x02030DAE)
+    map_x = WordField(0x02030DB6)
+    map_y = WordField(0x02030DAE)

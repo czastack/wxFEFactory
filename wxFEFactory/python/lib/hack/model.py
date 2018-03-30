@@ -1,4 +1,4 @@
-from lib.utils import float32
+from lib.utils import float32, Accumulator
 from lib.extypes import DataClass
 
 
@@ -128,9 +128,15 @@ class ByteField(Field):
         super().__init__(offset, int, 1)
 
 
-class ShortField(Field):
+class WordField(Field):
     def __init__(self, offset):
         super().__init__(offset, int, 2)
+
+
+DWordField = Field
+U8Field = ByteField
+U16Field = WordField
+U32Field = DWordField
 
 
 class SignedField(Field):
@@ -141,6 +147,29 @@ class SignedField(Field):
         if not isinstance(value, self.type):
             value = self.type(value)
         obj.handler.writeInt(obj.addr + self.offset, value, self.size)
+
+
+class BitsField(Field):
+    """位域字段"""
+    def __init__(self, offset, size, bitoffset, bitlen):
+        self.bitoffset = bitoffset
+        self.bitlen = bitlen
+        self.mask = (2 << bitlen) - 1
+        super().__init__(offset, int, size)
+
+    def __get__(self, obj, type=None):
+        value = super().__get__(obj)
+        return (value >> self.bitoffset) & self.mask
+
+    def __set__(self, obj, value):
+        old = super().__get__(obj)
+        value = old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF) | ((value & self.mask) << self.bitoffset)
+        super().__set__(obj, value)
+
+    @classmethod
+    def create(cls, offset, size, bits):
+        bitoffset = Accumulator()
+        return (cls(offset, size, bitoffset.add(bit), bit) for bit in bits)
 
 
 class OffsetsField(Field):
@@ -181,23 +210,37 @@ class ModelField(Field):
     def __init__(self, offset, modelClass, size=0):
         super().__init__(offset, None, size or modelClass.SIZE)
         self.modelClass = modelClass
+        self.key = None
 
     def __get__(self, obj, type=None):
-        return self.modelClass(obj.addr + self.offset, obj.handler)
+        ins = None
+        if self.key:
+            ins = getattr(obj, self.key, None)
+        if ins is None:
+            ins = self.modelClass(obj.addr + self.offset, obj.handler)
+            if self.key:
+                setattr(obj, self.key, ins)
+        else:
+            ins.addr = obj.addr + self.offset
+        return ins
 
     def __set__(self, obj, value):
         raise AttributeError("can't set attribute")
+
+    def __set_name__(self, owner, name):
+        self.key = '_' + name
 
 
 class CoordField:
     size = 12
     length = 3
 
-    def __init__(self, offset, length=None):
+    def __init__(self, offset, length=None, size=4):
         self.offset = offset
+        self.size = size
         if length:
             self.length = length
-            self.size = self.length * 4
+            self.size = self.length * size
 
     def __get__(self, obj, type=None):
         return CoordData(obj.addr + self.offset, obj.handler, self.length)
@@ -211,7 +254,7 @@ class CoordField:
                 item = next(it)
                 if item is None or item == '':
                     continue
-                obj.handler.writeFloat(obj.addr + self.offset + i * 4, item)
+                obj.handler.writeFloat(obj.addr + self.offset + i * self.size, item)
 
 
 class CoordData:

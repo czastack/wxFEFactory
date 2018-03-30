@@ -78,7 +78,7 @@ class ItemInfo(Model):
 
 class Global(BaseGlobal):
     # chapter = ByteField(0x0202BCFA)
-    # turns = ShortField(0x0202BCFC)
+    # turns = WordField(0x0202BCFC)
     person_addr = Field(0x021BED30)
     curx = ByteField(0x02273BD4) # 0x02272EA4
     cury = ByteField(0x02273BD5) # 0x02272EA5

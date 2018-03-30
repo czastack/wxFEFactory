@@ -28,10 +28,10 @@ class RunningScript(BaseRunningScript):
     SIZE = 0xE0
 
     condResult = model.Field(0xc5)
-    MissionCleanUpFlag = model.Field(0xc6, size=1)
-    notFlag = model.Field(0xd2, size=1)
-    missionFlag = model.Field(0xdc, size=1)
-    IsCustom = model.Field(0xdf, size=1)
+    MissionCleanUpFlag = model.ByteField(0xc6)
+    notFlag = model.ByteField(0xd2)
+    missionFlag = model.ByteField(0xdc)
+    IsCustom = model.ByteField(0xdf)
     baseIP = model.Field(0x10)
     curIP = model.Field(0x14)
     m_aLVars = model.ArrayField(0x3c, 32, model.Field(0))

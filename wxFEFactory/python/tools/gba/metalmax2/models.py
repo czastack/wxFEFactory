@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ShortField, ArrayField, ModelField, CAttr
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, CAttr
 
 
 class Person(Model):
@@ -7,10 +7,10 @@ class Person(Model):
     # name = Field(0, bytes, 0xF)
     exp = Field(0x0, size=3)
     level = ByteField(0x03003D69)
-    hp = ShortField(0x03003D41)
-    hpmax = ShortField(0x03003D43)
-    atk = ShortField(0x03003D45)
-    defensive = ShortField(0x03003D47)
+    hp = WordField(0x03003D41)
+    hpmax = WordField(0x03003D43)
+    atk = WordField(0x03003D45)
+    defensive = WordField(0x03003D47)
     power = ByteField(0x03003D6A)
     intelli = ByteField(0x03003D6B)
     stamina = ByteField(0x03003D6C)
@@ -44,12 +44,12 @@ class Person(Model):
 class Chariot(Model):
     SIZE = 8
 
-    sp = ShortField(0x03003C78)
+    sp = WordField(0x03003C78)
     items = ArrayField(0x03003E91, 8, ByteField(0))
     equips = ArrayField(0x03003EE9, 8, ByteField(0))
     bullet = ByteField(0x0300404C)
     defensive = ByteField(0x0300404A)
-    weight = ShortField(0x0300404F)
+    weight = WordField(0x0300404F)
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
 
@@ -77,7 +77,7 @@ class Global(Model):
     battlein = ByteField(0x03003244)
     posx = ByteField(0x030042FA)
     posy = ByteField(0x030042FB)
-    storage = ArrayField(0x03004106, 100, ShortField(0))
+    storage = ArrayField(0x03004106, 100, WordField(0))
     storage_page = 1
     storage_page_lenth = 10
 

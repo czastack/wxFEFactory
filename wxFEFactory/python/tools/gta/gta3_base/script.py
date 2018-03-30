@@ -153,11 +153,11 @@ class RunningScript(BaseRunningScript):
     m_nIp = model.Field(0x10)
     scriptType = model.Field(0x2e)
     m_aLVars = model.ArrayField(0x30, 16, model.Field(0))
-    m_nCondResult = model.Field(0x79, size=1)
-    m_bIsMission = model.Field(0x7a, size=1)
-    m_bNotFlag = model.Field(0x82, size=1)
-    m_bDeathArrestCheckEnabled = model.Field(0x83, size=1)
-    m_bMissionCleanup = model.Field(0x85, size=1)
+    m_nCondResult = model.ByteField(0x79)
+    m_bIsMission = model.ByteField(0x7a)
+    m_bNotFlag = model.ByteField(0x82)
+    m_bDeathArrestCheckEnabled = model.ByteField(0x83)
+    m_bMissionCleanup = model.ByteField(0x85)
 
     def run(self, command_id, signature, *args):
         self.m_bDeathArrestCheckEnabled = True

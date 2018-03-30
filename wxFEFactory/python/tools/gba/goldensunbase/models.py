@@ -1,10 +1,10 @@
-from lib.hack.model import Model, Field, ByteField, ShortField, ArrayField, ModelField
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
 class Skill(Model):
     """精神力"""
     SIZE = 4
-    _value = ShortField(0)
+    _value = WordField(0)
     
     @property
     def value(self):
@@ -22,10 +22,10 @@ class ItemSlot(Model):
     """
 
     SIZE = 2
-    _item = ShortField(0)
+    _item = WordField(0)
     _item1 = ByteField(0)
     _count = ByteField(1)
-    value = ShortField(0)
+    value = WordField(0)
 
     @property
     def item(self):
@@ -53,23 +53,23 @@ class BasePerson(Model):
     name = Field(0, bytes, 0xF)
     level = ByteField(0x0F)
     exp = Field(0x124)
-    hpmax = ShortField(0x34)
-    epmax = ShortField(0x36)
-    hp = ShortField(0x38)
-    ep = ShortField(0x3A)
-    atk = ShortField(0x3C)
-    defensive = ShortField(0x3E)
+    hpmax = WordField(0x34)
+    epmax = WordField(0x36)
+    hp = WordField(0x38)
+    ep = WordField(0x3A)
+    atk = WordField(0x3C)
+    defensive = WordField(0x3E)
 
-    ground_power = ShortField(0x48)
-    ground_defensive = ShortField(0x4A)
-    water_power = ShortField(0x4C)
-    water_defensive = ShortField(0x4E)
-    fire_power = ShortField(0x50)
-    fire_defensive = ShortField(0x52)
-    wind_power = ShortField(0x54)
-    wind_defensive = ShortField(0x56)
+    ground_power = WordField(0x48)
+    ground_defensive = WordField(0x4A)
+    water_power = WordField(0x4C)
+    water_defensive = WordField(0x4E)
+    fire_power = WordField(0x50)
+    fire_defensive = WordField(0x52)
+    wind_power = WordField(0x54)
+    wind_defensive = WordField(0x56)
 
-    speed = ShortField(0x40)
+    speed = WordField(0x40)
     lucky = ByteField(0x42)
     skills = ArrayField(0x58, 32, ModelField(0, Skill))
     items = ArrayField(0xD8, 15, ModelField(0, ItemSlot))

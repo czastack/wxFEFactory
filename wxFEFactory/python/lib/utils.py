@@ -36,6 +36,31 @@ class HistoryList(list):
         self._index = 0
 
 
+class Accumulator:
+    """累加器"""
+    def __init__(self, value=0):
+        self.value = value
+
+    def add(self, i):
+        self.value += i
+        return self.value
+
+    def sub(self, i):
+        self.value -= i
+        return self.value
+
+    def inc(self):
+        return self.add(1)
+
+    def dec(self):
+        return self.sub(1)
+
+    def __int__(self):
+        return self.value
+
+    __index__ = __int__
+
+
 def float32(f):
     return round(f, 6)
 
@@ -64,3 +89,16 @@ def gen_values(items):
 
 def gen_flag(items):
     return tuple(1 << i for i in range(len(items)))
+
+def split_value_label(options):
+    """把(value, label)分开"""
+    values = []
+    labels = []
+    for value, label in options:
+        values.append(value)
+        labels.append(label)
+    return tuple(labels), tuple(values)
+
+def split_label_value(options):
+    """把(label, value)分开"""
+    return reversed(split_value_label())

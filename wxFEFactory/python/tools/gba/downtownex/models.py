@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ShortField, ArrayField, ModelField
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
 class Person(Model):
@@ -14,9 +14,9 @@ class Person(Model):
     hp = ByteField(10)
     hpmax = ByteField(12)
     money = Field(64)
-    items = ArrayField(68, 12, ShortField(0))
-    skills = ArrayField(92, 12, ShortField(0))
-    skillkeys = ArrayField(116, 12, ShortField(0))
+    items = ArrayField(68, 12, WordField(0))
+    skills = ArrayField(92, 12, WordField(0))
+    skillkeys = ArrayField(116, 12, WordField(0))
 
 
 class Global(Model):

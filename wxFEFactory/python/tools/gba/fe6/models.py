@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ShortField, ArrayField, ModelField
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
 from ..febase.models import ItemSlot, BaseGlobal
 
 
@@ -31,10 +31,10 @@ class Person(Model):
 
 class Global(BaseGlobal):
     money = Field(0x0202AA50)
-    turns = ShortField(0x0202AA58)
+    turns = WordField(0x0202AA58)
     chapter = ByteField(0x0202AA56)
     person_addr = Field(0x02003114)
-    curx = ShortField(0x0202AA1C)
-    cury = ShortField(0x0202AA1E)
+    curx = WordField(0x0202AA1C)
+    cury = WordField(0x0202AA1E)
     persons = ArrayField(0x202AB78, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x02039430, 100, ModelField(0, ItemSlot)) # 运输队

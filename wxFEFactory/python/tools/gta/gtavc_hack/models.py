@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField
+from lib.hack.model import Model, Field, ByteField, WordField, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool, NativeModel
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 import math
@@ -110,7 +110,7 @@ class Marker(BaseBlip):
     blipType = Field(4)
     entity_handle = Field(8)
     coord = CoordField(24)
-    index = Field(36, size=2)
-    bright = Field(38, size=1)
-    active = Field(39, size=1)
-    sprite = Field(52, size=1)
+    index = WordField(36)
+    bright = ByteField(38)
+    active = ByteField(39)
+    sprite = ByteField(52)
