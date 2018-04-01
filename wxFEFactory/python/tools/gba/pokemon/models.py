@@ -20,7 +20,7 @@ class Pokemon(Model):
     hpmax = WordField(0x20069F8)
 
 
-class StoreItem:
+class StoreItem(Model):
     SIZE = 8
     item = WordField(0)
 
