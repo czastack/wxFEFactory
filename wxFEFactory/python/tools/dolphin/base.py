@@ -46,12 +46,16 @@ class BaseDolphinHack(BaseHackTool):
         self.handler = DolphinHandler()
 
     def check_attach(self, _=None):
+        if self.handler.active:
+            self.ondetach()
+
         if self.handler.attach():
             self.attach_status_view.label = self.handler.window_name + ' 正在运行'
             if not self.win.hotkeys:
                 hotkeys = self.get_hotkeys()
                 if hotkeys:
                     self.win.RegisterHotKeys(hotkeys)
+                self.onattach()
             return True
         else:
             self.attach_status_view.label = (('绑定失败, 不支持的版本: %s' % self.handler.window_name) 

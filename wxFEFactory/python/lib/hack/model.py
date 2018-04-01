@@ -94,16 +94,16 @@ class Field:
         self.type = type_
         self.size = size
 
-    def __get__(self, obj, type=None):
-        ret = obj.handler.read(obj.addr + self.offset, self.type, self.size)
+    def __get__(self, instance, owner=None):
+        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
         if self.type is float:
             ret = float32(ret)
         return ret
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        obj.handler.write(obj.addr + self.offset, value, self.size)
+        instance.handler.write(instance.addr + self.offset, value, self.size)
 
     def __str__(self):
         return "{}(offset={}, size={})".format(self.__class__.__name__, self.offset, self.size)
@@ -111,16 +111,41 @@ class Field:
     __repr__ = __str__
 
 
+class Cachable:
+    key = None
+
+    def __get__(self, instance, owner=None):
+        cache = None
+        key = self.key
+        if key is not None:
+            cache = getattr(instance, key, None)
+        if cache is None:
+            cache = self.create_cache(instance)
+            if cache is not None and key is not None:
+                setattr(instance, key, cache)
+        else:
+            self.update_cache(instance, cache)
+        return cache
+
+    def create_cache(self, instance):
+        pass
+
+    def update_cache(self, instance, cache):
+        pass
+
+    def __set_name__(self, owner, name):
+        self.key = '_' + name
+
+
 class PtrField(Field):
     def __init__(self, offset, size=0):
         super().__init__(offset, int, size)
 
-    def __get__(self, obj, type=None):
+    def __get__(self, instance, owner=None):
         if self.size is 0:
             # 对于ProcessHandler，根据目标进程获取指针大小
-            self.size = obj.handler.ptr_size
-        ret = obj.handler.readUint(obj.addr + self.offset, self.size)
-        return ret
+            self.size = instance.handler.ptr_size
+        return instance.handler.readUint(instance.addr + self.offset, self.size)
 
 
 class ByteField(Field):
@@ -140,13 +165,13 @@ U32Field = DWordField
 
 
 class SignedField(Field):
-    def __get__(self, obj, type=None):
-        return obj.handler.readInt(obj.addr + self.offset, self.type, self.size)
+    def __get__(self, instance, owner=None):
+        return instance.handler.readInt(instance.addr + self.offset, self.type, self.size)
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        obj.handler.writeInt(obj.addr + self.offset, value, self.size)
+        instance.handler.writeInt(instance.addr + self.offset, value, self.size)
 
 
 class BitsField(Field):
@@ -157,14 +182,14 @@ class BitsField(Field):
         self.mask = (2 << bitlen) - 1
         super().__init__(offset, int, size)
 
-    def __get__(self, obj, type=None):
-        value = super().__get__(obj)
+    def __get__(self, instance, owner=None):
+        value = super().__get__(instance)
         return (value >> self.bitoffset) & self.mask
 
-    def __set__(self, obj, value):
-        old = super().__get__(obj)
+    def __set__(self, instance, value):
+        old = super().__get__(instance)
         value = old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF) | ((value & self.mask) << self.bitoffset)
-        super().__set__(obj, value)
+        super().__set__(instance, value)
 
     @classmethod
     def create(cls, offset, size, bits):
@@ -173,65 +198,58 @@ class BitsField(Field):
 
 
 class OffsetsField(Field):
-    def __get__(self, obj, type=None):
-        ret = obj.handler.ptrsRead(obj.addr + self.offset[0], self.offset[1:], self.type, self.size)
+    def __get__(self, instance, owner=None):
+        ret = instance.handler.ptrsRead(instance.addr + self.offset[0], self.offset[1:], self.type, self.size)
         if self.type is float:
             ret = float32(ret)
         return ret
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        obj.handler.ptrsWrite(obj.addr + self.offset[0], self.offset[1:], value, self.size)
+        instance.handler.ptrsWrite(instance.addr + self.offset[0], self.offset[1:], value, self.size)
 
 
-class ModelPtrField(PtrField):
+class ModelPtrField(Cachable, PtrField):
     """模型指针字段"""
     def __init__(self, offset, modelClass, size=0):
         super().__init__(offset, size)
         self.modelClass = modelClass
 
-    def __get__(self, obj, type=None):
-        return self.modelClass(super().__get__(obj, type), obj.handler)
+    def create_cache(self, instance):
+        return self.modelClass(PtrField.__get__(self, instance, None), instance.handler)
 
-    def __set__(self, obj, value):
+    def update_cache(self, instance, cache):
+        cache.addr = PtrField.__get__(self, instance, None)
+
+    def __set__(self, instance, value):
         if isinstance(value, Model):
-            super().__set__(obj, value.addr)
+            super().__set__(instance, value.addr)
 
 
 class ManagedModelPtrField(ModelPtrField):
     """托管模型指针字段"""
-    def __get__(self, obj, type=None):
-        return self.modelClass(super().__get__(obj, type), obj.context)
+    def __get__(self, instance, owner=None):
+        return self.modelClass(super().__get__(instance, owner), instance.context)
 
 
-class ModelField(Field):
+class ModelField(Cachable, Field):
     """模型字段"""
     def __init__(self, offset, modelClass, size=0):
         super().__init__(offset, None, size or modelClass.SIZE)
         self.modelClass = modelClass
-        self.key = None
 
-    def __get__(self, obj, type=None):
-        ins = None
-        if self.key:
-            ins = getattr(obj, self.key, None)
-        if ins is None:
-            ins = self.modelClass(obj.addr + self.offset, obj.handler)
-            if self.key:
-                setattr(obj, self.key, ins)
-        else:
-            ins.addr = obj.addr + self.offset
-        return ins
+    def create_cache(self, instance):
+        return self.modelClass(instance.addr + self.offset, instance.handler)
 
-    def __set__(self, obj, value):
+    def update_cache(self, instance, cache):
+        cache.addr = instance.addr + self.offset
+
+    def __set__(self, instance, value):
         raise AttributeError("can't set attribute")
 
-    def __set_name__(self, owner, name):
-        self.key = '_' + name
 
-
-class CoordField:
+class CoordField(Cachable):
     size = 12
     length = 3
 
@@ -242,11 +260,11 @@ class CoordField:
             self.length = length
             self.size = self.length * size
 
-    def __get__(self, obj, type=None):
-        return CoordData(obj.addr + self.offset, obj.handler, self.length)
+    def create_cache(self, instance):
+        return CoordData(instance.addr + self.offset, instance.handler, self.length)
 
-    def __set__(self, obj, value):
-        if isinstance(value, CoordData) and value.addr == obj.addr + self.offset:
+    def __set__(self, instance, value):
+        if isinstance(value, CoordData) and value.addr == instance.addr + self.offset:
             print('The value is a copy of this CoordData')
         else:
             it = iter(value)
@@ -254,7 +272,7 @@ class CoordField:
                 item = next(it)
                 if item is None or item == '':
                     continue
-                obj.handler.writeFloat(obj.addr + self.offset + i * self.size, item)
+                instance.handler.writeFloat(instance.addr + self.offset + i * self.size, item)
 
 
 class CoordData:
@@ -299,25 +317,25 @@ class CoordData:
         return self.__class__.__name__ + str(tuple(self.values()))
 
 
-class ArrayField(Field):
-    def __init__(self, offset, length, field):
+class ArrayField(Cachable, Field):
+    itemkeys = None
+
+    def __init__(self, offset, length, field, itemcachable=False):
         self.offset = offset
         self.length = length
         self.field = field
-        self.key = None
+        self.itemcachable = itemcachable and isinstance(field, Cachable)
 
-    def __get__(self, obj, type):
-        ins = None
-        if self.key:
-            ins = getattr(obj, self.key, None)
-        if ins is None:
-            ins = ArrayData(obj, self.offset, self.length, self.field)
-            if self.key:
-                setattr(obj, self.key, ins)
-        return ins
+    def __set_name__(self, owner, name):
+        super().__set_name__(owner, name)
+        if self.itemcachable:
+            self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
-    def __set__(self, obj, value):
-        data = self.__get__(obj, type(obj))
+    def create_cache(self, instance):
+        return ArrayData(instance, self.offset, self.length, self.field, self.itemkeys)
+
+    def __set__(self, instance, value):
+        data = self.__get__(instance, type(instance))
         it = iter(value)
         for i in range(self.length):
             item = next(it)
@@ -325,30 +343,38 @@ class ArrayField(Field):
                 continue
             data[i] = item
 
-    def __set_name__(self, owner, name):
-        self.key = '_' + name
-
 
 class ArrayData:
-    def __init__(self, obj, offset, length, field):
-        self.obj = obj
+    def __init__(self, instance, offset, length, field, itemkeys):
+        """
+        :param itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
+        """
+        self.instance = instance
         self.offset = offset
-        self.addr = obj.addr + offset
+        self.addr = instance.addr + offset
         self.length = length
         self.field = field
+        self.itemkeys = itemkeys
         if field.size is 0:
             """传入了延迟设置size的field"""
-            field.__get__(obj)
+            field.__get__(instance)
+
+    def __len__(self):
+        return self.length
 
     def __getitem__(self, i):
         field = self.field
         field.offset = self.offset + field.size * i
-        return field.__get__(self.obj)
+        if self.itemkeys:
+            field.key = self.itemkeys[i]
+        return field.__get__(self.instance)
 
     def __setitem__(self, i, value):
         field = self.field
         field.offset = self.offset + field.size * i
-        return field.__set__(self.obj, value)
+        if self.itemkeys:
+            field.key = self.itemkeys[i]
+        return field.__set__(self.instance, value)
 
     def __iter__(self):
         self._pos = 0
@@ -380,16 +406,16 @@ class StringField(Field):
         super().__init__(offset, bytes, size)
         self.encoding = encoding
 
-    def __get__(self, obj, type=None):
-        ret = obj.handler.read(obj.addr + self.offset, self.type, self.size or 64)
+    def __get__(self, instance, owner=None):
+        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size or 64)
         return ret.rstrip(b'\x00').decode(self.encoding)
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if isinstance(value, str):
             value = bytes(value, self.encoding)
         if value[-1] != 0:
             value += b'\x00'
-        super().__set__(obj, value)
+        super().__set__(instance, value)
 
 
 """

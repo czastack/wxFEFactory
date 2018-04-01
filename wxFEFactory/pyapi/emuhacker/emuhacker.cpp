@@ -59,13 +59,13 @@ namespace emuhacker {
 		else if (PyBytes_Check(data.ptr()))
 		{
 			if (size == 0)
-				size = py::len(data);
+				size = PyBytes_Size(data.ptr());
 			return self.write(addr, bytesGetBuff(data), size);
 		}
 		else if (PyByteArray_Check(data.ptr()))
 		{
 			if (size == 0)
-				size = py::len(data);
+				size = PyByteArray_Size(data.ptr());
 			return self.write(addr, PyByteArray_AsString(data.ptr()), size);
 		}
 

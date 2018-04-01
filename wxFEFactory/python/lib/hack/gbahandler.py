@@ -34,7 +34,7 @@ class GbaEmuHandler(MemHandler):
         return False
 
     def getRomTitle(self):
-        return self.read(0x080000A0, bytes, 12).decode()
+        return self.read(0x080000A0, bytes, 16).decode()
 
     def getRomCode(self):
         return self.read(0x080000AC, bytes, 4).decode()

@@ -67,6 +67,12 @@ def float32(f):
 def u32(n):
     return n & 0xFFFFFFFF
 
+def LOWORD(n):
+    return n & 0xFFFF
+
+def HIWORD(n):
+    return (n >> 16) & 0xFFFF
+
 def u32bytes(n):
     """32位整型转bytes"""
     try:

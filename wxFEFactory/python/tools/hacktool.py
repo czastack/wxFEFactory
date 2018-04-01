@@ -37,7 +37,7 @@ class BaseHackTool(NestedTool):
     def check_attach(self, _=None):
         """检查运行目标程序状态"""
         if self.handler.active:
-            self.free_remote_function()
+            self.ondetach()
 
         if self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
             self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
@@ -46,7 +46,7 @@ class BaseHackTool(NestedTool):
                 hotkeys = self.get_hotkeys()
                 if hotkeys:
                     self.win.RegisterHotKeys(hotkeys)
-            self.init_remote_function()
+            self.onattach()
             return True
         else:
             self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME
@@ -58,7 +58,7 @@ class BaseHackTool(NestedTool):
 
     def onClose(self, *args):
         if self.handler.active:
-            self.free_remote_function()
+            self.ondetach()
         self.config.write()
         return super().onClose(*args)
 
@@ -111,12 +111,10 @@ class BaseHackTool(NestedTool):
         r = self.handler.readFloat
         return (r(addr), r(addr + 4), r(addr + 8))
 
-    def init_remote_function(self):
-        """初始化远程函数"""
+    def onattach(self):
         pass
 
-    def free_remote_function(self):
-        """释放远程函数"""
+    def ondetach(self):
         pass
 
     def custom_hotkey(self, _=None):

@@ -139,6 +139,28 @@ void exec_file(py::str file, pyobj scope)
 	py::eval_file(file, scope);
 }
 
+py::bytes mem_read(size_t address, size_t size)
+{
+	const char *p = (const char *)address;
+	return py::bytes(p, size);
+}
+
+void mem_write(size_t address, py::bytes value, size_t size)
+{
+	Py_ssize_t ssize;
+	char *p = NULL;
+	PyBytes_AsStringAndSize(value.ptr(), &p, &ssize);
+	if (size == 0 || size > ssize)
+	{
+		size = ssize;
+	}
+
+	if (p && size)
+	{
+		memcpy((void *)address, p, size);
+	}
+}
+
 wxItemKind getItemKind(wxcstr kindStr)
 {
 	wxItemKind kind = wxITEM_NORMAL;

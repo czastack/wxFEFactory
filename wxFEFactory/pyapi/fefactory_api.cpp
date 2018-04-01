@@ -55,7 +55,9 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 		.def("setOnAppExit", setOnAppExit)
 		.def("exec_file", &exec_file)
 		.def("get_clipboard", get_clipboard)
-		.def("set_clipboard", set_clipboard);
+		.def("set_clipboard", set_clipboard)
+		.def("mem_read", mem_read, "address"_a, "size"_a)
+		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a);
 
 	ATTR_INT(m.ptr(), YES, wx),
 	ATTR_INT(m.ptr(), NO, wx),

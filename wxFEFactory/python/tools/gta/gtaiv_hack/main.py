@@ -192,15 +192,15 @@ class Tool(BaseGTATool):
         # 此次运行的Native Script地址缓存
         address.NATIVE_ADDRS = {}
 
-    def init_remote_function(self):
+    def onattach(self):
         """初始化远程函数"""
         self.init_addr()
-        super().init_remote_function()
+        super().onattach()
         self.FindNativeAddress = self.handler.write_function(self.FUNCTION_FIND_NATIVE_ADDRESS)
 
-    def free_remote_function(self):
+    def ondetach(self):
         """释放远程函数"""
-        super().free_remote_function()
+        super().ondetach()
         self.handler.free_memory(self.FindNativeAddress)
 
     def get_native_addr(self, name):

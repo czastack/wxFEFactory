@@ -35,14 +35,14 @@ class BaseGTATool(BaseHackTool):
         """重写这个函数，返回要注册的热键列表"""
         return self.get_common_hotkeys()
 
-    def init_remote_function(self):
+    def onattach(self):
         """初始化远程函数"""
         self.NativeCall = self.handler.write_function(self.FUNCTION_NATIVE_CALL)
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(self.NativeContext.SIZE)
         self.native_context = self.NativeContext(context_addr, self.handler)
 
-    def free_remote_function(self):
+    def ondetach(self):
         """释放远程函数"""
         self.handler.free_memory(self.NativeCall)
         self.handler.free_memory(self.native_context.addr)

@@ -11,10 +11,12 @@ wxString choose_file(wxcstr msg, pycref dir, pycref file, pycref wildcard, bool 
 wxString choose_dir(wxcstr msg, pycref defaultPath, bool mustExist);
 
 wxString get_clipboard();
-
 void set_clipboard(wxcstr text);
 
 void exec_file(py::str file, pyobj scope);
+
+py::bytes mem_read(size_t address, size_t size);
+void mem_write(size_t address, py::bytes value, size_t size);
 
 wxItemKind getItemKind(wxcstr kindStr);
 
