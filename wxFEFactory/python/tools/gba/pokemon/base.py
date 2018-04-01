@@ -18,8 +18,15 @@ class BasePMHack(BaseGbaHack):
     def render_main(self):
         datasets = self.datasets
         pokemon = self.weak._pokemon
-        with Group("global", "全局", self._global):
+        with Group("global", "全局", self._global, horizontal=False):
             ModelInput("money", "金钱", spin=True)
+            ModelInput("coin", "游戏币", spin=True)
+            ModelInput("dust", "宝石版火山灰", spin=True)
+            ModelInput("spray_time", "喷雾剂剩余步数", spin=True)
+            ModelInput("safari_time", "狩猎区剩余步数", spin=True)
+            ModelInput("battle_points_current", "战斗点数（仅绿宝石）", spin=True)
+            ModelInput("battle_points_trainer_card", "训练员卡上的战斗点数（仅绿宝石）", spin=True)
+
             ModelSelect("store", "商店购物", choices=datasets.ITEMS)
             ModelSelect("area", "地点瞬移", choices=datasets.AREA_LABELS, values=datasets.AREA_VALUES)
             ModelSelect("wild_pokemon", "遇到精灵", choices=datasets.POKEMONS)

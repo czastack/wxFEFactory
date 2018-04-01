@@ -63,6 +63,10 @@ styles = {
             'showPadding': '1 1 0 1',
             'textAlign': 'right',
         },
+        'input_label_vertical': {
+            'padding': 5,
+            'showPadding': '0 0 1 0',
+        },
         'form_label': {
             'padding': 8,
             'showPadding': '0 1 0 1',

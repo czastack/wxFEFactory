@@ -11,6 +11,7 @@ ui = fefactory_api.ui
 
 class Widget:
     GROUPS = []
+    horizontal = True
 
     def __init__(self, name, label, addr, offsets=(), readonly=False):
         self.weak = WeakBinder(self)
@@ -28,14 +29,21 @@ class Widget:
 
             if parent.handler:
                 self.handler = parent.handler
-        self.render()
+
+        if isinstance(parent, Group) and not parent.horizontal:
+            self.horizontal = False
+            with ui.Vertical(className="expand"):
+                self.render()
+            del self.horizontal
+        else:
+            self.render()
 
     @classmethod
     def active_group(cls):
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
 
     def render(self):
-        ui.Text(self.label, className="input_label expand")
+        ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
 
     def render_btn(self):
         this = self.weak
@@ -126,19 +134,14 @@ class OffsetsWidget:
     
 
 class BaseGroup(Widget):
-    cols = 2
     cachable = True
 
-    def __init__(self, name, label, addr, flexgrid=True, hasfooter=True, handler=None, cols=None, cachable=True):
+    def __init__(self, name, label, addr, handler=None, cachable=True):
         """
         :param cachable: 子元素是ModelWidget时有用
         """
-        self.flexgrid = flexgrid
-        self.hasfooter = hasfooter
         self.children = []
         self.handler = handler
-        if cols:
-            self.cols = cols
         cachable = cachable and callable(addr)
         if not cachable:
             self.cachable = False
@@ -202,15 +205,34 @@ class BaseGroup(Widget):
 
 class Group(BaseGroup):
     cols = 2
+    horizontal = True
+
+    def __init__(self, *args, flexgrid=True, hasfooter=True, horizontal=True, cols=None, **kwargs):
+        self.flexgrid = flexgrid
+        self.hasfooter = hasfooter
+        if cols:
+            self.cols = cols
+        if not horizontal:
+            self.horizontal = horizontal
+        super().__init__(*args, **kwargs)
 
     def render(self):
+        root = self.render_root()
+        ui.Item(root, caption=self.label)
+        self.root = root
+
+    def render_root(self):
         this = self.weak
-        with ui.Vertical() as root:
+        with ui.Vertical(className="fill") as root:
             with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
-                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
-                    for i in range(self.cols >> 1):
-                        self.view.AddGrowableCol((i << 1) + 1)
+                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
+                    if self.horizontal:
+                        for i in range(self.cols >> 1):
+                            self.view.AddGrowableCol((i << 1) + 1)
+                    else:
+                        for i in range(self.cols):
+                            self.view.AddGrowableCol(i)
                 else:
                     self.view = content
 
@@ -219,8 +241,25 @@ class Group(BaseGroup):
                     ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
                     ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
                 self.footer = footer
-        ui.Item(root, caption=self.label)
+        return root
+
+
+class DialogGroup(Group):
+    def __init__(self, *args, **kwargs):
+        self.dialog_style = kwargs.pop('dialog_style', None)
+        super().__init__(*args, **kwargs)
+
+    def render(self):
+        ui.Button(label=self.label, onclick=self.weak.show)
+        style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
+        with main_win:
+            with exui.StdDialog(self.label, style=style, styles=styles) as root:
+                self.render_root()
+
         self.root = root
+
+    def show(self, _=None):
+        self.root.show()
 
 
 class StaticGroup(Group):
@@ -234,37 +273,6 @@ class GroupBox(BaseGroup):
             self.view = ui.ScrollView(className="fill container")
 
         self.root = root
-
-
-class DialogGroup(BaseGroup):
-    def __init__(self, *args, **kwargs):
-        self.dialog_style = kwargs.pop('dialog_style', None)
-        super().__init__(*args, **kwargs)
-
-    def render(self):
-        this = self.weak
-        ui.Button(label=self.label, onclick=this.show)
-        style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
-        with main_win:
-            with exui.StdDialog(self.label, style=style, styles=styles) as root:
-                with ui.Vertical(className="fill"):
-                    with ui.ScrollView(className="fill container") as content:
-                        if self.flexgrid:
-                            self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, className="fill")
-                            for i in range(self.cols >> 1):
-                                self.view.AddGrowableCol((i << 1) + 1)
-                        else:
-                            self.view = content
-
-                    if self.hasfooter:
-                        with ui.Horizontal(className="container"):
-                            ui.Button(label="读取", onclick=lambda btn: this.read())
-                            ui.Button(label="写入", onclick=lambda btn: this.write())
-
-        self.root = root
-
-    def show(self, _=None):
-        self.root.show()
 
 
 class BaseInput(TwoWayWidget):

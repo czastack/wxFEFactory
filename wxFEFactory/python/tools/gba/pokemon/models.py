@@ -228,10 +228,19 @@ class PokemonStructActives(Model):
 
 
 class BaseGlobal(Model):
-    def mask(self, value):
+    def _empty(self):
+        pass
+
+    battle_points_current = property(_empty)
+    battle_points_trainer_card = battle_points_current
+
+    def mask(self, value, field):
         if not isinstance(value, int):
             value = int(value)
-        return self.xor_mask ^ value
+        value = self.xor_mask ^ value
+        if field.size == 2:
+            value &= 0xFFFF
+        return value
 
     
 MaskedField = FieldPrep(BaseGlobal.mask)
@@ -258,7 +267,7 @@ class RubySapphireJpGlobal(BaseGlobal):
     _player_id = Field(0x02024C0E)
     xor_mask = 0
     money = MaskedField(Field(0x02025924))
-    coin = MaskedField(Field(0x02025928))
+    coin = MaskedField(WordField(0x02025928))
     dust = WordField(0x02026864)
     menu = Field(0x020267B4)
     decorate = Field(0x02027B34)
@@ -289,7 +298,7 @@ class RubySapphireEnGlobal(BaseGlobal):
     _player_id = Field(0x02024EAE)
     xor_mask = 0
     money = MaskedField(Field(0x02025BC4))
-    coin = MaskedField(Field(0x02025BC8))
+    coin = MaskedField(WordField(0x02025BC8))
     dust = WordField(0x02026B04)
     menu = Field(0x02026A54)
     decorate = Field(0x02027DD4)
@@ -329,7 +338,7 @@ class FireLeafJpGlobal(PointerGlobal):
         _player_id = Field(0x0A)
         xor_mask = Field(0x00000AF8)
         money = MaskedField(Field(0x00001234))
-        coin = MaskedField(Field(0x00001238))
+        coin = MaskedField(WordField(0x00001238))
         menu = Field(0x00001F89)
         badge = Field(0x00001F8A)
         spray_time = WordField(0x00001FE4)
@@ -377,7 +386,7 @@ class EmeraldJpGlobal(PointerGlobal):
         _player_id = Field(0x0A)
         xor_mask = Field(0x000000AC)
         money = MaskedField(Field(0x0000143C))
-        coin = MaskedField(Field(0x00001440))
+        coin = MaskedField(WordField(0x00001440))
         dust = WordField(0x000023D8)
         menu = Field(0x00002328)
         decorate = Field(0x000036E0)

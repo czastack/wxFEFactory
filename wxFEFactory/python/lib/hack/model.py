@@ -456,10 +456,10 @@ class FieldPrep:
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        return self.preget(instance, self.field.__get__(instance, owner))
+        return self.preget(instance, self.field.__get__(instance, owner), self.field)
 
     def __set__(self, instance, value):
-        self.field.__set__(instance, self.preset(instance, value))
+        self.field.__set__(instance, self.preset(instance, value, self.field))
 
     def __call__(self, field):
         return __class__(self.preget, self.preset, field)
