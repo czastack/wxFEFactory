@@ -31,11 +31,17 @@ class LocalHandler:
         else:
             return mem_write(addr, data, size)
 
-    def readUint(self, addr, size=4):
-        return int.from_bytes(mem_read(addr, size), 'little')
+    def readUint(self, addr, size=4, signed=False):
+        return int.from_bytes(mem_read(addr, size), 'little', signed=signed)
 
-    def writeUint(self, addr, data, size=4):
-        return mem_write(addr, data.to_bytes(size, 'little'), size)
+    def writeUint(self, addr, data, size=4, signed=False):
+        return mem_write(addr, data.to_bytes(size, 'little', signed=signed), size)
+
+    def readInt(self, addr, size=4):
+        return self.readUint(addr, size, signed=True)
+
+    def writeInt(self, addr, data, size=4):
+        return self.writeUint(addr, data, size, signed=True)
 
     def readAddr(self, addr):
         return self.readUint(addr, self.ptr_size)

@@ -447,6 +447,24 @@ class StringField(Field):
         super().__set__(instance, value)
 
 
+class FieldPrep:
+    def __init__(self, preget, preset=None, field=None):
+        self.preget = preget
+        self.preset = preset or preget
+        self.field = field
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        return self.preget(instance, self.field.__get__(instance, owner))
+
+    def __set__(self, instance, value):
+        self.field.__set__(instance, self.preset(instance, value))
+
+    def __call__(self, field):
+        return __class__(self.preget, self.preset, field)
+
+
 """
 复杂字段名(多用于ArrayField)
 :param name: 字段名称

@@ -1,6 +1,6 @@
 from lib.hack.model import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
-    ModelField, ModelPtrField, OffsetsField
+    ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField
 )
 from lib.hack.localhandler import LocalHandler
 from lib import utils
@@ -228,7 +228,26 @@ class PokemonStructActives(Model):
 
 
 class BaseGlobal(Model):
-    pass
+    def mask(self, value):
+        if not isinstance(value, int):
+            value = int(value)
+        return self.xor_mask ^ value
+
+    
+MaskedField = FieldPrep(BaseGlobal.mask)
+
+
+class PointerGlobal(BaseGlobal):
+    def __getattr__(self, name):
+        if self.Inner.field(name):
+            return getattr(self.inner, name)
+        return super().__getattr__(name)
+
+    def __setattr__(self, name, value):
+        if self.Inner.field(name):
+            setattr(self.inner, name, value)
+        else:
+            return super().__setattr__(name, value)
 
 
 class RubySapphireJpGlobal(BaseGlobal):
@@ -238,21 +257,21 @@ class RubySapphireJpGlobal(BaseGlobal):
     _player_name = Field(0x02024C04, bytes, 10)
     _player_id = Field(0x02024C0E)
     xor_mask = 0
-    money = Field(0x02025924)
-    coin = Field(0x02025928)
-    dust = Field(0x02026864)
+    money = MaskedField(Field(0x02025924))
+    coin = MaskedField(Field(0x02025928))
+    dust = WordField(0x02026864)
     menu = Field(0x020267B4)
     decorate = Field(0x02027B34)
     badge = Field(0x020267B5)
     clock_adjustment = Field(0x02024C9C)
     per_day_random = Field(0x0202681C)
-    spray_time = Field(0x02026816)
-    safari_balls = Field(0x02038504)
-    safari_time = Field(0x02038506)
-    daycare_center_step_1 = Field(0x02028540)
-    daycare_center_step_2 = Field(0x02028544)
-    step_counter = Field(0x0202854A)
-    exp_gain = Field(0x0202494C)
+    spray_time = WordField(0x02026816)
+    safari_balls = ByteField(0x02038504)
+    safari_time = WordField(0x02038506)
+    daycare_center_step_1 = ByteField(0x02028540)
+    daycare_center_step_2 = ByteField(0x02028544)
+    step_counter = ByteField(0x0202854A)
+    exp_gain = SignedField(0x0202494C, size=2)
 
     item_normalitem = ArrayField(0x020259F4, 0x14, Field(0))
     item_keyitem = ArrayField(0x02025A44, 0x14, Field(0))
@@ -269,21 +288,21 @@ class RubySapphireEnGlobal(BaseGlobal):
     _player_name = Field(0x02024EA4, bytes, 10)
     _player_id = Field(0x02024EAE)
     xor_mask = 0
-    money = Field(0x02025BC4)
-    coin = Field(0x02025BC8)
-    dust = Field(0x02026B04)
+    money = MaskedField(Field(0x02025BC4))
+    coin = MaskedField(Field(0x02025BC8))
+    dust = WordField(0x02026B04)
     menu = Field(0x02026A54)
     decorate = Field(0x02027DD4)
     badge = Field(0x02026A55)
     clock_adjustment = Field(0x02024F3C)
     per_day_random = Field(0x02026B0A)
-    spray_time = Field(0x02026AB6)
-    safari_balls = Field(0x02038808)
-    safari_time = Field(0x0203880A)
-    daycare_center_step_1 = Field(0x020287E0)
-    daycare_center_step_2 = Field(0x020287E4)
-    step_counter = Field(0x020287EA)
-    exp_gain = Field(0x02024BEC)
+    spray_time = WordField(0x02026AB6)
+    safari_balls = ByteField(0x02038808)
+    safari_time = WordField(0x0203880A)
+    daycare_center_step_1 = ByteField(0x020287E0)
+    daycare_center_step_2 = ByteField(0x020287E4)
+    step_counter = ByteField(0x020287EA)
+    exp_gain = SignedField(0x02024BEC, size=2)
 
     item_normalitem = ArrayField(0x02025C94, 0x14, Field(0))
     item_keyitem = ArrayField(0x02025CE4, 0x14, Field(0))
@@ -293,7 +312,7 @@ class RubySapphireEnGlobal(BaseGlobal):
     item_pokeblock = ArrayField(0x02025F2C, 0x28, Field(0))
 
 
-class FireLeafJpGlobal(BaseGlobal):
+class FireLeafJpGlobal(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x020241E4, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005050, 4))
@@ -301,22 +320,22 @@ class FireLeafJpGlobal(BaseGlobal):
     decorate = 0
     clock_adjustment = 0
     per_day_random = 0
-    safari_balls = Field(0x0203990C)
-    safari_time = Field(0x0203990E)
-    exp_gain = Field(0x02023CB0)
+    safari_balls = ByteField(0x0203990C)
+    safari_time = WordField(0x0203990E)
+    exp_gain = SignedField(0x02023CB0, size=2)
 
     class Inner(Model):
         _player_name = Field(0, bytes, 10)
         _player_id = Field(0x0A)
         xor_mask = Field(0x00000AF8)
-        money = Field(0x00001234)
-        coin = Field(0x00001238)
+        money = MaskedField(Field(0x00001234))
+        coin = MaskedField(Field(0x00001238))
         menu = Field(0x00001F89)
         badge = Field(0x00001F8A)
-        spray_time = Field(0x00001FE4)
-        daycare_center_step_1 = Field(0x00003FAC)
-        daycare_center_step_2 = Field(0x00004038)
-        step_counter = Field(0x0000403E)
+        spray_time = WordField(0x00001FE4)
+        daycare_center_step_1 = ByteField(0x00003FAC)
+        daycare_center_step_2 = ByteField(0x00004038)
+        step_counter = ByteField(0x0000403E)
 
         item_normalitem = ArrayField(0x000012B4, 0x2A, Field(0))
         item_keyitem = ArrayField(0x0000135C, 0x1E, Field(0))
@@ -329,7 +348,7 @@ class FireLeafJpGlobal(BaseGlobal):
     inner = ModelPtrField(0x0300504C, Inner)
 
 
-class FireLeafEnGlobal(BaseGlobal):
+class FireLeafEnGlobal(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x02024284, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005010, 4))
@@ -337,38 +356,40 @@ class FireLeafEnGlobal(BaseGlobal):
     decorate = 0
     clock_adjustment = 0
     per_day_random = 0
-    safari_balls = Field(0x02039994)
-    safari_time = Field(0x02039996)
-    exp_gain = Field(0x02023D50)
+    safari_balls = ByteField(0x02039994)
+    safari_time = WordField(0x02039996)
+    exp_gain = SignedField(0x02023D50, size=2)
 
     Inner = FireLeafJpGlobal.Inner
     inner = ModelPtrField(0x0300500C, Inner)
 
 
-class EmeraldJpGlobal(BaseGlobal):
+class EmeraldJpGlobal(PointerGlobal):
     active_pokemon_count = Field(0x0202418D)
     active_pokemon = ModelField(0x02024190, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005AF4, 4))
-    safari_balls = Field(0x02039D18)
-    safari_time = Field(0x02039D1A)
-    exp_gain = Field(0x02023E94)
+    safari_balls = ByteField(0x02039D18)
+    safari_time = WordField(0x02039D1A)
+    exp_gain = SignedField(0x02023E94, size=2)
 
     class Inner(Model):
         _player_name = Field(0, bytes, 10)
         _player_id = Field(0x0A)
         xor_mask = Field(0x000000AC)
-        money = Field(0x0000143C)
-        coin = Field(0x00001440)
-        dust = Field(0x000023D8)
+        money = MaskedField(Field(0x0000143C))
+        coin = MaskedField(Field(0x00001440))
+        dust = WordField(0x000023D8)
         menu = Field(0x00002328)
         decorate = Field(0x000036E0)
         badge = Field(0x00002329)
         clock_adjustment = Field(0x00000098)
         per_day_random = Field(0x00002390)
-        spray_time = Field(0x0000238A)
-        daycare_center_step_1 = Field(0x00004064)
-        daycare_center_step_2 = Field(0x000040F0)
-        step_counter = Field(0x000040F8)
+        spray_time = WordField(0x0000238A)
+        daycare_center_step_1 = ByteField(0x00004064)
+        daycare_center_step_2 = ByteField(0x000040F0)
+        step_counter = ByteField(0x000040F8)
+        battle_points_current = WordField(0x00000EB8)
+        battle_points_trainer_card = WordField(0x00000EBA)
 
         item_normalitem = ArrayField(0x0000150C, 0x1E, Field(0))
         item_keyitem = ArrayField(0x00001584, 0x1E, Field(0))
@@ -381,13 +402,13 @@ class EmeraldJpGlobal(BaseGlobal):
     inner = ModelPtrField(0x03005AF0, Inner)
 
 
-class EmeraldEnGlobal(BaseGlobal):
+class EmeraldEnGlobal(PointerGlobal):
     active_pokemon_count = Field(0x020244E9)
     active_pokemon = ModelField(0x020244EC, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005D94, 4))
-    safari_balls = Field(0x0203A9FC)
-    safari_time = Field(0x0203A076)
-    exp_gain = Field(0x020241F0)
+    safari_balls = ByteField(0x0203A9FC)
+    safari_time = WordField(0x0203A076)
+    exp_gain = SignedField(0x020241F0, size=2)
 
     store = ArrayField(0x02005274, 8, ModelField(0, StoreItem))
     area = WordField(0x020322E4)

@@ -295,10 +295,10 @@ class SpinCtrl: public Control
 {
 public:
 	template <class... Args>
-	SpinCtrl(wxcstr value, int min, int max, int initial, Args ...args) : Control(args...)
+	SpinCtrl(wxcstr value, int min, int max, int initial, long wxstyle, Args ...args) : Control(args...)
 	{
 		bindElem(new wxSpinCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), 
-			wxSP_ARROW_KEYS | wxALIGN_RIGHT, min, max, initial));
+			wxstyle ? wxstyle: (wxSP_ARROW_KEYS | wxALIGN_RIGHT), min, max, initial));
 	}
 
 	wxSpinCtrl& ctrl() const

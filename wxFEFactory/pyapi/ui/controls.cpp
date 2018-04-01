@@ -239,8 +239,8 @@ void init_controls(py::module & m)
 		.def_property("value", &SearchCtrl::getValue, &SearchCtrl::setValue);
 
 	py::class_t<SpinCtrl, Control>(m, "SpinCtrl")
-		.def(py::init<wxcstr, int, int, int, pyobj, pyobj>(),
-			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, className, style)
+		.def(py::init<wxcstr, int, int, int, long, pyobj, pyobj>(),
+			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, wxstyle, className, style)
 		.def("setOnChange", &SpinCtrl::setOnChange, evt_fn, evt_reset)
 		.def_property("value", 
 			[](SpinCtrl &self) { return self.ctrl().GetValue(); },

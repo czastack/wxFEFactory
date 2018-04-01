@@ -11,7 +11,7 @@ class BasePMHack(BaseGbaHack):
 
     def __init__(self):
         super().__init__()
-        self._global = None
+        self._globalins = None
         self._pokemonins = models.Pokemon(0, self.handler)
         self.pokemon_index = 0
 
@@ -19,7 +19,7 @@ class BasePMHack(BaseGbaHack):
         datasets = self.datasets
         pokemon = self.weak._pokemon
         with Group("global", "全局", self._global):
-            ModelInput("money", "金钱")
+            ModelInput("money", "金钱", spin=True)
             ModelSelect("store", "商店购物", choices=datasets.ITEMS)
             ModelSelect("area", "地点瞬移", choices=datasets.AREA_LABELS, values=datasets.AREA_VALUES)
             ModelSelect("wild_pokemon", "遇到精灵", choices=datasets.POKEMONS)
@@ -39,9 +39,12 @@ class BasePMHack(BaseGbaHack):
             item = models.GAME_ENCRYPTED.get(szGameVersion, None)
 
         if item:
-            self._global = item[0](0, self.handler)
+            self._globalins = item[0](0, self.handler)
             self.pm_version = item[1]
             self.lang = item[2]
+
+    def _global(self):
+        return self._globalins
 
     def on_pokemon_change(self, lb):
         self.pokemon_index = lb.index
@@ -52,7 +55,7 @@ class BasePMHack(BaseGbaHack):
         return self._pokemonins
 
     def _active_pokemons(self):
-        pokemons = self._global.active_pokemon.to_local()
+        pokemons = self._globalins.active_pokemon.to_local()
         for pokemon in pokemons.content:
             pokemon.pmStruct.attach()
             pokemon.pmStruct.Decode()

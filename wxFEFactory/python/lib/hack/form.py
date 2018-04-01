@@ -50,7 +50,7 @@ class Widget:
             if code == event.getWXK('r'):
                 self.read()
                 return True
-            elif code == event.getWXK('w'):
+            elif code == event.getWXK('w') or code == 13:
                 self.write()
                 return True
         event.Skip()
@@ -268,35 +268,40 @@ class DialogGroup(BaseGroup):
 
 
 class BaseInput(TwoWayWidget):
-    def __init__(self, *args, hex=False, spin=False, size=4, **kwargs):
+    def __init__(self, *args, hex=False, spin=False, size=4, max=None, **kwargs):
         """size: hex为True时有用"""
         self.hex = hex and not spin
         self.spin = spin
         self.size = size
+        self.max = max
         super().__init__(*args, **kwargs)
 
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
             if self.spin:
-                self.view = ui.SpinCtrl(className="fill")
+                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
                 self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
+            del self.max
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
 
     @property
     def input_value(self):
         value = self.view.value
-        if value == '':
-            return None
-        if self.hex or value.startswith('0x'):
-            value = int(value, 16)
+        if not self.spin:
+            if value == '':
+                return None
+            if self.hex or value.startswith('0x'):
+                value = int(value, 16)
         return value
 
     @input_value.setter
     def input_value(self, value):
-        self.view.value = ("0x%0*X" % (self.size << 1, value)) if self.hex else str(value)
+        if not self.spin:
+            value = ("0x%0*X" % (self.size << 1, value)) if self.hex else str(value)
+        self.view.value = value
 
 
 class Input(BaseInput, OffsetsWidget):
