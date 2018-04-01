@@ -25,17 +25,18 @@ class Person(Model):
     def __getattr__(self, name):
         data = self.test_comlex_attr(name)
         if data:
-            if data.name == 'equips':
-                return self.equips[data.index] & 0x7F
-            elif data.name == 'items':
-                return self.items[data.index] & 0x7F
+            name = data.attrs[0]
+            if name == 'equips':
+                return self.equips[data.attrs[1]] & 0x7F
+            elif name == 'items':
+                return self.items[data.attrs[1]] & 0x7F
         return super().__getattr__(name)
 
     def __setattr__(self, name, value):
         data = self.test_comlex_attr(name)
         if data:
             if data.name == 'equips':
-                self.equips[data.index] = 0x80 | value
+                self.equips[data.attrs[1]] = 0x80 | value
                 return
         
         super().__setattr__(name, value)
@@ -56,17 +57,18 @@ class Chariot(Model):
     def __getattr__(self, name):
         data = self.test_comlex_attr(name)
         if data:
-            if data.name == 'equips':
-                return self.equips[data.index] & 0x7F
-            elif data.name == 'items':
-                return self.items[data.index] & 0x7F
+            name = data.attrs[0]
+            if name == 'equips':
+                return self.equips[data.attrs[1]] & 0x7F
+            elif name == 'items':
+                return self.items[data.attrs[1]] & 0x7F
         return super().__getattr__(name)
 
     def __setattr__(self, name, value):
         data = self.test_comlex_attr(name)
         if data:
-            if data.name == 'equips':
-                self.equips[data.index] = 0x80 | value
+            if data.attrs[0] == 'equips':
+                self.equips[data.attrs[1]] = 0x80 | value
                 return
         
         super().__setattr__(name, value)

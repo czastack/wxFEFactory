@@ -47,7 +47,7 @@ class BaseGSTool(BaseGbaHack):
 
         with Group("skills", "角色精神力", person) as skills_group:
             for i in range(5):
-                ModelSelect("skills.%d" % i, "精神力", choices=datasets.SKILLS)
+                ModelSelect("skills.%d+skills_offset.value" % i, "精神力", choices=datasets.SKILLS)
             with Group.active_group().footer:
                 Pagination(self.on_skills_page, 7)
         self.skills_group = skills_group

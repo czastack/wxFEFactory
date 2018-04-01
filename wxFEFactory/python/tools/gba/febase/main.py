@@ -57,8 +57,8 @@ class FeTool(BaseGbaHack):
     def render_train_items(self):
         datasets = self.datasets
         for i in range(10):
-            ModelSelect("train_items.%d.item+train_items_offset" % i, "", choices=datasets.ITEMS)
-            ModelInput("train_items.%d.count+train_items_offset" % i, "数量")
+            ModelSelect("train_items.%d+train_items_offset.item" % i, "", choices=datasets.ITEMS)
+            ModelInput("train_items.%d+train_items_offset.count" % i, "数量")
         with Group.active_group().footer:
             Pagination(self.on_train_items_page, 10)
 

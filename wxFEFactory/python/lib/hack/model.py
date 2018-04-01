@@ -35,32 +35,57 @@ class Model:
     def __getattr__(self, name):
         data = test_comlex_attr(name)
         if data is not None:
-            item = getattr(self, data.name)
-            index = data.index
-            # 计算偏移量(多用于分页)
-            if index is not None and data.offset:
-                index += getattr(self, data.offset)
-            if index is not None:
-                item = item[index]
-            if data.attr:
-                item = getattr(item, data.attr)
+            item = self
+            prev = None # 取offset的对象
+            i = 0
+            for attr in data.attrs:
+                if isinstance(attr, int):
+                    offset = data.offsets and data.offsets.get(i, None)
+                    if offset is not None:
+                        attr += getattr(prev, offset)
+                    try:
+                        item = item[attr]
+                    except IndexError:
+                        item = 0
+                        break
+                else:
+                    prev = item
+                    item = getattr(item, attr)
+                    if item is None or item is 0:
+                        break
+                i += 1
             return item
 
     def __setattr__(self, name, value):
         data = test_comlex_attr(name)
         if data is not None:
-            item = getattr(self, data.name)
-            index = data.index
-            # 计算偏移量(多用于分页)
-            if index is not None and data.offset:
-                index += getattr(self, data.offset)
-            if index is not None and not data.attr:
-                item[index] = value
-            else:
-                if index is not None:
-                    item = item[index]
-                if data.attr:
-                    setattr(item, data.attr, value)
+            item = self
+            prev = None # 取offset的对象
+            i = 0
+            last = len(data.attrs) - 1
+            for attr in data.attrs:
+                if isinstance(attr, int):
+                    offset = data.offsets and data.offsets.get(i, None)
+                    if offset is not None:
+                        attr += getattr(prev, offset)
+                    try:
+                        if i is last:
+                            item[attr] = value
+                        else:
+                            item = item[attr]
+                    except IndexError:
+                        print("下标{}超过限制，长度为{}".format(attr, item.length))
+                        break
+                else:
+                    if i is last:
+                        setattr(item, attr, value)
+                    else:
+                        prev = item
+                        item = getattr(item, attr)
+                        if item is None or item is 0:
+                            break
+                    
+                i += 1
         else:
             super().__setattr__(name, value)
 
@@ -363,6 +388,8 @@ class ArrayData:
         return self.length
 
     def __getitem__(self, i):
+        if i >= self.length:
+            raise IndexError("array index out of range")
         field = self.field
         field.offset = self.offset + field.size * i
         if self.itemkeys:
@@ -370,6 +397,8 @@ class ArrayData:
         return field.__get__(self.instance)
 
     def __setitem__(self, i, value):
+        if i >= self.length:
+            raise IndexError("array index out of range")
         field = self.field
         field.offset = self.offset + field.size * i
         if self.itemkeys:
@@ -423,48 +452,36 @@ class StringField(Field):
 :param name: 字段名称
 :param index: 下标
 :param attr: 下一层的属性
-:param offset 偏移字段名: str
+:param offsets {level: 偏移字段名}
 """
-CAttr = DataClass("CAttr", ("name", "index", "attr", "offset"))
+CAttr = DataClass("CAttr", ("attrs", "offsets"))
 
 COMLEX_ATTR_MAP = {}
 
 def test_comlex_attr(text):
     """
     检查字段名是否是能构造CAttr的字符串
-    格式: {name}.{index} 或 {name}.{index}.{attr} 或 {name}.{attr}
     若是，返回对应的CAttr实例，否则返回None
     """
     it = COMLEX_ATTR_MAP.get(text, None)
     if it is None:
-        n = text.find('.')
-        if n is not -1:
-            index = None
-            attr = None
-            offset = None
+        if text.find('.') is not -1:
+            attrs = []
+            offsets = None
+            args = text.split('.')
+            i = 0
+            for arg in args:
+                if arg.find('+') is not -1:
+                    arg, offset = arg.split('+')
+                    arg = int(arg)
+                    if offsets is None:
+                        offsets = {}
+                    offsets[i] = offset
+                elif arg.isdigit():
+                    arg = int(arg)
+                attrs.append(arg)
+                i += 1
 
-            p = text.rfind('+')
-            if p is not -1:
-                offset = text[p + 1:]
-            else:
-                p = None
-
-            name = text[:n]
-            index = text[n + 1:p]
-
-            m = index.find('.')
-            if m is not -1:
-                # {name}.{index}.{attr}
-                attr = index[m + 1:]
-                index = index[:m]
-            elif not index.isdigit():
-                # {name}.{attr}
-                attr = index
-            if index.isdigit():
-                index = int(index)
-            else:
-                # {name}.{attr}
-                index = None
-            it = CAttr(name, index, attr, offset)
+            it = CAttr(attrs, offsets)
             COMLEX_ATTR_MAP[text] = it
     return it
