@@ -1,4 +1,4 @@
-from gba.rom import BaseRomRW, RomProxyRW, RomHandler
+from lib.gba.rom import BaseRomRW, RomProxyRW, RomHandler
 from lib.lazy import lazy
 from . import config
 from .fedict import FeDict, CtrlCode

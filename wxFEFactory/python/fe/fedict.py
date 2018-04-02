@@ -1,4 +1,4 @@
-from gba.dictionary import Dictionary, CtrlCode
+from lib.gba.dictionary import Dictionary, CtrlCode
 import ctypes
 
 
