@@ -7,11 +7,14 @@ ui = fefactory_api.ui
 
 
 class BaseGSTool(BaseGbaHack):
+    SKILLS_PAGE_LENGTH = 5
+    SKILLS_PAGE_TOTAL = 7
 
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._personins = self.models.Person(0, self.handler)
+        self._personins.skills_offset = 0
         self.person_index = 0
     
     def render_main(self):
@@ -48,8 +51,8 @@ class BaseGSTool(BaseGbaHack):
         with Group("skills", "角色精神力", person) as skills_group:
             for i in range(5):
                 ModelSelect("skills.%d+skills_offset.value" % i, "精神力", choices=datasets.SKILLS)
-            with Group.active_group().footer:
-                Pagination(self.on_skills_page, 7)
+            with skills_group.footer:
+                Pagination(self.on_skills_page, self.SKILLS_PAGE_TOTAL)
         self.skills_group = skills_group
 
         with Group("skills", "角色物品", person, cols=4):
@@ -101,7 +104,7 @@ class BaseGSTool(BaseGbaHack):
     person = property(_person)
 
     def on_skills_page(self, page):
-        self.person.skills_page = page
+        self.person.skills_offset = (page - 1) * self.SKILLS_PAGE_LENGTH
         self.skills_group.read()
 
     def move_left(self, _=None):

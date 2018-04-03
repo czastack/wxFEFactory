@@ -8,9 +8,13 @@ ui = fefactory_api.ui
 
 
 class Tool(BaseGbaHack):
+    STORAGE_PAGE_LENGTH = 10
+    STORAGE_PAGE_TOTAL = 10
+
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
+        self._global.storage_offset = 0
         self._personins = models.Person(0, self.handler)
         self.person_index = 0
         self._chariotins = models.Chariot(0, self.handler)
@@ -94,7 +98,7 @@ class Tool(BaseGbaHack):
         for i in range(10):
             ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values)
         with Group.active_group().footer:
-            Pagination(self.on_storage_page, 10)
+            Pagination(self.on_storage_page, self.STORAGE_PAGE_TOTAL)
 
     def get_hotkeys(self):
         this = self.weak
@@ -113,7 +117,7 @@ class Tool(BaseGbaHack):
         self.chariot_index = lb.index
 
     def on_storage_page(self, page):
-        self._global.storage_page = page
+        self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
         self.storage_group.read()
 
     def _person(self):

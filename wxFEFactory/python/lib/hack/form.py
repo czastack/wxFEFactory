@@ -207,8 +207,9 @@ class Group(BaseGroup):
     cols = 2
     horizontal = True
 
-    def __init__(self, *args, flexgrid=True, hasfooter=True, horizontal=True, cols=None, **kwargs):
+    def __init__(self, *args, flexgrid=True, hasheader=False, hasfooter=True, horizontal=True, cols=None, **kwargs):
         self.flexgrid = flexgrid
+        self.hasheader = hasheader
         self.hasfooter = hasfooter
         if cols:
             self.cols = cols
@@ -224,6 +225,9 @@ class Group(BaseGroup):
     def render_root(self):
         this = self.weak
         with ui.Vertical(className="fill") as root:
+            if self.hasheader:
+                self.header = ui.Horizontal(className="expand container")
+
             with ui.ScrollView(className="fill container") as content:
                 if self.flexgrid:
                     self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
@@ -241,6 +245,7 @@ class Group(BaseGroup):
                     ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
                     ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
                 self.footer = footer
+        del self.flexgrid, self.hasheader, self.hasfooter
         return root
 
 
@@ -264,7 +269,7 @@ class DialogGroup(Group):
 
 class StaticGroup(Group):
     def __init__(self, caption):
-        return Group.__init__(self, None, caption, 0, False, False)
+        return Group.__init__(self, None, caption, 0, flexgrid=False, hasfooter=False)
 
 
 class GroupBox(BaseGroup):

@@ -310,6 +310,11 @@ public:
 	{
 		bindEvt(wxEVT_SPINCTRL, fn, reset);
 	}
+
+	void setOnEnter(pycref fn, bool reset = true)
+	{
+		bindEvt(wxEVT_TEXT_ENTER, fn, reset);
+	}
 };
 
 

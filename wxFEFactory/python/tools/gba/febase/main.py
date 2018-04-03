@@ -7,10 +7,13 @@ ui = fefactory_api.ui
 
 
 class FeTool(BaseGbaHack):
+    TRAIN_ITEMS_PAGE_LENGTH = 10
+    TRAIN_ITEMS_PAGE_TOTAL = 10
 
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
+        self._global.train_items_offset = 0
         self._personins = self.models.Person(0, self.handler)
     
     def render_main(self):
@@ -60,7 +63,7 @@ class FeTool(BaseGbaHack):
             ModelSelect("train_items.%d+train_items_offset.item" % i, "", choices=datasets.ITEMS)
             ModelInput("train_items.%d+train_items_offset.count" % i, "数量")
         with Group.active_group().footer:
-            Pagination(self.on_train_items_page, 10)
+            Pagination(self.on_train_items_page, self.TRAIN_ITEMS_PAGE_TOTAL)
 
     def get_hotkeys(self):
         return (
@@ -87,5 +90,5 @@ class FeTool(BaseGbaHack):
         person.posy = _global.cury
 
     def on_train_items_page(self, page):
-        self._global.train_items_page = page
+        self._global.train_items_offset = (page - 1) * self.TRAIN_ITEMS_PAGE_LENGTH
         self.train_items_group.read()

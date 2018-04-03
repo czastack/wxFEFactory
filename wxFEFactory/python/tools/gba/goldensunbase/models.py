@@ -47,9 +47,6 @@ class ItemSlot(Model):
 class BasePerson(Model):
     SIZE = 0x14C
 
-    skills_page = 1
-    skills_page_length = 5
-
     name = Field(0, bytes, 0xF)
     level = ByteField(0x0F)
     exp = Field(0x124)
@@ -93,10 +90,6 @@ class BasePerson(Model):
     djinni_water_on_count = Field(0x11D)
     djinni_fire_on_count = Field(0x11E)
     djinni_wind_on_count = Field(0x11F)
-
-    @property
-    def skills_offset(self):
-        return (self.skills_page - 1) * self.skills_page_length
 
 
 class BaseGlobal(Model):

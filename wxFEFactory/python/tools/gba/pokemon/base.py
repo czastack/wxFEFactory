@@ -2,12 +2,13 @@ from ..base import BaseGbaHack
 from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
-from . import models
+from . import models, datasets
 import fefactory_api
 ui = fefactory_api.ui
 
 
 class BasePMHack(BaseGbaHack):
+    BACKPACK_PAGE_LENGTH = 10
 
     def __init__(self):
         super().__init__()
@@ -36,6 +37,17 @@ class BasePMHack(BaseGbaHack):
             for i in range(8):
                 ModelSelect("store.%d.item" % i, "商品%d" % (i + 1), choices=datasets.ITEMS)
 
+        with Group("store", "背包", self._global, hasheader=True, cols=4) as backpack_group:
+            with backpack_group.header:
+                ui.RadioBox("类型", className="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_swith)
+            for i in range(self.BACKPACK_PAGE_LENGTH):
+                ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
+                ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
+            with backpack_group.footer:
+                self.backpack_pageview = Pagination(self.weak.on_backpack_page, self.BACKPACK_PAGE_LENGTH)
+            self.backpack_group = backpack_group
+
+
     def onattach(self):
         rom_title = self.handler.getRomTitle()
 
@@ -48,6 +60,9 @@ class BasePMHack(BaseGbaHack):
             self._globalins = item[0](0, self.handler)
             self.pm_version = item[1]
             self.lang = item[2]
+            # 初始化一些背包参数
+            self._globalins.backpack_offset = 0
+            self._globalins.backpack_items = getattr(self._globalins, self.datasets.BACKPACK_KEYS[0])
 
     def _global(self):
         return self._globalins
@@ -69,3 +84,14 @@ class BasePMHack(BaseGbaHack):
 
     pokemon = property(_pokemon)
     active_pokemons = property(_active_pokemons)
+
+    def on_backpack_page(self, page):
+        """背包物品切换页"""
+        self._globalins.backpack_offset = (page - 1) * self.BACKPACK_PAGE_LENGTH
+        self.backpack_group.read()
+
+    def on_backpack_swith(self, view):
+        backpack_type = self.datasets.BACKPACK_KEYS[view.index]
+        self._globalins.backpack_items = items = getattr(self._globalins, backpack_type)
+        self.backpack_pageview.asset_total(items.length, self.BACKPACK_PAGE_LENGTH)
+        self.backpack_group.read()

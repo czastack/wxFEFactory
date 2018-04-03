@@ -80,9 +80,3 @@ class Global(Model):
     posx = ByteField(0x030042FA)
     posy = ByteField(0x030042FB)
     storage = ArrayField(0x03004106, 100, WordField(0))
-    storage_page = 1
-    storage_page_lenth = 10
-
-    @property
-    def storage_offset(self):
-        return (self.storage_page - 1) * self.storage_page_lenth

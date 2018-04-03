@@ -1,6 +1,6 @@
 from lib.hack.model import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
-    ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField
+    ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField, ManagedModel
 )
 from lib.hack.localhandler import LocalHandler
 from lib import utils
@@ -231,9 +231,6 @@ class BaseGlobal(Model):
     def _empty(self):
         pass
 
-    battle_points_current = property(_empty)
-    battle_points_trainer_card = battle_points_current
-
     def mask(self, value, field):
         if not isinstance(value, int):
             value = int(value)
@@ -242,8 +239,36 @@ class BaseGlobal(Model):
             value &= 0xFFFF
         return value
 
+    def managed_mask(self, value, field):
+        if not isinstance(value, int):
+            value = int(value)
+        value = self.context.xor_mask ^ value
+        if field.size == 2:
+            value &= 0xFFFF
+        return value
+
+    battle_points_current = property(_empty)
+    battle_points_trainer_card = battle_points_current
+
     
 MaskedField = FieldPrep(BaseGlobal.mask)
+ManagedMaskedField = FieldPrep(BaseGlobal.managed_mask)
+
+
+class PokemonItem(ManagedModel):
+    """背包物品"""
+    SIZE = 4
+
+    item = WordField(0)
+    quantity = ManagedMaskedField(WordField(2))
+
+
+class PokemonItemField(ModelField):
+    def __init__(self, offset):
+        super().__init__(offset, PokemonItem)
+
+    def create_cache(self, instance):
+        return self.modelClass(instance.addr + self.offset, instance)
 
 
 class PointerGlobal(BaseGlobal):
@@ -282,12 +307,13 @@ class RubySapphireJpGlobal(BaseGlobal):
     step_counter = ByteField(0x0202854A)
     exp_gain = SignedField(0x0202494C, size=2)
 
-    item_normalitem = ArrayField(0x020259F4, 0x14, Field(0))
-    item_keyitem = ArrayField(0x02025A44, 0x14, Field(0))
-    item_pokeball = ArrayField(0x02025A94, 0x10, Field(0))
-    item_machine = ArrayField(0x02025AD4, 0x40, Field(0))
-    item_berry = ArrayField(0x02025BD4, 0x2E, Field(0))
-    item_pokeblock = ArrayField(0x02025C8C, 0x28, Field(0))
+    _iemfield = PokemonItemField(0)
+    item_normal = ArrayField(0x020259F4, 0x14, _iemfield)
+    item_keyitem = ArrayField(0x02025A44, 0x14, _iemfield)
+    item_pokeball = ArrayField(0x02025A94, 0x10, _iemfield)
+    item_machine = ArrayField(0x02025AD4, 0x40, _iemfield)
+    item_berry = ArrayField(0x02025BD4, 0x2E, _iemfield)
+    item_pokeblock = ArrayField(0x02025C8C, 0x28, _iemfield)
 
 
 class RubySapphireEnGlobal(BaseGlobal):
@@ -313,12 +339,13 @@ class RubySapphireEnGlobal(BaseGlobal):
     step_counter = ByteField(0x020287EA)
     exp_gain = SignedField(0x02024BEC, size=2)
 
-    item_normalitem = ArrayField(0x02025C94, 0x14, Field(0))
-    item_keyitem = ArrayField(0x02025CE4, 0x14, Field(0))
-    item_pokeball = ArrayField(0x02025D34, 0x10, Field(0))
-    item_machine = ArrayField(0x02025D74, 0x40, Field(0))
-    item_berry = ArrayField(0x02025E74, 0x2E, Field(0))
-    item_pokeblock = ArrayField(0x02025F2C, 0x28, Field(0))
+    _iemfield = PokemonItemField(0)
+    item_normal = ArrayField(0x02025C94, 0x14, _iemfield)
+    item_keyitem = ArrayField(0x02025CE4, 0x14, _iemfield)
+    item_pokeball = ArrayField(0x02025D34, 0x10, _iemfield)
+    item_machine = ArrayField(0x02025D74, 0x40, _iemfield)
+    item_berry = ArrayField(0x02025E74, 0x2E, _iemfield)
+    item_pokeblock = ArrayField(0x02025F2C, 0x28, _iemfield)
 
 
 class FireLeafJpGlobal(PointerGlobal):
@@ -346,11 +373,12 @@ class FireLeafJpGlobal(PointerGlobal):
         daycare_center_step_2 = ByteField(0x00004038)
         step_counter = ByteField(0x0000403E)
 
-        item_normalitem = ArrayField(0x000012B4, 0x2A, Field(0))
-        item_keyitem = ArrayField(0x0000135C, 0x1E, Field(0))
-        item_pokeball = ArrayField(0x000013D4, 0x0D, Field(0))
-        item_machine = ArrayField(0x00001408, 0x3A, Field(0))
-        item_berry = ArrayField(0x000014F0, 0x2B, Field(0))
+        _iemfield = PokemonItemField(0)
+        item_normal = ArrayField(0x000012B4, 0x2A, _iemfield)
+        item_keyitem = ArrayField(0x0000135C, 0x1E, _iemfield)
+        item_pokeball = ArrayField(0x000013D4, 0x0D, _iemfield)
+        item_machine = ArrayField(0x00001408, 0x3A, _iemfield)
+        item_berry = ArrayField(0x000014F0, 0x2B, _iemfield)
         item_pokeblock = None
 
 
@@ -400,12 +428,13 @@ class EmeraldJpGlobal(PointerGlobal):
         battle_points_current = WordField(0x00000EB8)
         battle_points_trainer_card = WordField(0x00000EBA)
 
-        item_normalitem = ArrayField(0x0000150C, 0x1E, Field(0))
-        item_keyitem = ArrayField(0x00001584, 0x1E, Field(0))
-        item_pokeball = ArrayField(0x000015FC, 0x10, Field(0))
-        item_machine = ArrayField(0x0000163C, 0x40, Field(0))
-        item_berry = ArrayField(0x0000173C, 0x46, Field(0))
-        item_pokeblock = ArrayField(0x000017F4, 0x28, Field(0))
+        _iemfield = PokemonItemField(0)
+        item_normal = ArrayField(0x0000150C, 0x1E, _iemfield)
+        item_keyitem = ArrayField(0x00001584, 0x1E, _iemfield)
+        item_pokeball = ArrayField(0x000015FC, 0x10, _iemfield)
+        item_machine = ArrayField(0x0000163C, 0x40, _iemfield)
+        item_berry = ArrayField(0x0000173C, 0x46, _iemfield)
+        item_pokeblock = ArrayField(0x000017F4, 0x28, _iemfield)
         
 
     inner = ModelPtrField(0x03005AF0, Inner)
