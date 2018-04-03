@@ -62,7 +62,6 @@ class BasePMHack(BaseGbaHack):
             self.lang = item[2]
             # 初始化一些背包参数
             self._globalins.backpack_offset = 0
-            self._globalins.backpack_items = getattr(self._globalins, self.datasets.BACKPACK_KEYS[0])
 
     def _global(self):
         return self._globalins
@@ -91,7 +90,6 @@ class BasePMHack(BaseGbaHack):
         self.backpack_group.read()
 
     def on_backpack_swith(self, view):
-        backpack_type = self.datasets.BACKPACK_KEYS[view.index]
-        self._globalins.backpack_items = items = getattr(self._globalins, backpack_type)
-        self.backpack_pageview.asset_total(items.length, self.BACKPACK_PAGE_LENGTH)
+        self._globalins.backpack_type = self.datasets.BACKPACK_KEYS[view.index]
+        self.backpack_pageview.asset_total(self._globalins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
         self.backpack_group.read()

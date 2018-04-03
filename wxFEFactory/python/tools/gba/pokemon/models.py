@@ -247,8 +247,13 @@ class BaseGlobal(Model):
             value &= 0xFFFF
         return value
 
+    @property
+    def backpack_items(self):
+        return getattr(self, self.backpack_type)
+
     battle_points_current = property(_empty)
     battle_points_trainer_card = battle_points_current
+    backpack_type = 'item_normal'
 
     
 MaskedField = FieldPrep(BaseGlobal.mask)
