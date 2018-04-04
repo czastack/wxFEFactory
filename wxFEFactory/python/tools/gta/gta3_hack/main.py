@@ -77,8 +77,9 @@ class Tool(BaseGTA3Tool):
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
+
         with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 self.render_common_button()
                 self.set_buttons_contextmenu()
 

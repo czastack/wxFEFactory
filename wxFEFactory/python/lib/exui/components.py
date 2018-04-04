@@ -21,6 +21,7 @@ class Pagination(ui.Horizontal):
     def set_total(self, total):
         self.total = total
         self.total_view.label = " 共%d页 " % total
+        self.page_input.max = total
         if self.page > total:
             self.set_page(total)
 

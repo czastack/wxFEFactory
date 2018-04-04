@@ -74,7 +74,7 @@ class Tool(BaseGTA3Tool):
 
         with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
-                with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+                with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                     SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
                     SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
@@ -91,7 +91,7 @@ class Tool(BaseGTA3Tool):
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
 
         with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 self.render_common_button()
                 self.set_buttons_contextmenu()
 

@@ -29,9 +29,9 @@ class BasePMHack(BaseGbaHack):
             ModelInput("battle_points_trainer_card", "训练员卡上的战斗点数（仅绿宝石）", spin=True)
 
             ModelSelect("area", "地点瞬移", choices=datasets.AREA_LABELS, values=datasets.AREA_VALUES)
-            ModelSelect("wild_pokemon", "遇到精灵", choices=datasets.POKEMONS)
             ModelSelect("furniture_purchase", "家具购买", choices=datasets.FURNITURES)
             ModelSelect("appearance", "性别外形", choices=datasets.APPEARANCE)
+            # ModelSelect("wild_pokemon", "遇到精灵", choices=datasets.POKEMONS)
 
         with Group("store", "商店购物", self._global):
             for i in range(8):
@@ -47,6 +47,9 @@ class BasePMHack(BaseGbaHack):
                 self.backpack_pageview = Pagination(self.weak.on_backpack_page, self.BACKPACK_PAGE_LENGTH)
             self.backpack_group = backpack_group
 
+        with Group("pokemon", "宝可梦", self._global):
+            
+            pass
 
     def onattach(self):
         rom_title = self.handler.getRomTitle()
@@ -93,3 +96,6 @@ class BasePMHack(BaseGbaHack):
         self._globalins.backpack_type = self.datasets.BACKPACK_KEYS[view.index]
         self.backpack_pageview.asset_total(self._globalins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
         self.backpack_group.read()
+
+    def read_active_pokemons(self, _=None):
+        pass

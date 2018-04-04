@@ -110,7 +110,7 @@ class Tool(BaseGTATool):
                         ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
 
         with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 self.render_common_button()
                 ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
                 ui.Button("附近的人着火", onclick=self.near_peds_make_fire)

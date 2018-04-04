@@ -135,7 +135,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
 
         with StaticGroup("作弊"):
             with ui.Vertical(className="fill container"):
-                with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+                with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     self.cheat_views = [
                         ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
                             '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃', '最大威望', '最大引力',
@@ -167,7 +167,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Text("附近的人大风车: alt+shift+r")
 
         with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
                 self.render_common_button()
                 ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
                 ui.Button("敌人爆炸", onclick=self.enemys_explode)

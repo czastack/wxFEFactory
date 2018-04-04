@@ -180,7 +180,7 @@ class Tool(BaseGTATool):
         self.object_model_book  = render_tab_list(datasets.OBJECT_MODEL)
 
     def render_functions(self):
-        with ui.GridLayout(cols=4, vgap=10, className="fill container"):
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
             self.render_common_button()
             # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
             ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)

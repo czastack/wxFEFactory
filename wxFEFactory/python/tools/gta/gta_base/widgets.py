@@ -88,7 +88,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
 
         if not dialog:
             with exui.StdDialog("选择颜色", style=dialog_style) as dialog:
-                with ui.GridLayout(cols=13, vgap=10, className="fill container"):
+                with ui.GridLayout(cols=13, vgap=10, className="expand"):
                     for color in self.color_list:
                         view = ui.Text("", style=cls.color_item_style)
                         view.background = color

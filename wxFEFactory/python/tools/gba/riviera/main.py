@@ -61,6 +61,14 @@ class Tool(BaseGbaHack):
             ModelInput("vit", "VIT")
             ModelInput("_resist", "抗性")
 
+        with StaticGroup("功能"):
+            with ui.GridLayout(cols=4, vgap=10, className="expand"):
+                for name in ('enable_addition', 'all_cg', 'all_item_book', 'all_music',
+                        'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'):
+                    func = getattr(self.weak, name)
+                    ui.Button(func.__doc__, onclick=func)
+
+
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
                 ui.Text("恢复HP: alt+h")
@@ -89,3 +97,36 @@ class Tool(BaseGbaHack):
     def pull_through(self, _=None):
         for person in self.persons():
             person.hp = person.hpmax
+
+    def enable_addition(self, btn):
+        """附加项开启"""
+        self.handler.write16(0x0200AFDA, 0xFFFF)
+
+    def all_cg(self, btn):
+        """全CG"""
+        self.handler.writeUint(0x02008570, 0xFFFFFFFFFF, 5)
+
+    def all_item_book(self, btn):
+        """全道具图鉴"""
+        self.handler.write(0x02008534, b'\xff' * 0x1E)
+
+    def all_music(self, btn):
+        """全音乐"""
+        self.handler.writeUint(0x020086C4, 0xFFFFFFFFFF, 5)
+
+    def all_face(self, btn):
+        """全表情"""
+        self.handler.write(0x020084D8, b'\xff' * 0x22)
+        self.handler.write16(0x02008504, 0xFFFF)
+
+    def all_dubbing(self, btn):
+        """全配音"""
+        self.handler.write(0x020086CC, b'\xff' * 0x16)
+
+    def enable_chapter8(self, btn):
+        """第8章开启"""
+        self.handler.write16(0x020084D6, 0xFFFF)
+
+    def all_item_desc(self, btn):
+        """全道具说明"""
+        self.handler.write(0x020086F0, '\xff' * 0x78)

@@ -4,11 +4,12 @@ import re
 class Dictionary:
     __slots__ = ('_ct', '_tc', 'low_range', 'ctrltable', 'ctrl_low_range')
 
-    def __init__(self, codetable, low_range=None, ctrltable=None, ctrl_low_range=None):
+    def __init__(self, codetable, low_range=None, ctrltable=None, ctrl_low_range=None, end_code=0):
         """
         :param codetable: 码表文件路径或字典
         :param low_range: 双字节码的低字节判定范围: 长度为2的元组
         :param ctrltable: 控制码表: 字典{code: fn(bytes, i) -> (word, i)}
+        :param end_code: 结束符 
         """
         self._ct = ct = {}
         self._tc = tc = {}
@@ -19,6 +20,7 @@ class Dictionary:
 
         self.ctrltable = ctrltable
         self.ctrl_low_range = ctrl_low_range
+        self.end_code = end_code
 
         if isinstance(codetable, str):
             with open(codetable, 'r', encoding="utf8") as f:
@@ -61,7 +63,7 @@ class Dictionary:
                         if not words:
                             offset = i
                         continue
-                    elif byte == 0x00:
+                    elif byte == self.end_code:
                         # 读到结束符，把当前文本缓冲区内容存入result，并清空缓冲区
                         if words:
                             result.append((offset, ''.join(words)))
@@ -144,6 +146,8 @@ class Dictionary:
                 result.append(code)
             if sep:
                 result.append(sep)
+        if self.end_code:
+            result.append(self.end_code)
         return result
 
     def encodeToArray(self, text):
@@ -188,7 +192,7 @@ class Dictionary:
                     if not words:
                         offset = i
                     continue
-                elif not ignore_zero and byte == 0x00:
+                elif not ignore_zero and byte == self.end_code:
                     # 读到结束符，把当前文本缓冲区内容存入result，并清空缓冲区
                     if words:
                         break

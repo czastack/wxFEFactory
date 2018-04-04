@@ -629,6 +629,11 @@ class BaseSelect(TwoWayWidget):
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
 
+    def setItems(self, choices, values=0):
+        self.view.setItems(choices)
+        if values is not 0:
+            self.values = values
+
     @property
     def input_value(self):
         index = self.view.index
