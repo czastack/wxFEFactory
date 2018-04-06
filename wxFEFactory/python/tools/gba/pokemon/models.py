@@ -227,6 +227,42 @@ class PokemonStructActives(Model):
         return local_ins
 
 
+class BreedListEntry(Model):
+    SIZE = 28
+    bHP = ByteField(0)
+    bAtk = ByteField(1)
+    bDef = ByteField(2)
+    bDex = ByteField(3)
+    bSAtk = ByteField(4)
+    bSDef = ByteField(5)
+    bType1 = ByteField(6)
+    bType2 = ByteField(7)
+    bCatchRatio = ByteField(8)
+    bBaseExp = ByteField(9)
+    wBattleBonuses = WordField(10)
+    wDrop1 = WordField(12)
+    wDrop2 = WordField(14)
+    bFemaleRatio = ByteField(16)
+    bHatchTime = ByteField(17)
+    bInitIntimate = ByteField(18)
+    bExpType = ByteField(19)
+    bEggGroup1 = ByteField(20)
+    bEggGroup2 = ByteField(21)
+    bSpecialty1 = ByteField(22)
+    bSpecialty2 = ByteField(23)
+    bEscapeRatio = ByteField(24)
+    # unk0 = ByteField(25)
+    wReserved = WordField(26)
+
+
+class EvoListEntry:
+    SIZE = 8
+    wCondition = WordField(0)
+    wValue = WordField(2)
+    wBreed = WordField(4)
+    wReserved = WordField(6)
+
+
 class BaseGlobal(Model):
     def _empty(self):
         pass
@@ -289,7 +325,7 @@ class PointerGlobal(BaseGlobal):
             return super().__setattr__(name, value)
 
 
-class RubySapphireJpGlobal(BaseGlobal):
+class RubySapphireJp(BaseGlobal):
     active_pokemon_count = Field(0x03004280)
     active_pokemon = ModelField(0x03004290, PokemonStructActives)
     stored_pokemon = Field(0x0202FDC0)
@@ -321,7 +357,25 @@ class RubySapphireJpGlobal(BaseGlobal):
     item_pokeblock = ArrayField(0x02025C8C, 0x28, _iemfield)
 
 
-class RubySapphireEnGlobal(BaseGlobal):
+class RubyJp(RubySapphireJp):
+    NAME = "红宝石(日文版)"
+    # rom
+    breed_list = ArrayField(0x081D09CC, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x00000000)
+    item_list = Field(0x0039A648)
+    skill_list = Field(0x001CCEE0)
+
+
+class SapphireJp(RubySapphireJp):
+    NAME = "蓝宝石(日文版)"
+    # rom
+    breed_list = ArrayField(0x081D095C, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x00000000)
+    item_list = Field(0x0039A62C)
+    skill_list = Field(0x001CCE70)
+
+
+class RubySapphireEn(BaseGlobal):
     active_pokemon_count = Field(0x03004350)
     active_pokemon = ModelField(0x03004360, PokemonStructActives)
     stored_pokemon = Field(0x020300A4)
@@ -353,7 +407,25 @@ class RubySapphireEnGlobal(BaseGlobal):
     item_pokeblock = ArrayField(0x02025F2C, 0x28, _iemfield)
 
 
-class FireLeafJpGlobal(PointerGlobal):
+class RubyEn(RubySapphireEn):
+    NAME = "红宝石(英文版)"
+    # rom
+    breed_list = ArrayField(0x081FEC18, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x00000000)
+    item_list = Field(0x003C5564)
+    skill_list = Field(0x001FB12C)
+
+
+class SapphireEn(RubySapphireEn):
+    NAME = "蓝宝石(英文版)"
+    # rom
+    breed_list = ArrayField(0x081FEBA8, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x00000000)
+    item_list = Field(0x003C55BC)
+    skill_list = Field(0x001FB0BC)
+
+
+class FireLeafJp(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x020241E4, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005050, 4))
@@ -390,7 +462,25 @@ class FireLeafJpGlobal(PointerGlobal):
     inner = ModelPtrField(0x0300504C, Inner)
 
 
-class FireLeafEnGlobal(PointerGlobal):
+class FireJp(FireLeafJp):
+    NAME = "火红(日文版)"
+    # rom
+    breed_list = ArrayField(0x0821118C, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x0021AA2E)
+    item_list = Field(0x003A06F8)
+    skill_list = Field(0x0020D60C)
+
+
+class LeafJp(FireLeafJp):
+    NAME = "叶绿(日文版)"
+    # rom
+    breed_list = ArrayField(0x08211168, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x0021AA0E)
+    item_list = Field(0x003A0568)
+    skill_list = Field(0x0020D5E8)
+
+
+class FireLeafEn(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x02024284, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005010, 4))
@@ -402,11 +492,31 @@ class FireLeafEnGlobal(PointerGlobal):
     safari_time = WordField(0x02039996)
     exp_gain = SignedField(0x02023D50, size=2)
 
-    Inner = FireLeafJpGlobal.Inner
+    Inner = FireLeafJp.Inner
     inner = ModelPtrField(0x0300500C, Inner)
 
 
-class EmeraldJpGlobal(PointerGlobal):
+class FireEn(FireLeafEn):
+    NAME = "火红(英文版)"
+    # rom
+    breed_list = ArrayField(0x08254784, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x0025E026)
+    item_list = Field(0x003DB028)
+    skill_list = Field(0x00250C04)
+
+
+class LeafEn(FireLeafEn):
+    NAME = "叶绿(英文版)"
+    # rom
+    breed_list = ArrayField(0x08254760, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x0025E006)
+    item_list = Field(0x003DAE64)
+    skill_list = Field(0x00250BE0)
+
+
+class EmeraldJp(PointerGlobal):
+    NAME = "绿宝石(日文版)"
+
     active_pokemon_count = Field(0x0202418D)
     active_pokemon = ModelField(0x02024190, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005AF4, 4))
@@ -444,8 +554,16 @@ class EmeraldJpGlobal(PointerGlobal):
 
     inner = ModelPtrField(0x03005AF0, Inner)
 
+    # rom
+    breed_list = ArrayField(0x082F0D54, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x002FA6D6)
+    item_list = Field(0x0055CEE8)
+    skill_list = Field(0x002ED220)
 
-class EmeraldEnGlobal(PointerGlobal):
+
+class EmeraldEn(PointerGlobal):
+    NAME = "绿宝石(英文版)"
+
     active_pokemon_count = Field(0x020244E9)
     active_pokemon = ModelField(0x020244EC, PokemonStructActives)
     stored_pokemon = OffsetsField((0x03005D94, 4))
@@ -459,22 +577,15 @@ class EmeraldEnGlobal(PointerGlobal):
     furniture_purchase = ByteField(0x03005E3A)
     appearance = ByteField(0x02024A5C)
 
-    Inner = EmeraldJpGlobal.Inner
+    Inner = EmeraldJp.Inner
     inner = ModelPtrField(0x03005D90, Inner)
 
+    # rom
+    breed_list = ArrayField(0x083203CC, 412, ModelField(0, BreedListEntry))
+    deoxys_breed_abilities = Field(0x00329D48)
+    item_list = Field(0x005839A0)
+    skill_list = Field(0x0031C898)
 
-Globals = {
-    'ruby_jp': RubySapphireJpGlobal,
-    'ruby_en': RubySapphireEnGlobal,
-    'sapphire_jp': RubySapphireJpGlobal,
-    'sapphire_en': RubySapphireEnGlobal,
-    'fire_jp': FireLeafJpGlobal,
-    'fire_en': FireLeafEnGlobal,
-    'leaf_jp': FireLeafJpGlobal,
-    'leaf_en': FireLeafEnGlobal,
-    'emerald_jp': EmeraldJpGlobal,
-    'emerald_en': EmeraldJpGlobal,
-}
 
 PM_UNKNOWN = 0
 PM_SAPPHIRE = 1
@@ -486,20 +597,20 @@ LANG_JP = 0
 LANG_EN = 1
 
 GAME_VERSON = {
-    "POKEMON RUBYAXVJ": (RubySapphireJpGlobal, PM_RUBY, LANG_JP),
-    "POKEMON RUBYAXVE": (RubySapphireEnGlobal, PM_RUBY, LANG_EN),
-    "POKEMON SAPPAXPJ": (RubySapphireJpGlobal, PM_SAPPHIRE, LANG_JP),
-    "POKEMON SAPPAXPE": (RubySapphireEnGlobal, PM_SAPPHIRE, LANG_EN),
-    "POKEMON FIREBPRJ": (FireLeafJpGlobal, PM_FIRE, LANG_JP),
-    "POKEMON FIREBPRE": (FireLeafEnGlobal, PM_FIRE, LANG_EN),
-    "POKEMON LEAFBPGJ": (FireLeafJpGlobal, PM_LEAF, LANG_JP),
-    "POKEMON LEAFBPGE": (FireLeafEnGlobal, PM_LEAF, LANG_EN),
-    "POKEMON EMERBPEJ": (EmeraldJpGlobal, PM_EMERALD, LANG_JP),
-    "POKEMON EMERBPEE": (EmeraldEnGlobal, PM_EMERALD, LANG_EN),
+    "POKEMON RUBYAXVJ": (RubyJp, PM_RUBY, LANG_JP),
+    "POKEMON RUBYAXVE": (RubyEn, PM_RUBY, LANG_EN),
+    "POKEMON SAPPAXPJ": (SapphireJp, PM_SAPPHIRE, LANG_JP),
+    "POKEMON SAPPAXPE": (SapphireEn, PM_SAPPHIRE, LANG_EN),
+    "POKEMON FIREBPRJ": (FireJp, PM_FIRE, LANG_JP),
+    "POKEMON FIREBPRE": (FireEn, PM_FIRE, LANG_EN),
+    "POKEMON LEAFBPGJ": (LeafJp, PM_LEAF, LANG_JP),
+    "POKEMON LEAFBPGE": (LeafEn, PM_LEAF, LANG_EN),
+    "POKEMON EMERBPEJ": (EmeraldJp, PM_EMERALD, LANG_JP),
+    "POKEMON EMERBPEE": (EmeraldEn, PM_EMERALD, LANG_EN),
 }
 
 GAME_ENCRYPTED = {
-    "pokemon red version": (FireLeafJpGlobal, PM_FIRE, LANG_JP),
-    "pokemon green version": (FireLeafJpGlobal, PM_LEAF, LANG_JP),
-    "pokemon emerald version": (EmeraldJpGlobal, PM_EMERALD, LANG_JP),
+    "pokemon red version": (FireJp, PM_FIRE, LANG_JP),
+    "pokemon green version": (LeafJp, PM_LEAF, LANG_JP),
+    "pokemon emerald version": (EmeraldJp, PM_EMERALD, LANG_JP),
 }

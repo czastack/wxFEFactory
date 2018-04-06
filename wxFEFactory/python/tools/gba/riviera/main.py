@@ -18,7 +18,7 @@ class Tool(BaseGbaHack):
         person = self.weak._person
         with Group("global", "全局", self._global):
             ModelInput("tp", "TP")
-            ModelInput("kill_slot", "必杀槽")
+            ModelInput("kill_slot", "必杀槽").view.setToolTip("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
             ModelInput("rage", "RAGE")
             ModelInput("member_num", "队伍人数")
             for i in range(5):
@@ -49,7 +49,7 @@ class Tool(BaseGbaHack):
             for i in range(3):
                 ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
-        with Group("player", "角色", person, cols=4):
+        with Group("player", "角色", person, cols=4) as person_group:
             ui.Text("角色", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
@@ -60,6 +60,9 @@ class Tool(BaseGbaHack):
             ModelInput("agl", "AGL")
             ModelInput("vit", "VIT")
             ModelInput("_resist", "抗性")
+
+            with person_group.footer:
+                ui.Button("全技能", onclick=self.weak.all_skills)
 
         with StaticGroup("功能"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
@@ -129,4 +132,7 @@ class Tool(BaseGbaHack):
 
     def all_item_desc(self, btn):
         """全道具说明"""
-        self.handler.write(0x020086F0, '\xff' * 0x78)
+        self.handler.write(0x020086F0, b'\xff' * 0x78)
+
+    def all_skills(self, btn):
+        self.person.skills = b'\xff' * 0x48

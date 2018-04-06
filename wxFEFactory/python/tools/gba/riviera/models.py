@@ -18,6 +18,7 @@ class Person(Model):
     agl = ByteField(0x20069FE)
     vit = ByteField(0x20069FF)
     _resist = ByteField(0x2006A07)
+    skills = Field(0x02006A18, bytes, 0x48)
 
 
 class PersonBattle(Model):

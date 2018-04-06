@@ -254,7 +254,7 @@ class ModelPtrField(Cachable, PtrField):
 
 class ManagedModelPtrField(ModelPtrField):
     """托管模型指针字段"""
-    def __get__(self, instance, owner=None):
+    def create_cache(self, instance):
         return self.modelClass(super().__get__(instance, owner), instance.context)
 
 
@@ -272,6 +272,12 @@ class ModelField(Cachable, Field):
 
     def __set__(self, instance, value):
         raise AttributeError("can't set attribute")
+
+
+class ManagedModelField(ModelField):
+    """托管模型字段"""
+    def create_cache(self, instance):
+        return self.modelClass(instance.addr + self.offset, instance.context)
 
 
 class CoordField(Cachable):
