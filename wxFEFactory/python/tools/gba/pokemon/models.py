@@ -2,9 +2,9 @@ from lib.hack.model import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
     ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField, ManagedModel
 )
-from lib.hack.localhandler import LocalHandler
-from lib import utils
-import ctypes
+from lib.hack.localhandler import LocalHandler, LocalModel
+from lib.utils import LOWORD, HIWORD
+import random
 
 
 class ItemSlot(Model):
@@ -27,6 +27,7 @@ class StoreItem(Model):
 
 class PokemonStructHeader(Model):
     SIZE = 32
+    bSex = ByteField(0x00)                              # @00, dwChar低8位表示性别
     dwChar = DWordField(0x00)                           # @00, 性格値
     dwID = DWordField(0x04)                             # @04, トレーナのＩＤ
     bNickName = Field(0x08, bytes, 10)                  # @08, ニックネーム
@@ -64,12 +65,12 @@ class PokemonStructAcquiredInfo(Model):
 class PokemonStructInnateInfo(Model):
     SIZE = 12
     (
-        bPokeVirus,    # @0x00, if any bit is set, ポケルスがかかる
-        bBlackPoint,   # @0x04, if any bit is set, 黒い点がつき
-        bCatchPlace,   # @0x08, where the Pokemon was caught
-        bCatchLevel,   # @0x10, the Pokemon's level when it was caught
-        bGameVersion,  # @0x17, game version (sapphire=1, ruby=2, emerald=3, fire=4, leaf=5)
-        bPokeBall,     # @0x1B, Poke-Ball type (Write twice, why?)
+        bPokeVirus,    # @0x00, if any bit is set, 宝可梦病毒
+        bBlackPoint,   # @0x04, if any bit is set, 黑点
+        bCatchPlace,   # @0x08, 捕捉地点
+        bCatchLevel,   # @0x10, 捕捉时等级
+        bGameVersion,  # @0x17, 游戏版本 (sapphire=1, ruby=2, emerald=3, fire=4, leaf=5)
+        bPokeBall,     # @0x1B, 所用精灵球
         unk1,          # @0x1F, 0
     ) = BitsField.create(0x00, 4, (4, 4, 8, 7, 4, 4, 1))
     (
@@ -100,9 +101,10 @@ class PokemonStructInfo(Model):
     SkillInfo = ModelField(0, PokemonStructSkillInfo)
     AcquiredInfo = ModelField(0, PokemonStructAcquiredInfo)
     InnateInfo = ModelField(0, PokemonStructInnateInfo)
+    value = Field(0, bytes, SIZE)
 
 
-class PokemonStruct(Model):
+class PokemonStruct(LocalModel):
     SIZE = 80
     bEncoded = True
 
@@ -166,9 +168,9 @@ class PokemonStruct(Model):
                 temp = pdwPokemon[n]
                 temp ^= dwXorMask
                 pdwPokemon[n] = temp
-                wChecksum += utils.LOWORD(temp) + utils.HIWORD(temp)
+                wChecksum += LOWORD(temp) + HIWORD(temp)
 
-            Header.wChecksum = utils.LOWORD(wChecksum)
+            Header.wChecksum = LOWORD(wChecksum)
             self.bEncoded = False
 
     def Encode(self):
@@ -180,7 +182,7 @@ class PokemonStruct(Model):
         Header = self.Header
 
         # make sure this pokemon is daycare-center-enbled, and not a bag egg
-        if self.breedInfo.wBreed != 0:
+        if self.breedInfo and self.breedInfo.wBreed != 0:
             Header.bBadEgg |= 0x02
             Header.bBadEgg &= (~0x05) & 0xFF
 
@@ -189,11 +191,117 @@ class PokemonStruct(Model):
 
         for n in range(len(pdwPokemon)):
             temp = pdwPokemon[n]
-            wChecksum += utils.LOWORD(temp) + utils.HIWORD(temp)
+            wChecksum += LOWORD(temp) + HIWORD(temp)
             pdwPokemon[n] = temp ^ dwXorMask
 
-        Header.wChecksum = wChecksum
+        Header.wChecksum = LOWORD(wChecksum)
         self.bEncoded = True
+
+    def SetChar(self, char):
+        rgInfo = self.rgInfo
+        bOrder = self.DetermineWhichIsWhere()
+        values = tuple(rgInfo[bOrder[i]].value for i in range(4))
+        Header = self.Header
+        Header.dwChar = dwChar
+        bOrder = self.DetermineWhichIsWhere()
+        for i in range(4):
+            rgInfo[bOrder[i]].value = values[i]
+        self.CalculatePokemonStructInfoPtr()
+
+        bShiny = self.GetIsShiny()
+        if bShiny is True:
+            Header.dwID = self.GenShinyID()
+        elif bShiny is False:
+            while self.GetIsShiny():
+                SetID(Header.dwID + 0x00010000)
+
+    def GetIsShiny(self):
+        if self.bEncoded:
+            return
+        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        wShiny = LOWORD(dwChar) ^ HIWORD(dwChar) ^ LOWORD(dwID)   ^ HIWORD(dwID)
+        return wShiny <= 0x07
+
+    def GenShinyID(self):
+        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        dwShinyId = LOWORD(dwID) ^ LOWORD(dwChar) ^ HIWORD(dwChar) ^ random.randint(0, 7)
+        dwShinyId = (dwShinyId << 16) | LOWORD(dwID)
+        return dwShinyId
+
+    def GenNoShinyID(self):
+        wNoShinyRand = random.randint(0, 0xFFFF) & 0xFFF8
+        if wNoShinyRand == 0:
+            wNoShinyRand = 8
+        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        dwNoShinyId = LOWORD(dwID) ^ LOWORD(dwChar) ^ HIWORD(dwChar)
+        dwNoShinyId = ((dwNoShinyId ^ wNoShinyRand) << 16) | LOWORD(dwID)
+        return dwNoShinyId
+
+    def GetPersonality(self):
+        # 性格序号
+        if self.bEncoded:
+            return 0
+        return self.Header.dwChar % 25
+
+    def SetPersonality(self, bType):
+        if self.bEncoded:
+            return
+        bShiny = GetIsShiny()
+        if bType >= 25:
+            bType %= 25
+        dwDiff = bType + 25 - GetPersonality()
+        if dwDiff >= 25:
+            dwDiff %= 25
+        if dwDiff is 0:
+            return
+        # note: 0x00100000 % 25 = 1
+        # it is an ideal number for preserving the low word
+        dwChar = self.Header.dwChar
+        if 0xFFFFFFFF - dwChar < dwDiff:
+            dwChar -= 0x01900000 - dwDiff
+        else:
+            dwChar += dwDiff
+        self.SetChar(dwChar)
+
+    personality = property(GetPersonality, SetPersonality)
+
+    def GetSexByte(self):
+        return 0 if self.bEncoded else self.Header.bSex
+
+    def SetSexByte(self, bSex):
+        self.Header.bSex = bSex
+        self.SetPersonality(self.GetPersonality())
+
+    def GetSex(self, bFemaleRatio):
+        if self.bEncoded:
+            return PM_NEITHER
+        if bFemaleRatio == 0xFF:        # 性別不明
+            return PM_NEITHER
+        elif bFemaleRatio == 0xFE:   # 雌のみ
+            return PM_FEMALE
+        elif bFemaleRatio == 0x00:   # 雄のみ
+            return PM_MALE
+        else:
+            # the least significant byte indicates sex
+            if self.GetSexByte() <= bFemaleRatio:
+                return PM_FEMALE
+            else:
+                return PM_MALE
+
+    def SetSex(self, bType, bFemaleRatio):
+        if self.bEncoded:
+            return
+        if (bFemaleRatio == 0xFF or # 性別不明
+            bFemaleRatio == 0xFE or # 雌のみ
+            bFemaleRatio == 0x00):  # 雄のみ
+            return
+        if bType is PM_FEMALE:
+            bSex = random.randint(0, bFemaleRatio + 1)
+        elif bType is PM_MALE:
+            bSex = 0xFF - random.randint(0, 0xFF - bFemaleRatio)
+        else:
+            return
+        self.SetSexByte(bSex)
 
 
 class PokemonStructRear(Model):
@@ -219,12 +327,6 @@ class PokemonStructActives(Model):
     """local helper"""
     SIZE = PokemonStructActive.SIZE * 6
     content = ArrayField(0, 6, ModelField(0, PokemonStructActive), True)
-
-    def to_local(self):
-        p = ctypes.create_string_buffer(self.to_bytes())
-        local_ins = __class__(ctypes.addressof(p), LocalHandler.get_instance())
-        local_ins.buff = p
-        return local_ins
 
 
 class BreedListEntry(Model):
@@ -587,14 +689,20 @@ class EmeraldEn(PointerGlobal):
     skill_list = Field(0x0031C898)
 
 
+# 版本
 PM_UNKNOWN = 0
 PM_SAPPHIRE = 1
 PM_RUBY = 2
 PM_EMERALD = 3
 PM_FIRE = 4
 PM_LEAF = 5
+# 语言
 LANG_JP = 0
 LANG_EN = 1
+# 性别
+PM_FEMALE = 0
+PM_MALE = 1
+PM_NEITHER = 2
 
 GAME_VERSON = {
     "POKEMON RUBYAXVJ": (RubyJp, PM_RUBY, LANG_JP),

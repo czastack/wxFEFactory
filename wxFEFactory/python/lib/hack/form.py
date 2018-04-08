@@ -617,17 +617,19 @@ class ModelCoordWidget(ModelWidget, CoordWidget):
 
 
 class BaseSelect(TwoWayWidget):
-    def __init__(self, *args, choices=None, values=None, **kwargs):
+    def __init__(self, *args, choices=None, values=None, onselect=None, **kwargs):
         self.choices = choices
         self.values = values
+        self.onselect = onselect
         super().__init__(*args, **kwargs)
 
     def render(self):
         super().render()
         with ui.Horizontal(className="fill"):
-            self.view = ui.Choice(className="fill", choices=self.choices)
+            self.view = ui.Choice(className="fill", choices=self.choices, onselect=self.onselect)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
+        del self.choices, self.onselect
 
     def setItems(self, choices, values=0):
         self.view.setItems(choices)

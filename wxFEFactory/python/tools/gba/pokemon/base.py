@@ -14,11 +14,14 @@ class BasePMHack(BaseGbaHack):
         super().__init__()
         self._globalins = None
         self._pokemonins = models.Pokemon(0, self.handler)
-        self.pokemon_index = 0
+        self.active_pokemon_index = 0
+        self.active_pokemon_ins = None
 
     def render_main(self):
         datasets = self.datasets
-        pokemon = self.weak._pokemon
+        this = self.weak
+        # pokemon = self.weak._pokemon
+        active_pokemon = this._active_pokemon
         with Group("global", "全局", self._global, horizontal=False):
             ModelInput("money", "金钱", spin=True)
             ModelInput("coin", "游戏币", spin=True)
@@ -44,12 +47,34 @@ class BasePMHack(BaseGbaHack):
                 ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
                 ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
             with backpack_group.footer:
-                self.backpack_pageview = Pagination(self.weak.on_backpack_page, self.BACKPACK_PAGE_LENGTH)
+                self.backpack_pageview = Pagination(this.on_backpack_page, self.BACKPACK_PAGE_LENGTH)
             self.backpack_group = backpack_group
 
-        with Group("pokemon", "宝可梦", self._global):
-            
-            pass
+        with StaticGroup("宝可梦") as pokemon_group:
+            ui.RadioBox("带着的宝可梦", className="expand", choices=tuple(str(i) for i in range(1, 7)), onselect=self.on_active_pokemo_swith)
+
+            with ui.Notebook(className="fill") as book:
+                with Group("basic", "基本", active_pokemon):
+                    ModelInput("breedInfo.bIntimate", "亲密度", spin=True, max=255)
+                    ModelSelect("breedInfo.wBreed", "种族", choices=datasets.POKEMONS)
+                    ModelInput("Header.dwChar", "性格值", hex=True)
+                    ModelInput("Header.dwID", "ID", hex=True)
+                    ModelSelect("personality", "性格", choices=datasets.PERSONALITYS, onselect=this.on_personality_select)
+                    ui.Text("性格描述")
+                    self.personality_desc = ui.Text("")
+                with Group("basic", "能力", active_pokemon):
+                    pass
+                with Group("basic", "技能", active_pokemon):
+                    pass
+                with Group("basic", "缎带", active_pokemon):
+                    pass
+                with Group("basic", "其它", active_pokemon):
+                    pass
+
+            with ui.Horizontal(className="expand"):
+                ui.Button("读入", className="btn_sm", onclick=this.read_active_pokemon)
+                ui.Button("写回", className="btn_sm", onclick=this.write_active_pokemon)
+            self.pokemon_group = pokemon_group
 
     def onattach(self):
         rom_title = self.handler.getRomTitle()
@@ -69,23 +94,34 @@ class BasePMHack(BaseGbaHack):
     def _global(self):
         return self._globalins
 
-    def on_pokemon_change(self, lb):
-        self.pokemon_index = lb.index
-
-    def _pokemon(self):
-        pokemon_addr = self.PERSON_ADDR_START + self.pokemon_index * models.Pokemon.SIZE
-        self._pokemonins.addr = pokemon_addr
-        return self._pokemonins
-
-    def _active_pokemons(self):
-        pokemons = self._globalins.active_pokemon.to_local()
+    def read_active_pokemons(self):
+        pokemons = self._globalins.active_pokemon.tolocal()
         for pokemon in pokemons.content:
             pokemon.pmStruct.attach()
             pokemon.pmStruct.Decode()
         return pokemons
 
-    pokemon = property(_pokemon)
-    active_pokemons = property(_active_pokemons)
+    def read_active_pokemon(self, _=None):
+        active_pokemon = self._globalins.active_pokemon.content[self.active_pokemon_index]
+        self.active_pokemon_ins = pokemon = active_pokemon.pmStruct.tolocal()
+        pokemon.attach()
+        pokemon.Decode()
+        return pokemon
+
+    def write_active_pokemon(self, _=None):
+        pokemon = self.active_pokemon_ins
+        if pokemon:
+            temp = pokemon.tolocal()
+            temp.bEncoded = False
+            temp.Encode()
+            self._globalins.active_pokemon.content[self.active_pokemon_index].pmStruct = temp
+
+
+    def _active_pokemon(self):
+        return self.active_pokemon_ins or self.read_active_pokemon()
+
+    # pokemon = property(_pokemon)
+    # active_pokemons = property(_active_pokemons)
 
     def on_backpack_page(self, page):
         """背包物品切换页"""
@@ -97,5 +133,16 @@ class BasePMHack(BaseGbaHack):
         self.backpack_pageview.asset_total(self._globalins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
         self.backpack_group.read()
 
-    def read_active_pokemons(self, _=None):
-        pass
+    def on_active_pokemo_swith(self, view):
+        self.active_pokemon_index = view.index
+        self.read_active_pokemon()
+        self.pokemon_group.read()
+
+    def on_personality_select(self, view):
+        personality = view.index
+        b = [1, 1, 1, 1, 1]
+        b[personality // 5] += 1
+        b[personality % 5] -= 1
+        sz = ("－", "　", "＋")
+        desc = "攻击:{}防御:{}敏捷:{}特攻:{}特防:{}".format(*(sz[i] for i in b))
+        self.personality_desc.label = desc

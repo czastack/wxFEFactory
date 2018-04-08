@@ -1,5 +1,6 @@
 from lib import utils
 from .. import datasets
+from ..datasets import PERSONALITYS
 
 BACKPACK_LABELS = datasets.BACKPACK_LABELS[:-1]
 BACKPACK_KEYS = datasets.BACKPACK_KEYS[:-1]

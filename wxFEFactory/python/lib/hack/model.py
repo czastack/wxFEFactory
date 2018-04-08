@@ -32,6 +32,20 @@ class Model:
     def __and__(self, field):
         return self.addrof(field)
 
+    def __getitem__(self, attrs):
+        if isinstance(attrs, str):
+            return getattr(self, attr)
+        else:
+            return (getattr(self, attr) for attr in attrs)
+
+    def __setitem__(self, attrs, values):
+        if isinstance(attrs, str):
+            setattr(self, attrs, values)
+        else:
+            valueiter = iter(values)
+            for attr in attrs:
+                setattr(self, attr, next(valueiter))
+
     def __getattr__(self, name):
         data = test_comlex_attr(name)
         if data is not None:
@@ -271,7 +285,14 @@ class ModelField(Cachable, Field):
         cache.addr = instance.addr + self.offset
 
     def __set__(self, instance, value):
-        raise AttributeError("can't set attribute")
+        if isinstance(value, self.modelClass):
+            instance.handler.write(instance.addr + self.offset, value.to_bytes())
+        elif isinstance(value, bytes):
+            if len(value) != self.size:
+                raise ValueError("value size {} not match Model size {}".format(len(value), self.size))
+            instance.handler.write(instance.addr + self.offset, value)
+        else:
+            raise ValueError("can't set attribute, except bytes or Model object")
 
 
 class ManagedModelField(ModelField):

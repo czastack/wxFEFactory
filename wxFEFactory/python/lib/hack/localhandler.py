@@ -1,4 +1,5 @@
 from fefactory_api import mem_read, mem_write
+from .model import Model
 import ctypes
 import struct
 
@@ -114,3 +115,11 @@ class LocalHandler:
         if __instance is None:
             __instance = cls()
         return __instance
+
+
+class LocalModel(Model):
+    def tolocal(self):
+        p = ctypes.create_string_buffer(self.to_bytes())
+        local_ins = self.__class__(ctypes.addressof(p), LocalHandler.get_instance())
+        local_ins.buff = p
+        return local_ins
