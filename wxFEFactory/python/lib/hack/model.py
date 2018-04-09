@@ -69,6 +69,7 @@ class Model:
                         break
                 i += 1
             return item
+        raise AttributeError
 
     def __setattr__(self, name, value):
         data = test_comlex_attr(name)

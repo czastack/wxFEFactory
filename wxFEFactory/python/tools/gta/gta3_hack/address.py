@@ -13,3 +13,6 @@ SCRIPT_SPACE_BASE = 0x74B248
 
 FUNC_IsBoatModel = 0x50BB90
 FUNC_CAutomobile__Fix = 0x53C240
+
+# FUNC_CPhysical__ApplyMoveForce = 0x4959A0
+# FUNC_CPhysical__ApplyMoveSpeed = 0x495B10

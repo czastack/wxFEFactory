@@ -71,3 +71,6 @@ FUNC_CClothes__RebuildPlayer = 0x5A82C0
 FUNC_CRunningScript__Init = 0x4648E0
 FUNC_CRunningScript__ProcessOneCommand = 0x469EB0
 SCRIPT_SPACE_BASE = 0xA49960
+
+# FUNC_CPhysical__ApplyMoveForce = 0x5429F0
+# FUNC_CPhysical__ApplyMoveSpeed = 0x542DD0

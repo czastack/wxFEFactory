@@ -25,3 +25,6 @@ FUNC_IsBikeModel = 0x55F4E0
 
 FUNC_CAutomobile__Fix = 0x588530
 FUNC_CBike_Fix = 0x609F00
+
+# FUNC_CPhysical__ApplyMoveForce = 0x4BADC0
+# FUNC_CPhysical__ApplyMoveSpeed = 0x4BAC70
