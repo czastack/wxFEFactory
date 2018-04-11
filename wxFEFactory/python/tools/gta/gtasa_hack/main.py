@@ -39,14 +39,14 @@ class Tool(BaseGTA3_VC_SA_Tool):
         player = self.weak._player
         vehicle = self.weak._vehicle
         with Group("player", "角色", player):
-            self.hp_view = ModelInput("hp", "生命")
+            ModelInput("hp", "生命")
             self.maxhp_view = ModelInput("maxhp", "最大生命")
-            self.ap_view = ModelInput("ap", "防弹衣")
-            self.rot_view = ModelInput("rotation", "旋转")
+            ModelInput("ap", "防弹衣")
+            ModelInput("rotation", "旋转")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInput("weight", "重量")
-            self.wanted_level_view = ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
+            ModelCoordWidget("speed", "速度")
+            ModelInput("weight", "重量")
+            ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
             ui.Hr()
             with ui.Vertical(className="fill"):
                 with ui.GridLayout(cols=5, vgap=10, className="expand"):
@@ -65,12 +65,12 @@ class Tool(BaseGTA3_VC_SA_Tool):
                     ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
                     ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip("死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", vehicle):
-            self.vehicle_hp_view = ModelInput("hp", "HP")
-            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            ModelInput("hp", "HP")
+            ModelCoordWidget("dir", "方向")
             self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInput("weight", "重量")
+            ModelCoordWidget("speed", "速度")
+            ModelInput("weight", "重量")
             ui.Text("")
             with ui.Vertical(className="fill"):
                 with ui.GridLayout(cols=5, vgap=10, className="expand"):
@@ -114,7 +114,7 @@ class Tool(BaseGTA3_VC_SA_Tool):
             ]
             
         with Group("global", "全局", 0):
-            self.money_view = Input("money", "金钱", address.MONEY)
+            Input("money", "金钱", address.MONEY)
             Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
             Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
             Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, type_=float)

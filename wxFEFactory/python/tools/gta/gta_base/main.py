@@ -138,7 +138,7 @@ class BaseGTATool(BaseHackTool):
         """获取偏航角"""
         PI = math.pi
         HALF_PI = PI / 2
-        yaw = self.rot_view.mem_value
+        yaw = self.player.rotation
         yaw += HALF_PI
         if yaw > PI:
             yaw += PI * 2
@@ -650,6 +650,9 @@ class BaseGTATool(BaseHackTool):
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
         self.wanted_level_view.mem_value = 0
+
+    def set_wanted_level(self, value):
+        self.player.wanted_level = 0
     
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""

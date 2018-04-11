@@ -44,13 +44,13 @@ class Tool(BaseGTATool):
         player = self.weak._player
         vehicle = self.weak._vehicle
         with Group("player", "角色", player):
-            self.hp_view = ModelInput("hp", "生命")
-            self.ap_view = ModelInput("ap", "防弹衣")
+            ModelInput("hp", "生命")
+            ModelInput("ap", "防弹衣")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            # self.weight_view = ModelInput("gravity", "重量")
-            self.speed_view = ModelCoordWidget("speed", "速度")
-            self.rot_view = ModelInput("rotation", "旋转")
-            self.wanted_level_view = ModelInput("wanted_level", "通缉等级")
+            # ModelInput("gravity", "重量")
+            ModelCoordWidget("speed", "速度")
+            ModelInput("rotation", "旋转")
+            ModelInput("wanted_level", "通缉等级")
             self.money = ModelInput("money", "金钱")
             ui.Text("")
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
@@ -63,12 +63,12 @@ class Tool(BaseGTATool):
                 ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
 
         with Group("vehicle", "汽车", vehicle):
-            self.vehicle_hp_view = ModelInput("hp", "HP")
-            self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
-            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            ModelInput("hp", "HP")
+            ModelCoordWidget("roll", "滚动")
+            ModelCoordWidget("dir", "方向")
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInput("weight", "重量")
+            ModelCoordWidget("speed", "速度")
+            ModelInput("weight", "重量")
             ui.Text("")
             with ui.Horizontal(className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)

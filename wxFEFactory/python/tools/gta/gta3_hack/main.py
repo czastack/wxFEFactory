@@ -36,24 +36,24 @@ class Tool(BaseGTA3Tool):
         player = self.weak._player
         vehicle = self.weak._vehicle
         with Group("player", "角色", player, handler=self.handler):
-            self.hp_view = ModelInput("hp", "生命")
-            self.ap_view = ModelInput("ap", "防弹衣")
-            self.rot_view = ModelInput("rotation", "旋转")
+            ModelInput("hp", "生命")
+            ModelInput("ap", "防弹衣")
+            ModelInput("rotation", "旋转")
             self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInput("weight", "重量")
-            self.wanted_level_view = ModelInput("wanted_level", "通缉等级")
+            ModelCoordWidget("speed", "速度")
+            ModelInput("weight", "重量")
+            ModelInput("wanted_level", "通缉等级")
             ui.Hr()
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
         with Group("vehicle", "汽车", vehicle, handler=self.handler):
-            self.vehicle_hp_view = ModelInput("hp", "HP")
-            self.vehicle_roll_view = ModelCoordWidget("roll", "滚动")
-            self.vehicle_dir_view = ModelCoordWidget("dir", "方向")
+            ModelInput("hp", "HP")
+            ModelCoordWidget("roll", "滚动")
+            ModelCoordWidget("dir", "方向")
             self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            self.vehicle_speed_view = ModelCoordWidget("speed", "速度")
-            self.weight_view = ModelInput("weight", "重量")
+            ModelCoordWidget("speed", "速度")
+            ModelInput("weight", "重量")
             ui.Hr()
             with ui.GridLayout(cols=5, vgap=10, className="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
@@ -69,7 +69,7 @@ class Tool(BaseGTA3Tool):
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
         with Group("global", "全局", 0, handler=self.handler):
-            self.money_view = Input("money", "金钱", address.MONEY)
+            Input("money", "金钱", address.MONEY)
             
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
