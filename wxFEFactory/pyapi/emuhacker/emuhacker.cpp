@@ -86,6 +86,13 @@ namespace emuhacker {
 		return self.write_function(buff, size);
 	}
 
+	auto alloc_data(ProcessHandler &self, py::bytes buf) {
+		char *buff;
+		ssize_t size;
+		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
+		return self.alloc_data(buff, size);
+	}
+
 	wxString getModuleFile(ProcessHandler &self, addr_t module = 0)
 	{
 		wxChar buff[MAX_PATH];
@@ -215,16 +222,21 @@ void init_emuhacker(pybind11::module & m)
 		.def("get_module", &ProcessHandler::getModuleHandle)
 		.def("get_module_file", &emuhacker::getModuleFile, "module"_a = 0)
 		.def("get_module_version", &emuhacker::getModuleVersion)
-		.def("write_function", &emuhacker::write_function)
-		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a)
+		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a, "protect"_a=PAGE_READWRITE)
 		.def("free_memory", &ProcessHandler::free_memory)
+		.def("write_function", &emuhacker::write_function)
+		.def("alloc_data", &emuhacker::alloc_data)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def("enumWindows", &emuhacker::enumWindows, "callback"_a, "prefix"_a=None)
+		.def("getProcAddressHelper", &ProcessHandler::getProcAddressHelper)
 		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process);
+
+	py::class_<ProcAddressHelper>(emuhacker, "ProcAddressHelper")
+		.def("getProcAddress", &ProcAddressHelper::getProcAddress);
 }
 
 #endif

@@ -30,7 +30,7 @@ bool Is64Bit_OS()
 bool ProcessHandler::m_is64os = Is64Bit_OS();
 
 
-ProcessHandler::ProcessHandler():mProcess(nullptr)
+ProcessHandler::ProcessHandler():m_process(nullptr), m_funcGetProcAddress(0)
 {
 	HANDLE	hProcess;
 	HANDLE	hToken;
@@ -59,10 +59,10 @@ ProcessHandler::~ProcessHandler()
 }
 
 void ProcessHandler::close(){
-	if(mProcess)
+	if(m_process)
 	{
-		CloseHandle(mProcess);
-		mProcess = nullptr;
+		CloseHandle(m_process);
+		m_process = nullptr;
 	}
 }
 
@@ -76,19 +76,19 @@ bool ProcessHandler::attachByWindowHandle(HWND hWnd){
 		DWORD	dwProcessId;
 		close();
 		GetWindowThreadProcessId(hWnd, &dwProcessId);
-		mProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
+		m_process = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 		m_is32process = is32Process();
-		return mProcess != nullptr;
+		return m_process != nullptr;
 	}
 	return false;
 }
 
 bool ProcessHandler::isValid()
 {
-	if (mProcess)
+	if (m_process)
 	{
 		DWORD code;
-		GetExitCodeProcess(mProcess, &code);
+		GetExitCodeProcess(m_process, &code);
 		return code == STILL_ACTIVE;
 	}
 	return false;
@@ -106,7 +106,7 @@ bool ProcessHandler::is32Process()
 	if (NULL != fnIsWow64Process)
 	{
 		BOOL bIsWow64 = FALSE;
-		fnIsWow64Process(mProcess, &bIsWow64);
+		fnIsWow64Process(m_process, &bIsWow64);
 		if (bIsWow64)
 		{
 			return true;
@@ -117,12 +117,12 @@ bool ProcessHandler::is32Process()
 
 bool ProcessHandler::rawRead(addr_t addr, LPVOID buffer, size_t size)
 {
-	return ReadProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
+	return ReadProcessMemory(m_process, (LPVOID)addr, buffer, size, NULL) != 0;
 }
 
 bool ProcessHandler::rawWrite(addr_t addr, LPCVOID buffer, size_t size)
 {
-	return WriteProcessMemory(mProcess, (LPVOID)addr, buffer, size, NULL) != 0;
+	return WriteProcessMemory(m_process, (LPVOID)addr, buffer, size, NULL) != 0;
 }
 
 bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
@@ -155,7 +155,7 @@ addr_t ProcessHandler::getProcessBaseAddress()
 	HMODULE     baseModule;
 	DWORD       bytesRequired;
 
-	if (EnumProcessModules(mProcess, &baseModule, sizeof(baseModule), &bytesRequired))
+	if (EnumProcessModules(m_process, &baseModule, sizeof(baseModule), &bytesRequired))
 	{
 		return (addr_t)baseModule;
 	}
@@ -168,12 +168,12 @@ addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
 	DWORD cbNeeded;
 	HMODULE hMods[256];
 
-	if (EnumProcessModulesEx(mProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL))
+	if (EnumProcessModulesEx(m_process, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL))
 	{
 		for (int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
 		{
 			TCHAR szModName[64];
-			if (GetModuleBaseName(mProcess, hMods[i], szModName, sizeof(szModName)))
+			if (GetModuleBaseName(m_process, hMods[i], szModName, sizeof(szModName)))
 			{
 				if (wcscmp(name, szModName) == 0)
 				{
@@ -185,36 +185,41 @@ addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
 	return 0;
 }
 
+addr_t ProcessHandler::alloc_memory(size_t size, DWORD protect)
+{
+	return (addr_t)VirtualAllocEx(m_process, NULL, size, MEM_COMMIT | MEM_RESERVE, protect);
+}
+
+void ProcessHandler::free_memory(addr_t addr)
+{
+	VirtualFreeEx(m_process, (LPVOID)addr, 0, MEM_RELEASE);
+}
+
 addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
 {
-	addr_t fnAddr = alloc_memory(size);
-	if (fnAddr == NULL)
+	addr_t fnAddr = alloc_memory(size, PAGE_EXECUTE_READWRITE);
+	if (!fnAddr || !rawWrite(fnAddr, buf, size))
 	{
-		std::cout << "Alloc function failed" << std::endl;
-		return 0;
-	}
-
-	if (!rawWrite(fnAddr, buf, size))
-	{
-		std::cout << "Write function failed" << std::endl;
+		// std::cout << "Write failed" << std::endl;
 		return 0;
 	}
 	return fnAddr;
 }
 
-addr_t ProcessHandler::alloc_memory(size_t size)
+addr_t ProcessHandler::alloc_data(LPCVOID buf, size_t size)
 {
-	return (addr_t)VirtualAllocEx(mProcess, NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-}
-
-void ProcessHandler::free_memory(addr_t addr)
-{
-	VirtualFreeEx(mProcess, (LPVOID)addr, 0, MEM_RELEASE);
+	addr_t addr = alloc_memory(size);
+	if (!addr || !rawWrite(addr, buf, size))
+	{
+		// std::cout << "Write failed" << std::endl;
+		return 0;
+	}
+	return addr;
 }
 
 DWORD ProcessHandler::remote_call(addr_t addr, LONG_PTR arg)
 {
-	HANDLE hThread = CreateRemoteThread(mProcess, NULL, 0, (PTHREAD_START_ROUTINE)addr, (LPVOID)arg, 0, NULL);
+	HANDLE hThread = CreateRemoteThread(m_process, NULL, 0, (PTHREAD_START_ROUTINE)addr, (LPVOID)arg, 0, NULL);
 
 	if (!hThread)
 	{
@@ -231,4 +236,69 @@ DWORD ProcessHandler::remote_call(addr_t addr, LONG_PTR arg)
 	return code;
 }
 
+ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
+{
+	LONG e_lfanew;
+	DWORD VirtualAddress;
+	// IMAGE_NT_HEADERS64 nth;
+	IMAGE_EXPORT_DIRECTORY ides;
+
+	rawRead(module + offsetof(IMAGE_DOS_HEADER, e_lfanew), &e_lfanew, sizeof(LONG));
+	size_t offsetVirtualAddress = m_is32process ?
+		offsetof(IMAGE_NT_HEADERS32, OptionalHeader) + offsetof(IMAGE_OPTIONAL_HEADER32, DataDirectory)
+			+ offsetof(IMAGE_DATA_DIRECTORY, VirtualAddress) :
+		offsetof(IMAGE_NT_HEADERS64, OptionalHeader) + offsetof(IMAGE_OPTIONAL_HEADER64, DataDirectory)
+			+ offsetof(IMAGE_DATA_DIRECTORY, VirtualAddress);
+	rawRead(module + e_lfanew + offsetVirtualAddress, &VirtualAddress, sizeof(DWORD));
+	rawRead(module + VirtualAddress, &ides, sizeof(IMAGE_EXPORT_DIRECTORY));
+	
+	return new ProcAddressHelper(this, &ides, module);
+}
+
 #endif
+
+ProcAddressHelper::ProcAddressHelper(ProcessHandler * handler, LPVOID pides, addr_t module):
+	m_handler(handler), m_module(module)
+{
+	m_pides = new IMAGE_EXPORT_DIRECTORY;
+	memcpy(m_pides, pides, sizeof(IMAGE_EXPORT_DIRECTORY));
+}
+
+ProcAddressHelper::~ProcAddressHelper()
+{
+	if (m_pides)
+	{
+		delete m_pides;
+	}
+}
+
+addr_t ProcAddressHelper::getProcAddress(LPCSTR funcname)
+{
+	size_t namesize = strlen(funcname);
+	char *namebuf = (char*)malloc(namesize + 1);
+	namebuf[namesize] = NULL;
+
+	// 按函数名查找函数地址
+	IMAGE_EXPORT_DIRECTORY &ides = *(PIMAGE_EXPORT_DIRECTORY)m_pides;
+	addr_t namePtrAddr = m_module + ides.AddressOfNames;
+	DWORD nameAddr;
+	addr_t result = NULL;
+	for (unsigned i = 0; i < ides.NumberOfNames; i++)
+	{
+		m_handler->rawRead(namePtrAddr, &nameAddr, sizeof(DWORD));
+		m_handler->rawRead(m_module + nameAddr, namebuf, namesize);
+
+		if (strcmp(namebuf, funcname) == 0)
+		{
+			WORD origin;
+			DWORD func;
+			m_handler->rawRead(m_module + ides.AddressOfNameOrdinals + i * sizeof(WORD), &origin, sizeof(WORD));
+			m_handler->rawRead(m_module + ides.AddressOfFunctions + origin * sizeof(DWORD), &func, sizeof(DWORD));
+			result = m_module + func;
+			break;
+		}
+		namePtrAddr += sizeof(DWORD);
+	}
+	free(namebuf);
+	return result;
+}

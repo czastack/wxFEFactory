@@ -10,7 +10,8 @@ typedef const wchar_t* CSTR;
 class ProcessHandler
 {
 protected:
-	HANDLE		mProcess;
+	HANDLE		m_process;
+	addr_t      m_funcGetProcAddress;
 	static bool m_is64os;
 	bool        m_is32process; // 目标是32位进程
 
@@ -46,8 +47,8 @@ public:
 	bool isValid();
 
 	bool is32Process();
-	auto getProcess() { return mProcess; }
-	DWORD getProcessId() { return ::GetProcessId(mProcess); }
+	auto getProcess() { return m_process; }
+	DWORD getProcessId() { return ::GetProcessId(m_process); }
 
 	int getPtrSize() { return m_is32process ? 4 : 8; }
 
@@ -211,10 +212,25 @@ public:
 
 	addr_t getModuleHandle(LPCTSTR name);
 
-	addr_t write_function(LPCVOID buf, size_t size);
-
-	addr_t alloc_memory(size_t size);
+	addr_t alloc_memory(size_t size, DWORD protect = PAGE_READWRITE);
 	void free_memory(addr_t addr);
 
+	addr_t write_function(LPCVOID buf, size_t size);
+	addr_t alloc_data(LPCVOID buf, size_t size);
+
 	DWORD remote_call(addr_t addr, LONG_PTR arg);
+	class ProcAddressHelper* getProcAddressHelper(addr_t module);
+};
+
+
+class ProcAddressHelper
+{
+private:
+	ProcessHandler * m_handler;
+	LPVOID m_pides;
+	addr_t m_module;
+public:
+	ProcAddressHelper(ProcessHandler *handler, LPVOID pides, addr_t module);
+	~ProcAddressHelper();
+	addr_t getProcAddress(LPCSTR funcname);
 };

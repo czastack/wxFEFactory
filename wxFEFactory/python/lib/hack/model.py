@@ -69,7 +69,7 @@ class Model:
                         break
                 i += 1
             return item
-        raise AttributeError
+        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
         data = test_comlex_attr(name)

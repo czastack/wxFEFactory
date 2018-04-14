@@ -62,6 +62,30 @@ class MemHandler(ProcessHandler):
             return self.write(addr, data, size)
         return False
 
+    def inject_dll(self, path):
+        LoadLibrary = getattr(self, '_LoadLibrary', None)
+        if LoadLibrary is None:
+            module = self.get_module('KERNEL32.DLL')
+            helper = self.getProcAddressHelper(module)
+            self._LoadLibrary = LoadLibrary = helper.getProcAddress('LoadLibraryW')
+            self._FreeLibrary = LoadLibrary = helper.getProcAddress('FreeLibrary')
+
+        if LoadLibrary and path:
+            print(LoadLibrary)
+            data = path.encode('unicode_internal') + b'\x00\x00'
+            lpname = self.alloc_data(data)
+            result = self.remote_call(LoadLibrary, lpname)
+            self.free_memory(lpname)
+            return result
+        return False
+
+    def free_dll(self, name):
+        FreeLibrary = getattr(self, '_FreeLibrary', None)
+        if FreeLibrary is not None:
+            module = self.get_module(name)
+            return self.remote_call(FreeLibrary, module)
+        return False
+
     def raw_env(self):
         return _RawEnv(self)
 

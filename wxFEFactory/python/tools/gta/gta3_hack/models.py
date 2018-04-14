@@ -96,6 +96,10 @@ class Player(Entity, GTA3Player):
         self.handler.write32(wanted_ptr, (0, 60, 220, 420, 820, 1620, 3220)[value])
 
 
+class Object(Entity):
+    SIZE = 0x198
+
+
 class Marker(BaseBlip):
     SIZE = 48
 

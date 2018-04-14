@@ -132,7 +132,7 @@ class BaseGTATool(BaseHackTool):
     @property
     def object_pool(self):
         """物体池"""
-        return self.models.Pool(self.address.OBJECT_POOL, self, self.Object)
+        return self.models.Pool(self.address.OBJECT_POOL, self, self.models.Object)
 
     def get_yaw(self):
         """获取偏航角"""
@@ -532,6 +532,7 @@ class BaseGTATool(BaseHackTool):
                 coord = blip.coord
             else:
                 entity = blip.entity
+                self.en = entity
                 if entity:
                     coord = entity.coord
                 else:

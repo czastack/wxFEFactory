@@ -103,6 +103,10 @@ class Vehicle(Entity, GTA3Vehicle):
         self.door_status = 1
 
 
+class Object(Entity):
+    SIZE = 0x194
+
+
 class Marker(BaseBlip):
     SIZE = 56
 
