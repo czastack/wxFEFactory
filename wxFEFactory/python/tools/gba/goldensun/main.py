@@ -72,8 +72,8 @@ class BaseGSTool(BaseGbaHack):
 
     def render_djinnis(self):
         for (tlable, tname), (labels, helps) in zip(self.datasets.ELEMENT_TYPES, self.datasets.DJINNIS):
-            ModelFlagWidget("djinni_%s" % tname, "%s精灵" % tlable, labels=labels, helps=helps, checkbtn=True)
-            ModelFlagWidget("djinni_%s_on" % tname, "附身", labels=labels, helps=helps, checkbtn=True)
+            ModelFlagWidget("djinni_%s" % tname, "%s精灵" % tlable, labels=labels, helps=helps, checkbtn=True, cols=8)
+            ModelFlagWidget("djinni_%s_on" % tname, "附身", labels=labels, helps=helps, checkbtn=True, cols=8)
             ModelInput("djinni_%s_count" % tname, "拥有数量").view.setToolTip("至少一个角色精灵数量大于0才会显示精灵菜单")
             ModelInput("djinni_%s_on_count" % tname, "附身数量")
 

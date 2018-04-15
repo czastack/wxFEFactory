@@ -663,18 +663,23 @@ class ModelSelect(ModelWidget, BaseSelect):
 
 
 class BaseFlagWidget(TwoWayWidget):
-    def __init__(self, *args, labels=None, helps=None, values=None, checkbtn=False, **kwargs):
+    def __init__(self, *args, labels=None, helps=None, values=None, checkbtn=False, cols=None, **kwargs):
         """size: hex为True时有用"""
         self.labels = labels
         self.helps = helps
         self.values = values or tuple(1 << i for i in range(len(labels)))
         self.checkbtn = checkbtn
+        self.cols = cols
         super().__init__(*args, **kwargs)
 
     def render(self):
         ui.Text(self.label, className="form_label expand")
         with ui.Horizontal(className="fill"):
-            with ui.Horizontal(className="fill") as view:
+            if self.cols is not None:
+                view = ui.GridLayout(cols=self.cols, vgap=10, className="fill")
+            else:
+                view = ui.Horizontal(className="fill")
+            with view:
                 self.views = tuple(
                     ui.CheckBox(label) for label in self.labels
                 )
@@ -686,6 +691,7 @@ class BaseFlagWidget(TwoWayWidget):
                 ui.Button(label="不选", style=btn_xs_style, onclick=self.weak.uncheck_all)
             self.render_btn()
         self.view = view
+        del self.labels, self.helps, self.cols
 
     @property
     def input_value(self):
