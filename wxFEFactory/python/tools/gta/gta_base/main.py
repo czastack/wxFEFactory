@@ -650,10 +650,10 @@ class BaseGTATool(BaseHackTool):
 
     def clear_wanted_level(self, _=None):
         """清除通缉等级"""
-        self.wanted_level_view.mem_value = 0
+        self.set_wanted_level(0)
 
     def set_wanted_level(self, value):
-        self.player.wanted_level = 0
+        self.player.wanted_level = value
     
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""

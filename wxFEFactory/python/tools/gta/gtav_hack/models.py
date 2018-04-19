@@ -179,10 +179,15 @@ class NativeEntity(NativeModel):
     @property
     def entity_attached_to(self):
         entity = NativeEntity(self.native_call('GET_ENTITY_ATTACHED_TO', 'Q', self.handle), self.context)
-        if entity.is_ped:
-            return Player(0, entity.handle, self.context)
-        elif entity.is_vehicle:
-            return Vehicle(entity.handle, self.context)
+        return entity.subtype_instance()
+
+    def subtype_instance(self):
+        if self.is_ped:
+            return Player(0, self.handle, self.context)
+        elif self.is_vehicle:
+            return Vehicle(self.handle, self.context)
+        elif self.is_object:
+            return Object(self.handle, self.context)
 
     def fight_against(self, ped):
         self.script_call('TASK_COMBAT_PED', '4Q', self.handle, self.make_handle(ped), 0, 16)

@@ -63,7 +63,9 @@ class Tool(BaseGTATool):
         self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
         self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
         self.lazy_group(StaticGroup("测试"), self.render_functions)
-        self.lazy_group(Group(None, "设置", None, hasfooter=False), self.render_config)
+        
+        with Group(None, "设置", None, hasfooter=False):
+            self.render_config()
 
     def render_player(self):
         ModelInput("hp", "生命")
@@ -232,6 +234,8 @@ class Tool(BaseGTATool):
             ui.Button("发射生成物体", onclick=self.create_launch_object)
             ui.Button("前面起火", onclick=self.create_fire_at_front)
             ui.Button("打架", onclick=self.fight_against)
+            ui.Button("导弹射向所瞄", onclick=self.rocket_shoot_entity_aiming_at)
+            ui.Button("所瞄目标爆炸", onclick=self.entity_aiming_at_explode)
             self.set_buttons_contextmenu()
 
     def render_config(self):
@@ -1191,7 +1195,7 @@ class Tool(BaseGTATool):
                 coord0[2] += height
                 self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
-    def rocket_shoot(self, entitys, speed=100, height=10):
+    def rocket_shoot(self, entitys, speed=100):
         """导弹射向目标"""
         weapon = self.get_shoot_weapon()
         if self.config.rocket_attack_no_owner:
@@ -1480,3 +1484,24 @@ class Tool(BaseGTATool):
         me = self.ped_id
         for p in self.get_near_peds():
             p.fight_against(me)
+
+    @property
+    def entity_aiming_at(self):
+        self.native_call('GET_ENTITY_PLAYER_IS_FREE_AIMING_AT', '2Q', self.player_id, self.native_context.get_temp_addr())
+        entity = models.NativeEntity(self.native_context.get_temp_value(), self)
+        return entity.subtype_instance()
+
+    def rocket_shoot_entity_aiming_at(self, _):
+        entity = self.entity_aiming_at
+        if entity is not None:
+            self.rocket_shoot((entity,))
+
+    def entity_aiming_at_explode(self, _):
+        entity = self.entity_aiming_at
+        if entity is not None:
+            entity.create_explosion()
+
+    # def entity_aiming_at_test(self, _):
+    #     entity = self.entity_aiming_at
+    #     if entity:
+    #         print(entity, entity.coord)

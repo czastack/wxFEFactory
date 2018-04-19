@@ -1,4 +1,5 @@
 coords = (
+    ('任务相关', 'tasks'),
     ('房屋销售标志', 'ForSaleSign'),
     ('太空船碎片', 'SpaceshipPart'),
     ('信件碎片', 'LetterScrap'),
