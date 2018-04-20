@@ -424,7 +424,7 @@ class Player(NativeEntity):
         self.script_call('GIVE_WEAPON_COMPONENT_TO_PED', '3Q', self.handle, weapon, component)
 
     def remove_weapon_component(self, weapon, component):
-        self.script_call('REMOVE_WEAPON_COMPONENT_TO_PED', '3Q', self.handle, weapon, component)
+        self.script_call('REMOVE_WEAPON_COMPONENT_FROM_PED', '3Q', self.handle, weapon, component)
 
     def explode_head(self):
         """爆头"""
