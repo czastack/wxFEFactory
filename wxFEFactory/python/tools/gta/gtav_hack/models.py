@@ -420,6 +420,12 @@ class Player(NativeEntity):
 
     vehicle_weapon = property(get_vehicle_weapon, set_vehicle_weapon)
 
+    def give_weapon_component(self, weapon, component):
+        self.script_call('GIVE_WEAPON_COMPONENT_TO_PED', '3Q', self.handle, weapon, component)
+
+    def remove_weapon_component(self, weapon, component):
+        self.script_call('REMOVE_WEAPON_COMPONENT_TO_PED', '3Q', self.handle, weapon, component)
+
     def explode_head(self):
         """爆头"""
         self.script_call('EXPLODE_PED_HEAD', '2Q', self.handle, 0x1B06D571)
@@ -796,49 +802,49 @@ class Blip(NativeModel):
         self.native_call('HIDE_NUMBER_ON_BLIP', 'Ql', self.handle, number)
 
 
-class NativeRegistration(Model):
-    nextRegistration = Field(0, size=8)
-    handlers = ArrayField(8, 7, Field(0, size=8))
-    numEntries = Field(0x40)
-    hashes = ArrayField(0x48, 7, Field(0, size=8))
+# class NativeRegistration(Model):
+#     nextRegistration = Field(0, size=8)
+#     handlers = ArrayField(8, 7, Field(0, size=8))
+#     numEntries = Field(0x40)
+#     hashes = ArrayField(0x48, 7, Field(0, size=8))
 
-    def get_func(self, hash):
-        registration = NativeRegistration(self.addr, self.handler)
-        while registration.addr:
-            for i in range(registration.numEntries):
-                if hash == registration.hashes[i]:
-                    return registration.handlers[i]
-            registration.addr = registration.nextRegistration
+#     def get_func(self, hash):
+#         registration = NativeRegistration(self.addr, self.handler)
+#         while registration.addr:
+#             for i in range(registration.numEntries):
+#                 if hash == registration.hashes[i]:
+#                     return registration.handlers[i]
+#             registration.addr = registration.nextRegistration
 
 
-class NativeRegistration1290(Model):
-    """原生函数表 For 1290版本"""
-    nextRegistration1 = Field(0, size=8)
-    nextRegistration2 = Field(8, size=8)
-    handlers = ArrayField(16, 7, Field(0, size=8))
-    numEntries1 = Field(0x48)
-    numEntries2 = Field(0x4C)
-    hashes = Field(0x50, size=8)
+# class NativeRegistration1290(Model):
+#     """原生函数表 For 1290版本"""
+#     nextRegistration1 = Field(0, size=8)
+#     nextRegistration2 = Field(8, size=8)
+#     handlers = ArrayField(16, 7, Field(0, size=8))
+#     numEntries1 = Field(0x48)
+#     numEntries2 = Field(0x4C)
+#     hashes = Field(0x50, size=8)
 
-    def getNextRegistration(self):
-        v5 = self & 'nextRegistration1'
-        v13 = v5 ^ self.nextRegistration2
-        temp = self.nextRegistration1
-        return (u32(v13 ^ (temp >> 32)) << 32) | u32(v13 ^ u32(temp))
+#     def getNextRegistration(self):
+#         v5 = self & 'nextRegistration1'
+#         v13 = v5 ^ self.nextRegistration2
+#         temp = self.nextRegistration1
+#         return (u32(v13 ^ (temp >> 32)) << 32) | u32(v13 ^ u32(temp))
 
-    def getNumEntries(self):
-        return u32((self & 'numEntries1') ^ self.numEntries1 ^ self.numEntries2)
+#     def getNumEntries(self):
+#         return u32((self & 'numEntries1') ^ self.numEntries1 ^ self.numEntries2)
 
-    def getHash(self, index):
-        naddr = 16 * index + (self & 'nextRegistration1') + 0x54
-        v10 = naddr ^ self.handler.read32(naddr + 8)
-        temp = self.handler.read64(naddr)
-        return (u32(v10 ^ (temp >> 32)) << 32) | u32(v10 ^ u32(temp))
+#     def getHash(self, index):
+#         naddr = 16 * index + (self & 'nextRegistration1') + 0x54
+#         v10 = naddr ^ self.handler.read32(naddr + 8)
+#         temp = self.handler.read64(naddr)
+#         return (u32(v10 ^ (temp >> 32)) << 32) | u32(v10 ^ u32(temp))
 
-    def get_func(self, hash):
-        registration = NativeRegistration1290(self.addr, self.handler)
-        while registration.addr:
-            for i in range(registration.getNumEntries()):
-                if hash == registration.getHash(i):
-                    return registration.handlers[i]
-            registration.addr = registration.getNextRegistration()
+#     def get_func(self, hash):
+#         registration = NativeRegistration1290(self.addr, self.handler)
+#         while registration.addr:
+#             for i in range(registration.getNumEntries()):
+#                 if hash == registration.getHash(i):
+#                     return registration.handlers[i]
+#             registration.addr = registration.getNextRegistration()

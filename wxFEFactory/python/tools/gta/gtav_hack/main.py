@@ -12,7 +12,6 @@ from ..gta_base.utils import degreeToRadian, Vector3
 from ..gta_base.native import SafeScriptEnv
 from ..gta_base.widgets import ColorWidget
 from . import address, models, datasets, coords
-from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget, CustomColorWidget
@@ -62,6 +61,7 @@ class Tool(BaseGTATool):
         self.lazy_group(StaticGroup("角色模型"), self.render_ped_model)
         self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
         self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
+        self.lazy_group(StaticGroup("武器配件"), self.render_weapon_components)
         self.lazy_group(StaticGroup("测试"), self.render_functions)
         
         with Group(None, "设置", None, hasfooter=False):
@@ -166,8 +166,9 @@ class Tool(BaseGTATool):
             ui.Text("特殊能力能量充满: alt+capslock")
 
     def render_ped_model(self):
+        from .datasets.player_models import PLAYER_MODELS
         with ui.Horizontal(className="fill container"):
-            self.player_model_book = render_tab_list(datasets.PLAYER_MODEL)
+            self.player_model_book = render_tab_list(PLAYER_MODELS)
             with ui.ScrollView(className="fill container"):
                 ui.Text("1. 切换模型会失去武器")
                 ui.Text("2. 切换动物模型容易引发bug，请慎用")
@@ -176,10 +177,32 @@ class Tool(BaseGTATool):
                 ui.Button("生成人物", onclick=self.create_selected_ped)
 
     def render_vehicle_model(self):
-        self.vehicle_model_book = render_tab_list(datasets.VEHICLE_LIST)
+        from .datasets.vehicle_models import VEHICLE_MODELS
+        self.vehicle_model_book = render_tab_list(VEHICLE_MODELS)
 
     def render_object_model(self):
-        self.object_model_book  = render_tab_list(datasets.OBJECT_MODEL)
+        from .datasets.object_models import OBJECT_MODELS
+        self.object_model_book  = render_tab_list(OBJECT_MODELS)
+
+    def render_weapon_components(self):
+        from .datasets.weapon_components import WEAPON_COMPONENTS
+
+        weapon_map = {}
+        for category in datasets.WEAPON_LIST:
+            for item in category[1]:
+                weapon_map[item[0]] = item
+
+        self.weapon_components = weapon_components = []
+        for item in WEAPON_COMPONENTS:
+            weapon = weapon_map[item[0]]
+            weapon_components.append((weapon[1], item[1], weapon[2]))
+
+        with ui.Vertical(className="fill container"):
+            self.weapon_component_book  = render_tab_list(weapon_components)
+            # self.weapon_component_book.setToolTip("选中后回车键给与配件")
+            with ui.Horizontal():
+                ui.Button("给予", onclick=self.give_weapon_component)
+                ui.Button("移除", onclick=self.remove_weapon_component)
 
     def render_functions(self):
         with ui.GridLayout(cols=4, vgap=10, className="expand"):
@@ -999,7 +1022,8 @@ class Tool(BaseGTATool):
 
     def get_selected_vehicle_list(self):
         """当前刷车器活动的载具模型列表"""
-        return VEHICLE_LIST[self.vehicle_model_book.index][1]
+        from .datasets.vehicle_models import VEHICLE_MODELS
+        return VEHICLE_MODELS[self.vehicle_model_book.index][1]
 
     # 兼容继承自BaseGTATool的方法
     VEHICLE_LIST = property(get_selected_vehicle_list)
@@ -1010,10 +1034,11 @@ class Tool(BaseGTATool):
 
     def get_selected_vehicle_model(self):
         """获取刷车器选中的载具模型"""
+        from .datasets.vehicle_models import VEHICLE_MODELS
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = VEHICLE_LIST[page_index][1][item_index][1]
+            model_name = VEHICLE_MODELS[page_index][1][item_index][1]
             if isinstance(model_name, int):
                 return model_name
             return self.get_cache('vehicle_model', model_name, self.get_hash_key)
@@ -1295,10 +1320,11 @@ class Tool(BaseGTATool):
 
     def get_selected_ped_model(self):
         """获取选中的角色模型"""
+        from .datasets.player_models import PLAYER_MODELS
         page_index = self.player_model_book.index
         item_index = self.player_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = datasets.PLAYER_MODEL[page_index][1][item_index][1]
+            model_name = PLAYER_MODELS[page_index][1][item_index][1]
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
     def set_player_model(self, _=None):
@@ -1315,10 +1341,11 @@ class Tool(BaseGTATool):
 
     def get_selected_object_model(self):
         """获取选中的物体模型"""
+        from .datasets.object_models import OBJECT_MODELS
         page_index = self.object_model_book.index
         item_index = self.object_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = datasets.OBJECT_MODEL[page_index][1][item_index][1]
+            model_name = OBJECT_MODEL[page_index][1][item_index][1]
             return self.get_cache('object_model', model_name, self.get_hash_key)
 
     def create_selected_object(self, _=None):
@@ -1505,3 +1532,22 @@ class Tool(BaseGTATool):
     #     entity = self.entity_aiming_at
     #     if entity:
     #         print(entity, entity.coord)
+
+    def get_selected_weapon_component(self):
+        page_index = self.weapon_component_book.index
+        item_index = self.weapon_component_book.getPage(page_index).index
+        if item_index is not -1:
+            data = self.weapon_components[page_index]
+            weapon_hash = data[2]
+            component_hash = data[1][item_index][1]
+            return weapon_hash, component_hash
+
+    def give_weapon_component(self, _):
+        data = self.get_selected_weapon_component()
+        if data:
+            self.player.give_weapon_component(*data)
+
+    def remove_weapon_component(self, _):
+        data = self.get_selected_weapon_component()
+        if data:
+            self.player.remove_weapon_component(*data)
