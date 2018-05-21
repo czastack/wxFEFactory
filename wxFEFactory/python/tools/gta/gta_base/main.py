@@ -306,7 +306,7 @@ class BaseGTATool(BaseHackTool):
 
     def collect_vehicles(self):
         """暂存附近的载具"""
-        self._vehicles = self.get_near_vehicles(distance=100)
+        self._vehicles = self.get_near_vehicles()
 
     def next_collected_vehicle(self, is_retry=False, recollect=False):
         """获取下一辆暂存的载具"""

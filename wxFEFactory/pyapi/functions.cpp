@@ -150,7 +150,7 @@ void mem_write(size_t address, py::bytes value, size_t size)
 	Py_ssize_t ssize;
 	char *p = NULL;
 	PyBytes_AsStringAndSize(value.ptr(), &p, &ssize);
-	if (size == 0 || size > ssize)
+	if (size == 0 || (Py_ssize_t)size > ssize)
 	{
 		size = ssize;
 	}

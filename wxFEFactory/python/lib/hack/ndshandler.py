@@ -41,10 +41,10 @@ class NdsEmuHandler(MemHandler):
 
 class DeSmuMEHandler(NdsEmuHandler):
     # DeSmuME_0.9.10?: 0x51E8B90
-    WINDOW_NAME = "DeSmuME"
+    CLASS_NAME = "DeSmuME"
 
     def attach(self):
-        succeed = self.attachByWindowName(self.WINDOW_NAME, None)
+        succeed = self.attachByWindowName(self.CLASS_NAME, None)
         if succeed:
             self.base_addr = self.base + 0x5411250
         return succeed

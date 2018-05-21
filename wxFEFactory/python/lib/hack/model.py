@@ -143,12 +143,26 @@ class Field:
     def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
+        if self.type is int and value < 0:
+            value &= (1 << (self.size << 3)) - 1
         instance.handler.write(instance.addr + self.offset, value, self.size)
 
     def __str__(self):
         return "{}(offset={}, size={})".format(self.__class__.__name__, self.offset, self.size)
 
     __repr__ = __str__
+
+
+class Fields:
+    def __init__(self, *args):
+        self.fields = args
+
+    def __get__(self, instance, owner=None):
+        return self.fields[0].__get__(instance, owner)
+
+    def __set__(self, instance, value):
+        for field in self.fields:
+            field.__set__(instance, value)
 
 
 class Cachable:
@@ -384,6 +398,10 @@ class ArrayField(Cachable, Field):
         if self.itemcachable:
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
+    @property
+    def size(self):
+        return self.length * self.field.size
+
     def create_cache(self, instance):
         return ArrayData(instance, self.offset, self.length, self.field, self.itemkeys)
 
@@ -395,6 +413,11 @@ class ArrayField(Cachable, Field):
             if item is None or item == '':
                 continue
             data[i] = item
+
+    def __str__(self):
+        return "{}(offset={}, length={}, field)".format(self.__class__.__name__, self.offset, self.length, self.field)
+
+    __repr__ = __str__
 
 
 class ArrayData:

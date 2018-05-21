@@ -230,13 +230,13 @@ WEAPON_COMPONENTS = (
     ("SNIPERRIFLE", (
         ("消音器", 0xA73D4664),
         ("瞄准镜", 0xD2443DDC),
-        ("Advanced 瞄准镜", 0xBC54DA77),
+        ("高级瞄准镜", 0xBC54DA77),
         ("尤素福·阿米尔奢华涂饰", 0x4032B5E7),
     )),
 
     ("HEAVYSNIPER", (
         ("瞄准镜", 0xD2443DDC),
-        ("Advanced 瞄准镜", 0xBC54DA77),
+        ("高级瞄准镜", 0xBC54DA77),
     )),
 
     ("GRENADELAUNCHER", (

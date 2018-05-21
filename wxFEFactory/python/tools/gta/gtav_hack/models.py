@@ -454,7 +454,7 @@ class Player(NativeEntity):
 
     @property
     def head_coord(self):
-        return self.get_bone_coord(12844) # SKEL_Head
+        return self.get_bone_coord(12844) # IK_Head
 
     def follow_to_entity(self, entity, speed=2, timeout=-1):
         """跟着实体"""

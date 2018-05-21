@@ -259,6 +259,7 @@ class Tool(BaseGTATool):
             ui.Button("打架", onclick=self.fight_against)
             ui.Button("导弹射向所瞄", onclick=self.rocket_shoot_entity_aiming_at)
             ui.Button("所瞄目标爆炸", onclick=self.entity_aiming_at_explode)
+            # ui.Button("所射子弹爆炸", onclick=self.explode_projectiles_test)
             self.set_buttons_contextmenu()
 
     def render_config(self):
@@ -268,7 +269,7 @@ class Tool(BaseGTATool):
             BoolConfig('rocket_attack_no_owner', '导弹攻击时不设置所有者(不会被通缉，但某些任务敌人打不死)')
             FloatConfig('rocket_attack_speed', '导弹攻击速度', 100)
             FloatConfig('rocket_shoot_speed', '导弹向前速度', -1.0)
-            IntConfig('rocket_shoot_count_little', '导弹发射对数(少)', 1)
+            IntConfig('rocket_shoot_count_little', '导弹发射对数(少)', 0)
             IntConfig('rocket_shoot_count_more', '导弹发射对数(多)', 3)
             IntConfig('rocket_shoot_target_count', '射向目标导弹数', 1)
             IntConfig('rocket_damage', '导弹攻击伤害', 250)
@@ -1075,7 +1076,7 @@ class Tool(BaseGTATool):
             model = self.get_hash_key(model)
         m = models.VModel(model, self)
         m.request()
-        handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model, *(coord or self.get_front_coord()), 0, 1, 0)
+        handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model, *(coord or self.get_front_coord()), 0, 1, 1)
         if handle:
             obj = models.Object(handle, self)
             if on_ground:
@@ -1144,27 +1145,24 @@ class Tool(BaseGTATool):
     def shoot_vehicle_rocket(self, ped=0, count=1):
         """发射车载火箭"""
         weapon = self.get_shoot_weapon()
-        coord = Vector3(self.get_cam_front_coord())
+        isInVehicle = self.isInVehicle
         rot = Vector3(self.get_camera_rot())
-        if rot.z > 0.2:
-            rot.z += 0.015
-
+        coord = Vector3(self.player.get_bone_coord(12844)) + rot * 2
+        coord.z -= 0.1
+        # if rot.z > 0.2:
+        #     rot.z += 0.015
         # 目标坐标
         target = coord + rot * 100
-
-        vertical_1, vertical_2 = rot.get_vetical_xy()
-        if not self.isInVehicle:
-            vertical_1 *= 0.5
-            vertical_2 *= 0.5
-        else:
+        if isInVehicle:
             vehicle = self.vehicle
+            coord += Vector3(vehicle.speed) * 0.5
             height = vehicle.height
             if vehicle.model.is_car:
                 driver_height = vehicle.driver.height
                 if driver_height > height:
                     height = driver_height + 0.2
-                coord[2] += height
-                target[2] += 1
+                coord.z += height
+                target.z += 1
             elif height > 15:
                 # 在飞机上
                 coord += rot * 5
@@ -1172,9 +1170,16 @@ class Tool(BaseGTATool):
         speed = self.config.rocket_shoot_speed or -1.0
         damage = self.config.rocket_damage
 
-        for i in range(1, count + 1):
-            self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, damage, weapon, ped, speed, False)
-            self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, damage, weapon, ped, speed, False)
+        if count > 1:
+            vertical_1, vertical_2 = rot.get_vetical_xy()
+            if not isInVehicle:
+                vertical_1 *= 0.5
+                vertical_2 *= 0.5
+            for i in range(1, count + 1):
+                self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, damage, weapon, ped, speed, False)
+                self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, damage, weapon, ped, speed, False)
+        else:
+            self.shoot_between(coord, target, damage, weapon, ped, speed, False)
 
     def shoot_vehicle_rocket_little(self, _=None):
         """发射少量车载火箭"""
@@ -1345,18 +1350,18 @@ class Tool(BaseGTATool):
         page_index = self.object_model_book.index
         item_index = self.object_model_book.getPage(page_index).index
         if item_index is not -1:
-            model_name = OBJECT_MODEL[page_index][1][item_index][1]
+            model_name = OBJECT_MODELS[page_index][1][item_index][1]
             return self.get_cache('object_model', model_name, self.get_hash_key)
 
-    def create_selected_object(self, _=None):
+    def create_selected_object(self, _=None, on_ground=True):
         """生成该模型的物体"""
         model = self.get_selected_object_model()
         if model:
-            return self.create_object(self.get_selected_object_model())
+            return self.create_object(self.get_selected_object_model(), on_ground=on_ground)
 
     def create_launch_object(self, _=None):
         """生成该模型的物体并发射"""
-        obj = self.create_selected_object()
+        obj = self.create_selected_object(on_ground=False)
         if obj:
             self.launch_entity(obj)
 
@@ -1551,3 +1556,6 @@ class Tool(BaseGTATool):
         data = self.get_selected_weapon_component()
         if data:
             self.player.remove_weapon_component(*data)
+
+    # def explode_projectiles_test(self, _):
+    #     self.script_call('EXPLODE_PROJECTILES', '3Q', self.ped_id, self.config.shoot_weapon_hash, True)

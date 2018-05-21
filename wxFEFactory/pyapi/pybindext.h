@@ -97,7 +97,7 @@ namespace pybind11 {
 	{
 	public:
 		template <typename... Extra>
-		class_t(handle scope, const char *name, const Extra &... extra): class_(scope, name, extra...) {
+		class_t(handle scope, const char *name, const Extra &... extra): class_<type_, options...>(scope, name, extra...) {
 			auto &internals = detail::get_internals();
 			auto *tinfo = internals.registered_types_cpp[std::type_index(typeid(type_))];
 			tinfo->init_instance = init_instance;
