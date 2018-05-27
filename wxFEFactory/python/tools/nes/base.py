@@ -1,5 +1,5 @@
 from lib.hack.handler import ProxyHandler
-from lib.hack.neshandler import VirtuaNesHandler
+from lib.hack.neshandler import VirtuaNesHandler, NestopiaHandler
 from ..hacktool import BaseHackTool
 
 
@@ -12,7 +12,7 @@ class BaseNesHack(BaseHackTool):
         if self.handler.active:
             self.ondetach()
             
-        for Handler in (VirtuaNesHandler, ):
+        for Handler in (VirtuaNesHandler, NestopiaHandler):
             handler = Handler()
             if handler.attach():
                 self.handler.set(handler)
