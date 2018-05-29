@@ -16,7 +16,7 @@ class Widget:
     def __init__(self, name, label, addr, offsets=(), readonly=False):
         self.weak = WeakBinder(self)
         self.name = name
-        self.label = label
+        self.label = label or name
         self.addr = addr
         self.offsets = offsets
         self.readonly = readonly
@@ -88,12 +88,12 @@ class TwoWayWidget(Widget):
 
 
 class ModelWidget:
-    def __init__(self, name, label, ins=None, prop=None, **kwargs):
+    def __init__(self, name, label=None, ins=None, prop=None, **kwargs):
         """
         :param ins: Model实例，或者返回Model实例的函数，在Widget中用addr占位
         :param prop: Widget对应Field的属性对象或者名称，在Widget中用offsets占位
         """
-        super().__init__(name, label, addr=ins, offsets=prop or name, **kwargs)
+        super().__init__(name, label or name, addr=ins, offsets=prop or name, **kwargs)
 
     @property
     def ins(self):
@@ -691,7 +691,7 @@ class BaseFlagWidget(TwoWayWidget):
                 ui.Button(label="不选", style=btn_xs_style, onclick=self.weak.uncheck_all)
             self.render_btn()
         self.view = view
-        del self.labels, self.helps, self.cols
+        self.helps, self.cols
 
     @property
     def input_value(self):

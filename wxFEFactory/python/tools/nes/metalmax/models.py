@@ -76,5 +76,5 @@ class Global(Model):
     posy = ByteField(0x035c)
     offx = ByteField(0x0062)
     offy = ByteField(0x0063)
-    storage = ArrayField(0x03004106, 100, WordField(0))
+    # storage = ArrayField(0x03004106, 100, WordField(0))
     undead = ByteField(0x647B)

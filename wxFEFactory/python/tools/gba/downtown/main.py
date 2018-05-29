@@ -16,6 +16,7 @@ class ExTool(BaseGbaHack):
     def render_main(self):
         datasets = self.datasets
         person = self.weak._person
+    
         with Group("global", "全局", self._global):
             ModelInput("partner_count", "我方人数")
             ModelInput("enemy_count", "敌方人数")

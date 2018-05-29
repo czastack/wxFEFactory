@@ -29,6 +29,9 @@ class Model:
         else:
             raise TypeError('expected a Field object, got ' + str(field))
 
+    def set_with(self, namefrom, nameto):
+        setattr(self, nameto, getattr(person, namefrom))
+
     def __and__(self, field):
         return self.addrof(field)
 

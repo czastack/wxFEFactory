@@ -8,6 +8,18 @@ class MemHandler(ProcessHandler):
     def prepareAddr(self, addr, size):
         return addr
 
+    def rawRead(self, addr, type=int, size=0):
+        self._raw_addr = True
+        result = self.read(addr, type, size)
+        self._raw_addr = False
+        return result
+
+    def rawWrite(self, addr, data, size=0):
+        self._raw_addr = True
+        result = self.write(addr, data, size)
+        self._raw_addr = False
+        return result
+
     def read8(self, addr):
         return self.readUint(addr, 1)
 

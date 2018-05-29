@@ -43,6 +43,25 @@ ENEMY_ATTRS = (
 
 class Global(Model):
     growth_points = ByteField(0x008B)
+    _money_1p = Field(0x7AE0, size=3)
+    _money_2p = Field(0x7AE3, size=3)
+
+    @property
+    def money_1p(self):
+        return "%X" % self._money_1p
+
+    @money_1p.setter
+    def money_1p(self, value):
+        self._money_1p = int(str(value), 16)
+
+    @property
+    def money_2p(self):
+        return "%X" % self._money_2p
+
+    @money_2p.setter
+    def money_2p(self, value):
+        self._money_2p = int(str(value), 16)
+
 
 
 class Person(Model):

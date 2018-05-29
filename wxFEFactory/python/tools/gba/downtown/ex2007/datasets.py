@@ -1,3 +1,6 @@
+from lib import utils
+
+
 ITEMS = (
     "咖啡",
     "茶",
@@ -176,8 +179,7 @@ SKILL_ITEMS = (
     (0x8314, "凌波微步"),
     (0x8315, "空中漫步"),
 )
-SKILLS = tuple(item[1] for item in SKILL_ITEMS)
-SKILL_VALUES = tuple(item[0] for item in SKILL_ITEMS)
+SKILLS, SKILL_VALUES = utils.split_value_label(SKILL_ITEMS)
 
 SKILLKEYS = (
     "重按A",
