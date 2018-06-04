@@ -146,6 +146,8 @@ class BaseDataClass:
         for field in kwargs:
             setattr(self, field, kwargs[field])
 
+    set_data = __init__
+
     def to_dict(self):
         return {field: getattr(self, field) for field in self.__slots__}
 
