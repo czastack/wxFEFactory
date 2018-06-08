@@ -13,7 +13,9 @@ class Tool(BaseNesHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._personins = models.Person(0, self.handler)
+        # self._weaponins = models.Weapon(0, self.handler)
         self.person_index = 0
+        # self.weapon_index = 0
     
     def render_main(self):
         with Group("global", "全局", self._global):
@@ -22,8 +24,7 @@ class Tool(BaseNesHack):
 
         with Group("player", "我方角色", self.weak._person, cols=4):
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.PARTNERS, onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=datasets.PARTNERS, onselect=self.on_person_change).setSelection(0)
             ModelInput("ability", "机体类型(海陆空)及变身能力")
             ModelInput("spiritual_type", "精神类型")
             ModelSelect("robot", "机体图", choices=datasets.ROBOTS)
@@ -41,6 +42,9 @@ class Tool(BaseNesHack):
             ModelInput("move", "行动次数")
             ModelInput("spiritual", "精神")
             ModelInput("spiritual_max", "精神上限")
+
+        self.lazy_group(Group("items", "道具", None), self.render_items)
+        # self.lazy_group(Group("weapons", "武器", self.weak._weapon), self.render_weapons)
             
 
         # with Group("enemy", "敌人", None, cols=4):
@@ -51,6 +55,20 @@ class Tool(BaseNesHack):
             with ui.ScrollView(className="fill"):
                 ui.Text("恢复HP: alt+h")
 
+    def render_items(self):
+        for i, item in enumerate(datasets.ITEMS):
+            ModelInput("items.%d" % i, item)
+
+    # def render_weapons(self):
+    #     ui.Text("武器", className="input_label expand")
+    #     ui.Choice(className="fill", choices=datasets.WEAPONS, onselect=self.on_weapon_change).setSelection(0)
+    #     ModelInput("range_max", "远射程")
+    #     ModelInput("hit", "命中")
+    #     ModelInput("range_min", "近射程")
+    #     ModelInput("atk_air", "空攻击力")
+    #     ModelInput("atk_land", "陆攻击力")
+    #     ModelInput("atk_sea", "海攻击力")
+
     def get_hotkeys(self):
         this = self.weak
         return (
@@ -60,19 +78,23 @@ class Tool(BaseNesHack):
     def on_person_change(self, lb):
         self.person_index = lb.index
 
+    def on_weapon_change(self, lb):
+        self.weapon_index = lb.index
+
     def _person(self):
         self._personins.addr = self.person_index
         return self._personins
 
+    # def _weapon(self):
+    #     if self.weapon_index:
+    #         self._weaponins.addr = self._global.weapons.addr_at(self.weapon_index - 1)
+    #         return self._weaponins
+
     person = property(_person)
+    # weapon = property(_weapon)
 
     def persons(self):
         person = models.Person(0, self.handler)
-        for i in range(2):
+        for i in range(len(datasets.PARTNERS)):
             person.addr = i
             yield person
-
-    def pull_through(self, _=None):
-        for person in self.persons():
-            person.set_with("体力最大值", "体力当前值")
-            person.set_with("气力最大值", "气力当前值")

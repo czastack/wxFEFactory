@@ -50,8 +50,7 @@ class Tool(BaseGbaHack):
 
         with Group("player", "角色", person, cols=4) as person_group:
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
             ModelInput("hpmax", "HP上限")
             ModelInput("resist", "RESIST")
             ModelInput("str", "STR")

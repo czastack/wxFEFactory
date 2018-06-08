@@ -29,8 +29,7 @@ class Tool(BaseGbaHack):
 
         with Group("player", "角色", person, cols=4):
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
             ModelInput("level", "等级")
             ModelInput("hpmax", "HP上限")
             ModelInput("hp", "HP")
@@ -55,8 +54,7 @@ class Tool(BaseGbaHack):
 
         with Group("chariot", "战车", chariot):
             ui.Text("战车", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
+            ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
             ModelInput("sp", "装甲片")
             ModelInput("bullet", "弹仓容量")
             ModelInput("defensive", "守备力")

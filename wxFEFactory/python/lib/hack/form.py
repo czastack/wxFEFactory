@@ -202,6 +202,10 @@ class BaseGroup(Widget):
             field.write()
         self.end_ins_cache()
 
+    def after_lazy(self):
+        """lazy_group渲染后调用"""
+        pass
+
 
 class Group(BaseGroup):
     cols = 2
@@ -247,6 +251,10 @@ class Group(BaseGroup):
                 self.footer = footer
         del self.flexgrid, self.hasheader, self.hasfooter
         return root
+
+    def after_lazy(self):
+        if isinstance(self.view, ui.FlexGridLayout):
+            self.view.parent.reLayout()
 
 
 class DialogGroup(Group):

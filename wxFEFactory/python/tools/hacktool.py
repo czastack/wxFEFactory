@@ -78,6 +78,7 @@ class BaseHackTool(NestedTool):
                 group, fn = item
                 with group:
                     fn()
+                group.after_lazy()
                 del groups[root]
 
     def begin_group(self):

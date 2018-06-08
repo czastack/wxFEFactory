@@ -24,8 +24,7 @@ class Tool(BaseNesHack):
 
         with Group("player", "我方角色", self.weak._person, cols=4) as group:
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=("1P", "2P"), onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=("1P", "2P"), onselect=self.on_person_change).setSelection(0)
             
             for addr, name in models.PERSON_ATTRS:
                 ModelInput(name)

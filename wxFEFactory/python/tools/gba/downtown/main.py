@@ -24,8 +24,7 @@ class ExTool(BaseGbaHack):
         with Group("player", "角色", person, cols=4) as group:
             # ModelInput("addr_hex", "地址", readonly=True)
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=("国夫", "阿力"), onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=("国夫", "阿力"), onselect=self.on_person_change).setSelection(0)
             ModelInput("punch", "拳")
             ModelInput("foot", "脚")
             ModelInput("arms", "武器")

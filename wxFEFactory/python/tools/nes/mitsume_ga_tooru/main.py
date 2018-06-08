@@ -1,14 +1,14 @@
 from ..base import BaseNesHack
 from lib.hack.form import Group, StaticGroup, ModelInput
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-from lib.hack.model import Model, Field, ByteField, WordField, FieldPrep
+from lib.hack.model import Model, Field, ByteField, WordField, MulFieldPrep
 
 
 class Global(Model):
     invincible = ByteField(0x0074)
     hp = ByteField(0x007A)
     life = ByteField(0x007B)
-    money = FieldPrep(lambda ins, x, f: x * 10, lambda ins, x, f: int(x) // 10, WordField(0x007C))
+    money = MulFieldPrep(10, WordField(0x007C))
     weapon = ByteField(0x0081)
     arrow = ByteField(0x0527)
 

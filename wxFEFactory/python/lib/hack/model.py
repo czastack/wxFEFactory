@@ -519,6 +519,18 @@ class FieldPrep:
         return __class__(self.preget, self.preset, field)
 
 
+class AddFieldPrep(FieldPrep):
+    """加预处理"""
+    def __init__(self, diff, field=None):
+        super().__init__(lambda ins, x, f: x + diff, lambda ins, x, f: int(x) - diff, field)
+
+
+class MulFieldPrep(FieldPrep):
+    """乘积预处理"""
+    def __init__(self, p, field=None):
+        super().__init__(lambda ins, x, f: x * p, lambda ins, x, f: int(x) // p, field)
+
+
 """
 复杂字段名(多用于ArrayField)
 :param name: 字段名称

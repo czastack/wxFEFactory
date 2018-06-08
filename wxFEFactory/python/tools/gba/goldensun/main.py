@@ -31,8 +31,7 @@ class BaseGSTool(BaseGbaHack):
 
         with Group("player", "角色", person, cols=4):
             ui.Text("角色", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("level", "等级")
             ModelInput("exp", "经验")

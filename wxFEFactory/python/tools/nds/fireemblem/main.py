@@ -80,8 +80,7 @@ class FeHack(BaseNdsHack):
 
         with Group("iteminfos", "武器属性", weak._iteminfo):
             ui.Text("物品", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
+            ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
             ui.Text("复制属性", className="input_label expand")
             with ui.Horizontal(className="fill"):
                 self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)

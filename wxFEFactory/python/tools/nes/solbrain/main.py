@@ -1,7 +1,7 @@
 from ..base import BaseNesHack
 from lib.hack.form import Group, StaticGroup, ModelInput, ModelSelect
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-from lib.hack.model import Model, Field, ByteField, WordField, FieldPrep
+from lib.hack.model import Model, Field, ByteField, WordField, MulFieldPrep
 from lib import utils
 
 
@@ -9,7 +9,7 @@ class Global(Model):
     invincible = ByteField(0x05A3)
     hp = ByteField(0x05C5)
     helper_hp = ByteField(0x06FC)
-    p = FieldPrep(lambda ins, x, f: x * 10, lambda ins, x, f: int(x) // 10, WordField(0x05C6))
+    p = MulFieldPrep(10, WordField(0x05C6))
     powerup = ByteField(0x05C8)
     highjump = ByteField(0x05EA)
     gun = ByteField(0x05C2)

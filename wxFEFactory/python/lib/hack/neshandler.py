@@ -16,7 +16,8 @@ class VirtuaNesHandler(MemHandler):
     # SPRAM = 0x5A0424 # size=0x100
     # PROM = 0x57C364 # ptr
     # VROM = 0x5A0420 # ptr
-    BANKS = 0x57B340
+    CPU_MEM_BANKS = 0x57B340
+    PPU_MEM_BANKS = 0x5732EC
 
     def attach(self):
         return self.attachByWindowName(self.CLASS_NAME, None)
@@ -30,8 +31,14 @@ class VirtuaNesHandler(MemHandler):
         elif 0x6000 <= addr <= 0x7FFF:
             return self.WRAM + (addr - 0x6000)
         elif 0x8000 <= addr <= 0xFFFF:
-            return self.rawRead(self.BANKS + ((addr >> 13) << 2), int, 4) + (addr & 0x1FFF)
+            return self.cpu_mem_bank_addr(addr >> 13) + (addr & 0x1FFF)
         return False
+
+    def cpu_mem_bank_addr(self, i):
+        return self.rawRead(self.CPU_MEM_BANKS + (i << 2), int, 4)
+
+    def ppu_mem_bank_addr(self, i):
+        return self.rawRead(self.PPU_MEM_BANKS + (i << 2), int, 4)
 
 
 class NestopiaHandler(MemHandler):
