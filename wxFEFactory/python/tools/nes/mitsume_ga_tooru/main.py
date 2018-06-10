@@ -7,7 +7,7 @@ from lib.hack.model import Model, Field, ByteField, WordField, MulFieldPrep
 class Global(Model):
     invincible = ByteField(0x0074)
     hp = ByteField(0x007A)
-    life = ByteField(0x007B)
+    lives = ByteField(0x007B)
     money = MulFieldPrep(10, WordField(0x007C))
     weapon = ByteField(0x0081)
     arrow = ByteField(0x0527)
@@ -20,7 +20,7 @@ class Tool(BaseNesHack):
         with Group("global", "全局", self._global):
             ModelInput("invincible", "无敌时间(max:85)")
             ModelInput("hp", "血量(max:6)")
-            ModelInput("life", "生命(max:9)")
+            ModelInput("lives", "生命(max:9)")
             ModelInput("money", "金钱")
 
     def get_hotkeys(self):

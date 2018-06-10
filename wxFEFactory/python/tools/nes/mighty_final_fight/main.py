@@ -16,7 +16,7 @@ class Tool(BaseNesHack):
             ModelSelect("enemy", "角色", choices=datasets.PLAYERS)
             ModelSelect("enemy", "敌人模型", choices=datasets.ENEMY_LABELS, values=datasets.ENEMY_VALUES)
             ModelInput("level", "等级")
-            ModelInput("life", "命数")
+            ModelInput("lives", "命数")
             ModelInput("hp", "HP")
             ModelInput("exp", "总经验")
             ModelInput("tool_count", "手持物数量")

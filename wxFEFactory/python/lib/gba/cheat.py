@@ -97,9 +97,9 @@ SEED_INCREMENT = 0x9E3779B9
 SEEDS_V1 = (0x09F4FBBD, 0x9681884A, 0x352027E9, 0xF3DEE5A7)
 SEEDS_V3 = (0x7AA9648F, 0x7FAE6994, 0xC0EFAAD5, 0x42712C57)
 
-REG_GS = re.compile("(?i)\\b([0-9a-f]{8}) ?([0-9a-f]{8})\\b") # Gameshark
-REG_CB = re.compile("(?i)([0-9a-f]{8}) ([0-9a-f]{4})")
-REG_RAW = re.compile("(?i)(0[23][0-9a-f]{6})[ :]([0-9a-f]{1,8})")
+REG_GS = re.compile("(?i)\\b([0-9a-f]{8}) ?([0-9a-f]{8})\\b$") # Gameshark
+REG_CB = re.compile("(?i)([0-9a-f]{8}) ([0-9a-f]{4})$")
+REG_RAW = re.compile("(?i)(0[23][0-9a-f]{6})[ :]([0-9a-f]{1,8})$")
 
 TYPE_8BIT = {INT_8_BIT_WRITE, GSA_8_BIT_GS_WRITE, GSA_8_BIT_GS_WRITE2, GSA_8_BIT_SLIDE, GSA_8_BIT_IF_TRUE, 
     GSA_8_BIT_IF_FALSE, GSA_8_BIT_FILL, GSA_8_BIT_IF_TRUE2, GSA_8_BIT_IF_FALSE2, GSA_SLOWDOWN}
@@ -252,6 +252,7 @@ def cb_string(address, value):
 def decode(src, code):
     """解析金手指"""
     match = REG_CB.match(src)
+
     if match:
         codeType = TYPE_CB
         address = int(match.group(1), 16)
@@ -331,6 +332,10 @@ def decode(src, code):
                             codeFunc = GSA_32_BIT_SLIDE
                         code.wait_second = True
                         value = 0
+                else:
+                    codeFunc = GSA_8_BIT_FILL
+                    code.dataSize = value >> 8
+                    value &= MASK_8
             elif v3type is 0x01:
                 codeFunc = GSA_16_BIT_FILL
                 code.dataSize = value >> 16
@@ -459,6 +464,7 @@ class CheatCode:
         self.func = func
         self.buffer = []
         self.batch_mode = False
+        self.wait_second = False
 
     def clear(self):
         self.buffer.clear()
@@ -466,6 +472,9 @@ class CheatCode:
     def set_text(self, text):
         if self.batch_mode and len(self.buffer):
             self.add_line(text)
+        else:
+            self.clear()
+            self.buffer.append(text)
 
     def get_text(self):
         return ''.join(self.buffer)
@@ -477,10 +486,15 @@ class CheatCode:
     def set_gs(self, isv3):
         self.set_text(gsencode_string(self.address, self.value, isv3))
 
-    def set_cb(self, isv3):
+    def set_cb(self):
         self.set_text(cb_string(self.address, self.value))
+
+    def from_string(self, text):
+        decode(text, self)
+        return self
+
 
 if __name__ == '__main__':
     code = CheatCode()
-    decode("0146DCEA3E32A31D", code)
+    code.from_string("0146DCEA3E32A31D")
     print("%08X %08X" % (code.address, code.value))

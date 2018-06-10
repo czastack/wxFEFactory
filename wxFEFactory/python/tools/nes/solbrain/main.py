@@ -16,7 +16,7 @@ class Global(Model):
     fire_helper = ByteField(0x065C)
     own_helper = ByteField(0x060C)
     form = ByteField(0x05C4)
-    life = ByteField(0x071C)
+    lives = ByteField(0x071C)
     level = ByteField(0x0055)
 
 
@@ -40,7 +40,7 @@ class Tool(BaseNesHack):
         with Group("global", "全局", self._global):
             ModelInput("hp", "血量(max:8)")
             ModelInput("helper_hp", "助手血量(max:16)")
-            ModelInput("life", "生命(max:9)")
+            ModelInput("lives", "生命(max:9)")
             ModelInput("powerup_2", "威力加强(max:3)")
             ModelInput("fire_helper", "喷火助手(4)")
             ModelInput("own_helper", "拥有助手(4)")

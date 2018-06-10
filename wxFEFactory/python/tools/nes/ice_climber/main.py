@@ -5,8 +5,8 @@ from lib.hack.model import Model, Field, ByteField, WordField, Fields
 
 
 class Global(Model):
-    life_1 = ByteField(0x0076)
-    life_2 = ByteField(0x0076)
+    lives_1 = ByteField(0x0076)
+    lives_2 = ByteField(0x0076)
     medicine_1 = Fields(ByteField(0x0369), ByteField(0x0078))
     medicine_2 = Fields(ByteField(0x0369), ByteField(0x0079))
     invincible_1 = ByteField(0x03D2)
@@ -21,8 +21,8 @@ class Tool(BaseNesHack):
         self._global = Global(0, self.handler)
 
         with Group("global", "全局", self._global):
-            ModelInput("life_1", "1P生命")
-            ModelInput("life_2", "2P生命")
+            ModelInput("lives_1", "1P生命")
+            ModelInput("lives_2", "2P生命")
             ModelCheckBox("invincible_1", "1P无敌", enableData=0xFF, disableData=0)
             ModelCheckBox("invincible_2", "2P无敌", enableData=0xFF, disableData=0)
             # ModelInput("level", "关卡(0-4)")

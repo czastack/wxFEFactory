@@ -4,7 +4,7 @@ from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Field
 class Global(Model):
     player = ByteField(0x0034)
     hp = ByteField(0x003A)
-    life = ByteField(0x003E)
+    lives = ByteField(0x003E)
     play_level = ByteField(0x0022) # 关卡
     invincible = WordField(0x0069) # 无敌时间
     level = ByteField(0x006B)

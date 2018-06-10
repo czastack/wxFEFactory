@@ -11,8 +11,8 @@ class Global(Model):
     invincible_2 = ByteField(0x00B1)
     weapon_1 = ByteField(0x00AA)
     weapon_2 = ByteField(0x00AB)
-    life_1 = ByteField(0x0032)
-    life_2 = ByteField(0x0033)
+    lives_1 = ByteField(0x0032)
+    lives_2 = ByteField(0x0033)
 
 
 BULLETS = ["普通", "M弹", "F弹", "S弹", "L弹"]
@@ -30,8 +30,8 @@ class Tool(BaseNesHack):
             ModelCheckBox("invincible_2", "2P无敌", enableData=0xFF, disableData=0)
             ModelSelect("weapon_1", "1P武器", choices=BULLETS, values=BULLET_VALUES)
             ModelSelect("weapon_2", "2P武器", choices=BULLETS, values=BULLET_VALUES)
-            ModelInput("life_1", "1P生命")
-            ModelInput("life_2", "2P生命")
+            ModelInput("lives_1", "1P生命")
+            ModelInput("lives_2", "2P生命")
 
     def get_hotkeys(self):
         this = self.weak

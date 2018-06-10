@@ -470,6 +470,10 @@ class ArrayData:
             return ret
         raise StopIteration
 
+    def fill(self, value):
+        for i in range(self.length):
+            self[i] = value
+
     def addr_at(self, i):
         if i < 0:
             i += self.length
