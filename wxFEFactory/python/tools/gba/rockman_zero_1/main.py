@@ -66,7 +66,7 @@ class Tool(BaseGbaHack):
         )
 
     def pull_through(self, _):
-        self._global.set_max('hp', 'hpmax')
+        self._global.set_with('hp', 'hpmax')
 
     def invincible(self, _=None):
         self._global.invincible = 0xFF

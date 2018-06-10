@@ -42,7 +42,7 @@ class Tool(BaseNesHack):
 
     def pull_through(self, _=None):
         """HP恢复"""
-        self._global.set_max('hp', 'hpmax')
+        self._global.set_with('hp', 'hpmax')
 
     def hp_max(self, _=None):
         """HP最大"""

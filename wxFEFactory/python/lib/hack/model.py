@@ -30,7 +30,7 @@ class Model:
             raise TypeError('expected a Field object, got ' + str(field))
 
     def set_with(self, namefrom, nameto):
-        setattr(self, nameto, getattr(person, namefrom))
+        setattr(self, nameto, getattr(self, namefrom))
 
     def __and__(self, field):
         return self.addrof(field)
@@ -471,8 +471,12 @@ class ArrayData:
         raise StopIteration
 
     def fill(self, value):
-        for i in range(self.length):
-            self[i] = value
+        if isinstance(value, int) and isinstance(self.field, Field) and self.field.type is int:
+            data = value.to_bytes(self.field.size, 'little') * self.length
+            self.instance.handler.write(self.addr, data)
+        else:
+            for i in range(self.length):
+                self[i] = value
 
     def addr_at(self, i):
         if i < 0:
