@@ -2,7 +2,7 @@ from ..base import BaseGbaHack
 from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Fields
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Fields, ToggleField
 from lib import utils
 import fefactory_api
 ui = fefactory_api.ui
@@ -18,9 +18,9 @@ class Global(Model):
     int = WordField(0x0201327A)
     lck = WordField(0x0201327C)
     level = ByteField(0x201326D)
-    invincible1 = Field(0x08020910)
-    enemy_static = WordField(0x020004BE)
-    invincible2 = ByteField(0x02000502)
+    invincible1 = ToggleField(0x08020910, enableData=0, disableData=0x04008008)
+    enemy_static = ToggleField(0x020004BE, size=2, enableData=0xFFFF, disableData=0)
+    invincible2 = ToggleField(0x02000502, size=1, enableData=0xFF, disableData=0)
     monster_flag = ArrayField(0x02013394, 7, Field(0))
     skill_flag = ArrayField(0x02013386, 3, WordField(0))
     soul_flag = ArrayField(0x02013310, 31, Field(0))
@@ -53,9 +53,9 @@ class Tool(BaseGbaHack):
             ModelInput("int", "INT")
             ModelInput("lck", "LCK")
             ModelInput("level", "等级")
-            ModelCheckBox("invincible1", "不会扣血", enableData=0, disableData=0x04008008)
-            ModelCheckBox("enemy_static", "敌人静止", enableData=0xFFFF, disableData=0)
-            ModelCheckBox("invincible2", "暂时无敌", enableData=0xFF, disableData=0)
+            ModelCheckBox("invincible1", "不会扣血")
+            ModelCheckBox("enemy_static", "敌人静止")
+            ModelCheckBox("invincible2", "暂时无敌")
 
         with StaticGroup("功能"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):

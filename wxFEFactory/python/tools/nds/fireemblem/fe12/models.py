@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ArrayField, ModelField, OffsetsField, ModelPtrField
+from lib.hack.model import Model, Field, ByteField, ArrayField, ModelField, OffsetsField, ModelPtrField, ToggleField
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -8,7 +8,7 @@ class Person(Model):
     level = ByteField(0x5A)
     exp = ByteField(0x5B)
     no = ByteField(0x41) # 头像、身份？
-    moved = ByteField(0x94)
+    moved = ToggleField(0x94, size=1, enableData=1, disableData=0)
     posx = ByteField(0x5E)
     posy = ByteField(0x5F)
     hpmax = ByteField(0x50)
@@ -84,20 +84,20 @@ class Global(BaseGlobal):
     cury = ByteField(0x02273BD5) # 0x02272EA5
     # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot)) # 运输队
-    ourturn = Field(0x021CC278)
-    control_enemy = Field(0x021D5674)
-    upgrade_max = Field(0x02050AC0)
-    upgrade_all = Field(0x02050A98)
-    lv1_can_transfer = Field(0x02049EE0)
-    infinite_refine = ByteField(0x02069683)
+    ourturn = ToggleField(0x021CC278, enableData=0xE3A01001, disableData=0xE5D01000)
+    control_enemy = ToggleField(0x021D5674, enableData=0xE1500000, disableData=0xE1510000)
+    upgrade_max = ToggleField(0x02050AC0, enableData=0xB1A06004, disableData=0xB2866001)
+    upgrade_all = ToggleField(0x02050A98, enableData=0xE1A00000, disableData=0xAA000009)
+    lv1_can_transfer = ToggleField(0x02049EE0, enableData=0x00000001, disableData=0xE350000A)
+    can_train = ToggleField(0x021EBE08, enableData=0xE3A00002, disableData=0xEBF98E8F)
+    can_visit = ToggleField(0x021ECB14, enableData=0xE3A00002, disableData=0xEBF98B4C)
+    can_holddown = ToggleField(0x021EBBD8, enableData=0xE3A00002, disableData=0xEBF98F1B)
+    use_enemy_prof = ToggleField(0x021D4CEC, enableData=0xEA000022, disableData=0x1A000022)
+    infinite_refine = ToggleField(0x02069683, size=1, enableData=0, disableData=0xE3)
+    item_consume = ToggleField(0x02051650, enableData=0x12400000, disableData=0x12400001)
+    enemy_item_drop = ToggleField(0x021F8CE0, size=8, enableData=0xE3500000E1D006B0, disableData=0xE3100020E5D00063)
     exp_rate = Field(0x021F4DA8)
     pro_rate = Field(0x021F4F5C)
-    item_consume = Field(0x02051650)
-    enemy_item_drop = Field(0x021F8CE0, size=8)
-    can_train = Field(0x021EBE08)
-    can_visit = Field(0x021ECB14)
-    can_holddown = Field(0x021EBBD8)
-    use_enemy_prof = Field(0x021D4CEC)
     config = ModelPtrField(0x021BD44C, Config, 4)
     # iteminfo_base = Field(0x0227A748)
     _iteminfos = ArrayField(0x022AA97C, 0xff, ModelField(0, ItemInfo))

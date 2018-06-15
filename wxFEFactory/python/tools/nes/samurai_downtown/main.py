@@ -1,5 +1,5 @@
 from ..base import BaseNesHack
-from lib.hack.form import Group, DialogGroup, StaticGroup, ModelInput, ModelCheckBox, ModelSelect, ModelFlagWidget, Input
+from lib.hack.form import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import utils
 from . import models, datasets

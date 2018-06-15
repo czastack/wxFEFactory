@@ -13,7 +13,7 @@ class BaseNdsHack(BaseHackTool):
             handler = Handler()
             if handler.attach():
                 self.handler.set(handler)
-                self.attach_status_view.label = handler.WINDOW_NAME + ' 正在运行'
+                self.attach_status_view.label = handler.CLASS_NAME + ' 正在运行'
                 if not self.win.hotkeys:
                     hotkeys = self.get_hotkeys()
                     if hotkeys:

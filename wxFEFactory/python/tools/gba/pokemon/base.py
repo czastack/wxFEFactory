@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
+from lib.hack.form import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 from . import models, datasets

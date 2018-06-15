@@ -10,6 +10,7 @@ ui = fefactory_api.ui
 class Tool(NestedTool):
     def render(self):
         self.code = cheat.CheatCode()
+        self.code.batch_mode = True
 
         with self.render_win() as win:
             with ui.Vertical():
@@ -21,7 +22,7 @@ class Tool(NestedTool):
         return win
 
     def analyse(self, _=None):
-        self.code.batch_mode = True
+        self.code.clear()
         for line in self.textinput.value.split('\n'):
             self.code.from_string(line)
             if not self.code.wait_second:

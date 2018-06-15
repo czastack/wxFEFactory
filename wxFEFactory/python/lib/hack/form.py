@@ -91,15 +91,13 @@ class ModelWidget:
     def __init__(self, name, label=None, ins=None, prop=None, **kwargs):
         """
         :param ins: Model实例，或者返回Model实例的函数，在Widget中用addr占位
-        :param prop: Widget对应Field的属性对象或者名称，在Widget中用offsets占位
+        :param prop: Widget对应Field的属性名称，在Widget中用offsets占位
         """
         super().__init__(name, label or name, addr=ins, offsets=prop or name, **kwargs)
 
     @property
     def ins(self):
-        if callable(self.addr):
-            return self.addr()
-        return self.addr
+        return self.addr() if callable(self.addr) else self.addr
 
     @property
     def mem_value(self):
@@ -118,6 +116,13 @@ class ModelWidget:
         ins = self.ins
         if ins:
             delattr(ins, self.offsets)
+
+    @property
+    def field(self):
+        # 尝试获取对应的模型字段
+        ins = self.ins
+        if ins and hasattr(ins, 'field'):
+            return ins.field(self.offsets)
 
 
 class OffsetsWidget:
@@ -402,8 +407,53 @@ class CheckBox(BaseCheckBox, OffsetsWidget):
     pass
 
 
-class ModelCheckBox(ModelWidget, CheckBox):
-    pass
+class ModelCheckBox(ModelWidget, BaseCheckBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.enableData is None:
+            # 尝试从字段读取
+            field = self.field
+            self.enableData = getattr(field, 'enableData', None)
+            self.disableData = getattr(field, 'disableData', None)
+
+
+class ModelMultiCheckBox(BaseCheckBox):
+    """同步多个ToggleField"""
+    @property
+    def ins(self):
+        return self.addr() if callable(self.addr) else self.addr
+
+    @property
+    def mem_value(self):
+        """所有字段都符合enableData，返回True，否则返回False"""
+        ins = self.ins
+        if ins:
+            for prop in self.offsets:
+                field = ins.field(prop)
+                value = getattr(ins, prop)
+                if value is not field.enableData:
+                    break
+            else:
+                return True
+
+        return False
+
+    @mem_value.setter
+    def mem_value(self, value):
+        """True时写入每个字段对应的enableData，否则写入disableData"""
+        ins = self.ins
+        if ins:
+            for prop in self.offsets:
+                field = ins.field(prop)
+                value = setattr(ins, prop, field.enableData if value else field.enableData.disableData)
+
+    @property
+    def input_value(self):
+        return self.view.checked
+
+    @input_value.setter
+    def input_value(self, value):
+        self.view.checked = value
 
 
 class CoordWidget(TwoWayWidget):

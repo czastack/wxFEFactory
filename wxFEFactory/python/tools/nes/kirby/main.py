@@ -1,7 +1,7 @@
 from ..base import BaseNesHack
 from lib.hack.form import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-from lib.hack.model import Model, Field, ByteField, WordField, FieldPrep
+from lib.hack.model import Model, Field, ByteField, WordField, FieldPrep, ToggleField
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -11,8 +11,8 @@ class Global(Model):
     star = ByteField(0x0598) # 音波等形态次数
     lives = ByteField(0x0599)
     credits = ByteField(0x07BB) # 无限Credits, 02
-    invincible = ByteField(0x05F9)
-    invincible2 = ByteField(0x05FB) # 44
+    invincible = ToggleField(0x05F9, size=1, enableData=0xFF, disableData=0)
+    invincible2 = ToggleField(0x05FB, size=1, enableData=0x44, disableData=0)
     form = ByteField(0x05E0)
     ability = ByteField(0x05E3)
 
@@ -31,8 +31,8 @@ class Tool(BaseNesHack):
             ModelInput("star", "星星")
             ModelInput("lives", "生命")
             # ModelInput("credits", "分数")
-            ModelCheckBox("invincible", "闪光无敌", enableData=0xFF, disableData=0)
-            ModelCheckBox("invincible2", "状态无敌", enableData=0x44, disableData=0)
+            ModelCheckBox("invincible", "闪光无敌")
+            ModelCheckBox("invincible2", "状态无敌")
             ModelInput("form", "形态")
             ModelSelect("ability", "能力", choices=ABILITY)
 

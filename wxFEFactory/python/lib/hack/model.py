@@ -157,6 +157,7 @@ class Field:
 
 
 class Fields:
+    """同步控制多个地址的值"""
     def __init__(self, *args):
         self.fields = args
 
@@ -169,6 +170,7 @@ class Fields:
 
 
 class Cachable:
+    """可缓存对象"""
     key = None
 
     def __get__(self, instance, owner=None):
@@ -222,6 +224,7 @@ U32Field = DWordField
 
 
 class SignedField(Field):
+    """有符号字段"""
     def __get__(self, instance, owner=None):
         return instance.handler.readInt(instance.addr + self.offset, self.type, self.size)
 
@@ -229,6 +232,14 @@ class SignedField(Field):
         if not isinstance(value, self.type):
             value = self.type(value)
         instance.handler.writeInt(instance.addr + self.offset, value, self.size)
+
+
+class ToggleField(Field):
+    """开关字段"""
+    def __init__(self, offset, type_=int, size=4, enableData=None, disableData=None):
+        super().__init__(offset, type_, size)
+        self.enableData = enableData
+        self.disableData = disableData
 
 
 class BitsField(Field):
