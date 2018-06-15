@@ -415,6 +415,7 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
             field = self.field
             self.enableData = getattr(field, 'enableData', None)
             self.disableData = getattr(field, 'disableData', None)
+            self.type = type(self.enableData)
 
 
 class ModelMultiCheckBox(BaseCheckBox):

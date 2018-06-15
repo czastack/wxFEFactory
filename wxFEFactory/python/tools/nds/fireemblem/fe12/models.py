@@ -8,7 +8,7 @@ class Person(Model):
     level = ByteField(0x5A)
     exp = ByteField(0x5B)
     no = ByteField(0x41) # 头像、身份？
-    moved = ToggleField(0x94, size=1, enableData=1, disableData=0)
+    moved = ByteField(0x94)
     posx = ByteField(0x5E)
     posy = ByteField(0x5F)
     hpmax = ByteField(0x50)
