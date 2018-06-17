@@ -15,24 +15,20 @@ class Tool(BaseGbaHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._global.storage_offset = 0
-        self._personins = models.Person(0, self.handler)
-        self.person_index = 0
-        self._chariotins = models.Chariot(0, self.handler)
-        self.chariot_index = 0
+        self.person = models.Person(0, self.handler)
+        self.chariot = models.Chariot(0, self.handler)
     
     def render_main(self):
-        person = self.weak._person
-        chariot = self.weak._chariot
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("battlein", "遇敌率")
 
-        with Group("player", "角色", person, cols=4):
+        with Group("player", "角色", self.person, cols=4):
             ui.Text("角色", className="input_label expand")
             ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
             ModelInput("level", "等级")
-            ModelInput("hpmax", "HP上限")
             ModelInput("hp", "HP")
+            ModelInput("hpmax", "HP上限")
             ModelInput("atk", "攻击")
             ModelInput("defensive", "守备")
             ModelInput("power", "腕力")
@@ -44,15 +40,15 @@ class Tool(BaseGbaHack):
             ModelInput("fix", "修理")
             ModelInput("exp", "经验")
 
-        with Group("human_equips", "角色装备", person):
+        with Group("human_equips", "角色装备", self.person):
             for i in range(8):
                 ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
 
-        with Group("human_items", "角色物品", person):
+        with Group("human_items", "角色物品", self.person):
             for i in range(8):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
 
-        with Group("chariot", "战车", chariot):
+        with Group("chariot", "战车", self.chariot):
             ui.Text("战车", className="input_label expand")
             ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
             ModelInput("sp", "装甲片")
@@ -61,15 +57,15 @@ class Tool(BaseGbaHack):
             ModelInput("weight", "底盘重量")
 
 
-        with Group("chariot_equips", "战车装备", chariot):
+        with Group("chariot_equips", "战车装备", self.chariot):
             for i in range(8):
                 ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS)
 
-        with Group("chariot_items", "战车物品", chariot):
+        with Group("chariot_items", "战车物品", self.chariot):
             for i in range(8):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ITEMS)
 
-        with Group("special_bullets", "特殊炮弹", chariot, cols=4):
+        with Group("special_bullets", "特殊炮弹", self.chariot, cols=4):
             for i in range(8):
                 ModelSelect("special_bullets.%d" % i, "", choices=datasets.SPECIAL_BULLETS)
                 ModelInput("special_bullets_count.%d" % i, "数量")
@@ -109,19 +105,14 @@ class Tool(BaseGbaHack):
         )
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
+        self.person.addr = lb.index * models.Person.SIZE
 
     def on_chariot_change(self, lb):
-        self.chariot_index = lb.index
+        self.chariot.addr = lb.index * models.Chariot.SIZE
 
     def on_storage_page(self, page):
         self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
         self.storage_group.read()
-
-    def _person(self):
-        person_addr = self.person_index * models.Person.SIZE
-        self._personins.addr = person_addr
-        return self._personins
 
     def persons(self):
         person = models.Person(0, self.handler)
@@ -129,19 +120,11 @@ class Tool(BaseGbaHack):
             person.addr = i * models.Person.SIZE
             yield person
 
-    def _chariot(self):
-        chariot_addr = self.chariot_index * models.Chariot.SIZE
-        self._chariotins.addr = chariot_addr
-        return self._chariotins
-
     def chariots(self):
         chariot = models.chariot(0, self.handler)
         for i in range(len(datasets.CHARIOTS)):
             chariot.addr = i * models.chariot.SIZE
             yield chariot
-
-    person = property(_person)
-    chariot = property(_chariot)
 
     def move_left(self, _=None):
         self._global.posx -= 1

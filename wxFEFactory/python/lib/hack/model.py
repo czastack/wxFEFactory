@@ -1,5 +1,6 @@
 from lib.utils import float32, Accumulator
 from lib.extypes import DataClass
+from functools import partialmethod
 
 
 class Model:
@@ -135,10 +136,11 @@ class ManagedModel(Model):
 
 
 class Field:
-    def __init__(self, offset, type=int, size=4):
+    def __init__(self, offset, type=int, size=4, label=None):
         self.offset = offset
         self.type = type
         self.size = size
+        self.label = label
 
     def __get__(self, instance, owner=None):
         ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
@@ -154,15 +156,17 @@ class Field:
         instance.handler.write(instance.addr + self.offset, value, self.size)
 
     def __str__(self):
-        return "{}(offset={}, size={})".format(self.__class__.__name__, self.offset, self.size)
+        return "{}(offset={}, size={})".format(self.__class__.__name__, 
+            hex(self.offset) if self.offset > 0xFF else self.offset, self.size)
 
     __repr__ = __str__
 
 
 class Fields:
     """同步控制多个地址的值"""
-    def __init__(self, *args):
+    def __init__(self, *args, label=None):
         self.fields = args
+        self.label = None
 
     def __get__(self, instance, owner=None):
         return self.fields[0].__get__(instance, owner)
@@ -200,8 +204,7 @@ class Cachable:
 
 
 class PtrField(Field):
-    def __init__(self, offset, size=0):
-        super().__init__(offset, int, size)
+    __init__ = partialmethod(Field.__init__, size=0)
 
     def __get__(self, instance, owner=None):
         if self.size is 0:
@@ -211,13 +214,11 @@ class PtrField(Field):
 
 
 class ByteField(Field):
-    def __init__(self, offset):
-        super().__init__(offset, int, 1)
+    __init__ = partialmethod(Field.__init__, size=1)
 
 
 class WordField(Field):
-    def __init__(self, offset):
-        super().__init__(offset, int, 2)
+    __init__ = partialmethod(Field.__init__, size=2)
 
 
 DWordField = Field
@@ -239,20 +240,37 @@ class SignedField(Field):
 
 class ToggleField(Field):
     """开关字段"""
-    def __init__(self, offset, type=int, size=4, enableData=None, disableData=None):
-        super().__init__(offset, type, size)
+    def __init__(self, *args, enableData=None, disableData=None, **kwargs):
+        super().__init__(*args, **kwargs)
         self.enableData = enableData
         self.disableData = disableData
         self.type = type(enableData)
 
 
+class ToggleFields:
+    """同步控制多个ToggleField"""
+    def __init__(self, *args, label=None):
+        self.fields = args
+        self.label = label
+
+    def __get__(self, instance, owner=None):
+        for field in self.fields:
+            if field.__get__(instance, owner) != field.enableData:
+                return False
+        return True
+
+    def __set__(self, instance, value):
+        for field in self.fields:
+            field.__set__(instance, field.enableData if value else field.disableData)
+
+
 class BitsField(Field):
     """位域字段"""
-    def __init__(self, offset, size, bitoffset, bitlen):
+    def __init__(self, offset, size, bitoffset, bitlen, label=None):
         self.bitoffset = bitoffset
         self.bitlen = bitlen
         self.mask = (2 << bitlen) - 1
-        super().__init__(offset, int, size)
+        super().__init__(offset, int, size, label)
 
     def __get__(self, instance, owner=None):
         value = super().__get__(instance)
@@ -284,8 +302,8 @@ class OffsetsField(Field):
 
 class ModelPtrField(Cachable, PtrField):
     """模型指针字段"""
-    def __init__(self, offset, modelClass, size=0):
-        super().__init__(offset, size)
+    def __init__(self, offset, modelClass, size=0, label=None):
+        super().__init__(offset, size=size, label=label)
         self.modelClass = modelClass
 
     def create_cache(self, instance):
@@ -307,8 +325,8 @@ class ManagedModelPtrField(ModelPtrField):
 
 class ModelField(Cachable, Field):
     """模型字段"""
-    def __init__(self, offset, modelClass, size=0):
-        super().__init__(offset, None, size or modelClass.SIZE)
+    def __init__(self, offset, modelClass, size=0, label=None):
+        super().__init__(offset, None, size or modelClass.SIZE, label)
         self.modelClass = modelClass
 
     def create_cache(self, instance):
@@ -338,9 +356,10 @@ class CoordField(Cachable):
     size = 12
     length = 3
 
-    def __init__(self, offset, length=None, size=4):
+    def __init__(self, offset, length=None, size=4, label=None):
         self.offset = offset
         self.size = size
+        self.label = label
         if length:
             self.length = length
             self.size = self.length * size
@@ -405,20 +424,16 @@ class CoordData:
 class ArrayField(Cachable, Field):
     itemkeys = None
 
-    def __init__(self, offset, length, field, itemcachable=False):
-        self.offset = offset
+    def __init__(self, offset, length, field, itemcachable=False, label=None):
         self.length = length
         self.field = field
         self.itemcachable = itemcachable and isinstance(field, Cachable)
+        super().__init__(offset, field, length * field.size, label)
 
     def __set_name__(self, owner, name):
         super().__set_name__(owner, name)
         if self.itemcachable:
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
-
-    @property
-    def size(self):
-        return self.length * self.field.size
 
     def create_cache(self, instance):
         return ArrayData(instance, self.offset, self.length, self.field, self.itemkeys)
@@ -508,8 +523,8 @@ class ArrayData:
 
 
 class StringField(Field):
-    def __init__(self, offset, size=0, encoding='gbk'):
-        super().__init__(offset, bytes, size)
+    def __init__(self, offset, size=0, label=None, encoding='gbk'):
+        super().__init__(offset, bytes, size, label)
         self.encoding = encoding
 
     def __get__(self, instance, owner=None):

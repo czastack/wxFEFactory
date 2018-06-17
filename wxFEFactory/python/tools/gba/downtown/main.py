@@ -10,12 +10,11 @@ class ExTool(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
-        self._personins = self.models.Person(0, self.handler)
-        self.person_index = 0
+        self.person = self.models.Person(0, self.handler)
     
     def render_main(self):
         datasets = self.datasets
-        person = self.weak._person
+        person = self.person
     
         with Group("global", "全局", self._global):
             ModelInput("partner_count", "我方人数")
@@ -51,12 +50,4 @@ class ExTool(BaseGbaHack):
                         ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
-
-    def _person(self):
-        person_addr = self.PERSON_ADDR_START + self.person_index * 0x9c
-        if person_addr:
-            self._personins.addr = person_addr
-            return self._personins
-
-    person = property(_person)
+        self.person.addr = self.PERSON_ADDR_START + lb.index * 0x9c

@@ -16,7 +16,7 @@ class Widget:
     def __init__(self, name, label, addr, offsets=(), readonly=False):
         self.weak = WeakBinder(self)
         self.name = name
-        self.label = label or name
+        self.label = name if label is None else label
         self.addr = addr
         self.offsets = offsets
         self.readonly = readonly
@@ -93,7 +93,14 @@ class ModelWidget:
         :param ins: Model实例，或者返回Model实例的函数，在Widget中用addr占位
         :param prop: Widget对应Field的属性名称，在Widget中用offsets占位
         """
-        super().__init__(name, label or name, addr=ins, offsets=prop or name, **kwargs)
+        super().__init__(name, label, addr=ins, offsets=prop or name, **kwargs)
+
+    def render(self):
+        if self.label is self.name and not callable(self.addr):
+            label = self.addr.field(self.offsets).label
+            if label:
+                self.label = label
+        super().render()
 
     @property
     def ins(self):
@@ -418,36 +425,8 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
             self.type = type(self.enableData)
 
 
-class ModelMultiCheckBox(BaseCheckBox):
-    """同步多个ToggleField"""
-    @property
-    def ins(self):
-        return self.addr() if callable(self.addr) else self.addr
-
-    @property
-    def mem_value(self):
-        """所有字段都符合enableData，返回True，否则返回False"""
-        ins = self.ins
-        if ins:
-            for prop in self.offsets:
-                field = ins.field(prop)
-                value = getattr(ins, prop)
-                if value is not field.enableData:
-                    break
-            else:
-                return True
-
-        return False
-
-    @mem_value.setter
-    def mem_value(self, value):
-        """True时写入每个字段对应的enableData，否则写入disableData"""
-        ins = self.ins
-        if ins:
-            for prop in self.offsets:
-                field = ins.field(prop)
-                value = setattr(ins, prop, field.enableData if value else field.enableData.disableData)
-
+class ModelMultiCheckBox(ModelWidget, BaseCheckBox):
+    """使用ToggleFields"""
     @property
     def input_value(self):
         return self.view.checked

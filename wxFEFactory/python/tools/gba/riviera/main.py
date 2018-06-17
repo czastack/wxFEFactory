@@ -10,11 +10,10 @@ class Tool(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self._personins = models.Person(0, self.handler)
-        self.person_index = 0
+        self.person = models.Person(0, self.handler)
     
     def render_main(self):
-        person = self.weak._person
+        person = self.person
         with Group("global", "全局", self._global):
             ModelInput("tp", "TP")
             ModelInput("kill_slot", "必杀槽").view.setToolTip("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
@@ -80,20 +79,13 @@ class Tool(BaseGbaHack):
         )
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
-
-    def _person(self):
-        person_addr = self.person_index * models.Person.SIZE
-        self._personins.addr = person_addr
-        return self._personins
+        self.person.addr = self.person_index * lb.index
 
     def persons(self):
         person = models.Person(0, self.handler)
         for i in range(len(datasets.PERSONS)):
             person.addr = i * models.Person.SIZE
             yield person
-
-    person = property(_person)
 
     def pull_through(self, _=None):
         for person in self.persons():

@@ -2,7 +2,7 @@ from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Model
 
 
 class Person(Model):
-    SIZE = 24
+    SIZE = 8
 
     # name = Field(0, bytes, 0xF)
     exp = Field(0x0, size=3)

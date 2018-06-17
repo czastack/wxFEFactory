@@ -12,10 +12,9 @@ class Tool(BaseNesHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self._personins = models.Person(0, self.handler)
-        self._itemholderins = models.ItemHolder(0, self.handler)
-        self._skillholderins = models.SkillHolder(0, self.handler)
-        self.person_index = 0
+        self.person = models.Person(0, self.handler)
+        self.itemholder = models.ItemHolder(0, self.handler)
+        self.skillholder = models.SkillHolder(0, self.handler)
     
     def render_main(self):
         with Group("global", "全局", self._global):
@@ -23,7 +22,7 @@ class Tool(BaseNesHack):
             ModelInput("money_1p", "1p金钱")
             ModelInput("money_2p", "2p金钱")
 
-        with Group("player", "我方角色", self.weak._person, cols=4) as group:
+        with Group("player", "我方角色", self.person, cols=4) as group:
             ui.Text("角色", className="input_label expand")
             ui.Choice(className="fill", choices=("1P", "2P"), onselect=self.on_person_change).setSelection(0)
             
@@ -32,11 +31,11 @@ class Tool(BaseNesHack):
 
         with group.footer:
             dialog_style = {'width': 1200, 'height': 900}
-            with DialogGroup("items", "道具", self.weak._itemholder, cols=4, dialog_style=dialog_style) as dialog_group:
+            with DialogGroup("items", "道具", self.itemholder, cols=4, dialog_style=dialog_style) as dialog_group:
                 indexs = (0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15)
                 for i in indexs:
                     ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
-            with DialogGroup("skills", "技能", self.weak._skillholder, dialog_style=dialog_style):
+            with DialogGroup("skills", "技能", self.skillholder, dialog_style=dialog_style):
                 values = [1 << i for i in range(7, -1, -1)]
                 for i, labels in enumerate(datasets.SKILL_ITEMS):
                     ModelFlagWidget("have_%s" % (i+1), "拥有", labels=labels, values=values, checkbtn=True, cols=4)
@@ -57,22 +56,10 @@ class Tool(BaseNesHack):
         )
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
-
-    def _person(self):
-        self._personins.addr = self.person_index
-        return self._personins
-
-    def _itemholder(self):
-        self._itemholderins.addr = self.person_index * models.ItemHolder.SIZE
-        return self._itemholderins
-
-    def _skillholder(self):
-        return self._skillholderins
-
-    person = property(_person)
-    itemholder = property(_itemholder)
-    skillholder = property(_skillholder)
+        index = lb.index
+        self.person.addr = index
+        self.itemholder.addr = index * models.ItemHolder.SIZE
+        # self.skillholder.addr = index * models.SkillHolder.SIZE
 
     def persons(self):
         person = models.Person(0, self.handler)

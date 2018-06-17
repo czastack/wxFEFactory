@@ -44,7 +44,7 @@ class Person(Model):
     def __setattr__(self, name, value):
         data = self.test_comlex_attr(name)
         if data:
-            if data.attrs[0] == 'skills'
+            if data.attrs[0] == 'skills':
                 skill = self.skills[data.attrs[1]]
                 skill.skill = value
                 skill.spec = 0x0002

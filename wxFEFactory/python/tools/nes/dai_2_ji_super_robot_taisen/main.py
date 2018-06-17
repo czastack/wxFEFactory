@@ -12,17 +12,14 @@ class Tool(BaseNesHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self._personins = models.Person(0, self.handler)
-        # self._weaponins = models.Weapon(0, self.handler)
-        self.person_index = 0
-        # self.weapon_index = 0
+        self.person = models.Person(0, self.handler)
     
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("exp", "驾驶员经验")
 
-        with Group("player", "我方角色", self.weak._person, cols=4):
+        with Group("player", "我方角色", self.person, cols=4):
             ui.Text("角色", className="input_label expand")
             ui.Choice(className="fill", choices=datasets.PARTNERS, onselect=self.on_person_change).setSelection(0)
             ModelInput("ability", "机体类型(海陆空)及变身能力")
@@ -76,21 +73,15 @@ class Tool(BaseNesHack):
         )
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
+        self.person.addr = lb.index
 
     def on_weapon_change(self, lb):
         self.weapon_index = lb.index
-
-    def _person(self):
-        self._personins.addr = self.person_index
-        return self._personins
 
     # def _weapon(self):
     #     if self.weapon_index:
     #         self._weaponins.addr = self._global.weapons.addr_at(self.weapon_index - 1)
     #         return self._weaponins
-
-    person = property(_person)
     # weapon = property(_weapon)
 
     def persons(self):

@@ -13,9 +13,8 @@ class BaseGSTool(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
-        self._personins = self.models.Person(0, self.handler)
-        self._personins.skills_offset = 0
-        self.person_index = 0
+        self.person = self.models.Person(0, self.handler)
+        self.person.skills_offset = 0
     
     def render_main(self):
         datasets = self.datasets
@@ -87,20 +86,13 @@ class BaseGSTool(BaseGbaHack):
         )
 
     def on_person_change(self, lb):
-        self.person_index = lb.index
-
-    def _person(self):
-        person_addr = self.PERSON_ADDR_START + self.person_index * self.models.Person.SIZE
-        self._personins.addr = person_addr
-        return self._personins
+        self.person.addr = self.PERSON_ADDR_START + lb.index * self.models.Person.SIZE
 
     def persons(self):
         person = self.models.Person(0, self.handler)
         for i in range(len(self.datasets.PERSONS)):
             person.addr = self.PERSON_ADDR_START + i * self.models.Person.SIZE
             yield person
-
-    person = property(_person)
 
     def on_skills_page(self, page):
         self.person.skills_offset = (page - 1) * self.SKILLS_PAGE_LENGTH
