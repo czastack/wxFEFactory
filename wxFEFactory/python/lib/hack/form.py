@@ -331,8 +331,8 @@ class BaseInput(TwoWayWidget):
 
 
 class Input(BaseInput, OffsetsWidget):
-    def __init__(self, *args, type_=int, **kwargs):
-        self.type = type_
+    def __init__(self, *args, type=int, **kwargs):
+        self.type = type
         super().__init__(*args, **kwargs)
 
 
@@ -458,14 +458,14 @@ class ModelMultiCheckBox(BaseCheckBox):
 
 
 class CoordWidget(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), length=3, type_=float, size=4, savable=False, preset=None):
+    def __init__(self, name, label, addr, offsets=(), length=3, type=float, size=4, savable=False, preset=None):
         """
         :param length: 坐标维数
         :param saveble: 是否支持存取文件
         :param preset: 预设坐标模块(要读__file__属性)
         """
         self.length = length
-        self.type = type_
+        self.type = type
         self.size = size
         self.savable = savable
         self.preset = preset
@@ -711,8 +711,8 @@ class BaseSelect(TwoWayWidget):
 
 
 class Select(BaseSelect, OffsetsWidget):
-    def __init__(self, *args, type_=int, size=4, **kwargs):
-        self.type = type_
+    def __init__(self, *args, type=int, size=4, **kwargs):
+        self.type = type
         self.size = size
         super().__init__(*args, **kwargs)
 
@@ -776,8 +776,8 @@ class BaseFlagWidget(TwoWayWidget):
 
 
 class FlagWidget(BaseFlagWidget, OffsetsWidget):
-    def __init__(self, *args, type_=int, size=4, **kwargs):
-        self.type = type_
+    def __init__(self, *args, type=int, size=4, **kwargs):
+        self.type = type
         self.size = size
         super().__init__(*args, **kwargs)
 

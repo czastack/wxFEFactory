@@ -32,6 +32,9 @@ class Model:
     def set_with(self, namefrom, nameto):
         setattr(self, nameto, getattr(self, namefrom))
 
+    def set_addr_by_index(self, i):
+        self.addr = self.SIZE * i
+
     def __and__(self, field):
         return self.addrof(field)
 
@@ -132,9 +135,9 @@ class ManagedModel(Model):
 
 
 class Field:
-    def __init__(self, offset, type_=int, size=4):
+    def __init__(self, offset, type=int, size=4):
         self.offset = offset
-        self.type = type_
+        self.type = type
         self.size = size
 
     def __get__(self, instance, owner=None):
@@ -236,10 +239,11 @@ class SignedField(Field):
 
 class ToggleField(Field):
     """开关字段"""
-    def __init__(self, offset, type_=int, size=4, enableData=None, disableData=None):
-        super().__init__(offset, type_, size)
+    def __init__(self, offset, type=int, size=4, enableData=None, disableData=None):
+        super().__init__(offset, type, size)
         self.enableData = enableData
         self.disableData = disableData
+        self.type = type(enableData)
 
 
 class BitsField(Field):

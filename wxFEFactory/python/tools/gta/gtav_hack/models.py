@@ -215,21 +215,21 @@ class Player(NativeEntity):
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
-    def player_setter(name, type_=int, default=None):
-        if type_ is int:
+    def player_setter(name, type=int, default=None):
+        if type is int:
             s = 'Q'
-        elif type_ is float:
+        elif type is float:
             s = 'f'
-        elif type_ is bool:
+        elif type is bool:
             s = '?'
         else:
-            raise ValueError('not support type: ' + type_.__name__)
+            raise ValueError('not support type: ' + type.__name__)
         if default is not None:
             def setter(self, value=default):
-                self.native_call(name, 'Q' + s, self.index, type_(value))
+                self.native_call(name, 'Q' + s, self.index, type(value))
         else:
             def setter(self, value):
-                self.native_call(name, 'Q' + s, self.index, type_(value))
+                self.native_call(name, 'Q' + s, self.index, type(value))
         return setter
 
     @property

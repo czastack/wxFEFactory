@@ -62,9 +62,9 @@ class Global(Model):
     money1 = Field(0x003AE350)
     money2 = Field(0x003AE354)
     money3 = Field(0x003AE358)
-    exp1 = Field(0x003AE35C, type_=float)
-    exp2 = Field(0x003AE360, type_=float)
-    exp3 = Field(0x003AE364, type_=float)
+    exp1 = Field(0x003AE35C, type=float)
+    exp2 = Field(0x003AE360, type=float)
+    exp3 = Field(0x003AE364, type=float)
     pedid = ByteField(0x003AC8FC) # 当前人物编号
     curx = ByteField(0x003C88B1) # 当前光标x坐标
     cury = ByteField(0x003C88B3) # 当前光标y坐标

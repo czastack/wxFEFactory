@@ -3,7 +3,7 @@ from lib.hack.form import Group, ModelCheckBox, ModelInput, ModelSelect
 from lib.hack.handler import MemHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
-from ..hacktool import BaseHackTool
+from tools.hacktool import BaseHackTool
 from . import models
 import base64
 import fefactory_api

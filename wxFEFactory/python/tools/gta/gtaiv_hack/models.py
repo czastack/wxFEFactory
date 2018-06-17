@@ -146,15 +146,15 @@ class Player(NativeEntity):
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
         return getter
 
-    def player_setter(name, type_=int):
-        if type_ is int:
+    def player_setter(name, type=int):
+        if type is int:
             s = 'L'
-        elif type_ is float:
+        elif type is float:
             s = 'f'
-        elif type_ is bool:
+        elif type is bool:
             s = '?'
         else:
-            raise ValueError('not support type: ' + type_.__name__)
+            raise ValueError('not support type: ' + type.__name__)
         def setter(self, value):
             self.native_call(name, 'L' + s, self.index, value)
         return setter

@@ -26,8 +26,8 @@ class BaseGSTool(BaseGbaHack):
             ModelInput("get_money", "战后金钱")
             ModelInput("get_exp", "战后经验")
             ModelInput("battlein", "遇敌率")
-            ModelCoordWidget("town_pos", "城镇坐标", length=2, type_=int, savable=True, preset=self.coords)
-            ModelCoordWidget("map_pos", "地图坐标", length=2, type_=int, savable=True, preset=self.coords)
+            ModelCoordWidget("town_pos", "城镇坐标", length=2, type=int, savable=True, preset=self.coords)
+            ModelCoordWidget("map_pos", "地图坐标", length=2, type=int, savable=True, preset=self.coords)
 
         with Group("player", "角色", person, cols=4):
             ui.Text("角色", className="input_label expand")
