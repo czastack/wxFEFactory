@@ -94,17 +94,11 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("sp")
         ModelSelect("chassis", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
         ModelSelect("double_type", choices=datasets.DOUBLE_TYPE)
-        ui.Text("C装置", className="input_label expand")
-        with ui.Horizontal(className="fill"):
-            ModelSelect("equips.0.equip", "", choices=datasets.CHARIOT_CONTROL.choices, values=datasets.CHARIOT_CONTROL.values)
+        with ModelSelect("equips.0.equip", "C装置", choices=datasets.CHARIOT_CONTROL.choices, values=datasets.CHARIOT_CONTROL.values).container:
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.0"))
-        ui.Text("引擎", className="input_label expand")
-        with ui.Horizontal(className="fill"):
-            ModelSelect("equips.1.equip", "", choices=datasets.CHARIOT_ENGINE.choices, values=datasets.CHARIOT_ENGINE.values)
+        with ModelSelect("equips.1.equip", "引擎", choices=datasets.CHARIOT_ENGINE.choices, values=datasets.CHARIOT_ENGINE.values).container:
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.1"))
-        ui.Text("C装置2/引擎2", className="input_label expand")
-        with ui.Horizontal(className="fill"):
-            ModelSelect("equips.2.equip", "", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, values=datasets.CHARIOT_CONTROL_ENGINE.values)
+        with ModelSelect("equips.2.equip", "C装置2/引擎2", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, values=datasets.CHARIOT_CONTROL_ENGINE.values).container:
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.2"))
         for i in range(5):
             ui.Text("炮穴%d" % (i + 1), className="input_label expand")
@@ -116,9 +110,7 @@ class MetalMaxHack(BaseNdsHack):
     def render_chariot_items(self):
         datasets = self.datasets
         for i in range(self.chariot.items.length):
-            ui.Text("战车", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+            with ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values).container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="items.%d" % i))
 
     def render_package_group(self):

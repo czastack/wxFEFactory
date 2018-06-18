@@ -13,6 +13,7 @@ class Tool(BaseNesHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self.person = models.Person(0, self.handler)
+        # self.weapon = models.Weapon(0, self.handler)
     
     def render_main(self):
         with Group("global", "全局", self._global):
@@ -41,7 +42,7 @@ class Tool(BaseNesHack):
             ModelInput("spiritual_max", "精神上限")
 
         self.lazy_group(Group("items", "道具", None), self.render_items)
-        # self.lazy_group(Group("weapons", "武器", self.weak._weapon), self.render_weapons)
+        # self.lazy_group(Group("weapons", "武器", self.weapon), self.render_weapons)
             
 
         # with Group("enemy", "敌人", None, cols=4):
@@ -76,13 +77,7 @@ class Tool(BaseNesHack):
         self.person.addr = lb.index
 
     def on_weapon_change(self, lb):
-        self.weapon_index = lb.index
-
-    # def _weapon(self):
-    #     if self.weapon_index:
-    #         self._weaponins.addr = self._global.weapons.addr_at(self.weapon_index - 1)
-    #         return self._weaponins
-    # weapon = property(_weapon)
+        self.weapon.index = self._global.weapons.addr_at(self.lb.index - 1)
 
     def persons(self):
         person = models.Person(0, self.handler)

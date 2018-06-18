@@ -318,7 +318,7 @@ class BaseInput(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(className="fill") as container:
             if self.spin:
                 self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
@@ -326,6 +326,7 @@ class BaseInput(TwoWayWidget):
             del self.max
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
+        self.container = container
 
     @property
     def input_value(self):
@@ -401,9 +402,10 @@ class BaseCheckBox(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(className="fill") as container:
             self.view = ui.CheckBox("", className="fill")
             self.render_btn()
+        self.container = container
 
     @property
     def input_value(self):
@@ -465,7 +467,7 @@ class CoordWidget(TwoWayWidget):
         this = self.weak
         super().render()
         if not self.savable:
-            with ui.Horizontal(className="expand"):
+            with ui.Horizontal(className="expand") as container:
                 self.views = tuple(ui.TextInput(className="fill") for i in range(self.length))
                 self.render_btn()
 
@@ -481,7 +483,7 @@ class CoordWidget(TwoWayWidget):
                                 views.append(ui.TextInput(className="fill"))
                             ui.Text("名称", className="input_label expand")
                             self.name_view = ui.TextInput(className="fill")
-                        with ui.Horizontal(className="expand container"):
+                        with ui.Horizontal(className="expand container") as container:
                             self.render_btn()
                             ui.Button(label="添加", className="button", onclick=this.onAdd)
                             ui.Button(label="更新", className="button", onclick=this.onUpdate)
@@ -500,6 +502,7 @@ class CoordWidget(TwoWayWidget):
                 root.setContextMenu(contextmenu)
             self.views = tuple(views)
         self.view = self.views[0]
+        self.container = container
 
     @property
     def mem_value(self):
@@ -677,10 +680,11 @@ class BaseSelect(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(className="fill") as container:
             self.view = ui.Choice(className="fill", choices=self.choices, onselect=self.onselect)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
+        self.container = container
         del self.choices, self.onselect
 
     def setItems(self, choices, values=0):
@@ -727,7 +731,7 @@ class BaseFlagWidget(TwoWayWidget):
     def render(self):
         if self.label != "":
             ui.Text(self.label, className="form_label expand")
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(className="fill") as container:
             if self.cols is not None:
                 view = ui.GridLayout(cols=self.cols, vgap=10, className="fill")
             else:
@@ -744,6 +748,7 @@ class BaseFlagWidget(TwoWayWidget):
                 ui.Button(label="不选", style=btn_xs_style, onclick=self.weak.uncheck_all)
             self.render_btn()
         self.view = view
+        self.container = container
         self.helps, self.cols
 
     @property
