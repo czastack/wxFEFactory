@@ -44,13 +44,13 @@ class ChariotEquipInfo(Model):
 
 
 class ChariotItemInfo(ChariotEquipInfo):
-    pass
+    item = WordField(0, label="种类")
 
 
 class Chariot(Model):
     SIZE = 0x25C
 
-    chassis_type = WordField(0x02196D24)
+    chassis = WordField(0x02196D24, label="底盘")
     specital_bullet = ByteField(0x02196F40)
     specital_bullet_count = ByteField(0x02196F41)
 
@@ -58,7 +58,7 @@ class Chariot(Model):
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo))
 
     hole_type = ArrayField(0x02196D1F, 5, WordField(0))
-    double_type = ByteField(0x02196D29) # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
+    double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
 
 
 class ChariotStatus(Model):
@@ -129,11 +129,16 @@ class Global(BaseGlobal):
     # 战斗必定先制
     must_first = ToggleField(0x02085A3E, size=6, enableData=0x46C070012102, disableData=0xD12A28027800, label="战斗必定先制")
 
-    # 道具
-    items = ArrayField(0x02194C78, 26, ModelField(0, ItemInfo2)) # 0x00~, size=2
     # 回复道具
-    potions = ArrayField(0x0219491C, 26, ModelField(0, ItemInfo)) # 0x11~, size=1
+    potions = ArrayField(0x0219491C, 27, ModelField(0, ItemInfo))
     # 战斗道具
-    battle_items = ArrayField(0x02194A3C, 45, ModelField(0, ItemInfo)) # 0x2C~, size=1
+    battle_items = ArrayField(0x02194A3C, 46, ModelField(0, ItemInfo))
+    # 道具
+    humen_items = ArrayField(0x02194C78, 222, ModelField(0, ItemInfo2))
     # 装备
-    equips = ArrayField(0x02194FF0, 200, ModelField(0, ItemInfo2)) # (0176, 01A1, 01DE, 0201, 02E9)~, size=2
+    equips = ArrayField(0x02194FF0, 373, ModelField(0, ItemInfo2))
+
+    monster_1 = WordField(0x021AAF40, label="怪物1种类")
+    monster_1_count = ByteField(0x021AAF42, label="怪物1种类")
+    monster_2 = WordField(0x021AAF46, label="怪物1种类")
+    monster_2_count = ByteField(0x021AAF48, label="怪物1种类")

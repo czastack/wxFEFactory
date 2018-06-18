@@ -10,7 +10,7 @@ class ItemInfo(Model):
 class ItemInfo2(Model):
     SIZE = 4
     item = WordField(0)
-    count = ByteField(3)
+    count = ByteField(2)
 
 
 class BaseGlobal(Model):

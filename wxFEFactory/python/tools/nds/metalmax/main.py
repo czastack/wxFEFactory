@@ -3,17 +3,18 @@ from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelMultiCheckBox,
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 from fefactory_api import ui
+from functools import partial
 
 
 class MetalMaxHack(BaseNdsHack):
-    TRAIN_ITEMS_PAGE_LENGTH = 10
-    TRAIN_ITEMS_PAGE_TOTAL = 20
+    IREM_PAGE_LENGTH = 9
 
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
         self.person = self.models.Person(0, self.handler)
+        self.chariot = self.models.Chariot(0, self.handler)
         self.item_index = 1
     
     def render_main(self):
@@ -57,76 +58,73 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("speed")
             ModelInput("spirit")
             ModelInput("scar")
+            ModelInput("level_max")
+            ModelSelect("subprof", choices=datasets.SUBPROFS)
+            ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+            ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+            ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+            ModelSelect("equip_head", choices=datasets.EQUIP_HEAD.choices, values=datasets.EQUIP_HEAD.values)
+            ModelSelect("equip_body", choices=datasets.EQUIP_BODY.choices, values=datasets.EQUIP_BODY.values)
+            ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
+            ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
+            ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
+        
+        with Group("chariot", "战车", self.chariot):
+            ui.Text("战车", className="input_label expand")
+            ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
+            ModelSelect("chassis", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
+            ModelSelect("double_type", choices=datasets.DOUBLE_TYPE)
+            ModelSelect("equips.0", "C装置", choices=datasets.CHARIOT_CONTROL.choices, values=datasets.CHARIOT_CONTROL.values)
+            ModelSelect("equips.1", "引擎", choices=datasets.CHARIOT_ENGINE.choices, values=datasets.CHARIOT_ENGINE.values)
+            ModelSelect("equips.2", "C装置2/引擎2", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, values=datasets.CHARIOT_CONTROL_ENGINE.values)
+            for i in range(5):
+                ui.Text("炮穴%d" % (i + 1), className="input_label expand")
+                with ui.Horizontal(className="fill"):
+                    ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
+                    ModelSelect("equips.%d" % (i + 3), "装备", choices=datasets.CHARIOT_WEAPON.choices, values=datasets.CHARIOT_WEAPON.values)
 
-        # with Group("items", "角色物品", self.person, cols=4):
-        #     for i in range(5):
-        #         ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-        #         ModelInput("items.%d.count" % i, "数量")
 
+        self.lazy_group(Group("chariot_items", "战车物品", self.chariot, cols=4), self.render_chariot_items)
 
-        # self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
-        # self.lazy_group(self.train_items_group, self.render_train_items)
+        self.render_package_group()
 
-    def render_train_items(self):
+    def render_chariot_items(self):
         datasets = self.datasets
-        for i in range(10):
-            ModelSelect("train_items.%d+train_items_offset.item" % i, "", choices=datasets.ITEMS)
-            ModelInput("train_items.%d+train_items_offset.count" % i, "数量")
-        with Group.active_group().footer:
-            Pagination(self.on_train_items_page, self.TRAIN_ITEMS_PAGE_TOTAL)
+        for i in range(self.chariot.items.length):
+            ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+
+    def render_package_group(self):
+        datasets = self.datasets
+
+        def on_page_change(self, page, item=None):
+            setattr(self._global, "{}_offset".format(item['key']), (page - 1) * self.IREM_PAGE_LENGTH)
+            item['group'].read()
+
+        def render_items(self, item=None):
+            for i in range(self.IREM_PAGE_LENGTH):
+                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
+                ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
+            with Group.active_group().footer:
+                Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
+
+        for item in (
+            {'key': 'humen_items', 'label': '道具', 'source': datasets.HUMEN_ITEM, 'page_count': 25},
+            {'key': 'potions', 'label': '恢复道具', 'source': datasets.POTION, 'page_count': 3},
+            {'key': 'battle_items', 'label': '战斗道具', 'source': datasets.BATTLE_ITEM, 'page_count': 6},
+            {'key': 'equips', 'label': '装备', 'source': datasets.ALL_EQUIP, 'page_count': 45},
+        ):
+            item['group'] = Group(item['key'], item['label'], self._global, cols=4)
+            self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
+            setattr(self._global, "{}_offset".format(item['key']), 0)
 
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('continue_move', MOD_ALT, getVK('m'), this.continue_move),
-            ('move_to_cursor', MOD_ALT, getVK('g'), this.move_to_cursor),
-            ('move_left', MOD_ALT, getVK('left'), this.move_left),
-            ('move_right', MOD_ALT, getVK('right'), this.move_right),
-            ('move_up', MOD_ALT, getVK('up'), this.move_up),
-            ('move_down', MOD_ALT, getVK('down'), this.move_down),
+
         )
 
     def on_person_change(self, lb):
         self.person.set_addr_by_index(lb.index)
 
-    def _config(self):
-        return self._global.config
-
-    def on_item_change(self, lb):
-        self.item_index = lb.index
-
-    def _iteminfo(self):
-        if self.item_index > 0:
-            return self._global.iteminfos[self.item_index - 1]
-
-    def copy_iteminfo(self, _=None):
-        index = self.copy_iteminfo_view.index
-        if index > 0:
-            item_from = self._global.iteminfos[index - 1]
-            self.handler.write(self._global.iteminfos.addr_at(self.item_index - 1), item_from.to_bytes())
-
-    def continue_move(self, _=None):
-        """再移动"""
-        self.person.moved = False
-
-    def move_to_cursor(self, _=None):
-        person = self.person
-        _global = self._global
-        person.posx = _global.curx
-        person.posy = _global.cury
-
-    def move_left(self, _=None):
-        self.person.posx -= 1
-
-    def move_right(self, _=None):
-        self.person.posx += 1
-
-    def move_up(self, _=None):
-        self.person.posy -= 1
-
-    def move_down(self, _=None):
-        self.person.posy += 1
-
-    def on_train_items_page(self, page):
-        self._global.train_items_offset = (page - 1) * self.TRAIN_ITEMS_PAGE_LENGTH
-        self.train_items_group.read()
+    def on_chariot_change(self, lb):
+        self.chariot.set_addr_by_index(lb.index)

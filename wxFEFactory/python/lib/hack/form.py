@@ -1,5 +1,4 @@
-from lib import exui, fileutils
-from lib.utils import float32
+from lib import exui, fileutils, utils
 from lib.extypes import WeakBinder
 from styles import styles, dialog_style, btn_xs_style
 from __main__ import win as main_win
@@ -137,7 +136,7 @@ class OffsetsWidget:
     def mem_value(self):
         ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
         if self.type is float:
-            ret = float32(ret)
+            ret = utils.float32(ret)
         return ret
 
     @mem_value.setter
@@ -505,7 +504,7 @@ class CoordWidget(TwoWayWidget):
                 offsets[-1] += self.size
             else:
                 if self.type is float:
-                    value = float32(self.handler.readFloat(addr))
+                    value = utils.float32(self.handler.readFloat(addr))
                 else:
                     value = self.handler.read(addr, self.type, self.size)
                 addr += self.size
@@ -656,6 +655,13 @@ class ModelCoordWidget(ModelWidget, CoordWidget):
 
 class BaseSelect(TwoWayWidget):
     def __init__(self, *args, choices=None, values=None, onselect=None, **kwargs):
+        # 预处理choices, values
+        if values is None:
+            list_tuple = (list, tuple)
+            if not isinstance(choices, list_tuple):
+                choices = tuple(choices)
+            if choices and isinstance(choices[0], list_tuple):
+                choices, values = utils.split_value_label(choices)
         self.choices = choices
         self.values = values
         self.onselect = onselect
