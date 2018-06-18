@@ -19,6 +19,7 @@ HOLE_TYPE, HOLE_TYPE_VALUES = utils.split_value_label((
     (0x0, "关"),
     (0x1, "主炮类"),
     (0x11, "副炮类"),
+    (0x13, "副炮类"),
     (0x1F, "S-E类"),
 ))
 

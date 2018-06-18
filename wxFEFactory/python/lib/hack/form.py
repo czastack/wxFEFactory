@@ -42,7 +42,8 @@ class Widget:
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
 
     def render(self):
-        ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
+        if self.label != "":
+            ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
 
     def render_btn(self):
         this = self.weak
@@ -269,21 +270,28 @@ class Group(BaseGroup):
 
 
 class DialogGroup(Group):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, button=True, **kwargs):
+        self.button = button
         self.dialog_style = kwargs.pop('dialog_style', None)
         super().__init__(*args, **kwargs)
 
     def render(self):
-        ui.Button(label=self.label, onclick=self.weak.show)
+        if self.button:
+            ui.Button(label=self.label, onclick=self.weak.show)
+            
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
             with exui.StdDialog(self.label, style=style, styles=styles) as root:
                 self.render_root()
 
         self.root = root
+        del self.button
 
     def show(self, _=None):
         self.root.show()
+
+    def showModal(self, _=None):
+        self.root.showModal()
 
 
 class StaticGroup(Group):
@@ -717,7 +725,8 @@ class BaseFlagWidget(TwoWayWidget):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        ui.Text(self.label, className="form_label expand")
+        if self.label != "":
+            ui.Text(self.label, className="form_label expand")
         with ui.Horizontal(className="fill"):
             if self.cols is not None:
                 view = ui.GridLayout(cols=self.cols, vgap=10, className="fill")

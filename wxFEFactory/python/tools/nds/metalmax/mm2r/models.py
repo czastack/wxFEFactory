@@ -31,16 +31,15 @@ class Person(Model):
 class ChariotEquipInfo(Model):
     SIZE = 0x14
 
-    euip = WordField(0, label="种类")
+    equip = WordField(0, label="种类")
     chaneg = ByteField(5, label="超改次数")
+    status = ByteField(6, label="状态") # 0x14=破损 0x64=损坏
     ammo = ByteField(8, label="剩余弹药")
     level = ByteField(9, label="武器星级")
     defensive = WordField(10, label="守备力")
-    hit = WordField(12, label="命中率(辅助)")
-    atk = WordField(12, label="攻击力(武器)")
-    avoid = WordField(14, label="回避率(辅助)")
-    ammo_max = WordField(14, label="弹舱容量(武器)") # 00: 无限弹药
-    weight = WordField(18, label="重量")
+    attr1 = WordField(12, label="命中率(C装置)/攻击力(武器)/引擎载重(0.01t)")
+    attr2 = WordField(14, label="回避率(C装置)/弹舱容量(武器)")
+    weight = WordField(18, label="重量(0.01t)")
 
 
 class ChariotItemInfo(ChariotEquipInfo):
@@ -50,26 +49,24 @@ class ChariotItemInfo(ChariotEquipInfo):
 class Chariot(Model):
     SIZE = 0x25C
 
+    sp = WordField(0x02196D1C, label="装甲")
+    hole_type = ArrayField(0x02196D1F, 5, ByteField(0))
     chassis = WordField(0x02196D24, label="底盘")
+    double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
     specital_bullet = ByteField(0x02196F40)
     specital_bullet_count = ByteField(0x02196F41)
 
     equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo)) # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo))
 
-    hole_type = ArrayField(0x02196D1F, 5, WordField(0))
-    double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
-
-
-class ChariotStatus(Model):
-    SIZW = 0xBC
-    sp = WordField(0x021AB3E4)
-    spmax = WordField(0x021AB3E8)
+    def health(self):
+        for equip in self.equips:
+            equip.status = 0
 
 
 class Global(BaseGlobal):
-    # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
-    # train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot)) # 运输队
+    persons = ArrayField(0, 15, ModelField(0, Person))
+    chariots = ArrayField(0, 12, ModelField(0, Chariot))
     money = Field(0x021947D8, label="金钱")
     exp = Field(0x021AAE90, label="经验")
     stamp = WordField(0x02194844, label="邮票")
