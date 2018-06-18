@@ -42,8 +42,7 @@ class Widget:
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
 
     def render(self):
-        if self.label != "":
-            ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
+        ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
 
     def render_btn(self):
         this = self.weak
@@ -97,9 +96,9 @@ class ModelWidget:
 
     def render(self):
         if self.label is self.name and not callable(self.addr):
-            label = self.addr.field(self.offsets).label
-            if label:
-                self.label = label
+            field = self.addr.field(self.offsets)
+            if field and field.label:
+                self.label = field.label
         super().render()
 
     @property
@@ -729,8 +728,7 @@ class BaseFlagWidget(TwoWayWidget):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        if self.label != "":
-            ui.Text(self.label, className="form_label expand")
+        ui.Text(self.label, className="form_label expand")
         with ui.Horizontal(className="fill") as container:
             if self.cols is not None:
                 view = ui.GridLayout(cols=self.cols, vgap=10, className="fill")

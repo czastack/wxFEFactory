@@ -20,25 +20,25 @@ class Tool(BaseGbaHack):
     
     def render_main(self):
         with Group("global", "全局", self._global):
-            ModelInput("money", "金钱")
-            ModelInput("battlein", "遇敌率")
+            ModelInput("money")
+            ModelInput("battlein")
 
         with Group("player", "角色", self.person, cols=4):
             ui.Text("角色", className="input_label expand")
             ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
-            ModelInput("level", "等级")
-            ModelInput("hp", "HP")
-            ModelInput("hpmax", "HP上限")
-            ModelInput("atk", "攻击")
-            ModelInput("defensive", "守备")
-            ModelInput("power", "腕力")
-            ModelInput("intelli", "知力")
-            ModelInput("stamina", "体力")
-            ModelInput("speed", "速度")
-            ModelInput("battle", "战斗")
-            ModelInput("drive", "驾驶")
-            ModelInput("fix", "修理")
-            ModelInput("exp", "经验")
+            ModelInput("level")
+            ModelInput("hp")
+            ModelInput("hpmax")
+            ModelInput("atk")
+            ModelInput("defensive")
+            ModelInput("power")
+            ModelInput("intelli")
+            ModelInput("stamina")
+            ModelInput("speed")
+            ModelInput("battle")
+            ModelInput("drive")
+            ModelInput("fix")
+            ModelInput("exp")
 
         with Group("human_equips", "角色装备", self.person):
             for i in range(8):
@@ -51,11 +51,10 @@ class Tool(BaseGbaHack):
         with Group("chariot", "战车", self.chariot):
             ui.Text("战车", className="input_label expand")
             ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
-            ModelInput("sp", "装甲片")
-            ModelInput("bullet", "弹仓容量")
-            ModelInput("defensive", "守备力")
-            ModelInput("weight", "底盘重量")
-
+            ModelInput("sp")
+            ModelInput("bullet")
+            ModelInput("defensive")
+            ModelInput("weight")
 
         with Group("chariot_equips", "战车装备", self.chariot):
             for i in range(8):
@@ -67,7 +66,7 @@ class Tool(BaseGbaHack):
 
         with Group("special_bullets", "特殊炮弹", self.chariot, cols=4):
             for i in range(8):
-                ModelSelect("special_bullets.%d" % i, "", choices=datasets.SPECIAL_BULLETS)
+                ModelSelect("special_bullets.%d" % i, "炮弹%d" % (i + 1), choices=datasets.SPECIAL_BULLETS)
                 ModelInput("special_bullets_count.%d" % i, "数量")
 
         self.storage_group = Group("storage", "保管物品", self._global)

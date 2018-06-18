@@ -2359,6 +2359,7 @@ def itemof(start, end, can_empty=True):
     return ItemProvider(ITEMS, start, end, can_empty)
 
 
+SPECIAL_BULLETS = itemof(0x01, 0x10)
 HUMEN_ITEM = itemof(0x005A, 0x016F) # 道具
 POTION = itemof(0x11, 0x2C) # 恢复道具
 BATTLE_ITEM = itemof(0x2C, 0x59) # 战斗道具

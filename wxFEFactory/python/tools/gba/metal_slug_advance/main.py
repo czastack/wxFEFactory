@@ -9,15 +9,15 @@ ui = fefactory_api.ui
 
 
 class Global(Model):
-    hp = ByteField(0x02004948)
-    tankhp = ByteField(0x02005618)
-    invincible = ByteField(0x02000028)
-    ammo = WordField(0x02000072)
-    bomb = ByteField(0x0200006F)
-    shell = ByteField(0x03004756)
+    hp = ByteField(0x02004948, label="生命(50)")
+    tankhp = ByteField(0x02005618, label="载具生命(50)")
+    invincible = ByteField(0x02000028, label="无敌")
+    ammo = WordField(0x02000072, label="子弹")
+    bomb = ByteField(0x0200006F, label="手榴")
+    shell = ByteField(0x03004756, label="机器炮弹")
     shoot_limit = ByteField(0x0200006C)
-    weapon = ByteField(0x0200006D)
-    bombtype = ByteField(0x0200006E)
+    weapon = ByteField(0x0200006D, label="武器种类")
+    bombtype = ByteField(0x0200006E, label="炸弹种类")
     level_flag = ByteField(0x0200CD69)
     cards_flag = ByteField(0x0200CD70) # ~0x0200CD88
     prisoner_flag = ByteField(0x0200CD90) # ~0x0200CD9C
@@ -49,14 +49,14 @@ class Tool(BaseGbaHack):
     
     def render_main(self):
         with Group("global", "全局", self._global):
-            ModelInput("hp", "生命(50)")
-            # ModelInput("tankhp", "载具生命(50)")
-            ModelCheckBox("invincible", "无敌", enableData=0x20, disableData=0)
-            ModelInput("ammo", "子弹")
-            ModelInput("bomb", "手榴")
-            ModelInput("shell", "机器炮弹")
-            ModelSelect("weapon", "武器种类", choices=WEAPONS, values=WEAPON_VALUES)
-            ModelSelect("bombtype", "炸弹种类", choices=BOMB_TYPES, values=BOMB_VALUES)
+            ModelInput("hp")
+            # ModelInput("tankhp")
+            ModelCheckBox("invincible", enableData=0x20, disableData=0)
+            ModelInput("ammo")
+            ModelInput("bomb")
+            ModelInput("shell")
+            ModelSelect("weapon", choices=WEAPONS, values=WEAPON_VALUES)
+            ModelSelect("bombtype", choices=BOMB_TYPES, values=BOMB_VALUES)
 
         with StaticGroup("功能"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):

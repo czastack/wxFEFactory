@@ -106,6 +106,11 @@ class MetalMaxHack(BaseNdsHack):
                 ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
                 ModelSelect("equips.%d.equip" % (i + 3), "装备", choices=datasets.CHARIOT_WEAPON.choices, values=datasets.CHARIOT_WEAPON.values)
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.%d" % (i + 3)))
+        for i in range(4):
+            ui.Text("特殊炮弹%d" % (i + 1), className="input_label expand")
+            with ui.Horizontal(className="fill"):
+                ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
+                ModelInput("special_bullets.%d.count" % i, "数量")
 
     def render_chariot_items(self):
         datasets = self.datasets

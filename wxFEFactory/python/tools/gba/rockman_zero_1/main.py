@@ -9,20 +9,20 @@ ui = fefactory_api.ui
 
 
 class Global(Model):
-    hp = ByteField(0x0202B62C)
-    hpmax = ByteField(0x0202B723)
-    limit_time = ByteField(0x02022CDC) # 限时关卡的时间
-    lives = ByteField(0x0202A5D0)
-    invincible = ByteField(0x0202B634)
-    money = WordField(0x0202B79E)
-    level = ByteField(0x0202B718)
-    weapon_flag = ByteField(0x0202B728)
+    hp = ByteField(0x0202B62C, label="HP")
+    hpmax = ByteField(0x0202B723, label="最大HP")
+    limit_time = ByteField(0x02022CDC, label="生命") # 限时关卡的时间
+    lives = ByteField(0x0202A5D0, label="限时关卡的时间")
+    invincible = ByteField(0x0202B634, label="无敌")
+    money = WordField(0x0202B79E, label="水晶")
+    level = ByteField(0x0202B718, label="等级")
+    weapon_flag = ByteField(0x0202B728, label="武器")
     element_flag = ByteField(0x0202B729)
     weapon_level = Field(0x0202B734)
-    weapon_level_1 = ByteField(0x0202B734)
-    weapon_level_2 = ByteField(0x0202B735)
-    weapon_level_3 = ByteField(0x0202B736)
-    weapon_level_4 = ByteField(0x0202B737)
+    weapon_level_1 = ByteField(0x0202B734, label="光弹枪等级")
+    weapon_level_2 = ByteField(0x0202B735, label="光束刀等级")
+    weapon_level_3 = ByteField(0x0202B736, label="三尖矛等级")
+    weapon_level_4 = ByteField(0x0202B737, label="护盾回旋镖等级")
     fairy_flag = ArrayField(0x0202B744, 5, Field(0))
     fairy_use_count = ArrayField(0x0202B758, 5, WordField(0))
 
@@ -39,18 +39,18 @@ class Tool(BaseGbaHack):
     
     def render_main(self):
         with Group("global", "全局", self._global):
-            ModelInput("hp", "HP")
-            ModelInput("hpmax", "最大HP")
-            ModelInput("lives", "生命")
-            ModelInput("limit_time", "限时关卡的时间")
-            ModelInput("money", "水晶")
-            ModelInput("weapon_level_1", "光弹枪等级")
-            ModelInput("weapon_level_2", "光束刀等级")
-            ModelInput("weapon_level_3", "三尖矛等级")
-            ModelInput("weapon_level_4", "护盾回旋镖等级")
-            ModelSelect("level", "等级", choices=LEVELS)
-            ModelFlagWidget("weapon_flag", "武器", labels=WEAPONS)
-            ModelCheckBox("invincible", "无敌", enableData=0xFF, disableData=0)
+            ModelInput("hp")
+            ModelInput("hpmax")
+            ModelInput("lives")
+            ModelInput("limit_time")
+            ModelInput("money")
+            ModelInput("weapon_level_1")
+            ModelInput("weapon_level_2")
+            ModelInput("weapon_level_3")
+            ModelInput("weapon_level_4")
+            ModelSelect("level", choices=LEVELS)
+            ModelFlagWidget("weapon_flag", labels=WEAPONS)
+            ModelCheckBox("invincible", enableData=0xFF, disableData=0)
 
         with StaticGroup("功能"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):

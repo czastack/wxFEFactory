@@ -53,8 +53,7 @@ class Chariot(Model):
     hole_type = ArrayField(0x02196D1F, 5, ByteField(0))
     chassis = WordField(0x02196D24, label="底盘")
     double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
-    specital_bullet = ByteField(0x02196F40)
-    specital_bullet_count = ByteField(0x02196F41)
+    special_bullets = ArrayField(0x02196F40, 4, ModelField(0, ItemInfo)) # 特殊炮弹
 
     equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo)) # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo))
