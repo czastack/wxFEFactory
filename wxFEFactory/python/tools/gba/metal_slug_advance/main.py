@@ -59,10 +59,7 @@ class Tool(BaseGbaHack):
             ModelSelect("bombtype", choices=BOMB_TYPES, values=BOMB_VALUES)
 
         with StaticGroup("功能"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                for name in ('max_ammo', 'fast_shoot'):
-                    func = getattr(self.weak, name)
-                    ui.Button(func.__doc__, onclick=func)
+            self.render_functions(('max_ammo', 'fast_shoot'))
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):

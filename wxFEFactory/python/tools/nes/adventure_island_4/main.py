@@ -29,10 +29,7 @@ class Tool(BaseNesHack):
             ModelSelect("dragon", "当前龙", choices=DRAGONS)
 
         with StaticGroup("功能"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                for name in ('pull_through', 'hp_max', 'all_dragons', 'all_tools'):
-                    func = getattr(self.weak, name)
-                    ui.Button(func.__doc__, onclick=func)
+            self.render_functions(('pull_through', 'hp_max', 'all_dragons', 'all_tools'))
 
     def get_hotkeys(self):
         this = self.weak

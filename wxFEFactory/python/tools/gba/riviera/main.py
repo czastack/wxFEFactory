@@ -62,11 +62,8 @@ class Tool(BaseGbaHack):
                 ui.Button("全技能", onclick=self.weak.all_skills)
 
         with StaticGroup("功能"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                for name in ('enable_addition', 'all_cg', 'all_item_book', 'all_music',
-                        'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'):
-                    func = getattr(self.weak, name)
-                    ui.Button(func.__doc__, onclick=func)
+            self.render_functions(('enable_addition', 'all_cg', 'all_item_book', 'all_music',
+                        'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'))
 
 
         with StaticGroup("快捷键"):

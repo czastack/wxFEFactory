@@ -17,14 +17,14 @@ class Person(Model):
     subprof = ByteField(0x02195DC8, label="副职业")
     figure = ByteField(0x02195DC9, label="形象")
     level_max = ByteField(0x02195DD0, label="等级上限")
-    weapon_1 = ByteField(0x02195DEA, label="武器1")
-    weapon_2 = ByteField(0x02195DEC, label="武器2")
-    weapon_3 = ByteField(0x02195DEE, label="武器3")
-    equip_head = ByteField(0x02195DF0, label="头部装备")
-    equip_body = ByteField(0x02195DF2, label="上身装备")
-    equip_hand = ByteField(0x02195DF4, label="手部装备")
-    equip_foot = ByteField(0x02195DF6, label="脚部装备")
-    equip_orn = ByteField(0x02195DF8, label="装饰")
+    weapon_1 = WordField(0x02195DEA, label="武器1")
+    weapon_2 = WordField(0x02195DEC, label="武器2")
+    weapon_3 = WordField(0x02195DEE, label="武器3")
+    equip_head = WordField(0x02195DF0, label="头部装备")
+    equip_body = WordField(0x02195DF2, label="上身装备")
+    equip_hand = WordField(0x02195DF4, label="手部装备")
+    equip_foot = WordField(0x02195DF6, label="脚部装备")
+    equip_orn = WordField(0x02195DF8, label="装饰")
     subprof_levels = ArrayField(0x02195E3A, 6, ByteField(0)) # 副职业等级(猎人、机械师、战士、护士、摔跤手、艺术家)
 
 
@@ -61,6 +61,38 @@ class Chariot(Model):
     def health(self):
         for equip in self.equips:
             equip.status = 0
+
+
+class EnemyCase(Model):
+    SIZE = 6
+    race = WordField(0, label="种族")
+    count = ByteField(2, label="数量")
+
+
+class Enemy(Model):
+    SIZE = 0xBC
+
+    race = WordField(0x021AB5CE, label="种族")
+    level = ByteField(0x021AB616, label="等级")
+    hp = WordField(0x021AB618, label="HP")
+    atk = WordField(0x021AB620, label="攻击")
+    defensive = WordField(0x021AB622, label="防御")
+    hit = WordField(0x021AB624, label="命中")
+    avoid = WordField(0x021AB626, label="回避")
+    speed = WordField(0x021AB628, label="速度")
+    # exp = WordField(0x021AB62C, label="EXP")
+    # g = WordField(0x021AB62E, label="G")
+    # shine = WordField(0x021AB630, label="闪光")
+    # 抗性(物火光电音气冷)
+    resistance = ArrayField(0x021AB632, 7, WordField(0))
+
+    # class MonsterAtkPart(Model):
+    #     SIZE = 6
+    #     part = WordField(0, "部件")
+    #     arg1 = ByteField(2, "参数1")
+    #     arg1 = ByteField(3, "参数2")
+    #     arg1 = ByteField(4, "参数3")
+    # atk_parts = ArrayField(0x021AB644, 7, ModelField(0, MonsterAtkPart))
 
 
 class Global(BaseGlobal):
@@ -134,7 +166,7 @@ class Global(BaseGlobal):
     # 装备
     equips = ArrayField(0x02194FF0, 373, ModelField(0, ItemInfo2))
 
-    monster_1 = WordField(0x021AAF40, label="怪物1种类")
-    monster_1_count = ByteField(0x021AAF42, label="怪物1种类")
-    monster_2 = WordField(0x021AAF46, label="怪物1种类")
-    monster_2_count = ByteField(0x021AAF48, label="怪物1种类")
+    # 敌人分布
+    enemy_case = ArrayField(0x021AAF40, 4, ModelField(0, EnemyCase))
+    # 敌人情况
+    enemys = ArrayField(0, 10, ModelField(0, Enemy))

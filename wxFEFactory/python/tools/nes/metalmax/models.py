@@ -21,7 +21,6 @@ class PersonChariot(Model):
             field.offset = field.origin_offset + field.size * i
             if isinstance(field, ArrayField):
                 data = field.__get__(self, self.__class__)
-                data.addr = self.addr + field.offset
                 data.offset = field.offset
 
 

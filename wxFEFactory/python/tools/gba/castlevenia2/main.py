@@ -58,11 +58,8 @@ class Tool(BaseGbaHack):
             ModelCheckBox("invincible2")
 
         with StaticGroup("功能"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                for name in ('set_monster_flag', 'set_skill_flag', 'set_soul_flag', 'set_equip_counts',
-                        'set_tool_counts', 'set_enemy_flag', 'set_map_flag', 'set_extra_flag', 'set_boss_rush_flag'):
-                    func = getattr(self.weak, name)
-                    ui.Button(func.__doc__, onclick=func)
+            self.render_functions(('set_monster_flag', 'set_skill_flag', 'set_soul_flag', 'set_equip_counts',
+                        'set_tool_counts', 'set_enemy_flag', 'set_map_flag', 'set_extra_flag', 'set_boss_rush_flag'))
 
     def get_hotkeys(self):
         this = self.weak

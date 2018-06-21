@@ -16,6 +16,7 @@ class MetalMaxHack(BaseNdsHack):
         self.person = self.models.Person(0, self.handler)
         self.chariot = self.models.Chariot(0, self.handler)
         self.chariot_item_info = self.models.ChariotItemInfo(0, self.handler)
+        self.enemy = self.models.Enemy(0, self.handler)
         self.item_index = 1
     
     def render_main(self):
@@ -72,8 +73,12 @@ class MetalMaxHack(BaseNdsHack):
 
         self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车物品", self.chariot), self.render_chariot_items)
+        self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
 
         self.render_package_group()
+
+        with StaticGroup("功能"):
+            self.render_functions(('enemy_weak',))
 
         with DialogGroup("chariot_item_info", "战车物品详情", self.chariot_item_info, cols=1,
                 dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as chariot_item_info_dialog:
@@ -84,6 +89,7 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("attr1")
             ModelInput("attr2")
             ModelInput("weight")
+            ModelInput("status")
 
             self.chariot_item_info_dialog = chariot_item_info_dialog
 
@@ -142,6 +148,26 @@ class MetalMaxHack(BaseNdsHack):
             self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
             setattr(self._global, "{}_offset".format(item['key']), 0)
 
+    def render_enemy(self):
+        datasets = self.datasets
+        ui.Text("敌人", className="input_label expand")
+        ui.Choice(className="fill", choices=tuple("敌人%d" % i for i in range(1, 11)), onselect=self.on_enemy_change).setSelection(0)
+        ModelSelect("race", choices=datasets.MONSTERS)
+        ModelInput("level")
+        ModelInput("hp")
+        ModelInput("atk")
+        ModelInput("defensive")
+        ModelInput("hit")
+        ModelInput("avoid")
+        ModelInput("speed")
+        for i, label in enumerate("物火光电音气冷"):
+            ModelInput("resistance.%d" % i, "%s抗性" % label).view.setToolTip(">150:○, >100:空, >50:△, <=50:×")
+
+        for i in range(4):
+            ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)
+            ModelInput("enemy_case.%d.count" % i, "数量", ins=self._global)
+        
+
     def get_hotkeys(self):
         this = self.weak
         return (
@@ -154,6 +180,9 @@ class MetalMaxHack(BaseNdsHack):
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
 
+    def on_enemy_change(self, lb):
+        self.enemy.set_addr_by_index(lb.index)
+
     def show_chariot_item_info(self, view, key=None):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
@@ -165,3 +194,8 @@ class MetalMaxHack(BaseNdsHack):
             person.set_with('hp', 'hpmax')
         for chariot in self._global.chariots:
             chariot.health()
+
+    def enemy_weak(self, _):
+        """敌人一击死"""
+        for enemy in self._global.enemys:
+            enemy.hp = 1

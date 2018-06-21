@@ -460,7 +460,6 @@ class ArrayData:
         """
         self.instance = instance
         self.offset = offset
-        self.addr = instance.addr + offset
         self.length = length
         self.field = field
         self.itemkeys = itemkeys
@@ -520,6 +519,10 @@ class ArrayData:
     @property
     def size(self):
         return self.length * self.field.size
+
+    @property
+    def addr(self):
+        return self.instance.addr + self.offset
 
 
 class StringField(Field):

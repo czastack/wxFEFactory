@@ -3,6 +3,7 @@ from lib.extypes import WeakBinder
 from styles import styles, dialog_style, btn_xs_style
 from __main__ import win as main_win
 import json
+import traceback
 import types
 import fefactory_api
 ui = fefactory_api.ui
@@ -209,9 +210,29 @@ class BaseGroup(Widget):
 
     def write(self):
         self.start_ins_cache()
-        for field in self.children:
-            field.write()
+        
         self.end_ins_cache()
+
+    def load(self):
+        path = fefactory_api.choose_file("选择要读取的文件", file=getattr(self, 'lastfile', None), wildcard='*.json')
+        if path:
+            self.lastfile = path
+            with open(path, encoding="utf-8") as file:
+                data = json.load(file)
+                for field in self.children:
+                    try:
+                        if field.name in data:
+                            field.input_value = data[field.name]
+                    except Exception as e:
+                        print("加载字段%s出错" % field.name, e.args)
+
+    def export(self):
+        data = {field.name: field.input_value for field in self.children}
+        path = fefactory_api.choose_file("选择保存文件", file=getattr(self, 'lastfile', None), wildcard='*.json')
+        if path:
+            self.lastfile = path
+        with open(path, 'w', encoding="utf-8") as file:
+            json.dump(data, file)
 
     def after_lazy(self):
         """lazy_group渲染后调用"""
@@ -259,6 +280,8 @@ class Group(BaseGroup):
                 with ui.Horizontal(className="expand container") as footer:
                     ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
                     ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
+                    ui.Button(label="导入", className="btn_sm", onclick=lambda btn: this.load())
+                    ui.Button(label="导出", className="btn_sm", onclick=lambda btn: this.export())
                 self.footer = footer
         del self.flexgrid, self.hasheader, self.hasfooter
         return root
