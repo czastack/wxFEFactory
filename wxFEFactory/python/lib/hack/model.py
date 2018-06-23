@@ -353,55 +353,64 @@ class ManagedModelField(ModelField):
 
 
 class CoordField(Cachable):
-    size = 12
+    size = 4
     length = 3
 
-    def __init__(self, offset, length=None, size=4, label=None):
+    def __init__(self, offset, type=float, length=length, size=size, label=None):
         self.offset = offset
+        self.type = type
         self.size = size
+        self.length = length
+        self.size = self.length * size
         self.label = label
-        if length:
-            self.length = length
-            self.size = self.length * size
 
     def create_cache(self, instance):
-        return CoordData(instance.addr + self.offset, instance.handler, self.length)
+        return CoordData(instance, self)
 
     def __set__(self, instance, value):
         if isinstance(value, CoordData) and value.addr == instance.addr + self.offset:
             print('The value is a copy of this CoordData')
+        elif isinstance(value, bytes):
+            instance.handler.write(instance.addr + self.offset, value)
         else:
             it = iter(value)
             for i in range(self.length):
                 item = next(it)
                 if item is None or item == '':
                     continue
-                instance.handler.writeFloat(instance.addr + self.offset + i * self.size, item)
+                instance.handler.write(instance.addr + self.offset + i * self.size, self.type, self.type(item))
 
 
 class CoordData:
-    def __init__(self, addr, handler, length=3):
-        self.addr = addr
-        self.handler = handler
-        self.length = length
+    def __init__(self, instance, field):
+        self.instance = instance
+        self.field = field
         self._pos = 0
 
+    @property
+    def addr(self):
+        return self.instance.addr + self.field.offset
+
     def values(self):
-        return [self.handler.readFloat(self.addr + i * 4) for i in range(self.length)]
+        addr = self.addr
+        return [self.instance.handler.read(addr + i * 4) for i in range(self.field.length)]
 
     def set(self, value):
         it = iter(value)
-        for i in range(self.length):
+        for i in range(self.field.length):
             item = next(it)
             if item is None or item == '':
                 continue
             self[i] = item
 
+    def to_bytes(self):
+        return self.instance.handler.read(self.addr, bytes, self.field.size)
+
     def __getitem__(self, i):
-        return self.handler.readFloat(self.addr + i * 4)
+        return self.instance.handler.read(self.addr + i * 4, self.type)
 
     def __setitem__(self, i, value):
-        return self.handler.writeFloat(self.addr + i * 4, float(value))
+        return self.instance.handler.write(self.addr + i * 4, self.type(value))
 
     def __iter__(self):
         self._pos = 0
@@ -439,13 +448,17 @@ class ArrayField(Cachable, Field):
         return ArrayData(instance, self.offset, self.length, self.field, self.itemkeys)
 
     def __set__(self, instance, value):
-        data = self.__get__(instance, type(instance))
-        it = iter(value)
-        for i in range(self.length):
-            item = next(it)
-            if item is None or item == '':
-                continue
-            data[i] = item
+        if isinstance(value, bytes):
+            instance.handler.write(instance.addr + self.offset, value)
+        else:
+            # iterable
+            data = self.__get__(instance, type(instance))
+            it = iter(value)
+            for i in range(self.length):
+                item = next(it)
+                if item is None or item == '':
+                    continue
+                data[i] = item
 
     def __str__(self):
         return "{}(offset={}, length={}, field)".format(self.__class__.__name__, self.offset, self.length, self.field)
@@ -499,6 +512,14 @@ class ArrayData:
             return ret
         raise StopIteration
 
+    @property
+    def addr(self):
+        return self.instance.addr + self.offset
+
+    @property
+    def size(self):
+        return self.length * self.field.size
+
     def fill(self, value):
         if isinstance(value, int) and isinstance(self.field, Field) and self.field.type is int:
             data = value.to_bytes(self.field.size, 'little') * self.length
@@ -516,22 +537,17 @@ class ArrayData:
 
         return self.addr + self.field.size * i
 
-    @property
-    def size(self):
-        return self.length * self.field.size
-
-    @property
-    def addr(self):
-        return self.instance.addr + self.offset
+    def to_bytes(self):
+        return self.instance.handler.read(self.addr, bytes, self.size)
 
 
 class StringField(Field):
     def __init__(self, offset, size=0, label=None, encoding='gbk'):
-        super().__init__(offset, bytes, size, label)
+        super().__init__(offset, bytes, size or 64, label)
         self.encoding = encoding
 
     def __get__(self, instance, owner=None):
-        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size or 64)
+        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
         return ret.rstrip(b'\x00').decode(self.encoding)
 
     def __set__(self, instance, value):

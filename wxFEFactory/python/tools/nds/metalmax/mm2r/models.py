@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, OffsetsField, ModelPtrField, ToggleField, ToggleFields
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields
 from ..models import ItemInfo, ItemInfo2, BaseGlobal
 
 
@@ -50,13 +50,14 @@ class Chariot(Model):
     SIZE = 0x25C
 
     sp = WordField(0x02196D1C, label="装甲")
-    hole_type = ArrayField(0x02196D1F, 5, ByteField(0))
+    hole_type = ArrayField(0x02196D1F, 5, ByteField(0), label="炮穴类型")
     chassis = WordField(0x02196D24, label="底盘")
     double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
-    special_bullets = ArrayField(0x02196F40, 4, ModelField(0, ItemInfo)) # 特殊炮弹
+    equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
+    items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo), label="道具")
+    special_bullets = ArrayField(0x02196F40, 4, ModelField(0, ItemInfo), label="特殊炮弹")
 
-    equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo)) # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
-    items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo))
+    exportable_fields = ('hole_type', 'double_type', 'equips', 'items', 'special_bullets')
 
     def health(self):
         for equip in self.equips:
@@ -170,3 +171,6 @@ class Global(BaseGlobal):
     enemy_case = ArrayField(0x021AAF40, 4, ModelField(0, EnemyCase))
     # 敌人情况
     enemys = ArrayField(0, 10, ModelField(0, Enemy))
+
+    posx = WordField(0x0219120E, label="X坐标")
+    posy = WordField(0x02191212, label="Y坐标")

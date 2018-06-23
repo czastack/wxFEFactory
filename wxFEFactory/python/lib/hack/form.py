@@ -5,6 +5,7 @@ from __main__ import win as main_win
 import json
 import traceback
 import types
+import fefactory
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -214,25 +215,18 @@ class BaseGroup(Widget):
         self.end_ins_cache()
 
     def load(self):
-        path = fefactory_api.choose_file("选择要读取的文件", file=getattr(self, 'lastfile', None), wildcard='*.json')
-        if path:
-            self.lastfile = path
-            with open(path, encoding="utf-8") as file:
-                data = json.load(file)
-                for field in self.children:
-                    try:
-                        if field.name in data:
-                            field.input_value = data[field.name]
-                    except Exception as e:
-                        print("加载字段%s出错" % field.name, e.args)
+        data = fefactory.json_load_file(self)
+        if data:
+            for field in self.children:
+                try:
+                    if field.name in data:
+                        field.input_value = data[field.name]
+                except Exception as e:
+                    print("加载字段%s出错" % field.name, e.args)
 
     def export(self):
         data = {field.name: field.input_value for field in self.children}
-        path = fefactory_api.choose_file("选择保存文件", file=getattr(self, 'lastfile', None), wildcard='*.json')
-        if path:
-            self.lastfile = path
-        with open(path, 'w', encoding="utf-8") as file:
-            json.dump(data, file)
+        fefactory.json_dump_file(self, data)
 
     def after_lazy(self):
         """lazy_group渲染后调用"""
@@ -602,20 +596,16 @@ class CoordWidget(TwoWayWidget):
             self.data_list.pop(pos)
 
     def onSave(self, btn):
-        path = fefactory_api.choose_file("选择保存文件", file=self.lastfile, wildcard='*.json')
-        if path:
-            self.lastfile = path
-            with open(path, 'w', encoding="utf-8") as file:
-                # json.dump(self.data_list, file, ensure_ascii=False)
-                content = json.dumps(self.data_list, ensure_ascii=False).replace('{', '\n\t{')[:-1] + '\n]'
-                file.write(content)
+        def dumper(data, file):
+            content = json.dumps(data, ensure_ascii=False).replace('{', '\n\t{')[:-1] + '\n]'
+            file.write(content)
+
+        fefactory.json_dump_file(self, self.data_list, dumper)
 
     def onLoad(self, btn):
-        path = fefactory_api.choose_file("选择要读取的文件", file=self.lastfile, wildcard='*.json')
-        if path:
-            self.lastfile = path
-            with open(path, encoding="utf-8") as file:
-                self.load(json.load(file))
+        data = fefactory.json_load_file(self)
+        if data:
+            self.load(data)
 
     def choosePreset(self, btn):
         if self.preset:

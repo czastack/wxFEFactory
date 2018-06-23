@@ -1,7 +1,10 @@
 from .tool import NestedTool
 from lib.config import Config
 from lib.hack.form import Widget, BaseGroup
+from lib import exui
 import traceback
+import base64
+import fefactory
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -156,7 +159,49 @@ class BaseHackTool(NestedTool):
             btn.setContextMenu(contextmenu)
 
     def render_functions(self, names):
+        """渲染功能按钮"""
         with ui.GridLayout(cols=4, vgap=10, className="expand"):
             for name in names:
                 func = getattr(self.weak, name)
                 ui.Button(func.__doc__, onclick=func)
+
+    def load_model_fields(self, model):
+        """导入模型字段数据"""
+        data = fefactory.json_load_file(self)
+        if data['model'] != model.__name__:
+            print('Model不匹配，需要的Model为%s，读取到的为%s' % (data['model'], model.__name__))
+            return
+
+        names = tuple(data['data'].keys())
+        exportable_fields = [model.field(name) for name in names]
+        choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
+        dialog = exui.ListDialog("选择导出的字段", listbox={'choices': choices})
+        if dialog.showModal():
+            for i in dialog.listbox.getCheckedItems():
+                field = exportable_fields[i]
+                value = data['data'][names[i]]
+                if isinstance(value, str):
+                    value = base64.b64decode(value.encode())
+                field.__set__(self.chariot, value)
+            print('导入成功')
+
+    def dump_model_fields(self, model, names=None):
+        """导出模型字段数据"""
+        model = self.models.Chariot
+        if names is None:
+            names = model.exportable_fields
+        exportable_fields = [model.field(name) for name in names]
+        choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
+        dialog = exui.ListDialog("选择导出的字段", listbox={'choices': choices})
+        if dialog.showModal():
+            data = {'model': model.__name__, 'data': {}}
+            for i in dialog.listbox.getCheckedItems():
+                field = exportable_fields[i]
+                value = field.__get__(self.chariot)
+                if not isinstance(value, (int, float)):
+                    # 尝试按bytes处理
+                    if not hasattr(value, 'to_bytes'):
+                        raise ValueError('%s不支持序列化(to_bytes)' % choices[i])
+                    value = base64.b64encode(value.to_bytes()).decode()
+                data['data'][names[i]] = value
+            fefactory.json_dump_file(self, data)

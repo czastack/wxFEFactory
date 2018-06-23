@@ -30,6 +30,8 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("game_time")
             ModelInput("after_money")
             ModelInput("after_exp")
+            ModelInput("posx")
+            ModelInput("posy")
             ModelSelect("after_money_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
             ModelSelect("after_exp_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
             ModelCheckBox("quick_switch")
@@ -104,7 +106,8 @@ class MetalMaxHack(BaseNdsHack):
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.0"))
         with ModelSelect("equips.1.equip", "引擎", choices=datasets.CHARIOT_ENGINE.choices, values=datasets.CHARIOT_ENGINE.values).container:
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.1"))
-        with ModelSelect("equips.2.equip", "C装置2/引擎2", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, values=datasets.CHARIOT_CONTROL_ENGINE.values).container:
+        with ModelSelect("equips.2.equip", "C装置2/引擎2", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, 
+                values=datasets.CHARIOT_CONTROL_ENGINE.values).container:
             ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.2"))
         for i in range(5):
             ui.Text("炮穴%d" % (i + 1), className="input_label expand")
@@ -117,11 +120,15 @@ class MetalMaxHack(BaseNdsHack):
             with ui.Horizontal(className="fill"):
                 ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
                 ModelInput("special_bullets.%d.count" % i, "数量")
+        with Group.active_group().footer:
+            ui.Button("导入字段", className="btn_sm", onclick=self.weak.load_chariot_fields)
+            ui.Button("导出字段", className="btn_sm", onclick=self.weak.dump_chariot_fields)
 
     def render_chariot_items(self):
         datasets = self.datasets
         for i in range(self.chariot.items.length):
-            with ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values).container:
+            with ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), 
+                    choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values).container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="items.%d" % i))
 
     def render_package_group(self):
@@ -199,3 +206,9 @@ class MetalMaxHack(BaseNdsHack):
         """敌人一击死"""
         for enemy in self._global.enemys:
             enemy.hp = 1
+
+    def load_chariot_fields(self, _):
+        super().load_model_fields(self.models.Chariot)
+
+    def dump_chariot_fields(self, _):
+        super().dump_model_fields(self.models.Chariot)

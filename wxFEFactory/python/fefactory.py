@@ -1,8 +1,9 @@
 from modules import modules
 from functools import partial
-import sys
-import os
 import fefactory_api
+import json
+import os
+import sys
 import traceback
 import __main__
 
@@ -43,13 +44,36 @@ def reload(start_option=None, callback=None):
 def executable_file():
     return sys.argv[0]
 
+
 def executable_name():
     path = executable_file()
     return os.path.splitext(os.path.basename(path))[0]
 
+
 def execfile(path, encoding="utf-8"):
     with open(path, encoding=encoding) as f:
         exec(f.read())
+
+
+def json_dump_file(owner, data, dumper=None):
+    """选择json文件导出"""
+    path = fefactory_api.choose_file("选择保存文件", file=getattr(owner, 'lastfile', None), wildcard='*.json')
+    if path:
+        owner.lastfile = path
+
+        with open(path, 'w', encoding="utf-8") as file:
+            if dumper is None:
+                json.dump(data, file)
+            else:
+                dumper(data, file)
+
+def json_load_file(owner):
+    """选择json文件导入"""
+    path = fefactory_api.choose_file("选择要读取的文件", file=getattr(owner, 'lastfile', None), wildcard='*.json')
+    if path:
+        owner.lastfile = path
+        with open(path, encoding="utf-8") as file:
+            return json.load(file)
 
 
 class Screen:
