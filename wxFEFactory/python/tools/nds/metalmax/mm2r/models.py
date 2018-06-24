@@ -5,17 +5,19 @@ from ..models import ItemInfo, ItemInfo2, BaseGlobal
 class Person(Model):
     SIZE = 0xC4
     
+    figure = ByteField(0x02195DC9, label="形象")
+    level = WordField(0x02195DCE, label="等级")
+    exp = WordField(0x02195DD4, label="经验")
     hp = WordField(0x02195DD8, label="当前HP")
     hpmax = WordField(0x02195DDA, label="最大HP")
     battle_level = WordField(0x02195DE2, label="战斗等级")
     drive_level = WordField(0x02195DE4, label="驾驶等级")
-    power = WordField(0x02195DDC, label="腕力")
+    power = WordField(0x02195E68, label="腕力")
     strength = WordField(0x02195DDE, label="体力")
-    speed = WordField(0x02195DE0, label="速度")
+    speed = WordField(0x02195E6C, label="速度")
     spirit = WordField(0x02195DE8, label="男子气概")
     scar = WordField(0x02195DE6, label="伤痕")
-    subprof = ByteField(0x02195DC8, label="副职业")
-    figure = ByteField(0x02195DC9, label="形象")
+    prof = ByteField(0x02195DC8, label="职业")
     level_max = ByteField(0x02195DD0, label="等级上限")
     weapon_1 = WordField(0x02195DEA, label="武器1")
     weapon_2 = WordField(0x02195DEC, label="武器2")
@@ -25,7 +27,11 @@ class Person(Model):
     equip_hand = WordField(0x02195DF4, label="手部装备")
     equip_foot = WordField(0x02195DF6, label="脚部装备")
     equip_orn = WordField(0x02195DF8, label="装饰")
+    skill_counts = ArrayField(0x02195DFB, 9, ByteField(0)) # 主职业技能剩余次数数组
+    subskill_counts = ArrayField(0x02195E16, 9, ByteField(0)) # 副职业技能剩余次数数组
+    subprof = ByteField(0x02195E39, label="副职业")
     subprof_levels = ArrayField(0x02195E3A, 6, ByteField(0)) # 副职业等级(猎人、机械师、战士、护士、摔跤手、艺术家)
+    subprof_exps = ArrayField(0x02195E40, 6, Field(0)) # 副职业经验
 
 
 class ChariotEquipInfo(Model):

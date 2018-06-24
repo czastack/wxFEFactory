@@ -54,6 +54,9 @@ class MetalMaxHack(BaseNdsHack):
         with Group("player", "角色", self.person, cols=4):
             exui.Label("角色")
             ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            ModelSelect("figure", choices=datasets.FIGURES)
+            ModelInput("level")
+            ModelInput("exp")
             ModelInput("hp")
             ModelInput("hpmax")
             ModelInput("battle_level")
@@ -64,7 +67,6 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("spirit")
             ModelInput("scar")
             ModelInput("level_max")
-            ModelSelect("subprof", choices=datasets.SUBPROFS)
             ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
             ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
             ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
@@ -73,7 +75,10 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
             ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
             ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
+            ModelSelect("prof", choices=datasets.PROFS)
+            ModelSelect("subprof", choices=("无",) + datasets.SUBPROFS)
 
+        self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
@@ -82,6 +87,16 @@ class MetalMaxHack(BaseNdsHack):
 
         with StaticGroup("功能"):
             self.render_functions(('enemy_weak',))
+
+    def render_person_ext(self):
+        datasets = self.datasets
+        for i, label in enumerate(datasets.SUBPROFS[1:]):
+            ModelInput("subprof_levels.%d" % i, "%s等级" % label)
+            ModelInput("subprof_exps.%d" % i, "%s经验" % label)
+        for i in range(self.person.skill_counts.length):
+            ModelInput("skill_counts.%d" % i, "技能%d次数" % (i + 1))
+        for i in range(self.person.subskill_counts.length):
+            ModelInput("subskill_counts.%d" % i, "副职业技能%d次数" % (i + 1))
 
     def render_chariot(self):
         datasets = self.datasets

@@ -2,7 +2,7 @@ from lib import utils
 from lib.hack.utils import ItemProvider
 
 
-PERSONS = ("主角",) + tuple("同伴%d" % i for i in range(1, 16))
+PERSONS = tuple("同伴%d" % i for i in range(1, 16))
 CHARIOTS = tuple("No.%d" % i for i in range(1, 13))
 
 RATE = ('1', '2', '4', '8', '16', '32', '64', '128')
@@ -13,7 +13,8 @@ FIGURES = ("主角(男)", "猎人(男)", "机械师(男)", "战士(男)", "护�
     "波奇(狗)", "贝罗(狗)", "哈奇(狗)", "米西卡", "食金虫",
 )
 
-SUBPROFS = ("猎人", "机械师", "战士", "护士", "摔跤手", "艺术家", "狗(慎用)", "食金虫(慎用)")
+PROFS = ("猎人", "机械师", "战士", "护士", "摔跤手", "艺术家", "狗(慎用)", "食金虫(慎用)")
+SUBPROFS = ("无", "猎人", "机械师", "战士", "护士", "摔跤手", "艺术家")
 
 HOLE_TYPE, HOLE_TYPE_VALUES = utils.split_value_label((
     (0x0, "关"),
