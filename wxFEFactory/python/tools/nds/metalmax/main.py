@@ -76,7 +76,7 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
             ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
             ModelSelect("prof", choices=datasets.PROFS)
-            ModelSelect("subprof", choices=("无",) + datasets.SUBPROFS)
+            ModelSelect("subprof", choices=datasets.SUBPROFS)
 
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
