@@ -211,7 +211,8 @@ class BaseGroup(Widget):
 
     def write(self):
         self.start_ins_cache()
-        
+        for field in self.children:
+            field.write()
         self.end_ins_cache()
 
     def load(self):

@@ -180,8 +180,11 @@ public:
 		return m_event_table.contains(eventKey);
 	}
 
+	/**
+	 * pass_event 是否传递event实例作为callback参数
+	 */
 	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false, bool wxbind = true);
+	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false, bool wxbind = true, bool pass_event = false);
 
 	void handleEvent(pycref fn, wxEvent &event)
 	{
@@ -219,10 +222,7 @@ public:
 	 */
 	void setOnKeyDown(pycref fn)
 	{
-		py::dict arg;
-		arg["callback"] = fn;
-		arg["arg_event"] = py::bool_(true);
-		bindEvt(wxEVT_KEY_DOWN, arg);
+		bindEvt(wxEVT_KEY_DOWN, fn, false, true, true);
 	}
 
 	void setOnFileDrop(pycref ondrop)
@@ -423,7 +423,7 @@ public:
 
 
 template<typename EventTag>
-void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbind)
+void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbind, bool pass_event)
 {
 	if (!fn.is_none())
 	{
@@ -449,6 +449,15 @@ void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbin
 				((wxEvtHandler*)m_elem)->Bind(eventType, &View::_handleEvent, this);
 			}
 		}
-		event_list.attr("append")(fn);
+		if (pass_event && !isPyDict(fn))
+		{
+			py::dict arg;
+			arg["callback"] = fn;
+			arg["arg_event"] = py::bool_(true);
+			event_list.attr("append")(arg);
+		}
+		else {
+			event_list.attr("append")(fn);
+		}
 	}
 }

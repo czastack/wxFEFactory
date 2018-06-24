@@ -203,10 +203,7 @@ public:
 
 	void setOnChar(pycref fn, bool reset = true)
 	{
-		py::dict arg;
-		arg["callback"] = fn;
-		arg["arg_event"] = py::bool_(true);
-		bindEvt(wxEVT_CHAR, arg, reset);
+		bindEvt(wxEVT_CHAR, fn, reset, true, true);
 	}
 
 	void appendText(wxcstr text)
@@ -768,7 +765,7 @@ public:
 
 	void setOnItemActivated(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_TREE_ITEM_ACTIVATED, fn, reset);
+		bindEvt(wxEVT_TREE_ITEM_ACTIVATED, fn, reset, true, true);
 	}
 };
 

@@ -20,3 +20,7 @@ class HotkeyCtrl(ui.TextInput):
         self.value = getWXKName(code, mod)
         self.code = code
         self.mode = mod
+
+
+def Label(text):
+    return ui.Text(text, className="input_label expand")

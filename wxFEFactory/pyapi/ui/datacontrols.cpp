@@ -300,7 +300,10 @@ void init_datacontrols(py::module &m)
 		.def("setOnItemSelected", &ListView::setOnItemSelected, "onselect"_a, evt_reset)
 		.def("setOnItemDeselected", &ListView::setOnItemDeselected, "ondeselect"_a, evt_reset)
 		.def("setOnItemChecked", &ListView::setOnItemChecked, "oncheck"_a, evt_reset)
-		.def("setOnItemUnchecked", &ListView::setOnItemUnchecked, "onuncheck"_a, evt_reset);
+		.def("setOnItemUnchecked", &ListView::setOnItemUnchecked, "onuncheck"_a, evt_reset)
+		.def("setOnItemActivated", &ListView::setOnItemActivated, "callback"_a, evt_reset)
+		.def("setOnColClick", &ListView::setOnColClick, "callback"_a, evt_reset)
+		.def("setOnColRightClick", &ListView::setOnColRightClick, "callback"_a, evt_reset);
 	
 	ATTR_INT(pyListView.ptr(), LEFT, wxLIST_FORMAT_),
 	ATTR_INT(pyListView.ptr(), RIGHT, wxLIST_FORMAT_),

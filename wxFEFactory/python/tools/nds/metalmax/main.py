@@ -1,6 +1,7 @@
 from ..base import BaseNdsHack
 from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelMultiCheckBox, ModelInput, ModelSelect, ModelFlagWidget, DialogGroup
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib import exui
 from lib.exui.components import Pagination
 from fefactory_api import ui
 from functools import partial
@@ -51,7 +52,7 @@ class MetalMaxHack(BaseNdsHack):
             ModelMultiCheckBox("through_wall")
 
         with Group("player", "角色", self.person, cols=4):
-            ui.Text("角色", className="input_label expand")
+            exui.Label("角色")
             ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
             ModelInput("hp")
             ModelInput("hpmax")
@@ -74,7 +75,7 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
 
         self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
-        self.lazy_group(Group("chariot_items", "战车物品", self.chariot), self.render_chariot_items)
+        self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
 
         self.render_package_group()
@@ -82,54 +83,59 @@ class MetalMaxHack(BaseNdsHack):
         with StaticGroup("功能"):
             self.render_functions(('enemy_weak',))
 
-        with DialogGroup("chariot_item_info", "战车物品详情", self.chariot_item_info, cols=1,
-                dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as chariot_item_info_dialog:
-            ModelInput("chaneg")
-            ModelInput("ammo")
-            ModelInput("level")
-            ModelInput("defensive")
-            ModelInput("attr1")
-            ModelInput("attr2")
-            ModelInput("weight")
-            ModelInput("status")
-
-            self.chariot_item_info_dialog = chariot_item_info_dialog
-
     def render_chariot(self):
         datasets = self.datasets
-        ui.Text("战车", className="input_label expand")
+        detail_keep_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
+        detail_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key)
+        preset_click = lambda key: partial(__class__.show_chariot_weapon_preset, self.weak, key=key)
+        preset_ci_click = lambda key: partial(__class__.show_chariot_ci_preset, self.weak, key=key)
+
+        exui.Label("战车")
         ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
         ModelInput("sp")
         ModelSelect("chassis", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
         ModelSelect("double_type", choices=datasets.DOUBLE_TYPE)
-        with ModelSelect("equips.0.equip", "C装置", choices=datasets.CHARIOT_CONTROL.choices, values=datasets.CHARIOT_CONTROL.values).container:
-            ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.0"))
-        with ModelSelect("equips.1.equip", "引擎", choices=datasets.CHARIOT_ENGINE.choices, values=datasets.CHARIOT_ENGINE.values).container:
-            ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.1"))
-        with ModelSelect("equips.2.equip", "C装置2/引擎2", choices=datasets.CHARIOT_CONTROL_ENGINE.choices, 
-                values=datasets.CHARIOT_CONTROL_ENGINE.values).container:
-            ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.2"))
+
+        exui.Label("C装置")
+        with ui.Horizontal(className="right"):
+            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.0"))
+            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.0"))
+            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.0"))
+        exui.Label("引擎")
+        with ui.Horizontal(className="right"):
+            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.1"))
+            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.1"))
+            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.1"))
+        exui.Label("C装置2/引擎2")
+        with ui.Horizontal(className="right"):
+            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.2"))
+            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.2"))
+            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.2"))
         for i in range(5):
-            ui.Text("炮穴%d" % (i + 1), className="input_label expand")
+            exui.Label("炮穴%d" % (i + 1))
             with ui.Horizontal(className="fill"):
                 ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
-                ModelSelect("equips.%d.equip" % (i + 3), "装备", choices=datasets.CHARIOT_WEAPON.choices, values=datasets.CHARIOT_WEAPON.values)
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="equips.%d" % (i + 3)))
-        for i in range(4):
-            ui.Text("特殊炮弹%d" % (i + 1), className="input_label expand")
+                ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % (i + 3)))
+                ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % (i + 3)))
+                ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % (i + 3)))
+        for i in range(self.chariot.items.length):
+            exui.Label("物品%d" % (i + 1))
+            with ui.Horizontal(className="right"):
+                ui.Button("上次", className="btn_sm", onclick=detail_keep_click("items.%d" % i))
+                ui.Button("详情", className="btn_sm", onclick=detail_click("items.%d" % i))
+                ui.Button("C装置/引擎预设", onclick=preset_ci_click("equips.2"))
+                ui.Button("武器预设", onclick=preset_click("items.%d" % i))
+        with Group.active_group().footer:
+            ui.Button("导入字段", onclick=self.weak.load_chariot_fields)
+            ui.Button("导出字段", onclick=self.weak.dump_chariot_fields)
+
+    def render_chariot_special_bullets(self):
+        datasets = self.datasets
+        for i in range(self.chariot.special_bullets.length):
+            exui.Label("特殊炮弹%d" % (i + 1))
             with ui.Horizontal(className="fill"):
                 ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
                 ModelInput("special_bullets.%d.count" % i, "数量")
-        with Group.active_group().footer:
-            ui.Button("导入字段", className="btn_sm", onclick=self.weak.load_chariot_fields)
-            ui.Button("导出字段", className="btn_sm", onclick=self.weak.dump_chariot_fields)
-
-    def render_chariot_items(self):
-        datasets = self.datasets
-        for i in range(self.chariot.items.length):
-            with ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), 
-                    choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values).container:
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_item_info, self.weak, key="items.%d" % i))
 
     def render_package_group(self):
         datasets = self.datasets
@@ -157,7 +163,7 @@ class MetalMaxHack(BaseNdsHack):
 
     def render_enemy(self):
         datasets = self.datasets
-        ui.Text("敌人", className="input_label expand")
+        exui.Label("敌人")
         ui.Choice(className="fill", choices=tuple("敌人%d" % i for i in range(1, 11)), onselect=self.on_enemy_change).setSelection(0)
         ModelSelect("race", choices=datasets.MONSTERS)
         ModelInput("level")
@@ -173,7 +179,119 @@ class MetalMaxHack(BaseNdsHack):
         for i in range(4):
             ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)
             ModelInput("enemy_case.%d.count" % i, "数量", ins=self._global)
-        
+
+    def get_chariot_item_info_dialog(self):
+        datasets = self.datasets
+        dialog = getattr(self, 'chariot_item_info_dialog', None)
+        if dialog is None:
+            with DialogGroup("chariot_item_info", "战车物品详情", self.chariot_item_info, cols=1,
+                    dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
+                ModelSelect("equip", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+                ModelInput("chaneg")
+                ModelInput("ammo")
+                ModelInput("level")
+                ModelInput("defensive")
+                ModelInput("attr1")
+                ModelInput("attr2")
+                ModelInput("weight")
+                ModelInput("status")
+
+            self.chariot_item_info_dialog = dialog
+        return dialog
+
+    def get_chariot_weapon_dialog(self):
+        """战车武器预设对话框"""
+        dialog = getattr(self, 'chariot_weapon_dialog', None)
+        if dialog is None:
+            chariot_equips = self.chariot_equips
+            datasets = self.datasets
+            self.chariot_weapon_list = [] # 读取预设数据时的列表
+            with exui.StdDialog("战车武器", scrollable=False, style={'width': 1360, 'height': 900}) as dialog:
+                li = ui.ListView(className="fill")
+                with ui.Horizontal(className="expand"):
+                    dialog.use_weight = ui.CheckBox(label="重量", className="vcenter", checked=True)
+                    dialog.use_ammo = ui.CheckBox(label="弹舱", className="vcenter", checked=True)
+                    dialog.use_max = ui.CheckBox(label="最大", className="vcenter", checked=True)
+                li.appendColumns(*chariot_equips.CHARIOT_WEAPON_HEAD)
+                for item in chariot_equips.CHARIOT_WEAPON_ITEMS:
+                    part_name = (datasets.ITEMS[item[0]],)
+                    if isinstance(item[1], tuple):
+                        # 多个星级
+                        part_id = item[:1]
+                        for sub in item[1]:
+                            li.insertItems([part_name + sub + item[2:]])
+                            self.chariot_weapon_list.append(part_id + sub)
+                    else:
+                        li.insertItems([part_name + item[1:]])
+                        self.chariot_weapon_list.append(item)
+                li.setOnItemActivated(self.weak.on_chariot_weapon_selected)
+            self.chariot_weapon_dialog = dialog
+        return dialog
+    
+    def on_chariot_weapon_selected(self, view, event):
+        """战车武器预设选中处理"""
+        chariot_equips = self.chariot_equips
+        data = self.chariot_weapon_list[event.index]
+        ins = self.chariot_item_info
+        dialog = self.chariot_weapon_dialog
+        use_max = dialog.use_max.checked
+        ins.equip = data[0]
+        ins.level = data[1]
+        ins.attr1 = data[3] if use_max else data[2]
+        ins.defensive = data[5] if use_max else data[4]
+        if dialog.use_weight.checked:
+            ins.weight = data[6]
+        if dialog.use_ammo.checked:
+            ins.ammo = ins.attr2 = data[8] if use_max else data[7]
+        dialog.endModal()
+
+    def get_chariot_ci_dialog(self):
+        dialog = getattr(self, 'chariot_ci_dialog', None)
+        if dialog is None:
+            chariot_equips = self.chariot_equips
+            datasets = self.datasets
+            self.chariot_ci_list = [] # 读取预设数据时的列表
+            with exui.StdDialog("战车C装置/引擎", scrollable=False, style={'width': 1330, 'height': 900}) as dialog:
+                li = ui.ListView(className="fill")
+                with ui.Horizontal(className="expand"):
+                    dialog.use_weight = ui.CheckBox(label="重量", className="vcenter", checked=True)
+                    dialog.use_max = ui.CheckBox(label="最大", className="vcenter", checked=True)
+                li.appendColumns(*chariot_equips.CHARIOT_CI_HEAD)
+                for item in chariot_equips.CHARIOT_CI_ITEMS:
+                    part_name = (datasets.ITEMS[item[0]],)
+                    if isinstance(item[1], tuple):
+                        # 多个星级
+                        part_id = item[:1]
+                        for sub in item[1]:
+                            li.insertItems([part_name + sub + item[2:]])
+                            self.chariot_ci_list.append(part_id + sub)
+                    else:
+                        li.insertItems([part_name + item[1:]])
+                        self.chariot_ci_list.append(item)
+                li.setOnItemActivated(self.weak.on_chariot_ci_selected)
+            self.chariot_ci_dialog = dialog
+        return dialog
+    
+    def on_chariot_ci_selected(self, view, event):
+        """战车C装置/引擎预设选中处理"""
+        chariot_equips = self.chariot_equips
+        data = self.chariot_ci_list[event.index]
+        ins = self.chariot_item_info
+        dialog = self.chariot_ci_dialog
+        use_max = dialog.use_max.checked
+        ins.equip = data[0]
+        ins.level = data[1]
+        ins.defensive = data[5] if use_max else data[4]
+        if dialog.use_weight.checked:
+            ins.weight = data[6]
+        if data[0] >= 0x3BC:
+            # C装置
+            ins.attr1 = data[3] if use_max else data[2]
+            ins.attr2 = data[8] if use_max else data[7]
+        else:
+            # 引擎
+            ins.attr1 = data[2]
+        dialog.endModal()
 
     def get_hotkeys(self):
         this = self.weak
@@ -190,11 +308,26 @@ class MetalMaxHack(BaseNdsHack):
     def on_enemy_change(self, lb):
         self.enemy.set_addr_by_index(lb.index)
 
-    def show_chariot_item_info(self, view, key=None):
+    def show_chariot_item_info(self, view, key=None, read=True):
+        """显示详情对话框"""
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
-        self.chariot_item_info_dialog.read()
-        self.chariot_item_info_dialog.showModal()
+        dialog = self.get_chariot_item_info_dialog()
+        if read:
+            dialog.read()
+        dialog.show()
+
+    def show_chariot_weapon_preset(self, view, key=None):
+        """显示预设对话框"""
+        item = getattr(self.chariot, key)
+        self.chariot_item_info.addr = item.addr
+        self.get_chariot_weapon_dialog().showModal()
+
+    def show_chariot_ci_preset(self, view, key=None):
+        """显示预设对话框"""
+        item = getattr(self.chariot, key)
+        self.chariot_item_info.addr = item.addr
+        self.get_chariot_ci_dialog().showModal()
 
     def pull_through(self, _):
         for person in self._global.persons:

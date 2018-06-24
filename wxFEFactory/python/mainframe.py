@@ -279,7 +279,7 @@ class MainFrame:
                 for item in self.root_tools:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
-                tree.setOnItemActivated({'callback': self.weak.on_tool_sel, 'arg_event': True})
+                tree.setOnItemActivated(self.weak.on_tool_sel)
             self.tool_dialog = dialog
         dialog.showModal()
 

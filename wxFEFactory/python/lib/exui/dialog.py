@@ -5,7 +5,7 @@ from fefactory_api import ui
 
 
 class StdDialog(ui.Dialog):
-    def __init__(self, *args, cancel=True, ok=True, **kwargs):
+    def __init__(self, *args, cancel=True, ok=True, scrollable=True, **kwargs):
         kwargs.setdefault('style', dialog_style)
         kwargs.setdefault('styles', styles)
         super().__init__(*args, **kwargs)
@@ -13,7 +13,7 @@ class StdDialog(ui.Dialog):
 
         super().__enter__()
         with ui.Vertical(className="fill"):
-            self.view = ui.ScrollView(className="fill container")
+            self.view = (ui.ScrollView if scrollable else ui.Vertical)(className="fill container")
 
             with ui.Horizontal(className="container right") as footer:
                 if cancel:
