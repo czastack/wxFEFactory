@@ -15,7 +15,7 @@ class Person(Model):
     power = WordField(0x02195E68, label="腕力")
     strength = WordField(0x02195DDE, label="体力")
     speed = WordField(0x02195E6C, label="速度")
-    spirit = WordField(0x02195DE8, label="男子气概")
+    spirit = ByteField(0x02195DE8, label="男子气概")
     scar = WordField(0x02195DE6, label="伤痕")
     prof = ByteField(0x02195DC8, label="职业")
     level_max = ByteField(0x02195DD0, label="等级上限")

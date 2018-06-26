@@ -227,7 +227,7 @@ class BaseGroup(Widget):
                     print("加载字段%s出错" % field.name, e.args)
 
     def export(self):
-        data = {field.name: field.input_value for field in self.children if field.input_value}
+        data = {field.name: field.input_value for field in self.children if field.input_value is not None}
         fefactory.json_dump_file(self, data)
 
     def after_lazy(self):
