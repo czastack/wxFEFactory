@@ -220,13 +220,14 @@ class BaseGroup(Widget):
         if data:
             for field in self.children:
                 try:
-                    if field.name in data:
-                        field.input_value = data[field.name]
+                    value = data.get(field.name, None)
+                    if value is not None:
+                        field.input_value = value
                 except Exception as e:
                     print("加载字段%s出错" % field.name, e.args)
 
     def export(self):
-        data = {field.name: field.input_value for field in self.children}
+        data = {field.name: field.input_value for field in self.children if field.input_value}
         fefactory.json_dump_file(self, data)
 
     def after_lazy(self):

@@ -6,7 +6,9 @@ PERSONS = tuple("同伴%d" % i for i in range(1, 16))
 CHARIOTS = tuple("No.%d" % i for i in range(1, 13))
 
 RATE = ('1', '2', '4', '8', '16', '32', '64', '128')
-RATE_VALUES = (0x00, 0x00C8, 0x0190, 0x0320, 0x0640, 0x0C80, 0x1900, 0x3200)
+RATE_VALUES = (100, 200, 400, 800, 1600, 3200, 6400, 12800)
+
+DIFFICULTY = ("Normal", "Hurd", "Super", "God")
 
 FIGURES = ("主角(男)", "猎人(男)", "机械师(男)", "战士(男)", "护士(男)", "摔跤手(男)", "艺术家(男)", "艾克赛尔",
     "主角(女)", "猎人(女)", "机械师(女)", "战士(女)", "护士(女)", "摔跤手(女)", "艺术家(女)",
@@ -2382,5 +2384,5 @@ ALL_EQUIP = itemof(0x16F, 0x2F4) # 全部人类装备
 # CHARIOT_SE = itemof(0x483, 0x4DD) # SE
 # CHARIOT_FIXED = itemof(0x4DE, 0x543) # 固定武器
 # CHARIOT_WEAPON = itemof(0x3EF, 0x543) # 全部战车武器
-CHARIOT_ALL_ITEM = itemof(0x2F4, 0x4DD) # 全部战车物品
+CHARIOT_ALL_ITEM = itemof(0x2F4, 0x543) # 全部战车物品
 CHARIOT_CHASSIS = itemof(0x543, 0x6AC) # 底盘

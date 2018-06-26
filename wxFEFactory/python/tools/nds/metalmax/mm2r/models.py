@@ -69,6 +69,17 @@ class Chariot(Model):
         for equip in self.equips:
             equip.status = 0
 
+    @classmethod
+    def item_type(self, id):
+        if 0x2F4 <= id < 0x341:
+            return 'item'
+        elif 0x341 <= id < 0x3BC:
+            return 'engine'
+        elif 0x3BC <= id < 0x3EF:
+            return 'control'
+        elif 0x3EF <= id < 0x543:
+            return 'weapon'
+
 
 class EnemyCase(Model):
     SIZE = 6
@@ -81,7 +92,7 @@ class Enemy(Model):
 
     race = WordField(0x021AB5CE, label="种族")
     level = ByteField(0x021AB616, label="等级")
-    hp = WordField(0x021AB618, label="HP")
+    hp = Field(0x021AB618, label="HP")
     atk = WordField(0x021AB620, label="攻击")
     defensive = WordField(0x021AB622, label="防御")
     hit = WordField(0x021AB624, label="命中")
@@ -95,10 +106,10 @@ class Enemy(Model):
 
     # class MonsterAtkPart(Model):
     #     SIZE = 6
-    #     part = WordField(0, "部件")
-    #     arg1 = ByteField(2, "参数1")
-    #     arg1 = ByteField(3, "参数2")
-    #     arg1 = ByteField(4, "参数3")
+    #     part = WordField(0, label="部件")
+    #     arg1 = ByteField(2, label="参数1")
+    #     arg1 = ByteField(3, label="参数2")
+    #     arg1 = ByteField(4, label="参数3")
     # atk_parts = ArrayField(0x021AB644, 7, ModelField(0, MonsterAtkPart))
 
 
@@ -106,8 +117,11 @@ class Global(BaseGlobal):
     persons = ArrayField(0, 15, ModelField(0, Person))
     chariots = ArrayField(0, 12, ModelField(0, Chariot))
     money = Field(0x021947D8, label="金钱")
-    exp = Field(0x021AAE90, label="经验")
+    difficulty = ByteField(0x0219483D, label="难易度")
     stamp = WordField(0x02194844, label="邮票")
+    game_turn = ByteField(0x021AA3E4, label="通关次数")
+    exp = Field(0x021AAE90, label="经验")
+    game_time = Field(0x021295DC, label="游戏时间")
     quick_switch = ToggleField(0x02027164, enableData=0x00002001, disableData=0x47702000, label="画面切换高速化")
     quick_move = ToggleField(0x021911FC, enableData=0x00001000, disableData=0x199, label="高速移动")
     must_winning = ToggleField(0x02042B54, enableData=0x46C04287, disableData=0xDD014287, label="贩卖机绝对会中奖")
@@ -117,7 +131,6 @@ class Global(BaseGlobal):
         ToggleField(0x020DF908, enableData=0xE0002000, disableData=0xF7F32064),
         label="等级上升时随机数值最大"
     )
-    game_time = Field(0x021295DC, label="游戏时间")
 
     weight_zero = ToggleFields(
         ToggleField(0x0206F37C, enableData=0x85482000, disableData=0x18248D48),

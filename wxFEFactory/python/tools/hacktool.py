@@ -168,6 +168,8 @@ class BaseHackTool(NestedTool):
     def load_model_fields(self, model):
         """导入模型字段数据"""
         data = fefactory.json_load_file(self)
+        if not data:
+            return
         if data['model'] != model.__name__:
             print('Model不匹配，需要的Model为%s，读取到的为%s' % (data['model'], model.__name__))
             return
