@@ -314,6 +314,8 @@ void init_controls(py::module & m)
 			type, choices, onselect, className, style)
 		.def("setOnEnter", &ComboBox::setOnEnter, evt_fn, evt_reset)
 		.def("autoComplete", &ComboBox::autoComplete)
+		.def("popup", [](ComboBox &self) { self.ctrl().Popup(); })
+		.def("dismiss", [](ComboBox &self) { self.ctrl().Dismiss(); })
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, ItemContainer>(m, "RadioBox")

@@ -241,6 +241,14 @@ py::list ListView::getSelectedList()
 	return result;
 }
 
+void ListView::clearSelected()
+{
+	for (int i = ctrl().GetFirstSelected(); i != -1; i = ctrl().GetNextSelected(i))
+	{
+		selectItem(i, false);
+	}
+}
+
 void init_datacontrols(py::module &m)
 {
 	using namespace py::literals;
@@ -297,13 +305,17 @@ void init_datacontrols(py::module &m)
 		.def("selectItem", &ListView::selectItem, "item"_a, "selected"_a = true)
 		.def("getCheckedList", &ListView::getCheckedList)
 		.def("getSelectedList", &ListView::getSelectedList)
+		.def("clearSelected", &ListView::clearSelected)
 		.def("setOnItemSelected", &ListView::setOnItemSelected, "onselect"_a, evt_reset)
 		.def("setOnItemDeselected", &ListView::setOnItemDeselected, "ondeselect"_a, evt_reset)
 		.def("setOnItemChecked", &ListView::setOnItemChecked, "oncheck"_a, evt_reset)
 		.def("setOnItemUnchecked", &ListView::setOnItemUnchecked, "onuncheck"_a, evt_reset)
 		.def("setOnItemActivated", &ListView::setOnItemActivated, "callback"_a, evt_reset)
 		.def("setOnColClick", &ListView::setOnColClick, "callback"_a, evt_reset)
-		.def("setOnColRightClick", &ListView::setOnColRightClick, "callback"_a, evt_reset);
+		.def("setOnColRightClick", &ListView::setOnColRightClick, "callback"_a, evt_reset)
+		.def_property("focused_item",
+			[](ListView &self) { return self.ctrl().GetFocusedItem(); },
+			[](ListView &self, long value) { self.ctrl().Focus(value); });
 	
 	ATTR_INT(pyListView.ptr(), LEFT, wxLIST_FORMAT_),
 	ATTR_INT(pyListView.ptr(), RIGHT, wxLIST_FORMAT_),

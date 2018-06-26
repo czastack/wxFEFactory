@@ -269,6 +269,7 @@ public:
 
 	py::list getCheckedList();
 	py::list getSelectedList();
+	void clearSelected();
 
 	void setOnItemSelected(pyobj &fn, bool reset = true)
 	{
