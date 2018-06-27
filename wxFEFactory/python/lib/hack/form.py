@@ -1,4 +1,4 @@
-from lib import exui, fileutils, utils
+from lib import exui, fileutils, utils, lazy
 from lib.extypes import WeakBinder
 from styles import styles, dialog_style, btn_xs_style
 from __main__ import win as main_win
@@ -663,14 +663,14 @@ class CoordWidget(TwoWayWidget):
             self.listbox.setText(self.data_list[index]['name'], index)
             self.listbox.setText(self.data_list[index + 1]['name'], index + 1)
 
-    def onCopy(self, _=None):
+    def onCopy(self, v, m):
         fefactory_api.set_clipboard(str(tuple(self.input_value)))
 
-    def onPaste(self, _=None):
+    def onPaste(self, v, m):
         values = eval(fefactory_api.get_clipboard())
         self.input_value = values
 
-    def onClear(self, _=None):
+    def onClear(self, v, m):
         self.clear()
 
 
@@ -679,6 +679,8 @@ class ModelCoordWidget(ModelWidget, CoordWidget):
 
 
 class BaseSelect(TwoWayWidget):
+    search_map = {}
+
     def __init__(self, *args, choices=None, values=None, onselect=None, **kwargs):
         # 预处理choices, values
         if values is None:
@@ -696,12 +698,16 @@ class BaseSelect(TwoWayWidget):
         super().render()
         with ui.Horizontal(className="fill") as container:
             self.view = ui.Choice(className="fill", choices=self.choices, onselect=self.onselect)
+            self.view.setContextMenu(self.contextmenu)
+            self.view.setOnDestroy(self.weak.onDestroy)
             self.render_btn()
-            self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
-        del self.choices, self.onselect
+        self.view.setOnKeyDown(self.weak.onKey)
+        self.search_map[id(self.view)] = self
+        del self.onselect
 
     def setItems(self, choices, values=0):
+        self.choices = choices
         self.view.setItems(choices)
         if values is not 0:
             self.values = values
@@ -720,6 +726,48 @@ class BaseSelect(TwoWayWidget):
         except ValueError:
             print(hex(value), "不在%s的可选值中" % self.label)
 
+    @lazy.ClassLazy
+    def contextmenu(cls):
+        with ui.ContextMenu() as contextmenu:
+            ui.MenuItem("搜索(&S)", onselect=cls.onSearch)
+        return contextmenu
+
+    @lazy.ClassLazy
+    def search_dialog(cls):
+        return exui.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
+
+    @classmethod
+    def onSearch(cls, v, m):
+        cls.active_ins = cls.search_map[id(v)]
+        if getattr(cls, 'search_last_choices', None) is not cls.active_ins.choices:
+            cls.search_dialog.listbox.clear()
+        else:
+            cls.search_dialog.listbox.index = -1
+        cls.search_dialog.showModal()
+        del cls.active_ins
+
+    @classmethod
+    def onsearch(cls, dialog, value):
+        choices = []
+        values = []
+        i = 0
+        for item in cls.active_ins.choices:
+            if value in item:
+                choices.append(item)
+                values.append(i)
+            i += 1
+        cls.search_dialog.listbox.setItems(choices)
+        cls.search_last_choices = cls.active_ins.choices # 上次搜索的内容集
+        cls.search_values = values
+
+    @classmethod
+    def onsearch_select(cls, view):
+        # 搜索结果选择后切换到对应的序号
+        cls.active_ins.view.setSelection(cls.search_values[view.index], True)
+        cls.search_dialog.endModal()
+
+    def onDestroy(self, view):
+        self.search_map.pop(id(view), None)
 
 class Select(BaseSelect, OffsetsWidget):
     def __init__(self, *args, type=int, size=4, **kwargs):

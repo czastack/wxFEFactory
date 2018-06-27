@@ -593,9 +593,8 @@ public:
 		{
 			style |= wxTE_PROCESS_ENTER;
 		}
-		// else if (type == wxT("readonly"))
-		else {
-			style = wxCB_READONLY;
+		else if (type == wxT("readonly")) {
+			style |= wxCB_READONLY;
 		}
 		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), style));
 		bindEvt(wxEVT_COMBOBOX, onselect);

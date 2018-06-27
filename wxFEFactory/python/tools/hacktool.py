@@ -153,8 +153,8 @@ class BaseHackTool(NestedTool):
 
     def set_buttons_contextmenu(self):
         parent = ui.View.get_active_layout()
-        with ui.ContextMenu(onselect=self.set_cfn) as contextmenu:
-            ui.MenuItem("设为alt+c快捷键(&C)")
+        with ui.ContextMenu() as contextmenu:
+            ui.MenuItem("设为alt+c快捷键(&C)", onselect=self.set_cfn)
         for btn in parent.children:
             btn.setContextMenu(contextmenu)
 

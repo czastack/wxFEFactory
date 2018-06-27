@@ -4,12 +4,15 @@ from lib.extypes import WeakBinder
 from fefactory_api import ui
 
 
+__ALL__ = ('StdDialog', 'ListDialog', 'ChoiceDialog', 'CheckChoiceDialog', 'SearchDialog')
+
+
 class StdDialog(ui.Dialog):
-    def __init__(self, *args, cancel=True, ok=True, scrollable=True, **kwargs):
+    def __init__(self, *args, cancel=True, ok=True, scrollable=False, **kwargs):
         kwargs.setdefault('style', dialog_style)
         kwargs.setdefault('styles', styles)
         super().__init__(*args, **kwargs)
-        this = WeakBinder(self)
+        self.weak = WeakBinder(self)
 
         super().__enter__()
         with ui.Vertical(className="fill"):
@@ -36,14 +39,13 @@ class ListDialog(StdDialog):
         listbox_opt = kwargs.pop('listbox', {})
         kwargs.setdefault('style', dialog_style)
         super().__init__(*args, **kwargs)
-        this = WeakBinder(self)
 
         with self:
             with ui.Vertical(styles=styles, style=styles['class']['fill']):
                 self.listbox = ui.CheckListBox(className='fill', **listbox_opt)
                 with ui.Horizontal(className="expand"):
-                    ui.Button(label="全选", className="button", onclick=this.checkAll)
-                    ui.Button(label="反选", className="button", onclick=this.reverseCheck)
+                    ui.Button(label="全选", className="button", onclick=self.weak.checkAll)
+                    ui.Button(label="反选", className="button", onclick=self.weak.reverseCheck)
 
     def checkAll(self, btn):
         self.listbox.checkAll()
@@ -100,3 +102,20 @@ class CheckChoiceDialog(ListDialog):
 
         self.listbox = None
         return ret
+
+
+class SearchDialog(StdDialog):
+    """搜索对话框"""
+    def __init__(self, title, onselect, onsearch=None, *args, **kwargs):
+        kwargs.setdefault('style', dialog_style)
+        self.onsearch = onsearch
+        super().__init__(title, *args, **kwargs)
+
+        with self:
+            self.input = ui.TextInput(className='expand', wxstyle=0x0400)
+            self.listbox = ui.ListBox(className='fill', onselect=onselect)
+            self.input.setOnEnter(self.weak.onEnter)
+
+    def onEnter(self, _):
+        if self.onsearch:
+            self.onsearch(self, self.input.value)

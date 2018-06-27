@@ -3,12 +3,12 @@
 
 wxVector<MenuHolder*> BaseMenu::MENUS;
 
-bool MenuHolder::onSelect(int id)
+bool MenuHolder::onSelect(int id, pycref owner)
 {
 	pycref item = getMenu(id);
 	if (py::isinstance<MenuItem>(item))
 	{
-		return item.cast<MenuItem*>()->onSelect();
+		return item.cast<MenuItem*>()->onSelect(owner);
 	}
 	return false;
 }
@@ -35,7 +35,7 @@ void Menu::remove(MenuItem &item)
 
 bool ContextMenu::onSelect(pycref view, int id)
 {
-	if (MenuHolder::onSelect(id))
+	if (MenuHolder::onSelect(id, view))
 	{
 		return true;
 	}
@@ -61,7 +61,7 @@ void MenuBar::remove(Menu & m)
 
 bool MenuBar::onSelect(int id)
 {
-	if (MenuHolder::onSelect(id))
+	if (MenuHolder::onSelect(id, None))
 	{
 		return true;
 	}
@@ -90,6 +90,23 @@ MenuItem::MenuItem(wxcstr text, wxcstr helpStr, wxcstr kind, int id, bool sep, p
 	{
 		m_ptr = nullptr;
 	}
+}
+
+bool MenuItem::onSelect(pycref owner)
+{
+	if (!m_onselect.is_none())
+	{
+		if (owner.is_none())
+		{
+			pyCall(m_onselect, py::cast(this));
+		}
+		else
+		{
+			pyCall(m_onselect, owner, py::cast(this));
+		}
+		return true;
+	}
+	return false;
 }
 
 

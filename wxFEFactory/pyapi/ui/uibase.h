@@ -245,6 +245,11 @@ public:
 		bindEvt(wxEVT_LEFT_DOWN, fn);
 	}
 
+	void setOnRightClick(pycref fn)
+	{
+		bindEvt(wxEVT_RIGHT_DOWN, fn);
+	}
+
 	void setOnDestroy(pycref fn)
 	{
 		bindEvt(wxEVT_DESTROY, fn);

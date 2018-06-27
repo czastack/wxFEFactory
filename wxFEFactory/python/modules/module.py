@@ -115,9 +115,6 @@ class BaseListBoxModuel(BaseModule):
                 self.render_main()
         ui.AuiItem(panel, caption=self.getTitle(), onclose=this.onClose)
 
-        with ui.ContextMenu() as listmenu:
-            ui.MenuItem("重命名", onselect=this.onRename)
-
         self.listbox.setOnKeyDown(this.onListBoxKey)
 
         contextmenu = self.render_contextmenu()
@@ -147,7 +144,7 @@ class BaseListBoxModuel(BaseModule):
             self.listbox.clear()
             return True
 
-    def onRename(self, m):
+    def onRename(self, v, m):
         """重命名列表项"""
         name = self.listbox.text
         if name:

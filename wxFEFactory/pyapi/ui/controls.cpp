@@ -311,7 +311,7 @@ void init_controls(py::module & m)
 
 	py::class_t<ComboBox, ControlWithItems>(m, "ComboBox")
 		.def(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
-			type, choices, onselect, className, style)
+			"type"_a="readonly", choices, onselect, className, style)
 		.def("setOnEnter", &ComboBox::setOnEnter, evt_fn, evt_reset)
 		.def("autoComplete", &ComboBox::autoComplete)
 		.def("popup", [](ComboBox &self) { self.ctrl().Popup(); })

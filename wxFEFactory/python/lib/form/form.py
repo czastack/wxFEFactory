@@ -1,5 +1,4 @@
 from .fields import Field, Group
-from lib.lazy import lazyclassmethod
 import ctypes
 
 class FormMetaclass(type):

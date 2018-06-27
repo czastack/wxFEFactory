@@ -49,7 +49,7 @@ public:
 		(*getHandlers())[py::cast(id)] = item;
 	}
 
-	bool onSelect(int id);
+	bool onSelect(int id, pycref owner);
 
 protected:
 	py::list m_children;
@@ -226,15 +226,7 @@ public:
 		return m_ptr->GetId();
 	}
 
-	bool onSelect()
-	{
-		if (!m_onselect.is_none())
-		{
-			pyCall(m_onselect, py::cast(this));
-			return true;
-		}
-		return false;
-	}
+	bool onSelect(pycref owner);
 
 	bool isChecked()
 	{

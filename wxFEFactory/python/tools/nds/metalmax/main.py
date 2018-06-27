@@ -228,7 +228,7 @@ class MetalMaxHack(BaseNdsHack):
         if dialog is None:
             chariot_equips = self.chariot_equips
             datasets = self.datasets
-            with exui.StdDialog(label, scrollable=False, style={'width': 1400, 'height': 900}) as dialog:
+            with exui.StdDialog(label, style={'width': 1400, 'height': 900}) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))

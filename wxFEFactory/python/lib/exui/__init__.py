@@ -1,2 +1,2 @@
-from .dialog import StdDialog, ListDialog, ChoiceDialog, CheckChoiceDialog
+from .dialog import *
 from .controls import Label
