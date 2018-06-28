@@ -82,6 +82,12 @@ class Chariot(Model):
             return 'weapon'
 
 
+class ChariotBattleStatus(Model):
+    SIZE = 0xBC
+    sp = WordField(0x021AB3E4, label="装甲")
+    spmax = WordField(0x021AB3E8, label="最大装甲")
+
+
 class EnemyCase(Model):
     SIZE = 6
     race = WordField(0, label="种族")
@@ -117,12 +123,40 @@ class Enemy(Model):
 class Global(BaseGlobal):
     persons = ArrayField(0, 15, ModelField(0, Person))
     chariots = ArrayField(0, 12, ModelField(0, Chariot))
+    chariot_battle_status = ArrayField(0, 4, ModelField(0, ChariotBattleStatus))
     money = Field(0x021947D8, label="金钱")
     difficulty = ByteField(0x0219483D, label="难易度")
     stamp = WordField(0x02194844, label="邮票")
     game_turn = ByteField(0x021AA3E4, label="通关次数")
     exp = Field(0x021AAE90, label="经验")
     game_time = Field(0x021295DC, label="游戏时间")
+
+    allfax = ToggleField(0x0219E90B, size=6, enableData=0xFFFFFFFFFFFF, label="传真全开")
+    allmap = ToggleFields(
+        ToggleField(0x020ACE8A, enableData=0x20FF, size=2, disableData=0x7828),
+        ToggleField(0x020AC3F0, enableData=0x4770, size=2, disableData=0xD000),
+        label="地图全开"
+    )
+    enemy_flash = ToggleFields(
+        ToggleField(0x020D3E94, enableData=0x2209, size=2, disableData=0x7F0A),
+        ToggleField(0x020D41AA, enableData=0x46C0, size=2, disableData=0xDA03),
+        label="敌人闪光"
+    )
+    can_use_other_skill = ToggleFields(
+        ToggleField(0x020753A4, enableData=0xE005, size=2, disableData=0xD105),
+        ToggleField(0x02075628, enableData=0x4280, size=2, disableData=0x42A0),
+        ToggleField(0x020E1F60, enableData=0x4280, size=2, disableData=0x4285),
+        ToggleField(0x020DDB58, enableData=0x4280, size=2, disableData=0x2A02),
+        label="可以使用其他副职业的特技"
+    )
+    must_critical_hit = ToggleFields(
+        ToggleField(0x02000180, enableData=0x9800DB032807B500, size=8, disableData=0xBDAF1785CC47D6C6),
+        ToggleField(0x02000188, enableData=0xF0D6BD009000380C, size=8, disableData=0x3AA28F402E0005E8),
+        ToggleField(0x02000190, enableData=0xBD00F9BB, disableData=0x4B358143),
+        ToggleField(0x020D6614, enableData=0xFDB4F729, disableData=0xFF78F7FF),
+        label="必定会心一击"
+    )
+
     quick_switch = ToggleField(0x02027164, enableData=0x00002001, disableData=0x47702000, label="画面切换高速化")
     quick_move = ToggleField(0x021911FC, enableData=0x00001000, disableData=0x199, label="高速移动")
     must_winning = ToggleField(0x02042B54, enableData=0x46C04287, disableData=0xDD014287, label="贩卖机绝对会中奖")

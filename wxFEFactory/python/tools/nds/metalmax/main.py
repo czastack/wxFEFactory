@@ -39,6 +39,8 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("after_exp_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
             ModelCheckBox("quick_switch")
             ModelCheckBox("quick_move")
+            ModelMultiCheckBox("through_wall")
+            ModelCheckBox("no_battle")
             ModelCheckBox("must_winning")
             ModelCheckBox("tool_count_keep")
             ModelCheckBox("ammo_keep")
@@ -48,10 +50,13 @@ class MetalMaxHack(BaseNdsHack):
             ModelMultiCheckBox("without_material")
             ModelCheckBox("twin_engines")
             ModelCheckBox("drop_item_three_star")
-            ModelCheckBox("no_battle")
             ModelCheckBox("must_drop_item")
             ModelCheckBox("must_first")
-            ModelMultiCheckBox("through_wall")
+            ModelCheckBox("allfax")
+            ModelMultiCheckBox("allmap")
+            ModelMultiCheckBox("enemy_flash")
+            ModelMultiCheckBox("can_use_other_skill")
+            ModelMultiCheckBox("must_critical_hit")
 
         with Group("player", "角色", self.person, cols=4):
             exui.Label("角色")
@@ -83,6 +88,7 @@ class MetalMaxHack(BaseNdsHack):
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
+        self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
 
         self.render_package_group()
@@ -184,6 +190,11 @@ class MetalMaxHack(BaseNdsHack):
             item['group'] = Group(item['key'], item['label'], self._global, cols=4)
             self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
             setattr(self._global, "{}_offset".format(item['key']), 0)
+
+    def render_battle_status(self):
+        for i in range(self._global.chariot_battle_status.length):
+            ModelInput("chariot_battle_status.%d.sp" % i, "战车%d装甲" % (i + 1))
+            ModelInput("chariot_battle_status.%d.spmax" % i, "最大装甲")
 
     def render_enemy(self):
         datasets = self.datasets
@@ -357,8 +368,8 @@ class MetalMaxHack(BaseNdsHack):
     def pull_through(self, _):
         for person in self._global.persons:
             person.set_with('hp', 'hpmax')
-        for chariot in self._global.chariots:
-            chariot.health()
+        for item in self._global.chariot_battle_status:
+            item.set_with('sp', 'spmax')
 
     def enemy_weak(self, _):
         """敌人一击死"""
