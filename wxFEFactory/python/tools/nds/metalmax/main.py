@@ -116,6 +116,7 @@ class MetalMaxHack(BaseNdsHack):
         exui.Label("战车")
         ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
         ModelInput("sp")
+        ModelInput("item_capcity").view.setToolTip('道具容量，最大18个')
         ModelSelect("chassis", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
         ModelSelect("double_type", choices=datasets.DOUBLE_TYPE)
 
@@ -212,7 +213,7 @@ class MetalMaxHack(BaseNdsHack):
                 ModelSelect("equip", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
                 ModelInput("chaneg")
                 ModelInput("ammo")
-                ModelInput("level")
+                ModelInput("star")
                 ModelInput("defensive")
                 ModelInput("attr1")
                 ModelInput("attr2")
@@ -275,14 +276,14 @@ class MetalMaxHack(BaseNdsHack):
         data = dialog.data_list[event.index]
         ins = self.chariot_item_info
         use_max = dialog.use_max.checked
+        item_type = self.models.Chariot.item_type(data[0])
         ins.equip = data[0]
-        ins.level = data[1]
-        ins.attr1 = data[3] if use_max else data[2]
+        ins.star = data[1]
+        ins.attr1 = data[3] if use_max and item_type != 'engine' else data[2]
         ins.defensive = data[5] if use_max else data[4]
         if dialog.use_weight.checked:
             ins.weight = data[6]
         if dialog.use_attr2.checked:
-            item_type = self.models.Chariot.item_type(data[0])
             if item_type != 'engine':
                 attr2 = ins.attr2 = data[8] if use_max else data[7]
                 if item_type == 'weapon':
@@ -330,6 +331,13 @@ class MetalMaxHack(BaseNdsHack):
             i = 0
             for item in dialog.data_list:
                 if item[0] == equip:
+                    # 尝试匹配星级
+                    star = self.chariot_item_info.star
+                    for j in range(min(4, len(dialog.data_list) - i)):
+                        item = dialog.data_list[i + j]
+                        if item[0] == equip and item[1] == star:
+                            i = i + j
+                            break
                     dialog.listview.clearSelected()
                     dialog.listview.selectItem(i)
                     dialog.listview.focused_item = i

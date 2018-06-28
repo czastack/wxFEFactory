@@ -26,7 +26,7 @@ HOLE_TYPE, HOLE_TYPE_VALUES = utils.split_value_label((
     (0x1F, "S-E类"),
 ))
 
-DOUBLE_TYPE = ("单引擎 单C装置", "双引擎", "", "双C装置")
+DOUBLE_TYPE = ("单引擎 单C装置", "双引擎", "双引擎", "双C装置")
 
 
 ITEMS = (

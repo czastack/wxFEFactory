@@ -41,7 +41,7 @@ class ChariotEquipInfo(Model):
     chaneg = ByteField(5, label="超改次数")
     status = ByteField(6, label="损坏程度(>20:破损,>100:损坏)")
     ammo = ByteField(8, label="剩余弹药")
-    level = ByteField(9, label="武器星级")
+    star = ByteField(9, label="武器星级")
     defensive = WordField(10, label="守备力")
     attr1 = WordField(12, label="C装置命中率/武器攻击力/引擎载重(0.01t)")
     attr2 = WordField(14, label="C装置回避率/武器弹舱容量")
@@ -59,6 +59,7 @@ class Chariot(Model):
     hole_type = ArrayField(0x02196D1F, 5, ByteField(0), label="炮穴类型")
     chassis = WordField(0x02196D24, label="底盘")
     double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
+    item_capcity = ByteField(0x02196D30, label="荷台")
     equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo), label="道具")
     special_bullets = ArrayField(0x02196F40, 15, ModelField(0, ItemInfo), label="特殊炮弹")

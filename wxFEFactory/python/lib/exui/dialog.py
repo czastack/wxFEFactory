@@ -112,10 +112,12 @@ class SearchDialog(StdDialog):
         super().__init__(title, *args, **kwargs)
 
         with self:
-            self.input = ui.TextInput(className='expand', wxstyle=0x0400)
+            with ui.Horizontal(className='expand'):
+                self.input = ui.TextInput(className='fill', wxstyle=0x0400)
+                ui.Button(label="搜索", className='btn_sm', onclick=self.weak.onenter)
             self.listbox = ui.ListBox(className='fill', onselect=onselect)
-            self.input.setOnEnter(self.weak.onEnter)
+            self.input.setOnEnter(self.weak.onenter)
 
-    def onEnter(self, _):
+    def onenter(self, _):
         if self.onsearch:
             self.onsearch(self, self.input.value)
