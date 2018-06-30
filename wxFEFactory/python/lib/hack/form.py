@@ -98,6 +98,7 @@ class ModelWidget:
 
     def render(self):
         if self.label is self.name and not callable(self.addr):
+            # 从Field读取label
             field = self.addr.field(self.offsets)
             if field and field.label:
                 self.label = field.label
@@ -390,7 +391,7 @@ class ProxyInput(BaseInput):
 
 class SimpleCheckBox(Widget):
     """采用切换事件的立即模式"""
-    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
+    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None, size=None):
         """
         :param enableData: 激活时写入的数据
         :param disableData: 关闭时写入的数据
@@ -398,13 +399,19 @@ class SimpleCheckBox(Widget):
         super().__init__(name, label, addr, offsets)
         self.enableData = enableData
         self.disableData = disableData
+        if size is None:
+            if isinstance(enableData, bytes):
+                size = len(enableData)
+            else:
+                size = 4
+        self.size = size
 
     def render(self):
         self.view = ui.CheckBox(self.label, onchange=self.weak.onChange)
 
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
-        self.handler.ptrsWrite(self.addr, self.offsets, data, len(data))
+        self.handler.ptrsWrite(self.addr, self.offsets, data, self.size)
 
 
 class BaseCheckBox(TwoWayWidget):
@@ -451,16 +458,18 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
             self.disableData = getattr(field, 'disableData', None)
             self.type = type(self.enableData)
 
-
-class ModelMultiCheckBox(ModelWidget, BaseCheckBox):
-    """使用ToggleFields"""
     @property
     def input_value(self):
-        return self.view.checked
+        if self.enableData is None:
+            return self.view.checked
+        return super().input_value
 
     @input_value.setter
     def input_value(self, value):
-        self.view.checked = value
+        if self.enableData is None:
+            self.view.checked = value
+        else:
+            super().input_value = value
 
 
 class CoordWidget(TwoWayWidget):

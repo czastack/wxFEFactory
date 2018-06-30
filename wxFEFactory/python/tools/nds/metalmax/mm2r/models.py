@@ -5,8 +5,10 @@ from ..models import ItemInfo, ItemInfo2, BaseGlobal
 class Person(Model):
     SIZE = 0xC4
     
+    prof = ByteField(0x02195DC8, label="职业")
     figure = ByteField(0x02195DC9, label="形象")
     level = WordField(0x02195DCE, label="等级")
+    level_max = ByteField(0x02195DD0, label="等级上限")
     exp = WordField(0x02195DD4, label="经验")
     hp = WordField(0x02195DD8, label="当前HP")
     hpmax = WordField(0x02195DDA, label="最大HP")
@@ -17,8 +19,6 @@ class Person(Model):
     speed = WordField(0x02195E6C, label="速度")
     spirit = ByteField(0x02195DE8, label="男子气概")
     scar = WordField(0x02195DE6, label="伤痕")
-    prof = ByteField(0x02195DC8, label="职业")
-    level_max = ByteField(0x02195DD0, label="等级上限")
     weapon_1 = WordField(0x02195DEA, label="武器1")
     weapon_2 = WordField(0x02195DEC, label="武器2")
     weapon_3 = WordField(0x02195DEE, label="武器3")
@@ -38,7 +38,7 @@ class ChariotEquipInfo(Model):
     SIZE = 0x14
 
     equip = WordField(0, label="种类")
-    chaneg = ByteField(5, label="超改次数")
+    change = ByteField(5, label="超改次数")
     status = ByteField(6, label="损坏程度(>20:破损,>100:损坏)")
     ammo = ByteField(8, label="剩余弹药")
     star = ByteField(9, label="武器星级")
@@ -55,11 +55,10 @@ class ChariotItemInfo(ChariotEquipInfo):
 class Chariot(Model):
     SIZE = 0x25C
 
+    # name = Field(0x2196D0C, size=10, label="名字")
     sp = WordField(0x02196D1C, label="装甲")
     hole_type = ArrayField(0x02196D1F, 5, ByteField(0), label="炮穴类型")
-    chassis = WordField(0x02196D24, label="底盘")
-    double_type = ByteField(0x02196D29, label="双持") # (0: 单引擎 单C装置, 1: 双引擎, 3: 双C装置)
-    item_capcity = ByteField(0x02196D30, label="荷台")
+    chassis = ModelField(0x02196D24, ChariotEquipInfo, label="底盘")
     equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo), label="道具")
     special_bullets = ArrayField(0x02196F40, 15, ModelField(0, ItemInfo), label="特殊炮弹")
@@ -126,7 +125,7 @@ class Global(BaseGlobal):
     chariot_battle_status = ArrayField(0, 4, ModelField(0, ChariotBattleStatus))
     money = Field(0x021947D8, label="金钱")
     difficulty = ByteField(0x0219483D, label="难易度")
-    stamp = WordField(0x02194844, label="邮票")
+    stamp = WordField(0x02194844, label="印章")
     game_turn = ByteField(0x021AA3E4, label="通关次数")
     exp = Field(0x021AAE90, label="经验")
     game_time = Field(0x021295DC, label="游戏时间")
@@ -157,7 +156,7 @@ class Global(BaseGlobal):
         label="必定会心一击"
     )
 
-    quick_switch = ToggleField(0x02027164, enableData=0x00002001, disableData=0x47702000, label="画面切换高速化")
+    quick_switch = ToggleField(0x02027164, enableData=0x47702001, disableData=0x47702000, label="画面切换高速化")
     quick_move = ToggleField(0x021911FC, enableData=0x00001000, disableData=0x199, label="高速移动")
     must_winning = ToggleField(0x02042B54, enableData=0x46C04287, disableData=0xDD014287, label="贩卖机绝对会中奖")
     tool_count_keep = ToggleField(0x0206DD4C, enableData=0x2600B5F8, disableData=0x1C16B5F8, label="消费道具用后不减")

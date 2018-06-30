@@ -1,6 +1,7 @@
 import re
 import struct
 
+
 def bytesbeautify(b, offset=0, step=1):
     if offset == 0 and step == 1:
         return " ".join("%02X" % x for x in b)
@@ -62,8 +63,8 @@ def ror(a, n, N=32):
     return ((a << (N - n)) | (a >> n)) & ((1<<N)-1)
 
 
-hexReg = re.compile('([\da-fA-F]+)')
+REG_HEX = re.compile('([\\da-fA-F]+)')
 
-def hexCalc(expr):
+def compute_hex(expr):
     """计算16进制算式"""
-    return "%X" % eval(hexReg.sub('0x\\1', expr))
+    return "%X" % eval(REG_HEX.sub('0x\\1', expr))

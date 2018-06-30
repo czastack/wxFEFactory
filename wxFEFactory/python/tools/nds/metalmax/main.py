@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelMultiCheckBox, ModelInput, ModelSelect, ModelFlagWidget, DialogGroup
+from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, DialogGroup
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import exui
 from lib.exui.components import Pagination
@@ -39,24 +39,24 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("after_exp_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
             ModelCheckBox("quick_switch")
             ModelCheckBox("quick_move")
-            ModelMultiCheckBox("through_wall")
+            ModelCheckBox("through_wall")
             ModelCheckBox("no_battle")
             ModelCheckBox("must_winning")
             ModelCheckBox("tool_count_keep")
             ModelCheckBox("ammo_keep")
-            ModelMultiCheckBox("level_up_max")
-            ModelMultiCheckBox("weight_zero")
-            ModelMultiCheckBox("equip_limit_remove")
-            ModelMultiCheckBox("without_material")
+            ModelCheckBox("level_up_max")
+            ModelCheckBox("weight_zero")
+            ModelCheckBox("equip_limit_remove")
+            ModelCheckBox("without_material")
             ModelCheckBox("twin_engines")
             ModelCheckBox("drop_item_three_star")
             ModelCheckBox("must_drop_item")
             ModelCheckBox("must_first")
             ModelCheckBox("allfax")
-            ModelMultiCheckBox("allmap")
-            ModelMultiCheckBox("enemy_flash")
-            ModelMultiCheckBox("can_use_other_skill")
-            ModelMultiCheckBox("must_critical_hit")
+            ModelCheckBox("allmap")
+            ModelCheckBox("enemy_flash")
+            ModelCheckBox("can_use_other_skill")
+            ModelCheckBox("must_critical_hit")
 
         with Group("player", "角色", self.person, cols=4):
             exui.Label("角色")
@@ -122,9 +122,12 @@ class MetalMaxHack(BaseNdsHack):
         exui.Label("战车")
         ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
         ModelInput("sp")
-        ModelInput("item_capcity").view.setToolTip('道具容量，最大18个')
-        ModelSelect("chassis", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
-        ModelSelect("double_type", choices=datasets.DOUBLE_TYPE)
+        ModelSelect("chassis.equip", "底盘", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
+        ModelInput("chassis.defensive", "底盘防御")
+        ModelInput("chassis.attr1", "荷台").view.setToolTip('道具容量，最大18个')
+        ModelInput("chassis.attr2", "弹舱")
+        ModelSelect("chassis.change", "双持类型", choices=datasets.DOUBLE_TYPE)
+        ModelInput("chassis.weight", "底盘重量")
 
         exui.Label("C装置")
         with ui.Horizontal(className="right"):
@@ -222,7 +225,7 @@ class MetalMaxHack(BaseNdsHack):
             with DialogGroup("chariot_item_info", "战车物品详情", self.chariot_item_info, cols=1,
                     dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
                 ModelSelect("equip", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
-                ModelInput("chaneg")
+                ModelInput("change")
                 ModelInput("ammo")
                 ModelInput("star")
                 ModelInput("defensive")

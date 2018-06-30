@@ -8,6 +8,17 @@ class Model:
         self.addr = addr
         self.handler = handler
 
+    @classmethod
+    def field(cls, name):
+        for base in cls.__mro__:
+            field = base.__dict__.get(name, None)
+            if field:
+                return field
+
+    @property
+    def addr_hex(self):
+        return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
+
     def next(self):
         self.addr += self.SIZE
         return self
@@ -35,6 +46,9 @@ class Model:
 
     def set_addr_by_index(self, i):
         self.addr = self.SIZE * i
+
+    def test_comlex_attr(self, name):
+        return test_comlex_attr(name)
 
     def __and__(self, field):
         return self.addrof(field)
@@ -110,20 +124,6 @@ class Model:
                 i += 1
         else:
             super().__setattr__(name, value)
-
-    def test_comlex_attr(self, name):
-        return test_comlex_attr(name)
-
-    @classmethod
-    def field(cls, name):
-        for base in cls.__mro__:
-            field = base.__dict__.get(name, None)
-            if field:
-                return field
-
-    @property
-    def addr_hex(self):
-        return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
 
 
 class ManagedModel(Model):
@@ -240,11 +240,27 @@ class SignedField(Field):
 
 class ToggleField(Field):
     """开关字段"""
+    # 几种情况: 1. data在Widget中, get, set使用真实值; 2. data在Field中，get, set使用布尔值
     def __init__(self, *args, enableData=None, disableData=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.enableData = enableData
         self.disableData = disableData
         self.type = type(enableData)
+        if self.type is bytes:
+            self.size = len(enableData)
+
+    def __get__(self, instance, owner=None):
+        value = super().__get__(instance, owner)
+        if self.enableData is not None:
+            return value == self.enableData
+        return value
+
+    def __set__(self, instance, value):
+        if value is True:
+            value = self.enableData
+        elif value is False:
+            value = self.disableData
+        super().__set__(instance, value)
 
 
 class ToggleFields:
@@ -255,13 +271,13 @@ class ToggleFields:
 
     def __get__(self, instance, owner=None):
         for field in self.fields:
-            if field.__get__(instance, owner) != field.enableData:
+            if field.__get__(instance, owner) is False:
                 return False
         return True
 
     def __set__(self, instance, value):
         for field in self.fields:
-            field.__set__(instance, field.enableData if value else field.disableData)
+            field.__set__(instance, value)
 
 
 class BitsField(Field):
