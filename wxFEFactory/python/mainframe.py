@@ -76,12 +76,12 @@ class MainFrame:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
                         self.console_input = ui.TextInput(wxstyle=0x0400, className="expand console-input")
-                        ui.Button(label="∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                        ui.Button("∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
                     with ui.Vertical(className="expand"):
-                        ui.Button(label="∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
-                        ui.Button(label=">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码 Ctrl+Enter")
+                        ui.Button("∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                        ui.Button(">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码 Ctrl+Enter")
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
                 ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
             ui.StatusBar()

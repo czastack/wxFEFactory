@@ -14,6 +14,8 @@
 
 class Button : public Control
 {
+protected:
+	using Control::Control;
 public:
 	template <class... Args>
 	Button(wxcstr label, pyobj &onclick, Args ...args) : Control(args...)
@@ -35,6 +37,19 @@ public:
 	void click()
 	{
 		addPendingEvent(wxEVT_BUTTON);
+	}
+};
+
+
+class BitmapButton : public Button
+{
+public:
+	template <class... Args>
+	BitmapButton(pycref src, pyobj &onclick, Args ...args) : Button(args...)
+	{
+		wxBitmap bp;
+		bindElem(new wxBitmapButton(*getActiveLayout(), wxID_ANY, castBitmap(src, bp), wxDefaultPosition, getStyleSize()));
+		setOnClick(onclick);
 	}
 };
 
@@ -128,6 +143,23 @@ public:
 	void setOnChange(pyobj &fn, bool reset = true)
 	{
 		bindEvt(wxEVT_CHECKBOX, fn, reset);
+	}
+};
+
+
+class Img : public Control 
+{
+public:
+	template <class... Args>
+	Img(pycref src, Args ...args) : Control(args...)
+	{
+		wxBitmap bp;
+		bindElem(new wxStaticBitmap(*getActiveLayout(), wxID_ANY, castBitmap(src, bp), wxDefaultPosition, getStyleSize()));
+	}
+
+	wxStaticBitmap& ctrl() const
+	{
+		return *(wxStaticBitmap*)m_elem;
 	}
 };
 

@@ -21,3 +21,4 @@ void mem_write(size_t address, py::bytes value, size_t size);
 wxItemKind getItemKind(wxcstr kindStr);
 
 long getBitmapTypeByExt(wxcstr path);
+class wxBitmap& castBitmap(pycref path, class wxBitmap &bp);

@@ -194,6 +194,12 @@ void init_controls(py::module & m)
 		.def("click", &Button::click)
 		.def_property("label", &Button::getLabel, &Button::setLabel);
 
+	auto pyBitmapButton = py::class_t<BitmapButton, Button>(m, "BitmapButton")
+		.def(py::init<pycref, pyobj, pyobj, pyobj>(),
+			"src"_a, "onclick"_a = None, className, style);
+
+	py::setattr(m, "ImageButton", pyBitmapButton);
+
 	py::class_t<ToggleButton, Control>(m, "ToggleButton")
 		.def(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "onchange"_a = None, className, style)
@@ -212,6 +218,12 @@ void init_controls(py::module & m)
 		.def("trigger", &CheckBox::trigger)
 		.def_property("label", &CheckBox::getLabel, &CheckBox::setLabel)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked);
+
+	py::class_t<Img, Control>(m, "Img")
+		.def(py::init<pycref, pyobj, pyobj>(), "src"_a, className, style)
+		.def_property("scalemode",
+			[](Img &self) { return (int)self.ctrl().GetScaleMode(); },
+			[](Img &self, int value) { return self.ctrl().SetScaleMode((wxStaticBitmap::ScaleMode)value); });
 
 	py::class_t<Text, Control>(m, "Text")
 		.def(py::init<wxcstr, pyobj, pyobj>(), label, className, style)

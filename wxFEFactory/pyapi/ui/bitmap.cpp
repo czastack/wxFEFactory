@@ -31,7 +31,7 @@ void init_bitmap(py::module & m)
 
 	auto Bitmap = py::class_<wxBitmap>(m, "Bitmap")
 		.def(py::init<>())
-		.def(py::init<wxcstr, long>(), "name"_a, bptype)
+		.def(py::init<wxcstr, long>(), "src"_a, bptype)
 		.def("save", &wxBitmap::SaveFile, "path"_a, bptype, "palette"_a=NULL)
 		.def("load", &wxBitmap::LoadFile, "path"_a, bptype)
 		.def("loadIcon", wxBitmap__LoadIcon)

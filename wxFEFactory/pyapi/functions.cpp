@@ -207,3 +207,29 @@ long getBitmapTypeByExt(wxcstr path)
 	}
 	return type;
 }
+
+wxBitmap & castBitmap(pycref bitmap, wxBitmap & bp)
+{
+	if (py::isinstance<wxBitmap>(bitmap))
+	{
+		bp = bitmap.cast<wxBitmap>();
+	}
+	else if (PY_IS_TYPE(bitmap, PyUnicode))
+	{
+		wxcstr path = bitmap.cast<wxString>();
+		wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
+		if (type == wxBITMAP_TYPE_ICO)
+		{
+			bp.CopyFromIcon(wxIcon(path, wxBITMAP_TYPE_ICO));
+		}
+		else
+		{
+			bp.LoadFile(path, type);
+		}
+	}
+	else
+	{
+		bp.Create({ 1, 1 });
+	}
+	return bp;
+}

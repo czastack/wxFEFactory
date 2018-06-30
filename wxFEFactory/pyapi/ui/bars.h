@@ -29,25 +29,7 @@ public:
 	int addTool(wxcstr label, wxcstr shortHelp, pycref bitmap, pycref onclick, int toolid, wxcstr kind)
 	{
 		wxBitmap bp;
-
-		if (py::isinstance<wxBitmap>(bitmap))
-		{
-			bp = bitmap.cast<wxBitmap>();
-		}
-		else if (PY_IS_TYPE(bitmap, PyUnicode))
-		{
-			wxcstr path = bitmap.cast<wxString>();
-			wxBitmapType type = (wxBitmapType)getBitmapTypeByExt(path);
-			if (type)
-			{
-				bp.LoadFile(path, type);
-			}
-		}
-		else
-		{
-			bp.Create({ 1, 1 });
-		}
-		auto *tool = ctrl().AddTool(toolid, label, bp, shortHelp, getItemKind(kind));
+		auto *tool = ctrl().AddTool(toolid, label, castBitmap(bitmap, bp), shortHelp, getItemKind(kind));
 		toolid = tool->GetId();
 		if (!onclick.is(None))
 		{
