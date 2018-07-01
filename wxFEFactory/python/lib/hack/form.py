@@ -327,11 +327,12 @@ class GroupBox(BaseGroup):
 
 
 class BaseInput(TwoWayWidget):
-    def __init__(self, *args, hex=False, spin=False, size=4, max=None, **kwargs):
+    def __init__(self, *args, hex=False, spin=False, size=4, min=0, max=None, **kwargs):
         """size: hex为True时有用"""
         self.hex = hex and not spin
-        self.spin = spin
         self.size = size
+        self.spin = spin
+        self.min = min
         self.max = max
         super().__init__(*args, **kwargs)
 
@@ -339,13 +340,13 @@ class BaseInput(TwoWayWidget):
         super().render()
         with ui.Horizontal(className="fill") as container:
             if self.spin:
-                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, max=self.max or (1 << (self.size << 3) - 1) - 1)
+                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, min=self.min, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
                 self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
-            del self.max
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
+        del self.min, self.max
 
     @property
     def input_value(self):
