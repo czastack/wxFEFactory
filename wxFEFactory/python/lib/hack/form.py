@@ -449,15 +449,6 @@ class CheckBox(BaseCheckBox, OffsetsWidget):
 
 
 class ModelCheckBox(ModelWidget, BaseCheckBox):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.enableData is None:
-            # 尝试从字段读取
-            field = self.field
-            self.enableData = getattr(field, 'enableData', None)
-            self.disableData = getattr(field, 'disableData', None)
-            self.type = type(self.enableData)
-
     @property
     def input_value(self):
         if self.enableData is None:

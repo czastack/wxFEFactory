@@ -136,7 +136,7 @@ class Global(BaseGlobal):
     )
 
     quick_switch = ToggleField(0x0202460C, enableData=0x47702001, disableData=0x47702000, label="画面切换高速化")
-    quick_move = ToggleField(0x020C2A58, size=2, enableData=0x14CD, disableData=0x2994, label="高速移动")
+    quick_move = ToggleField(0x020C2A58, size=2, enableData=0x2994, disableData=0x14CD, label="高速移动")
     must_winning = ToggleField(0x020442F0, enableData=0x2007E008, disableData=0x2007DD08, label="贩卖机绝对会中奖")
     tool_count_keep = ToggleField(0x0207681E, enableData=0x46C00049, disableData=0x54420049, label="消费道具用后不减")
 
