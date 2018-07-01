@@ -1,8 +1,7 @@
 import re
 
 INDENT = '    '
-# I = '[\da-fA-F]'
-I = '[\dA-F]'
+I = '[\\dA-F]'
 FMT = {
     'i': I,
     'i7': I + '{7}',

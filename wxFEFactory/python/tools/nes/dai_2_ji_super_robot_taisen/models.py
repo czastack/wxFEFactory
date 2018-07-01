@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, AddFieldPrep
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
 # 76C5-01-01敌方HP(1当1)

@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, DialogGroup
+from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import exui
 from lib.exui.components import Pagination
@@ -19,6 +19,7 @@ class MetalMaxHack(BaseNdsHack):
         self.chariot_item_info = self.models.ChariotItemInfo(0, self.handler)
         self.enemy = self.models.Enemy(0, self.handler)
         self.item_index = 1
+        self.has_holes = self.chariot.field('hole_type') is not None
     
     def render_main(self):
         datasets = self.datasets
@@ -26,37 +27,8 @@ class MetalMaxHack(BaseNdsHack):
         
         with Group("global", "全局", self._global, cols=4):
             ModelInput("money")
-            ModelInput("exp")
             ModelInput("stamp")
-            ModelInput("game_turn")
-            ModelInput("game_time")
-            ModelInput("after_money")
-            ModelInput("after_exp")
-            ModelInput("posx")
-            ModelInput("posy")
-            ModelSelect("difficulty", choices=datasets.DIFFICULTY)
-            ModelSelect("after_money_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
-            ModelSelect("after_exp_rate", choices=datasets.RATE, values=datasets.RATE_VALUES)
-            ModelCheckBox("quick_switch")
-            ModelCheckBox("quick_move")
-            ModelCheckBox("through_wall")
-            ModelCheckBox("no_battle")
-            ModelCheckBox("must_winning")
-            ModelCheckBox("tool_count_keep")
-            ModelCheckBox("ammo_keep")
-            ModelCheckBox("level_up_max")
-            ModelCheckBox("weight_zero")
-            ModelCheckBox("equip_limit_remove")
-            ModelCheckBox("without_material")
-            ModelCheckBox("twin_engines")
-            ModelCheckBox("drop_item_three_star")
-            ModelCheckBox("must_drop_item")
-            ModelCheckBox("must_first")
-            ModelCheckBox("allfax")
-            ModelCheckBox("allmap")
-            ModelCheckBox("enemy_flash")
-            ModelCheckBox("can_use_other_skill")
-            ModelCheckBox("must_critical_hit")
+            self.render_global_ext()
 
         with Group("player", "角色", self.person, cols=4):
             exui.Label("角色")
@@ -82,11 +54,20 @@ class MetalMaxHack(BaseNdsHack):
             ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
             ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
             ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
+            ModelInput("atk1")
+            ModelInput("atk2")
+            ModelInput("atk3")
+            ModelInput("defensive")
+
+            for i, label in enumerate("火光电声气冰"):
+                ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, max=100)
+
             ModelSelect("prof", choices=datasets.PROFS)
-            ModelSelect("subprof", choices=datasets.SUBPROFS)
+            if self.person.field("subprof"):
+                ModelSelect("subprof", choices=datasets.SUBPROFS)
 
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
-        self.lazy_group(Group("chariot", "战车", self.chariot), self.render_chariot)
+        self.lazy_group(Group("chariot", "战车", self.chariot, cols=2 if self.has_holes else 4), self.render_chariot)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
@@ -101,6 +82,9 @@ class MetalMaxHack(BaseNdsHack):
         return (
             ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
         )
+
+    def render_global_ext(self):
+        pass
 
     def render_person_ext(self):
         datasets = self.datasets
@@ -146,8 +130,9 @@ class MetalMaxHack(BaseNdsHack):
             ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.2"))
         for i in range(5):
             exui.Label("炮穴%d" % (i + 1))
-            with ui.Horizontal(className="fill"):
-                ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
+            with ui.Horizontal(className="right"):
+                if self.has_holes:
+                    ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % (i + 3)))
                 ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % (i + 3)))
                 ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % (i + 3)))
@@ -156,8 +141,8 @@ class MetalMaxHack(BaseNdsHack):
             with ui.Horizontal(className="right"):
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click("items.%d" % i))
                 ui.Button("详情", className="btn_sm", onclick=detail_click("items.%d" % i))
-                ui.Button("C装置/引擎预设", onclick=preset_ci_click("equips.2"))
-                ui.Button("武器预设", onclick=preset_click("items.%d" % i))
+                ui.Button("C装置/引擎", onclick=preset_ci_click("equips.2"))
+                ui.Button("武器", className="btn_sm", onclick=preset_click("items.%d" % i))
         with Group.active_group().footer:
             ui.Button("导入字段", onclick=self.weak.load_chariot_fields)
             ui.Button("导出字段", onclick=self.weak.dump_chariot_fields)
@@ -212,7 +197,7 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("avoid")
         ModelInput("speed")
         for i, label in enumerate("物火光电音气冷"):
-            ModelInput("resistance.%d" % i, "%s抗性" % label).view.setToolTip(">150:○, >100:空, >50:△, <=50:×")
+            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).view.setToolTip("○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
 
         for i in range(4):
             ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)

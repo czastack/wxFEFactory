@@ -2362,27 +2362,27 @@ def itemof(start, end, can_empty=True):
     return ItemProvider(ITEMS, start, end, can_empty)
 
 
-SPECIAL_BULLETS = itemof(0x01, 0x10)
+SPECIAL_BULLETS = itemof(0x01, 0x10) # 特殊炮弹
 HUMEN_ITEM = itemof(0x005A, 0x016F) # 道具
 POTION = itemof(0x11, 0x2C) # 恢复道具
 BATTLE_ITEM = itemof(0x2C, 0x59) # 战斗道具
 
-EQUIP_HEAD = itemof(0x16F, 0x19B) # 头部装备
-EQUIP_BODY = itemof(0x19B, 0x1D8) # 上身装备
-EQUIP_HAND = itemof(0x1D8, 0x1F9) # 手部装备
-EQUIP_FOOT = itemof(0x1F9, 0x222) # 脚部装备
-EQUIP_ORN = itemof(0x222, 0x260) # 装饰
-EQUIP_WEAPON = itemof(0x260, 0x2F4) # 武器
-ALL_EQUIP = itemof(0x16F, 0x2F4) # 全部人类装备
+EQUIP_HEAD = itemof(0x016F, 0x019B) # 头部装备
+EQUIP_BODY = itemof(0x019B, 0x01D8) # 上身装备
+EQUIP_HAND = itemof(0x01D8, 0x01F9) # 手部装备
+EQUIP_FOOT = itemof(0x01F9, 0x0222) # 脚部装备
+EQUIP_ORN = itemof(0x0222, 0x0260) # 装饰
+EQUIP_WEAPON = itemof(0x0260, 0x02F4) # 武器
+ALL_EQUIP = itemof(0x016F, 0x02F4) # 全部人类装备
 
-# CHARIOT_ITEM = itemof(0x2F4, 0x341) # 战车物品
-# CHARIOT_ENGINE = itemof(0x341, 0x3BC) # 引擎
-# CHARIOT_CONTROL = itemof(0x3BC, 0x3EF) # C装置
-# CHARIOT_CONTROL_ENGINE = itemof(0x341, 0x3EF) # C装置/引擎
-# CHARIOT_MAIN = itemof(0x3EF, 0x450) # 主炮
-# CHARIOT_GUNS = itemof(0x450, 0x483) # 机枪
-# CHARIOT_SE = itemof(0x483, 0x4DD) # SE
-# CHARIOT_FIXED = itemof(0x4DE, 0x543) # 固定武器
-# CHARIOT_WEAPON = itemof(0x3EF, 0x543) # 全部战车武器
-CHARIOT_ALL_ITEM = itemof(0x2F4, 0x543) # 全部战车物品
-CHARIOT_CHASSIS = itemof(0x543, 0x6AC) # 底盘
+# CHARIOT_ITEM = itemof(0x02F4, 0x0341) # 战车物品
+# CHARIOT_ENGINE = itemof(0x0341, 0x03BC) # 引擎
+# CHARIOT_CONTROL = itemof(0x03BC, 0x03EF) # C装置
+# CHARIOT_CONTROL_ENGINE = itemof(0x0341, 0x03EF) # C装置/引擎
+# CHARIOT_MAIN = itemof(0x03EF, 0x0450) # 主炮
+# CHARIOT_GUNS = itemof(0x0450, 0x0483) # 机枪
+# CHARIOT_SE = itemof(0x0483, 0x04DD) # SE
+# CHARIOT_FIXED = itemof(0x04DE, 0x0543) # 固定武器
+# CHARIOT_WEAPON = itemof(0x03EF, 0x0543) # 全部战车武器
+CHARIOT_ALL_ITEM = itemof(0x02F4, 0x0543) # 全部战车物品
+CHARIOT_CHASSIS = itemof(0x0543, 0x06AC) # 底盘

@@ -591,6 +591,22 @@ class FieldPrep:
     def __call__(self, field):
         return __class__(self.preget, self.preset, field)
 
+    @property
+    def offset(self):
+        return self.field.offset
+
+    @offset.setter
+    def offset(self, value):
+        self.field.offset = value
+
+    @property
+    def size(self):
+        return self.field.size
+
+    @property
+    def type(self):
+        return self.field.type
+
 
 class AddFieldPrep(FieldPrep):
     """加预处理"""
@@ -602,6 +618,12 @@ class MulFieldPrep(FieldPrep):
     """乘积预处理"""
     def __init__(self, p, field=None):
         super().__init__(lambda ins, x, f: x * p, lambda ins, x, f: int(x) // p, field)
+
+
+class MinuendFieldPrep(FieldPrep):
+    """被减处理"""
+    def __init__(self, subtrahend, field=None):
+        super().__init__(lambda ins, x, f: subtrahend - x, lambda ins, x, f: subtrahend - int(x), field)
 
 
 """

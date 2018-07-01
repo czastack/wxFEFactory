@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields
+from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields, MinuendFieldPrep
 from ..models import ItemInfo, ItemInfo2, BaseGlobal
 
 
@@ -32,6 +32,11 @@ class Person(Model):
     subprof = ByteField(0x02195E39, label="副职业")
     subprof_levels = ArrayField(0x02195E3A, 6, ByteField(0)) # 副职业等级(猎人、机械师、战士、护士、摔跤手、艺术家)
     subprof_exps = ArrayField(0x02195E40, 6, Field(0)) # 副职业经验
+    atk1 = WordField(0x02195E62, label="武器1攻击力")
+    atk2 = WordField(0x02195E64, label="武器2攻击力")
+    atk3 = WordField(0x02195E66, label="武器3攻击力")
+    defensive = WordField(0x02195E6A, label="总防御力")
+    resistance = ArrayField(0x02195E73, 6, MinuendFieldPrep(100, WordField(0))) # 火光电声气冰
 
 
 class ChariotEquipInfo(Model):
@@ -108,7 +113,7 @@ class Enemy(Model):
     # g = WordField(0x021AB62E, label="G")
     # shine = WordField(0x021AB630, label="闪光")
     # 抗性(物火光电音气冷)
-    resistance = ArrayField(0x021AB632, 7, WordField(0))
+    resistance = ArrayField(0x021AB632, 7, MinuendFieldPrep(100, WordField(0)))
 
     # class MonsterAtkPart(Model):
     #     SIZE = 6
@@ -127,7 +132,6 @@ class Global(BaseGlobal):
     difficulty = ByteField(0x0219483D, label="难易度")
     stamp = WordField(0x02194844, label="印章")
     game_turn = ByteField(0x021AA3E4, label="通关次数")
-    exp = Field(0x021AAE90, label="经验")
     game_time = Field(0x021295DC, label="游戏时间")
 
     allfax = ToggleField(0x0219E90B, size=6, enableData=0xFFFFFFFFFFFF, label="传真全开")
@@ -183,7 +187,7 @@ class Global(BaseGlobal):
 
     without_material = ToggleFields(
         ToggleField(0x0204E9F0, enableData=0xE0141884, disableData=0x88601884),
-        ToggleField(0x204EC04, enableData=0xE00AFCCF, disableData=0x8878FCCF),
+        ToggleField(0x0204EC04, enableData=0xE00AFCCF, disableData=0x8878FCCF),
         label="艺术家制作不需要素材",
     )
 
