@@ -76,13 +76,13 @@ class Chariot(Model):
 
     @classmethod
     def item_type(self, id):
-        if 0x2F4 <= id < 0x341:
+        if 0x02F4 <= id < 0x0341:
             return 'item'
-        elif 0x341 <= id < 0x3BC:
+        elif 0x0341 <= id < 0x03BC:
             return 'engine'
-        elif 0x3BC <= id < 0x3EF:
+        elif 0x03BC <= id < 0x03EF:
             return 'control'
-        elif 0x3EF <= id < 0x543:
+        elif 0x03EF <= id < 0x0543:
             return 'weapon'
 
 
