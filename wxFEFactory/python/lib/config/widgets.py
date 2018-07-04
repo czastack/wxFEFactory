@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from lib import extypes
 from styles import btn_xs_style
-from . import Configurable
 from lib.extypes import WeakBinder
+from .group import ConfigGroup
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -10,51 +10,12 @@ ui = fefactory_api.ui
 __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
 
 
-
-class ConfigGroup:
-    GROUPS = []
-
-    def __init__(self, owner):
-        if not isinstance(owner, Configurable):
-            raise TypeError('owner must be Configurable object')
-        self.owner = owner
-        self.children = []
-
-    def __del__(self):
-        self.children.clear()
-
-    def appendChild(self, child):
-        self.children.append(child)
-
-    def __enter__(self):
-        self.GROUPS.append(self)
-        return self
-
-    def __exit__(self, *args):
-        if self.GROUPS.pop() is not self:
-            raise ValueError('GROUPS层次校验失败')
-        for field in self.children:
-            field.render()
-            field.read()
-            help_text = getattr(field, 'help', None)
-            if help_text is not None:
-                field.set_help()
-
-    def read(self, _=None):
-        for field in self.children:
-            field.read()
-
-    def write(self, _=None):
-        for field in self.children:
-            field.write()
-
-
 class ConfigCtrl(ABC):
     def __init__(self, name, label, default):
-        parent = ConfigGroup.GROUPS[-1] if len(ConfigGroup.GROUPS) else None
+        parent = ConfigGroup.active_group()
 
         if not parent:
-            raise TypeError('Config Widget must put within ConfigGroup')
+            raise TypeError('Config Widget must be within ConfigGroup')
         
         self.weak = WeakBinder(self)
         self.name = name
@@ -63,7 +24,7 @@ class ConfigCtrl(ABC):
         parent.appendChild(self)
         self.owner = parent.owner
         self.owner.setDefault(name, default)
-        self.owner.registerObserver(name, self._onConfigChange)
+        self.owner.registerObserver(name, self.weak._onConfigChange)
 
     def _onConfigChange(self, config, name, value):
         self.read()

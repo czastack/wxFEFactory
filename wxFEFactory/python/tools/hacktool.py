@@ -1,5 +1,5 @@
 from .tool import NestedTool
-from lib.config import Config
+from lib.config import Config, ConfigGroup
 from lib.hack.form import Widget, BaseGroup
 from lib import exui
 import traceback
@@ -86,17 +86,20 @@ class BaseHackTool(NestedTool):
 
     def begin_group(self):
         Widget.GROUPS.append(self)
+        ConfigGroup.GROUPS.append(self)
         self.groups = []
 
     def appendChild(self, child):
-        if isinstance(child, BaseGroup):
+        if isinstance(child, (BaseGroup, ConfigGroup)):
             self.groups.append(child)
         else:
-            raise ValueError("Group层级校验失败")
+            raise ValueError("子元素必须是lib.hack.form.BaseGroup或lib.config.group.ConfigGroup的实例")
 
     def end_group(self):
-        while Widget.GROUPS.pop() is not self:
-            pass
+        if Widget.GROUPS.pop() is not self:
+            raise ValueError("Widget Group层级校验失败")
+        if ConfigGroup.GROUPS.pop() is not self:
+            raise ValueError("ConfigGroup Group层级校验失败")
 
     def discard_config(self, _=None):
         self.config.cancel_change()
