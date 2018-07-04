@@ -10,7 +10,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseHackTool):
+class Main(BaseHackTool):
     CLASS_NAME = 'D3D Window'
     WINDOW_NAME = 'ROCKMANX8'
 

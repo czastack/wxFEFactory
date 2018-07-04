@@ -33,7 +33,7 @@ FORMS = (
 FORM_LABELS, FORM_VALUES = utils.split_value_label(FORMS)
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

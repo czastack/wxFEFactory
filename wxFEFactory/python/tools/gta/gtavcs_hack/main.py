@@ -1,4 +1,4 @@
-from ..gtasa_hack.main import Tool as GTAVCSBaseTool
+from ..gtasa_hack.main import Main as GTAVCSBaseTool
 
-class Tool(GTAVCSBaseTool):
+class Main(GTAVCSBaseTool):
     WINDOW_NAME = 'GTA: Vice City Stories'

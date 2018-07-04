@@ -41,7 +41,7 @@ BOMB_TYPES = ("手榴", "火瓶")
 BOMB_VALUES = (1, 2)
 
 
-class Tool(BaseGbaHack):
+class Main(BaseGbaHack):
 
     def __init__(self):
         super().__init__()

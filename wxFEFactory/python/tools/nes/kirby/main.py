@@ -22,7 +22,7 @@ ABILITY = ("吐火", "火花", "回力刀", "剑士", "烈焰", "镭射", "音�
     "必杀", "光明", "摔跤", "投掷", "UFO", "星之杖")
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

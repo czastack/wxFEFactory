@@ -1,7 +1,7 @@
 from ..base import SimpleNesHack
 
 
-class Tool(SimpleNesHack):
+class Main(SimpleNesHack):
     fields = (
         (0x003F, "血量", 1, 10),
         (0x0040, "能量", 1, 0xFF),

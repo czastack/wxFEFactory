@@ -3,6 +3,6 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BasePMHack):
+class Main(BasePMHack):
     from . import datasets
     

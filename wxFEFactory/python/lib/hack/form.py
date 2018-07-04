@@ -170,9 +170,6 @@ class BaseGroup(Widget):
         if cachable:
             self.addr = self.weak.cached_ins_getter
 
-    def __del__(self):
-        self.children.clear()
-
     def appendChild(self, child):
         self.children.append(child)
 

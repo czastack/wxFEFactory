@@ -114,7 +114,7 @@ class MainFrame:
     def getTool(self, name):
         name = name.__name__ if isinstance(name, types.ModuleType) else 'tools.' + name
         module = __import__(name, fromlist=['main']).main
-        return module.Tool
+        return module.Main
         
     def onNav(self, listbox):
         """左边导航切换模块"""

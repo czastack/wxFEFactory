@@ -19,7 +19,7 @@ BULLETS = BULLETS + ["快速" + s for s in BULLETS]
 BULLET_VALUES = BULLET_VALUES + [0x130 | i for i in BULLET_VALUES]
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

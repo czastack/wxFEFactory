@@ -7,7 +7,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
 
     def __init__(self):
         super().__init__()

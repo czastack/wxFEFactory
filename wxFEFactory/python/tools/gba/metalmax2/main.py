@@ -7,7 +7,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGbaHack):
+class Main(BaseGbaHack):
     STORAGE_PAGE_LENGTH = 10
     STORAGE_PAGE_TOTAL = 10
 

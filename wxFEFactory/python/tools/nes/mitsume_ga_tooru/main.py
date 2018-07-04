@@ -13,7 +13,7 @@ class Global(Model):
     arrow = ByteField(0x0527)
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

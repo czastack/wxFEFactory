@@ -7,7 +7,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(NestedTool):
+class Main(NestedTool):
     def render(self):
         with self.render_win() as win:
             with ui.Vertical():

@@ -18,7 +18,7 @@ class Global(Model):
 DRAGONS = ("无", "火龙", "闪电龙", "飞龙", "水龙", "三角龙")
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

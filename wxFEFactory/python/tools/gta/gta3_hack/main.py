@@ -18,7 +18,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGTA3Tool):
+class Main(BaseGTA3Tool):
     CLASS_NAME = 'Grand theft auto 3'
     WINDOW_NAME = 'GTA3'
     address = address

@@ -20,7 +20,7 @@ class Global(Model):
 WEAPONS = ("普通", "S(散弹)", "C(飞弹)", "H(导弹)", "F(火焰)", "L(激光)", "坦克")
 
 
-class Tool(BaseGbaHack):
+class Main(BaseGbaHack):
 
     def __init__(self):
         super().__init__()

@@ -6,7 +6,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGbaHack):
+class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)

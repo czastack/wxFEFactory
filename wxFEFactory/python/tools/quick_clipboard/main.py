@@ -8,7 +8,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseTool):
+class Main(BaseTool):
     def attach(self, frame):
         super().attach(frame)
         self.win.RegisterHotKeys((

@@ -31,7 +31,7 @@ LEVELS = ('F', 'E', 'D', 'C', 'B', 'A', 'S')
 WEAPONS = ('光弹枪', '光束刀', '三尖矛', '护盾回旋镖')
 
 
-class Tool(BaseGbaHack):
+class Main(BaseGbaHack):
 
     def __init__(self):
         super().__init__()

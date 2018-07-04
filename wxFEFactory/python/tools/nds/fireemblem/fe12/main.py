@@ -1,5 +1,5 @@
 from ..main import FeHack
 
 
-class Tool(FeHack):
+class Main(FeHack):
     from . import models, datasets

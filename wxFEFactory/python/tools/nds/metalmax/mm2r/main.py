@@ -2,7 +2,7 @@ from ..main import MetalMaxHack
 from lib.hack.form import ModelCheckBox, ModelInput, ModelSelect
 
 
-class Tool(MetalMaxHack):
+class Main(MetalMaxHack):
     from . import models, datasets
 
     @property

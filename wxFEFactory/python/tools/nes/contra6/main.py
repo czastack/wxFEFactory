@@ -18,7 +18,7 @@ class Global(Model):
     weapon_beans = ByteField(0x0082)
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

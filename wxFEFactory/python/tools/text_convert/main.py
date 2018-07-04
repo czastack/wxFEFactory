@@ -4,7 +4,7 @@ from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 
 
-class Tool(BaseTool):
+class Main(BaseTool):
     def render(self):
         input_style = {
             'height': 60,

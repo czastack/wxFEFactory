@@ -7,7 +7,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     STORAGE_PAGE_LENGTH = 10
     STORAGE_PAGE_TOTAL = 10
     models = models

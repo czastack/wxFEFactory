@@ -16,7 +16,7 @@ class Global(Model):
 MEDICINE = ("红", "蓝", "褐")
 
 
-class Tool(BaseNesHack):
+class Main(BaseNesHack):
     def render_main(self):
         self._global = Global(0, self.handler)
 

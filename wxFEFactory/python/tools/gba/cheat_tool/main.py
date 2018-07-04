@@ -7,7 +7,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(NestedTool):
+class Main(NestedTool):
     def render(self):
         self.code = cheat.CheatCode()
         self.code.batch_mode = True

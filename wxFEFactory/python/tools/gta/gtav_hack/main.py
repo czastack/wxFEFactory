@@ -24,7 +24,7 @@ import fefactory_api
 ui = fefactory_api.ui
 
 
-class Tool(BaseGTATool):
+class Main(BaseGTATool):
     CLASS_NAME = 'grcWindow'
     WINDOW_NAME = 'Grand Theft Auto V'
     address = address
