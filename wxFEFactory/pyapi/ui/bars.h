@@ -168,5 +168,3 @@ public:
 		ctrl().PushStatusText(text, n);
 	}
 };
-
-void init_bars(py::module &m);

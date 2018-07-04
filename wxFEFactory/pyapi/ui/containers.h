@@ -241,5 +241,3 @@ public:
 		bindEvt(wxEVT_LISTBOOK_PAGE_CHANGED, fn, reset);
 	}
 };
-
-void init_containers(py::module &m);

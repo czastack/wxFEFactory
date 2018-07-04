@@ -255,5 +255,3 @@ public:
 		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	}
 };*/
-
-void init_frames(py::module &m);

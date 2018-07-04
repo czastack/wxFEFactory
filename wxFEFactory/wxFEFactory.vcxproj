@@ -159,7 +159,7 @@
     <ClCompile Include="pyapi\functions.cpp" />
     <ClCompile Include="pyapi\ui\events.cpp" />
     <ClCompile Include="pyapi\ui\frames.cpp" />
-    <ClCompile Include="pyapi\ui\layout.cpp" />
+    <ClCompile Include="pyapi\ui\ui.cpp" />
     <ClCompile Include="pyapi\ui\uibase.cpp" />
     <ClCompile Include="pyapi\ui\containers.cpp" />
     <ClCompile Include="pyapi\ui\menu.cpp" />
@@ -188,7 +188,7 @@
     <ClInclude Include="pyapi\ui\frames.h" />
     <ClInclude Include="pyapi\ui\uibase.h" />
     <ClInclude Include="pyapi\ui\containers.h" />
-    <ClInclude Include="pyapi\ui\layout.h" />
+    <ClInclude Include="pyapi\ui\ui.h" />
     <ClInclude Include="pyapi\ui\menu.h" />
     <ClInclude Include="pyapi\ui\screen.h" />
     <ClInclude Include="pyapi\ui\thread.h" />

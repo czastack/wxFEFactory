@@ -829,5 +829,3 @@ namespace pybind11 {
 		};
 	};
 };
-
-void init_controls(py::module &m);

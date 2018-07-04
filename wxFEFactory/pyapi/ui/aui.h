@@ -172,5 +172,3 @@ public:
 		init();
 	}
 };
-
-void init_aui(py::module &m);

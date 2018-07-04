@@ -306,5 +306,3 @@ public:
 		bindEvt(wxEVT_LIST_COL_RIGHT_CLICK, fn, reset, true, true);
 	}
 };
-
-void init_datacontrols(py::module &m);

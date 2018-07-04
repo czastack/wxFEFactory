@@ -5,7 +5,7 @@
 #include "myapp.h"
 #include "functions.h"
 #include "ui/console.h"
-#include "ui/layout.h"
+#include "ui/ui.h"
 #include "fe/fe.h"
 #ifdef __WXMSW__
 #include "auto/auto.h"
@@ -63,7 +63,7 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 	ATTR_INT(m.ptr(), NO, wx),
 	ATTR_INT(m.ptr(), CANCEL, wx);
 
-	init_layout(m);
+	init_ui(m);
 	init_fe(m);
 #ifdef _WIN32
 	init_auto(m);

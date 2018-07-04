@@ -244,6 +244,3 @@ private:
 	wxMenuItem *m_ptr;
 	pyobj m_onselect;
 };
-
-
-void init_menu(py::module &m);

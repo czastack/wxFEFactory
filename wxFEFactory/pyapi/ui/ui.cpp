@@ -1,28 +1,19 @@
 #include <wx/wx.h>
 #include "../pyutils.h"
 #include "../functions.h"
-#include "layout.h"
-#include "menu.h"
-#include "bitmap.h"
-#include "frames.h"
-#include "containers.h"
-#include "controls.h"
-#include "datacontrols.h"
-#include "aui.h"
-#include "events.h"
+#include "ui.h"
 #include "screen.h"
-#include "bars.h"
-#include "console.h"
 #include "thread.h"
+#include "console.h"
 
 
-void setConsoleElem(TextInput &input, TextInput &output)
+void setConsoleElem(View *input, View *output)
 {
-	pyConsole.setConsoleElem((wxTextCtrl*)input.ptr(), (wxTextCtrl*)output.ptr());
+	pyConsole.setConsoleElem((wxTextCtrl*)input->ptr(), (wxTextCtrl*)output->ptr());
 }
 
 
-void init_layout(py::module &m)
+void init_ui(py::module &m)
 {
 	using namespace py::literals;
 

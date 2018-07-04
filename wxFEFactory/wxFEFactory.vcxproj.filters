@@ -26,7 +26,7 @@
     <ClCompile Include="wxpatch.cpp">
       <Filter>wx</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\ui\layout.cpp">
+    <ClCompile Include="pyapi\ui\ui.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\fe\graph.cpp">
@@ -111,7 +111,7 @@
     <ClInclude Include="pyapi\emuhacker\ProcessHandler.h">
       <Filter>pyapi\emuhacker</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\ui\layout.h">
+    <ClInclude Include="pyapi\ui\ui.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="wxpatch.h">
