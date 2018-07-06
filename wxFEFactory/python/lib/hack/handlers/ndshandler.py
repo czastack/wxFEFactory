@@ -23,7 +23,7 @@ NDS_MEMORY_SIZE = (
 
 
 class NdsEmuHandler(MemHandler):
-    def prepareAddr(self, addr, size):
+    def address_map(self, addr, size):
         if self._raw_addr:
             return addr
 
@@ -44,12 +44,12 @@ class DeSmuMEHandler(NdsEmuHandler):
     CLASS_NAME = "DeSmuME"
 
     def attach(self):
-        succeed = self.attachByWindowName(self.CLASS_NAME, None)
+        succeed = self.attach_window(self.CLASS_NAME, None)
         if succeed:
             self.base_addr = self.base + 0x5411250
         return succeed
 
-    def prepareAddr(self, addr, size):
+    def address_map(self, addr, size):
         if self._raw_addr:
             return addr
 
@@ -68,7 +68,7 @@ class NogbaHandler(NdsEmuHandler):
     WINDOW_NAME = "No$gba"
 
     def attach(self):
-        succeed = self.attachByWindowName("No$dlgClass", "No$gba Debugger (Fullversion)");
+        succeed = self.attach_window("No$dlgClass", "No$gba Debugger (Fullversion)");
     
         if succeed:
             with self.raw_env():

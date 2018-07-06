@@ -128,7 +128,7 @@ namespace emuhacker {
 		return result;
 	}
 
-	BOOL CALLBACK _enumWindow(HWND hWnd, LPARAM lParam)
+	BOOL CALLBACK _enum_window(HWND hWnd, LPARAM lParam)
 	{
 		TCHAR szWindowName[64];
 		DWORD cchWindowName;
@@ -145,21 +145,21 @@ namespace emuhacker {
 		return TRUE;
 	}
 
-	void enumWindows(ProcessHandler &self, pycref callback, pycref prefix)
+	void enum_windows(ProcessHandler &self, pycref callback, pycref prefix)
 	{
 		Py_ssize_t prefix_len = 0;
 		wxChar *title_prefix = prefix.is_none() ? nullptr : PyUnicode_AsWideCharString(prefix.ptr(), &prefix_len);
 		std::tuple<pycref, wxChar*, Py_ssize_t> args(callback, title_prefix, prefix_len);
-		EnumWindows(_enumWindow, reinterpret_cast<LPARAM>(&args));
+		EnumWindows(_enum_window, reinterpret_cast<LPARAM>(&args));
 		if (title_prefix)
 		{
 			PyMem_Free(title_prefix);
 		}
 	}
 
-	bool attachByWindowHandle(ProcessHandler &self, size_t hWnd)
+	bool attach_handle(ProcessHandler &self, size_t hWnd)
 	{
-		return self.attachByWindowHandle((HWND)hWnd);
+		return self.attach_handle((HWND)hWnd);
 	}
 };
 
@@ -178,11 +178,11 @@ public:
 		);
 	}
 
-	addr_t prepareAddr(addr_t addr, size_t size) override {
+	addr_t address_map(addr_t addr, size_t size) override {
 		PYBIND11_OVERLOAD_PURE(
 			addr_t,              /* Return type */
 			ProcessHandler,      /* Parent class */
-			prepareAddr,         /* Name of function in C++ (must match Python name) */
+			address_map,         /* Name of function in C++ (must match Python name) */
 			addr,                /* Argument(s) */
 			size
 		);
@@ -205,9 +205,9 @@ void init_emuhacker(pybind11::module & m)
 	py::class_<ProcessHandler, PyProcessHandler>(emuhacker, "ProcessHandler")
 		.def(py::init<>())
 		.def("attach", &ProcessHandler::attach)
-		.def("attachByWindowName", &ProcessHandler::attachByWindowName)
-		.def("attachByWindowHandle", &emuhacker::attachByWindowHandle)
-		.def("prepareAddr", &ProcessHandler::prepareAddr)
+		.def("attach_window", &ProcessHandler::attach_window)
+		.def("attach_handle", &emuhacker::attach_handle)
+		.def("address_map", &ProcessHandler::address_map)
 		.def("readUint", &ProcessHandler::readUint)
 		.def("writeUint", &ProcessHandler::writeUint)
 		.def("readInt", &ProcessHandler::readInt)
@@ -227,7 +227,7 @@ void init_emuhacker(pybind11::module & m)
 		.def("write_function", &emuhacker::write_function)
 		.def("alloc_data", &emuhacker::alloc_data)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
-		.def("enumWindows", &emuhacker::enumWindows, "callback"_a, "prefix"_a=None)
+		.def("enum_windows", &emuhacker::enum_windows, "callback"_a, "prefix"_a=None)
 		.def("getProcAddressHelper", &ProcessHandler::getProcAddressHelper)
 		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)

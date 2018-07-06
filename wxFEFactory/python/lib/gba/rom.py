@@ -29,32 +29,32 @@ class RomProxyRW:
     def __init__(self, reader):
         self.reader = reader
 
-    def prepareAddr(self, addr):
+    def address_map(self, addr):
         return addr | 0x08000000
 
     def read8(self, addr):
-        return self.reader.read8(self.prepareAddr(addr))
+        return self.reader.read8(self.address_map(addr))
 
     def read16(self, addr):
-        return self.reader.read16(self.prepareAddr(addr))
+        return self.reader.read16(self.address_map(addr))
 
     def read32(self, addr):
-        return self.reader.read32(self.prepareAddr(addr))
+        return self.reader.read32(self.address_map(addr))
 
     def write8(self, addr, data):
-        return self.reader.write8(self.prepareAddr(addr), data)
+        return self.reader.write8(self.address_map(addr), data)
 
     def write16(self, addr, data):
-        return self.reader.write16(self.prepareAddr(addr), data)
+        return self.reader.write16(self.address_map(addr), data)
 
     def write32(self, addr, data):
-        return self.reader.write32(self.prepareAddr(addr), data)
+        return self.reader.write32(self.address_map(addr), data)
 
     def read(self, addr, type, size):
-        return self.reader.read(self.prepareAddr(addr), type, size)
+        return self.reader.read(self.address_map(addr), type, size)
 
     def write(self, addr, data, size=0):
-        return self.reader.write(self.prepareAddr(addr), data)
+        return self.reader.write(self.address_map(addr), data)
 
     def add(self, addr, n):
-        return self.reader.add(self.prepareAddr(addr), n)
+        return self.reader.add(self.address_map(addr), n)

@@ -20,6 +20,8 @@ class Memory64(Model):
     ROMType = ByteField(74170)
     ROMSize = ByteField(74171)
     ROMChecksum = Field(74172)
+    HiROM = ByteField(74220)
+    LoROM = ByteField(74221)
 
 
 class Snes9xHandler(MemHandler):
@@ -29,16 +31,26 @@ class Snes9xHandler(MemHandler):
     MEMORY_ADDR = 0x1405D9270
 
     def attach(self):
-        succeed = self.attachByWindowName(self.CLASS_NAME, None)
+        succeed = self.attach_window(self.CLASS_NAME, None)
         if succeed:
             with self.raw_env():
-                self.memory = Memory64(self.MEMORY_ADDR, self).datasnap(('RAM', 'ROM', 'SRAM', 'VRAM', 'ROMFilename'))
+                self.memory = Memory64(self.MEMORY_ADDR, self).datasnap(('RAM', 'ROM', 'ROMFilename', 'HiROM', 'LoROM'))
         return succeed
 
-    def prepareAddr(self, addr, size=4):
+    def address_map(self, addr, size=4):
         if self._raw_addr:
             return addr
 
-        if 0x0000 <= addr <= 0xFFFF:
-            return self.memory.RAM + addr
+        bank = (addr >> 16) & 0xFF
+        addr &= 0xFFFF
+
+        if 0 <= bank <= 0x3F:
+            if addr <= 0x1FFF:
+                return self.memory.RAM + addr
+            elif 0x8000 <= addr <= 0xFFFF:
+                return self.memory.ROM + (addr - 0x8000)
+        elif bank == 0x7E or bank == 0x7F:
+            return self.memory.RAM + ((bank - 0x7E << 16) | addr)
+        elif bank == 0xFE or bank == 0xFF:
+            return self.memory.ROM + ((bank - 0xFE << 16) | addr)
         return False

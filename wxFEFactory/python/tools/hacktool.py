@@ -44,7 +44,7 @@ class BaseHackTool(NestedTool):
             self.ondetach()
 
         succeed = self.handler.attach()
-        if succeed or succeed is None and self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
+        if succeed or succeed is None and self.handler.attach_window(self.CLASS_NAME, self.WINDOW_NAME):
             self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
 
             if not self.win.hotkeys:

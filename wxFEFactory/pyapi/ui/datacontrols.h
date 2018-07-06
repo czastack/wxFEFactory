@@ -109,8 +109,7 @@ public:
 	}
 
 	void addEnumProperty(wxcstr title, wxcstr name, pycref help, pyobj labels, pyobj values, int value = 0) {
-		prepareOptions(labels, values, true);
-		Append(new wxEnumProperty(title, name, py::cast<wxArrayString>(labels), py::cast<wxArrayInt>(values), value), help);
+		Append(new wxEnumProperty(title, name, py::cast<wxArrayString>(labels), values.is_none() ? wxArrayInt() : py::cast<wxArrayInt>(values), value), help);
 	}
 
 	void addFlagsProperty(wxcstr title, wxcstr name, pycref help, pycref py_items, pycref py_values, int value = 0);
@@ -130,8 +129,7 @@ public:
 		wxPGProperty *p = ctrl().GetPropertyByName(name);
 		if (wxIsKindOf(p, wxEnumProperty))
 		{
-			prepareOptions(labels, values, true);
-			wxPGChoices choices(py::cast<wxArrayString>(labels), py::cast<wxArrayInt>(values));
+			wxPGChoices choices(py::cast<wxArrayString>(labels), values.is_none() ? wxArrayInt(): py::cast<wxArrayInt>(values));
 			((wxEnumProperty*)p)->SetChoices(choices);
 		}
 	}

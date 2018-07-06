@@ -8,7 +8,7 @@ class MemHandler(ProcessHandler):
     def attach(self):
         pass
 
-    def prepareAddr(self, addr, size):
+    def address_map(self, addr, size):
         return addr
 
     def rawRead(self, addr, type=int, size=0):

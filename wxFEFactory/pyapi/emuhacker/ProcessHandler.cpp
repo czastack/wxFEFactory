@@ -66,11 +66,11 @@ void ProcessHandler::close(){
 	}
 }
 
-bool ProcessHandler::attachByWindowName(CSTR className, CSTR windowName){
-	return attachByWindowHandle(FindWindow(className, windowName));
+bool ProcessHandler::attach_window(CSTR className, CSTR windowName){
+	return attach_handle(FindWindow(className, windowName));
 }
 
-bool ProcessHandler::attachByWindowHandle(HWND hWnd){
+bool ProcessHandler::attach_handle(HWND hWnd){
 	if(IsWindow(hWnd))
 	{
 		DWORD	dwProcessId;
@@ -128,7 +128,7 @@ bool ProcessHandler::rawWrite(addr_t addr, LPCVOID buffer, size_t size)
 bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 	if(isValid())
 	{
-		addr = prepareAddr(addr, size);
+		addr = address_map(addr, size);
 		if (addr) {
 			return rawRead(addr, buffer, size);
 		}
@@ -139,7 +139,7 @@ bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 	if(isValid())
 	{
-		addr = prepareAddr(addr, size);
+		addr = address_map(addr, size);
 		if (addr) {
 			return rawWrite(addr, buffer, size);
 		}

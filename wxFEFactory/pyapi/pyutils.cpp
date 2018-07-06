@@ -43,38 +43,6 @@ py::object pyDictGet(pycref di, pycref key)
 }
 
 
-
-/**
-* 会返回options和values的值
-*/
-void prepareOptions(pyobj& options, pyobj& values, bool rangeIfNone)
-{
-	if (!options.is_none())
-	{
-		// values 是函数，用于map
-		bool is_fn = py::isinstance<py::function>(values);
-		// options 元素是元组，(label, value)
-		bool is_tuple = !is_fn && values.is_none() && py::len(options) && py::isinstance<py::tuple>(options[py::cast(0)]);
-
-		if (is_fn || is_tuple)
-		{
-			py::list tmpOptions, tmpValues;
-			for (auto &e : options)
-			{
-				const py::tuple& item = (const py::tuple&)(is_fn ? values(e) : py::reinterpret_borrow<py::object>(e));
-				tmpOptions.append(item[0]);
-				tmpValues.append(item[1]);
-			}
-			options = tmpOptions;
-			values = tmpValues;
-		}
-		else if (rangeIfNone && values.is_none())
-		{
-			values = py::handle((PyObject*)&PyRange_Type)(py::len(options));
-		}
-	}
-}
-
 void py_interpreter_run(wxcstr line) {
 	static PyObject *m = PyImport_AddModule("__main__");
 	static PyObject *d = PyModule_GetDict(m);

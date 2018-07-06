@@ -11,7 +11,7 @@ OFFSET_MAP = {
 
 
 class DolphinHandler(BigendHandler):
-    def prepareAddr(self, addr, size=0):
+    def address_map(self, addr, size=0):
         if self._raw_addr:
             return addr
 
@@ -19,9 +19,9 @@ class DolphinHandler(BigendHandler):
 
     def attach(self):
         self.window_name = None
-        self.enumWindows(self._enum_window, 'Dolphin ')
+        self.enum_windows(self._enum_window, 'Dolphin ')
         if self.window_name:
-            if self.attachByWindowHandle(self.hwnd):
+            if self.attach_handle(self.hwnd):
                 self.version = self.window_name[8:]
                 offset = OFFSET_MAP.get(self.version, None)
                 if offset:

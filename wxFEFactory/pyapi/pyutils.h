@@ -98,11 +98,6 @@ pyobj asPyList(T &array)
 	return list;
 }
 
-/**
- * 会返回options和values的值
- */
-void prepareOptions(pyobj &options, pyobj &values, bool rangeIfNone = false);
-
 template <typename... Args>
 py::object pyCall(const py::object & obj, Args &&...args) {
 	try {

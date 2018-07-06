@@ -20,7 +20,7 @@ public:
 	virtual ~ProcessHandler();
 
 	virtual bool attach() { return false; }
-	virtual addr_t prepareAddr(addr_t addr, size_t size) {
+	virtual addr_t address_map(addr_t addr, size_t size) {
 		return addr;
 	};
 
@@ -33,13 +33,13 @@ public:
 	 * find the first process whose main window has the specified class and window name,
 	 * the handle will be automatically closed, unless it is detached
 	 */
-	bool attachByWindowName(CSTR className, CSTR windowName);
+	bool attach_window(CSTR className, CSTR windowName);
 
 	/*
 	 * attach the process whose main window is the specified window
 	 * the handle will be automatically closed, unless it is detached
 	 */
-	bool attachByWindowHandle(HWND hWnd);
+	bool attach_handle(HWND hWnd);
 
 	/*
 	 * return value is TRUE, if this object has attached to a valid process handle

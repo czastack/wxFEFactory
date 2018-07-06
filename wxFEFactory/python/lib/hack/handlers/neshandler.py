@@ -20,9 +20,9 @@ class VirtuaNesHandler(MemHandler):
     PPU_MEM_BANKS = 0x5732EC
 
     def attach(self):
-        return self.attachByWindowName(self.CLASS_NAME, None)
+        return self.attach_window(self.CLASS_NAME, None)
 
-    def prepareAddr(self, addr, size=4):
+    def address_map(self, addr, size=4):
         if self._raw_addr:
             return addr
 
@@ -46,7 +46,7 @@ class NestopiaHandler(MemHandler):
     WINDOW_NAME = CLASS_NAME
 
     def attach(self):
-        succeed = self.attachByWindowName(self.CLASS_NAME, None)
+        succeed = self.attach_window(self.CLASS_NAME, None)
         self.ram = 0
         self.wram = 0
         self.roms = None
@@ -77,7 +77,7 @@ class NestopiaHandler(MemHandler):
 
         return succeed
 
-    def prepareAddr(self, addr, size=4):
+    def address_map(self, addr, size=4):
         if self._raw_addr:
             return addr
 

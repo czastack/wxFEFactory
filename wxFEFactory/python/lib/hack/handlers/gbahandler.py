@@ -19,7 +19,7 @@ GBA_MEMORY_SIZE = (
 
 
 class GbaEmuHandler(MemHandler):
-    def prepareAddr(self, addr, size=4):
+    def address_map(self, addr, size=4):
         if self._raw_addr:
             return addr
 
@@ -70,8 +70,8 @@ class VbaHandler(GbaEmuHandler):
 
     def attach(self):
         self.hwnd = None
-        self.enumWindows(self._enum_window, self.WINDOW_NAME + '-')
-        succeed = self.hwnd and self.attachByWindowHandle(self.hwnd) or False
+        self.enum_windows(self._enum_window, self.WINDOW_NAME + '-')
+        succeed = self.hwnd and self.attach_handle(self.hwnd) or False
         if succeed:
             with self.raw_env():
                 ptr_table = self.read(self.MAP_ADDR, bytes, 72)
@@ -92,7 +92,7 @@ class NogbaHandler(GbaEmuHandler):
     WINDOW_NAME = 'No$gba'
 
     def attach(self):
-        succeed = self.attachByWindowName("No$dlgClass", "No$gba Debugger (Fullversion)");
+        succeed = self.attach_window("No$dlgClass", "No$gba Debugger (Fullversion)");
     
         if succeed:
             with self.raw_env():
