@@ -1,5 +1,5 @@
-from lib.hack.handler import ProxyHandler
-from lib.hack.ndshandler import DeSmuMEHandler, NogbaHandler
+from lib.hack.handlers import ProxyHandler
+from lib.hack.handlers.ndshandler import DeSmuMEHandler, NogbaHandler
 from ..hacktool import BaseHackTool
 
 

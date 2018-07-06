@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup
+from lib.hack.form import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import exui
 from lib.exui.components import Pagination
@@ -73,6 +73,7 @@ class MetalMaxHack(BaseNdsHack):
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
 
         self.render_package_group()
+        self.render_ext()
 
         with StaticGroup("功能"):
             self.render_functions(('enemy_weak',))
@@ -158,26 +159,27 @@ class MetalMaxHack(BaseNdsHack):
     def render_package_group(self):
         datasets = self.datasets
 
-        def on_page_change(self, page, item=None):
-            setattr(self._global, "{}_offset".format(item['key']), (page - 1) * self.IREM_PAGE_LENGTH)
-            item['group'].read()
+        with Groups("包裹", self.weak.onNotePageChange):
+            def on_page_change(self, page, item=None):
+                setattr(self._global, "{}_offset".format(item['key']), (page - 1) * self.IREM_PAGE_LENGTH)
+                item['group'].read()
 
-        def render_items(self, item=None):
-            for i in range(self.IREM_PAGE_LENGTH):
-                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
-                ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
-            with Group.active_group().footer:
-                Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
+            def render_items(self, item=None):
+                for i in range(self.IREM_PAGE_LENGTH):
+                    ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
+                    ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
+                with Group.active_group().footer:
+                    Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
 
-        for item in (
-            {'key': 'humen_items', 'label': '道具', 'source': datasets.HUMEN_ITEM, 'page_count': 25},
-            {'key': 'potions', 'label': '恢复道具', 'source': datasets.POTION, 'page_count': 3},
-            {'key': 'battle_items', 'label': '战斗道具', 'source': datasets.BATTLE_ITEM, 'page_count': 6},
-            {'key': 'equips', 'label': '装备', 'source': datasets.ALL_EQUIP, 'page_count': 45},
-        ):
-            item['group'] = Group(item['key'], item['label'], self._global, cols=4)
-            self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
-            setattr(self._global, "{}_offset".format(item['key']), 0)
+            for item in (
+                {'key': 'humen_items', 'label': '道具', 'source': datasets.HUMEN_ITEM, 'page_count': 25},
+                {'key': 'potions', 'label': '恢复道具', 'source': datasets.POTION, 'page_count': 3},
+                {'key': 'battle_items', 'label': '战斗道具', 'source': datasets.BATTLE_ITEM, 'page_count': 6},
+                {'key': 'equips', 'label': '装备', 'source': datasets.ALL_EQUIP, 'page_count': 45},
+            ):
+                item['group'] = Group(item['key'], item['label'], self._global, cols=4)
+                self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
+                setattr(self._global, "{}_offset".format(item['key']), 0)
 
     def render_battle_status(self):
         for i in range(self._global.chariot_battle_status.length):
@@ -202,6 +204,9 @@ class MetalMaxHack(BaseNdsHack):
         for i in range(4):
             ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)
             ModelInput("enemy_case.%d.count" % i, "数量", ins=self._global)
+
+    def render_ext(self):
+        pass
 
     def get_chariot_item_info_dialog(self):
         datasets = self.datasets

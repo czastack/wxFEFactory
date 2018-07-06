@@ -323,6 +323,24 @@ class GroupBox(BaseGroup):
         self.root = root
 
 
+class Groups(BaseGroup):
+    """可容纳子Group"""
+    def __init__(self, caption, onPageChange=None):
+        self.onPageChange = onPageChange
+        return super().__init__(None, caption, 0)
+
+    def render(self):
+        self.view = ui.Notebook(className="fill")
+        ui.Item(self.view, caption=self.label)
+        if self.onPageChange:
+            self.view.setOnPageChange(self.onPageChange)
+
+    def __exit__(self, *args):
+        super().__exit__(*args)
+        if self.onPageChange:
+            self.onPageChange(self.view)
+
+
 class BaseInput(TwoWayWidget):
     def __init__(self, *args, hex=False, spin=False, size=4, min=0, max=None, **kwargs):
         """size: hex为True时有用"""

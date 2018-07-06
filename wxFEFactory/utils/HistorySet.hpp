@@ -42,7 +42,7 @@ public:
 		{
 			RemoveAt(i);
 		}
-		else if (m_maxsize != -1 && m_maxsize == size())
+		else if (m_maxsize != -1 && size() >= m_maxsize)
 		{
 			RemoveAt(0);
 		}

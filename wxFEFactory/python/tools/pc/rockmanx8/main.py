@@ -1,6 +1,6 @@
 from functools import partial
 from lib.hack.form import Group, ModelCheckBox, ModelInput, ModelSelect
-from lib.hack.handler import MemHandler
+from lib.hack.handlers import MemHandler
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from tools.hacktool import BaseHackTool

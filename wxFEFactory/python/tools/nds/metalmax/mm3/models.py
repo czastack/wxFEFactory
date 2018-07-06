@@ -56,6 +56,7 @@ class ChariotItemInfo(ChariotEquipInfo):
 class Chariot(Model):
     SIZE = 0x256
 
+    # name = Field(0x021A1B8C, type=bytes, size=10)
     sp = WordField(0x21A1B9E, label="装甲")
     chassis = ModelField(0x021A1BA0, ChariotEquipInfo, label="底盘")
     equips = ArrayField(0x021A1BB4, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,引擎2,洞1,洞2,洞3,洞4,洞5
@@ -130,7 +131,7 @@ class Global(BaseGlobal):
     # allfax = ToggleField(0x0219E90B, size=6, enableData=0xFFFFFFFFFFFF, label="传真全开") # TODO
     # allmap = ToggleFields()
     enemy_flash = ToggleFields(
-        ToggleField(0x02087ADE, enableData=0x2109, size=2, disableData=0x718E),
+        ToggleField(0x02087ADE, enableData=0x2109, size=2, disableData=0x7E81),
         ToggleField(0x02087DBA, enableData=0x46C0, size=2, disableData=0xDA40),
         label="敌人闪光"
     )
@@ -216,10 +217,10 @@ class Global(BaseGlobal):
     # 好感度
     favorability = ArrayField(0x021AB52E, 12, ByteField(0))
 
-    # 通缉名单状态03=击破 01=逃走
-    wanted_status = ArrayField(0x021AB503, 26, ByteField(0))
+    # 通缉名单状态01=逃走, 03=击破 
+    wanted_status = ArrayField(0x021AB503, 30, ByteField(0))
 
     # 连射
     # 2212919C 00000000
 
-    # move_speed = WordField(0x020C2A58, label="移动速度")
+    move_speed = WordField(0x020C2A58, label="移动速度")

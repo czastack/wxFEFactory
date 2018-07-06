@@ -1,4 +1,4 @@
-from lib.hack.handler import BigendHandler
+from lib.hack.handlers.handler import BigendHandler
 from ..hacktool import BaseHackTool
 
 

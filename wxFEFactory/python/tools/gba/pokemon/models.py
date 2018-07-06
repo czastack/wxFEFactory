@@ -2,7 +2,7 @@ from lib.hack.model import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
     ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField, ManagedModel
 )
-from lib.hack.localhandler import LocalHandler, LocalModel
+from lib.hack.handlers.localhandler import LocalHandler, LocalModel
 from lib.utils import LOWORD, HIWORD
 import random
 

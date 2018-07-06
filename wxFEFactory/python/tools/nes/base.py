@@ -1,5 +1,5 @@
-from lib.hack.handler import ProxyHandler
-from lib.hack.neshandler import VirtuaNesHandler, NestopiaHandler
+from lib.hack.handlers import ProxyHandler
+from lib.hack.handlers.neshandler import VirtuaNesHandler, NestopiaHandler
 from lib.hack.form import Group, StaticGroup, ModelInput
 from lib.hack.model import Model, Field, ByteField, WordField
 from lib.win32.keys import getVK, MOD_ALT

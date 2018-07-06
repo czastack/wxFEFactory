@@ -315,7 +315,7 @@ class MainFrame:
 
     def attachEmu(self, m):
         if m.checked:
-            from lib.hack.gbahandler import VbaHandler, NogbaHandler
+            from lib.hack.handlers.gbahandler import VbaHandler, NogbaHandler
             from fe.ferom import FeEmuRW
             
             attached = False
