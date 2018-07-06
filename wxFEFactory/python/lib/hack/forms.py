@@ -330,13 +330,20 @@ class Groups(BaseGroup):
         return super().__init__(None, caption, 0)
 
     def render(self):
-        self.view = ui.Notebook(className="fill")
-        ui.Item(self.view, caption=self.label)
+        with ui.Vertical(className="fill") as root:
+            self.view = ui.Notebook(className="fill")
+        ui.Item(root, caption=self.label)
+        self.root = root
         if self.onPageChange:
             self.view.setOnPageChange(self.onPageChange)
 
+    def __enter__(self):
+        super().__enter__()
+        self.root.freeze()
+
     def __exit__(self, *args):
         super().__exit__(*args)
+        self.root.thaw()
         if self.onPageChange:
             self.onPageChange(self.view)
 

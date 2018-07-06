@@ -5,6 +5,7 @@ namespace pybind11 {
 }
 
 
+void init_uibase(py::module &m);
 void init_aui(py::module &m);
 void init_bars(py::module &m);
 void init_bitmap(py::module &m);

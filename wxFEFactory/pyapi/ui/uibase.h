@@ -335,7 +335,7 @@ public:
 		m_elem->SetSize(getStyleSize());
 	}
 
-	friend void init_ui(py::module &m);
+	friend void init_uibase(py::module &m);
 };
 
 
@@ -393,7 +393,7 @@ public:
 
 	View* findFocus();
 
-	friend void init_ui(py::module &m);
+	friend void init_uibase(py::module &m);
 protected:
 	py::list m_children;
 	pyobj m_styles;

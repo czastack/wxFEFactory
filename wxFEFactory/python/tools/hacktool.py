@@ -67,7 +67,7 @@ class BaseHackTool(NestedTool):
 
     @property
     def WINDOW_NAME(self):
-        return self.handler.WINDOW_NAME
+        return getattr(self.handler, 'WINDOW_NAME', None) or self.CLASS_NAME
     
 
     def onClose(self, *args):
@@ -239,7 +239,7 @@ class ProxyHackTool(BaseHackTool):
             handler = Handler()
             if handler.attach():
                 self.handler.set(handler)
-                self.attach_status_view.label = handler.WINDOW_NAME + ' 正在运行'
+                self.attach_status_view.label = getattr('handler', 'WINDOW_NAME', handler.CLASS_NAME) + ' 正在运行'
                 if not self.win.hotkeys:
                     hotkeys = self.get_hotkeys()
                     if hotkeys:

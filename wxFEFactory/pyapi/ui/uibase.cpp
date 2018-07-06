@@ -467,3 +467,50 @@ void Item::__init()
 		pLayout->doAdd(m_view);
 	}
 }
+
+
+void init_uibase(py::module & m)
+{
+	using namespace py::literals;
+
+	auto view = py::class_<View>(m, "View")
+		.def("isShow", &View::isShow)
+		.def("show", &View::show, "show"_a = true)
+		.def("destroy", &View::destroy)
+		.def("refresh", &View::refresh)
+		.def("setToolTip", &View::setToolTip)
+		.def("setContextMenu", &View::setContextMenu)
+		.def("setOnKeyDown", &View::setOnKeyDown)
+		.def("setOnFileDrop", &View::setOnFileDrop)
+		.def("setOnTextDrop", &View::setOnTextDrop)
+		.def("setOnClick", &View::setOnClick)
+		.def("setOnDoubleClick", &View::setOnDoubleClick)
+		.def("setOnDestroy", &View::setOnDestroy)
+		.def("freeze",
+			[](View &self) { return self.ptr()->Freeze(); })
+		.def("thaw",
+			[](View &self) { return self.ptr()->Thaw(); })
+		.def_static("get_active_layout", &View::getActiveLayout)
+		.def_readwrite("style", &View::m_style)
+		.def_readwrite("className", &View::m_class)
+		.def_property("enabled", &View::getEnabaled, &View::setEnabaled)
+		.def_property("background", &View::getBackground, &View::setBackground)
+		.def_property("color", &View::getForeground, &View::setForeground)
+		.def_property("id",
+			[](View &self) { return self.ptr()->GetId(); },
+			[](View &self, int id) { self.ptr()->SetId(id); }
+		)
+		.def_property_readonly("parent", &View::getParent);
+
+	py::class_<Control, View>(m, "Control");
+
+	py::class_<Layout, View>(m, "Layout")
+		.def("__enter__", &Layout::__enter__)
+		.def("__exit__", &Layout::__exit__)
+		.def("styles", &Layout::setStyles)
+		.def("removeChild", &Layout::removeChild)
+		.def("clearChildren", &Layout::clearChildren)
+		.def("reLayout", &Layout::reLayout)
+		.def("findFocus", &Layout::findFocus)
+		.def_readonly("children", &Layout::m_children);
+}

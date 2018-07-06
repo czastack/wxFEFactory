@@ -30,49 +30,13 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("stamp")
             self.render_global_ext()
 
-        with Group("player", "角色", self.person, cols=4):
-            exui.Label("角色")
-            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
-            ModelSelect("figure", choices=datasets.FIGURES)
-            ModelInput("level")
-            ModelInput("exp")
-            ModelInput("hp")
-            ModelInput("hpmax")
-            ModelInput("battle_level")
-            ModelInput("drive_level")
-            ModelInput("power")
-            ModelInput("strength")
-            ModelInput("speed")
-            ModelInput("spirit")
-            ModelInput("scar")
-            ModelInput("level_max")
-            ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
-            ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
-            ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
-            ModelSelect("equip_head", choices=datasets.EQUIP_HEAD.choices, values=datasets.EQUIP_HEAD.values)
-            ModelSelect("equip_body", choices=datasets.EQUIP_BODY.choices, values=datasets.EQUIP_BODY.values)
-            ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
-            ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
-            ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
-            ModelInput("atk1")
-            ModelInput("atk2")
-            ModelInput("atk3")
-            ModelInput("defensive")
-
-            for i, label in enumerate("火光电声气冰"):
-                ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, max=100)
-
-            ModelSelect("prof", choices=datasets.PROFS)
-            if self.person.field("subprof"):
-                ModelSelect("subprof", choices=datasets.SUBPROFS)
-
+        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot, cols=2 if self.has_holes else 4), self.render_chariot)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
-
-        self.render_package_group()
+        self.lazy_group(Groups("包裹", self.weak.onNotePageChange), self.render_package_group)
         self.render_ext()
 
         with StaticGroup("功能"):
@@ -86,6 +50,43 @@ class MetalMaxHack(BaseNdsHack):
 
     def render_global_ext(self):
         pass
+
+    def render_person(self):
+        datasets = self.datasets
+        exui.Label("角色")
+        ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+        ModelSelect("figure", choices=datasets.FIGURES)
+        ModelInput("level")
+        ModelInput("exp")
+        ModelInput("hp")
+        ModelInput("hpmax")
+        ModelInput("battle_level")
+        ModelInput("drive_level")
+        ModelInput("power")
+        ModelInput("strength")
+        ModelInput("speed")
+        ModelInput("spirit")
+        ModelInput("scar")
+        ModelInput("level_max")
+        ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+        ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+        ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+        ModelSelect("equip_head", choices=datasets.EQUIP_HEAD.choices, values=datasets.EQUIP_HEAD.values)
+        ModelSelect("equip_body", choices=datasets.EQUIP_BODY.choices, values=datasets.EQUIP_BODY.values)
+        ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
+        ModelSelect("equip_foot", choices=datasets.EQUIP_FOOT.choices, values=datasets.EQUIP_FOOT.values)
+        ModelSelect("equip_orn", choices=datasets.EQUIP_ORN.choices, values=datasets.EQUIP_ORN.values)
+        ModelInput("atk1")
+        ModelInput("atk2")
+        ModelInput("atk3")
+        ModelInput("defensive")
+
+        for i, label in enumerate("火光电声气冰"):
+            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, max=100)
+
+        ModelSelect("prof", choices=datasets.PROFS)
+        if self.person.field("subprof"):
+            ModelSelect("subprof", choices=datasets.SUBPROFS)
 
     def render_person_ext(self):
         datasets = self.datasets
@@ -159,27 +160,26 @@ class MetalMaxHack(BaseNdsHack):
     def render_package_group(self):
         datasets = self.datasets
 
-        with Groups("包裹", self.weak.onNotePageChange):
-            def on_page_change(self, page, item=None):
-                setattr(self._global, "{}_offset".format(item['key']), (page - 1) * self.IREM_PAGE_LENGTH)
-                item['group'].read()
+        def on_page_change(self, page, item=None):
+            setattr(self._global, "{}_offset".format(item['key']), (page - 1) * self.IREM_PAGE_LENGTH)
+            item['group'].read()
 
-            def render_items(self, item=None):
-                for i in range(self.IREM_PAGE_LENGTH):
-                    ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
-                    ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
-                with Group.active_group().footer:
-                    Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
+        def render_items(self, item=None):
+            for i in range(self.IREM_PAGE_LENGTH):
+                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
+                ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
+            with Group.active_group().footer:
+                Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
 
-            for item in (
-                {'key': 'humen_items', 'label': '道具', 'source': datasets.HUMEN_ITEM, 'page_count': 25},
-                {'key': 'potions', 'label': '恢复道具', 'source': datasets.POTION, 'page_count': 3},
-                {'key': 'battle_items', 'label': '战斗道具', 'source': datasets.BATTLE_ITEM, 'page_count': 6},
-                {'key': 'equips', 'label': '装备', 'source': datasets.ALL_EQUIP, 'page_count': 45},
-            ):
-                item['group'] = Group(item['key'], item['label'], self._global, cols=4)
-                self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
-                setattr(self._global, "{}_offset".format(item['key']), 0)
+        for item in (
+            {'key': 'humen_items', 'label': '道具', 'source': datasets.HUMEN_ITEM, 'page_count': 25},
+            {'key': 'potions', 'label': '恢复道具', 'source': datasets.POTION, 'page_count': 3},
+            {'key': 'battle_items', 'label': '战斗道具', 'source': datasets.BATTLE_ITEM, 'page_count': 6},
+            {'key': 'equips', 'label': '装备', 'source': datasets.ALL_EQUIP, 'page_count': 45},
+        ):
+            item['group'] = Group(item['key'], item['label'], self._global, cols=4)
+            self.lazy_group(item['group'], partial(render_items, self.weak, item=item))
+            setattr(self._global, "{}_offset".format(item['key']), 0)
 
     def render_battle_status(self):
         for i in range(self._global.chariot_battle_status.length):
