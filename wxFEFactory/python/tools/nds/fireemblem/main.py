@@ -40,82 +40,90 @@ class FeHack(BaseNdsHack):
             # ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
             # ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
 
-        with Group("player", "配置", weak._config, cols=4):
-            ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
-            ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
-            ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
-            ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
-            ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
-            ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
-
-        with Group("player", "角色", weak._person, cols=4):
-            ModelInput("addr_hex", "地址", readonly=True)
-            ModelInput("no", "序号")
-            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
-            ModelInput("level", "等级")
-            ModelInput("exp", "经验")
-            ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
-            ModelInput("posx", "X坐标")
-            ModelInput("posy", "Y坐标")
-            ModelInput("hpmax", "HP上限+")
-            ModelInput("hp", "ＨＰ")
-            ModelInput("power", "力量+")
-            ModelInput("magic", "魔力+")
-            ModelInput("skill", "技术+")
-            ModelInput("speed", "速度+")
-            ModelInput("defensive", "守备+")
-            ModelInput("magicdef", "魔防+")
-            ModelInput("lucky", "幸运+")
-            ModelInput("physical_add", "体格+")
-            ModelInput("move_add", "移动+")
-            # ModelSelect("status", "状态种类", choices=datasets.STATUS)
-            # ModelInput("status_turn", "状态持续")
-            for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
-                ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
-
-        with Group("items", "角色物品", weak._person, cols=4):
-            for i in range(5):
-                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items.%d.count" % i, "数量")
-
-        with Group("iteminfos", "武器属性", weak._iteminfo):
-            ui.Text("物品", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
-            ui.Text("复制属性", className="input_label expand")
-            with ui.Horizontal(className="fill"):
-                self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)
-                ui.Button("复制", onclick=self.copy_iteminfo)
-            ModelInput("addr_hex", "地址", readonly=True)
-            ModelInput("name_ptr", "名称指针", hex=True)
-            ModelInput("desc_ptr", "介绍文本", hex=True)
-            ModelInput("icon", "图标序号")
-            ModelSelect("type", "类型", choices=datasets.WEAPONTYPES)
-            ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
-            ModelInput("power", "威力")
-            ModelInput("hit", "命中")
-            ModelInput("kill", "必杀")
-            ModelInput("weight", "重量")
-            ModelInput("range_min", "最小射程")
-            ModelInput("range_max", "最大射程")
-            ModelInput("move_add", "移动+")
-            ModelInput("hp_add", "HP+")
-            ModelInput("power_add", "力量+")
-            ModelInput("magic_add", "魔力+")
-            ModelInput("skill_add", "技巧+")
-            ModelInput("speed_add", "速度+")
-            ModelInput("lucky_add", "幸运+")
-            ModelInput("defensive_add", "防御+")
-            ModelInput("magicdef_add", "魔防+")
-            
-            i = 0
-            for item in datasets.ITEM_ATTRS:
-                hint, labels = item
-                i += 1
-                ModelFlagWidget("attr%d" % i, hint or "属性%d" % i, labels=labels)
-
+        self.lazy_group(Group("config", "配置", weak._config, cols=4), self.render_config)
+        self.lazy_group(Group("player", "角色", weak._person, cols=4), self.render_person)
+        self.lazy_group(Group("items", "角色物品", weak._person, cols=4), self.render_items)
+        self.lazy_group(Group("iteminfos", "武器属性", weak._iteminfo), self.render_iteminfos)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
+
+    def render_config(self):
+        datasets = self.datasets
+        ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
+        ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
+        ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
+        ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
+        ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
+        ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
+
+    def render_person(self):
+        datasets = self.datasets
+        ModelInput("addr_hex", "地址", readonly=True)
+        ModelInput("no", "序号")
+        ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
+        ModelInput("level", "等级")
+        ModelInput("exp", "经验")
+        ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
+        ModelInput("posx", "X坐标")
+        ModelInput("posy", "Y坐标")
+        ModelInput("hpmax", "HP上限+")
+        ModelInput("hp", "ＨＰ")
+        ModelInput("power", "力量+")
+        ModelInput("magic", "魔力+")
+        ModelInput("skill", "技术+")
+        ModelInput("speed", "速度+")
+        ModelInput("defensive", "守备+")
+        ModelInput("magicdef", "魔防+")
+        ModelInput("lucky", "幸运+")
+        ModelInput("physical_add", "体格+")
+        ModelInput("move_add", "移动+")
+        # ModelSelect("status", "状态种类", choices=datasets.STATUS)
+        # ModelInput("status_turn", "状态持续")
+        for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
+            ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
+
+    def render_items(self):
+        datasets = self.datasets
+        for i in range(5):
+            ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+            ModelInput("items.%d.count" % i, "数量")
+
+    def render_iteminfos(self):
+        datasets = self.datasets
+        ui.Text("物品", className="input_label expand")
+        ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
+        ui.Text("复制属性", className="input_label expand")
+        with ui.Horizontal(className="fill"):
+            self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)
+            ui.Button("复制", onclick=self.copy_iteminfo)
+        ModelInput("addr_hex", "地址", readonly=True)
+        ModelInput("name_ptr", "名称指针", hex=True)
+        ModelInput("desc_ptr", "介绍文本", hex=True)
+        ModelInput("icon", "图标序号")
+        ModelSelect("type", "类型", choices=datasets.WEAPONTYPES)
+        ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
+        ModelInput("power", "威力")
+        ModelInput("hit", "命中")
+        ModelInput("kill", "必杀")
+        ModelInput("weight", "重量")
+        ModelInput("range_min", "最小射程")
+        ModelInput("range_max", "最大射程")
+        ModelInput("move_add", "移动+")
+        ModelInput("hp_add", "HP+")
+        ModelInput("power_add", "力量+")
+        ModelInput("magic_add", "魔力+")
+        ModelInput("skill_add", "技巧+")
+        ModelInput("speed_add", "速度+")
+        ModelInput("lucky_add", "幸运+")
+        ModelInput("defensive_add", "防御+")
+        ModelInput("magicdef_add", "魔防+")
+        
+        i = 0
+        for item in datasets.ITEM_ATTRS:
+            hint, labels = item
+            i += 1
+            ModelFlagWidget("attr%d" % i, hint or "属性%d" % i, labels=labels)
 
     def render_train_items(self):
         datasets = self.datasets
