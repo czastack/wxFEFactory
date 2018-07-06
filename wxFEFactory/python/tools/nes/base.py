@@ -4,32 +4,11 @@ from lib.hack.forms import Group, StaticGroup, ModelInput
 from lib.hack.models import Model, Field, ByteField, WordField
 from lib.win32.keys import getVK, MOD_ALT
 from lib.extypes import DataClass
-from ..hacktool import BaseHackTool
+from ..hacktool import ProxyHackTool
 
 
-class BaseNesHack(BaseHackTool):
-    def __init__(self):
-        super().__init__()
-        self.handler = ProxyHandler()
-
-    def check_attach(self, _=None):
-        if self.handler.active:
-            self.ondetach()
-            
-        for Handler in (VirtuaNesHandler, NestopiaHandler):
-            handler = Handler()
-            if handler.attach():
-                self.handler.set(handler)
-                self.attach_status_view.label = handler.WINDOW_NAME + ' 正在运行'
-                if not self.win.hotkeys:
-                    hotkeys = self.get_hotkeys()
-                    if hotkeys:
-                        self.win.RegisterHotKeys(hotkeys)
-                self.onattach()
-                return True
-        else:
-            self.attach_status_view.label = '绑定失败, 未找到支持的模拟器进程'
-            return False
+class BaseNesHack(ProxyHackTool):
+    handlers = VirtuaNesHandler, NestopiaHandler
 
 
 FieldItem = DataClass('FieldItem', ('addr', 'name', 'size', 'max'))

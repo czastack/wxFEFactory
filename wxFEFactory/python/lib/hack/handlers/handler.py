@@ -5,6 +5,9 @@ import struct
 class MemHandler(ProcessHandler):
     _raw_addr = False
 
+    def attach(self):
+        pass
+
     def prepareAddr(self, addr, size):
         return addr
 

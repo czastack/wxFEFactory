@@ -1,6 +1,7 @@
 from .tool import NestedTool
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
+from lib.hack.handlers import ProxyHandler
 from lib import exui
 import traceback
 import base64
@@ -42,7 +43,8 @@ class BaseHackTool(NestedTool):
         if self.handler.active:
             self.ondetach()
 
-        if self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
+        succeed = self.handler.attach()
+        if succeed or succeed is None and self.handler.attachByWindowName(self.CLASS_NAME, self.WINDOW_NAME):
             self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
 
             if not self.win.hotkeys:
@@ -52,12 +54,21 @@ class BaseHackTool(NestedTool):
             self.onattach()
             return True
         else:
-            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME
+            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME or self.WINDOW_TITLE
             return False
 
     def get_hotkeys(self):
         """重写这个函数，返回要注册的热键列表"""
         return ()
+
+    @property
+    def CLASS_NAME(self):
+        return self.handler.CLASS_NAME
+
+    @property
+    def WINDOW_NAME(self):
+        return self.handler.WINDOW_NAME
+    
 
     def onClose(self, *args):
         if self.handler.active:
@@ -210,3 +221,31 @@ class BaseHackTool(NestedTool):
                     value = base64.b64encode(value.to_bytes()).decode()
                 data['data'][names[i]] = value
             fefactory.json_dump_file(self, data)
+
+
+class ProxyHackTool(BaseHackTool):
+    """ 使用代理Handler
+    abs field: handlers: iterable
+    """
+    def __init__(self):
+        super().__init__()
+        self.handler = ProxyHandler()
+
+    def check_attach(self, _=None):
+        if self.handler.active:
+            self.ondetach()
+            
+        for Handler in self.handlers:
+            handler = Handler()
+            if handler.attach():
+                self.handler.set(handler)
+                self.attach_status_view.label = handler.WINDOW_NAME + ' 正在运行'
+                if not self.win.hotkeys:
+                    hotkeys = self.get_hotkeys()
+                    if hotkeys:
+                        self.win.RegisterHotKeys(hotkeys)
+                self.onattach()
+                return True
+        else:
+            self.attach_status_view.label = '绑定失败, 未找到支持的进程'
+            return False

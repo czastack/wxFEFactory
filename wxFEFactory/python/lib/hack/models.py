@@ -232,11 +232,15 @@ class ByteField(Field):
 class WordField(Field):
     __init__ = partialmethod(Field.__init__, size=2)
 
+class QWordField(Field):
+    __init__ = partialmethod(Field.__init__, size=8)
+
 
 DWordField = Field
 U8Field = ByteField
 U16Field = WordField
 U32Field = DWordField
+U64Field = QWordField
 
 
 class SignedField(Field):
