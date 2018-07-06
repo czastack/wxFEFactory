@@ -1,8 +1,8 @@
 from ..base import BaseGbaHack
-from lib.hack.form import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Fields, ToggleField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Fields, ToggleField
 from lib import utils
 import fefactory_api
 ui = fefactory_api.ui

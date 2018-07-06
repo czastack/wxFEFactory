@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ArrayField, ModelPtrField, CoordField, CoordData
+from lib.hack.models import Model, Field, ArrayField, ModelPtrField, CoordField, CoordData
 from ..gta_base.native import NativeContext
 
 

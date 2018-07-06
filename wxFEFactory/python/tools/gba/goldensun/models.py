@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
 class Skill(Model):

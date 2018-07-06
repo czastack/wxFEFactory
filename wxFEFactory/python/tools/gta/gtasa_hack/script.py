@@ -1,4 +1,4 @@
-from lib.hack import model
+from lib.hack import models
 from ..gta3_base.script import ArgType, BaseRunningScript
 import struct
 
@@ -27,14 +27,14 @@ class RunningScript(BaseRunningScript):
     """原生脚本调用环境"""
     SIZE = 0xE0
 
-    condResult = model.Field(0xc5)
-    MissionCleanUpFlag = model.ByteField(0xc6)
-    notFlag = model.ByteField(0xd2)
-    missionFlag = model.ByteField(0xdc)
-    IsCustom = model.ByteField(0xdf)
-    baseIP = model.Field(0x10)
-    curIP = model.Field(0x14)
-    m_aLVars = model.ArrayField(0x3c, 32, model.Field(0))
+    condResult = models.Field(0xc5)
+    MissionCleanUpFlag = models.ByteField(0xc6)
+    notFlag = models.ByteField(0xd2)
+    missionFlag = models.ByteField(0xdc)
+    IsCustom = models.ByteField(0xdf)
+    baseIP = models.Field(0x10)
+    curIP = models.Field(0x14)
+    m_aLVars = models.ArrayField(0x3c, 32, models.Field(0))
 
     def run(self, command_id, signature, *args):
         self.IsCustom = self.missionFlag = self.MissionCleanUpFlag = False

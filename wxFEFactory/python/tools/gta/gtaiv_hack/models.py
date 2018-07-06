@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField, ManagedModelPtrField
+from lib.hack.models import Model, Field, CoordField, ManagedModelPtrField
 from lib.lazy import lazy
 from lib.utils import float32
 from ..gta_base import utils

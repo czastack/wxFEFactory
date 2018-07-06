@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, CoordField
+from lib.hack.models import Model, Field, CoordField
 from lib.lazy import lazy
 from .datasets import VEHICLE_LIST
 from ..gta_base.models import Physicle, WeaponSet, Pool, ManagedModel

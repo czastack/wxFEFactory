@@ -1,6 +1,6 @@
 from fefactory_api import ui
 from lib import exui
-from lib.hack.form import Group, TwoWayWidget, ModelWidget
+from lib.hack.forms import Group, TwoWayWidget, ModelWidget
 from styles import dialog_style
 
 

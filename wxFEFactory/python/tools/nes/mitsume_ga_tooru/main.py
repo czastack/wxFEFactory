@@ -1,7 +1,7 @@
 from ..base import BaseNesHack
-from lib.hack.form import Group, StaticGroup, ModelInput
+from lib.hack.forms import Group, StaticGroup, ModelInput
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
-from lib.hack.model import Model, Field, ByteField, WordField, MulFieldPrep
+from lib.hack.models import Model, Field, ByteField, WordField, MulFieldPrep
 
 
 class Global(Model):

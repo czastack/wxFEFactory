@@ -1,6 +1,6 @@
 from functools import partial
 from lib import utils
-from lib.hack.form import (
+from lib.hack.forms import (
     Group, StaticGroup, Input, ProxyInput, Select, ModelInput, ModelCoordWidget
 )
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT

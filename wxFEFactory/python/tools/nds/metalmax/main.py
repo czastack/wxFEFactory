@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.form import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup
+from lib.hack.forms import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import exui
 from lib.exui.components import Pagination

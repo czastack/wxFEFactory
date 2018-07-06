@@ -1,6 +1,6 @@
 from .tool import NestedTool
 from lib.config import Config, ConfigGroup
-from lib.hack.form import Widget, BaseGroup
+from lib.hack.forms import Widget, BaseGroup
 from lib import exui
 import traceback
 import base64
@@ -93,7 +93,7 @@ class BaseHackTool(NestedTool):
         if isinstance(child, (BaseGroup, ConfigGroup)):
             self.groups.append(child)
         else:
-            raise ValueError("子元素必须是lib.hack.form.BaseGroup或lib.config.group.ConfigGroup的实例")
+            raise ValueError("子元素必须是lib.hack.forms.BaseGroup或lib.config.group.ConfigGroup的实例")
 
     def end_group(self):
         if Widget.GROUPS.pop() is not self:

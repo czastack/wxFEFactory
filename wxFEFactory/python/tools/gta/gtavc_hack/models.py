@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, CoordField
+from lib.hack.models import Model, Field, ByteField, WordField, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool, NativeModel
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 import math

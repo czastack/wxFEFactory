@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField
+from lib.hack.models import Model, Field, ByteField
 from ..models import Person
 
 

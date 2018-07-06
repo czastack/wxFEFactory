@@ -1,4 +1,4 @@
-from lib.hack import model
+from lib.hack import models
 from ..gta_base.models import ManagedModel
 import struct
 
@@ -35,7 +35,7 @@ class ArgType:
 
 
 class BaseRunningScript(ManagedModel):
-    m_szName = model.StringField(0x08, 8)
+    m_szName = models.StringField(0x08, 8)
 
     def __init__(self, addr, context, script_space_base, init_addr, process_addr, buff_size=255):
         """
@@ -150,14 +150,14 @@ class RunningScript(BaseRunningScript):
     """原生脚本调用环境"""
     SIZE = 0x88
 
-    m_nIp = model.Field(0x10)
-    scriptType = model.Field(0x2e)
-    m_aLVars = model.ArrayField(0x30, 16, model.Field(0))
-    m_nCondResult = model.ByteField(0x79)
-    m_bIsMission = model.ByteField(0x7a)
-    m_bNotFlag = model.ByteField(0x82)
-    m_bDeathArrestCheckEnabled = model.ByteField(0x83)
-    m_bMissionCleanup = model.ByteField(0x85)
+    m_nIp = models.Field(0x10)
+    scriptType = models.Field(0x2e)
+    m_aLVars = models.ArrayField(0x30, 16, models.Field(0))
+    m_nCondResult = models.ByteField(0x79)
+    m_bIsMission = models.ByteField(0x7a)
+    m_bNotFlag = models.ByteField(0x82)
+    m_bDeathArrestCheckEnabled = models.ByteField(0x83)
+    m_bMissionCleanup = models.ByteField(0x85)
 
     def run(self, command_id, signature, *args):
         self.m_bDeathArrestCheckEnabled = True

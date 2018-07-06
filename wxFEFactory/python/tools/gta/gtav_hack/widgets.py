@@ -1,5 +1,5 @@
 from fefactory_api import ui
-from lib.hack.form import ModelWidget, TwoWayWidget
+from lib.hack.forms import ModelWidget, TwoWayWidget
 from lib.utils import rgb2bgr
 from styles import btn_sm_style
 

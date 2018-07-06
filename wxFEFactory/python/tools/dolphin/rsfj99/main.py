@@ -1,7 +1,7 @@
 from functools import partial
 from ..base import BaseDolphinHack
 from . import models, datasets
-from lib.hack.form import Group, StaticGroup, Input, CheckBox, ModelInput
+from lib.hack.forms import Group, StaticGroup, Input, CheckBox, ModelInput
 import fefactory_api
 ui = fefactory_api.ui
 

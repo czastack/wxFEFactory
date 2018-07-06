@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, CAttr
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, CAttr
 
 
 class PersonChariot(Model):

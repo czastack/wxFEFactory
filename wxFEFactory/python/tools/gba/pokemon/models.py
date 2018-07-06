@@ -1,4 +1,4 @@
-from lib.hack.model import (
+from lib.hack.models import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
     ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField, ManagedModel
 )

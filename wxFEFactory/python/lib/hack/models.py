@@ -1,6 +1,7 @@
 from lib.utils import float32, Accumulator
 from lib.extypes import DataClass
 from functools import partialmethod
+from types import SimpleNamespace
 
 
 class Model:
@@ -124,6 +125,17 @@ class Model:
                 i += 1
         else:
             super().__setattr__(name, value)
+
+    def datasnap(self, fields=None):
+        data = SimpleNamespace()
+        if fields:
+            for name in fields:
+                setattr(data, name, getattr(self, name))
+        else:
+            for name, value in self.__class__.__dict__:
+                if isinstance(value, Field):
+                    setattr(data, name, getattr(self, name))
+        return data
 
 
 class ManagedModel(Model):

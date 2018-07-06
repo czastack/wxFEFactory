@@ -1,4 +1,4 @@
-from lib.hack.model import Model, ManagedModel, Field
+from lib.hack.models import Model, ManagedModel, Field
 from . import utils
 import math
 

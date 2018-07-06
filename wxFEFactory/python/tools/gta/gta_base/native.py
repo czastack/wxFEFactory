@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ArrayField, CoordField, CoordData
+from lib.hack.models import Model, Field, ArrayField, CoordField, CoordData
 from lib.lazy import lazy
 import math
 import struct

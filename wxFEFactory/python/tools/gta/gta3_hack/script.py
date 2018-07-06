@@ -1,4 +1,4 @@
-from lib.hack import model
+from lib.hack import models
 from ..gta3_base.script import ArgType, RunningScript
 import struct
 
@@ -7,8 +7,8 @@ class RunningScript(RunningScript):
     """原生脚本调用环境"""
     SIZE = 0x88
 
-    m_nCondResult = model.ByteField(0x78)
-    m_bIsMission = model.ByteField(0x79)
+    m_nCondResult = models.ByteField(0x78)
+    m_bIsMission = models.ByteField(0x79)
 
     def push_common_arg(self, arg_type, fmt, arg):
         """ 压入通用参数

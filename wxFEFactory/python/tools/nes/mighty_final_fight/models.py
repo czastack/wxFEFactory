@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, Fields
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Fields
 
 
 class Global(Model):

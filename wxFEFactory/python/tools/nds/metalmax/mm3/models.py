@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields, MinuendFieldPrep
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields, MinuendFieldPrep
 from ..models import ItemInfo, ItemInfo2, BaseGlobal
 
 

@@ -1,4 +1,4 @@
-from lib.hack.model import Model, Field, ByteField, ArrayField, ModelField, ModelPtrField, ToggleField
+from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, ModelPtrField, ToggleField
 from ..models import ItemSlot, BaseGlobal
 
 
