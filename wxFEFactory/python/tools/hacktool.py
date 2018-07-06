@@ -126,7 +126,7 @@ class BaseHackTool(NestedTool):
         """ 在addr读三个float类型
         :return: (x, y, z)
         """
-        r = self.handler.readFloat
+        r = self.handler.read_float
         return (r(addr), r(addr + 4), r(addr + 8))
 
     def onattach(self):

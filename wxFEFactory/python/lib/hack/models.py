@@ -222,7 +222,7 @@ class PtrField(Field):
         if self.size is 0:
             # 对于ProcessHandler，根据目标进程获取指针大小
             self.size = instance.handler.ptr_size
-        return instance.handler.readUint(instance.addr + self.offset, self.size)
+        return instance.handler.read_uint(instance.addr + self.offset, self.size)
 
 
 class ByteField(Field):
@@ -246,12 +246,12 @@ U64Field = QWordField
 class SignedField(Field):
     """有符号字段"""
     def __get__(self, instance, owner=None):
-        return instance.handler.readInt(instance.addr + self.offset, self.type, self.size)
+        return instance.handler.read_int(instance.addr + self.offset, self.type, self.size)
 
     def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        instance.handler.writeInt(instance.addr + self.offset, value, self.size)
+        instance.handler.write_int(instance.addr + self.offset, value, self.size)
 
 
 class ToggleField(Field):
@@ -321,7 +321,7 @@ class BitsField(Field):
 
 class OffsetsField(Field):
     def __get__(self, instance, owner=None):
-        ret = instance.handler.ptrsRead(instance.addr + self.offset[0], self.offset[1:], self.type, self.size)
+        ret = instance.handler.ptrs_read(instance.addr + self.offset[0], self.offset[1:], self.type, self.size)
         if self.type is float:
             ret = float32(ret)
         return ret
@@ -329,7 +329,7 @@ class OffsetsField(Field):
     def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        instance.handler.ptrsWrite(instance.addr + self.offset[0], self.offset[1:], value, self.size)
+        instance.handler.ptrs_write(instance.addr + self.offset[0], self.offset[1:], value, self.size)
 
 
 class ModelPtrField(Cachable, PtrField):

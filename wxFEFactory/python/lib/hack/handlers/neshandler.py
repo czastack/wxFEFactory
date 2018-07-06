@@ -35,10 +35,10 @@ class VirtuaNesHandler(MemHandler):
         return False
 
     def cpu_mem_bank_addr(self, i):
-        return self.rawRead(self.CPU_MEM_BANKS + (i << 2), int, 4)
+        return self.raw_read(self.CPU_MEM_BANKS + (i << 2), int, 4)
 
     def ppu_mem_bank_addr(self, i):
-        return self.rawRead(self.PPU_MEM_BANKS + (i << 2), int, 4)
+        return self.raw_read(self.PPU_MEM_BANKS + (i << 2), int, 4)
 
 
 class NestopiaHandler(MemHandler):

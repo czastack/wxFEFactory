@@ -218,25 +218,25 @@ class Main(BaseGTA3_VC_SA_Tool):
         else:
             PI = math.pi
             HALF_PI = PI / 2
-            cam_x = self.handler.readFloat(address.CAMERA)
-            cam_y = self.handler.readFloat(address.CAMERA + 4)
+            cam_x = self.handler.read_float(address.CAMERA)
+            cam_y = self.handler.read_float(address.CAMERA + 4)
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
             self.rot_view.mem_value = rot
 
     def playerCoordFromMap(self, _=None):
         # 从大地图读取坐标
-        self.coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
-        self.coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
+        self.coord_view.views[0].value = str(self.handler.read_float(address.MAP_X_ADDR))
+        self.coord_view.views[1].value = str(self.handler.read_float(address.MAP_Y_ADDR))
 
     def vehicleCoordFromMap(self, _=None):
         # 从大地图读取坐标
-        self.vehicle_coord_view.views[0].value = str(self.handler.readFloat(address.MAP_X_ADDR))
-        self.vehicle_coord_view.views[1].value = str(self.handler.readFloat(address.MAP_Y_ADDR))
+        self.vehicle_coord_view.views[0].value = str(self.handler.read_float(address.MAP_X_ADDR))
+        self.vehicle_coord_view.views[1].value = str(self.handler.read_float(address.MAP_Y_ADDR))
 
     def move_to_map_cursor(self, _=None):
         coord = self.vehicle.coord
-        coord[0] = self.handler.readFloat(address.MAP_X_ADDR)
-        coord[1] = self.handler.readFloat(address.MAP_Y_ADDR)
+        coord[0] = self.handler.read_float(address.MAP_X_ADDR)
+        coord[1] = self.handler.read_float(address.MAP_Y_ADDR)
 
     def set_player_proof(self, checkbox, bitindex):
         """设置玩家免疫"""
@@ -310,11 +310,11 @@ class Main(BaseGTA3_VC_SA_Tool):
     def get_weapon_prop(self, index):
         """武器熟练度"""
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
-        return utils.float32(self.handler.readFloat(addr))
+        return utils.float32(self.handler.read_float(addr))
 
     def set_weapon_prop(self, value, index):
         addr = self.get_cheat_config()['WEAPON_PROF_ADDR'][index]
-        return self.handler.writeFloat(addr, value)
+        return self.handler.write_float(addr, value)
 
     def freeze_timer(self, cb):
         """冻结任务中的计时"""

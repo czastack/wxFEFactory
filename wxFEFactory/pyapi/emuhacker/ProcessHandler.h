@@ -52,8 +52,8 @@ public:
 
 	int getPtrSize() { return m_is32process ? 4 : 8; }
 
-	bool rawRead(addr_t addr, LPVOID buffer, size_t size);
-	bool rawWrite(addr_t addr, LPCVOID buffer, size_t size);
+	bool raw_read(addr_t addr, LPVOID buffer, size_t size);
+	bool raw_write(addr_t addr, LPCVOID buffer, size_t size);
 
 	bool read(addr_t addr, LPVOID buffer, size_t size);
 	bool write(addr_t addr, LPCVOID buffer, size_t size);
@@ -65,21 +65,21 @@ public:
 		return write(addr, origin);
 	}
 
-	size_t readUint(addr_t addr, size_t size)
+	size_t read_uint(addr_t addr, size_t size)
 	{
 		size_t data = 0;
 		read(addr, &data, size);
 		return data;
 	}
 
-	bool writeUint(addr_t addr, size_t data, size_t size)
+	bool write_uint(addr_t addr, size_t data, size_t size)
 	{
 		return write(addr, &data, size);
 	}
 
-	INT64 readInt(addr_t addr, size_t size)
+	INT64 read_int(addr_t addr, size_t size)
 	{
-		INT64 data = (INT64)readUint(addr, size);
+		INT64 data = (INT64)read_uint(addr, size);
 		switch (size)
 		{
 		case 1:
@@ -97,9 +97,9 @@ public:
 		return data;
 	}
 
-	bool writeInt(addr_t addr, INT64 data, size_t size)
+	bool write_int(addr_t addr, INT64 data, size_t size)
 	{
-		return writeUint(addr, data & ((1 << (size << 3)) - 1), size);
+		return write_uint(addr, data & ((1 << (size << 3)) - 1), size);
 	}
 
 	/**
@@ -144,7 +144,7 @@ public:
 		return data;
 	}
 
-	addr_t readAddr(addr_t addr)
+	addr_t read_addr(addr_t addr)
 	{
 #ifdef _WIN64
 		if (m_is32process)
@@ -165,23 +165,23 @@ public:
 		return addr;
 	}
 
-	bool ptrRead(addr_t addr, u32 offset, size_t size, LPVOID buffer) {
-		addr = readAddr(addr);
+	bool ptr_read(addr_t addr, u32 offset, size_t size, LPVOID buffer) {
+		addr = read_addr(addr);
 		if (addr)
 			return read(addr + offset, buffer, size);
 		return false;
 	}
-	bool ptrWrite(addr_t addr, u32 offset, size_t size, LPCVOID buffer) {
-		addr = readAddr(addr);
+	bool ptr_write(addr_t addr, u32 offset, size_t size, LPCVOID buffer) {
+		addr = read_addr(addr);
 		if (addr)
 			return write(addr + offset, buffer, size);
 		return false;
 	}
 
 	template<typename ListType>
-	addr_t readLastAddr(addr_t addr, const ListType &offsets) {
+	addr_t read_last_addr(addr_t addr, const ListType &offsets) {
 		for (auto const offset : offsets) {
-			addr = readAddr(addr);
+			addr = read_addr(addr);
 			if (!addr)
 				return 0;
 
@@ -194,8 +194,8 @@ public:
 	 * 多级指针读取数据
 	 */
 	template<typename ListType>
-	bool ptrsRead(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
-		addr = readLastAddr(addr, offsets);
+	bool ptrs_read(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
+		addr = read_last_addr(addr, offsets);
 		return addr && read(addr, buffer, size);
 	}
 
@@ -203,8 +203,8 @@ public:
 	 * 多级指针写入数据
 	 */
 	template<typename ListType>
-	bool ptrsWrite(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
-		addr = readLastAddr(addr, offsets);
+	bool ptrs_write(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
+		addr = read_last_addr(addr, offsets);
 		return addr && write(addr, buffer, size);
 	}
 

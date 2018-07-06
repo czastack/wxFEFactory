@@ -116,7 +116,7 @@ class Main(BaseGTA3Tool):
         self.load_model(weapon_view.selected_item[1])
 
     def get_yaw(self):
-        yaw = self.handler.readFloat(address.CAMERA_ROTZ)
+        yaw = self.handler.read_float(address.CAMERA_ROTZ)
         if not self.isInVehicle:
             yaw = yaw - math.pi
         return yaw
@@ -129,9 +129,9 @@ class Main(BaseGTA3Tool):
         TEXT1_ADDR = 0x7D3E40
         TEXT2_ADDR = 0x939028
         
-        self.handler.ptrsWrite(TEXT1_ADDR, (), text)
+        self.handler.ptrs_write(TEXT1_ADDR, (), text)
         time.sleep(0.01)
-        self.handler.ptrsWrite(TEXT2_ADDR, (), text)
+        self.handler.ptrs_write(TEXT2_ADDR, (), text)
 
     def bigbang(self, _=None):
         self.inputCheat('bigbang')

@@ -94,7 +94,7 @@ class Main(BaseGbaHack):
 
     def all_cg(self, btn):
         """全CG"""
-        self.handler.writeUint(0x02008570, 0xFFFFFFFFFF, 5)
+        self.handler.write_uint(0x02008570, 0xFFFFFFFFFF, 5)
 
     def all_item_book(self, btn):
         """全道具图鉴"""
@@ -102,7 +102,7 @@ class Main(BaseGbaHack):
 
     def all_music(self, btn):
         """全音乐"""
-        self.handler.writeUint(0x020086C4, 0xFFFFFFFFFF, 5)
+        self.handler.write_uint(0x020086C4, 0xFFFFFFFFFF, 5)
 
     def all_face(self, btn):
         """全表情"""

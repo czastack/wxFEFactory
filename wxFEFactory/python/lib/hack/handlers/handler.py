@@ -11,68 +11,68 @@ class MemHandler(ProcessHandler):
     def address_map(self, addr, size):
         return addr
 
-    def rawRead(self, addr, type=int, size=0):
+    def raw_read(self, addr, type=int, size=0):
         self._raw_addr = True
         result = self.read(addr, type, size)
         self._raw_addr = False
         return result
 
-    def rawWrite(self, addr, data, size=0):
+    def raw_write(self, addr, data, size=0):
         self._raw_addr = True
         result = self.write(addr, data, size)
         self._raw_addr = False
         return result
 
     def read8(self, addr):
-        return self.readUint(addr, 1)
+        return self.read_uint(addr, 1)
 
     def read16(self, addr):
-        return self.readUint(addr, 2)
+        return self.read_uint(addr, 2)
 
     def read32(self, addr):
-        return self.readUint(addr, 4)
+        return self.read_uint(addr, 4)
 
     def read64(self, addr):
-        return self.readUint(addr, 8)
+        return self.read_uint(addr, 8)
 
     def write8(self, addr, data):
-        return self.writeUint(addr, data, 1)
+        return self.write_uint(addr, data, 1)
 
     def write16(self, addr, data):
-        return self.writeUint(addr, data, 2)
+        return self.write_uint(addr, data, 2)
 
     def write32(self, addr, data):
-        return self.writeUint(addr, data, 4)
+        return self.write_uint(addr, data, 4)
 
     def write64(self, addr, data):
-        return self.writeUint(addr, data, 8)
+        return self.write_uint(addr, data, 8)
 
-    def readFloat(self, addr):
+    def read_float(self, addr):
         return self.read(addr, float, 4)
 
-    def writeFloat(self, addr, data):
+    def write_float(self, addr, data):
         return self.write(addr, float(data), 4)
 
-    def ptrRead(self, addr, offset, type, size=0):
-        addr = self.readAddr(addr)
+    def ptr_read(self, addr, offset, type, size=0):
+        addr = self.read_addr(addr)
         if addr:
             return self.read(addr + offset, type, size)
         return False
 
-    def ptrWrite(self, addr, offset, data, size=0):
-        addr = self.readAddr(addr)
+    def ptr_write(self, addr, offset, data, size=0):
+        addr = self.read_addr(addr)
         if addr:
             return self.write(addr + offset, data, size)
         return False
 
-    def ptrsRead(self, addr, offsets, type, size=0):
-        addr = self.readLastAddr(addr, offsets)
+    def ptrs_read(self, addr, offsets, type, size=0):
+        addr = self.read_last_addr(addr, offsets)
         if addr:
             return self.read(addr, type, size)
         return False
 
-    def ptrsWrite(self, addr, offsets, data, size=0):
-        addr = self.readLastAddr(addr, offsets)
+    def ptrs_write(self, addr, offsets, data, size=0):
+        addr = self.read_last_addr(addr, offsets)
         if addr:
             return self.write(addr, data, size)
         return False
@@ -109,7 +109,7 @@ class BigendHandler(MemHandler):
     """大端处理器"""
     def read(self, addr, type, size=0):
         if type is int:
-            return self.readUint(addr, size if size else self.ptr_size)
+            return self.read_uint(addr, size if size else self.ptr_size)
         elif type is float:
             data = ProcessHandler.read(self, addr, bytes, size if size else 4)
             return struct.unpack('>f', data)[0]
@@ -121,7 +121,7 @@ class BigendHandler(MemHandler):
     def write(self, addr, data, size=0):
         _type = type(data)
         if _type is int:
-            return self.writeUint(addr, data, size if size else self.ptr_size)
+            return self.write_uint(addr, data, size if size else self.ptr_size)
         elif _type is float:
             return ProcessHandler.write(self, addr, struct.pack('>f', data), size if size else 4)
         elif _type is bool:
@@ -129,10 +129,10 @@ class BigendHandler(MemHandler):
         else:
             return ProcessHandler.write(self, addr, data, size)
 
-    def readUint(self, addr, size=0):
+    def read_uint(self, addr, size=0):
         return int.from_bytes(ProcessHandler.read(self, addr, bytes, size), 'big')
 
-    def writeUint(self, addr, data, size=0):
+    def write_uint(self, addr, data, size=0):
         return ProcessHandler.write(self, addr, data.to_bytes(size, 'big'), size)
 
 

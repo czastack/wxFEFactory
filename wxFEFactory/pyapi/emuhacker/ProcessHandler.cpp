@@ -115,12 +115,12 @@ bool ProcessHandler::is32Process()
 	return false;
 }
 
-bool ProcessHandler::rawRead(addr_t addr, LPVOID buffer, size_t size)
+bool ProcessHandler::raw_read(addr_t addr, LPVOID buffer, size_t size)
 {
 	return ReadProcessMemory(m_process, (LPVOID)addr, buffer, size, NULL) != 0;
 }
 
-bool ProcessHandler::rawWrite(addr_t addr, LPCVOID buffer, size_t size)
+bool ProcessHandler::raw_write(addr_t addr, LPCVOID buffer, size_t size)
 {
 	return WriteProcessMemory(m_process, (LPVOID)addr, buffer, size, NULL) != 0;
 }
@@ -130,7 +130,7 @@ bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 	{
 		addr = address_map(addr, size);
 		if (addr) {
-			return rawRead(addr, buffer, size);
+			return raw_read(addr, buffer, size);
 		}
 	}
 	return false;
@@ -141,7 +141,7 @@ bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 	{
 		addr = address_map(addr, size);
 		if (addr) {
-			return rawWrite(addr, buffer, size);
+			return raw_write(addr, buffer, size);
 		}
 	}
 	return false;
@@ -198,7 +198,7 @@ void ProcessHandler::free_memory(addr_t addr)
 addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
 {
 	addr_t fnAddr = alloc_memory(size, PAGE_EXECUTE_READWRITE);
-	if (!fnAddr || !rawWrite(fnAddr, buf, size))
+	if (!fnAddr || !raw_write(fnAddr, buf, size))
 	{
 		// std::cout << "Write failed" << std::endl;
 		return 0;
@@ -209,7 +209,7 @@ addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
 addr_t ProcessHandler::alloc_data(LPCVOID buf, size_t size)
 {
 	addr_t addr = alloc_memory(size);
-	if (!addr || !rawWrite(addr, buf, size))
+	if (!addr || !raw_write(addr, buf, size))
 	{
 		// std::cout << "Write failed" << std::endl;
 		return 0;
@@ -243,14 +243,14 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
 	// IMAGE_NT_HEADERS64 nth;
 	IMAGE_EXPORT_DIRECTORY ides;
 
-	rawRead(module + offsetof(IMAGE_DOS_HEADER, e_lfanew), &e_lfanew, sizeof(LONG));
+	raw_read(module + offsetof(IMAGE_DOS_HEADER, e_lfanew), &e_lfanew, sizeof(LONG));
 	size_t offsetVirtualAddress = m_is32process ?
 		offsetof(IMAGE_NT_HEADERS32, OptionalHeader) + offsetof(IMAGE_OPTIONAL_HEADER32, DataDirectory)
 			+ offsetof(IMAGE_DATA_DIRECTORY, VirtualAddress) :
 		offsetof(IMAGE_NT_HEADERS64, OptionalHeader) + offsetof(IMAGE_OPTIONAL_HEADER64, DataDirectory)
 			+ offsetof(IMAGE_DATA_DIRECTORY, VirtualAddress);
-	rawRead(module + e_lfanew + offsetVirtualAddress, &VirtualAddress, sizeof(DWORD));
-	rawRead(module + VirtualAddress, &ides, sizeof(IMAGE_EXPORT_DIRECTORY));
+	raw_read(module + e_lfanew + offsetVirtualAddress, &VirtualAddress, sizeof(DWORD));
+	raw_read(module + VirtualAddress, &ides, sizeof(IMAGE_EXPORT_DIRECTORY));
 	
 	return new ProcAddressHelper(this, &ides, module);
 }
@@ -285,15 +285,15 @@ addr_t ProcAddressHelper::getProcAddress(LPCSTR funcname)
 	addr_t result = NULL;
 	for (unsigned i = 0; i < ides.NumberOfNames; i++)
 	{
-		m_handler->rawRead(namePtrAddr, &nameAddr, sizeof(DWORD));
-		m_handler->rawRead(m_module + nameAddr, namebuf, namesize);
+		m_handler->raw_read(namePtrAddr, &nameAddr, sizeof(DWORD));
+		m_handler->raw_read(m_module + nameAddr, namebuf, namesize);
 
 		if (strcmp(namebuf, funcname) == 0)
 		{
 			WORD origin;
 			DWORD func;
-			m_handler->rawRead(m_module + ides.AddressOfNameOrdinals + i * sizeof(WORD), &origin, sizeof(WORD));
-			m_handler->rawRead(m_module + ides.AddressOfFunctions + origin * sizeof(DWORD), &func, sizeof(DWORD));
+			m_handler->raw_read(m_module + ides.AddressOfNameOrdinals + i * sizeof(WORD), &origin, sizeof(WORD));
+			m_handler->raw_read(m_module + ides.AddressOfFunctions + origin * sizeof(DWORD), &func, sizeof(DWORD));
 			result = m_module + func;
 			break;
 		}

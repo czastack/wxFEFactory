@@ -77,11 +77,11 @@ class BaseGTATool(BaseHackTool):
             self.native_context.fflag, addr, this, *args, ret_type=None, ret_size=ret_size)
         # 获取结果
         if ret_type is int:
-            return self.handler.readUint(self.native_context.m_pReturn, ret_size)
+            return self.handler.read_uint(self.native_context.m_pReturn, ret_size)
         elif ret_type is float:
             if ret_size is 8:
                 return self.handler.readDouble(self.native_context.m_pReturn + 16)
-            return self.handler.readFloat(self.native_context.m_pReturn + 8)
+            return self.handler.read_float(self.native_context.m_pReturn + 8)
 
     def inputCheat(self, text):
         auto.sendKey(TextVK(text), 10)

@@ -11,15 +11,15 @@
 
 
 namespace emuhacker {
-	auto readPtr(ProcessHandler &self, addr_t addr) { return self.readUint(addr, self.getPtrSize()); }
-	bool writePtr(ProcessHandler &self, addr_t addr, size_t data) { return self.writeUint(addr, data, self.getPtrSize()); }
+	auto readPtr(ProcessHandler &self, addr_t addr) { return self.read_uint(addr, self.getPtrSize()); }
+	bool writePtr(ProcessHandler &self, addr_t addr, size_t data) { return self.write_uint(addr, data, self.getPtrSize()); }
 
 
 	pyobj process_read(ProcessHandler &self, addr_t addr, pycref type, size_t size)
 	{
 		if (type.ptr() == (PyObject*)&PyLong_Type)
 		{
-			size_t data = self.readUint(addr, size ? size : self.getPtrSize());
+			size_t data = self.read_uint(addr, size ? size : self.getPtrSize());
 			return py::cast(data);
 		}
 		else if (type.ptr() == (PyObject*)&PyFloat_Type)
@@ -46,7 +46,7 @@ namespace emuhacker {
 	{
 		if (PyLong_Check(data.ptr()))
 		{
-			self.writeUint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
+			self.write_uint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
 		}
 		else if (PyFloat_Check(data.ptr()))
 		{
@@ -73,10 +73,10 @@ namespace emuhacker {
 	}
 
 
-	addr_t readLastAddr(ProcessHandler &self, addr_t addr, py::iterable &args)
+	addr_t read_last_addr(ProcessHandler &self, addr_t addr, py::iterable &args)
 	{
 		wxArrayInt offsets = py::cast<wxArrayInt>(args);
-		return self.readLastAddr(addr, offsets);
+		return self.read_last_addr(addr, offsets);
 	}
 
 	auto write_function(ProcessHandler &self, py::bytes buf) {
@@ -208,16 +208,16 @@ void init_emuhacker(pybind11::module & m)
 		.def("attach_window", &ProcessHandler::attach_window)
 		.def("attach_handle", &emuhacker::attach_handle)
 		.def("address_map", &ProcessHandler::address_map)
-		.def("readUint", &ProcessHandler::readUint)
-		.def("writeUint", &ProcessHandler::writeUint)
-		.def("readInt", &ProcessHandler::readInt)
-		.def("writeInt", &ProcessHandler::writeInt)
+		.def("read_uint", &ProcessHandler::read_uint)
+		.def("write_uint", &ProcessHandler::write_uint)
+		.def("read_int", &ProcessHandler::read_int)
+		.def("write_int", &ProcessHandler::write_int)
 		.def("readPtr", &emuhacker::readPtr)
 		.def("writePtr", &emuhacker::writePtr)
 		.def("read", &emuhacker::process_read, addr_a, type_a, "size"_a = 0)
 		.def("write", &emuhacker::process_write, addr_a, data_a, "size"_a = 0)
-		.def("readAddr", &ProcessHandler::readAddr)
-		.def("readLastAddr", &emuhacker::readLastAddr)
+		.def("read_addr", &ProcessHandler::read_addr)
+		.def("read_last_addr", &emuhacker::read_last_addr)
 		.def("add", &ProcessHandler::add)
 		.def("get_module", &ProcessHandler::getModuleHandle)
 		.def("get_module_file", &emuhacker::getModuleFile, "module"_a = 0)

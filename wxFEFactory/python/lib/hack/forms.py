@@ -137,14 +137,14 @@ class ModelWidget:
 class OffsetsWidget:
     @property
     def mem_value(self):
-        ret = self.handler.ptrsRead(self.addr, self.offsets, self.type, self.size)
+        ret = self.handler.ptrs_read(self.addr, self.offsets, self.type, self.size)
         if self.type is float:
             ret = utils.float32(ret)
         return ret
 
     @mem_value.setter
     def mem_value(self, value):
-        self.handler.ptrsWrite(self.addr, self.offsets, self.type(value), self.size)
+        self.handler.ptrs_write(self.addr, self.offsets, self.type(value), self.size)
     
 
 class BaseGroup(Widget):
@@ -434,7 +434,7 @@ class SimpleCheckBox(Widget):
 
     def onChange(self, checkbox):
         data = self.enableData if checkbox.checked else self.disableData
-        self.handler.ptrsWrite(self.addr, self.offsets, data, self.size)
+        self.handler.ptrs_write(self.addr, self.offsets, data, self.size)
 
 
 class BaseCheckBox(TwoWayWidget):
@@ -552,11 +552,11 @@ class CoordWidget(TwoWayWidget):
         ret = []
         for child in self.views:
             if offsets:
-                value = self.handler.ptrsRead(addr, offsets, self.type, self.size)
+                value = self.handler.ptrs_read(addr, offsets, self.type, self.size)
                 offsets[-1] += self.size
             else:
                 if self.type is float:
-                    value = utils.float32(self.handler.readFloat(addr))
+                    value = utils.float32(self.handler.read_float(addr))
                 else:
                     value = self.handler.read(addr, self.type, self.size)
                 addr += self.size
@@ -574,7 +574,7 @@ class CoordWidget(TwoWayWidget):
                 continue
             value = self.type(value)
             if offsets:
-                self.handler.ptrsWrite(addr, offsets, value, self.size)
+                self.handler.ptrs_write(addr, offsets, value, self.size)
                 offsets[-1] += self.size
             else:
                 self.handler.write(addr, value, self.size)

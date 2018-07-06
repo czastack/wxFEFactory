@@ -90,9 +90,9 @@ class NativeContext(Model):
 
     def get_vector_result(self, size=4, fixed=-1):
         if fixed is -1:
-            r = self.handler.readFloat
+            r = self.handler.read_float
         else:
-            r = lambda addr: round(self.handler.readFloat(addr), fixed)
+            r = lambda addr: round(self.handler.read_float(addr), fixed)
         addr = self.m_pReturn
         return (r(addr), r(addr + size), r(addr + size + size))
 

@@ -27,55 +27,55 @@ class FileRW:
         self._file.seek(offset)
         return self
 
-    def rawRead(self, size):
+    def raw_read(self, size):
         return self._file.read(size)
 
     def read(self, addr, type, size=1):
-        return self.pos(addr).rawRead(size)
+        return self.pos(addr).raw_read(size)
 
-    def readUint(self, pos, size, signed=False):
+    def read_uint(self, pos, size, signed=False):
         if pos is not None:
             self.pos(pos)
         return int.from_bytes(self._file.read(size), byteorder='little', signed=signed)
 
-    def writeUint(self, pos, value, size, signed=False):
+    def write_uint(self, pos, value, size, signed=False):
         if value is None:
             value = pos
         elif pos is not None:
             self.pos(pos)
         return self._file.write(value.to_bytes(size, byteorder='little', signed=signed))
 
-    def readInt(self, addr, size=4):
-        return self.readUint(addr, size, signed=True)
+    def read_int(self, addr, size=4):
+        return self.read_uint(addr, size, signed=True)
 
-    def writeInt(self, addr, data, size=4):
-        return self.writeUint(addr, data, size, signed=True)
+    def write_int(self, addr, data, size=4):
+        return self.write_uint(addr, data, size, signed=True)
 
     def read8(self, pos=None):
-        return self.readUint(pos, 1)
+        return self.read_uint(pos, 1)
 
     def read16(self, pos=None):
-        return self.readUint(pos, 2)
+        return self.read_uint(pos, 2)
 
     def read32(self, pos=None):
-        return self.readUint(pos, 4)
+        return self.read_uint(pos, 4)
 
-    def rawWrite(self, data):
+    def raw_write(self, data):
         return self._file.write(data)
 
     def write(self, addr, data, size=0):
         if size:
             data = data[:size]
-        return self.pos(addr).rawWrite(data)
+        return self.pos(addr).raw_write(data)
 
     def write8(self, pos, value=None):
-        return self.writeUint(pos, value, 1)
+        return self.write_uint(pos, value, 1)
 
     def write16(self, pos, value=None):
-        return self.writeUint(pos, value, 2)
+        return self.write_uint(pos, value, 2)
 
     def write32(self, pos, value=None):
-        return self.writeUint(pos, value, 4)
+        return self.write_uint(pos, value, 4)
 
     def patchFile(self, addr, file, offset=0, size=-1):
         with open(file, 'rb') as f:
