@@ -8,6 +8,7 @@ import types
 import fefactory
 import fefactory_api
 ui = fefactory_api.ui
+Label = exui.Label
 
 
 class Widget:
@@ -520,9 +521,9 @@ class CoordWidget(TwoWayWidget):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
                             for i, v in zip(range(self.length), ('X', 'Y', 'Z')):
-                                ui.Text("%s坐标" % v, className="input_label expand")
+                                exui.Label("%s坐标" % v)
                                 views.append(ui.TextInput(className="fill"))
-                            ui.Text("名称", className="input_label expand")
+                            exui.Label("名称")
                             self.name_view = ui.TextInput(className="fill")
                         with ui.Horizontal(className="expand container") as container:
                             self.render_btn()
@@ -745,9 +746,10 @@ class BaseSelect(TwoWayWidget):
     @input_value.setter
     def input_value(self, value):
         try:
-            self.view.index = self.values.index(value) if self.values else value
+            self.view.index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
         except ValueError:
-            print(hex(value), "不在%s的可选值中" % self.label)
+            self.view.index = -1
+            # print(hex(value), "不在%s的可选值中" % self.label)
 
     @lazy.ClassLazy
     def contextmenu(cls):
@@ -801,6 +803,11 @@ class Select(BaseSelect, OffsetsWidget):
 
 class ModelSelect(ModelWidget, BaseSelect):
     pass
+
+
+def Choice(laebl, choices, onselect):
+    exui.Label(laebl)
+    ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
 
 
 class BaseFlagWidget(TwoWayWidget):

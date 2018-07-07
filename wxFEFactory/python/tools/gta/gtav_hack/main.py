@@ -6,6 +6,7 @@ from lib.hack.forms import (Group, StaticGroup, Input, CoordWidget, ModelInput, 
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
+from lib import exui
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.utils import degreeToRadian, Vector3
@@ -106,7 +107,7 @@ class Main(BaseGTATool):
             ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
             ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-        ui.Text("颜色", className="input_label expand")
+        exui.Label("颜色")
         with ui.Horizontal(className="fill"):
             ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
             ColorWidget("vehicle_specular_color", "条纹", vehicle, "specular_color", datasets.COLOR_LIST)
@@ -143,7 +144,7 @@ class Main(BaseGTATool):
         ModelInput("money", "金钱")
 
         ModelInput("wind_speed", "风速")
-        ui.Text("天气", className="input_label expand")
+        exui.Label("天气")
         with ui.Horizontal(className="fill"):
             self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
             ui.Button("短暂", onclick=self.apply_weather)

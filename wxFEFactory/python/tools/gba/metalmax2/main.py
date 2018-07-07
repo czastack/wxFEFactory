@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 from . import models, datasets
@@ -24,8 +24,7 @@ class Main(BaseGbaHack):
             ModelInput("battlein")
 
         with Group("player", "角色", self.person, cols=4):
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            Choice("角色", datasets.PERSONS, self.on_person_change)
             ModelInput("level")
             ModelInput("hp")
             ModelInput("hpmax")
@@ -49,8 +48,7 @@ class Main(BaseGbaHack):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
 
         with Group("chariot", "战车", self.chariot):
-            ui.Text("战车", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
+            Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
             ModelInput("sp")
             ModelInput("bullet")
             ModelInput("defensive")

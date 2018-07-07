@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from lib import extypes
 from styles import btn_xs_style
 from lib.extypes import WeakBinder
+from lib import exui
 from .group import ConfigGroup
 import fefactory_api
 ui = fefactory_api.ui
@@ -50,7 +51,7 @@ class ConfigCtrl(ABC):
         pass
 
     def render_lable(self):
-        return ui.Text(self.label, className="input_label expand")
+        return exui.Label(self.label)
 
     def read(self, _=None):
         self.set_input_value(self.get_config_value())

@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField
 
 
 class PersonChariot(Model):
@@ -40,8 +40,8 @@ class Person(PersonChariot):
     fix = ByteField(0x6490)
     drive = ByteField(0x6493)
     # 装备、道具代码0x80以上表示装备状态
-    equips = ArrayField(0x6496, 8, ByteField(0))
-    items = ArrayField(0x64AE, 8, ByteField(0))
+    equips = ArrayField(0x6496, 8, BitsField(0, 1, 0, 7))
+    items = ArrayField(0x64AE, 8, BitsField(0, 1, 0, 7))
 
 
 class ChariotEquip(Model):

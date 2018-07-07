@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, Label
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 from fefactory_api import ui
@@ -91,9 +91,8 @@ class FeHack(BaseNdsHack):
 
     def render_iteminfos(self):
         datasets = self.datasets
-        ui.Text("物品", className="input_label expand")
-        ui.Choice(className="fill", choices=datasets.ITEMS, onselect=self.on_item_change).setSelection(1)
-        ui.Text("复制属性", className="input_label expand")
+        Choice("物品", datasets.ITEMS, self.on_item_change)
+        Label("复制属性")
         with ui.Horizontal(className="fill"):
             self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)
             ui.Button("复制", onclick=self.copy_iteminfo)

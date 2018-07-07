@@ -1,5 +1,5 @@
 from ..base import BaseNesHack
-from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input
+from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import utils
 from . import models, datasets
@@ -21,8 +21,7 @@ class Main(BaseNesHack):
             ModelInput("exp", "驾驶员经验")
 
         with Group("player", "我方角色", self.person, cols=4):
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.PARTNERS, onselect=self.on_person_change).setSelection(0)
+            Choice("角色", datasets.PARTNERS, self.on_person_change)
             ModelInput("ability", "机体类型(海陆空)及变身能力")
             ModelInput("spiritual_type", "精神类型")
             ModelSelect("robot", "机体图", choices=datasets.ROBOTS)
@@ -58,8 +57,7 @@ class Main(BaseNesHack):
             ModelInput("items.%d" % i, item)
 
     # def render_weapons(self):
-    #     ui.Text("武器", className="input_label expand")
-    #     ui.Choice(className="fill", choices=datasets.WEAPONS, onselect=self.on_weapon_change).setSelection(0)
+    #     Choice("武器", datasets.WEAPONS, self.on_weapon_change)
     #     ModelInput("range_max", "远射程")
     #     ModelInput("hit", "命中")
     #     ModelInput("range_min", "近射程")

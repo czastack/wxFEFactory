@@ -1,5 +1,5 @@
 from ..base import BaseNesHack
-from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect
+from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib import utils
 from . import models, datasets
@@ -22,8 +22,7 @@ class Main(BaseNesHack):
             ModelSelect("scene", "场景", choices=datasets.SCENES)
 
         with Group("player", "我方角色", self.person, cols=4) as group:
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=("1P", "2P"), onselect=self.on_person_change).setSelection(0)
+            Choice("角色", ("1P", "2P"), self.on_person_change)
             
             for addr, name in models.PERSON_ATTRS:
                 ModelInput(name)

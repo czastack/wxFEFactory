@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect
+from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 import fefactory_api
 ui = fefactory_api.ui
@@ -22,8 +22,7 @@ class ExTool(BaseGbaHack):
 
         with Group("player", "角色", person, cols=4) as group:
             # ModelInput("addr_hex", "地址", readonly=True)
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=("国夫", "阿力"), onselect=self.on_person_change).setSelection(0)
+            Choice("角色", ("国夫", "阿力"), self.on_person_change)
             ModelInput("punch", "拳")
             ModelInput("foot", "脚")
             ModelInput("arms", "武器")

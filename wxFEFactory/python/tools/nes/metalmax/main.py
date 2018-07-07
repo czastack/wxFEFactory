@@ -1,5 +1,5 @@
 from ..base import BaseNesHack
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 from . import models, datasets
@@ -28,8 +28,7 @@ class Main(BaseNesHack):
             ModelCheckBox("battlein", "不遇敌", enableData=0xFF, disableData=0)
 
         with Group("player", "角色", person, cols=4):
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            Choice("角色", datasets.PERSONS, self.on_person_change)
             ModelInput("level", "等级")
             ModelInput("hpmax", "HP上限")
             ModelInput("hp", "HP")
@@ -55,8 +54,7 @@ class Main(BaseNesHack):
                     choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
 
         with Group("chariot", "战车", chariot):
-            ui.Text("战车", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.CHARIOTS, onselect=self.on_chariot_change).setSelection(0)
+            Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
             ModelInput("sp", "装甲片")
             ModelInput("main_bullets_count", "主炮炮弹")
             ModelInput("bullet", "弹仓容量")

@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.exui.components import Pagination
 import fefactory_api
@@ -29,8 +29,7 @@ class BaseGSTool(BaseGbaHack):
             ModelCoordWidget("map_pos", "地图坐标", length=2, type=int, savable=True, preset=self.coords)
 
         with Group("player", "角色", person, cols=4):
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            Choice("角色", datasets.PERSONS, self.on_person_change)
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("level", "等级")
             ModelInput("exp", "经验")

@@ -301,7 +301,7 @@ class BitsField(Field):
     def __init__(self, offset, size, bitoffset, bitlen, label=None):
         self.bitoffset = bitoffset
         self.bitlen = bitlen
-        self.mask = (2 << bitlen) - 1
+        self.mask = (1 << bitlen) - 1
         super().__init__(offset, int, size, label)
 
     def __get__(self, instance, owner=None):

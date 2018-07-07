@@ -1,5 +1,5 @@
 from ..base import BaseGbaHack
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
+from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from . import models, datasets
 import fefactory_api
@@ -48,8 +48,7 @@ class Main(BaseGbaHack):
                 ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
         with Group("player", "角色", person, cols=4) as person_group:
-            ui.Text("角色", className="input_label expand")
-            ui.Choice(className="fill", choices=datasets.PERSONS, onselect=self.on_person_change).setSelection(0)
+            Choice("角色", datasets.PERSONS, self.on_person_change)
             ModelInput("hpmax", "HP上限")
             ModelInput("resist", "RESIST")
             ModelInput("str", "STR")
