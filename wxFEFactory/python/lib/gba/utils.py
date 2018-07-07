@@ -2,7 +2,15 @@ import re
 import struct
 
 
-def bytesbeautify(b, offset=0, step=1):
+def checkbytes(b):
+    return hasattr(b, '__iter__') and type(b[0]) is int
+
+
+def bytes_hex(bs):
+    return ''.join(("%02X" % b for b in bs))
+
+
+def bytes_beautify(b, offset=0, step=1):
     if offset == 0 and step == 1:
         return " ".join("%02X" % x for x in b)
 
@@ -20,37 +28,9 @@ def bytesbeautify(b, offset=0, step=1):
     return " ".join(result)
 
 
-def strhex(n, size=0):
-    """
-    :param size: 字节数
-    """
-    if size is 0:
-        for x in (0x8, 0x10, 0x20, 0x40, 0x80):
-            if n < (1 << x):
-                break
-        size = x >> 3
-    return "%0*X" % ((size << 1), n)
-
-
-def checkbytes(b):
-    return hasattr(b, '__iter__') and type(b[0]) is int
-
-
-def align4(addr):
-    """使地址对齐4"""
-    tail = addr & 0b11
-    if tail != 0:
-        addr += 4 - tail
-    return addr
-
-
-def bytes2hex(bs):
-    return ''.join(("%02X" % b for b in bs))
-
-
 def r1(data):
     """先输出低字节的HEX"""
-    return bytes2hex(struct.pack('L', data))
+    return bytes_hex(struct.pack('L', data))
 
 
 def rol(a, n, N=32):

@@ -1,7 +1,7 @@
 from lib import exui, fileutils, utils, lazy
 from lib.extypes import WeakBinder
-from styles import styles, dialog_style, btn_xs_style
-from __main__ import win as main_win
+from .utils import strhex
+from styles import btn_xs_style
 import json
 import traceback
 import types
@@ -63,6 +63,9 @@ class Widget:
             elif code == event.getWXK('w') or code == 13:
                 self.write()
                 return True
+            elif code == event.getWXK('='):
+                print(strhex(self.get_addr()))
+                return True
         event.Skip()
 
     def read(self):
@@ -70,6 +73,9 @@ class Widget:
 
     def write(self):
         pass
+
+    def get_addr(self):
+        return self.addr
 
     def __repr__(self):
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
@@ -133,6 +139,9 @@ class ModelWidget:
         ins = self.ins
         if ins and hasattr(ins, 'field'):
             return ins.field(self.offsets)
+
+    def get_addr(self):
+        return self.ins & self.offsets
 
 
 class OffsetsWidget:
@@ -293,6 +302,9 @@ class DialogGroup(Group):
         super().__init__(*args, **kwargs)
 
     def render(self):
+        from __main__ import win as main_win
+        from styles import styles, dialog_style
+
         if self.button:
             ui.Button(label=self.label, onclick=self.weak.show)
             
