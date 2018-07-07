@@ -72,6 +72,8 @@ class Main(BaseSfcHack):
         for i in range(8):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.HUMAN_ITEMS)
+        with Group.active_group().footer:
+            ui.Button("装备全部", className="btn_md", onclick=self.equip_all)
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -84,8 +86,7 @@ class Main(BaseSfcHack):
             ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1), 
                 choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
 
-        ModelInput("posx")
-        ModelInput("posy")
+        ModelInput("position", hex=True)
 
     def render_chariot_items(self):
         for i in range(8):
@@ -242,22 +243,25 @@ class Main(BaseSfcHack):
             chariot.set_addr_by_index(i)
             yield chariot
 
-    def move_left(self, _=None):
+    def move_left(self, _):
         self._global.posx -= 1
         self._global.offx -= 1
 
-    def move_right(self, _=None):
+    def move_right(self, _):
         self._global.posx += 1
         self._global.offx += 1
 
-    def move_up(self, _=None):
+    def move_up(self, _):
         self._global.posy -= 1
         self._global.offy -= 1
 
-    def move_down(self, _=None):
+    def move_down(self, _):
         self._global.posy += 1
         self._global.offy += 1
 
-    def pull_through(self, _=None):
+    def pull_through(self, _):
         for person in self.persons():
             person.hp = person.hpmax
+
+    def equip_all(self, _):
+        self.person.equip_all()

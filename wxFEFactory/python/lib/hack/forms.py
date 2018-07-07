@@ -64,7 +64,12 @@ class Widget:
                 self.write()
                 return True
             elif code == event.getWXK('='):
+                # 逻辑地址
                 print(strhex(self.get_addr()))
+                return True
+            elif code == event.getWXK('-'):
+                # 进程中的地址
+                print(strhex(self.handler.address_map(self.get_addr())))
                 return True
         event.Skip()
 

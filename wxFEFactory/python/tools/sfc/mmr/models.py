@@ -21,6 +21,10 @@ class Person(Model):
     status = ByteField(0x7E8017, label="状态")
     items = ArrayField(0x7E801A, 12, ByteField(0)) # 0x80以上表示装备状态
     equips = ArrayField(0x7E8026, 8, BitsField(0, 1, 0, 7))
+    equips_raw = Field(0x7E8026, size=8)
+
+    def equip_all(self):
+        self.equips_raw |= 0x8080808080808080
 
 
 class ChariotEquip(Model):
@@ -29,8 +33,7 @@ class ChariotEquip(Model):
     defensive = ByteField(1, label="守备力")
     weight = BitsField(2, 2, bitoffset=0, bitlen=12, label="重量")
     status = BitsField(3, 1, bitoffset=4, bitlen=4, label="状态") # flag 2=损坏 4=大破 8=装备
-    attr1 = ByteField(4, label="攻击力/命中率/积载力")
-    unknow = ByteField(5)
+    attr1 = WordField(4, label="攻击力/命中率/积载力")
     attr2 = ByteField(6, label="弹药数/回避率")
     ammo = ByteField(7, label="弹舱")
 
@@ -48,8 +51,11 @@ class Chariot(Model):
     equips = ArrayField(0x7E833A, 8, ModelField(0, ChariotEquip))
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
-    posx = Field(0x7E8389, label="横坐标")
-    posy = Field(0x7E838D, label="纵坐标")
+    position = Field(0x7E8389, size=7, label="地图位置")
+    # mapid = WordField(0x7E8389, label="所在地图")
+    # posx = WordField(0x7E838B, label="横坐标")
+    # posy = WordField(0x7E838D, label="纵坐标")
+    # img = ByteField(0x7E838F, label="地图形象")
 
     @classmethod
     def item_type(self, id):

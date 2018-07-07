@@ -337,7 +337,7 @@ class BitsField(Field):
 
     def __set__(self, instance, value):
         old = super().__get__(instance)
-        value = old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF) | ((value & self.mask) << self.bitoffset)
+        value = old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF) | ((int(value) & self.mask) << self.bitoffset)
         super().__set__(instance, value)
 
     @classmethod
