@@ -43,34 +43,9 @@ class Main(BaseNesHack):
             ModelInput("fix", "修理")
             ModelInput("exp", "经验")
 
-        with Group("human_equips", "角色装备", person):
-            for i in range(8):
-                ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
-                    choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
-
-        with Group("human_items", "角色物品", person):
-            for i in range(8):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
-                    choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
-
-        with Group("chariot", "战车", chariot):
-            Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
-            ModelInput("sp", "装甲片")
-            ModelInput("main_bullets_count", "主炮炮弹")
-            ModelInput("bullet", "弹仓容量")
-            ModelInput("defensive", "守备力")
-            ModelInput("weight", "底盘重量")
-
-
-        with Group("chariot_equips", "战车装备", chariot):
-            for i in range(8):
-                ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1), 
-                    choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
-
-        with Group("chariot_items", "战车物品", chariot):
-            for i in range(8):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
-                    choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
+        self.lazy_group(Group("human_items", "角色装备/物品", person, cols=4), self.render_human_items)
+        self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
+        self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
 
         # with Group("special_bullets", "特殊炮弹", chariot, cols=4):
         #     for i in range(8):
@@ -87,6 +62,30 @@ class Main(BaseNesHack):
                 ui.Text("上移: alt+up")
                 ui.Text("下移: alt+right")
                 ui.Text("恢复HP: alt+h")
+
+    def render_human_items(self):
+        for i in range(8):
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
+                choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
+        for i in range(8):
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
+                choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
+
+    def render_chariot(self):
+        Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
+        ModelInput("sp", "装甲片")
+        ModelInput("main_bullets_count", "主炮炮弹")
+        ModelInput("bullet", "弹仓容量")
+        ModelInput("defensive", "守备力")
+        ModelInput("weight", "底盘重量")
+
+    def render_chariot_items(self):
+        for i in range(8):
+            ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1), 
+                choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
+        for i in range(8):
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
+                choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
 
     def render_storage(self):
         choices = datasets.HUMAN_EQUIPS + datasets.HUMAN_ITEMS + datasets.CHARIOT_EQUIPS + datasets.CHARIOT_ITEMS

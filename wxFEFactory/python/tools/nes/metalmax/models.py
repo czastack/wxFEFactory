@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
 class PersonChariot(Model):
@@ -39,9 +39,9 @@ class Person(PersonChariot):
     battle = ByteField(0x648d)
     fix = ByteField(0x6490)
     drive = ByteField(0x6493)
-    # 装备、道具代码0x80以上表示装备状态
-    equips = ArrayField(0x6496, 8, BitsField(0, 1, 0, 7))
-    items = ArrayField(0x64AE, 8, BitsField(0, 1, 0, 7))
+    equips = ArrayField(0x6496, 8, ByteField(0))
+    items = ArrayField(0x64AE, 8, ByteField(0))
+    equip_flag = ByteField(0x64C6) # 第一个装备状态是最高位0x80
 
 
 class ChariotEquip(Model):
@@ -53,9 +53,9 @@ class Chariot(PersonChariot):
     sp = WordField(0x64E8)
     items = ArrayField(0x65CF, 8, ByteField(0))
     equips = ArrayField(0x6627, 8, ModelField(0, ChariotEquip))
-    bullet = ByteField(0x0300404C)
-    defensive = ByteField(0x0300404A)
-    weight = WordField(0x0300404F)
+    weight = WordField(0x64D2)
+    defensive = WordField(0x64FE)
+    bullet = ByteField(0x651F)
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
     main_bullets_count = ByteField(0x6535) # 主炮数量
@@ -64,7 +64,6 @@ class Chariot(PersonChariot):
         super().set_index(i)
         field = self.field('equips')
         field.offset = field.origin_offset + i
-        self.equips.addr = self.addr + field.offset
         self.equips.offset = field.offset
 
 

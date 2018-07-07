@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, CAttr
+from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField, CAttr
 
 
 class Person(Model):
@@ -19,27 +19,8 @@ class Person(Model):
     drive = ByteField(0x03003D6F, label="驾驶")
     fix = ByteField(0x03003D70, label="修理")
     # 装备、道具代码0x80以上表示装备状态
-    equips = ArrayField(0x03003D91, 8, ByteField(0))
-    items = ArrayField(0x03003DB9, 8, ByteField(0))
-
-    def __getattr__(self, name):
-        data = self.test_comlex_attr(name)
-        if data:
-            name = data.attrs[0]
-            if name == 'equips':
-                return self.equips[data.attrs[1]] & 0x7F
-            elif name == 'items':
-                return self.items[data.attrs[1]] & 0x7F
-        return super().__getattr__(name)
-
-    def __setattr__(self, name, value):
-        data = self.test_comlex_attr(name)
-        if data:
-            if data.name == 'equips':
-                self.equips[data.attrs[1]] = 0x80 | value
-                return
-        
-        super().__setattr__(name, value)
+    equips = ArrayField(0x03003D91, 8, BitsField(0, 1, 0, 7))
+    items = ArrayField(0x03003DB9, 8, BitsField(0, 1, 0, 7))
 
 
 class Chariot(Model):

@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField
 
 
 PERSON_ATTRS = (
@@ -49,13 +49,4 @@ class Person(Model):
 
 class ItemHolder(Model):
     SIZE = 8
-
-    items = ArrayField(0x064D, 8, ByteField(0))
-
-    def __getattr__(self, name):
-        data = self.test_comlex_attr(name)
-        if data:
-            name = data.attrs[0]
-            if name == 'items':
-                return self.items[data.attrs[1]] & 0x7F
-        return super().__getattr__(name)
+    items = ArrayField(0x064D, 8, BitsField(0, 1, 0, 7))
