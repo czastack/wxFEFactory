@@ -31,38 +31,40 @@ class Model:
         return self.__class__(self.addr, self.handler)
 
     def addrof(self, field):
-        return self.addr + self.offsetof(field)
+        offset = self.offsetof(field)
+        if offset is None:
+            data = test_comlex_attr(field)
+            if data is not None:
+                item = self
+                prev = None # 取offset的对象
+                i = 0
+                last = len(data.attrs) - 1
+                for attr in data.attrs:
+                    if isinstance(attr, int):
+                        offset = data.offsets and data.offsets.get(i, None)
+                        if offset is not None:
+                            attr += getattr(prev, offset)
+                        if i == last:
+                            return item.addr_at(attr)
+                        else:
+                            item = item[attr]
+                    else:
+                        prev = item
+                        if i == last:
+                            return item & attr
+                        else:
+                            item = getattr(item, attr)
+                    i += 1
+            else:
+                return None
+        else:
+            return self.addr + offset
 
     def offsetof(self, field):
         if isinstance(field, str):
-            temp = self.field(field)
-            if temp is None:
-                data = test_comlex_attr(field)
-                if data is not None:
-                    item = self
-                    prev = None # 取offset的对象
-                    i = 0
-                    last = len(data.attrs) - 1
-                    for attr in data.attrs:
-                        if isinstance(attr, int):
-                            offset = data.offsets and data.offsets.get(i, None)
-                            if offset is not None:
-                                attr += getattr(prev, offset)
-                            if i == last:
-                                return item.addr_at(attr)
-                            else:
-                                item = item[attr]
-                        else:
-                            prev = item
-                            if i == last:
-                                return item & attr
-                            else:
-                                item = getattr(item, attr)
-                        i += 1
-                else:
-                    return None
-            else:
-                field = temp
+            field = self.field(field)
+            if field is None:
+                return
 
         if isinstance(field, Field):
             return field.offset
