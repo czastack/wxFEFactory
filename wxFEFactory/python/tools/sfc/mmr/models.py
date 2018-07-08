@@ -53,8 +53,8 @@ class Chariot(Model):
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
     position = Field(0x7E8389, size=7, label="地图位置")
     # mapid = WordField(0x7E8389, label="所在地图")
-    # posx = WordField(0x7E838B, label="横坐标")
-    # posy = WordField(0x7E838D, label="纵坐标")
+    posx = WordField(0x7E838B, label="横坐标")
+    posy = WordField(0x7E838D, label="纵坐标")
     # img = ByteField(0x7E838F, label="地图形象")
 
     @classmethod

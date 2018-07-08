@@ -46,6 +46,7 @@ class Main(BaseSfcHack):
             ModelInput("battle")
             ModelInput("fix")
             ModelInput("drive")
+            ModelInput("status")
 
         self.lazy_group(Group("human_items", "角色装备/物品", person, cols=4), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
@@ -66,10 +67,10 @@ class Main(BaseSfcHack):
                 ui.Text("恢复HP: alt+h")
 
     def render_human_items(self):
-        for i in range(8):
+        for i in range(self.person.equips.length):
             ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
                 choices=datasets.HUMAN_EQUIPS)
-        for i in range(8):
+        for i in range(self.person.items.length):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.HUMAN_ITEMS)
         with Group.active_group().footer:
@@ -89,7 +90,7 @@ class Main(BaseSfcHack):
         ModelInput("position", hex=True)
 
     def render_chariot_items(self):
-        for i in range(8):
+        for i in range(self.chariot.items.length):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.CHARIOT_ITEMS)
         
@@ -97,7 +98,7 @@ class Main(BaseSfcHack):
         detail_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key)
         preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
 
-        for i in range(8):
+        for i in range(self.chariot.items.length):
             exui.Label("装备%d" % (i + 1))
             with ui.Horizontal(className="right"):
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))
@@ -244,20 +245,16 @@ class Main(BaseSfcHack):
             yield chariot
 
     def move_left(self, _):
-        self._global.posx -= 1
-        self._global.offx -= 1
+        self.chariot.posx -= 24
 
     def move_right(self, _):
-        self._global.posx += 1
-        self._global.offx += 1
+        self.chariot.posx += 24
 
     def move_up(self, _):
-        self._global.posy -= 1
-        self._global.offy -= 1
+        self.chariot.posy -= 24
 
     def move_down(self, _):
-        self._global.posy += 1
-        self._global.offy += 1
+        self.chariot.posy += 24
 
     def pull_through(self, _):
         for person in self.persons():

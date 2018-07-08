@@ -180,7 +180,6 @@ HUMAN_ITEMS = (
     "柔软果子",
     "瘫软种子",
     "冻肉",
-    "无(只能放在最后)"
 ) # END is 0xFF
 
 HUMAN_EQUIPS = (
