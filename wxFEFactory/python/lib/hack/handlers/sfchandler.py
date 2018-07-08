@@ -4,6 +4,8 @@ import struct
 
 
 class Memory64(Model):
+    ADDR = 0x1405D9270
+
     RAM = QWordField(40)
     ROM = QWordField(48)
     SRAM = QWordField(56)
@@ -24,17 +26,39 @@ class Memory64(Model):
     LoROM = ByteField(74221)
 
 
+class Memory32(Model):
+    ADDR = 0x007832A0
+
+    RAM = Field(36)
+    ROM = Field(40)
+    SRAM = Field(44)
+    VRAM = Field(48)
+    FillRAM = Field(52)
+
+    ROMFilename = StringField(41037, 100, encoding='utf-8')
+    ROMName = StringField(41298, 23, encoding='utf-8')
+    RawROMName = StringField(41321, 23, encoding='utf-8')
+    ROMId = StringField(41344, 5, encoding='utf-8')
+    CompanyId = Field(41352)
+    ROMRegion = ByteField(41356)
+    ROMSpeed = ByteField(41357)
+    ROMType = ByteField(41358)
+    ROMSize = ByteField(41359)
+    ROMChecksum = Field(41360)
+    HiROM = ByteField(41408)
+    LoROM = ByteField(41409)
+
+
 class Snes9xHandler(MemHandler):
     CLASS_NAME = 'Snes9X: WndClass'
     WINDOW_NAME = 'Snes9X'
 
-    MEMORY_ADDR = 0x1405D9270
-
     def attach(self):
         succeed = self.attach_window(self.CLASS_NAME, None)
         if succeed:
+            Memory = Memory32 if self.is32process else Memory64
             with self.raw_env():
-                self.memory = Memory64(self.MEMORY_ADDR, self).datasnap(('RAM', 'ROM', 'ROMFilename', 'HiROM', 'LoROM'))
+                self.memory = Memory(Memory.ADDR, self).datasnap(('RAM', 'ROM', 'ROMFilename', 'HiROM', 'LoROM'))
         return succeed
 
     def address_map(self, addr, size=4):

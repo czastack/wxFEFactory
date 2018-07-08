@@ -60,7 +60,7 @@ class Main(BaseSfcHack):
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
-                ui.Text("左移: alt+left")
+                ui.Text("左移(目标战车坐标): alt+left")
                 ui.Text("右移: alt+right")
                 ui.Text("上移: alt+up")
                 ui.Text("下移: alt+right")
