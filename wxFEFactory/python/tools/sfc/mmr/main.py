@@ -53,11 +53,6 @@ class Main(BaseSfcHack):
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
         self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
 
-        # with Group("special_bullets", "特殊炮弹", chariot, cols=4):
-        #     for i in range(8):
-        #         ModelSelect("special_bullets.%d" % i, "", choices=datasets.SPECIAL_BULLETS)
-        #         ModelInput("special_bullets_count.%d" % i, "数量")
-
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
                 ui.Text("左移(目标战车坐标): alt+left")
@@ -98,7 +93,7 @@ class Main(BaseSfcHack):
         detail_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key)
         preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
 
-        for i in range(self.chariot.items.length):
+        for i in range(self.chariot.equips.length):
             exui.Label("装备%d" % (i + 1))
             with ui.Horizontal(className="right"):
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))

@@ -39,34 +39,11 @@ class Main(BaseGbaHack):
             ModelInput("fix")
             ModelInput("exp")
 
-        with Group("human_equips", "角色装备", self.person):
-            for i in range(8):
-                ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
 
-        with Group("human_items", "角色物品", self.person):
-            for i in range(8):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
-
-        with Group("chariot", "战车", self.chariot):
-            Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
-            ModelInput("sp")
-            ModelInput("bullet")
-            ModelInput("defensive")
-            ModelInput("weight")
-
-        with Group("chariot_equips", "战车装备", self.chariot):
-            for i in range(8):
-                ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS)
-
-        with Group("chariot_items", "战车物品", self.chariot):
-            for i in range(8):
-                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ITEMS)
-
-        with Group("special_bullets", "特殊炮弹", self.chariot, cols=4):
-            for i in range(8):
-                ModelSelect("special_bullets.%d" % i, "炮弹%d" % (i + 1), choices=datasets.SPECIAL_BULLETS)
-                ModelInput("special_bullets_count.%d" % i, "数量")
-
+        self.lazy_group(Group("human_items", "角色装备/物品", self.person), self.render_human_items)
+        self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
+        self.lazy_group(Group("chariot_items", "战车装备/物品", self.chariot), self.render_chariot_items)
+        self.lazy_group(Group("special_bullets", "特殊炮弹", self.chariot, cols=4), self.render_special_bullets)
         self.storage_group = Group("storage", "保管物品", self._global)
         self.lazy_group(self.storage_group, self.render_storage)
 
@@ -77,6 +54,30 @@ class Main(BaseGbaHack):
                 ui.Text("上移: alt+up")
                 ui.Text("下移: alt+right")
                 ui.Text("恢复HP: alt+h")
+
+    def render_human_items(self):
+        for i in range(self.person.equips.length):
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
+        for i in range(self.person.items.length):
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
+
+    def render_chariot(self):
+        Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
+        ModelInput("sp")
+        ModelInput("bullet")
+        ModelInput("defensive")
+        ModelInput("weight")
+
+    def render_chariot_items(self):
+        for i in range(self.chariot.equips.length):
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS)
+        for i in range(self.chariot.items.length):
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ITEMS)
+
+    def render_special_bullets(self):
+        for i in range(self.chariot.special_bullets.length):
+            ModelSelect("special_bullets.%d" % i, "炮弹%d" % (i + 1), choices=datasets.SPECIAL_BULLETS)
+            ModelInput("special_bullets_count.%d" % i, "数量")
 
     def render_storage(self):
         choices = datasets.HUMAN_EQUIPS + datasets.HUMAN_ITEMS + datasets.CHARIOT_EQUIPS + datasets.CHARIOT_ITEMS

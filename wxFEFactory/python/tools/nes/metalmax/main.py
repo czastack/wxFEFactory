@@ -8,10 +8,6 @@ ui = fefactory_api.ui
 
 
 class Main(BaseNesHack):
-    STORAGE_PAGE_LENGTH = 10
-    STORAGE_PAGE_TOTAL = 10
-    models = models
-
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
@@ -47,14 +43,6 @@ class Main(BaseNesHack):
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
 
-        # with Group("special_bullets", "特殊炮弹", chariot, cols=4):
-        #     for i in range(8):
-        #         ModelSelect("special_bullets.%d" % i, "", choices=datasets.SPECIAL_BULLETS)
-        #         ModelInput("special_bullets_count.%d" % i, "数量")
-
-        # self.storage_group = Group("storage", "保管物品", self._global)
-        # self.lazy_group(self.storage_group, self.render_storage)
-
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
                 ui.Text("左移: alt+left")
@@ -64,10 +52,10 @@ class Main(BaseNesHack):
                 ui.Text("恢复HP: alt+h")
 
     def render_human_items(self):
-        for i in range(8):
+        for i in range(self.person.equips.length):
             ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
                 choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
-        for i in range(8):
+        for i in range(self.person.items.length):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
 
@@ -80,25 +68,12 @@ class Main(BaseNesHack):
         ModelInput("weight", "底盘重量")
 
     def render_chariot_items(self):
-        for i in range(8):
+        for i in range(self.chariot.equips.length):
             ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1), 
                 choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
-        for i in range(8):
+        for i in range(self.chariot.items.length):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
-
-    def render_storage(self):
-        choices = datasets.HUMAN_EQUIPS + datasets.HUMAN_ITEMS + datasets.CHARIOT_EQUIPS + datasets.CHARIOT_ITEMS
-        values = (
-            tuple(range(len(datasets.HUMAN_ITEMS))) + 
-            tuple((0x0100 | i) for i in range(len(datasets.HUMAN_EQUIPS))) + 
-            tuple((0x0200 | i) for i in range(len(datasets.CHARIOT_ITEMS))) + 
-            tuple((0x0300 | i) for i in range(len(datasets.CHARIOT_EQUIPS)))
-        )
-        for i in range(10):
-            ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values)
-        with Group.active_group().footer:
-            Pagination(self.on_storage_page, self.STORAGE_PAGE_TOTAL)
 
     def get_hotkeys(self):
         this = self.weak

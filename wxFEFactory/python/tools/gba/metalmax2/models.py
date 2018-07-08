@@ -27,32 +27,13 @@ class Chariot(Model):
     SIZE = 8
 
     sp = WordField(0x03003C78, label="装甲片")
-    items = ArrayField(0x03003E91, 8, ByteField(0))
-    equips = ArrayField(0x03003EE9, 8, ByteField(0))
+    items = ArrayField(0x03003E91, 8, BitsField(0, 1, 0, 7))
+    equips = ArrayField(0x03003EE9, 8, BitsField(0, 1, 0, 7))
     bullet = ByteField(0x0300404C, label="弹仓容量")
     defensive = ByteField(0x0300404A, label="守备力")
     weight = WordField(0x0300404F, label="底盘重量")
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
-
-    def __getattr__(self, name):
-        data = self.test_comlex_attr(name)
-        if data:
-            name = data.attrs[0]
-            if name == 'equips':
-                return self.equips[data.attrs[1]] & 0x7F
-            elif name == 'items':
-                return self.items[data.attrs[1]] & 0x7F
-        return super().__getattr__(name)
-
-    def __setattr__(self, name, value):
-        data = self.test_comlex_attr(name)
-        if data:
-            if data.attrs[0] == 'equips':
-                self.equips[data.attrs[1]] = 0x80 | value
-                return
-        
-        super().__setattr__(name, value)
 
 
 class Global(Model):

@@ -19,8 +19,8 @@ class Person(Model):
     stamina = ByteField(0x7E8010, label="体力")
     speed = ByteField(0x7E8011, label="速度")
     status = ByteField(0x7E8017, label="状态")
-    items = ArrayField(0x7E801A, 12, ByteField(0)) # 0x80以上表示装备状态
-    equips = ArrayField(0x7E8026, 8, BitsField(0, 1, 0, 7))
+    items = ArrayField(0x7E801A, 12, ByteField(0))
+    equips = ArrayField(0x7E8026, 8, BitsField(0, 1, 0, 7)) # 0x80以上表示装备状态
     equips_raw = Field(0x7E8026, size=8)
 
     def equip_all(self):
@@ -49,8 +49,8 @@ class Chariot(Model):
     hole_type = ArrayField(0x7E8325, 3, ByteField(0)) # 炮穴类型
     items = ArrayField(0x7E8332, 8, BitsField(0, 1, 0, 7))
     equips = ArrayField(0x7E833A, 8, ModelField(0, ChariotEquip))
-    special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
-    special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
+    # special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
+    # special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
     position = Field(0x7E8389, size=7, label="地图位置")
     # mapid = WordField(0x7E8389, label="所在地图")
     posx = WordField(0x7E838B, label="横坐标")
