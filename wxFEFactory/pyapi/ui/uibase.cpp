@@ -59,7 +59,7 @@ void View::startTextDrag(wxcstr text, pycref callback)
 	dragSource.SetData(data);
 	wxDragResult result = dragSource.DoDragDrop(wxDrag_AllowMove);
 	if (!callback.is_none()) {
-		pyCall(callback, this);
+		pyCall(callback, this, (int)result);
 	}
 }
 

@@ -18,7 +18,6 @@ class BaseGSTool(BaseGbaHack):
     
     def render_main(self):
         datasets = self.datasets
-        person = self.weak._person
         with Group("global", "全局", self._global):
             ModelInput("time", "时间")
             ModelInput("money", "金钱")
@@ -28,7 +27,7 @@ class BaseGSTool(BaseGbaHack):
             ModelCoordWidget("town_pos", "城镇坐标", length=2, type=int, savable=True, preset=self.coords)
             ModelCoordWidget("map_pos", "地图坐标", length=2, type=int, savable=True, preset=self.coords)
 
-        with Group("player", "角色", person, cols=4):
+        with Group("player", "角色", self.person, cols=4):
             Choice("角色", datasets.PERSONS, self.on_person_change)
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("level", "等级")
@@ -45,19 +44,19 @@ class BaseGSTool(BaseGbaHack):
                 ModelInput("%s_power" % tname, "%s力量" % tlabel)
                 ModelInput("%s_defensive" % tname, "%s抗性" % tlabel)
 
-        with Group("skills", "角色精神力", person) as skills_group:
+        with Group("skills", "角色精神力", self.person) as skills_group:
             for i in range(5):
                 ModelSelect("skills.%d+skills_offset.value" % i, "精神力", choices=datasets.SKILLS)
             with skills_group.footer:
                 Pagination(self.on_skills_page, self.SKILLS_PAGE_TOTAL)
         self.skills_group = skills_group
 
-        with Group("skills", "角色物品", person, cols=4):
+        with Group("skills", "角色物品", self.person, cols=4):
             for i in range(15):
                 ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items.%d.count" % i, "数量")
 
-        self.lazy_group(Group("djinnis", "角色精灵", person), self.render_djinnis)
+        self.lazy_group(Group("djinnis", "角色精灵", self.person), self.render_djinnis)
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
