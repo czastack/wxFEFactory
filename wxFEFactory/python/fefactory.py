@@ -1,5 +1,6 @@
 from modules import modules
 from functools import partial
+from lib import wxconst
 import fefactory_api
 import json
 import os
@@ -101,8 +102,8 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
             title = '提示'
         _alert(title, msg)
 
-    def confirm_yes(msg, defdefaultButton=fefactory_api.YES):
-        return fefactory_api.confirm('确认', msg, defdefaultButton) == fefactory_api.YES
+    def confirm_yes(msg, defdefaultButton=wxconst.YES):
+        return fefactory_api.confirm('确认', msg, defdefaultButton) == wxconst.YES
 
     fefactory_api.alert = alert
     fefactory_api.confirm_yes = confirm_yes

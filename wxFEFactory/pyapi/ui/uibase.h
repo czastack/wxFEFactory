@@ -235,6 +235,8 @@ public:
 		m_elem->SetDropTarget(new TextDropListener(ondrop));
 	}
 
+	void startTextDrag(wxcstr text, pycref callback);
+
 	void setOnDoubleClick(pycref fn)
 	{
 		bindEvt(wxEVT_LEFT_DCLICK, fn);

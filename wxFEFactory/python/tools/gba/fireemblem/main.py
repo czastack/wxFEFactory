@@ -1,6 +1,6 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.exui.components import Pagination
 import fefactory_api
 ui = fefactory_api.ui
@@ -67,8 +67,8 @@ class FeHack(BaseGbaHack):
 
     def get_hotkeys(self):
         return (
-            ('continue_move', MOD_ALT, getVK('m'), self.continue_move),
-            ('move_to_cursor', MOD_ALT, getVK('g'), self.move_to_cursor),
+            ('continue_move',VK.MOD_ALT, VK.M, self.continue_move),
+            ('move_to_cursor',VK.MOD_ALT, VK.G, self.move_to_cursor),
         )
 
     def _person(self):

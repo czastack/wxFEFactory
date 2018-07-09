@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from lib import extypes
 from styles import btn_xs_style
-from lib.extypes import WeakBinder
 from lib import exui
+from lib.extypes import WeakBinder
+from lib.win32.keys import WXK
 from .group import ConfigGroup
 import fefactory_api
 ui = fefactory_api.ui
@@ -111,10 +112,10 @@ class InputConfig(ConfigCtrl):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
-            if code == event.getWXK('r'):
+            if code == WXK.R:
                 self.read()
                 return True
-            elif code == event.getWXK('w'):
+            elif code == WXK.W:
                 self.write()
                 return True
         event.Skip()

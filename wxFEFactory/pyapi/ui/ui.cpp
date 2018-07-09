@@ -19,10 +19,6 @@ void init_ui(py::module &m)
 
 	py::module ui = m.def_submodule("ui");
 
-	// wx const
-	ATTR_INT(ui.ptr(), HORIZONTAL, wx),
-	ATTR_INT(ui.ptr(), VERTICAL, wx);
-
 	// 为了方便，setConsoleElem 挂在外层模块，但在这里定义
 	m.def("setConsoleElem", setConsoleElem, "input"_a, "output"_a)
 		.def("getScreenSize", &Screen::getScreenSize)
@@ -43,8 +39,4 @@ void init_ui(py::module &m)
 	init_bars(ui);
 	init_datacontrols(ui);
 	init_bitmap(ui);
-
-
-	ATTR_INT(ui.ptr(), ID_OK, wx),
-	ATTR_INT(ui.ptr(), ID_CANCEL, wx);
 }

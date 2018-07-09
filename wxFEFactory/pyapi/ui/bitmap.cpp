@@ -37,9 +37,4 @@ void init_bitmap(py::module & m)
 		.def("loadIcon", wxBitmap__LoadIcon)
 		.def_property("size", wxBitmap__getSize, wxBitmap__setSize)
 		.ptr();
-	
-	ATTR_INT(Bitmap, TYPE_BMP, wxBITMAP_),
-	ATTR_INT(Bitmap, TYPE_ICON, wxBITMAP_),
-	ATTR_INT(Bitmap, TYPE_PNG, wxBITMAP_),
-	ATTR_INT(Bitmap, TYPE_JPEG, wxBITMAP_);
 }

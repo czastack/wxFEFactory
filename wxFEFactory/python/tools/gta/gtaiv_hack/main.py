@@ -1,7 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.hack.forms import Group, StaticGroup, Input, CoordWidget, ModelInput, ModelCoordWidget
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
 from lib import exui
@@ -146,13 +146,13 @@ class Main(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
-            ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
-            ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
-            ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-            ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
-            ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('enemys_harmless', MOD_ALT, getVK('s'), self.enemys_harmless),
+            ('spawn_choosed_vehicle_and_enter',VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
+            ('max_cur_weapon',VK.MOD_ALT, VK.G, self.max_cur_weapon),
+            ('teleport_to_waypoint',VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
+            ('dir_correct',VK.MOD_ALT, VK.E, self.dir_correct),
+            ('speed_large',VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30)),
+            ('explode_nearest_vehicle',VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
+            ('enemys_harmless',VK.MOD_ALT, VK.S, self.enemys_harmless),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):

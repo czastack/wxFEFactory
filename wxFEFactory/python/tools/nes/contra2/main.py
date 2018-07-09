@@ -1,6 +1,6 @@
 from ..base import BaseNesHack
 from lib.hack.forms import Group, ModelInput, ModelSelect, ModelCheckBox
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, FieldPrep
 
 
@@ -34,7 +34,7 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('invincible', MOD_ALT, getVK('i'), this.invincible),
+            ('invincible',VK.MOD_ALT, VK.I, this.invincible),
         )
 
     def invincible(self, _=None):

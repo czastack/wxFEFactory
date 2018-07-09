@@ -1,6 +1,6 @@
 from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, FieldPrep, ToggleField
 import fefactory_api
 ui = fefactory_api.ui
@@ -40,7 +40,7 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def pull_through(self, _=None):

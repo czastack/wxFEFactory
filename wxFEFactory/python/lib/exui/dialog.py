@@ -1,5 +1,5 @@
 from styles import styles, dialog_style
-from lib.win32.keys import getWXK, getWXKName, isWXKMod
+from lib import wxconst
 from lib.extypes import WeakBinder
 from fefactory_api import ui
 
@@ -20,9 +20,9 @@ class StdDialog(ui.Dialog):
 
             with ui.Horizontal(className="container right") as footer:
                 if cancel:
-                    ui.Button(label="取消").id = ui.ID_CANCEL
+                    ui.Button(label="取消").id = wxconst.ID_CANCEL
                 if ok:
-                    ui.Button(label="确定").id = ui.ID_OK
+                    ui.Button(label="确定").id = wxconst.ID_OK
             self.footer = footer
         super().__exit__()
 

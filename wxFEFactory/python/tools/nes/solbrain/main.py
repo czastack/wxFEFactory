@@ -1,6 +1,5 @@
 from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from lib.hack.models import Model, Field, ByteField, WordField, MulFieldPrep
 from lib import utils
 

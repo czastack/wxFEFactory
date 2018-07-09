@@ -1,4 +1,5 @@
 from application import app
+from lib import wxconst
 from lib.lazy import lazyclassmethod
 from lib.basescene import BaseScene
 from styles import styles
@@ -140,7 +141,7 @@ class BaseListBoxModuel(BaseModule):
 
     def onClear(self, m):
         """清空列表"""
-        if self.confirm('提示', '确认清空所有列表项？', self.NO) is self.YES:
+        if self.confirm('提示', '确认清空所有列表项？', wxconst.NO) is wxconst.YES:
             self.listbox.clear()
             return True
 
@@ -156,7 +157,7 @@ class BaseListBoxModuel(BaseModule):
         """删除一项"""
         pos = self.listbox.index
         if pos is not -1:
-            if self.confirm('提示', '确认删除该项？', self.NO) is self.YES:
+            if self.confirm('提示', '确认删除该项？', wxconst.NO) is wxconst.YES:
                 text = self.listbox[pos]
                 self.listbox.pop(pos)
                 return pos, text

@@ -4,6 +4,7 @@ from project import Project
 from modules import modules
 from fe.ferom import FeRomRW
 from lib import exui, extypes
+from lib.win32.keys import WXK
 import os
 import traceback
 import types
@@ -239,10 +240,10 @@ class MainFrame:
             if code == event.RETURN:
                 self.consolInputMultiRun()
                 return True
-            elif code == event.getWXK('a'):
+            elif code == WXK.A:
                 text_input.selectAll()
                 return True
-            elif code == event.getWXK('l'):
+            elif code == WXK.L:
                 self.console_output.clear()
                 return True
 

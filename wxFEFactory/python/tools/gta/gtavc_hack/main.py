@@ -1,6 +1,6 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, SimpleCheckBox, CoordWidget, ModelInput, ModelCoordWidget
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
 from . import address, models, coords
@@ -101,7 +101,7 @@ class Main(BaseGTA3Tool):
 
     def get_hotkeys(self):
         return (
-            ('bigbang', MOD_ALT, getVK('ENTER'), self.bigbang),
+            ('bigbang',VK.MOD_ALT, VK.ENTER, self.bigbang),
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):

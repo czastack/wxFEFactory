@@ -1,6 +1,5 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect, Choice
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 import fefactory_api
 ui = fefactory_api.ui
 

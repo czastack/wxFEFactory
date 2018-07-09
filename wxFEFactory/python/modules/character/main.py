@@ -1,3 +1,4 @@
+from lib import wxconst
 from ..module import BaseListBoxModuel
 from . import forms
 from . import config
@@ -54,10 +55,10 @@ class Module(BaseListBoxModuel):
 
     def onClose(self, _=None):
         if self.pg.changed:
-            choice = self.confirm('保存修改', '有修改，是否保存？', self.CANCEL)
-            if choice is self.CANCEL:
+            choice = self.confirm('保存修改', '有修改，是否保存？', wxconst.CANCEL)
+            if choice is wxconst.CANCEL:
                 return False
-            elif choice is self.YES:
+            elif choice is wxconst.YES:
                 self.onSave(None)
         return super().onClose()
 

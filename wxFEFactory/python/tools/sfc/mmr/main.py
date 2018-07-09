@@ -1,6 +1,6 @@
 from ..base import BaseSfcHack
 from lib.hack.forms import Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
 from functools import partial
@@ -107,11 +107,11 @@ class Main(BaseSfcHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('move_left', MOD_ALT, getVK('left'), this.move_left),
-            ('move_right', MOD_ALT, getVK('right'), this.move_right),
-            ('move_up', MOD_ALT, getVK('up'), this.move_up),
-            ('move_down', MOD_ALT, getVK('down'), this.move_down),
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
+            ('move_left',VK.MOD_ALT, VK.LEFT, this.move_left),
+            ('move_right',VK.MOD_ALT, VK.RIGHT, this.move_right),
+            ('move_up',VK.MOD_ALT, VK.UP, this.move_up),
+            ('move_down',VK.MOD_ALT, VK.DOWN, this.move_down),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def get_chariot_equip_info_dialog(self):

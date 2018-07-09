@@ -1,6 +1,6 @@
 from ..base import BaseNdsHack
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, Label
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from fefactory_api import ui
 
@@ -135,12 +135,12 @@ class FeHack(BaseNdsHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('continue_move', MOD_ALT, getVK('m'), this.continue_move),
-            ('move_to_cursor', MOD_ALT, getVK('g'), this.move_to_cursor),
-            ('move_left', MOD_ALT, getVK('left'), this.move_left),
-            ('move_right', MOD_ALT, getVK('right'), this.move_right),
-            ('move_up', MOD_ALT, getVK('up'), this.move_up),
-            ('move_down', MOD_ALT, getVK('down'), this.move_down),
+            ('continue_move',VK.MOD_ALT, VK.M, this.continue_move),
+            ('move_to_cursor',VK.MOD_ALT, VK.G, this.move_to_cursor),
+            ('move_left',VK.MOD_ALT, VK.LEFT, this.move_left),
+            ('move_right',VK.MOD_ALT, VK.RIGHT, this.move_right),
+            ('move_up',VK.MOD_ALT, VK.UP, this.move_up),
+            ('move_down',VK.MOD_ALT, VK.DOWN, this.move_down),
         )
 
     def _person(self):

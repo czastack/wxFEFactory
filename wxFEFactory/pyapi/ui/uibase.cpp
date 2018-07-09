@@ -50,6 +50,19 @@ void View::addToParent() {
 	}
 }
 
+void View::startTextDrag(wxcstr text, pycref callback)
+{
+	wxTextDataObject data(text);
+	wxDropSource dragSource(ptr(), wxDROP_ICON(dnd_copy),
+		wxDROP_ICON(dnd_move),
+		wxDROP_ICON(dnd_none));
+	dragSource.SetData(data);
+	wxDragResult result = dragSource.DoDragDrop(wxDrag_AllowMove);
+	if (!callback.is_none()) {
+		pyCall(callback, this);
+	}
+}
+
 int View::parseColor(wxcstr color, uint defval)
 {
 	u32 rgb = defval;
@@ -483,6 +496,7 @@ void init_uibase(py::module & m)
 		.def("setOnKeyDown", &View::setOnKeyDown)
 		.def("setOnFileDrop", &View::setOnFileDrop)
 		.def("setOnTextDrop", &View::setOnTextDrop)
+		.def("startTextDrag", &View::startTextDrag, "text"_a, "callback"_a=None)
 		.def("setOnClick", &View::setOnClick)
 		.def("setOnDoubleClick", &View::setOnDoubleClick)
 		.def("setOnDestroy", &View::setOnDestroy)

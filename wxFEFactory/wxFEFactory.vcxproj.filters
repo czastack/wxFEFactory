@@ -117,9 +117,6 @@
     <ClInclude Include="wxpatch.h">
       <Filter>wx</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\ui\drop.hpp">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\fe\graph.h">
       <Filter>pyapi\fe</Filter>
     </ClInclude>
@@ -166,6 +163,9 @@
       <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\ui\uibase.h">
+      <Filter>pyapi\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="pyapi\ui\drop.hpp">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@ from lib import utils
 from lib.lazy import lazy
 from lib.hack.forms import (Group, StaticGroup, Input, CoordWidget, ModelInput, ModelCoordWidget,
     render_tab_list)
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
 from lib import exui
@@ -287,17 +287,17 @@ class Main(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('spawn_choosed_vehicle_and_enter', MOD_ALT | MOD_SHIFT, getVK('v'), self.spawn_choosed_vehicle_and_enter),
-            ('max_cur_weapon', MOD_ALT, getVK('g'), self.max_cur_weapon),
-            ('teleport_to_waypoint', MOD_ALT | MOD_SHIFT, getVK('g'), self.teleport_to_waypoint),
-            ('dir_correct', MOD_ALT, getVK('e'), self.dir_correct),
-            ('speed_large', MOD_ALT | MOD_SHIFT, getVK('m'), partial(self.speed_up, rate=30)),
-            ('explode_nearest_vehicle', MOD_ALT, getVK('o'), self.explode_nearest_vehicle),
-            ('shoot_vehicle_rocket_little', MOD_ALT, getVK('r'), self.shoot_vehicle_rocket_little),
-            ('shoot_vehicle_rocket_more', MOD_ALT | MOD_SHIFT, getVK('r'), self.shoot_vehicle_rocket_more),
-            ('rocket_attack_enemy', MOD_ALT, getVK("enter"), self.rocket_attack_enemy),
-            ('rocket_shoot_enemy', MOD_ALT | MOD_SHIFT, getVK("enter"), self.rocket_shoot_enemy),
-            ('special_ability_fill_meter', MOD_ALT, getVK("capslock"), self.special_ability_fill_meter),
+            ('spawn_choosed_vehicle_and_enter',VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
+            ('max_cur_weapon',VK.MOD_ALT, VK.G, self.max_cur_weapon),
+            ('teleport_to_waypoint',VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
+            ('dir_correct',VK.MOD_ALT, VK.E, self.dir_correct),
+            ('speed_large',VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30)),
+            ('explode_nearest_vehicle',VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
+            ('shoot_vehicle_rocket_little',VK.MOD_ALT, VK.R, self.shoot_vehicle_rocket_little),
+            ('shoot_vehicle_rocket_more',VK.MOD_ALT | VK.MOD_SHIFT, VK.R, self.shoot_vehicle_rocket_more),
+            ('rocket_attack_enemy',VK.MOD_ALT, VK.ENTER, self.rocket_attack_enemy),
+            ('rocket_shoot_enemy',VK.MOD_ALT | VK.MOD_SHIFT, VK.ENTER, self.rocket_shoot_enemy),
+            ('special_ability_fill_meter',VK.MOD_ALT, VK.CAPSLOCK, self.special_ability_fill_meter),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):

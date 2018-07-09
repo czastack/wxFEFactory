@@ -1,4 +1,5 @@
 from fefactory_api import ui
+from lib.win32.keys import WXK
 
 
 class HotkeyCtrl(ui.TextInput):
@@ -10,14 +11,14 @@ class HotkeyCtrl(ui.TextInput):
 
     def onKey(self, v, event):
         code = event.GetKeyCode()
-        if isWXKMod(code):
+        if WXK.isMod(code):
             return
         mod = event.GetModifiers()
         self.handleKey(code, mod)
         return True
         
     def handleKey(self, code, mod):
-        self.value = getWXKName(code, mod)
+        self.value = WXK.getName(code, mod)
         self.code = code
         self.mode = mod
 

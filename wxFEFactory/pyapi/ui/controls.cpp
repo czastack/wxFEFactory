@@ -346,27 +346,12 @@ void init_controls(py::module & m)
 		.def_property("path", &FilePickerCtrl::getPath, &FilePickerCtrl::setPath)
 		.ptr();
 
-#define ATTR_FLP_STYLE(name) ATTR_INT(pyFilePickerCtrl, name, wxFLP_)
-	ATTR_FLP_STYLE(FILE_MUST_EXIST),
-		ATTR_FLP_STYLE(OPEN),
-		ATTR_FLP_STYLE(OVERWRITE_PROMPT),
-		ATTR_FLP_STYLE(SAVE),
-		ATTR_FLP_STYLE(SMALL),
-		ATTR_FLP_STYLE(USE_TEXTCTRL);
-#undef ATTR_FLP_STYLE
-
 	auto pyDirPickerCtrl = py::class_t<DirPickerCtrl, Control>(m, "DirPickerCtrl")
 		.def(py::init<wxcstr, wxcstr, long, pyobj, pyobj>(),
 			"path"_a = wxEmptyString, "msg"_a = wxEmptyString, "wxstyle"_a = (long)(wxDIRP_DEFAULT_STYLE | wxDIRP_SMALL), className, style)
 		.def("setOnChange", &DirPickerCtrl::setOnChange, evt_fn, evt_reset)
 		.def_property("path", &DirPickerCtrl::getPath, &DirPickerCtrl::setPath)
 		.ptr();
-
-#define ATTR_DIRP_STYLE(name) ATTR_INT(pyDirPickerCtrl, name, wxDIRP_)
-	ATTR_DIRP_STYLE(DIR_MUST_EXIST),
-		ATTR_DIRP_STYLE(SMALL),
-		ATTR_DIRP_STYLE(USE_TEXTCTRL);
-#undef ATTR_FLP_STYLE
 
 	auto text = "text"_a;
 	auto image = "image"_a = -1,

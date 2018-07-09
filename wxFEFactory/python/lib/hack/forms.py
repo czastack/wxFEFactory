@@ -1,5 +1,6 @@
 from lib import exui, fileutils, utils, lazy
 from lib.extypes import WeakBinder
+from lib.win32.keys import WXK
 from .utils import strhex
 from styles import btn_xs_style
 import json
@@ -57,17 +58,17 @@ class Widget:
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
-            if code == event.getWXK('r'):
+            if code == WXK.R:
                 self.read()
                 return True
-            elif code == event.getWXK('w') or code == 13:
+            elif code == WXK.W or code == 13:
                 self.write()
                 return True
-            elif code == event.getWXK('='):
+            elif code == WXK.getCode('='):
                 # 逻辑地址
                 print(strhex(self.get_addr()))
                 return True
-            elif code == event.getWXK('-'):
+            elif code == WXK.getCode('-'):
                 # 进程中的地址
                 print(strhex(self.handler.address_map(self.get_addr())))
                 return True
@@ -684,7 +685,7 @@ class CoordWidget(TwoWayWidget):
                 self.moveUp()
             elif code == event.DOWN:
                 self.moveDown()
-        elif code == event.getWXK('w'):
+        elif code == WXK.W:
             self.write()
         event.Skip()
 

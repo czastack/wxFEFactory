@@ -1,5 +1,4 @@
 from styles import styles
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
 from fefactory_api import auto
 from ...tool import NestedTool
 from lib.ndstool import ar

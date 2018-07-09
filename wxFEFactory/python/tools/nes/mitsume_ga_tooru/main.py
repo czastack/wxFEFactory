@@ -1,6 +1,6 @@
 from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, MulFieldPrep
 
 
@@ -26,8 +26,8 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
-            ('shoot_arrow', MOD_ALT, getVK('m'), this.shoot_arrow),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
+            ('shoot_arrow',VK.MOD_ALT, VK.M, this.shoot_arrow),
         )
 
     def pull_through(self, _=None):

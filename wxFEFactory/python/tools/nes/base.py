@@ -2,7 +2,7 @@ from lib.hack.handlers import ProxyHandler
 from lib.hack.handlers.neshandler import VirtuaNesHandler, NestopiaHandler
 from lib.hack.forms import Group, StaticGroup, ModelInput
 from lib.hack.models import Model, Field, ByteField, WordField
-from lib.win32.keys import getVK, MOD_ALT
+from lib.win32.keys import VK
 from lib.extypes import DataClass
 from ..hacktool import ProxyHackTool
 
@@ -55,5 +55,5 @@ class SimpleNesHack(BaseNesHack):
 
     def _get_hotkeys(self):
         return (
-            ('pull_through', MOD_ALT, getVK('h'), self.weak.pull_through),
+            ('pull_through',VK.MOD_ALT, VK.H, self.weak.pull_through),
         )

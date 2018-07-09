@@ -59,10 +59,6 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 		.def("mem_read", mem_read, "address"_a, "size"_a)
 		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a);
 
-	ATTR_INT(m.ptr(), YES, wx),
-	ATTR_INT(m.ptr(), NO, wx),
-	ATTR_INT(m.ptr(), CANCEL, wx);
-
 	init_ui(m);
 	init_fe(m);
 #ifdef _WIN32

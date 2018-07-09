@@ -1,6 +1,6 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Choice
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from . import models, datasets
 import fefactory_api
@@ -95,11 +95,11 @@ class Main(BaseGbaHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('move_left', MOD_ALT, getVK('left'), this.move_left),
-            ('move_right', MOD_ALT, getVK('right'), this.move_right),
-            ('move_up', MOD_ALT, getVK('up'), this.move_up),
-            ('move_down', MOD_ALT, getVK('down'), this.move_down),
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
+            ('move_left',VK.MOD_ALT, VK.LEFT, this.move_left),
+            ('move_right',VK.MOD_ALT, VK.RIGHT, this.move_right),
+            ('move_up',VK.MOD_ALT, VK.UP, this.move_up),
+            ('move_down',VK.MOD_ALT, VK.DOWN, this.move_down),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def on_person_change(self, lb):

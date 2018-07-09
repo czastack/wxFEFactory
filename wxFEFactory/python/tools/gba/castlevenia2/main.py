@@ -1,6 +1,6 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Fields, ToggleField
 from lib import utils
@@ -64,7 +64,7 @@ class Main(BaseGbaHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def pull_through(self, _):

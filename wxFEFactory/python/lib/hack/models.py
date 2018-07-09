@@ -71,7 +71,7 @@ class Model:
         else:
             raise TypeError('expected a Field object, got ' + str(field))
 
-    def set_with(self, namefrom, nameto):
+    def set_with(self, nameto, namefrom):
         setattr(self, nameto, getattr(self, namefrom))
 
     def set_addr_by_index(self, i):

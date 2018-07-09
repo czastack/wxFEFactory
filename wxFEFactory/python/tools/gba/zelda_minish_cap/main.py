@@ -1,7 +1,7 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox, ModelFlagWidget, Choice
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField, ArrayField
-from lib.win32 import keys
+from lib.win32.keys import VK
 import fefactory_api
 ui = fefactory_api.ui
 
@@ -110,7 +110,7 @@ class Main(BaseGbaHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through', keys.MOD_ALT, keys.getVK('h'), this.pull_through),
+            ('pull_through', VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def pull_through(self, _=None):

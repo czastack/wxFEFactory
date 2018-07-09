@@ -1,6 +1,6 @@
 from ..base import BaseNdsHack
 from lib.hack.forms import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup, Choice
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
 from fefactory_api import ui
@@ -44,7 +44,7 @@ class MetalMaxHack(BaseNdsHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through', MOD_ALT, getVK('h'), this.pull_through),
+            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def render_global_ext(self):

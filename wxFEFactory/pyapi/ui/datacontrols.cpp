@@ -316,10 +316,6 @@ void init_datacontrols(py::module &m)
 		.def_property("focused_item",
 			[](ListView &self) { return self.ctrl().GetFocusedItem(); },
 			[](ListView &self, long value) { self.ctrl().Focus(value); });
-	
-	ATTR_INT(pyListView.ptr(), LEFT, wxLIST_FORMAT_),
-	ATTR_INT(pyListView.ptr(), RIGHT, wxLIST_FORMAT_),
-	ATTR_INT(pyListView.ptr(), CENTER, wxLIST_FORMAT_);
 
 	py::class_<wxListEvent, wxEvent>(m, "ListEvent")
 		.def_property_readonly("keycode", &wxListEvent::GetKeyCode)

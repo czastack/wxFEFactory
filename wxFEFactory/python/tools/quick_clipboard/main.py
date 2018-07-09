@@ -1,5 +1,5 @@
 from styles import dialog_style, styles
-from lib.win32.keys import getVK, MOD_ALT, MOD_CONTROL, MOD_SHIFT
+from lib.win32.keys import VK
 from fefactory_api import auto
 from ..tool import BaseTool
 import json
@@ -12,10 +12,10 @@ class Main(BaseTool):
     def attach(self, frame):
         super().attach(frame)
         self.win.RegisterHotKeys((
-            ('item_prev', MOD_ALT, getVK('['), self.item_prev),
-            ('item_next', MOD_ALT, getVK(']'), self.item_next),
-            ('item_prev_input', MOD_ALT | MOD_SHIFT, getVK('['), self.item_prev_input),
-            ('item_next_input', MOD_ALT | MOD_SHIFT, getVK(']'), self.item_next_input),
+            ('item_prev',VK.MOD_ALT, VK.getCode('['), self.item_prev),
+            ('item_next',VK.MOD_ALT, VK.getCode(']'), self.item_next),
+            ('item_prev_input',VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('['), self.item_prev_input),
+            ('item_next_input',VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(']'), self.item_next_input),
         ))
 
     def render(self):
@@ -58,7 +58,7 @@ class Main(BaseTool):
         fefactory_api.set_clipboard(listbox.text)
 
     def paste(self):
-        auto.sendKey(auto.CombKey(MOD_CONTROL, getVK('v')), 10)
+        auto.sendKey(auto.CombKey(VK.MOD_CONTROL, VK.V), 10)
 
 
 win_style = {
