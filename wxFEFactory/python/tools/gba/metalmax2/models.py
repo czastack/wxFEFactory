@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField, CAttr
+from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField
 
 
 class Person(Model):
