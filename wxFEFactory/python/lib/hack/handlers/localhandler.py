@@ -1,5 +1,5 @@
 from fefactory_api import mem_read, mem_write
-from .model import Model
+from ..models import Model
 import ctypes
 import struct
 
