@@ -5,7 +5,6 @@
 #include "utils/color.h"
 #include "myapp.h"
 #include "menu.h"
-#include "drop.hpp"
 
 
 #define STYLE_WIDTH          wxT("width")
@@ -184,7 +183,8 @@ public:
 	 * pass_event 是否传递event实例作为callback参数
 	 */
 	template <typename EventTag>
-	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false, bool wxbind = true, bool pass_event = false);
+	void bindEvt(const EventTag& eventType, pycref fn, bool reset = false, bool pass_event = false);
+	bool _bindEvt(int eventType, pycref fn, bool reset = false, bool pass_event = false);
 
 	void handleEvent(pycref fn, wxEvent &event)
 	{
@@ -222,35 +222,14 @@ public:
 	 */
 	void setOnKeyDown(pycref fn)
 	{
-		bindEvt(wxEVT_KEY_DOWN, fn, false, true, true);
+		bindEvt(wxEVT_KEY_DOWN, fn, false, true);
 	}
 
-	void setOnFileDrop(pycref ondrop)
-	{
-		m_elem->SetDropTarget(new FileDropListener(ondrop));
-	}
+	void setOnFileDrop(pycref ondrop);
 
-	void setOnTextDrop(pycref ondrop)
-	{
-		m_elem->SetDropTarget(new TextDropListener(ondrop));
-	}
+	void setOnTextDrop(pycref ondrop);
 
 	void startTextDrag(wxcstr text, pycref callback);
-
-	void setOnDoubleClick(pycref fn)
-	{
-		bindEvt(wxEVT_LEFT_DCLICK, fn);
-	}
-
-	void setOnClick(pycref fn)
-	{
-		bindEvt(wxEVT_LEFT_DOWN, fn);
-	}
-
-	void setOnRightClick(pycref fn)
-	{
-		bindEvt(wxEVT_RIGHT_DOWN, fn);
-	}
 
 	void setOnDestroy(pycref fn)
 	{
@@ -430,41 +409,10 @@ public:
 
 
 template<typename EventTag>
-void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool wxbind, bool pass_event)
+void View::bindEvt(const EventTag & eventType, pycref fn, bool reset, bool pass_event)
 {
-	if (!fn.is_none())
+	if (_bindEvt((int)eventType, fn, reset, pass_event))
 	{
-		py::int_ eventKey((int)eventType);
-		py::object event_list;
-
-		if (m_event_table.contains(eventKey))
-		{
-			event_list = m_event_table[eventKey];
-
-			if (reset)
-			{
-				event_list.attr("clear")();
-			}
-		}
-		else
-		{
-			event_list = py::list();
-			m_event_table[eventKey] = event_list;
-
-			if (wxbind)
-			{
-				((wxEvtHandler*)m_elem)->Bind(eventType, &View::_handleEvent, this);
-			}
-		}
-		if (pass_event && !isPyDict(fn))
-		{
-			py::dict arg;
-			arg["callback"] = fn;
-			arg["arg_event"] = py::bool_(true);
-			event_list.attr("append")(arg);
-		}
-		else {
-			event_list.attr("append")(fn);
-		}
+		ptr()->Bind(eventType, &View::_handleEvent, this);
 	}
 }

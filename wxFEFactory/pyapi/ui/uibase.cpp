@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include "uibase.h"
+#include "drop.hpp"
 
 
 wxVector<Layout*> View::LAYOUTS;
@@ -48,6 +49,16 @@ void View::addToParent() {
 	{
 		pLayout->add(*this);
 	}
+}
+
+void View::setOnFileDrop(pycref ondrop)
+{
+	m_elem->SetDropTarget(new FileDropListener(ondrop));
+}
+
+void View::setOnTextDrop(pycref ondrop)
+{
+	m_elem->SetDropTarget(new TextDropListener(ondrop));
 }
 
 void View::startTextDrag(wxcstr text, pycref callback)
@@ -326,6 +337,43 @@ Layout* View::getParent()
 	return (Layout*)parent;
 }
 
+bool View::_bindEvt(int eventType, pycref fn, bool reset, bool pass_event)
+{
+	bool wxbind = false;
+	if (!fn.is_none())
+	{
+		py::int_ eventKey((int)eventType);
+		py::object event_list;
+
+		if (m_event_table.contains(eventKey))
+		{
+			event_list = m_event_table[eventKey];
+
+			if (reset)
+			{
+				event_list.attr("clear")();
+			}
+		}
+		else
+		{
+			event_list = py::list();
+			m_event_table[eventKey] = event_list;
+			wxbind = true;
+		}
+		if (pass_event && !isPyDict(fn))
+		{
+			py::dict arg;
+			arg["callback"] = fn;
+			arg["arg_event"] = py::bool_(true);
+			event_list.attr("append")(arg);
+		}
+		else {
+			event_list.attr("append")(fn);
+		}
+	}
+	return wxbind;
+}
+
 bool View::handleEvent(wxEvent & event)
 {
 	py::object event_list = pyDictGet(m_event_table, py::int_(event.GetEventType()));
@@ -497,13 +545,14 @@ void init_uibase(py::module & m)
 		.def("setOnFileDrop", &View::setOnFileDrop)
 		.def("setOnTextDrop", &View::setOnTextDrop)
 		.def("startTextDrag", &View::startTextDrag, "text"_a, "callback"_a=None)
-		.def("setOnClick", &View::setOnClick)
-		.def("setOnDoubleClick", &View::setOnDoubleClick)
+		.def("setOnLeftDown", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_DOWN, fn, true, true); })
+		.def("setOnLeftUp", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_UP, fn, true, true); })
+		.def("setOnRightDown", [](View &self, pycref fn) { self.bindEvt(wxEVT_RIGHT_DOWN, fn, true, true); })
+		.def("setOnRightUp", [](View &self, pycref fn) { self.bindEvt(wxEVT_RIGHT_UP, fn, true, true); })
+		.def("setOnDoubleClick", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_DCLICK, fn, true, true); })
 		.def("setOnDestroy", &View::setOnDestroy)
-		.def("freeze",
-			[](View &self) { return self.ptr()->Freeze(); })
-		.def("thaw",
-			[](View &self) { return self.ptr()->Thaw(); })
+		.def("freeze", [](View &self) { return self.ptr()->Freeze(); })
+		.def("thaw", [](View &self) { return self.ptr()->Thaw(); })
 		.def_static("get_active_layout", &View::getActiveLayout)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("className", &View::m_class)

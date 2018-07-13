@@ -2,7 +2,8 @@
 #include <wx/dnd.h>
 #include "../pyutils.h"
 
-class FileDropListener : public wxFileDropTarget {
+class FileDropListener : public wxFileDropTarget 
+{
 public:
 	FileDropListener(pycref ondrop): m_ondrop(ondrop) {}
 	virtual bool OnDropFiles(wxCoord x, wxCoord y,
@@ -24,7 +25,8 @@ private:
 };
 
 
-class TextDropListener : public wxTextDropTarget {
+class TextDropListener : public wxTextDropTarget 
+{
 public:
 	TextDropListener(pycref ondrop) : m_ondrop(ondrop) {}
 	virtual bool OnDropText(wxCoord x, wxCoord y, wxcstr text)

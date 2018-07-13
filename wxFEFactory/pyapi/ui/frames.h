@@ -40,7 +40,7 @@ public:
 
 	void setOnClose(pycref onclose)
 	{
-		bindEvt(wxEVT_CLOSE_WINDOW, onclose, true, false);
+		_bindEvt((int)wxEVT_CLOSE_WINDOW, onclose, true, false);
 	}
 
 	void close()

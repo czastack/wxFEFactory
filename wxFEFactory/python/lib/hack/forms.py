@@ -745,6 +745,8 @@ class BaseSelect(TwoWayWidget):
             self.render_btn()
         self.container = container
         self.view.setOnKeyDown(self.weak.onKey)
+        self.view.setOnLeftDown(self.weak.onLeftDown)
+        self.view.setOnTextDrop(self.weak.onTextDrop)
         self.search_map[id(self.view)] = self
         del self.onselect
 
@@ -772,7 +774,7 @@ class BaseSelect(TwoWayWidget):
     @lazy.ClassLazy
     def contextmenu(cls):
         with ui.ContextMenu() as contextmenu:
-            ui.MenuItem("搜索(&S)", onselect=cls.onSearch)
+            ui.MenuItem("搜索(&S)", onselect=cls.menu_search)
         return contextmenu
 
     @lazy.ClassLazy
@@ -780,7 +782,7 @@ class BaseSelect(TwoWayWidget):
         return exui.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
 
     @classmethod
-    def onSearch(cls, v, m):
+    def menu_search(cls, v, m):
         cls.active_ins = cls.search_map[id(v)]
         if getattr(cls, 'search_last_choices', None) is not cls.active_ins.choices:
             cls.search_dialog.listbox.clear()
@@ -811,6 +813,25 @@ class BaseSelect(TwoWayWidget):
 
     def onDestroy(self, view):
         self.search_map.pop(id(view), None)
+
+    def onLeftDown(self, view, event):
+        if fefactory_api.getKeyState(WXK.SHIFT):
+            view.startTextDrag(str(id(self.view)))
+            return False
+
+    def onTextDrop(self, i):
+        if i.isdigit():
+            ins = self.search_map.get(int(i), None)
+            if ins:
+                if ins.choices == self.choices:
+                    ctrl = fefactory_api.getKeyState(WXK.CONTROL)
+                    value = self.view.index
+                    self.view.index = ins.view.index
+                    if not ctrl:
+                        ins.view.index = value
+                else:
+                    print("数据源不一致")
+
 
 class Select(BaseSelect, OffsetsWidget):
     def __init__(self, *args, type=int, size=4, **kwargs):

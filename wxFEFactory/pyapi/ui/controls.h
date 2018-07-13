@@ -235,7 +235,7 @@ public:
 
 	void setOnChar(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_CHAR, fn, reset, true, true);
+		bindEvt(wxEVT_CHAR, fn, reset, true);
 	}
 
 	void appendText(wxcstr text)
@@ -796,7 +796,7 @@ public:
 
 	void setOnItemActivated(pycref fn, bool reset = true)
 	{
-		bindEvt(wxEVT_TREE_ITEM_ACTIVATED, fn, reset, true, true);
+		bindEvt(wxEVT_TREE_ITEM_ACTIVATED, fn, reset, true);
 	}
 };
 

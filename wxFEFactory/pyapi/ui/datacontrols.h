@@ -271,36 +271,36 @@ public:
 
 	void setOnItemSelected(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_ITEM_SELECTED, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_ITEM_SELECTED, fn, reset, true);
 	}
 
 	void setOnItemDeselected(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_ITEM_DESELECTED, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_ITEM_DESELECTED, fn, reset, true);
 	}
 
 	void setOnItemChecked(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_ITEM_CHECKED, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_ITEM_CHECKED, fn, reset, true);
 	}
 
 	void setOnItemUnchecked(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_ITEM_UNCHECKED, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_ITEM_UNCHECKED, fn, reset, true);
 	}
 
 	void setOnItemActivated(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_ITEM_ACTIVATED, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_ITEM_ACTIVATED, fn, reset, true);
 	}
 
 	void setOnColClick(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_COL_CLICK, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_COL_CLICK, fn, reset, true);
 	}
 
 	void setOnColRightClick(pyobj &fn, bool reset = true)
 	{
-		bindEvt(wxEVT_LIST_COL_RIGHT_CLICK, fn, reset, true, true);
+		bindEvt(wxEVT_LIST_COL_RIGHT_CLICK, fn, reset, true);
 	}
 };
