@@ -57,9 +57,9 @@ class Main(BaseGbaHack):
 
     def render_human_items(self):
         for i in range(self.person.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS, dragable=True)
         for i in range(self.person.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS, dragable=True)
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -70,13 +70,13 @@ class Main(BaseGbaHack):
 
     def render_chariot_items(self):
         for i in range(self.chariot.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS)
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS, dragable=True)
         for i in range(self.chariot.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ITEMS)
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.CHARIOT_ITEMS, dragable=True)
 
     def render_special_bullets(self):
         for i in range(self.chariot.special_bullets.length):
-            ModelSelect("special_bullets.%d" % i, "炮弹%d" % (i + 1), choices=datasets.SPECIAL_BULLETS)
+            ModelSelect("special_bullets.%d" % i, "炮弹%d" % (i + 1), choices=datasets.SPECIAL_BULLETS, dragable=True)
             ModelInput("special_bullets_count.%d" % i, "数量")
 
     def render_storage(self):
@@ -88,7 +88,7 @@ class Main(BaseGbaHack):
             tuple((0x0300 | i) for i in range(len(datasets.CHARIOT_EQUIPS)))
         )
         for i in range(10):
-            ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values)
+            ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values, dragable=True)
         with Group.active_group().footer:
             Pagination(self.on_storage_page, self.STORAGE_PAGE_TOTAL)
 

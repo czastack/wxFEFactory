@@ -511,7 +511,7 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
 class BaseSelect(TwoWayWidget):
     search_map = {}
 
-    def __init__(self, *args, choices=None, values=None, onselect=None, **kwargs):
+    def __init__(self, *args, choices=None, values=None, onselect=None, dragable=False, **kwargs):
         # 预处理choices, values
         if values is None:
             list_tuple = (list, tuple)
@@ -522,8 +522,10 @@ class BaseSelect(TwoWayWidget):
         self.choices = choices
         self.values = values
         self.onselect = onselect
-        parent = self.active_group()
-        self.parent = parent.weak
+        self.dragable = dragable
+        if dragable:
+            parent = self.active_group()
+            self.parent = parent.weak
         super().__init__(*args, **kwargs)
 
     def render(self):
@@ -535,10 +537,11 @@ class BaseSelect(TwoWayWidget):
             self.render_btn()
         self.container = container
         self.view.setOnKeyDown(self.weak.onKey)
-        self.view.setOnLeftDown(self.weak.onLeftDown)
-        self.view.setOnTextDrop(self.weak.onTextDrop)
+        if self.dragable:
+            self.view.setOnLeftDown(self.weak.onLeftDown)
+            self.view.setOnTextDrop(self.weak.onTextDrop)
         self.search_map[id(self.view)] = self
-        del self.onselect
+        del self.onselect, self.dragable
 
     def setItems(self, choices, values=0):
         self.choices = choices
@@ -565,6 +568,7 @@ class BaseSelect(TwoWayWidget):
     def contextmenu(cls):
         with ui.ContextMenu() as contextmenu:
             ui.MenuItem("搜索(&S)", onselect=cls.menu_search)
+            ui.MenuItem("拖拽帮助", onselect=cls.move_about)
         return contextmenu
 
     @lazy.ClassLazy
@@ -580,6 +584,11 @@ class BaseSelect(TwoWayWidget):
             cls.search_dialog.listbox.index = -1
         cls.search_dialog.showModal()
         del cls.active_ins
+
+    @classmethod
+    def move_about(cls, v, m):
+        fefactory_api.alert("按住shift，在下拉框上按下鼠标左键，拖拽到同源下拉框上释放，能交换两者的选值；\n"
+            "若释放时按着ctrl，则为复制值；若按着alt，则是把值移到目标处，原有区域下移或上移")
 
     @classmethod
     def onsearch(cls, dialog, value):
