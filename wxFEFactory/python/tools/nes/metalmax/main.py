@@ -1,5 +1,5 @@
 from ..base import BaseNesHack
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from . import models, datasets
