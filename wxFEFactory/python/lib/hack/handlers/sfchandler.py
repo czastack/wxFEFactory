@@ -61,7 +61,7 @@ class Snes9xHandler(MemHandler):
                 self.memory = Memory(Memory.ADDR, self).datasnap(('RAM', 'ROM', 'ROMFilename', 'HiROM', 'LoROM'))
         return succeed
 
-    def address_map(self, addr, size=4):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 

@@ -169,6 +169,7 @@ class PyProcessHandler: public ProcessHandler
 public:
 	using ProcessHandler::m_is64os;
 	using ProcessHandler::m_is32process;
+	using ProcessHandler::m_raw_addr;
 
 	bool attach() override {
 		PYBIND11_OVERLOAD_PURE(
@@ -178,13 +179,12 @@ public:
 		);
 	}
 
-	addr_t address_map(addr_t addr, size_t size) override {
+	addr_t address_map(addr_t addr) override {
 		PYBIND11_OVERLOAD_PURE(
 			addr_t,              /* Return type */
 			ProcessHandler,      /* Parent class */
 			address_map,         /* Name of function in C++ (must match Python name) */
-			addr,                /* Argument(s) */
-			size
+			addr                /* Argument(s) */
 		);
 	};
 };
@@ -233,7 +233,8 @@ void init_emuhacker(pybind11::module & m)
 		.def_property_readonly("proc_base", &ProcessHandler::getProcessBaseAddress)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
-		.def_readonly("is32process", &PyProcessHandler::m_is32process);
+		.def_readonly("is32process", &PyProcessHandler::m_is32process)
+		.def_readwrite("raw_addr", &PyProcessHandler::m_raw_addr);
 
 	py::class_<ProcAddressHelper>(emuhacker, "ProcAddressHelper")
 		.def("get_proc_address", &ProcAddressHelper::getProcAddress);

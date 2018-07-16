@@ -19,7 +19,7 @@ GBA_MEMORY_SIZE = (
 
 
 class GbaEmuHandler(MemHandler):
-    def address_map(self, addr, size=4):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 
@@ -29,7 +29,7 @@ class GbaEmuHandler(MemHandler):
                 index = 8
             addr &= 0x00FFFFFF
 
-            if (addr + size <= GBA_MEMORY_SIZE[index]):
+            if (addr <= GBA_MEMORY_SIZE[index]):
                 return self.ptr_table[index] + addr
         return False
 

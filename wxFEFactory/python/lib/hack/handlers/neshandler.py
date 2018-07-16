@@ -22,7 +22,7 @@ class VirtuaNesHandler(MemHandler):
     def attach(self):
         return self.attach_window(self.CLASS_NAME, None)
 
-    def address_map(self, addr, size=4):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 
@@ -77,7 +77,7 @@ class NestopiaHandler(MemHandler):
 
         return succeed
 
-    def address_map(self, addr, size=4):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 

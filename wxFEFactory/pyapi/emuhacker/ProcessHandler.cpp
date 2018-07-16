@@ -30,7 +30,7 @@ bool Is64Bit_OS()
 bool ProcessHandler::m_is64os = Is64Bit_OS();
 
 
-ProcessHandler::ProcessHandler():m_process(nullptr), m_funcGetProcAddress(0)
+ProcessHandler::ProcessHandler():m_process(nullptr), m_funcGetProcAddress(0), m_raw_addr(false)
 {
 	HANDLE	hProcess;
 	HANDLE	hToken;
@@ -128,7 +128,9 @@ bool ProcessHandler::raw_write(addr_t addr, LPCVOID buffer, size_t size)
 bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 	if(isValid())
 	{
-		addr = address_map(addr, size);
+		if (!m_raw_addr) {
+			addr = address_map(addr);
+		}
 		if (addr) {
 			return raw_read(addr, buffer, size);
 		}
@@ -139,7 +141,9 @@ bool ProcessHandler::read(addr_t addr, LPVOID buffer, size_t size){
 bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 	if(isValid())
 	{
-		addr = address_map(addr, size);
+		if (!m_raw_addr) {
+			addr = address_map(addr);
+		}
 		if (addr) {
 			return raw_write(addr, buffer, size);
 		}

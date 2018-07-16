@@ -23,7 +23,7 @@ NDS_MEMORY_SIZE = (
 
 
 class NdsEmuHandler(MemHandler):
-    def address_map(self, addr, size):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 
@@ -34,7 +34,7 @@ class NdsEmuHandler(MemHandler):
                 index = 8
             addr &= 0x00FFFFFF
 
-            if (addr + size <= NDS_MEMORY_SIZE[index]):
+            if (addr <= NDS_MEMORY_SIZE[index]):
                 return self.ptr_table[index] + addr
         return False
 
@@ -49,7 +49,7 @@ class DeSmuMEHandler(NdsEmuHandler):
             self.base_addr = self.proc_base + 0x5411250
         return succeed
 
-    def address_map(self, addr, size):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 
@@ -57,7 +57,7 @@ class DeSmuMEHandler(NdsEmuHandler):
         if addr < 0x0A000000:
             addr &= 0x00FFFFFF
 
-            if addr + size <= NDS_MEMORY_SIZE[2]:
+            if addr <= NDS_MEMORY_SIZE[2]:
                 return self.base_addr + addr
         return False
 

@@ -11,7 +11,7 @@ OFFSET_MAP = {
 
 
 class DolphinHandler(BigendHandler):
-    def address_map(self, addr, size=0):
+    def address_map(self, addr):
         if self._raw_addr:
             return addr
 

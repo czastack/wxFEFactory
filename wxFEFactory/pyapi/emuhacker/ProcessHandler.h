@@ -14,13 +14,14 @@ protected:
 	addr_t      m_funcGetProcAddress;
 	static bool m_is64os;
 	bool        m_is32process; // 目标是32位进程
+	bool        m_raw_addr;
 
 public:
 	ProcessHandler();
 	virtual ~ProcessHandler();
 
 	virtual bool attach() { return false; }
-	virtual addr_t address_map(addr_t addr, size_t size) {
+	virtual addr_t address_map(addr_t addr) {
 		return addr;
 	};
 
