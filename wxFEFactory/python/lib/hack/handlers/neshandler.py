@@ -53,20 +53,20 @@ class NestopiaHandler(MemHandler):
 
         if succeed:
             with self.raw_env():
-                pMsgHandler = self.readPtr(self.readPtr(self.base + 0x1b1334)) + 4
-                size = self.readPtr(pMsgHandler + 8) # msgHandler 列表数量
+                pMsgHandler = self.read_ptr(self.read_ptr(self.proc_base + 0x1b1334)) + 4
+                size = self.read_ptr(pMsgHandler + 8) # msgHandler 列表数量
                 if size > 0x1000:
                     return False
-                start = self.readPtr(pMsgHandler)
+                start = self.read_ptr(pMsgHandler)
                 for i in range(size):
                     if self.read32(start) == 0x0218: # WM_POWERBROADCAST
-                        pMain = self.readPtr(start + 4)
-                        pEmulator = self.readPtr(pMain)
-                        pMachine = self.readPtr(pEmulator)
+                        pMain = self.read_ptr(start + 4)
+                        pEmulator = self.read_ptr(pMain)
+                        pMachine = self.read_ptr(pEmulator)
                         pCpu = pMachine + 48
                         self.ram = pCpu + 104
-                        pBoard = self.readPtr(pCpu + 2664 + (12 * 0x6000))
-                        self.wram = self.readPtr(pBoard + 80)
+                        pBoard = self.read_ptr(pCpu + 2664 + (12 * 0x6000))
+                        self.wram = self.read_ptr(pBoard + 80)
                         self.roms = struct.unpack('4L', self.read(pBoard + 4, bytes, 16))
                         break
 

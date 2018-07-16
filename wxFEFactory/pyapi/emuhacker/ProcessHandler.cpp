@@ -152,7 +152,7 @@ bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
  */
 addr_t ProcessHandler::getProcessBaseAddress()
 {
-	HMODULE     baseModule;
+	HMODULE     baseModule = 0;
 	DWORD       bytesRequired;
 
 	if (EnumProcessModules(m_process, &baseModule, sizeof(baseModule), &bytesRequired))

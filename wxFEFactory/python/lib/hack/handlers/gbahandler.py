@@ -96,7 +96,7 @@ class NogbaHandler(GbaEmuHandler):
     
         if succeed:
             with self.raw_env():
-                address = self.readPtr(self.PTR_TABLE_BASE)
+                address = self.read_ptr(self.PTR_TABLE_BASE)
                 if address:
                     ptr_table = self.read(address + self.PTR_TABLE_OFFSET, bytes, 36)
                     self.ptr_table = struct.unpack('9L', ptr_table)

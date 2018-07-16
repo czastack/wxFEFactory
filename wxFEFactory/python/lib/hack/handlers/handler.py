@@ -81,9 +81,9 @@ class MemHandler(ProcessHandler):
         LoadLibrary = getattr(self, '_LoadLibrary', None)
         if LoadLibrary is None:
             module = self.get_module('KERNEL32.DLL')
-            helper = self.getProcAddressHelper(module)
-            self._LoadLibrary = LoadLibrary = helper.getProcAddress('LoadLibraryW')
-            self._FreeLibrary = LoadLibrary = helper.getProcAddress('FreeLibrary')
+            helper = self.get_proc_helper(module)
+            self._LoadLibrary = LoadLibrary = helper.get_proc_address('LoadLibraryW')
+            self._FreeLibrary = LoadLibrary = helper.get_proc_address('FreeLibrary')
 
         if LoadLibrary and path:
             print(LoadLibrary)

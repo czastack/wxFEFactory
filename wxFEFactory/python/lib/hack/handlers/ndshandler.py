@@ -46,7 +46,7 @@ class DeSmuMEHandler(NdsEmuHandler):
     def attach(self):
         succeed = self.attach_window(self.CLASS_NAME, None)
         if succeed:
-            self.base_addr = self.base + 0x5411250
+            self.base_addr = self.proc_base + 0x5411250
         return succeed
 
     def address_map(self, addr, size):
@@ -72,7 +72,7 @@ class NogbaHandler(NdsEmuHandler):
     
         if succeed:
             with self.raw_env():
-                address = self.readPtr(self.PTR_TABLE_BASE)
+                address = self.read_ptr(self.PTR_TABLE_BASE)
                 if address:
                     ptr_table = self.read(address + self.PTR_TABLE_OFFSET, bytes, 36)
                     self.ptr_table = struct.unpack('9L', ptr_table)

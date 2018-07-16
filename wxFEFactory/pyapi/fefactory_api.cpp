@@ -44,8 +44,7 @@ void setOnAppExit(pycref fn)
 
 PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 	using namespace py::literals;
-	m
-		.def("log_message", log_message)
+	m.def("log_message", log_message)
 		.def("alert", alert, "title"_a, "msg"_a)
 		.def("confirm", confirm_dialog, "title"_a, "msg"_a, "defaultButton"_a=wxOK)
 		.def("input", input_dialog, "title"_a, "msg"_a, "defaultValue"_a = wxEmptyString)

@@ -11,8 +11,8 @@
 
 
 namespace emuhacker {
-	auto readPtr(ProcessHandler &self, addr_t addr) { return self.read_uint(addr, self.getPtrSize()); }
-	bool writePtr(ProcessHandler &self, addr_t addr, size_t data) { return self.write_uint(addr, data, self.getPtrSize()); }
+	auto read_ptr(ProcessHandler &self, addr_t addr) { return self.read_uint(addr, self.getPtrSize()); }
+	bool write_ptr(ProcessHandler &self, addr_t addr, size_t data) { return self.write_uint(addr, data, self.getPtrSize()); }
 
 
 	pyobj process_read(ProcessHandler &self, addr_t addr, pycref type, size_t size)
@@ -212,8 +212,8 @@ void init_emuhacker(pybind11::module & m)
 		.def("write_uint", &ProcessHandler::write_uint)
 		.def("read_int", &ProcessHandler::read_int)
 		.def("write_int", &ProcessHandler::write_int)
-		.def("readPtr", &emuhacker::readPtr)
-		.def("writePtr", &emuhacker::writePtr)
+		.def("read_ptr", &emuhacker::read_ptr)
+		.def("write_ptr", &emuhacker::write_ptr)
 		.def("read", &emuhacker::process_read, addr_a, type_a, "size"_a = 0)
 		.def("write", &emuhacker::process_write, addr_a, data_a, "size"_a = 0)
 		.def("read_addr", &ProcessHandler::read_addr)
@@ -228,15 +228,15 @@ void init_emuhacker(pybind11::module & m)
 		.def("alloc_data", &emuhacker::alloc_data)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def("enum_windows", &emuhacker::enum_windows, "callback"_a, "prefix"_a=None)
-		.def("getProcAddressHelper", &ProcessHandler::getProcAddressHelper)
+		.def("get_proc_helper", &ProcessHandler::getProcAddressHelper)
 		.def_property_readonly("active", &ProcessHandler::isValid)
-		.def_property_readonly("base", &ProcessHandler::getProcessBaseAddress)
+		.def_property_readonly("proc_base", &ProcessHandler::getProcessBaseAddress)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process);
 
 	py::class_<ProcAddressHelper>(emuhacker, "ProcAddressHelper")
-		.def("getProcAddress", &ProcAddressHelper::getProcAddress);
+		.def("get_proc_address", &ProcAddressHelper::getProcAddress);
 }
 
 #endif

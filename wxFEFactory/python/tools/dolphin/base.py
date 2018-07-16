@@ -26,7 +26,7 @@ class DolphinHandler(BigendHandler):
                 offset = OFFSET_MAP.get(self.version, None)
                 if offset:
                     with self.raw_env():
-                        self.ram_addr = self.read_addr(self.base + offset)
+                        self.ram_addr = self.read_addr(self.proc_base + offset)
                     return True
         return False
 
