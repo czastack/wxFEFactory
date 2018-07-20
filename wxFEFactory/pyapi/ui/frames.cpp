@@ -139,7 +139,24 @@ void HotkeyWindow::RegisterHotKeys(py::iterable &items)
 	for (auto e : items)
 	{
 		const py::tuple &item = e.cast<py::tuple>();
-		RegisterHotKey(item[0], item[1].cast<int>(), item[2].cast<int>(), item[3]);
+		pyobj key;
+		if (py::len(item) >= 4)
+		{
+			key = item[0];
+		}
+		else
+		{
+			try
+			{
+				key = item[2].attr("__name__");
+			}
+			catch (py::error_already_set &e)
+			{
+				e.restore();
+				PyErr_Print();
+			}
+		}
+		RegisterHotKey(key, item[0].cast<int>(), item[1].cast<int>(), item[2]);
 	}
 }
 

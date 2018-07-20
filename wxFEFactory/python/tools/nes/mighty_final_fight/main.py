@@ -31,8 +31,8 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
-            ('one_hit_kill',VK.MOD_ALT, VK.SPACE, this.one_hit_kill),
+            (VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.SPACE, this.one_hit_kill),
         )
 
     def pull_through(self, _=None):

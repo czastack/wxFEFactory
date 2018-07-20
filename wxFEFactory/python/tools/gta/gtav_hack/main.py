@@ -287,17 +287,17 @@ class Main(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('spawn_choosed_vehicle_and_enter',VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
-            ('max_cur_weapon',VK.MOD_ALT, VK.G, self.max_cur_weapon),
-            ('teleport_to_waypoint',VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
-            ('dir_correct',VK.MOD_ALT, VK.E, self.dir_correct),
-            ('speed_large',VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30)),
-            ('explode_nearest_vehicle',VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
-            ('shoot_vehicle_rocket_little',VK.MOD_ALT, VK.R, self.shoot_vehicle_rocket_little),
-            ('shoot_vehicle_rocket_more',VK.MOD_ALT | VK.MOD_SHIFT, VK.R, self.shoot_vehicle_rocket_more),
-            ('rocket_attack_enemy',VK.MOD_ALT, VK.ENTER, self.rocket_attack_enemy),
-            ('rocket_shoot_enemy',VK.MOD_ALT | VK.MOD_SHIFT, VK.ENTER, self.rocket_shoot_enemy),
-            ('special_ability_fill_meter',VK.MOD_ALT, VK.CAPSLOCK, self.special_ability_fill_meter),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
+            (VK.MOD_ALT, VK.G, self.max_cur_weapon),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
+            (VK.MOD_ALT, VK.E, self.dir_correct),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30), 'speed_large'),
+            (VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
+            (VK.MOD_ALT, VK.R, self.shoot_vehicle_rocket_little),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.R, self.shoot_vehicle_rocket_more),
+            (VK.MOD_ALT, VK.ENTER, self.rocket_attack_enemy),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.ENTER, self.rocket_shoot_enemy),
+            (VK.MOD_ALT, VK.CAPSLOCK, self.special_ability_fill_meter),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):

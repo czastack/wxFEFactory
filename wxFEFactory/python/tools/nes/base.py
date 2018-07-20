@@ -55,5 +55,5 @@ class SimpleNesHack(BaseNesHack):
 
     def _get_hotkeys(self):
         return (
-            ('pull_through',VK.MOD_ALT, VK.H, self.weak.pull_through),
+            (VK.MOD_ALT, VK.H, self.weak.pull_through),
         )

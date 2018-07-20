@@ -61,8 +61,8 @@ class Main(BaseDolphinHack):
 
     def get_hotkeys(self):
         return (
-            ('continue_move',VK.MOD_ALT, VK.M, self.continue_move),
-            ('move_to_cursor',VK.MOD_ALT, VK.G, self.move_to_cursor),
+            (VK.MOD_ALT, VK.M, self.continue_move),
+            (VK.MOD_ALT, VK.G, self.move_to_cursor),
         )
 
     def _person(self):

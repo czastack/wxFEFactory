@@ -101,7 +101,7 @@ class Main(BaseGTA3Tool):
 
     def get_hotkeys(self):
         return (
-            ('bigbang',VK.MOD_ALT, VK.ENTER, self.bigbang),
+            (VK.MOD_ALT, VK.ENTER, self.bigbang),
         ) + self.get_common_hotkeys()
 
     def is_model_loaded(self, model_id):

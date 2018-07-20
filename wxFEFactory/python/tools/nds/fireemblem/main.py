@@ -135,12 +135,12 @@ class FeHack(BaseNdsHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('continue_move',VK.MOD_ALT, VK.M, this.continue_move),
-            ('move_to_cursor',VK.MOD_ALT, VK.G, this.move_to_cursor),
-            ('move_left',VK.MOD_ALT, VK.LEFT, this.move_left),
-            ('move_right',VK.MOD_ALT, VK.RIGHT, this.move_right),
-            ('move_up',VK.MOD_ALT, VK.UP, this.move_up),
-            ('move_down',VK.MOD_ALT, VK.DOWN, this.move_down),
+            (VK.MOD_ALT, VK.M, this.continue_move),
+            (VK.MOD_ALT, VK.G, this.move_to_cursor),
+            (VK.MOD_ALT, VK.LEFT, this.move_left),
+            (VK.MOD_ALT, VK.RIGHT, this.move_right),
+            (VK.MOD_ALT, VK.UP, this.move_up),
+            (VK.MOD_ALT, VK.DOWN, this.move_down),
         )
 
     def _person(self):

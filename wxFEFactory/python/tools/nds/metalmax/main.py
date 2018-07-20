@@ -44,7 +44,7 @@ class MetalMaxHack(BaseNdsHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def render_global_ext(self):

@@ -68,7 +68,7 @@ class Main(BaseGbaHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def pull_through(self, _=None):

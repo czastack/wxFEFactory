@@ -12,17 +12,18 @@ class Main(BaseTool):
     def attach(self, frame):
         super().attach(frame)
         self.win.RegisterHotKeys((
-            ('item_prev',VK.MOD_ALT, VK.getCode('['), self.item_prev),
-            ('item_next',VK.MOD_ALT, VK.getCode(']'), self.item_next),
-            ('item_prev_input',VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('['), self.item_prev_input),
-            ('item_next_input',VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(']'), self.item_next_input),
+            (VK.MOD_ALT, VK.C, self.record_copy),
+            (VK.MOD_ALT, VK.getCode('['), self.item_prev),
+            (VK.MOD_ALT, VK.getCode(']'), self.item_next),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('['), self.item_prev_input),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(']'), self.item_next_input),
         ))
 
     def render(self):
         with ui.HotkeyWindow(self.title, style=win_style, styles=styles, menubar=self.render_menu()) as win:
             with ui.Vertical(className="container"):
                 with ui.Vertical(className="container fill"):
-                    self.textinput = ui.TextInput(className="expand", multiline=True, style={'height': 200})
+                    self.input = ui.TextInput(className="expand", multiline=True, style={'height': 200})
                     self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
                     with ui.Horizontal(className="expand top_padding"):
                         ui.Button("输入", onclick=self.input_text)
@@ -31,10 +32,14 @@ class Main(BaseTool):
                         ui.Text("切换下一个: alt+]")
                         ui.Text("切换并粘贴上一个: alt+shift+[")
                         ui.Text("切换并粘贴下一个: alt+shift+]")
+        # win.keeptop = True
         return win
 
     def input_text(self, _=None):
-        self.listbox.setItems(self.textinput.value.split('\n'))
+        self.listbox.setItems(self.input.value.split('\n'))
+
+    def record_copy(self, _=None):
+        self.input.appendText('\n' + fefactory_api.get_clipboard())
 
     def item_prev(self, _=None):
         self.listbox.prev(False)
@@ -56,6 +61,9 @@ class Main(BaseTool):
 
     def onSelectChange(self, listbox):
         fefactory_api.set_clipboard(listbox.text)
+
+    def copy(self):
+        auto.sendKey(auto.CombKey(VK.MOD_CONTROL, VK.C), 10)
 
     def paste(self):
         auto.sendKey(auto.CombKey(VK.MOD_CONTROL, VK.V), 10)

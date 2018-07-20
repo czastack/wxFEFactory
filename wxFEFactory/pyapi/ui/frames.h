@@ -239,19 +239,3 @@ public:
 
 	void dismiss(bool ok = true);
 };
-
-
-/*class StdModalDialog : public Dialog
-{
-public:
-	using Dialog::Dialog;
-
-	pyobj __enter__() override;
-
-	void __exit__(py::args &args) override;
-
-	void doAdd(View &child) override
-	{
-		m_elem->GetSizer()->Add(child, wxSizerFlags(1).Expand().Border(wxALL, 5));
-	}
-};*/

@@ -146,13 +146,13 @@ class Main(BaseGTATool):
 
     def get_hotkeys(self):
         return (
-            ('spawn_choosed_vehicle_and_enter',VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
-            ('max_cur_weapon',VK.MOD_ALT, VK.G, self.max_cur_weapon),
-            ('teleport_to_waypoint',VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
-            ('dir_correct',VK.MOD_ALT, VK.E, self.dir_correct),
-            ('speed_large',VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30)),
-            ('explode_nearest_vehicle',VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
-            ('enemys_harmless',VK.MOD_ALT, VK.S, self.enemys_harmless),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.V, self.spawn_choosed_vehicle_and_enter),
+            (VK.MOD_ALT, VK.G, self.max_cur_weapon),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
+            (VK.MOD_ALT, VK.E, self.dir_correct),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.M, partial(self.speed_up, rate=30), 'speed_large'),
+            (VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
+            (VK.MOD_ALT, VK.S, self.enemys_harmless),
         ) + self.get_common_hotkeys()
 
     def get_addr(self, addr):

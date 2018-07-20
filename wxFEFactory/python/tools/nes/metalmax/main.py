@@ -78,11 +78,11 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            ('move_left',VK.MOD_ALT, VK.LEFT, this.move_left),
-            ('move_right',VK.MOD_ALT, VK.RIGHT, this.move_right),
-            ('move_up',VK.MOD_ALT, VK.UP, this.move_up),
-            ('move_down',VK.MOD_ALT, VK.DOWN, this.move_down),
-            ('pull_through',VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.LEFT, this.move_left),
+            (VK.MOD_ALT, VK.RIGHT, this.move_right),
+            (VK.MOD_ALT, VK.UP, this.move_up),
+            (VK.MOD_ALT, VK.DOWN, this.move_down),
+            (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
     def on_person_change(self, lb):

@@ -183,13 +183,13 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def get_hotkeys(self):
         return (
-            ('turn_and_speed_up',VK.MOD_ALT | VK.MOD_SHIFT, VK.M, self.turn_and_speed_up),
-            ('near_objects_to_front',VK.MOD_ALT | VK.MOD_SHIFT, VK.O, self.near_objects_to_front),
-            ('near_vehicles_pinwheel',VK.MOD_ALT, VK.R, self.near_vehicles_pinwheel),
-            ('near_peds_pinwheel',VK.MOD_ALT | VK.MOD_SHIFT, VK.R, self.near_peds_pinwheel),
-            ('dir_correct',VK.MOD_ALT, VK.E, self.dir_correct),
-            ('move_to_map_cursor',VK.MOD_CONTROL | VK.MOD_ALT, VK.G, self.move_to_map_cursor),
-            ('teleport_to_waypoint',VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.M, self.turn_and_speed_up),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.O, self.near_objects_to_front),
+            (VK.MOD_ALT, VK.R, self.near_vehicles_pinwheel),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.R, self.near_peds_pinwheel),
+            (VK.MOD_ALT, VK.E, self.dir_correct),
+            (VK.MOD_CONTROL | VK.MOD_ALT, VK.G, self.move_to_map_cursor),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.G, self.teleport_to_waypoint),
         ) + self.get_common_hotkeys()
 
     def script_call(self, command_id, signature, *args):
