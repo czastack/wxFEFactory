@@ -17,7 +17,7 @@ class Module(BaseListBoxModuel):
     def attach(self, frame):
         super().attach(frame)
 
-        data_list = self.loadJson('characters', [])
+        data_list = self.load_json('characters', [])
         for item in data_list:
             self.data_map[item['name']] = item
             self.doAdd(item['name'])
@@ -96,7 +96,7 @@ class Module(BaseListBoxModuel):
 
     def onSave(self, btn):
         self.pg.changed = False
-        self.dumpJson('characters', list(self.itervalues()))
+        self.dump_json('characters', list(self.itervalues()))
 
     def getCurData(self):
         text = self.listbox.text

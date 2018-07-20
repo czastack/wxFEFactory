@@ -61,7 +61,7 @@ class MainFrame:
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
                 ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggleConsolInputMulti)
             with ui.Menu("工具"):
-                ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.openTool)
+                ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.open_tool)
                 ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attachEmu, kind="check")
             with ui.Menu("窗口"):
                 ui.MenuItem("保存窗口位置和大小", onselect=self.saveWinOption)
@@ -152,7 +152,7 @@ class MainFrame:
         return toolbar.realize()
 
     def onToolbarToolClick(self, toolbar, toolid):
-        self.openToolByName(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
+        self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
 
     def toggleConsole(self, m):
         """显示/隐藏控制台"""
@@ -268,7 +268,7 @@ class MainFrame:
                         print('加载模块%s失败' % name)
                         traceback.print_exc()
 
-    def openTool(self, m):
+    def open_tool(self, m):
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
             with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
@@ -304,10 +304,10 @@ class MainFrame:
                 for child in item.children:
                     child.id = tree.InsertItem(item.id, child.label, data=child)
         else:
-            self.openToolByName(item.module)
+            self.open_tool_by_name(item.module)
             self.tool_dialog.endModal()
 
-    def openToolByName(self, name):
+    def open_tool_by_name(self, name):
         Tool = self.getTool(name)
         tool = Tool()
         tool.attach(self)

@@ -71,7 +71,7 @@ class BaseTool(BaseScene):
         def close_callback():
             def callback():
                 from mainframe import frame
-                frame.openToolByName(name)
+                frame.open_tool_by_name(name)
             frame.restart(callback=callback)
 
         if self.nested:

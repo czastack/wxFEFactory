@@ -25,7 +25,7 @@ class BaseModule(BaseScene):
         with frame.book:
             self.view = self.render()
         with frame.win.menubar:
-            self.menu = self.getMenu()
+            self.menu = self.get_menu()
 
     def onClose(self, _=None):
         """标签页关闭回调，返回False会取消关闭"""
@@ -46,7 +46,7 @@ class BaseModule(BaseScene):
         """
         pass
 
-    def getMenu(self):
+    def get_menu(self):
         """
         渲染菜单，供attach调用
         :return: 返回Menu对象
@@ -68,24 +68,24 @@ class BaseModule(BaseScene):
         return cls.__module__.split('.')[1]
 
     @classmethod
-    def getDir(cls):
+    def get_dir(cls):
         """根据当前项目获取模块数据存放目录，即模块工作目录"""
         return os.path.join(app.project.path, cls.module_name)
 
     @classmethod
-    def loadJson(cls, name, defval={}):
+    def load_json(cls, name, defval={}):
         """从模块工作目录读取一个json文件"""
         try:
-            with open(os.path.join(cls.getDir(), name + '.json'), encoding="utf-8") as file:
+            with open(os.path.join(cls.get_dir(), name + '.json'), encoding="utf-8") as file:
                 ret = json.load(file)
         except Exception: #FileNotFoundError, json.decoder.JSONDecodeError
             ret = defval
         return ret
 
     @classmethod
-    def dumpJson(cls, name, data, indent=DUMP_INDENT):
+    def dump_json(cls, name, data, indent=DUMP_INDENT):
         """在模块工作目录写入一个json文件"""
-        dir_ = cls.getDir()
+        dir_ = cls.get_dir()
         if not os.path.exists(dir_):
             os.mkdir(dir_)
         with open(os.path.join(dir_, name + '.json'), 'w', encoding="utf-8") as file:
@@ -134,7 +134,7 @@ class BaseListBoxModuel(BaseModule):
 
         return contextmenu
 
-    def getMenu(self):
+    def get_menu(self):
         with ui.Menu(self.unique_title) as menu:
             ui.MenuItem("清空", onselect=self.weak.onClear)
         return menu

@@ -12,7 +12,7 @@ class Module(BaseListBoxModuel):
 
     def attach(self, frame):
         super().attach(frame)
-        self.data_list = self.loadJson('strings', [])
+        self.data_list = self.load_json('strings', [])
         count = self.listbox.count
         for item in self.data_list:
             name = "%04X" % count
@@ -68,7 +68,7 @@ class Module(BaseListBoxModuel):
         self.data_list[self.listbox.index]['text'] = self.textarea.value
 
     def onSave(self, btn):
-        self.dumpJson('strings', self.data_list, indent=0)
+        self.dump_json('strings', self.data_list, indent=0)
 
     def onSaveAs(self, btn):
         tpl = self.longtext_dialog("输入模板", "{i:04X} {addr:08X}\n{text}\n")
