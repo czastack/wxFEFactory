@@ -29,7 +29,7 @@ class Main(BaseNesHack):
             ModelInput("hpmax", "HP上限")
             ModelInput("hp", "HP")
             ModelInput("atk", "攻击")
-            ModelInput("defensive", "守备")
+            ModelInput("defense", "守备")
             ModelInput("strength", "强度")
             ModelInput("intelli", "智力")
             ModelInput("stamina", "体力")
@@ -64,7 +64,7 @@ class Main(BaseNesHack):
         ModelInput("sp", "装甲片")
         ModelInput("main_bullets_count", "主炮炮弹")
         ModelInput("bullet", "弹仓容量")
-        ModelInput("defensive", "守备力")
+        ModelInput("defense", "守备力")
         ModelInput("weight", "底盘重量")
 
     def render_chariot_items(self):

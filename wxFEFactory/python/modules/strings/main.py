@@ -121,7 +121,7 @@ class Module(BaseListBoxModuel):
     def readFrom(self, reader):
         unique = False
         
-        choice = exui.CheckChoiceDialog(self.getTitle(), (
+        choice = exui.CheckChoiceDialog(self.unique_title, (
             ('unique', '是否过滤重复文本？'),
             ('show_addr', '是否显示文本在rom中的地址'),
             ('show_code', '是否显示文本的码表代码'),

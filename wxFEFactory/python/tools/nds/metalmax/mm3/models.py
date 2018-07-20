@@ -31,7 +31,7 @@ class Person(Model):
     atk1 = WordField(0x021A0C20, label="武器1攻击力")
     atk2 = WordField(0x021A0C22, label="武器2攻击力")
     atk3 = WordField(0x021A0C24, label="武器3攻击力")
-    defensive = WordField(0x021A0C28, label="总防御力")
+    defense = WordField(0x021A0C28, label="总防御力")
     resistance = ArrayField(0x021A0C30, 6, MinuendFieldPrep(100, WordField(0))) # 火光电声气冰
 
 
@@ -43,7 +43,7 @@ class ChariotEquipInfo(Model):
     status = ByteField(6, label="损坏程度(>20:破损,>100:损坏)")
     ammo = ByteField(8, label="剩余弹药")
     star = ByteField(9, label="武器星级")
-    defensive = WordField(10, label="守备力")
+    defense = WordField(10, label="守备力")
     attr1 = WordField(12, label="C装置命中率/武器攻击力/引擎载重(0.01t)")
     attr2 = WordField(14, label="C装置回避率/武器弹舱容量")
     weight = WordField(18, label="重量(0.01t)")
@@ -107,7 +107,7 @@ class Enemy(Model):
     level = ByteField(0x021A63FE, label="等级")
     hp = WordField(0x021A6400, label="HP")
     atk = WordField(0x021A6404, label="攻击")
-    defensive = WordField(0x021A6406, label="防御")
+    defense = WordField(0x021A6406, label="防御")
     hit = WordField(0x021A6408, label="命中")
     avoid = WordField(0x021A640A, label="回避")
     speed = WordField(0x021A640C, label="速度")

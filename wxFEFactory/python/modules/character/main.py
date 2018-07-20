@@ -42,7 +42,8 @@ class Module(BaseListBoxModuel):
         self.pg.setOnChange(this.onPgChange)
         self.pg.setOnSelected(this.onFieldSelect)
 
-    def doGetTitle(self):
+    @property
+    def title(self):
         return self.form.title
 
     def onFieldSelect(self, pg, name):

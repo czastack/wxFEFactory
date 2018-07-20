@@ -16,7 +16,7 @@ class Person(Model):
     power = ByteField(18)
     skill = ByteField(19)
     speed = ByteField(20)
-    defensive = ByteField(21)
+    defense = ByteField(21)
     magicdef = ByteField(22)
     lucky = ByteField(23)
     physical_add = ByteField(24)

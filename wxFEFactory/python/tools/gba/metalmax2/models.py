@@ -10,7 +10,7 @@ class Person(Model):
     hp = WordField(0x03003D41, label="HP")
     hpmax = WordField(0x03003D43, label="HP上限")
     atk = WordField(0x03003D45, label="攻击")
-    defensive = WordField(0x03003D47, label="守备")
+    defense = WordField(0x03003D47, label="守备")
     power = ByteField(0x03003D6A, label="腕力")
     intelli = ByteField(0x03003D6B, label="知力")
     stamina = ByteField(0x03003D6C, label="体力")
@@ -30,7 +30,7 @@ class Chariot(Model):
     items = ArrayField(0x03003E91, 8, BitsField(0, 1, 0, 7))
     equips = ArrayField(0x03003EE9, 8, BitsField(0, 1, 0, 7))
     bullet = ByteField(0x0300404C, label="弹仓容量")
-    defensive = ByteField(0x0300404A, label="守备力")
+    defense = ByteField(0x0300404A, label="守备力")
     weight = WordField(0x0300404F, label="底盘重量")
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹

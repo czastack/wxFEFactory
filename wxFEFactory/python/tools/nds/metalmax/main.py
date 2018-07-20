@@ -77,7 +77,7 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("atk1")
         ModelInput("atk2")
         ModelInput("atk3")
-        ModelInput("defensive")
+        ModelInput("defense")
 
         for i, label in enumerate("火光电声气冰"):
             ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, max=100)
@@ -106,7 +106,7 @@ class MetalMaxHack(BaseNdsHack):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
         ModelSelect("chassis.equip", "底盘", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
-        ModelInput("chassis.defensive", "底盘防御")
+        ModelInput("chassis.defense", "底盘防御")
         ModelInput("chassis.attr1", "荷台").view.setToolTip('道具容量，最大18个')
         ModelInput("chassis.attr2", "弹舱")
         ModelSelect("chassis.change", "双持类型", choices=datasets.DOUBLE_TYPE)
@@ -190,7 +190,7 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("level")
         ModelInput("hp")
         ModelInput("atk")
-        ModelInput("defensive")
+        ModelInput("defense")
         ModelInput("hit")
         ModelInput("avoid")
         ModelInput("speed")
@@ -214,7 +214,7 @@ class MetalMaxHack(BaseNdsHack):
                 ModelInput("change")
                 ModelInput("ammo")
                 ModelInput("star")
-                ModelInput("defensive")
+                ModelInput("defense")
                 ModelInput("attr1")
                 ModelInput("attr2")
                 ModelInput("weight")
@@ -280,7 +280,7 @@ class MetalMaxHack(BaseNdsHack):
         ins.equip = data[0]
         ins.star = data[1]
         ins.attr1 = data[3] if use_max and item_type != 'engine' else data[2]
-        ins.defensive = data[5] if use_max else data[4]
+        ins.defense = data[5] if use_max else data[4]
         if dialog.use_weight.checked:
             ins.weight = data[6]
         if dialog.use_attr2.checked:

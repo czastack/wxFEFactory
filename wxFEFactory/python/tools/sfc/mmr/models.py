@@ -10,7 +10,7 @@ class Person(Model):
     hp = WordField(0x7E800C, label="HP")
     hpmax = WordField(0x7E800A, label="HP最大值")
     atk = WordField(0x7E8039, label="攻击")
-    defensive = WordField(0x7E803B, label="防御")
+    defense = WordField(0x7E803B, label="防御")
     battle = ByteField(0x7E8007, label="战斗LV")
     drive = ByteField(0x7E8008, label="驾驶LV")
     fix = ByteField(0x7E8009, label="修理LV")
@@ -30,7 +30,7 @@ class Person(Model):
 class ChariotEquip(Model):
     SIZE = 8
     equip = ByteField(0, label="种类")
-    defensive = ByteField(1, label="守备力")
+    defense = ByteField(1, label="守备力")
     weight = BitsField(2, 2, bitoffset=0, bitlen=12, label="重量")
     status = BitsField(3, 1, bitoffset=4, bitlen=4, label="状态") # flag 2=损坏 4=大破 8=装备
     attr1 = WordField(4, label="攻击力/命中率/积载力")
@@ -43,7 +43,7 @@ class Chariot(Model):
     name = Field(0x7E8300, bytes, 10, label="名称")
     sp = WordField(0x7E8328, label="装甲")
     chassis = ByteField(0x7E830E, label="底盘")
-    defensive = ByteField(0x7E830F, label="底盘防御")
+    defense = ByteField(0x7E830F, label="底盘防御")
     weight = ByteField(0x7E8312, label="底盘重量")
     bullet = ByteField(0x7E8314, label="弹舱")
     hole_type = ArrayField(0x7E8325, 3, ByteField(0)) # 炮穴类型
@@ -84,7 +84,7 @@ class Global(Model):
     after_exp = WordField(0x7E4170, label="战后经验")
     bs_flag = WordField(0x7E4170, label="BS全功能") # 0x3FFF
     town_flag = WordField(0x7E8E28, label="村庄全开") # 0xFFFF
-    map_flag = Field(0x7E8E40, type=bytes, size=32, label="村庄全开")
+    map_flag = Field(0x7E8E40, type=bytes, size=32, label="地图全开")
     chariot_flag = ByteField(0x7E8E02, label="战车情报全开") # 0xFF
     iteminfo_flag = Field(0x7E8E80, type=bytes, size=52, label="道具情报全开")
     hunting_count = ArrayField(0x7E911F, 5, Field(0)) # 怪物猎杀数量
@@ -92,8 +92,8 @@ class Global(Model):
     medal_flag = WordField(0x7E8018, label="全勋章获得") # 0xFFFF
 
     wanted_status = ArrayField(0x7E910F, 16, ByteField(0)) # 0=未击破, 63=未领奖金, E3=已领奖金
-    parter_flag = ArrayField(0x7E9106, 3, ByteField(0))
-    parter_count = ByteField(0x7E9168) # 1=加入, FF=离队
+    parter_flag = ArrayField(0x7E9106, 3, ByteField(0)) # 1=加入, FF=离队
+    parter_count = ByteField(0x7E9168)
     auto_battle = ToggleField(0x7E8017, size=1, enableData=0x40, disableData=0x00, label="自动战斗")
 
     # 敌人情况

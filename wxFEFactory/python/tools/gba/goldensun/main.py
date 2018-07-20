@@ -37,12 +37,12 @@ class BaseGSTool(BaseGbaHack):
             ModelInput("ep", "EP")
             ModelInput("epmax", "EP上限")
             ModelInput("atk", "攻击")
-            ModelInput("defensive", "防御")
+            ModelInput("defense", "防御")
             ModelInput("speed", "速度")
             ModelInput("lucky", "好运")
             for tlabel, tname in datasets.ELEMENT_TYPES:
                 ModelInput("%s_power" % tname, "%s力量" % tlabel)
-                ModelInput("%s_defensive" % tname, "%s抗性" % tlabel)
+                ModelInput("%s_defense" % tname, "%s抗性" % tlabel)
 
         with Group("skills", "角色精神力", self.person) as skills_group:
             for i in range(5):

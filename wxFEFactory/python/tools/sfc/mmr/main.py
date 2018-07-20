@@ -38,7 +38,7 @@ class Main(BaseSfcHack):
             ModelInput("hpmax")
             ModelInput("hp")
             ModelInput("atk")
-            ModelInput("defensive")
+            ModelInput("defense")
             ModelInput("strength")
             ModelInput("intelli")
             ModelInput("stamina")
@@ -74,7 +74,7 @@ class Main(BaseSfcHack):
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
-        ModelInput("defensive")
+        ModelInput("defense")
         ModelInput("weight")
         ModelInput("bullet")
 
@@ -120,7 +120,7 @@ class Main(BaseSfcHack):
             with DialogGroup("chariot_equip_info", "战车物品详情", self.chariot_equip_info, cols=1,
                     dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
                 ModelSelect("equip", choices=datasets.CHARIOT_EQUIPS)
-                ModelInput("defensive")
+                ModelInput("defense")
                 ModelInput("weight")
                 ModelInput("status")
                 ModelInput("attr1")
@@ -162,7 +162,7 @@ class Main(BaseSfcHack):
         item_type = models.Chariot.item_type(equip)
         ins = self.chariot_equip_info
         ins.equip = equip
-        ins.defensive = data[1]
+        ins.defense = data[1]
         if dialog.use_weight.checked:
             ins.weight = data[2]
         ins.attr1 = data[3]

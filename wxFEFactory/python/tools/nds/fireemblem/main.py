@@ -73,7 +73,7 @@ class FeHack(BaseNdsHack):
         ModelInput("magic", "魔力+")
         ModelInput("skill", "技术+")
         ModelInput("speed", "速度+")
-        ModelInput("defensive", "守备+")
+        ModelInput("defense", "守备+")
         ModelInput("magicdef", "魔防+")
         ModelInput("lucky", "幸运+")
         ModelInput("physical_add", "体格+")
@@ -115,7 +115,7 @@ class FeHack(BaseNdsHack):
         ModelInput("skill_add", "技巧+")
         ModelInput("speed_add", "速度+")
         ModelInput("lucky_add", "幸运+")
-        ModelInput("defensive_add", "防御+")
+        ModelInput("defense_add", "防御+")
         ModelInput("magicdef_add", "魔防+")
         
         i = 0

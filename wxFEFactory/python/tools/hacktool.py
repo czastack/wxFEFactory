@@ -13,7 +13,7 @@ ui = fefactory_api.ui
 class BaseHackTool(NestedTool):
     def __init__(self):
         super().__init__()
-        self.config = Config(self.getName() + '_config.json')
+        self.config = Config(self.module_name + '_config.json')
 
     def attach(self, frame):
         super().attach(frame)

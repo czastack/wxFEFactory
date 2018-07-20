@@ -41,7 +41,7 @@ class Main(BaseDolphinHack):
             ModelInput("skill_add", "技术+")
             ModelInput("speed_add", "速+")
             ModelInput("lucky_add", "幸运+")
-            ModelInput("defensive_add", "守备+")
+            ModelInput("defense_add", "守备+")
             ModelInput("magicdef_add", "魔防+")
             ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
 

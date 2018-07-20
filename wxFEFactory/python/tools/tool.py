@@ -1,5 +1,5 @@
-from lib.basescene import BaseScene
-from lib.lazy import lazyclassmethod_indict
+from lib.scene import BaseScene
+from lib.lazy import ClassLazy
 from styles import styles
 import traceback
 import fefactory_api
@@ -12,7 +12,7 @@ class BaseTool(BaseScene):
     nested = False
 
     # def __del__(self):
-    #     print(self.getName(), '析构')
+    #     print(self.module_name, '析构')
 
     def attach(self, frame):
         try:
@@ -20,7 +20,7 @@ class BaseTool(BaseScene):
                 with frame.book:
                     win = self.render()
                     if win:
-                        ui.AuiItem(win, caption=self.getTitle())
+                        ui.AuiItem(win, caption=self.unique_title)
             else:
                 win = self.render()
             if win:
@@ -52,21 +52,21 @@ class BaseTool(BaseScene):
             close_callbacks = self._close_callbacks = []
         close_callbacks.append(callback)
 
-    @lazyclassmethod_indict
-    def doGetTitle(cls):
+    @ClassLazy
+    def title(cls):
         """获取原始标题，显示在标签页标题和菜单栏"""
         module = cls.__module__
         return __import__(module[:module.rfind('.')], fromlist='__init__').name
 
-    @lazyclassmethod_indict
-    def getName(cls):
+    @ClassLazy
+    def module_name(cls):
         """模块名称，即模块文件夹名"""
         module = cls.__module__
         return module[module.find('.') + 1: module.rfind('.')]
 
     def reload(self, _=None):
         from mainframe import frame
-        name = self.getName()
+        name = self.module_name
 
         def close_callback():
             def callback():
@@ -129,6 +129,6 @@ class NestedTool(BaseTool):
 
     def render_win(self):
         menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.doGetTitle(), styles=styles, menubar=menubar, wxstyle=0x80804)
+        self.win = ui.HotkeyWindow(self.title, styles=styles, menubar=menubar, wxstyle=0x80804)
         self.win.position = (70, 4)
         return self.win

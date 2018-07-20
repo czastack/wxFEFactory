@@ -1,7 +1,7 @@
 from application import app
 from lib import wxconst
-from lib.lazy import lazyclassmethod
-from lib.basescene import BaseScene
+from lib.lazy import ClassLazy
+from lib.scene import BaseScene
 from styles import styles
 from . import modules
 import os
@@ -18,7 +18,7 @@ class BaseModule(BaseScene):
     menu = None
 
     # def __del__(self):
-    #     print(self.getName(), '析构')
+    #     print(self.module_name, '析构')
 
     def attach(self, frame):
         """模块加载完毕后调用，用于添加视图到主窗口"""
@@ -53,39 +53,39 @@ class BaseModule(BaseScene):
         """
         pass
 
-    @lazyclassmethod
-    def doGetTitle(class_):
+    @ClassLazy
+    def title(cls):
         """获取原始标题，显示在标签页标题和菜单栏"""
-        name = class_.getName()
+        name = cls.module_name
         for item in modules:
             if item[1] == name:
                 return item[0]
         return name
 
-    @lazyclassmethod
-    def getName(class_):
+    @ClassLazy
+    def module_name(cls):
         """模块名称，即模块文件夹名"""
-        return class_.__module__.split('.')[1]
+        return cls.__module__.split('.')[1]
 
     @classmethod
-    def getDir(class_):
+    def getDir(cls):
         """根据当前项目获取模块数据存放目录，即模块工作目录"""
-        return os.path.join(app.project.path, class_.getName())
+        return os.path.join(app.project.path, cls.module_name)
 
     @classmethod
-    def loadJson(class_, name, defval={}):
+    def loadJson(cls, name, defval={}):
         """从模块工作目录读取一个json文件"""
         try:
-            with open(os.path.join(class_.getDir(), name + '.json'), encoding="utf-8") as file:
+            with open(os.path.join(cls.getDir(), name + '.json'), encoding="utf-8") as file:
                 ret = json.load(file)
         except Exception: #FileNotFoundError, json.decoder.JSONDecodeError
             ret = defval
         return ret
 
     @classmethod
-    def dumpJson(class_, name, data, indent=DUMP_INDENT):
+    def dumpJson(cls, name, data, indent=DUMP_INDENT):
         """在模块工作目录写入一个json文件"""
-        dir_ = class_.getDir()
+        dir_ = cls.getDir()
         if not os.path.exists(dir_):
             os.mkdir(dir_)
         with open(os.path.join(dir_, name + '.json'), 'w', encoding="utf-8") as file:
@@ -114,7 +114,7 @@ class BaseListBoxModuel(BaseModule):
                     ui.Button(label="删除", className="button", onclick=this.onDel)
             with ui.Vertical():
                 self.render_main()
-        ui.AuiItem(panel, caption=self.getTitle(), onclose=this.onClose)
+        ui.AuiItem(panel, caption=self.unique_title, onclose=this.onClose)
 
         self.listbox.setOnKeyDown(this.onListBoxKey)
 
@@ -135,7 +135,7 @@ class BaseListBoxModuel(BaseModule):
         return contextmenu
 
     def getMenu(self):
-        with ui.Menu(self.getTitle()) as menu:
+        with ui.Menu(self.unique_title) as menu:
             ui.MenuItem("清空", onselect=self.weak.onClear)
         return menu
 

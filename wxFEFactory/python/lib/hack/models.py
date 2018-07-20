@@ -368,6 +368,8 @@ class ModelPtrField(Cachable, PtrField):
         self.modelClass = modelClass
 
     def create_cache(self, instance):
+        if self.modelClass == 'self':
+            self.modelClass = type(instance)
         return self.modelClass(PtrField.__get__(self, instance, None), instance.handler)
 
     def update_cache(self, instance, cache):

@@ -39,7 +39,7 @@ class FeHack(BaseGbaHack):
             ModelInput("power", "力量")
             ModelInput("skill", "技术")
             ModelInput("speed", "速度")
-            ModelInput("defensive", "守备")
+            ModelInput("defense", "守备")
             ModelInput("magicdef", "魔防")
             ModelInput("lucky", "幸运")
             ModelInput("physical_add", "体格+")

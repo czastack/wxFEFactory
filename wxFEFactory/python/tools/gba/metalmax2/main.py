@@ -29,7 +29,7 @@ class Main(BaseGbaHack):
             ModelInput("hp")
             ModelInput("hpmax")
             ModelInput("atk")
-            ModelInput("defensive")
+            ModelInput("defense")
             ModelInput("power")
             ModelInput("intelli")
             ModelInput("stamina")
@@ -65,7 +65,7 @@ class Main(BaseGbaHack):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
         ModelInput("bullet")
-        ModelInput("defensive")
+        ModelInput("defense")
         ModelInput("weight")
 
     def render_chariot_items(self):

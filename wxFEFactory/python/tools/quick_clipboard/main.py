@@ -19,7 +19,7 @@ class Main(BaseTool):
         ))
 
     def render(self):
-        with ui.HotkeyWindow(self.doGetTitle(), style=win_style, styles=styles, menubar=self.render_menu()) as win:
+        with ui.HotkeyWindow(self.title, style=win_style, styles=styles, menubar=self.render_menu()) as win:
             with ui.Vertical(className="container"):
                 with ui.Vertical(className="container fill"):
                     self.textinput = ui.TextInput(className="expand", multiline=True, style={'height': 200})

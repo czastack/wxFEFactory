@@ -33,7 +33,7 @@ class Person(Model):
     skill_add = ByteField(0x2C)
     speed_add = ByteField(0x2D)
     lucky_add = ByteField(0x2E)
-    defensive_add = ByteField(0x2F)
+    defense_add = ByteField(0x2F)
     magicdef_add = ByteField(0x30)
     skills = ArrayField(0x3C, 12, ModelField(0, SkillSlot))
     items = ArrayField(0xCC, 7, ModelField(0, ItemSlot))

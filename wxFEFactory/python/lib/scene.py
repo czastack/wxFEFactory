@@ -35,12 +35,13 @@ class BaseScene:
             else:
                 break
 
-    def getTitle(self):
+    @property
+    def unique_title(self):
         """
         获取标题，显示在标签页标题和菜单栏
         如果打开了多个实例，会在标题后添加序号
         """
-        title = self.doGetTitle()
+        title = self.title
         if self.index is not 0:
             title += str(self.index + 1)
         return title

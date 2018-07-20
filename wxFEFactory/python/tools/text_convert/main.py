@@ -1,7 +1,7 @@
 from ..tool import BaseTool
-from mainframe import ui
 from styles import styles, dialog_style
 from fe.ferom import FeRomRW
+from fefactory_api import ui
 
 
 class Main(BaseTool):
@@ -10,7 +10,7 @@ class Main(BaseTool):
             'height': 60,
         }
 
-        with ui.Window(self.getTitle(), styles=styles, style=dialog_style, menubar=self.render_menu()) as win:
+        with ui.Window(self.title, styles=styles, style=dialog_style, menubar=self.render_menu()) as win:
             with ui.Vertical():
                 with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as container:
                     ui.Text("Rom", className="vcenter")
