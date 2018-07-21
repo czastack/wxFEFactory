@@ -174,11 +174,11 @@ class BaseListBoxModuel(BaseModule):
     def onListBoxKey(self, lb, event):
         """按键监听"""
         mod = event.GetModifiers()
-        if mod == event.CTRL:
+        if mod == WXK.MOD_CONTROL:
             code = event.GetKeyCode()
-            if code == event.UP:
+            if code == WXK.UP:
                 self.moveUp()
-            elif code == event.DOWN:
+            elif code == WXK.DOWN:
                 self.moveDown()
         event.Skip()
 

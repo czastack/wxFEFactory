@@ -182,10 +182,10 @@ class CoordWidget(TwoWayWidget):
         """按键监听"""
         mod = event.GetModifiers()
         code = event.GetKeyCode()
-        if mod == event.CTRL:
-            if code == event.UP:
+        if mod == WXK.MOD_CONTROL:
+            if code == WXK.UP:
                 self.moveUp()
-            elif code == event.DOWN:
+            elif code == WXK.DOWN:
                 self.moveDown()
         elif code == WXK.W:
             self.write()

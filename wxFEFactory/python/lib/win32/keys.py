@@ -145,7 +145,7 @@ class WXK(KEY):
     SPACE = 32
     DELETE = 127
     ENTER = 13
-    RETUEN = 13
+    RETURN = 13
     ESCAPE = 27
     LBUTTON = 301
     RBUTTON = 302

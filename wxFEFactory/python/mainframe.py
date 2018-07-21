@@ -233,11 +233,11 @@ class MainFrame:
         """控制台多行输入框按键事件"""
         mod = event.GetModifiers()
         code = event.GetKeyCode()
-        if code == event.TAB:
+        if code == WXK.TAB:
             text_input.writeText('    ')
             return True
-        if mod == event.CTRL:
-            if code == event.RETURN:
+        if mod == WXK.MOD_CONTROL:
+            if code == WXK.RETURN:
                 self.consol_input_multi_run()
                 return True
             elif code == WXK.A:

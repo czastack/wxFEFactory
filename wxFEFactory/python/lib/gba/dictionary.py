@@ -24,11 +24,13 @@ class Dictionary:
         if isinstance(code_table, str):
             with open(code_table, 'r', encoding='utf8') as f:
                 for line in f.readlines():
-                    k, v = line.rstrip('\n').split('=', 1)
-                    k = int(k, 16)
-                    code_char[k] = v
-                    if len(v) == 1:
-                        char_code[ord(v)] = k
+                    line = line.rstrip('\n')
+                    if line:
+                        k, v = line.split('=', 1)
+                        k = int(k, 16)
+                        code_char[k] = v
+                        if len(v) == 1:
+                            char_code[ord(v)] = k
 
     def getCode(self, ch):
         return self._char_code.get(ord(ch), 0x00)
@@ -149,7 +151,7 @@ class Dictionary:
             result.append(self.end_code)
         return result
 
-    def encodeToArray(self, text):
+    def encode_to_array(self, text):
         """不支持控制码"""
         def getCode(ch):
             code = self._char_code.get(ord(ch), 0x00)
@@ -160,7 +162,7 @@ class Dictionary:
         return [getCode(ch) for ch in text]
 
 
-    def decode_it(self, data, codebuff=None, ignore_zero=False):
+    def decode_it(self, data, buf=None, ignore_zero=False):
         """ 读到一句就返回
         :param ignore_zero: 不把00当作结束符
         """
@@ -177,8 +179,8 @@ class Dictionary:
             except StopIteration:
                 break
 
-            if codebuff is not None:
-                codebuff.append(byte)
+            if buf is not None:
+                buf.append(byte)
 
             if char == 0:
                 if (
@@ -233,7 +235,8 @@ class Dictionary:
 
 
 def fmt2reg(fmt):
-    return re.compile(re.escape(fmt).replace('\\%d', '(\w+)'))
+    return re.compile(re.escape(fmt).replace('\\%d', '(\\w+)'))
+
 
 class CtrlCode:
     # usage:
