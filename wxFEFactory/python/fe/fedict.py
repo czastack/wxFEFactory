@@ -28,27 +28,27 @@ class FeDict(Dictionary):
     """
     __slots__ = ('tree', 'leafmap')
 
-    def __init__(self, huffmandata, codetable, low_range=None, ctrltable=None, ctrl_low_range=None):
+    def __init__(self, huffman, code_table, low_range=None, ctrl_table=None, ctrl_low_range=None):
         """
-        :param huffmandata: 包含哈夫曼树的顺序存储数据 (file, start, size)
+        :param huffman: 包含哈夫曼树的顺序存储数据 (file, start, size)
         """
-        super().__init__(codetable, low_range, ctrltable, ctrl_low_range)
-        self.buildtree(huffmandata)
+        super().__init__(code_table, low_range, ctrl_table, ctrl_low_range)
+        self.buildtree(huffman)
 
-    def buildtree(self, huffmandata):
+    def buildtree(self, huffman):
         # 生成哈夫曼树
         buff = None
 
-        if isinstance(huffmandata, (tuple, list)):
-            file, start, size = huffmandata
+        if isinstance(huffman, (tuple, list)):
+            file, start, size = huffman
             buff = ctypes.create_string_buffer(size)
             with open(file, 'rb') as f:
                 f.seek(start)
                 f.readinto(buff)
-        elif isinstance(huffmandata, (bytes, bytearray)):
-            size = len(huffmandata)
+        elif isinstance(huffman, (bytes, bytearray)):
+            size = len(huffman)
             buff = ctypes.create_string_buffer(size)
-            buff.raw = huffmandata
+            buff.raw = huffman
 
         if buff is None:
             raise ValueError("生成哈夫曼树失败")
@@ -140,8 +140,8 @@ class FeDict(Dictionary):
                 if code == 0x8000:
                     code = code << 16 | next(it)
 
-                if self.ctrltable and code in self.ctrltable:
-                    word = self.ctrltable[code].decode_it(None)
+                if self.ctrl_table and code in self.ctrl_table:
+                    word = self.ctrl_table[code].decode_it(None)
                     text.append(word)
 
                     if code == 0x1000:
@@ -174,9 +174,9 @@ class FeDict(Dictionary):
             ch = text[i]
             code = self.getCode(ch)
             if code is 0:
-                if self.ctrltable and CtrlCode.FMT_START.startswith(ch):
+                if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False
-                    for ctrlcode in self.ctrltable.values():
+                    for ctrlcode in self.ctrl_table.values():
                         match = ctrlcode.encode_args(text, i)
                         if match:
                             code, args, i = match
@@ -203,7 +203,7 @@ class FeDict(Dictionary):
 
     def encodeHaffuman(self, text, buf=None, null=True):
         """ 文本转哈夫曼字节数组
-        :param null: 把\0添加到结尾
+        :param null: 把\\0添加到结尾
         :param buf: 可选的缓冲区（存放哈夫曼字节数据）
         """
         codes = self.encodeText(text)

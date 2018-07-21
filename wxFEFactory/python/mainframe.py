@@ -39,32 +39,32 @@ class MainFrame:
                 self.win.position = position
 
         if getattr(app, 'project', None):
-            self.onOpenProject(app.project)
+            self.on_open_project(app.project)
 
     def render(self):
         with ui.MenuBar() as menubar:
             with ui.Menu("文件"):
                 with ui.Menu("新建"):
-                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=self.newProject)
+                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=self.new_project)
                 with ui.Menu("打开"):
-                    ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=self.openProject)
+                    ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=self.open_project)
                 with ui.Menu("最近的工程"):
                     for path in app.config['recent_project']:
-                        ui.MenuItem(path, onselect=self.doOpenProject)
+                        ui.MenuItem(path, onselect=self.do_open_project)
                     if app.config['recent_project']:
-                       ui.MenuItem("清除列表", onselect=self.clearRecentProject, sep=True) 
-                ui.MenuItem("打开工程所在文件夹", onselect=self.openProjectDir)
-                ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.readFromRom)
+                       ui.MenuItem("清除列表", onselect=self.clear_recent_project, sep=True) 
+                ui.MenuItem("打开工程所在文件夹", onselect=self.open_project_dir)
+                ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
             with ui.Menu("视图"):
-                ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggleConsole)
-                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggleConsolInputMulti)
+                ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggle_console)
+                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_consol_input_multi)
             with ui.Menu("工具"):
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.open_tool)
-                ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attachEmu, kind="check")
+                ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attach_emu, kind="check")
             with ui.Menu("窗口"):
-                ui.MenuItem("保存窗口位置和大小", onselect=self.saveWinOption)
+                ui.MenuItem("保存窗口位置和大小", onselect=self.save_win_option)
 
         with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
@@ -77,12 +77,12 @@ class MainFrame:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
                         self.console_input = ui.TextInput(wxstyle=0x0400, className="expand console-input")
-                        ui.Button("∧", className="btn-sm", onclick=self.toggleConsolInputMulti)
+                        ui.Button("∧", className="btn-sm", onclick=self.toggle_consol_input_multi)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
                     with ui.Vertical(className="expand"):
-                        ui.Button("∨", className="btn-sm", onclick=self.toggleConsolInputMulti)
-                        ui.Button(">>", className="btn-sm fill", onclick=self.consolInputMultiRun).setToolTip("执行输入框中代码 Ctrl+Enter")
+                        ui.Button("∨", className="btn-sm", onclick=self.toggle_consol_input_multi)
+                        ui.Button(">>", className="btn-sm fill", onclick=self.consol_input_multi_run).setToolTip("执行输入框中代码 Ctrl+Enter")
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
                 ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
             ui.StatusBar()
@@ -108,11 +108,11 @@ class MainFrame:
     def tool_names(self):
         return (f'{t[1]}: {t[0]}' for t in tools.tools)
 
-    def getModule(self, name):
+    def get_module(self, name):
         module = __import__('modules.' + name, fromlist=['main']).main
         return module.Module
 
-    def getTool(self, name):
+    def get_tool(self, name):
         name = name.__name__ if isinstance(name, types.ModuleType) else 'tools.' + name
         module = __import__(name, fromlist=['main']).main
         return module.Main
@@ -121,7 +121,7 @@ class MainFrame:
         """左边导航切换模块"""
         name = modules[listbox.index][1]
         try:
-            Module = self.getModule(name)
+            Module = self.get_module(name)
             m = Module()
             m.attach(self)
             __main__.module = m
@@ -147,21 +147,21 @@ class MainFrame:
         toolbar = ui.AuiToolBar()
         for item in tools.toolbar_tools:
             bitmap.loadIcon('python/tools/%s/icon.ico' % item[1].replace('.', '/'))
-            toolbar.addTool(item[0], "", bitmap, self.onToolbarToolClick)
+            toolbar.addTool(item[0], "", bitmap, self.on_toolbar_tool_click)
 
         return toolbar.realize()
 
-    def onToolbarToolClick(self, toolbar, toolid):
-        self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
+    def on_toolbar_tool_click(self, toolbar, toolid):
+        self.open_tool_by_name(tools.toolbar_tools[toolbar.get_toolPos(toolid)][1])
 
-    def toggleConsole(self, m):
+    def toggle_console(self, m):
         """显示/隐藏控制台"""
         self.aui.togglePane("console")
 
     def onselect(self, *args):
         print(args)
 
-    def newProject(self, m):
+    def new_project(self, m):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -172,9 +172,9 @@ class MainFrame:
                 # TODO
                 project.title = input("请输入工程名称", Path.basename(path))
             app.onChangeProject(project)
-            self.onOpenProject(project)
+            self.on_open_project(project)
 
-    def openProject(self, m):
+    def open_project(self, m):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -183,33 +183,33 @@ class MainFrame:
             else:
                 fefactory_api.alert("提示", "该目录下没有project.json")
 
-    def doOpenProject(self, m):
+    def do_open_project(self, m):
         path = m.getText()
         print(path)
         if path != app.project.path:
             project = Project(path)
             app.onChangeProject(project)
-            self.onOpenProject(project)
+            self.on_open_project(project)
 
-    def onOpenProject(self, project):
+    def on_open_project(self, project):
         if project:
             self.win.title = "%s - %s" % (self.win.title, project.title)
 
-    def openProjectDir(self, m):
+    def open_project_dir(self, m):
         if app.project_confirm():
             os.startfile(app.project.path)
 
-    def clearRecentProject(self, m):
+    def clear_recent_project(self, m):
         pass
 
-    def toggleConsolInputMulti(self, _=None):
+    def toggle_consol_input_multi(self, _=None):
         p1 = self.console_input.parent
         isShow = not p1.isShow()
         p1.show(isShow)
         self.aui.showPane("multiline_console", not isShow)
         self.console.reLayout()
 
-    def consolInputMultiRun(self, _=None):
+    def consol_input_multi_run(self, _=None):
         try:
             exec(self.console_input_multi.value, vars(__main__))
         except Exception as e:
@@ -238,7 +238,7 @@ class MainFrame:
             return True
         if mod == event.CTRL:
             if code == event.RETURN:
-                self.consolInputMultiRun()
+                self.consol_input_multi_run()
                 return True
             elif code == WXK.A:
                 text_input.selectAll()
@@ -247,7 +247,7 @@ class MainFrame:
                 self.console_output.clear()
                 return True
 
-    def readFromRom(self, m):
+    def read_from_rom(self, m):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
         if not rom:
             return
@@ -259,7 +259,7 @@ class MainFrame:
                 for i in dialog.listbox.getCheckedItems():
                     name = modules[i][1]
                     try:
-                        Module = self.getModule(name)
+                        Module = self.get_module(name)
                         m = Module()
                         m.attach()
                         m.readFrom(reader)
@@ -308,13 +308,13 @@ class MainFrame:
             self.tool_dialog.endModal()
 
     def open_tool_by_name(self, name):
-        Tool = self.getTool(name)
+        Tool = self.get_tool(name)
         tool = Tool()
         tool.attach(self)
 
         __main__.tool = tool
 
-    def attachEmu(self, m):
+    def attach_emu(self, m):
         if m.checked:
             from lib.hack.handlers.gbahandler import VbaHandler, NogbaHandler
             from fe.ferom import FeEmuRW
@@ -337,7 +337,7 @@ class MainFrame:
                 __main__.emu.close()
                 __main__.emu = None
 
-    def saveWinOption(self, m):
+    def save_win_option(self, m):
         app.setConfig('start_option', {
             'position': self.win.position,
             'size': self.win.size,

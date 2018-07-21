@@ -5,7 +5,7 @@ from .fedict import FeDict, CtrlCode
 import os
 
 # 控制码表
-ctrltable = (
+ctrl_table = (
     CtrlCode(0x0000, "End"),              # 结束
     CtrlCode(0x0100, "br"),               # 换行
     CtrlCode(0x0200, "br2"),              # 换2行
@@ -154,7 +154,7 @@ class FeRomHandler(RomHandler):
         huffstart = self.read32(self.FONT_POINTER)
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
         self._dict = FeDict(self.read(huffstart, bytes, huffsize), 
-            path, (0x8180, 0x9f00), ctrltable)
+            path, (0x8180, 0x9f00), ctrl_table)
 
     @lazy
     def text_table_start(self):

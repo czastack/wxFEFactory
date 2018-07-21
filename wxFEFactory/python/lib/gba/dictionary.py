@@ -1,41 +1,40 @@
 from .utils import checkbytes
 import re
 
-class Dictionary:
-    __slots__ = ('_ct', '_tc', 'low_range', 'ctrltable', 'ctrl_low_range')
 
-    def __init__(self, codetable, low_range=None, ctrltable=None, ctrl_low_range=None, end_code=0):
+class Dictionary:
+    def __init__(self, code_table, low_range=None, ctrl_table=None, ctrl_low_range=None, end_code=0):
         """
-        :param codetable: 码表文件路径或字典
+        :param code_table: 码表文件路径或字典
         :param low_range: 双字节码的低字节判定范围: 长度为2的元组
-        :param ctrltable: 控制码表: 字典{code: fn(bytes, i) -> (word, i)}
+        :param ctrl_table: 控制码表: 字典{code: fn(bytes, i) -> (word, i)}
         :param end_code: 结束符 
         """
-        self._ct = ct = {}
-        self._tc = tc = {}
+        self._code_char = code_char = {}
+        self._char_code = char_code = {}
         self.low_range = low_range
 
-        if hasattr(ctrltable, '__len__') and isinstance(ctrltable[0], CtrlCode):
-            ctrltable = {ctrlcode.code: ctrlcode for ctrlcode in ctrltable}
+        if hasattr(ctrl_table, '__len__') and isinstance(ctrl_table[0], CtrlCode):
+            ctrl_table = {ctrlcode.code: ctrlcode for ctrlcode in ctrl_table}
 
-        self.ctrltable = ctrltable
+        self.ctrl_table = ctrl_table
         self.ctrl_low_range = ctrl_low_range
         self.end_code = end_code
 
-        if isinstance(codetable, str):
-            with open(codetable, 'r', encoding="utf8") as f:
+        if isinstance(code_table, str):
+            with open(code_table, 'r', encoding='utf8') as f:
                 for line in f.readlines():
                     k, v = line.rstrip('\n').split('=', 1)
                     k = int(k, 16)
-                    ct[k] = v
+                    code_char[k] = v
                     if len(v) == 1:
-                        tc[ord(v)] = k
+                        char_code[ord(v)] = k
 
     def getCode(self, ch):
-        return self._tc.get(ord(ch), 0x00)
+        return self._char_code.get(ord(ch), 0x00)
 
     def getChar(self, code):
-        return self._ct.get(code, None)
+        return self._code_char.get(code, None)
 
     def decode(self, data, one=False):
         """
@@ -73,13 +72,13 @@ class Dictionary:
                     else:
                         if not words:
                             offset = i
-                        word = self._ct.get(byte, None)
+                        word = self._code_char.get(byte, None)
                         if word:
                             # 读到单字节字码
                             pass
-                        elif self.ctrltable and byte in self.ctrltable:
+                        elif self.ctrl_table and byte in self.ctrl_table:
                             # 读到单字节控制码
-                            word, i = self.ctrltable[byte].decode(data, i)
+                            word, i = self.ctrl_table[byte].decode(data, i)
                         else:
                             # 无法解析
                             word = '[?%X]' % byte
@@ -87,11 +86,11 @@ class Dictionary:
                 else:
                     char = char << 8 | byte # 低字节在左边
                     try:
-                        words.append(self._ct[char])
+                        words.append(self._code_char[char])
                     except:
                         # 尝试双字节控制码
-                        if self.ctrltable and char in self.ctrltable:
-                            word, i = self.ctrltable[char].decode(data, i)
+                        if self.ctrl_table and char in self.ctrl_table:
+                            word, i = self.ctrl_table[char].decode(data, i)
                             words.append(word)
                         else:
                             raise
@@ -125,9 +124,9 @@ class Dictionary:
             ch = text[i]
             code = self.getCode(ch)
             if code == 0:
-                if self.ctrltable and CtrlCode.FMT_START.startswith(ch):
+                if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False
-                    for ctrlcode in self.ctrltable.values():
+                    for ctrlcode in self.ctrl_table.values():
                         m = ctrlcode.encode(text, i)
                         if m:
                             bs, i = m
@@ -153,7 +152,7 @@ class Dictionary:
     def encodeToArray(self, text):
         """不支持控制码"""
         def getCode(ch):
-            code = self._tc.get(ord(ch), 0x00)
+            code = self._char_code.get(ord(ch), 0x00)
             if code is 0:
                 print("warning: %s不在码表中" % ch)
             return code
@@ -201,14 +200,14 @@ class Dictionary:
                 else:
                     if not words:
                         offset = i
-                    word = self._ct.get(byte, None)
+                    word = self._code_char.get(byte, None)
                     if word:
                         # 读到单字节字码
                         pass
-                    elif self.ctrltable and byte in self.ctrltable:
+                    elif self.ctrl_table and byte in self.ctrl_table:
                         # 读到单字节控制码
                         try:
-                            word = self.ctrltable[byte].decode_it(it)
+                            word = self.ctrl_table[byte].decode_it(it)
                         except:
                             print(data)
                             word = '[??]'
@@ -220,11 +219,11 @@ class Dictionary:
             else:
                 char = char << 8 | byte # 低字节在左边
                 try:
-                    words.append(self._ct[char])
+                    words.append(self._code_char[char])
                 except:
                     # 尝试双字节控制码
-                    if self.ctrltable and char in self.ctrltable:
-                        word = self.ctrltable[char].decode_it(it)
+                    if self.ctrl_table and char in self.ctrl_table:
+                        word = self.ctrl_table[char].decode_it(it)
                         words.append(word)
                     else:
                         print("can't decode %04X" % char)
