@@ -31,9 +31,9 @@ class StaticItem(Model):
     SIZE = 0x80
     name = Field(0x0, bytes, 0x10, label="名称")
     desc = WordField(0x18) # 说明偏移(+00826AE0)
-    weight = WordField(0x34, "重量")
-    atk = WordField(0x40, "攻击")
-    strength = WordField(0x4C, "强度")
+    weight = WordField(0x34, label="重量")
+    atk = WordField(0x40, label="攻击")
+    strength = WordField(0x4C, label="强度")
 
 
 class Items:
@@ -111,6 +111,7 @@ class Global(Model):
     enemys = ArrayField(0, 10, ModelField(0, Enemy))
 
     first_item = ModelPtrField(0x007D10A8, ItemInfo, 4) # 道具1
+    static_items = ArrayField(0x007FC8D0, 0x041A, ModelField(0, StaticItem))
 
     def iter_items(self):
         item = self.first_item
