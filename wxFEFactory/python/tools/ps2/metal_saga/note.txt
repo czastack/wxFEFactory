@@ -1,0 +1,39 @@
+
+道具开始 size=0x80
+207FC8D0
+
+预设字编码
+2041D0E0~
+汉字:20C2D1C0~20C2E944
+
+输入框值
+20B9FE2C
+
+0x208067D0
+回复胶囊 b'\x8bq\x8b\xb2\x92\x8e\x8bo' 8B 71 8B B2 92 8E 8B 6F
+
+
+text="""
+
+"""
+
+data = text.strip().replace('\n', '')
+for i in range(len(data) - 1):
+    diff = ord(data[i+1]) - ord(data[i])
+    if ord(data[i+1]) - ord(data[i]) > 50:
+        print(data[i], data[i+1], diff)
+
+
+ぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖ゗゘゙゚゛゜ゝゞゟ゠ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヵヶヷヸヹヺ・ーヽヾヿ
+
+
+# 导出物品名称
+result = []
+addr = 0x207FC8D0
+for i in range(0x041A):
+    data = tool.handler.read(addr, bytes, 0x10)
+    data = data.rstrip(b'\x00').rstrip(b'\x20')
+    name = tool.dictionary.decode(data, one=True) or ''
+    result.append(name)
+    addr += 0x80
+copy('\n'.join(result))
