@@ -1,54 +1,66 @@
-PERSONS = ('Roberto(hero)', '基里亚', '米卡', 'Rashid', 'Charlene', 'Alpha', 'Shiba', 'Tosa', 'Terry', 'Bernie')
+from lib.hack.utils import ItemProvider
+
+
+PERSONS = ('主角', '基里亚', '米卡', '拉希德', '夏莉', '阿尔法', 'Shiba', 'Tosa', 'Terry', 'Bernie')
 CHARIOTS = tuple('战车%d' % i for i in range(1, 9))
 
 
 TITLES = (
-    "HOMELESS",
-    "FLOWER",
-    "LOVEHT",
-    "SCARYHT",
-    "YAMISFAN",
-    "THEONE",
-    "HITMAN",
-    "AZRAEL",
-    "WUDI",
-    "SLMKILLER",
-    "REDDEVIL",
-    "BOUNTIFUL",
-    "LENDKING",
-    "ITEMCLTER",
-    "TANKMAN",
-    "GREATHT",
-    "LOVETANK",
-    "WRENCHER",
-    "MECHER",
-    "TANKDOC",
-    "TANKGM",
-    "TANKMAGIC",
-    "REPAIR",
-    "MIGREPAIR",
-    "SNIPER",
-    "COMMANDER",
-    "BATTLECMP",
-    "",
-    "",
-    "NULL",
-    "",
-    "",
-    "BOMBGIRL",
-    "BAZOOKA",
-    "MISSILE",
-    "HIGHWIND",
-    "ROSEWOOD",
-    "DEATHLESS",
-    "WPMASTER",
-    "FINALWP",
-    "ONEKILL",
-    "DESTROIER",
-    "FIGHTGD",
-    "",
-    "",
-    "REDWOLF",
+    "菜鸟",
+    "终于够格的人",
+    "资深猎人",
+    "精英猎人",
+    "无敌之男",
+    "战斗狂",
+    "大富翁",
+    "武器狂",
+    "战车狂",
+    "道具收集狂",
+    "败家子",
+    "传说之猎人",
+    "巴特的挚友",
+    "奥林匹亚先生",
+    "舞者",
+    "玩家",
+    "后宫之主",
+    "活在爱中的人",
+    "妹控",
+    "恋母君",
+    "牵引专业户",
+    "勇者",
+    "购物狂",
+    "幸运儿",
+    "赌神",
+    "屠夫",
+    "垃圾回收者",
+    "顶级饲养员",
+    "沙门氏菌猿杀手",
+    "租借王",
+    "废柴",
+    "巴特真正的朋友",
+    "镜片之友",
+    "放荡儿子",
+    "用扳手的人",
+    "机械的朋友",
+    "战车技师",
+    "坦克医生",
+    "铁之魔术师",
+    "神技修理师",
+    "见习修理生",
+    "美眉机械师",
+    "旅行剑士",
+    "钢之保镖",
+    "沙漠武士",
+    "沙漠将军",
+    "剑圣",
+    "无敌保镖",
+    "火箭炮少女",
+    "导弹女士",
+    "枪手",
+    "不死身之女",
+    "最终兵器",
+    "胭脂旗",
+    "谜之少女",
 )
 
 ITEMS = (
@@ -1136,6 +1148,25 @@ ITEMS = (
     "所罗门之铠", # 0419
     "所罗门之剑", # 041A
 )
+
+def itemof(start, end, can_empty=True):
+    return ItemProvider(ITEMS, start, end, can_empty)
+
+HUMEN_ITEM = itemof(0x013F, 0x0310) # 人类道具
+
+EQUIP_WEAPON = itemof(0x0001, 0x0064) # 武器
+EQUIP_HEAD = itemof(0x0064, 0x0077) # 头部装备
+EQUIP_BODY = itemof(0x0077, 0x0090) # 上身装备
+EQUIP_HAND = itemof(0x0090, 0x009A) # 手部装备
+EQUIP_FOOT = itemof(0x009A, 0x00A5) # 脚部装备
+EQUIP_ORN = itemof(0x00A5, 0x0260) # 装饰
+ALL_EQUIP = itemof(0x0001, 0x0260) # 全部人类装备
+CHARIOT_ALL_ITEM = itemof(0x00BF, 0x013F) # 全部战车物品
+CHARIOT_CHASSIS = itemof(0x010A, 0x012B) # 底盘
+CHARIOT_ITEM = itemof(0x0310, 0x0343) # 战车道具
+SPECIAL_BULLETS = itemof(0x0343, 0x0352) # 特殊炮弹
+SPECIAL_SKILLS = itemof(0x0352, 0x03DF) # 特技
+OTHER_ITEMS = itemof(0x03DF, 0x041B) # 其他类道具
 
 CHARIOT_EQUIP_HEADS = (
     ("名称", "防御", "重量", "攻击/命中/积载", "弹仓/回避", "攻击范围/特性"),

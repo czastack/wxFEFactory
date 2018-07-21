@@ -11,12 +11,13 @@ class Pcsx2Handler(MemHandler):
     # 0x00100000-0x01ffffff this is the physical address for the ram.its cached there
     # 0x20100000-0x21ffffff uncached
     # 0x30100000-0x31ffffff uncached & accelerated
+    eeMem = 0x20000000
 
     def attach(self):
         succeed = self.attach_window(self.CLASS_NAME, self.WINDOW_NAME)
         if succeed:
-            with self.raw_env():
-                self.eeMem = self.read_addr(self.proc_base + 0x8252AC)
+            # with self.raw_env():
+            #     self.eeMem = self.read_addr(self.proc_base + 0x8252AC)
             self.eeHw = self.proc_base + 0x828000 # size: 0x10000(64kb)
             self.Main = self.eeMem
             self.ROM = self.eeMem + 0x02004000

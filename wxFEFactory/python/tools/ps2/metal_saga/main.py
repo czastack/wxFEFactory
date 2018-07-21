@@ -31,6 +31,10 @@ class Main(BasePs2Hack):
             ModelInput("money")
             ModelInput("battlein")
             ModelCheckBox("no_battle")
+            ModelInput("battle_count")
+            ModelInput("win_count")
+            ModelInput("die_count")
+            ModelInput("escape_count")
 
         with Group("player", "角色", person, cols=4):
             Choice("角色", datasets.PERSONS, self.on_person_change)

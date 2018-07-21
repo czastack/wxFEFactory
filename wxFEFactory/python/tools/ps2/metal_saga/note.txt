@@ -61,3 +61,27 @@ for i in range(565):
         text = hex(i) + ': err'
     result.append(text)
 copy('\n'.join(result))
+
+# 导出称号
+result = []
+addr = 0x2040C6B0
+while addr < 0x2040CA80:
+    data = tool.handler.read(addr, bytes, 0x20)
+    for j in range(len(data)):
+        if data[j] is not 0:
+            break
+    if j is not 0:
+        addr += j
+        continue
+    end = data.find(b'\x00')
+    if end is -1:
+        print(hex(addr), data)
+        break
+    addr += end + 1
+    data = data[:end].rstrip(b'\x00').rstrip(b'\x20')
+    try:
+        text = tool.dictionary.decode(data, one=True) or ''
+    except:
+        text = hex(addr) + ': err'
+    result.append(text)
+copy('\n'.join(result))
