@@ -1,4 +1,4 @@
-from .utils import checkbytes
+from .utils import is_bytes
 import re
 
 
@@ -42,7 +42,7 @@ class Dictionary:
         """
         :param one: 读到一句就返回
         """
-        if checkbytes(data):
+        if is_bytes(data):
             char = 0
             words = [] # 一句话
             result = []
