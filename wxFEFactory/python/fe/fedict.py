@@ -131,7 +131,7 @@ class FeDict(Dictionary):
             except StopIteration:
                 break
             if self.low_range[0] <= code < self.low_range[1]:
-                word = self.getChar(code)
+                word = self.get_char(code)
                 if word is not None:
                     text.append(word)
                 else:
@@ -172,7 +172,7 @@ class FeDict(Dictionary):
         while i < length:
             i += 1
             ch = text[i]
-            code = self.getCode(ch)
+            code = self.get_code(ch)
             if code is 0:
                 if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False

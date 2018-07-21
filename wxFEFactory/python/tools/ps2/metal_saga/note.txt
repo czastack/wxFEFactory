@@ -1,6 +1,8 @@
 
 道具开始 size=0x80
 207FC8D0
+道具说明开始
+20826AE0
 
 预设字编码
 2041D0E0~
@@ -37,7 +39,25 @@ addr = 0x207FC8D0
 for i in range(0x041A):
     data = tool.handler.read(addr, bytes, 0x10)
     data = data.rstrip(b'\x00').rstrip(b'\x20')
-    name = tool.dictionary.decode(data, one=True) or ''
-    result.append(name)
+    text = tool.dictionary.decode(data, one=True) or ''
+    result.append(text)
     addr += 0x80
+copy('\n'.join(result))
+
+# 导出物品说明
+result = []
+addr = 0x20826AE0
+for i in range(565):
+    data = tool.handler.read(addr, bytes, 0x50)
+    end = data.find(b'\x00')
+    if end is -1:
+        print(i, data)
+        break
+    addr += end + 1
+    data = data[:end].rstrip(b'\x00').rstrip(b'\x20')
+    try:
+        text = tool.dictionary.decode(data, one=True) or ''
+    except:
+        text = hex(i) + ': err'
+    result.append(text)
 copy('\n'.join(result))

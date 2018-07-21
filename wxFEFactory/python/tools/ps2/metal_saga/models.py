@@ -22,6 +22,18 @@ class ItemInfo(Model):
     prev = ModelPtrField(0x0, 'self', 4, label="上一指针")
     next = ModelPtrField(0x4, 'self', 4, label="下一指针")
     item = WordField(0x8, label="种类")
+    status = ByteField(0x18, label="状态") # 1:小破, 2:大破, 4:改
+    atk_addition = BitsField(0x1A, 1, 0, 4, label="攻击改造级别")
+    str_addition = BitsField(0x1A, 1, 4, 4, label="强度改造级别")
+
+
+class StaticItem(Model):
+    SIZE = 0x80
+    name = Field(0x0, bytes, 0x10, label="名称")
+    desc = WordField(0x18) # 说明偏移(+00826AE0)
+    weight = WordField(0x34, "重量")
+    atk = WordField(0x40, "攻击")
+    strength = WordField(0x4C, "强度")
 
 
 class Items:

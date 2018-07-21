@@ -103,10 +103,10 @@ class Main(BasePs2Hack):
     def get_hotkeys(self):
         this = self.weak
         return (
-            (VK.MOD_ALT, VK.LEFT, this.move_left),
-            (VK.MOD_ALT, VK.RIGHT, this.move_right),
-            (VK.MOD_ALT, VK.UP, this.move_up),
-            (VK.MOD_ALT, VK.DOWN, this.move_down),
+            # (VK.MOD_ALT, VK.LEFT, this.move_left),
+            # (VK.MOD_ALT, VK.RIGHT, this.move_right),
+            # (VK.MOD_ALT, VK.UP, this.move_up),
+            # (VK.MOD_ALT, VK.DOWN, this.move_down),
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
@@ -114,7 +114,7 @@ class Main(BasePs2Hack):
     def dictionary(self):
         from lib.gba.dictionary import Dictionary
         import os
-        return Dictionary(os.path.join(os.path.dirname(__file__), 'dict.txt'), low_range=(0x81, 0x98))
+        return Dictionary(os.path.join(os.path.dirname(__file__), 'dict.txt'), low_range=(0x81, 0x98), use_ascii=True)
 
     def get_chariot_equip_info_dialog(self):
         dialog = getattr(self, 'chariot_equip_info_dialog', None)

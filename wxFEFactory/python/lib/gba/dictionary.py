@@ -3,7 +3,7 @@ import re
 
 
 class Dictionary:
-    def __init__(self, code_table, low_range=None, ctrl_table=None, ctrl_low_range=None, end_code=0):
+    def __init__(self, code_table, low_range=None, ctrl_table=None, ctrl_low_range=None, end_code=0, use_ascii=False):
         """
         :param code_table: 码表文件路径或字典
         :param low_range: 双字节码的低字节判定范围: 长度为2的元组
@@ -20,6 +20,7 @@ class Dictionary:
         self.ctrl_table = ctrl_table
         self.ctrl_low_range = ctrl_low_range
         self.end_code = end_code
+        self.use_ascii = use_ascii
 
         if isinstance(code_table, str):
             with open(code_table, 'r', encoding='utf8') as f:
@@ -32,11 +33,20 @@ class Dictionary:
                         if len(v) == 1:
                             char_code[ord(v)] = k
 
-    def getCode(self, ch):
-        return self._char_code.get(ord(ch), 0x00)
+    def get_code(self, ch):
+        code = self._char_code.get(ord(ch), 0)
+        if code is 0 and self.use_ascii:
+            temp = ord(ch)
+            if 0x20 <= temp < 0x7f:
+                code = temp
+        return code
 
-    def getChar(self, code):
-        return self._code_char.get(code, None)
+    def get_char(self, code):
+        char = self._code_char.get(code, None)
+        if char is None and self.use_ascii:
+            if 0x20 <= code < 0x7f:
+                char = chr(code)
+        return char
 
     def decode(self, data, one=False):
         """
@@ -74,7 +84,7 @@ class Dictionary:
                     else:
                         if not words:
                             offset = i
-                        word = self._code_char.get(byte, None)
+                        word = self.get_char(byte)
                         if word:
                             # 读到单字节字码
                             pass
@@ -124,7 +134,7 @@ class Dictionary:
         while i < length:
             i += 1
             ch = text[i]
-            code = self.getCode(ch)
+            code = self.get_code(ch)
             if code == 0:
                 if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False
@@ -153,13 +163,13 @@ class Dictionary:
 
     def encode_to_array(self, text):
         """不支持控制码"""
-        def getCode(ch):
+        def get_code(ch):
             code = self._char_code.get(ord(ch), 0x00)
             if code is 0:
                 print("warning: %s不在码表中" % ch)
             return code
 
-        return [getCode(ch) for ch in text]
+        return [get_code(ch) for ch in text]
 
 
     def decode_it(self, data, buf=None, ignore_zero=False):
@@ -202,7 +212,7 @@ class Dictionary:
                 else:
                     if not words:
                         offset = i
-                    word = self._code_char.get(byte, None)
+                    word = self.get_char(byte)
                     if word:
                         # 读到单字节字码
                         pass
