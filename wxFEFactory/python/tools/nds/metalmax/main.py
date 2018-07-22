@@ -206,10 +206,11 @@ class MetalMaxHack(BaseNdsHack):
 
     def get_chariot_item_info_dialog(self):
         datasets = self.datasets
-        dialog = getattr(self, 'chariot_item_info_dialog', None)
+        name = 'chariot_item_info_dialog'
+        dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup("chariot_item_info", "战车物品详情", self.chariot_item_info, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
+            with DialogGroup(None, "战车物品详情", self.chariot_item_info, cols=1,
+                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("equip", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
                 ModelInput("change")
                 ModelInput("ammo")
@@ -220,7 +221,7 @@ class MetalMaxHack(BaseNdsHack):
                 ModelInput("weight")
                 ModelInput("status")
 
-            self.chariot_item_info_dialog = dialog
+            setattr(self, name, dialog)
         return dialog
 
     def get_chariot_item_dialog(self, name, label, head, items):
@@ -229,7 +230,7 @@ class MetalMaxHack(BaseNdsHack):
         if dialog is None:
             chariot_equips = self.chariot_equips
             datasets = self.datasets
-            with exui.StdDialog(label, style={'width': 1400, 'height': 900}) as dialog:
+            with exui.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))

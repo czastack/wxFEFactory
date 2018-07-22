@@ -216,7 +216,7 @@ void Dialog::dismiss(bool ok)
 	}
 	else
 	{
-		close();
+		win().Hide();
 	}
 }
 
@@ -292,9 +292,5 @@ void init_frames(py::module & m)
 		.def("showModal", &Dialog::showModal)
 		.def("endModal", &Dialog::endModal, "ok"_a=true)
 		.def("isModal", &Dialog::isModal)
-		.def("dismiss", &Dialog::dismiss);
-
-	//py::class_t<StdModalDialog, Dialog>(m, "StdModalDialog")
-	//	.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),
-	//		label, "wxstyle"_a = (long)(wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX), styles, className, style);
+		.def("dismiss", &Dialog::dismiss, "ok"_a=true);
 }

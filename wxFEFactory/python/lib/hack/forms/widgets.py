@@ -305,8 +305,9 @@ class Group(BaseGroup):
 
 
 class DialogGroup(Group):
-    def __init__(self, *args, button=True, **kwargs):
+    def __init__(self, *args, closable=True, button=True, **kwargs):
         self.button = button
+        self.closable = closable
         self.dialog_style = kwargs.pop('dialog_style', None)
         super().__init__(*args, **kwargs)
 
@@ -319,11 +320,11 @@ class DialogGroup(Group):
             
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
-            with exui.StdDialog(self.label, style=style, styles=styles) as root:
+            with exui.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
                 self.render_root()
 
         self.root = root
-        del self.button
+        del self.button, self.closable
 
     def show(self, _=None):
         self.root.show()
@@ -548,6 +549,9 @@ class BaseSelect(TwoWayWidget):
         self.view.setItems(choices)
         if values is not 0:
             self.values = values
+
+    def read(self):
+        self.input_value = self.mem_value
 
     @property
     def input_value(self):

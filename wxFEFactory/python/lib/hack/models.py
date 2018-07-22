@@ -116,8 +116,8 @@ class Model:
                 else:
                     prev = item
                     item = getattr(item, attr)
-                    if item is None or item is 0:
-                        break
+                if item is None or item is 0:
+                    break
                 i += 1
             return item
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
@@ -144,7 +144,10 @@ class Model:
                         break
                 else:
                     if i is last:
-                        setattr(item, attr, value)
+                        if item is not None:
+                            setattr(item, attr, value)
+                        else:
+                            print("目标为空，无法设置")
                     else:
                         prev = item
                         item = getattr(item, attr)

@@ -24,9 +24,9 @@ class ItemInfo(LookAfterModel):
 
     def set_field(self, name, value):
         if self.addr is 0:
-            print("没有数据，无法设置")
+            print("目标为空，无法设置")
         else:
-            super().__setattr__(name, value)
+            return super().set_field(name, value)
 
 
 class Items:

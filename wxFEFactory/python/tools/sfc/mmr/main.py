@@ -115,10 +115,11 @@ class Main(BaseSfcHack):
         )
 
     def get_chariot_equip_info_dialog(self):
-        dialog = getattr(self, 'chariot_equip_info_dialog', None)
+        name = 'chariot_equip_info_dialog'
+        dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup("chariot_equip_info", "战车物品详情", self.chariot_equip_info, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
+            with DialogGroup(None, "战车物品详情", self.chariot_equip_info, cols=1,
+                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("equip", choices=datasets.CHARIOT_EQUIPS)
                 ModelInput("defense")
                 ModelInput("weight")
@@ -127,14 +128,14 @@ class Main(BaseSfcHack):
                 ModelInput("attr2")
                 ModelInput("ammo")
 
-            self.chariot_equip_info_dialog = dialog
+            setattr(self, name, dialog)
         return dialog
 
     def get_chariot_preset_dialog(self, name, label, head, items):
         """战车物品预设对话框"""
         dialog = getattr(self, name, None)
         if dialog is None:
-            with exui.StdDialog(label, style={'width': 1100, 'height': 900}) as dialog:
+            with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))

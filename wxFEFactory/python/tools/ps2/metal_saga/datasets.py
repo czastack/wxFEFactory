@@ -542,7 +542,7 @@ ITEMS = (
     "假人", # 01CE
     
     # 核心
-    "180mm连射炮核心" # 01CF
+    "180mm连射炮核心", # 01CF
     "190mm连射炮核心", # 01D0
     "三发连射炮核心", # 01D1
     "165mm幽灵炮核心", # 01D2
@@ -1152,7 +1152,7 @@ ITEMS = (
 def itemof(start, end, can_empty=True):
     return ItemProvider(ITEMS, start, end, can_empty)
 
-HUMEN_ITEM = itemof(0x013F, 0x0310) # 人类道具
+HUMEN_ITEMS = itemof(0x013F, 0x0310) # 人类道具
 
 EQUIP_WEAPON = itemof(0x0001, 0x0064) # 武器
 EQUIP_HEAD = itemof(0x0064, 0x0077) # 头部装备

@@ -11,18 +11,21 @@ ui = fefactory_api.ui
 
 
 class Main(BasePs2Hack):
-    STORAGE_PAGE_LENGTH = 10
-    STORAGE_PAGE_TOTAL = 10
+    HUMEN_ITEMS_PAGE_LENGTH = 16
+    HUMEN_ITEMS_PAGE_TOTAL = 4
     models = models
+
+    ITEMS = datasets.ITEMS
 
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self._global.storage_offset = 0
+        self._global.human_items_offset = 0
         self.person = models.Person(0, self.handler)
         self.person_grow = models.PersonGrow(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
-        # self.chariot_equip_info = models.ChariotEquip(0, self.handler)
+        self.static_item = models.StaticItem(0, self.handler)
+        self.item_info = models.ItemInfo(0, self.handler)
         self.enemy = models.Enemy(0, self.handler)
     
     def render_main(self):
@@ -51,8 +54,9 @@ class Main(BasePs2Hack):
             # ModelInput("status")
 
         self.lazy_group(Group("person_grow", "角色成长", self.person_grow, cols=4), self.render_person_grow)
-        self.lazy_group(Group("person_equips", "角色装备", person, cols=4), self.render_person_equips)
-        self.lazy_group(Group("human_items", "人类道具", self._global, cols=4), self.render_human_items)
+        self.lazy_group(Group("person_equips", "角色装备", person), self.render_person_equips)
+        self.human_items_group = Group("human_items", "人类道具", self._global, cols=4)
+        self.lazy_group(self.human_items_group, self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
         self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
@@ -78,12 +82,26 @@ class Main(BasePs2Hack):
     def render_person_equips(self):
         sources = (datasets.EQUIP_WEAPON, datasets.EQUIP_HEAD, datasets.EQUIP_BODY, datasets.EQUIP_HAND, datasets.EQUIP_FOOT, datasets.EQUIP_ORN)
         for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
-            ModelSelect("equips.%d.item" % i, label, choices=sources[i].choices, values=sources[i].values)
+            prop = "equips.%d" % i
+            select = ModelSelect(prop + ".item", label, choices=sources[i].choices, values=sources[i].values)
+            with select.container:
+                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
+                    ins=self.person, prop=prop))
 
     def render_human_items(self):
-        for i in range(self._global.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
-                choices=datasets.HUMAN_ITEMS)
+        for i in range(self.HUMEN_ITEMS_PAGE_LENGTH):
+            prop = "items.%d+human_items_offset" % i
+            select = ModelSelect(prop + ".item", "物品%d" % (i + 1), 
+                choices=datasets.HUMEN_ITEMS.choices, values=datasets.HUMEN_ITEMS.values)
+            with select.container:
+                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
+                    ins=self._global, prop=prop))
+        with Group.active_group().footer:
+            Pagination(self.on_human_items_page, self.HUMEN_ITEMS_PAGE_TOTAL)
+
+    def on_human_items_page(self, page):
+        self._global.human_items_offset = (page - 1) * self.HUMEN_ITEMS_PAGE_LENGTH
+        self.human_items_group.read()
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -134,27 +152,44 @@ class Main(BasePs2Hack):
         import os
         return Dictionary(os.path.join(os.path.dirname(__file__), 'dict.txt'), low_range=(0x81, 0x98), use_ascii=True)
 
-    def get_chariot_equip_info_dialog(self):
-        dialog = getattr(self, 'chariot_equip_info_dialog', None)
+    def get_item_info_dialog(self):
+        """物品信息对话框"""
+        name = 'item_info_dialog'
+        dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup("chariot_equip_info", "战车物品详情", self.chariot_equip_info, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, horizontal=False, button=False) as dialog:
-                ModelSelect("equip", choices=datasets.CHARIOT_EQUIPS)
-                ModelInput("defense")
-                ModelInput("weight")
-                ModelInput("status")
+            with DialogGroup(name, "物品详情", self.item_info, cols=1,
+                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+                # ModelInput("item")
                 ModelInput("attr1")
-                ModelInput("attr2")
-                ModelInput("ammo")
+                ModelInput("status")
+                ModelInput("atk_addition")
+                ModelInput("str_addition")
+                ui.Button("修改", onclick=self.show_static_item)
 
-            self.chariot_equip_info_dialog = dialog
+            setattr(self, name, dialog)
+        return dialog
+
+    def get_static_item_dialog(self):
+        """静态物品对话框"""
+        name = 'static_item_dialog'
+        dialog = getattr(self, name, None)
+        if dialog is None:
+            with DialogGroup(None, "静态物品", self.static_item, cols=1,
+                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+                ModelInput("weight")
+                ModelInput("load")
+                ModelInput("atk")
+                ModelInput("defense")
+                ModelInput("strength")
+
+            setattr(self, name, dialog)
         return dialog
 
     def get_chariot_preset_dialog(self, name, label, head, items):
         """战车物品预设对话框"""
         dialog = getattr(self, name, None)
         if dialog is None:
-            with exui.StdDialog(label, style={'width': 1100, 'height': 900}) as dialog:
+            with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
@@ -216,14 +251,22 @@ class Main(BasePs2Hack):
         dialog.listview.selectItem(list_index)
         dialog.listview.focused_item = list_index
 
-    def show_chariot_equip_info(self, view, key=None, read=True):
-        """显示详情对话框"""
-        item = getattr(self.chariot, key)
-        self.chariot_equip_info.addr = item.addr
-        dialog = self.get_chariot_equip_info_dialog()
-        if read:
-            dialog.read()
+    def show_item_info(self, view, ins, prop):
+        """显示物品详情对话框"""
+        item = getattr(ins, prop)
+        self.item_info.addr = item.addr
+        dialog = self.get_item_info_dialog()
+        dialog.read()
         dialog.show()
+
+    def show_static_item(self, view):
+        """显示静态物品对话框"""
+        if self.item_info.addr:
+            item = self._global.static_items[self.item_info.item - 1]
+            self.static_item.addr = item.addr
+            dialog = self.get_static_item_dialog()
+            dialog.read()
+            dialog.show()
 
     def show_chariot_equip_preset(self, view, key=None):
         """显示预设对话框"""

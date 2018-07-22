@@ -8,7 +8,7 @@ __ALL__ = ('StdDialog', 'ListDialog', 'ChoiceDialog', 'CheckChoiceDialog', 'Sear
 
 
 class StdDialog(ui.Dialog):
-    def __init__(self, *args, cancel=True, ok=True, scrollable=False, **kwargs):
+    def __init__(self, *args, cancel=True, ok=True, closable=True, scrollable=False, **kwargs):
         kwargs.setdefault('style', dialog_style)
         kwargs.setdefault('styles', styles)
         super().__init__(*args, **kwargs)
@@ -26,12 +26,19 @@ class StdDialog(ui.Dialog):
             self.footer = footer
         super().__exit__()
 
+        if not closable:
+            self.setOnClose(self.prevent_close)
+
     def __enter__(self):
         self.view.__enter__()
         return self
 
     def __exit__(self, *args):
         self.view.__exit__(*args)
+
+    def prevent_close(self, v):
+        self.dismiss()
+        return False
 
 
 class ListDialog(StdDialog):
