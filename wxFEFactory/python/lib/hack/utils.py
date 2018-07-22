@@ -12,8 +12,12 @@ class ItemProvider:
         choices = self.datas[self.start:self.end]
         values = tuple(range(self.start, self.end))
         if self.can_empty:
-            choices = ("无",) + choices
-            values = (0,) + values
+            if isinstance(self.datas, list):
+                choices.insert(0, "无")
+                values.insert(0, 0)
+            elif isinstance(self.datas, tuple):
+                choices = ("无",) + choices
+                values = (0,) + values
         self._choices = choices
         self._values = values
         del self.datas, self.start, self.end, self.can_empty

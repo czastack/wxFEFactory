@@ -176,12 +176,48 @@ class ManagedModel(Model):
         return self.__class__(self.addr, self.context)
 
 
-class Field:
+class LookAfterModel(Model):
+    own_fields = ()
+
+    def __init_subclass__(cls):
+        fields = []
+        for name, value in cls.__dict__.items():
+            if isinstance(value, FieldType):
+                fields.append(name)
+        cls.own_fields = tuple(fields)
+
+    def __getattribute__(self, name):
+        if name != 'own_fields' and name in self.own_fields:
+            result = self.get_field(name)
+            if result is not None:
+                return result
+        return object.__getattribute__(self, name)
+
+    def __setattr__(self, name, value):
+        if name in self.own_fields:
+            if self.set_field(name, value) is False:
+                return
+        object.__setattr__(self, name, value)
+
+    def get_field(self, nam):
+        pass
+
+    def set_field(self, name, value):
+        pass
+
+
+class FieldType:
+    """最基本的字段类型"""
+    def __init__(self, label):
+        self.label = label
+
+
+class Field(FieldType):
     def __init__(self, offset, type=int, size=4, label=None):
         self.offset = offset
         self.type = type
         self.size = size
-        self.label = label
+        super().__init__(label)
 
     def __get__(self, instance, owner=None):
         ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
@@ -203,11 +239,11 @@ class Field:
     __repr__ = __str__
 
 
-class Fields:
+class Fields(FieldType):
     """同步控制多个地址的值"""
     def __init__(self, *args, label=None):
         self.fields = args
-        self.label = None
+        super().__init__(label)
 
     def __get__(self, instance, owner=None):
         return self.fields[0].__get__(instance, owner)
@@ -308,11 +344,11 @@ class ToggleField(Field):
         super().__set__(instance, value)
 
 
-class ToggleFields:
+class ToggleFields(FieldType):
     """同步控制多个ToggleField"""
     def __init__(self, *args, label=None):
         self.fields = args
-        self.label = label
+        super().__init__(label)
 
     def __get__(self, instance, owner=None):
         for field in self.fields:
@@ -415,7 +451,7 @@ class ManagedModelField(ModelField):
         return self.modelClass(instance.addr + self.offset, instance.context)
 
 
-class CoordField(Cachable):
+class CoordField(Cachable, FieldType):
     size = 4
     length = 3
 
@@ -425,7 +461,7 @@ class CoordField(Cachable):
         self.size = size
         self.length = length
         self.size = self.length * size
-        self.label = label
+        super().__init__(label)
 
     def create_cache(self, instance):
         return CoordData(instance, self)

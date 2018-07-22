@@ -1,46 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField, ToggleField, ModelPtrField
-
-
-class Person(Model):
-    SIZE = 0x0240
-    name = Field(0x007F8690, bytes, 24, label="名称")
-    prof = WordField(0x007F86BC, label="职业")
-    level = ByteField(0x007F86C4, label="等级")
-    exp = Field(0x007F86E4, label="经验")
-    hpmax = WordField(0x007F86C8, label="HP最大值")
-    hp = WordField(0x007F86CC, label="HP")
-    atk = WordField(0x007F86D0, label="攻击")
-    defense = WordField(0x007F86D4, label="防御")
-    drive = ByteField(0x007F86DC, label="运转")
-    title = ByteField(0x007F86EC, label="称号")
-    # status = ByteField(0x007F86C0, label="状态") # 1:正常, 2:死亡 (除1外车会消失?)
-    skills = ArrayField(0x007F86F4, 6, WordField(0)) # 技能
-    equips = ArrayField(0x007F8744, 6, BitsField(0, 1, 0, 7)) # 武器,头部,躯干,手臂,脚部,胸甲
-    # unkown_ptr = Field(0x007F86B8)
-
-
-class PersonGrow(Model):
-    """角色成长值"""
-    SIZE = 0x30
-    hp_init = Field(0x003A7DD0, label="HP初始值")
-    hp_grow = Field(0x003A7DD4, label="HP上升值")
-    atk_init = Field(0x003A7DD8, label="攻击力初始值")
-    atk_grow = Field(0x003A7DDC, label="攻击力上升值")
-    def_init = Field(0x003A7DE0, label="防御力初始值")
-    def_grow = Field(0x003A7DE4, label="防御力上升值")
-    drive_init = Field(0x003A7DF0, label="运转力初始值")
-    drive_grow = Field(0x003A7DF4, label="运转力上升值")
-
-
-class ItemInfo(Model):
-    SIZE = 0x30
-    prev = ModelPtrField(0x0, 'self', 4, label="上一指针")
-    next = ModelPtrField(0x4, 'self', 4, label="下一指针")
-    item = WordField(0x8, label="种类")
-    attr1 = ByteField(0x14, label="弹药数/C装置程序")
-    status = ByteField(0x18, label="状态") # 1:小破, 2:大破, 4:改
-    atk_addition = BitsField(0x1A, 1, 0, 4, label="攻击改造级别")
-    str_addition = BitsField(0x1A, 1, 4, 4, label="强度改造级别")
+from lib.hack.models import Model, LookAfterModel, Field, ByteField, WordField, BitsField, ArrayField, ModelField, ToggleField, ModelPtrField
 
 
 class StaticItem(Model):
@@ -52,6 +10,23 @@ class StaticItem(Model):
     atk = WordField(0x40, label="攻击")
     defense = WordField(0x48, label="C装置防御+")
     strength = WordField(0x4C, label="强度") # 防具防御力
+
+
+class ItemInfo(LookAfterModel):
+    SIZE = 0x30
+    prev = ModelPtrField(0x0, 'self', 4, label="上一指针")
+    next = ModelPtrField(0x4, 'self', 4, label="下一指针")
+    item = WordField(0x8, label="种类")
+    attr1 = ByteField(0x14, label="弹药数/C装置程序")
+    status = ByteField(0x18, label="状态") # 1:小破, 2:大破, 4:改
+    atk_addition = BitsField(0x1A, 1, 0, 4, label="攻击改造级别")
+    str_addition = BitsField(0x1A, 1, 4, 4, label="强度改造级别")
+
+    def set_field(self, name, value):
+        if self.addr is 0:
+            print("没有数据，无法设置")
+        else:
+            super().__setattr__(name, value)
 
 
 class Items:
@@ -71,6 +46,37 @@ class Items:
                 return item
             item = item.next
             i += 1
+
+
+class Person(Model):
+    SIZE = 0x0240
+    name = Field(0x007F8690, bytes, 24, label="名称")
+    prof = WordField(0x007F86BC, label="职业")
+    level = ByteField(0x007F86C4, label="等级")
+    exp = Field(0x007F86E4, label="经验")
+    hpmax = WordField(0x007F86C8, label="HP最大值")
+    hp = WordField(0x007F86CC, label="HP")
+    atk = WordField(0x007F86D0, label="攻击")
+    defense = WordField(0x007F86D4, label="防御")
+    drive = ByteField(0x007F86DC, label="运转")
+    title = ByteField(0x007F86EC, label="称号")
+    # status = ByteField(0x007F86C0, label="状态") # 1:正常, 2:死亡 (除1外车会消失?)
+    skills = ArrayField(0x007F86F4, 6, WordField(0)) # 技能
+    equips = ArrayField(0x007F8744, 6, ModelPtrField(0, ItemInfo)) # 武器,头部,躯干,手臂,脚部,胸甲
+    # unkown_ptr = Field(0x007F86B8)
+
+
+class PersonGrow(Model):
+    """角色成长值"""
+    SIZE = 0x30
+    hp_init = Field(0x003A7DD0, label="HP初始值")
+    hp_grow = Field(0x003A7DD4, label="HP上升值")
+    atk_init = Field(0x003A7DD8, label="攻击力初始值")
+    atk_grow = Field(0x003A7DDC, label="攻击力上升值")
+    def_init = Field(0x003A7DE0, label="防御力初始值")
+    def_grow = Field(0x003A7DE4, label="防御力上升值")
+    drive_init = Field(0x003A7DF0, label="运转力初始值")
+    drive_grow = Field(0x003A7DF4, label="运转力上升值")
 
 
 class Chariot(Model):

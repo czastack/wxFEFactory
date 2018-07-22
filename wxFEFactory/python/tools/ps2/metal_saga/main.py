@@ -20,6 +20,7 @@ class Main(BasePs2Hack):
         self._global = models.Global(0, self.handler)
         self._global.storage_offset = 0
         self.person = models.Person(0, self.handler)
+        self.person_grow = models.PersonGrow(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
         # self.chariot_equip_info = models.ChariotEquip(0, self.handler)
         self.enemy = models.Enemy(0, self.handler)
@@ -44,11 +45,14 @@ class Main(BasePs2Hack):
             ModelInput("hp")
             ModelInput("atk")
             ModelInput("defense")
-            ModelInput("speed")
             ModelInput("drive")
+            ModelInput("title")
+            ModelInput("prof")
             # ModelInput("status")
 
-        self.lazy_group(Group("human_items", "角色装备/物品", person, cols=4), self.render_human_items)
+        self.lazy_group(Group("person_grow", "角色成长", self.person_grow, cols=4), self.render_person_grow)
+        self.lazy_group(Group("person_equips", "角色装备", person, cols=4), self.render_person_equips)
+        self.lazy_group(Group("human_items", "人类道具", self._global, cols=4), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
         self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
@@ -61,15 +65,25 @@ class Main(BasePs2Hack):
                 ui.Text("下移: alt+right")
                 ui.Text("恢复HP: alt+h")
 
+    def render_person_grow(self):
+        ModelInput("hp_init")
+        ModelInput("hp_grow")
+        ModelInput("atk_init")
+        ModelInput("atk_grow")
+        ModelInput("def_init")
+        ModelInput("def_grow")
+        ModelInput("drive_init")
+        ModelInput("drive_grow")
+
+    def render_person_equips(self):
+        sources = (datasets.EQUIP_WEAPON, datasets.EQUIP_HEAD, datasets.EQUIP_BODY, datasets.EQUIP_HAND, datasets.EQUIP_FOOT, datasets.EQUIP_ORN)
+        for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
+            ModelSelect("equips.%d.item" % i, label, choices=sources[i].choices, values=sources[i].values)
+
     def render_human_items(self):
-        for i in range(self.person.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
-                choices=datasets.HUMAN_EQUIPS)
-        for i in range(self.person.items.length):
+        for i in range(self._global.items.length):
             ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
                 choices=datasets.HUMAN_ITEMS)
-        with Group.active_group().footer:
-            ui.Button("装备全部", className="btn_md", onclick=self.equip_all)
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -224,7 +238,9 @@ class Main(BasePs2Hack):
         dialog.showModal()
 
     def on_person_change(self, lb):
-        self.person.set_addr_by_index(lb.index)
+        index = lb.index
+        self.person.set_addr_by_index(index)
+        self.person_grow.set_addr_by_index(index)
 
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
