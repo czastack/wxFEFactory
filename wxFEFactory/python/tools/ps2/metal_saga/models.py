@@ -114,6 +114,7 @@ class Global(Model):
     # 敌人情况
     enemys = ArrayField(0, 10, ModelField(0, Enemy))
 
+    item_count = Field(0x007D10A4) # 道具数量
     first_item = ModelPtrField(0x007D10A8, ItemInfo, 4) # 道具1
     static_items = ArrayField(0x007FC8D0, 0x041A, ModelField(0, StaticItem))
 

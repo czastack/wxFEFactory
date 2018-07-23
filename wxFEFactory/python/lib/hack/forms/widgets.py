@@ -53,9 +53,9 @@ class Widget:
 
     def render_btn(self):
         this = self.weak
-        ui.Button(label="r", style=btn_xs_style, onclick=lambda btn: this.read())
-        if not self.readonly:
-            ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write())
+        btn_read = ui.Button(label="r", style=btn_xs_style, onclick=lambda btn: this.read())
+        btn_write = ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write()) if not self.readonly else None
+        return btn_read, btn_write
 
     def onKey(self, v, event):
         mod = event.GetModifiers()
@@ -669,8 +669,9 @@ class BaseChoiceDisplay(Widget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill") as container:
-            self.view = ui.Text('', className="fill padding_label")
+            self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=True)
             self.render_btn()
+        self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
 
     def setItems(self, choices, values=0):
@@ -686,7 +687,7 @@ class BaseChoiceDisplay(Widget):
             index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
         except ValueError:
             index = -1
-        self.view.label = self.choices[index] if index is not -1 else ''
+        self.view.value = self.choices[index] if index is not -1 else ''
 
     input_value = property(None, input_value)
 
