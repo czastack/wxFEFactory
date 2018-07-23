@@ -81,7 +81,7 @@ class PersonGrow(Model):
 
 
 class Chariot(Model):
-    SIZE = 0x100
+    SIZE = 0x02A0
     name = Field(0x009305C0, bytes, 24, label="名称")
     sp = WordField(0x009305F4, label="装甲")
     equiped_ptrs = ArrayField(0x009305F0, 10, Field(0)) # 装备着的装备指针, 底盘, C装置, 引擎, ?, ?, ?, ?, ?, ?, 副炮
