@@ -5,11 +5,12 @@ class StaticItem(Model):
     SIZE = 0x80
     name = Field(0x0, bytes, 0x10, label="名称")
     desc = WordField(0x18) # 说明偏移(+00826AE0)
-    weight = WordField(0x34, label="重量")
-    load = WordField(0x38, label="载重")
+    weight = WordField(0x34, label="战车物品重量")
+    load = WordField(0x38, label="引擎载重")
+    ammo = WordField(0x3C, label="底盘/武器弹舱")
     atk = WordField(0x40, label="攻击")
     defense = WordField(0x48, label="C装置防御+")
-    strength = WordField(0x4C, label="强度") # 防具防御力
+    strength = WordField(0x4C, label="防具防御/强度") # 防具防御力
 
 
 class ItemInfo(LookAfterModel):
@@ -112,7 +113,7 @@ class Chariot(Model):
 
     @property
     def equips(self):
-        return Items(self.first_equip, 10)
+        return Items(self.first_equip, 12)
 
 
 class Enemy(Model):

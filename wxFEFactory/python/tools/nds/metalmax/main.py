@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.forms import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, DialogGroup, Choice
+from lib.hack.forms import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
 from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
@@ -31,7 +31,8 @@ class MetalMaxHack(BaseNdsHack):
 
         self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
-        self.lazy_group(Group("chariot", "战车", self.chariot, cols=2 if self.has_holes else 4), self.render_chariot)
+        self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
+        self.lazy_group(Group("chariot_items", "战车物品/装备", self.chariot, cols=2 if self.has_holes else 4), self.render_chariot_items)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
@@ -98,10 +99,6 @@ class MetalMaxHack(BaseNdsHack):
 
     def render_chariot(self):
         datasets = self.datasets
-        detail_keep_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
-        detail_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key)
-        preset_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
-        preset_ci_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
 
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
@@ -112,36 +109,44 @@ class MetalMaxHack(BaseNdsHack):
         ModelSelect("chassis.change", "双持类型", choices=datasets.DOUBLE_TYPE)
         ModelInput("chassis.weight", "底盘重量")
 
-        exui.Label("C装置")
-        with ui.Horizontal(className="right"):
+    def render_chariot_items(self):
+        datasets = self.datasets
+        detail_keep_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
+        detail_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key)
+        preset_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
+        preset_ci_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
+        item_choices = self.datasets.CHARIOT_ALL_ITEM.choices
+        item_values = self.datasets.CHARIOT_ALL_ITEM.values
+
+        with ModelChoiceDisplay("equips.0.equip", "C装置", choices=item_choices, values=item_values).container:
             ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.0"))
             ui.Button("详情", className="btn_sm", onclick=detail_click("equips.0"))
             ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.0"))
-        exui.Label("引擎")
-        with ui.Horizontal(className="right"):
+        with ModelChoiceDisplay("equips.1.equip", "引擎", choices=item_choices, values=item_values).container:
             ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.1"))
             ui.Button("详情", className="btn_sm", onclick=detail_click("equips.1"))
             ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.1"))
-        exui.Label("C装置2/引擎2")
-        with ui.Horizontal(className="right"):
+        with ModelChoiceDisplay("equips.2.equip", "C装置2/引擎2", choices=item_choices, values=item_values).container:
             ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.2"))
             ui.Button("详情", className="btn_sm", onclick=detail_click("equips.2"))
             ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.2"))
         for i in range(5):
+            key = "equips.%d" % (i + 3)
             exui.Label("炮穴%d" % (i + 1))
-            with ui.Horizontal(className="right"):
+            with ui.Horizontal(className="fill"):
                 if self.has_holes:
                     ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
-                ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % (i + 3)))
-                ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % (i + 3)))
-                ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % (i + 3)))
+                ModelChoiceDisplay(key + '.equip', "", choices=item_choices, values=item_values)
+                ui.Button("上次", className="btn_sm", onclick=detail_keep_click(key))
+                ui.Button("详情", className="btn_sm", onclick=detail_click(key))
+                ui.Button("预设", className="btn_sm", onclick=preset_click(key))
         for i in range(self.chariot.items.length):
-            exui.Label("物品%d" % (i + 1))
-            with ui.Horizontal(className="right"):
-                ui.Button("上次", className="btn_sm", onclick=detail_keep_click("items.%d" % i))
-                ui.Button("详情", className="btn_sm", onclick=detail_click("items.%d" % i))
-                ui.Button("C装置/引擎", onclick=preset_ci_click("equips.2"))
-                ui.Button("武器", className="btn_sm", onclick=preset_click("items.%d" % i))
+            key = "items.%d" % i
+            with ModelChoiceDisplay(key + '.item', "物品%d" % (i + 1), choices=item_choices, values=item_values).container:
+                ui.Button("上次", className="btn_sm", onclick=detail_keep_click(key))
+                ui.Button("详情", className="btn_sm", onclick=detail_click(key))
+                ui.Button("C装置/引擎", onclick=preset_ci_click(key))
+                ui.Button("武器", className="btn_sm", onclick=preset_click(key))
         with Group.active_group().footer:
             ui.Button("导入字段", onclick=self.weak.load_chariot_fields)
             ui.Button("导出字段", onclick=self.weak.dump_chariot_fields)

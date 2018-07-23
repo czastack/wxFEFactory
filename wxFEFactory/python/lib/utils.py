@@ -118,3 +118,14 @@ def split_label_value(options):
     """把(label, value)分开"""
     a, b = split_value_label()
     return b, a
+
+def prepare_option(choices, values):
+    """预处理选项"""
+    if values is None:
+        if choices is not None:
+            list_tuple = (list, tuple)
+            if not isinstance(choices, list_tuple):
+                choices = tuple(choices)
+            if choices and isinstance(choices[0], list_tuple):
+                choices, values = split_value_label(choices)
+    return choices, values

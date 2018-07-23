@@ -58,6 +58,10 @@ styles = {
             'padding': 10,
             'showPadding': '1',
         },
+        'padding_label': {
+            'padding': 8,
+            'showPadding': '1 1 0 1',
+        },
         'input_label': {
             'padding': 8,
             'showPadding': '1 1 0 1',

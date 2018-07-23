@@ -37,7 +37,7 @@ for i in range(len(data) - 1):
 result = []
 addr = 0x207FC8D0
 for i in range(0x041A):
-    data = tool.handler.read(addr, bytes, 0x10)
+    data = tool.handler.read(addr, bytes, 0x20)
     data = data.rstrip(b'\x00').rstrip(b'\x20')
     text = tool.dictionary.decode(data, one=True) or ''
     result.append(text)
@@ -84,4 +84,54 @@ while addr < 0x2040CA80:
     except:
         text = hex(addr) + ': err'
     result.append(text)
+copy('\n'.join(result))
+
+# 说明序号
+texts = texts.strip().split('\n')
+result = []
+indexs = {}
+i = 0
+for item in data:
+    if item == 0xffff:
+        index = None
+    elif item in indexs:
+        index = indexs[item]
+    else:
+        index = i
+        indexs[item] = index
+        i += 1
+    result.append(str(index))
+print('\n'.join(result))
+
+# 导出人类武器攻击力
+result = []
+for i in range(0x0001, 0x0064):
+    result.append(str(tool._global.static_items[i - 1].atk))
+copy('\n'.join(result))
+
+# 导出人类防具防御力
+result = []
+for i in range(0x0064, 0x00BF):
+    result.append(str(tool._global.static_items[i - 1].strength))
+copy('\n'.join(result))
+
+# 导出战车武器数据
+result = []
+for i in range(0x00BF, 0x010A):
+    item = tool._global.static_items[i - 1]
+    result.append(str((item.strength, item.weight, item.atk, item.ammo)))
+copy('\n'.join(result))
+
+# 导出战车引擎数据
+result = []
+for i in range(0x012B, 0x0135):
+    item = tool._global.static_items[i - 1]
+    result.append(str((item.strength, item.weight, item.load)))
+copy('\n'.join(result))
+
+# 导出战车C装置数据
+result = []
+for i in range(0x0135, 0x013F):
+    item = tool._global.static_items[i - 1]
+    result.append(str((item.strength, item.weight, item.defense)))
 copy('\n'.join(result))

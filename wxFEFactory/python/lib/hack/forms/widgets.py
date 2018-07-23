@@ -514,14 +514,7 @@ class BaseSelect(TwoWayWidget):
 
     def __init__(self, *args, choices=None, values=None, onselect=None, dragable=False, **kwargs):
         # 预处理choices, values
-        if values is None:
-            list_tuple = (list, tuple)
-            if not isinstance(choices, list_tuple):
-                choices = tuple(choices)
-            if choices and isinstance(choices[0], list_tuple):
-                choices, values = utils.split_value_label(choices)
-        self.choices = choices
-        self.values = values
+        self.choices, self.values = utils.prepare_option(choices, values)
         self.onselect = onselect
         self.dragable = dragable
         if dragable:
@@ -663,6 +656,49 @@ class Select(BaseSelect, OffsetsWidget):
 
 
 class ModelSelect(ModelWidget, BaseSelect):
+    pass
+
+
+class BaseChoiceDisplay(Widget):
+    def __init__(self, *args, choices=None, values=None, **kwargs):
+        # 预处理choices, values
+        self.choices, self.values = utils.prepare_option(choices, values)
+        kwargs['readonly'] = True
+        super().__init__(*args, **kwargs)
+
+    def render(self):
+        super().render()
+        with ui.Horizontal(className="fill") as container:
+            self.view = ui.Text('', className="fill padding_label")
+            self.render_btn()
+        self.container = container
+
+    def setItems(self, choices, values=0):
+        self.choices = choices
+        if values is not 0:
+            self.values = values
+
+    def read(self):
+        self.input_value = self.mem_value
+
+    def input_value(self, value):
+        try:
+            index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
+        except ValueError:
+            index = -1
+        self.view.label = self.choices[index] if index is not -1 else ''
+
+    input_value = property(None, input_value)
+
+
+class ChoiceDisplay(BaseChoiceDisplay, OffsetsWidget):
+    def __init__(self, *args, type=int, size=4, **kwargs):
+        self.type = type
+        self.size = size
+        super().__init__(*args, **kwargs)
+
+
+class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
     pass
 
 

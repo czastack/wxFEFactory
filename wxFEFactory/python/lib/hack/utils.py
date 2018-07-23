@@ -1,12 +1,28 @@
+class BaseItemProvider:
+    def __init__(self):
+        self._choices = None
+        self._values = None
 
-class ItemProvider:
+    @property
+    def choices(self):
+        if self._choices is None:
+            self.generate()
+        return self._choices
+        
+    @property
+    def values(self):
+        if self._values is None:
+            self.generate()
+        return self._values
+
+
+class ItemProvider(BaseItemProvider):
     def __init__(self, datas, start, end, can_empty=True):
+        super().__init__()
         self.datas = datas
         self.start = start
         self.end = end
         self.can_empty = can_empty
-        self._choices = None
-        self._values = None
 
     def generate(self):
         choices = self.datas[self.start:self.end]
@@ -21,18 +37,29 @@ class ItemProvider:
         self._choices = choices
         self._values = values
         del self.datas, self.start, self.end, self.can_empty
-    
-    @property
-    def choices(self):
-        if self._choices is None:
-            self.generate()
-        return self._choices
-        
-    @property
-    def values(self):
-        if self._values is None:
-            self.generate()
-        return self._values
+
+    def __add__(self, items):
+        return ItemProviders(self, items)
+
+
+class ItemProviders(BaseItemProvider):
+    def __init__(self, *args):
+        self.elems = list(args)
+        super().__init__()
+
+    def generate(self):
+        choices = []
+        values = []
+        for elem in self.elems:
+            choices.extend(elem.choices)
+            values.extend(elem.values)
+        self._choices = tuple(choices)
+        self._values = tuple(values)
+        del self.elems
+
+    def __add__(self, items):
+        self.elems.append(items)
+        return self
 
 
 def strhex(n, size=0):

@@ -1,5 +1,5 @@
 from ..base import BasePs2Hack
-from lib.hack.forms import Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
+from lib.hack.forms import Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, Choice
 from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
@@ -13,9 +13,7 @@ ui = fefactory_api.ui
 class Main(BasePs2Hack):
     HUMEN_ITEMS_PAGE_LENGTH = 16
     HUMEN_ITEMS_PAGE_TOTAL = 4
-    models = models
-
-    ITEMS = datasets.ITEMS
+    datasets = datasets
 
     def __init__(self):
         super().__init__()
@@ -83,7 +81,7 @@ class Main(BasePs2Hack):
         sources = (datasets.EQUIP_WEAPON, datasets.EQUIP_HEAD, datasets.EQUIP_BODY, datasets.EQUIP_HAND, datasets.EQUIP_FOOT, datasets.EQUIP_ORN)
         for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
             prop = "equips.%d" % i
-            select = ModelSelect(prop + ".item", label, choices=sources[i].choices, values=sources[i].values)
+            select = ModelChoiceDisplay(prop + ".item", label, choices=sources[i].choices, values=sources[i].values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
                     ins=self.person, prop=prop))
@@ -110,27 +108,28 @@ class Main(BasePs2Hack):
         ModelInput("weight")
         ModelInput("bullet")
 
-        for i in range(self.chariot.hole_type.length):
-            ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1), 
-                choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
+        # for i in range(self.chariot.hole_type.length):
+        #     ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1), 
+        #         choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
 
-        ModelInput("position", hex=True)
+        # ModelInput("position", hex=True)
 
     def render_chariot_items(self):
-        for i in range(self.chariot.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
-                choices=datasets.CHARIOT_ITEMS)
-        
-        detail_keep_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key, read=False)
-        detail_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key)
-        preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
+        # detail_keep_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key, read=False)
+        # detail_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key)
+        # preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
 
         for i in range(self.chariot.equips.length):
-            exui.Label("装备%d" % (i + 1))
-            with ui.Horizontal(className="right"):
-                ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))
-                ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % i))
-                ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % i))
+            prop = "equips.%d" % i
+            select = ModelSelect(prop + ".item", "", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+            with select.container:
+                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
+                    ins=self.chariot, prop=prop))
+            # exui.Label("装备%d" % (i + 1))
+            # with ui.Horizontal(className="right"):
+            #     ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))
+            #     ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % i))
+            #     ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % i))
 
     def render_wanted(self):
         for i, name in enumerate(datasets.WANTED_LIST):
@@ -164,7 +163,7 @@ class Main(BasePs2Hack):
                 ModelInput("status")
                 ModelInput("atk_addition")
                 ModelInput("str_addition")
-                ui.Button("修改", onclick=self.show_static_item)
+                ui.Button("种类详情", onclick=self.show_static_item)
 
             setattr(self, name, dialog)
         return dialog
@@ -176,6 +175,7 @@ class Main(BasePs2Hack):
         if dialog is None:
             with DialogGroup(None, "静态物品", self.static_item, cols=1,
                     dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+                ModelChoiceDisplay("item", choices=datasets.ITEMS, ins=self.item_info)
                 ModelInput("weight")
                 ModelInput("load")
                 ModelInput("atk")
@@ -262,7 +262,8 @@ class Main(BasePs2Hack):
     def show_static_item(self, view):
         """显示静态物品对话框"""
         if self.item_info.addr:
-            item = self._global.static_items[self.item_info.item - 1]
+            index = self.item_info.item
+            item = self._global.static_items[index - 1]
             self.static_item.addr = item.addr
             dialog = self.get_static_item_dialog()
             dialog.read()

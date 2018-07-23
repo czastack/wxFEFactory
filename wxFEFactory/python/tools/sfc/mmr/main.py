@@ -1,5 +1,5 @@
 from ..base import BaseSfcHack
-from lib.hack.forms import Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
+from lib.hack.forms import Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, Choice
 from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
@@ -94,8 +94,7 @@ class Main(BaseSfcHack):
         preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
 
         for i in range(self.chariot.equips.length):
-            exui.Label("装备%d" % (i + 1))
-            with ui.Horizontal(className="right"):
+            with ModelChoiceDisplay("equips.0.equip", "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS).container:
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))
                 ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % i))
                 ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % i))
