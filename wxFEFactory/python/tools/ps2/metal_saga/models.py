@@ -62,7 +62,7 @@ class Person(Model):
     drive = ByteField(0x007F86DC, label="运转")
     title = ByteField(0x007F86EC, label="称号")
     # status = ByteField(0x007F86C0, label="状态") # 1:正常, 2:死亡 (除1外车会消失?)
-    skills = ArrayField(0x007F86F4, 6, WordField(0)) # 技能
+    skills = ArrayField(0x007F86F4, 6, Field(0)) # 技能
     equips = ArrayField(0x007F8744, 6, ModelPtrField(0, ItemInfo)) # 武器,头部,躯干,手臂,脚部,胸甲
     # unkown_ptr = Field(0x007F86B8)
 
@@ -87,29 +87,8 @@ class Chariot(Model):
     equiped_ptrs = ArrayField(0x009305F0, 10, Field(0)) # 装备着的装备指针, 底盘, C装置, 引擎, ?, ?, ?, ?, ?, ?, 副炮
     equip_count = ByteField(0x00930654, label="装备数量")
     first_equip = ModelPtrField(0x00930658, ItemInfo, 4) # 第一个装备指针
-    # chassis = ByteField(0x7E830E, label="底盘")
-    # defense = ByteField(0x7E830F, label="底盘防御")
-    # weight = ByteField(0x7E8312, label="底盘重量")
-    # bullet = ByteField(0x7E8314, label="弹舱")
-    # hole_type = ArrayField(0x7E8325, 3, ByteField(0)) # 炮穴类型
-    # items = ArrayField(0x7E8332, 8, BitsField(0, 1, 0, 7))
-    # equips = ArrayField(0x7E833A, 8, ModelField(0, ItemInfo))
     # special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
     # special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
-    position = Field(0x7E8389, size=7, label="地图位置")
-    # mapid = WordField(0x7E8389, label="所在地图")
-    posx = WordField(0x7E838B, label="横坐标")
-    posy = WordField(0x7E838D, label="纵坐标")
-    # img = ByteField(0x7E838F, label="地图形象")
-
-    @classmethod
-    def item_type(self, id):
-        if 0x00 <= id < 0x4A:
-            return 'weapon'
-        elif 0x4A <= id < 0x5E:
-            return 'control'
-        elif 0x5E <= id < 0x7F:
-            return 'engine'
 
     @property
     def equips(self):

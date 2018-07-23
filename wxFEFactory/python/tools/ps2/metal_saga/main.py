@@ -38,19 +38,7 @@ class Main(BasePs2Hack):
             ModelInput("die_count")
             ModelInput("escape_count")
 
-        with Group("player", "角色", person, cols=4):
-            Choice("角色", datasets.PERSONS, self.on_person_change)
-            ModelInput("level")
-            ModelInput("exp")
-            ModelInput("hpmax")
-            ModelInput("hp")
-            ModelInput("atk")
-            ModelInput("defense")
-            ModelInput("drive")
-            ModelInput("title")
-            ModelInput("prof")
-            # ModelInput("status")
-
+        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
         self.lazy_group(Group("person_grow", "角色成长", self.person_grow, cols=4), self.render_person_grow)
         self.lazy_group(Group("person_equips", "角色装备", person), self.render_person_equips)
         self.human_items_group = Group("human_items", "人类道具", self._global, cols=4)
@@ -66,6 +54,22 @@ class Main(BasePs2Hack):
                 ui.Text("上移: alt+up")
                 ui.Text("下移: alt+right")
                 ui.Text("恢复HP: alt+h")
+
+    def render_person(self):
+        Choice("角色", datasets.PERSONS, self.on_person_change)
+        ModelInput("level")
+        ModelInput("exp")
+        ModelInput("hpmax")
+        ModelInput("hp")
+        ModelInput("atk")
+        ModelInput("defense")
+        ModelInput("drive")
+        ModelInput("title")
+        ModelInput("prof")
+        # ModelInput("status")
+        for i in range(self.person.skills.length):
+            ModelSelect("skills.%d" % i, "技能%d" % (i + 1), 
+                choices=datasets.SPECIAL_SKILLS.choices, values=datasets.SPECIAL_SKILLS.values)
 
     def render_person_grow(self):
         ModelInput("hp_init")
@@ -85,14 +89,18 @@ class Main(BasePs2Hack):
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
                     ins=self.person, prop=prop))
+                ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak, 
+                    ins=self.person, prop=prop))
 
     def render_human_items(self):
         for i in range(self.HUMEN_ITEMS_PAGE_LENGTH):
             prop = "items.%d+human_items_offset" % i
-            select = ModelSelect(prop + ".item", "物品%d" % (i + 1), 
+            select = ModelChoiceDisplay(prop + ".item", "物品%d" % (i + 1), 
                 choices=datasets.HUMEN_ITEMS.choices, values=datasets.HUMEN_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
+                    ins=self._global, prop=prop))
+                ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak, 
                     ins=self._global, prop=prop))
         with Group.active_group().footer:
             Pagination(self.on_human_items_page, self.HUMEN_ITEMS_PAGE_TOTAL)
@@ -115,21 +123,14 @@ class Main(BasePs2Hack):
         # ModelInput("position", hex=True)
 
     def render_chariot_items(self):
-        # detail_keep_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key, read=False)
-        # detail_click = lambda key: partial(__class__.show_chariot_equip_info, self.weak, key=key)
-        # preset_click = lambda key: partial(__class__.show_chariot_equip_preset, self.weak, key=key)
-
         for i in range(self.chariot.equips.length):
             prop = "equips.%d" % i
-            select = ModelSelect(prop + ".item", "", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+            select = ModelChoiceDisplay(prop + ".item", "", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
                     ins=self.chariot, prop=prop))
-            # exui.Label("装备%d" % (i + 1))
-            # with ui.Horizontal(className="right"):
-            #     ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.%d" % i))
-            #     ui.Button("详情", className="btn_sm", onclick=detail_click("equips.%d" % i))
-            #     ui.Button("预设", className="btn_sm", onclick=preset_click("equips.%d" % i))
+                ui.Button("预设", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak, 
+                    ins=self.chariot, prop=prop))
 
     def render_wanted(self):
         for i, name in enumerate(datasets.WANTED_LIST):
@@ -185,48 +186,31 @@ class Main(BasePs2Hack):
             setattr(self, name, dialog)
         return dialog
 
-    def get_chariot_preset_dialog(self, name, label, head, items):
-        """战车物品预设对话框"""
+    def get_preset_dialog(self, name, label, head, items):
+        """预设对话框"""
         dialog = getattr(self, name, None)
         if dialog is None:
-            with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
+            with exui.StdDialog(label, style={'width': 1300, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
+                dialog.items = items
                 dialog.listview = listview = ui.ListView(className="fill")
-                with ui.Horizontal(className="expand"):
-                    dialog.use_weight = ui.CheckBox(label="重量", className="vcenter", checked=True)
-                    dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", className="vcenter", checked=True)
                 dialog.listview.appendColumns(*head)
-
                 listview.insertItems(items)
                 listview.setOnItemActivated(partial(__class__.on_chariot_item_preset_selected, self.weak, dialog=dialog))
             setattr(self, name, dialog)
         return dialog
 
     @property
-    def chariot_equip_preset_dialog(self):
-        return self.get_chariot_preset_dialog('_chariot_equip_preset_dialog', '战车装备',
-            datasets.CHARIOT_EQUIP_HEADS, datasets.CHARIOT_EQUIP_INFOS)
+    def item_preset_dialog(self):
+        return self.get_preset_dialog('_item_preset_dialog', '物品',
+            datasets.ITEM_HEADS, datasets.ITEMS_DATA)
     
     def on_chariot_item_preset_selected(self, view, event, dialog):
-        """战车物品预设选中处理"""
-        equip = event.index
-        data = datasets.CHARIOT_EQUIP_INFOS[equip]
-        item_type = models.Chariot.item_type(equip)
-        ins = self.chariot_equip_info
-        ins.equip = equip
-        ins.defense = data[1]
-        if dialog.use_weight.checked:
-            ins.weight = data[2]
-        ins.attr1 = data[3]
-        if dialog.use_attr2.checked:
-            if item_type != 'engine':
-                attr2 = ins.attr2 = data[4]
-                if item_type == 'weapon':
-                    ins.ammo = attr2
-
+        """物品预设选中处理"""
+        self.item_info.item = event.index
         dialog.endModal()
     
     def on_chariot_item_preset_search(self, _, dialog):
@@ -236,7 +220,7 @@ class Main(BasePs2Hack):
         values = []
         dialog.search_values = values
         i = 0
-        for item in datasets.CHARIOT_EQUIP_INFOS:
+        for item in dialog.items:
             if value in item[0]:
                 choices.append(item[0])
                 values.append(i)
@@ -269,16 +253,15 @@ class Main(BasePs2Hack):
             dialog.read()
             dialog.show()
 
-    def show_chariot_equip_preset(self, view, key=None):
+    def show_item_preset(self, view, ins, prop):
         """显示预设对话框"""
-        item = getattr(self.chariot, key)
-        self.chariot_equip_info.addr = item.addr
-        dialog = self.chariot_equip_preset_dialog
-        equip = self.chariot_equip_info.equip
-        if equip < 0x7F:
-            dialog.listview.clearSelected()
-            dialog.listview.selectItem(equip)
-            dialog.listview.focused_item = equip
+        item = getattr(ins, prop)
+        self.item_info.addr = item.addr
+        dialog = self.item_preset_dialog
+        index = self.item_info.item
+        dialog.listview.clearSelected()
+        dialog.listview.selectItem(index)
+        dialog.listview.focused_item = index
         dialog.showModal()
 
     def on_person_change(self, lb):

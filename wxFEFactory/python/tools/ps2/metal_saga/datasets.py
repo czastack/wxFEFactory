@@ -1742,16 +1742,10 @@ SPECIAL_SKILLS = itemof(0x0352, 0x03DF) # 特技
 OTHER_ITEMS = itemof(0x03DF, 0x041B) # 其他类道具
 ALL_HUMEN_ITEM = HUMEN_ITEMS + ALL_EQUIP + OTHER_ITEMS
 
-CHARIOT_EQUIP_HEADS = (
-    ("名称", "强度", "重量", "攻击/命中/积载", "弹仓/回避", "攻击范围/特性"),
-    (240, 100, 100, 200, 150, 200),
+ITEM_HEADS = (
+    ("名称", "说明", "人攻/人防/强度", "重量", "攻击/载重/防御+", "弹仓"),
+    (240, 400, 200, 80, 200, 80),
 )
-CHARIOT_EQUIP_INFOS = (
-    # 主炮, 强度, 重量, 攻击, 弹仓, 攻击范围
-    ("35mm机关炮", 42, 85, 45, 99, "单体"),
-)
-
-CHARIOT_EQUIPS = tuple(item[0] for item in CHARIOT_EQUIP_INFOS) # END is 0x7F
 
 SPECIAL_BULLETS = ()
 
