@@ -1,7 +1,7 @@
 from lib.hack.utils import ItemProvider
 
 
-PERSONS = ('主角', '基里亚', '米卡', '拉希德', '夏莉', '阿尔法', 'Shiba', 'Tosa', 'Terry', 'Bernie')
+PERSONS = ('主角', '基里亚', '米卡', '拉希德', '夏莉', '阿尔法', '波奇', '达罗', '贝尔纳尔', '达利')
 CHARIOTS = tuple('战车%d' % i for i in range(1, 9))
 
 

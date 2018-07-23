@@ -17,7 +17,7 @@ class PresetDialog:
         dialog = getattr(self, '_dialog', None)
         if dialog is None:
             weak = WeakBinder(self)
-            with exui.StdDialog(self.label, style={'width': 1300, 'height': 900}, closable=False) as dialog:
+            with exui.StdDialog(self.label, style={'width': 1300, 'height': 900}, closable=False, cancel=False) as dialog:
                 with ui.Horizontal(className="expand"):
                     dialog.search = ui.ComboBox(type="dropdown", className="fill", 
                         onselect=weak.on_search_select)
