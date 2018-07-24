@@ -45,6 +45,7 @@ class Main(BasePs2Hack):
         self.lazy_group(self.human_items_group, self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
+        self.lazy_group(StaticGroup("功能"), self.render_functions_group)
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):
@@ -81,10 +82,9 @@ class Main(BasePs2Hack):
         ModelInput("drive_grow")
 
     def render_person_equips(self):
-        sources = (datasets.EQUIP_WEAPON, datasets.EQUIP_HEAD, datasets.EQUIP_BODY, datasets.EQUIP_HAND, datasets.EQUIP_FOOT, datasets.EQUIP_ORN)
         for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
             prop = "equips.%d" % i
-            select = ModelChoiceDisplay(prop + ".item", label, choices=sources[i].choices, values=sources[i].values)
+            select = ModelChoiceDisplay(prop + ".item", label, choices=datasets.ALL_EQUIP.choices, values=datasets.ALL_EQUIP.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
                     ins=self.person, prop=prop))
@@ -130,6 +130,9 @@ class Main(BasePs2Hack):
     def render_wanted(self):
         for i, name in enumerate(datasets.WANTED_LIST):
             ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS, values=datasets.WANTED_STATUS_VALUES)
+
+    def render_functions_group(self):
+        self.render_functions(('fake_down',))
 
     def get_hotkeys(self):
         this = self.weak
@@ -253,3 +256,25 @@ class Main(BasePs2Hack):
 
     def equip_all(self, _):
         self.person.equip_all()
+
+    def fake_down(self, _):
+        """假装下车"""
+        flag = getattr(self, '_fake_downed', False)
+        if not flag:
+            i = 0
+            indexs = []
+            for person in self._global.persons:
+                if i > 5:
+                    break
+                if person.driving is 1:
+                    indexs.append(i)
+                    person.driving = 0
+                    if len(indexs) == 3:
+                        break
+                i += 1
+            self._fake_downed = True
+            self._fake_downed_indexs = indexs
+        else:
+            for i in self._fake_downed_indexs:
+                self._global.persons[i].driving = 1
+            self._fake_downed = False
