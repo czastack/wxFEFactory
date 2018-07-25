@@ -44,7 +44,8 @@ class Main(BasePs2Hack):
         self.human_items_group = Group("human_items", "人类道具", self._global, cols=4)
         self.lazy_group(self.human_items_group, self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
-        self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
+        self.lazy_group(Group("special_bullets", "特殊炮弹", chariot, cols=4), self.render_special_bullets)
+        # self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
         self.lazy_group(StaticGroup("功能"), self.render_functions_group)
 
         with StaticGroup("快捷键"):
@@ -65,7 +66,7 @@ class Main(BasePs2Hack):
         ModelInput("defense")
         ModelInput("drive")
         ModelInput("title")
-        ModelInput("prof")
+        ModelSelect("prof", choices=datasets.PROFS)
         # ModelInput("status")
         for i in range(self.person.skills.length):
             ModelSelect("skills.%d" % i, "技能%d" % (i + 1), 
@@ -120,7 +121,19 @@ class Main(BasePs2Hack):
 
         for i in range(self.chariot.equips.length):
             prop = "equips.%d" % i
-            select = ModelChoiceDisplay(prop + ".item", "物品%d" % (i + 1), choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+            select = ModelChoiceDisplay(prop + ".item", "物品%d" % (i + 1), 
+                choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
+            with select.container:
+                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
+                    ins=self.chariot, prop=prop))
+                ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak, 
+                    ins=self.chariot, prop=prop))
+
+    def render_special_bullets(self):
+        for i in range(self.chariot.special_bullets.length):
+            prop = "special_bullets.%d" % i
+            select = ModelChoiceDisplay(prop + ".item", "特殊炮弹%d" % (i + 1), 
+                choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak, 
                     ins=self.chariot, prop=prop))

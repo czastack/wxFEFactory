@@ -52,7 +52,7 @@ class Items:
 class Person(Model):
     SIZE = 0x0240
     name = Field(0x007F8690, bytes, 24, label="名称")
-    prof = WordField(0x007F86BC, label="职业")
+    prof = ByteField(0x007F86BC, label="职业")
     level = ByteField(0x007F86C4, label="等级")
     exp = Field(0x007F86E4, label="经验")
     hpmax = WordField(0x007F86C8, label="HP最大值")
@@ -60,6 +60,7 @@ class Person(Model):
     atk = WordField(0x007F86D0, label="攻击")
     defense = WordField(0x007F86D4, label="防御")
     drive = ByteField(0x007F86DC, label="运转")
+    # hair = ByteField(0x007F86E8, label="毛色光泽")
     title = ByteField(0x007F86EC, label="称号")
     # status = ByteField(0x007F86C0, label="状态") # 1:正常, 2:死亡 (除1外车会消失?)
     driving = ByteField(0x007F86C0) # 1: 乘车中, 其他: 下车状态
@@ -88,12 +89,16 @@ class Chariot(Model):
     equiped_ptrs = ArrayField(0x009305F0, 10, Field(0)) # 装备着的装备指针, 底盘, C装置, 引擎, ?, ?, ?, ?, ?, ?, 副炮
     equip_count = ByteField(0x00930654, label="装备数量")
     first_equip = ModelPtrField(0x00930658, ItemInfo, 4) # 第一个装备指针
-    # special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
-    # special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
+    first_special_bullet = ModelPtrField(0x00930678, ItemInfo, 4) # 特殊炮弹链头
+    last_special_bullet = ModelPtrField(0x0093067C, ItemInfo, 4) # 特殊炮弹链尾
 
     @property
     def equips(self):
         return Items(self.first_equip, 12)
+
+    @property
+    def special_bullets(self):
+        return Items(self.first_special_bullet, 8)
 
 
 class Enemy(Model):

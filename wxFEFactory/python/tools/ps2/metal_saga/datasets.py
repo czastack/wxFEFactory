@@ -4,6 +4,8 @@ from lib.hack.utils import ItemProvider
 PERSONS = ('主角', '基里亚', '米卡', '拉希德', '夏莉', '阿尔法', '波奇', '达罗', '贝尔纳尔', '达利')
 CHARIOTS = tuple('战车%d' % i for i in range(1, 9))
 
+PROFS = ("猎人", "机械师", "战士", "战士", "战士", "战士", "犬", "犬", "犬", "犬")
+
 
 TITLES = (
     "菜鸟",
@@ -1746,8 +1748,6 @@ ITEM_HEADS = (
     ("名称", "说明", "人攻/人防/强度", "重量", "攻击/载重/防御+", "弹仓"),
     (240, 400, 200, 80, 200, 80),
 )
-
-SPECIAL_BULLETS = ()
 
 
 WANTED_LIST = (
