@@ -20,11 +20,15 @@ class BaseGTATool(BaseHackTool):
     TO_UP_DELTA = 10
     TO_DOWN_DELTA = 6
 
-    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GF/3QDi034/1X0iUUIhf91DItGBMHgAolF9ANl9IsOi0UIX16JAYvlXcM=')
+    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GF/'
+        b'3QDi034/1X0iUUIhf91DItGBMHgAolF9ANl9IsOi0UIX16JAYvlXcM=')
 
     # x64 native_call
     FUNCTION_NATIVE_CALL_64 = base64.b64decode(
-        b'TIvcSYlbGEmJayBWV0FWSIPsMEiLcRBMi/FIiz5Ii24ISIPGEEmJe9hIixaDQQj9i1kISIXSdAz/w0jB5whJiXvY6wRIg8YISDP/g/sFfERIg8YgSIPrBEyNFN0gAAAASYvCSIPgD0iFwHQESYPCCEkr4kiL/EiDxyBIM8mLy/NIpUmL+oPDBEkr8kiFwHQESIPGCIP7AQ+MhAAAAEGKQ9g8AHQQPAF0BvIPEAbrCfMPEAbrA0iLDoP7AnxkQYpD2TwAdBI8AXQH8g8QTgjrC/MPEE4I6wRIi1YIg/sDfEFBikPaPAB0EjwBdAfyDxBWEOsL8w8QVhDrBEyLRhCD+wR8HkGKQ9s8AHQSPAF0B/IPEF4Y6wvzDxBeGOsETItOGP/VSYsOSIkB8w8RQQjyDxFBEEiF/3QDSAPnSIPEMEFeX17D'
+        b'TIvcSYlbGEmJayBWV0FWSIPsMEiLcRBMi/FIiz5Ii24ISIPGEEmJe9hIixaDQQj9i1kISIXSdAz/w0jB5whJiXvY6wRIg8YISDP/g/sFfERIg'
+        b'8YgSIPrBEyNFN0gAAAASYvCSIPgD0iFwHQESYPCCEkr4kiL/EiDxyBIM8mLy/NIpUmL+oPDBEkr8kiFwHQESIPGCIP7AQ+MhAAAAEGKQ9g8AH'
+        b'QQPAF0BvIPEAbrCfMPEAbrA0iLDoP7AnxkQYpD2TwAdBI8AXQH8g8QTgjrC/MPEE4I6wRIi1YIg/sDfEFBikPaPAB0EjwBdAfyDxBWEOsL8w8'
+        b'QVhDrBEyLRhCD+wR8HkGKQ9s8AHQSPAF0B/IPEF4Y6wvzDxBeGOsETItOGP/VSYsOSIkB8w8RQQjyDxFBEEiF/3QDSAPnSIPEMEFeX17D'
     )
 
     def __init__(self):
@@ -64,7 +68,7 @@ class BaseGTATool(BaseHackTool):
         :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
         :param arg_sign: 参数签名
         """
-        return self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''), 
+        return self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''),
             addr, this, *args, ret_type=ret_type, ret_size=ret_size)
 
     def native_call_64(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=8):
@@ -73,7 +77,7 @@ class BaseGTATool(BaseHackTool):
         :param this: this指针，为0则为普通函数
         :param arg_sign: 参数签名
         """
-        self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''), 
+        self.native_call(self.NativeCall, 'p2Q' + (arg_sign if arg_sign is not None else ''),
             self.native_context.fflag, addr, this, *args, ret_type=None, ret_size=ret_size)
         # 获取结果
         if ret_type is int:
@@ -171,7 +175,7 @@ class BaseGTATool(BaseHackTool):
     def go_forward(self, _=None, rate=0):
         """前进"""
         rate = rate or self.GO_FORWARD_COORD_RATE
-        
+
         yaw = self.get_yaw()
         x = math.cos(yaw)
         y = math.sin(yaw)
@@ -180,7 +184,7 @@ class BaseGTATool(BaseHackTool):
         coord = entity.coord.values()
         coord[0] += x * rate
         coord[1] += y * rate
-        
+
         entity.coord = coord
 
     def speed_up(self, _=None, rate=0):
@@ -267,7 +271,7 @@ class BaseGTATool(BaseHackTool):
 
     def iter_cam_dir_coords(self, count, space, first_double=False):
         """往视角方向迭代坐标
-        :param first_double: 第一个坐标是否是双倍距离 
+        :param first_double: 第一个坐标是否是双倍距离
         """
         cam_x, cam_y, cam_z = self.get_camera_rot()
         offset = (cam_x * space, cam_y * space, cam_z * space)
@@ -318,7 +322,7 @@ class BaseGTATool(BaseHackTool):
                     vehicle = getattr(self, 'last_iter_vehicle', None)
                     if vehicle:
                         flag = True
-                
+
                 if not flag:
                     vehicle = next(vehicles)
                     self.last_iter_vehicle = vehicle
@@ -430,7 +434,7 @@ class BaseGTATool(BaseHackTool):
     def bring_one_vehicle(self, _=None):
         """ 把一辆车移到眼前 """
         vehicle = self.next_collected_vehicle()
-        
+
         if not vehicle:
             return
 
@@ -455,9 +459,9 @@ class BaseGTATool(BaseHackTool):
         """切换锁车状态"""
         self.vehicle_lock_door(lock=tb.checked)
 
-    #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     # MARKER
-    #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def get_blips(self, color=None, types=None, sprite=None):
         """获取所有标记"""
         Marker = self.models.Marker
@@ -466,7 +470,8 @@ class BaseGTATool(BaseHackTool):
 
         for i in range(self.MARKER_RANGE):
             blipType = it.blipType
-            if it.blipType and (types is None or blipType in types) and (color is None or it.color is color) and (sprite is None or it.sprite is sprite):
+            if (it.blipType and (types is None or blipType in types) and (color is None or it.color is color)
+                    and (sprite is None or it.sprite is sprite)):
                 yield Marker(it.addr, self)
             it.next()
 
@@ -513,7 +518,7 @@ class BaseGTATool(BaseHackTool):
             entity = marker.entity
             if isinstance(entity, self.Player):
                 car = entity.vehicle
-                if car and car.hp > 1: 
+                if car and car.hp > 1:
                     if car.addr not in moved_car_addr:
                         moved_car_addr.append(car.addr)
                         car.coord = coord
@@ -540,7 +545,7 @@ class BaseGTATool(BaseHackTool):
             self.entity.coord = coord
             return True
         return False
-    
+
     def teleport_to_destination(self, _=None, color=None, types=None):
         """瞬移到目的地"""
         Marker = self.models.Marker
@@ -654,10 +659,11 @@ class BaseGTATool(BaseHackTool):
 
     def set_wanted_level(self, value):
         self.player.wanted_level = value
-    
+
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
-        distance = getattr(self, 'EXPLODE_DISTANCE_VEHICLE', 8) if self.isInVehicle else getattr(self, 'EXPLODE_DISTANCE', 6)
+        distance = (getattr(self, 'EXPLODE_DISTANCE_VEHICLE', 8) if self.isInVehicle
+            else getattr(self, 'EXPLODE_DISTANCE', 6))
         for coord in self.iter_cam_dir_coords(count, distance, True):
             self.create_explosion(coord)
 

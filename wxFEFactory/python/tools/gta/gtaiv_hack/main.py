@@ -13,13 +13,12 @@ from . import address, models, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .native import NativeContext
+from fefactory_api import ui
 import math
 import os
 import json
 import time
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGTATool):
@@ -80,7 +79,8 @@ class Main(BaseGTATool):
         with Group("weapon", "武器槽", None):
             self.weapon_views = []
             for i in range(1, len(self.WEAPON_LIST)):
-                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, self.SLOT_NO_AMMO, self.WEAPON_LIST))
+                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
+                    self.SLOT_NO_AMMO, self.WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
@@ -108,7 +108,8 @@ class Main(BaseGTATool):
                 self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
                 with self.vehicle_model_book:
                     for category in VEHICLE_LIST:
-                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
+                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])),
+                            caption=category[0])
 
         with StaticGroup("测试"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
@@ -209,7 +210,8 @@ class Main(BaseGTATool):
         addr = address.NATIVE_ADDRS.get(name, 0)
         if addr is 0:
             # 获取原生函数地址
-            addr = address.NATIVE_ADDRS[name] = self.handler.remote_call(self.FindNativeAddress, address.NATIVE_HASH[name])
+            addr = address.NATIVE_ADDRS[name] = self.handler.remote_call(self.FindNativeAddress,
+                address.NATIVE_HASH[name])
         return addr
 
     def native_call(self, name, arg_sign, *args, ret_type=int, ret_size=4):
@@ -264,7 +266,8 @@ class Main(BaseGTATool):
 
     def get_ped_handle(self, player_index=0):
         """获取当前角色的句柄"""
-        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_index(), self.native_context.get_temp_addr())
+        self.native_call('GET_PLAYER_CHAR', 'LL', player_index or self.get_player_index(),
+            self.native_context.get_temp_addr())
         return self.native_context.get_temp_value()
 
     def ped_index_to_handle(self, index):
@@ -330,7 +333,8 @@ class Main(BaseGTATool):
 
     def get_nearest_ped(self, distance=50):
         """获取最近的人"""
-        self.native_call('GET_CLOSEST_CHAR', '4f3L', *self.entity.coord, distance, 1, 0, self.native_context.get_temp_addr())
+        self.native_call('GET_CLOSEST_CHAR', '4f3L', *self.entity.coord, distance, 1, 0,
+            self.native_context.get_temp_addr())
         ped = self.native_context.get_temp_value()
         if ped:
             return Player(0, ped, self)
@@ -454,7 +458,7 @@ class Main(BaseGTATool):
         for p in self.get_enemys():
             try:
                 p.explode_head()
-            except:
+            except Exception:
                 pass
 
     def enemys_explode(self, _=None):
@@ -517,9 +521,9 @@ class Main(BaseGTATool):
 
     def get_blips(self, sprites, color=None, types=None):
         """根据sprite获取所有标记"""
-        check_blip = lambda blip: blip.blipType and (
-            (color is None or blip.color is color) and
-            (types is None or blipType in types) )
+        def check_blip(blip):
+            return (blip.blipType and (color is None or blip.color is color)
+                and (types is None or blip.blipType in types))
 
         if isinstance(sprites, int):
             sprites = (sprites,)
@@ -705,7 +709,8 @@ class Main(BaseGTATool):
         if m.is_in_cdimage and m.is_vehicle:
             m.request()
             if m.loaded:
-                self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr(), 1)
+                self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()),
+                    self.native_context.get_temp_addr(), 1)
                 return Vehicle(self.native_context.get_temp_value(), self)
             else:
                 print("模型未加载", hex(model))
@@ -726,12 +731,14 @@ class Main(BaseGTATool):
         """熄灭生成的火焰"""
         self.native_call('REMOVE_SCRIPT_FIRE', 'L', fire)
 
-    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=5, bSound=True, bInvisible=False, fCameraShake=0):
+    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET,
+            fRadius=5, bSound=True, bInvisible=False, fCameraShake=0):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def create_throwable_object(self, modelHash):
-        self.script_call('CREATE_OBJECT', 'L3f2L', modelHash, *self.get_front_coord(), self.native_context.get_temp_addr(), 1)
+        self.script_call('CREATE_OBJECT', 'L3f2L', modelHash, *self.get_front_coord(),
+            self.native_context.get_temp_addr(), 1)
         obj = models.Object(self.native_context.get_temp_value(), self)
         obj.invincible = False
         obj.dynamic = True

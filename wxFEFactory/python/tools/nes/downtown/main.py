@@ -2,9 +2,8 @@ from ..base import BaseNesHack
 from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, Choice
 from lib.win32.keys import VK
 from lib import utils
+from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseNesHack):
@@ -14,7 +13,7 @@ class Main(BaseNesHack):
         self._global = models.Global(0, self.handler)
         self.person = models.Person(0, self.handler)
         self.itemholder = models.ItemHolder(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("money_1p", "1p金钱")
@@ -23,7 +22,7 @@ class Main(BaseNesHack):
 
         with Group("player", "我方角色", self.person, cols=4) as group:
             Choice("角色", ("1P", "2P"), self.on_person_change)
-            
+
             for addr, name in models.PERSON_ATTRS:
                 ModelInput(name)
 

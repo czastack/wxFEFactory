@@ -4,8 +4,7 @@ from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField
 from lib import utils
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
@@ -19,8 +18,8 @@ class Global(Model):
     weapon = ByteField(0x0200006D, label="武器种类")
     bombtype = ByteField(0x0200006E, label="炸弹种类")
     level_flag = ByteField(0x0200CD69)
-    cards_flag = ByteField(0x0200CD70) # ~0x0200CD88
-    prisoner_flag = ByteField(0x0200CD90) # ~0x0200CD9C
+    cards_flag = ByteField(0x0200CD70)  # ~0x0200CD88
+    prisoner_flag = ByteField(0x0200CD90)  # ~0x0200CD9C
 
 
 WEAPONS, WEAPON_VALUES = utils.split_value_label((
@@ -46,7 +45,7 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = Global(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("hp")

@@ -1,9 +1,7 @@
 from styles import styles
-from fefactory_api import auto
+from fefactory_api import auto, ui
 from ...tool import NestedTool
 from lib.ndstool import ar
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(NestedTool):

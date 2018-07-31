@@ -2,22 +2,21 @@ from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox, ModelFlagWidget, Choice
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField, ArrayField
 from lib.win32.keys import VK
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
-    hp = ByteField(0x02002AEA, label="生命") # A0
-    hpmax = ByteField(0x02002AEB, label="生命上限") # A0
-    rupees = WordField(0x02002B00, label="宝石") # 03E7
-    rupeesmax = ByteField(0x02002AE8, label="宝石上限") # 03
-    scrolls_flag = WordField(0x02002B44, label="卷轴") # FFFF
-    skills_flag = WordField(0x0300402C, label="剑技") # FFFF
-    bomb = ByteField(0x02002AEC, label="炸弹数") # 63
-    array = ByteField(0x02002AED, label="弓箭数") # 63
-    conch = WordField(0x02002B02, label="海螺数") # 03E7
-    keys = ArrayField(0x02002E9D, 16, ByteField(0)) # 钥匙数
-    help_tool = ArrayField(0x02002EAD, 16, ByteField(0)) # 迷宫辅助道具
+    hp = ByteField(0x02002AEA, label="生命")  # A0
+    hpmax = ByteField(0x02002AEB, label="生命上限")  # A0
+    rupees = WordField(0x02002B00, label="宝石")  # 03E7
+    rupeesmax = ByteField(0x02002AE8, label="宝石上限")  # 03
+    scrolls_flag = WordField(0x02002B44, label="卷轴")  # FFFF
+    skills_flag = WordField(0x0300402C, label="剑技")  # FFFF
+    bomb = ByteField(0x02002AEC, label="炸弹数")  # 63
+    array = ByteField(0x02002AED, label="弓箭数")  # 63
+    conch = WordField(0x02002B02, label="海螺数")  # 03E7
+    keys = ArrayField(0x02002E9D, 16, ByteField(0))  # 钥匙数
+    help_tool = ArrayField(0x02002EAD, 16, ByteField(0))  # 迷宫辅助道具
     weapon_a = ByteField(0x02002AF4, label="A键武器")
     weapon_b = ByteField(0x02002AF5, label="B键武器")
     items_flag = Field(0x02002B32, size=8, label="物品")
@@ -32,8 +31,10 @@ class Global(Model):
 def gen_flags(items, unit=1):
     return gen_flags_by_indexs(range(len(items)), unit)
 
+
 def gen_flags_by_indexs(indexs, unit=1):
     return tuple((unit << (i << 1)) for i in indexs)
+
 
 WEAPONS = (
     "无",
@@ -83,7 +84,7 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = Global(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global, cols=4):
             ModelInput("hp")

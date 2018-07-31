@@ -52,7 +52,7 @@ class MainFrame:
                     for path in app.config['recent_project']:
                         ui.MenuItem(path, onselect=self.do_open_project)
                     if app.config['recent_project']:
-                       ui.MenuItem("清除列表", onselect=self.clear_recent_project, sep=True) 
+                        ui.MenuItem("清除列表", onselect=self.clear_recent_project, sep=True)
                 ui.MenuItem("打开工程所在文件夹", onselect=self.open_project_dir)
                 ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
@@ -82,15 +82,17 @@ class MainFrame:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
                     with ui.Vertical(className="expand"):
                         ui.Button("∨", className="btn-sm", onclick=self.toggle_consol_input_multi)
-                        ui.Button(">>", className="btn-sm fill", onclick=self.consol_input_multi_run).setToolTip("执行输入框中代码 Ctrl+Enter")
+                        ui.Button(">>", className="btn-sm fill", onclick=self.consol_input_multi_run).setToolTip(
+                            "执行输入框中代码 Ctrl+Enter")
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
-                ui.AuiItem(multiline_console, name="multiline_console", direction="bottom", captionVisible=False, hide=True)
+                ui.AuiItem(multiline_console, name="multiline_console", direction="bottom",
+                    captionVisible=False, hide=True)
             ui.StatusBar()
             # 尝试加载图标
             icon_name = fefactory.executable_name() + '.ico'
             if Path.exists(icon_name):
                 win.setIcon(icon_name)
-        
+
         win.setOnClose(self.onClose)
 
         self.win = win
@@ -116,7 +118,7 @@ class MainFrame:
         name = name.__name__ if isinstance(name, types.ModuleType) else 'tools.' + name
         module = __import__(name, fromlist=['main']).main
         return module.Main
-        
+
     def onNav(self, listbox):
         """左边导航切换模块"""
         name = modules[listbox.index][1]
@@ -152,7 +154,7 @@ class MainFrame:
         return toolbar.realize()
 
     def on_toolbar_tool_click(self, toolbar, toolid):
-        self.open_tool_by_name(tools.toolbar_tools[toolbar.get_toolPos(toolid)][1])
+        self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
 
     def toggle_console(self, m):
         """显示/隐藏控制台"""
@@ -276,7 +278,7 @@ class MainFrame:
                 tree = ui.TreeCtrl(className="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")
                 self.root_tools = self.get_sub_tools(tools)
-                
+
                 for item in self.root_tools:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
@@ -318,7 +320,7 @@ class MainFrame:
         if m.checked:
             from lib.hack.handlers.gbahandler import VbaHandler, NogbaHandler
             from fe.ferom import FeEmuRW
-            
+
             attached = False
             for Emu in VbaHandler, NogbaHandler:
                 emu = Emu()
@@ -343,6 +345,7 @@ class MainFrame:
             'size': self.win.size,
         })
 
+
 screen_width = fefactory.Screen.width
 if screen_width <= 1366:
     window_size = (900, 1200)
@@ -350,7 +353,7 @@ elif screen_width <= 1920:
     window_size = (1200, 960)
 elif screen_width <= 2560:
     window_size = (1200, 960)
-else: # elif screen_width <= 3840:
+else:  # elif screen_width <= 3840:
     window_size = (1366, 1800)
 
 window_style = {'width': window_size[0], 'height': window_size[1]}

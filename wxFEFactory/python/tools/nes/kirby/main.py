@@ -2,23 +2,22 @@ from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox
 from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, FieldPrep, ToggleField
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
     hp = ByteField(0x0597)
-    star = ByteField(0x0598) # 音波等形态次数
+    star = ByteField(0x0598)  # 音波等形态次数
     lives = ByteField(0x0599)
-    credits = ByteField(0x07BB) # 无限Credits, 02
+    credits = ByteField(0x07BB)  # 无限Credits, 02
     invincible = ToggleField(0x05F9, size=1, enableData=0xFF, disableData=0)
     invincible2 = ToggleField(0x05FB, size=1, enableData=0x44, disableData=0)
     form = ByteField(0x05E0)
     ability = ByteField(0x05E3)
 
 
-ABILITY = ("吐火", "火花", "回力刀", "剑士", "烈焰", "镭射", "音波", "车轮", "锤子", 
-    "阳伞", "睡觉", "针刺", "冰冻", "冻结", "高跳", "光束", "石头", "球球", "旋风", 
+ABILITY = ("吐火", "火花", "回力刀", "剑士", "烈焰", "镭射", "音波", "车轮", "锤子",
+    "阳伞", "睡觉", "针刺", "冰冻", "冻结", "高跳", "光束", "石头", "球球", "旋风",
     "必杀", "光明", "摔跤", "投掷", "UFO", "星之杖")
 
 
@@ -35,7 +34,6 @@ class Main(BaseNesHack):
             ModelCheckBox("invincible2", "状态无敌")
             ModelInput("form", "形态")
             ModelSelect("ability", "能力", choices=ABILITY)
-
 
     def get_hotkeys(self):
         this = self.weak

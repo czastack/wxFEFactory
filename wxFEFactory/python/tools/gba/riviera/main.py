@@ -1,9 +1,8 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
+from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGbaHack):
@@ -11,7 +10,7 @@ class Main(BaseGbaHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self.person = models.Person(0, self.handler)
-    
+
     def render_main(self):
         person = self.person
         with Group("global", "全局", self._global):
@@ -63,7 +62,6 @@ class Main(BaseGbaHack):
         with StaticGroup("功能"):
             self.render_functions(('enable_addition', 'all_cg', 'all_item_book', 'all_music',
                         'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'))
-
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):

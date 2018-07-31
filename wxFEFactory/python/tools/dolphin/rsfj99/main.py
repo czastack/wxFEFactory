@@ -2,8 +2,7 @@ from functools import partial
 from ..base import BaseDolphinHack
 from . import models, datasets
 from lib.hack.forms import Group, StaticGroup, Input, CheckBox, ModelInput
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Main(BaseDolphinHack):
@@ -12,7 +11,7 @@ class Main(BaseDolphinHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self.count_data = {}
-    
+
     def render_main(self):
         with Group("player", "角色", self._global, handler=self.handler):
             ModelInput("level", "等级(1+)")
@@ -73,15 +72,14 @@ class Main(BaseDolphinHack):
         if hascount:
             numcol = view.getColumnCount() - 1
             count_data = self.count_data[group['name']]
-        
+
         for i in range(len(group['items'])):
             if hascount:
                 view.setItem(i, numcol, str(data[i]))
                 count_data[i] = data[i]
-        
+
             if data[i]:
                 view.checkItem(i)
-
 
     def list_view_write(self, _, view, group, uncheck_action):
         field = getattr(self._global, group['name'])

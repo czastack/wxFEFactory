@@ -2,8 +2,7 @@ from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class FeHack(BaseGbaHack):
@@ -15,10 +14,10 @@ class FeHack(BaseGbaHack):
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
         self._personins = self.models.Person(0, self.handler)
-    
+
     def render_main(self):
         datasets = self.datasets
-        
+
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")

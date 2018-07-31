@@ -5,8 +5,7 @@ from lib import exui
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from .group import ConfigGroup
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
@@ -18,7 +17,7 @@ class ConfigCtrl(ABC):
 
         if not parent:
             raise TypeError('Config Widget must be within ConfigGroup')
-        
+
         self.weak = WeakBinder(self)
         self.name = name
         self.label = label

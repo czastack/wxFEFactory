@@ -1,11 +1,10 @@
 from styles import dialog_style, styles
 from lib.win32.keys import VK
-from fefactory_api import auto
+from fefactory_api import auto, ui
 from ..tool import BaseTool
 import json
 import time
 import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseTool):

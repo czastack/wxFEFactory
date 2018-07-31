@@ -2,8 +2,7 @@ from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox
 from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, FieldPrep
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):

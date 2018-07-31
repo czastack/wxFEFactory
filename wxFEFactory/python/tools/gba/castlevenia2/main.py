@@ -4,8 +4,7 @@ from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Fields, ToggleField
 from lib import utils
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
@@ -41,7 +40,7 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = Global(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("hp")
@@ -70,7 +69,7 @@ class Main(BaseGbaHack):
     def pull_through(self, _):
         self._global.set_with('hp', 'hpmax')
         self._global.set_with('mp', 'mpmax')
-        
+
     def set_monster_flag(self, _):
         """全怪物数据"""
         self._global.monster_flag.fill(0xFFFFFFFF)

@@ -9,13 +9,12 @@ from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from ..gta_base.widgets import WeaponWidget
 from ..gta3_base.main import BaseGTA3Tool
 from ..gta3_base.script import RunningScript
+from fefactory_api import ui
 import math
 import os
 import json
 import time
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGTA3Tool):

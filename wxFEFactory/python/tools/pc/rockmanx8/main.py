@@ -4,10 +4,9 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from tools.hacktool import BaseHackTool
+from fefactory_api import ui
 from . import models
 import base64
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseHackTool):

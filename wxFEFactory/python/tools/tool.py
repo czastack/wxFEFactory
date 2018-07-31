@@ -1,9 +1,8 @@
 from lib.scene import BaseScene
 from lib.lazy import ClassLazy
 from styles import styles
+from fefactory_api import ui, alert
 import traceback
-import fefactory_api
-ui = fefactory_api.ui
 import __main__
 
 
@@ -87,7 +86,7 @@ class BaseTool(BaseScene):
             try:
                 # closePage会自动调用onClose
                 self.win.parent.closePage()
-            except:
+            except Exception:
                 traceback.print_exc()
                 self.win.close()
         else:
@@ -103,7 +102,7 @@ class BaseTool(BaseScene):
         """
         if self.nested and event and event.id is not 0:
             # 第一种情况阻止关闭
-            fefactory_api.alert('请通过菜单过Tab上的关闭按钮关闭')
+            alert('请通过菜单过Tab上的关闭按钮关闭')
             return False
 
         close_callbacks = getattr(self, '_close_callbacks', None)

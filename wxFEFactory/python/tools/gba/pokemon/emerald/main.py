@@ -1,8 +1,6 @@
 from ..base import BasePMHack
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Main(BasePMHack):
     from . import datasets
-    

@@ -10,9 +10,9 @@ ui = fefactory_api.ui
 Label = exui.Label
 
 
-__ALL__ = ('Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox', 'Groups', 
-    'Input', 'ModelInput', 'ProxyInput', 'SimpleCheckBox', 'CheckBox', 'ModelCheckBox', 'Select', 'ModelSelect', 'Choice', 
-    'FlagWidget', 'ModelFlagWidget', 'render_tab_list', 'Label')
+__ALL__ = ('Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox',
+    'Groups', 'Input', 'ModelInput', 'ProxyInput', 'SimpleCheckBox', 'CheckBox', 'ModelCheckBox', 'Select',
+    'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'render_tab_list', 'Label')
 
 
 class Widget:
@@ -164,7 +164,7 @@ class OffsetsWidget:
     @mem_value.setter
     def mem_value(self, value):
         self.handler.ptrs_write(self.addr, self.offsets, self.type(value), self.size)
-    
+
 
 class BaseGroup(Widget):
     cachable = True
@@ -183,7 +183,7 @@ class BaseGroup(Widget):
             self._ins_getter = addr
             self._ins_cached = False
             self._ins = None
-            
+
         super().__init__(name, label, addr)
 
         if cachable:
@@ -317,7 +317,7 @@ class DialogGroup(Group):
 
         if self.button:
             ui.Button(label=self.label, onclick=self.weak.show)
-            
+
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with main_win:
             with exui.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
@@ -598,7 +598,7 @@ class BaseSelect(TwoWayWidget):
                 values.append(i)
             i += 1
         cls.search_dialog.listbox.setItems(choices)
-        cls.search_last_choices = cls.active_ins.choices # 上次搜索的内容集
+        cls.search_last_choices = cls.active_ins.choices  # 上次搜索的内容集
         cls.search_values = values
 
     @classmethod
@@ -641,7 +641,7 @@ class BaseSelect(TwoWayWidget):
                                     # 往上拖动
                                     for i in range(a, b, -1):
                                         sibling[i].view.index = sibling[i - 1].view.index
-                            except:
+                            except Exception:
                                 pass
                     self.view.index = value
                 else:
@@ -746,7 +746,7 @@ class BaseFlagWidget(TwoWayWidget):
         for i in range(len(self.labels)):
             if self.views[i].checked:
                 value |= self.values[i]
-            
+
         return value
 
     @input_value.setter

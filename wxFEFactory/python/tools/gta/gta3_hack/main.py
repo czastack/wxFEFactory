@@ -8,13 +8,12 @@ from .models import Player, Vehicle
 from .script import RunningScript
 from ..gta_base.widgets import WeaponWidget
 from ..gta3_base.main import BaseGTA3Tool
+from fefactory_api import ui
 import math
 import os
 import json
 import time
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGTA3Tool):
@@ -63,16 +62,17 @@ class Main(BaseGTA3Tool):
         with Group("weapon", "武器槽", None, handler=self.handler):
             self.weapon_views = []
             for i in range(1, 13):
-                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST))
+                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
+                    SLOT_NO_AMMO, WEAPON_LIST))
 
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
         with Group("global", "全局", 0, handler=self.handler):
             Input("money", "金钱", address.MONEY)
-            
+
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -103,11 +103,9 @@ class Main(BaseGTA3Tool):
     def vehicle_fix(self, vehicle):
         """修车"""
         model_id = vehicle.model_id
-
-        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
         fix_addr = None
 
-        if not is_type(address.FUNC_IsBoatModel):
+        if not self.native_call_auto(address.FUNC_IsBoatModel, 'L', model_id) & 0xFF:
             fix_addr = address.FUNC_CAutomobile__Fix
 
         if fix_addr:

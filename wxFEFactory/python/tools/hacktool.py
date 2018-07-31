@@ -3,11 +3,10 @@ from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler
 from lib import exui
+from fefactory_api import ui
 import traceback
 import base64
 import fefactory
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class BaseHackTool(NestedTool):

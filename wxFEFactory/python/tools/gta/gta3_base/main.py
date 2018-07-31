@@ -1,8 +1,7 @@
 from functools import partial
 from ..gta_base.main import BaseGTATool
 from . import opcodes
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class BaseGTA3_VC_SA_Tool(BaseGTATool):
@@ -10,10 +9,11 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
 
     def onattach(self):
         super().onattach()
-        
+
         script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
-        self.script_context = self.RunningScript(script_ctx_addr, self, 
-            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init, self.address.FUNC_CRunningScript__ProcessOneCommand)
+        self.script_context = self.RunningScript(script_ctx_addr, self,
+            self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init,
+            self.address.FUNC_CRunningScript__ProcessOneCommand)
 
     def ondetach(self):
         super().ondetach()
@@ -51,6 +51,7 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
     EXPLOSION_TYPE_BARREL = 9
     EXPLOSION_TYPE_TANK_GRENADE = 10
     EXPLOSION_TYPE_HELI_BOMB = 11
+
     def create_explosion(self, coord, explosionType=EXPLOSION_TYPE_ROCKET, radius=5):
         """产生爆炸"""
         # (X, Y, Z, iType, Radius)
@@ -64,7 +65,8 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
 
     def spawn_vehicle(self, model_id, coord=None):
         self.load_model(model_id)
-        self.script_call(0xa5, 'L3fP', model_id, *(coord or self.get_front_coord()), self.native_context.get_temp_addr())
+        self.script_call(0xa5, 'L3fP', model_id, *(coord or self.get_front_coord()),
+            self.native_context.get_temp_addr())
         vehicle_handle = self.native_context.get_temp_value()
         if vehicle_handle:
             return self.vehicle_pool[vehicle_handle >> 8]

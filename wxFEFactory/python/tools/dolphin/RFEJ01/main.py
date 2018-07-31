@@ -3,8 +3,7 @@ from ..base import BaseDolphinHack
 from . import models, datasets
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import VK
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Main(BaseDolphinHack):
@@ -12,7 +11,7 @@ class Main(BaseDolphinHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-    
+
     def render_main(self):
         person = self._person
         with Group("global", "全局", self._global):
@@ -26,7 +25,7 @@ class Main(BaseDolphinHack):
         with Group("player", "角色", person, cols=4):
             ModelInput("addr_hex", "地址", readonly=True)
             ModelInput("no", "角色编号", readonly=True)
-            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, 
+            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS,
                 values=tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
             ModelInput("hp", "当前HP")
             ModelInput("level", "等级")

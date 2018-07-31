@@ -2,9 +2,8 @@ from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
+from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseNesHack):
@@ -14,7 +13,7 @@ class Main(BaseNesHack):
         self._global.storage_offset = 0
         self.person = models.Person(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
-    
+
     def render_main(self):
         person = self.person
         chariot = self.chariot
@@ -53,10 +52,10 @@ class Main(BaseNesHack):
 
     def render_human_items(self):
         for i in range(self.person.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1), 
+            ModelSelect("equips.%d" % i, "装备%d" % (i + 1),
                 choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
         for i in range(self.person.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
                 choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
 
     def render_chariot(self):
@@ -69,10 +68,10 @@ class Main(BaseNesHack):
 
     def render_chariot_items(self):
         for i in range(self.chariot.equips.length):
-            ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1), 
+            ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1),
                 choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
         for i in range(self.chariot.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1), 
+            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
                 choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
 
     def get_hotkeys(self):

@@ -2,9 +2,8 @@ from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
+from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class BasePMHack(BaseGbaHack):
@@ -51,7 +50,8 @@ class BasePMHack(BaseGbaHack):
             self.backpack_group = backpack_group
 
         with StaticGroup("宝可梦") as pokemon_group:
-            ui.RadioBox("带着的宝可梦", className="expand", choices=tuple(str(i) for i in range(1, 7)), onselect=self.on_active_pokemo_swith)
+            ui.RadioBox("带着的宝可梦", className="expand", choices=tuple(str(i) for i in range(1, 7)),
+                onselect=self.on_active_pokemo_swith)
 
             with ui.Notebook(className="fill") as book:
                 with Group("basic", "基本", active_pokemon):
@@ -59,7 +59,8 @@ class BasePMHack(BaseGbaHack):
                     ModelSelect("breedInfo.wBreed", "种族", choices=datasets.POKEMONS)
                     ModelInput("Header.dwChar", "性格值", hex=True)
                     ModelInput("Header.dwID", "ID", hex=True)
-                    ModelSelect("personality", "性格", choices=datasets.PERSONALITYS, onselect=this.on_personality_select)
+                    ModelSelect("personality", "性格", choices=datasets.PERSONALITYS,
+                        onselect=this.on_personality_select)
                     ui.Text("性格描述")
                     self.personality_desc = ui.Text("")
                 with Group("basic", "能力", active_pokemon):
@@ -115,7 +116,6 @@ class BasePMHack(BaseGbaHack):
             temp.bEncoded = False
             temp.Encode()
             self._globalins.active_pokemon.content[self.active_pokemon_index].pmStruct = temp
-
 
     def _active_pokemon(self):
         return self.active_pokemon_ins or self.read_active_pokemon()

@@ -12,13 +12,12 @@ from .models import Player, Vehicle
 from .script import RunningScript
 from ..gta3_base.main import BaseGTA3_VC_SA_Tool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
+from fefactory_api import ui
 import math
 import os
 import json
 import time
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGTA3_VC_SA_Tool):
@@ -57,13 +56,18 @@ class Main(BaseGTA3_VC_SA_Tool):
                 ui.Text("防止主角受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.player_proof_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof, bitindex=Player.SPECIAL_FP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof,
+                            bitindex=Player.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof,
+                            bitindex=Player.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof,
+                            bitindex=Player.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof,
+                            bitindex=Player.SPECIAL_FP)),
                     ]
                     ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip("死亡或者重新读档后需要再次应用")
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip(
+                        "死亡或者重新读档后需要再次应用")
         with Group("vehicle", "汽车", vehicle):
             ModelInput("hp", "HP")
             ModelCoordWidget("dir", "方向")
@@ -83,36 +87,46 @@ class Main(BaseGTA3_VC_SA_Tool):
                 ui.Text("防止当前载具受到来自以下的伤害")
                 with ui.Horizontal(className="fill"):
                     self.vehicle_proof_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof, bitindex=Vehicle.SPECIAL_FP)),
+                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                            bitindex=Vehicle.SPECIAL_EP)),
+                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                            bitindex=Vehicle.SPECIAL_DP)),
+                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                            bitindex=Vehicle.SPECIAL_BP)),
+                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                            bitindex=Vehicle.SPECIAL_FP)),
                     ]
                     ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip("切换载具后需要再次应用")
+                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip(
+                        "切换载具后需要再次应用")
             ui.Text("颜色")
             with ui.Horizontal(className="fill"):
-                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color", datasets.COLOR_LIST)
-                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color", datasets.COLOR_LIST)
-                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", vehicle, "stripe_color", datasets.COLOR_LIST)
-                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", vehicle, "stripe2_color", datasets.COLOR_LIST)
+                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color",
+                    datasets.COLOR_LIST)
+                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color",
+                    datasets.COLOR_LIST)
+                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", vehicle, "stripe_color",
+                    datasets.COLOR_LIST)
+                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", vehicle, "stripe2_color",
+                    datasets.COLOR_LIST)
 
         with Group("weapon", "武器槽", None):
             self.weapon_views = []
             for i in range(13):
                 self.weapon_views.append(
-                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO, datasets.WEAPON_LIST, self.on_weapon_change)
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO,
+                        datasets.WEAPON_LIST, self.on_weapon_change)
                 )
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
         with Group("weapon_prop", "武器熟练度", None):
             self.weapon_prop_views = [
-                ProxyInput("weapon_prop_%d" % i, label, 
-                    partial(self.get_weapon_prop, index=i), partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
+                ProxyInput("weapon_prop_%d" % i, label, partial(self.get_weapon_prop, index=i),
+                    partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
                         '手枪', '消音手枪', '沙漠之鹰', '霰弹枪', '短管霰弹枪', '战斗霰弹枪', 'MP5', 'Tech9', 'AK47', 'M4',
                     ))
             ]
-            
+
         with Group("global", "全局", 0):
             Input("money", "金钱", address.MONEY)
             Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
@@ -138,8 +152,9 @@ class Main(BaseGTA3_VC_SA_Tool):
                 with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     self.cheat_views = [
                         ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
-                            '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃', '最大威望', '最大引力',
-                            '满街跑车', '满街破车', '无限奔跑', '主角防火', '完美操控', '交通通畅', '超级兔跳', '液压装置', '船可以飞', '车可以飞'
+                            '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃',
+                            '最大威望', '最大引力', '满街跑车', '满街破车', '无限奔跑', '主角防火', '完美操控', '交通通畅',
+                            '超级兔跳', '液压装置', '船可以飞', '车可以飞'
                         ))
                     ]
                     ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
@@ -155,7 +170,7 @@ class Main(BaseGTA3_VC_SA_Tool):
 
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -176,7 +191,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                 ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
                 ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
                 self.set_buttons_contextmenu()
-                
+
         with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
             with ui.Vertical(className="fill container"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
@@ -331,10 +346,13 @@ class Main(BaseGTA3_VC_SA_Tool):
         cheat_config = self.get_cheat_config()
 
         if cb.checked:
-            self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bInjectedJump_OneHitKill'], 0)
-            self.handler.write(cheat_config['CodeInjectCode_OneHitKillAddr'], cheat_config['bInjectedCode_OneHitKill'], 0)
+            self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'],
+                cheat_config['bInjectedJump_OneHitKill'], 0)
+            self.handler.write(cheat_config['CodeInjectCode_OneHitKillAddr'],
+                cheat_config['bInjectedCode_OneHitKill'], 0)
         else:
-            self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'], cheat_config['bNotInjectedJump_OneHitKill'], 0)
+            self.handler.write(cheat_config['CodeInjectJump_OneHitKillAddr'],
+                cheat_config['bNotInjectedJump_OneHitKill'], 0)
 
     def get_wanted_level(self):
         ptr = self.handler.read32(address.WANTED_LEVEL_ADDR)
@@ -393,10 +411,13 @@ class Main(BaseGTA3_VC_SA_Tool):
         """修车"""
         model_id = vehicle.model_id
 
-        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
+        def is_type(addr):
+            self.native_call_auto(addr, 'L', model_id) & 0xFF
+
         fix_addr = None
 
-        if is_type(address.FUNC_IsCarModel) or is_type(address.FUNC_IsMonsterTruckModel) or is_type(address.FUNC_IsTrailerModel):
+        if (is_type(address.FUNC_IsCarModel) or is_type(address.FUNC_IsMonsterTruckModel)
+                or is_type(address.FUNC_IsTrailerModel)):
             fix_addr = address.FUNC_CAutomobile__Fix
         elif is_type(address.FUNC_IsPlaneModel):
             fix_addr = address.FUNC_CPlane__Fix

@@ -3,8 +3,7 @@ from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelS
 from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField
 from lib import utils
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
@@ -24,7 +23,7 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = Global(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("lives")

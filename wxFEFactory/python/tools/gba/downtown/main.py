@@ -1,20 +1,18 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect, Choice
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class ExTool(BaseGbaHack):
-
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self.person = self.models.Person(0, self.handler)
-    
+
     def render_main(self):
         datasets = self.datasets
         person = self.person
-    
+
         with Group("global", "全局", self._global):
             ModelInput("partner_count", "我方人数")
             ModelInput("enemy_count", "敌方人数")
@@ -41,8 +39,7 @@ class ExTool(BaseGbaHack):
             for name, label, choices, values in (
                     ("tools", "道具", datasets.ITEMS, None),
                     ("skills", "技能", datasets.SKILLS, datasets.SKILL_VALUES),
-                    ("skillkeys", "技能按键", datasets.SKILLKEYS, None)
-                ):
+                    ("skillkeys", "技能按键", datasets.SKILLKEYS, None)):
                 with DialogGroup(name, label, person, cols=4, dialog_style=dialog_style) as dialog_group:
                     for i in indexs:
                         ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)

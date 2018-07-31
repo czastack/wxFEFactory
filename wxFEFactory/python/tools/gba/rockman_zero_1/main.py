@@ -4,14 +4,13 @@ from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField
 from lib import utils
-import fefactory_api
-ui = fefactory_api.ui
+from fefactory_api import ui
 
 
 class Global(Model):
     hp = ByteField(0x0202B62C, label="HP")
     hpmax = ByteField(0x0202B723, label="最大HP")
-    limit_time = ByteField(0x02022CDC, label="生命") # 限时关卡的时间
+    limit_time = ByteField(0x02022CDC, label="生命")  # 限时关卡的时间
     lives = ByteField(0x0202A5D0, label="限时关卡的时间")
     invincible = ByteField(0x0202B634, label="无敌")
     money = WordField(0x0202B79E, label="水晶")
@@ -36,7 +35,7 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = Global(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("hp")
@@ -53,7 +52,8 @@ class Main(BaseGbaHack):
             ModelCheckBox("invincible", enableData=0xFF, disableData=0)
 
         with StaticGroup("功能"):
-            self.render_functions(('max_weapon_level', 'all_weapon', 'all_element', 'all_fairy', 'fairy_use_count_infinite'))
+            self.render_functions(('max_weapon_level', 'all_weapon', 'all_element', 'all_fairy',
+                'fairy_use_count_infinite'))
 
     def get_hotkeys(self):
         this = self.weak
@@ -67,7 +67,7 @@ class Main(BaseGbaHack):
 
     def invincible(self, _=None):
         self._global.invincible = 0xFF
-        
+
     def max_weapon_level(self, _):
         """武器等级最高"""
         self._global.weapon_level = 0x02040603

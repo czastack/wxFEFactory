@@ -3,13 +3,12 @@ from lib import wxconst
 from lib.lazy import ClassLazy
 from lib.scene import BaseScene
 from styles import styles
+from fefactory_api import ui
 from . import modules
 import os
 import json
 import types
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 DUMP_INDENT = app.getConfig('json_indent', 4)
 
@@ -78,7 +77,7 @@ class BaseModule(BaseScene):
         try:
             with open(os.path.join(cls.get_dir(), name + '.json'), encoding="utf-8") as file:
                 ret = json.load(file)
-        except Exception: #FileNotFoundError, json.decoder.JSONDecodeError
+        except Exception:  # FileNotFoundError, json.decoder.JSONDecodeError
             ret = defval
         return ret
 

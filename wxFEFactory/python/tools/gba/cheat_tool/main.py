@@ -1,9 +1,7 @@
 from styles import styles
-from fefactory_api import auto
-from ...tool import NestedTool
+from fefactory_api import auto, ui
 from lib.gba import cheat
-import fefactory_api
-ui = fefactory_api.ui
+from ...tool import NestedTool
 
 
 class Main(NestedTool):

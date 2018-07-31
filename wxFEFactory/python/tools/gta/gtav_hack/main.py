@@ -16,13 +16,12 @@ from . import address, models, datasets, coords
 from .models import Player, Vehicle
 from .native import NativeContext
 from .widgets import WeaponWidget, CustomColorWidget
+from fefactory_api import ui
 import math
 import os
 import json
 import time
 import __main__
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseGTATool):

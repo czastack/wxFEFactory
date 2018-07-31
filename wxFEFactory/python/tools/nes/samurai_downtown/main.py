@@ -2,9 +2,8 @@ from ..base import BaseNesHack
 from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input, Choice
 from lib.win32.keys import VK
 from lib import utils
+from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
-ui = fefactory_api.ui
 
 
 class Main(BaseNesHack):
@@ -15,7 +14,7 @@ class Main(BaseNesHack):
         self.person = models.Person(0, self.handler)
         self.itemholder = models.ItemHolder(0, self.handler)
         self.skillholder = models.SkillHolder(0, self.handler)
-    
+
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelInput("growth_points", "成长点数")
@@ -24,7 +23,7 @@ class Main(BaseNesHack):
 
         with Group("player", "我方角色", self.person, cols=4) as group:
             Choice("角色", ("1P", "2P"), self.on_person_change)
-            
+
             for addr, name in models.PERSON_ATTRS:
                 ModelInput(name)
 
@@ -37,8 +36,8 @@ class Main(BaseNesHack):
             with DialogGroup("skills", "技能", self.skillholder, dialog_style=dialog_style):
                 values = [1 << i for i in range(7, -1, -1)]
                 for i, labels in enumerate(datasets.SKILL_ITEMS):
-                    ModelFlagWidget("have_%s" % (i+1), "拥有", labels=labels, values=values, checkbtn=True, cols=4)
-                    ModelFlagWidget("active_%s" % (i+1), "激活", labels=labels, values=values, checkbtn=True, cols=4)
+                    ModelFlagWidget("have_%s" % (i + 1), "拥有", labels=labels, values=values, checkbtn=True, cols=4)
+                    ModelFlagWidget("active_%s" % (i + 1), "激活", labels=labels, values=values, checkbtn=True, cols=4)
 
         with Group("enemy", "敌人", None, cols=4) as group:
             for addr, name in models.ENEMY_ATTRS:
