@@ -6,7 +6,7 @@ import math
 def distance(p1, p2):
     """求三围空间两点坐标"""
     return math.sqrt(
-          abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
+        abs(round(p1[0], 6) - round(p2[0], 6)) ** 2
         + abs(round(p1[1], 6) - round(p2[1], 6)) ** 2
         + abs(round(p1[2], 6) - round(p2[2], 6)) ** 2
     )
@@ -48,10 +48,10 @@ class WeaponSet(Model):
 
 
 class WeaponItem(Model):
-    id = Field(0) # 武器id
+    id = Field(0)  # 武器id
     state = Field(0x4, int)
-    ammo_clip = Field(0x8, int) # 弹夹数
-    ammo = Field(0xC, int) # 弹药数
+    ammo_clip = Field(0x8, int)  # 弹夹数
+    ammo = Field(0xC, int)  # 弹药数
 
     def set(self, other):
         if isinstance(other, WeaponItem):

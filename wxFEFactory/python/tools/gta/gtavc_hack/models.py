@@ -1,6 +1,7 @@
 from lib.hack.models import Model, Field, ByteField, WordField, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool, NativeModel
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
+from .datasets import VEHICLE_LIST
 import math
 
 
@@ -101,6 +102,15 @@ class Vehicle(Entity, GTA3Vehicle):
 
     def unlock_door(self):
         self.door_status = 1
+
+    @property
+    def name(self):
+        model_id = self.model_id
+        try:
+            item = next(filter(lambda x: x[1] == model_id, VEHICLE_LIST))
+            return item[0]
+        except Exception:
+            return None
 
 
 class Object(Entity):

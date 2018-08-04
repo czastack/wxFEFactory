@@ -19,7 +19,7 @@ class Entity(Physicle):
     SPECIAL_DP = 6
     SPECIAL_EP = 7
 
-    special = Field(0x42, int, 1) # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
+    special = Field(0x42, int, 1)  # bit coded for BP DP EP FP (Prevent from Explosion, Collision, Bullet, Fire)
     speed = CoordField(0x44)
     turn_speed = CoordField(0x50)
     model_id = Field(0x22, int, 2)
@@ -95,7 +95,7 @@ class Vehicle(Entity, GTA3Vehicle):
     hp = Field(0x4c0, float)
     num_passengers = Field(0x484, int, 1)
     max_passengers = Field(0x488, int, 1)
-    dirt = Field(0x4b0, float) # 0.0~15.0
+    dirt = Field(0x4b0, float)  # 0.0~15.0
     _tranler = Field(0x4c8, int)
     door_status = Field(0x4f8, int)
 
