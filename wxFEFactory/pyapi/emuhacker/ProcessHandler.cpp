@@ -259,7 +259,53 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
 	return new ProcAddressHelper(this, &ides, module);
 }
 
-#endif
+addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, addr_t end, int ordinal)
+{
+	const DWORD PAGE_SIZE = 4096;
+	bool finded = false;
+	BYTE page[PAGE_SIZE];
+	addr_t cur_addr = start;
+
+	BYTE *page_end = page + PAGE_SIZE - data_size;
+	BYTE *page_cursor = page;
+	int i; // data内偏移量
+	int ord = 0; // 找到的数据序号
+
+
+	while (cur_addr < end) {
+		read(cur_addr, page, PAGE_SIZE);
+		for (page_cursor = page; page_cursor < page_end; ++page_cursor)
+		{
+			for (i = 0; i < data_size; ++i) {
+				if (page_cursor[i] != data[i])
+				{
+					break;
+				}
+			}
+			if (i == data_size)
+			{
+				++ord;
+				if (ord == ordinal)
+				{
+					finded = true;
+					break;
+				}
+			}
+		}
+		if (finded) {
+			break;
+		}
+		cur_addr += PAGE_SIZE;
+	}
+	
+	if (finded)
+	{
+		return cur_addr + (page_cursor - page);
+	}
+
+	return -1;
+}
+
 
 ProcAddressHelper::ProcAddressHelper(ProcessHandler * handler, LPVOID pides, addr_t module):
 	m_handler(handler), m_module(module)
@@ -306,3 +352,5 @@ addr_t ProcAddressHelper::getProcAddress(LPCSTR funcname)
 	free(namebuf);
 	return result;
 }
+
+#endif

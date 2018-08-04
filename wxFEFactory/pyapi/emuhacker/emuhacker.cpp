@@ -93,6 +93,14 @@ namespace emuhacker {
 		return self.alloc_data(buff, size);
 	}
 
+	addr_t find_bytes(ProcessHandler &self, py::bytes buf, addr_t start, addr_t end, int ordinal)
+	{
+		char *buff;
+		ssize_t size;
+		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
+		return self.find_bytes((BYTE*)buff, size, start, end, ordinal);
+	}
+
 	wxString getModuleFile(ProcessHandler &self, addr_t module = 0)
 	{
 		wxChar buff[MAX_PATH];
@@ -226,6 +234,7 @@ void init_emuhacker(pybind11::module & m)
 		.def("free_memory", &ProcessHandler::free_memory)
 		.def("write_function", &emuhacker::write_function)
 		.def("alloc_data", &emuhacker::alloc_data)
+		.def("find_bytes", &emuhacker::find_bytes, "data"_a, "start"_a, "end"_a, "ordinal"_a=1)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def("enum_windows", &emuhacker::enum_windows, "callback"_a, "prefix"_a=None)
 		.def("get_proc_helper", &ProcessHandler::getProcAddressHelper)
