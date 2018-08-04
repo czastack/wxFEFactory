@@ -456,15 +456,15 @@ class ManagedModelField(ModelField):
 
 
 class CoordField(Cachable, FieldType):
-    size = 4
+    field_size = 4
     length = 3
 
-    def __init__(self, offset, type=float, length=length, size=size, label=None):
+    def __init__(self, offset, type=float, length=length, field_size=field_size, label=None):
         self.offset = offset
         self.type = type
-        self.size = size
+        self.field_size = field_size
         self.length = length
-        self.size = self.length * size
+        self.size = self.length * field_size
         super().__init__(label)
 
     def create_cache(self, instance):
@@ -481,7 +481,7 @@ class CoordField(Cachable, FieldType):
                 item = next(it)
                 if item is None or item == '':
                     continue
-                instance.handler.write(instance.addr + self.offset + i * self.size, self.type, self.type(item))
+                instance.handler.write(instance.addr + self.offset + i * self.field_size, self.type(item))
 
 
 class CoordData:
@@ -496,7 +496,8 @@ class CoordData:
 
     def values(self):
         addr = self.addr
-        return [self.instance.handler.read(addr + i * 4) for i in range(self.field.length)]
+        return [self.instance.handler.read(addr + i * self.field.field_size, self.field.type)
+            for i in range(self.field.length)]
 
     def set(self, value):
         it = iter(value)
@@ -510,10 +511,10 @@ class CoordData:
         return self.instance.handler.read(self.addr, bytes, self.field.size)
 
     def __getitem__(self, i):
-        return self.instance.handler.read(self.addr + i * 4, self.field.type)
+        return self.instance.handler.read(self.addr + i * self.field.field_size, self.field.type)
 
     def __setitem__(self, i, value):
-        return self.instance.handler.write(self.addr + i * 4, self.field.type(value))
+        return self.instance.handler.write(self.addr + i * self.field.field_size, self.field.type(value))
 
     def __iter__(self):
         self._pos = 0

@@ -68,7 +68,8 @@ class Main(BaseGTA3Tool):
             self.weapon_views = []
             for i in range(11):
                 self.weapon_views.append(
-                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST, self.on_weapon_change)
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST,
+                        self.on_weapon_change)
                 )
 
         with StaticGroup("作弊"):
@@ -76,14 +77,16 @@ class Main(BaseGTA3Tool):
                 with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                     SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-                    SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (), b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
+                    SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
+                        b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
                     SimpleCheckBox("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
                     SimpleCheckBox("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
                     SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
         with StaticGroup("快捷键"):
             with ui.Horizontal(className="fill container"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change, 
+                self.spawn_vehicle_id_view = ui.ListBox(className="expand",
+                    onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
                 with ui.ScrollView(className="fill container"):
                     self.render_common_text()
@@ -127,7 +130,7 @@ class Main(BaseGTA3Tool):
         text = (text + '\0').encode('utf-16le')
         TEXT1_ADDR = 0x7D3E40
         TEXT2_ADDR = 0x939028
-        
+
         self.handler.ptrs_write(TEXT1_ADDR, (), text)
         time.sleep(0.01)
         self.handler.ptrs_write(TEXT2_ADDR, (), text)
@@ -139,7 +142,9 @@ class Main(BaseGTA3Tool):
         """修车"""
         model_id = vehicle.model_id
 
-        is_type = lambda addr: self.native_call_auto(addr, 'L', model_id) & 0xFF
+        def is_type(addr):
+            return self.native_call_auto(addr, 'L', model_id) & 0xFF
+
         fix_addr = None
 
         if is_type(address.FUNC_IsCarModel):

@@ -142,7 +142,7 @@ void HotkeyWindow::RegisterHotKeys(py::iterable &items)
 		pyobj key;
 		if (py::len(item) >= 4)
 		{
-			key = item[0];
+			key = item[3];
 		}
 		else
 		{
