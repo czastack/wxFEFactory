@@ -54,7 +54,8 @@ class Widget:
     def render_btn(self):
         this = self.weak
         btn_read = ui.Button(label="r", style=btn_xs_style, onclick=lambda btn: this.read())
-        btn_write = ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write()) if not self.readonly else None
+        btn_write = (ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write())
+            if not self.readonly else None)
         return btn_read, btn_write
 
     def onKey(self, v, event):
@@ -174,15 +175,18 @@ class BaseGroup(Widget):
         :param cachable: 子元素是ModelWidget时有用
         """
         self.children = []
-        self.handler = handler
         cachable = cachable and callable(addr)
         if not cachable:
             self.cachable = False
+            if handler is None:
+                handler = getattr(addr, 'handler', None)
 
         if cachable:
             self._ins_getter = addr
             self._ins_cached = False
             self._ins = None
+
+        self.handler = handler
 
         super().__init__(name, label, addr)
 
@@ -385,7 +389,8 @@ class BaseInput(TwoWayWidget):
         super().render()
         with ui.Horizontal(className="fill") as container:
             if self.spin:
-                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, min=self.min, max=self.max or (1 << (self.size << 3) - 1) - 1)
+                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, min=self.min,
+                    max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
                 self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
             self.render_btn()

@@ -36,7 +36,7 @@ class Model:
             data = test_comlex_attr(field)
             if data is not None:
                 item = self
-                prev = None # 取offset的对象
+                prev = None  # 取offset的对象
                 i = 0
                 last = len(data.attrs) - 1
                 for attr in data.attrs:
@@ -126,7 +126,7 @@ class Model:
         data = test_comlex_attr(name)
         if data is not None:
             item = self
-            prev = None # 取offset的对象
+            prev = None  # 取offset的对象
             i = 0
             last = len(data.attrs) - 1
             for attr in data.attrs:
@@ -153,7 +153,7 @@ class Model:
                         item = getattr(item, attr)
                         if item is None or item is 0:
                             break
-                    
+
                 i += 1
         else:
             super().__setattr__(name, value)
@@ -236,7 +236,7 @@ class Field(FieldType):
         instance.handler.write(instance.addr + self.offset, value, self.size)
 
     def __str__(self):
-        return "{}(offset={}, size={})".format(self.__class__.__name__, 
+        return "{}(offset={}, size={})".format(self.__class__.__name__,
             hex(self.offset) if self.offset > 0xFF else self.offset, self.size)
 
     __repr__ = __str__
@@ -299,6 +299,7 @@ class ByteField(Field):
 
 class WordField(Field):
     __init__ = partialmethod(Field.__init__, size=2)
+
 
 class QWordField(Field):
     __init__ = partialmethod(Field.__init__, size=8)
@@ -509,17 +510,17 @@ class CoordData:
         return self.instance.handler.read(self.addr, bytes, self.field.size)
 
     def __getitem__(self, i):
-        return self.instance.handler.read(self.addr + i * 4, self.type)
+        return self.instance.handler.read(self.addr + i * 4, self.field.type)
 
     def __setitem__(self, i, value):
-        return self.instance.handler.write(self.addr + i * 4, self.type(value))
+        return self.instance.handler.write(self.addr + i * 4, self.field.type(value))
 
     def __iter__(self):
         self._pos = 0
         return self
 
     def __next__(self):
-        if self._pos < self.length:
+        if self._pos < self.field.length:
             ret = self[self._pos]
             self._pos += 1
             return ret
@@ -722,6 +723,7 @@ class MinuendFieldPrep(FieldPrep):
 CAttr = DataClass("CAttr", ("attrs", "offsets"))
 
 COMLEX_ATTR_MAP = {}
+
 
 def test_comlex_attr(text):
     """
