@@ -5,6 +5,7 @@ import ctypes
 class CTreeNode(ctypes.Structure):
     _fields_ = [("left", ctypes.c_ushort), ("right", ctypes.c_ushort)]
 
+
 LP_CNODE = ctypes.POINTER(CTreeNode)
 
 
@@ -150,7 +151,7 @@ class FeDict(Dictionary):
                             faceid = next(it) >> 8
                             # 这里没有判断范围，GBA三作都是2开始，后面几个id是离散的，每一作不一样
                             text.append('{Face%d}' % faceid)
-                        except:
+                        except Exception:
                             pass
                 else:
                     print("Error: %04X can't decode" % code)

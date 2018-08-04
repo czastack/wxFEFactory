@@ -1,5 +1,7 @@
 from ..base import BaseNdsHack
-from lib.hack.forms import Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
+from lib.hack.forms import (
+    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
+)
 from lib.win32.keys import VK
 from lib import exui
 from lib.exui.components import Pagination
@@ -19,11 +21,11 @@ class MetalMaxHack(BaseNdsHack):
         self.chariot_item_info = self.models.ChariotItemInfo(0, self.handler)
         self.enemy = self.models.Enemy(0, self.handler)
         self.has_holes = self.chariot.field('hole_type') is not None
-    
+
     def render_main(self):
         datasets = self.datasets
         weak = self.weak
-        
+
         with Group("global", "全局", self._global, cols=4):
             ModelInput("money")
             ModelInput("stamp")
@@ -32,7 +34,8 @@ class MetalMaxHack(BaseNdsHack):
         self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
         self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
-        self.lazy_group(Group("chariot_items", "战车物品/装备", self.chariot, cols=2 if self.has_holes else 4), self.render_chariot_items)
+        self.lazy_group(Group("chariot_items", "战车物品/装备", self.chariot, cols=2 if self.has_holes else 4),
+            self.render_chariot_items)
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
@@ -102,7 +105,8 @@ class MetalMaxHack(BaseNdsHack):
 
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
-        ModelSelect("chassis.equip", "底盘", choices=datasets.CHARIOT_CHASSIS.choices, values=datasets.CHARIOT_CHASSIS.values)
+        ModelSelect("chassis.equip", "底盘", choices=datasets.CHARIOT_CHASSIS.choices,
+            values=datasets.CHARIOT_CHASSIS.values)
         ModelInput("chassis.defense", "底盘防御")
         ModelInput("chassis.attr1", "荷台").view.setToolTip('道具容量，最大18个')
         ModelInput("chassis.attr2", "弹舱")
@@ -111,10 +115,19 @@ class MetalMaxHack(BaseNdsHack):
 
     def render_chariot_items(self):
         datasets = self.datasets
-        detail_keep_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
-        detail_click = lambda key: partial(__class__.show_chariot_item_info, self.weak, key=key)
-        preset_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
-        preset_ci_click = lambda key: partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
+
+        def detail_keep_click(key):
+            return partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
+
+        def detail_click(key):
+            return partial(__class__.show_chariot_item_info, self.weak, key=key)
+
+        def preset_click(key):
+            return partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
+
+        def preset_ci_click(key):
+            return partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
+
         item_choices = self.datasets.CHARIOT_ALL_ITEM.choices
         item_values = self.datasets.CHARIOT_ALL_ITEM.values
 
@@ -156,7 +169,8 @@ class MetalMaxHack(BaseNdsHack):
         for i in range(self.chariot.special_bullets.length):
             exui.Label("特殊炮弹%d" % (i + 1))
             with ui.Horizontal(className="fill"):
-                ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
+                ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices,
+                    values=datasets.SPECIAL_BULLETS.values)
                 ModelInput("special_bullets.%d.count" % i, "数量")
 
     def render_package_group(self):
@@ -168,7 +182,8 @@ class MetalMaxHack(BaseNdsHack):
 
         def render_items(self, item=None):
             for i in range(self.IREM_PAGE_LENGTH):
-                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "", choices=item['source'].choices, values=item['source'].values)
+                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "",
+                    choices=item['source'].choices, values=item['source'].values)
                 ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
             with Group.active_group().footer:
                 Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
@@ -200,7 +215,8 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("avoid")
         ModelInput("speed")
         for i, label in enumerate("物火光电音气冷"):
-            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).view.setToolTip("○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
+            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).view.setToolTip(
+                "○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
 
         for i in range(4):
             ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)
@@ -215,7 +231,8 @@ class MetalMaxHack(BaseNdsHack):
         dialog = getattr(self, name, None)
         if dialog is None:
             with DialogGroup(None, "战车物品详情", self.chariot_item_info, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+                    dialog_style={'width': 600, 'height': 1200},
+                    closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("equip", choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
                 ModelInput("change")
                 ModelInput("ammo")
@@ -237,7 +254,7 @@ class MetalMaxHack(BaseNdsHack):
             datasets = self.datasets
             with exui.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(type="dropdown", className="fill", 
+                    dialog.search = ui.ComboBox(type="dropdown", className="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(className="fill")
@@ -247,11 +264,11 @@ class MetalMaxHack(BaseNdsHack):
                     dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", className="vcenter", checked=True)
                 dialog.listview.appendColumns(*head)
 
-                dialog.data_list = [] # 读取预设数据时的列表
-                dialog.name_list = [] # 搜索时用的名称列表
+                dialog.data_list = []  # 读取预设数据时的列表
+                dialog.name_list = []  # 搜索时用的名称列表
                 for item in items:
                     item_name = datasets.ITEMS[item[0]]
-                    part_name = (item_name,) # 名称元祖
+                    part_name = (item_name,)  # 名称元祖
                     if isinstance(item[1], tuple):
                         # 多个星级
                         part_id = item[:1]
@@ -276,7 +293,7 @@ class MetalMaxHack(BaseNdsHack):
     def chariot_ci_dialog(self):
         return self.get_chariot_item_dialog('_chariot_ci_dialog', '战车C装置/引擎',
             self.chariot_equips.CHARIOT_CI_HEAD, self.chariot_equips.CHARIOT_CI_ITEMS)
-    
+
     def on_chariot_item_preset_selected(self, view, event, dialog):
         """战车物品预设选中处理"""
         data = dialog.data_list[event.index]
@@ -297,7 +314,7 @@ class MetalMaxHack(BaseNdsHack):
                     ins.ammo = attr2
 
         dialog.endModal()
-    
+
     def on_chariot_item_preset_search(self, _, dialog):
         """预设搜索"""
         value = dialog.search.value
@@ -312,7 +329,7 @@ class MetalMaxHack(BaseNdsHack):
             i += 1
         dialog.search.setItems(choices)
         dialog.search.popup()
-    
+
     def on_chariot_item_preset_search_select(self, view, dialog):
         """点击搜索项定位"""
         list_index = dialog.search_values[view.index]

@@ -63,7 +63,7 @@ for i in range(565):
     data = data[:end].rstrip(b'\x00').rstrip(b'\x20')
     try:
         text = tool.dictionary.decode(data, one=True) or ''
-    except:
+    except Exception:
         text = hex(i) + ': err'
     result.append(text)
 copy('\n'.join(result))
@@ -87,7 +87,7 @@ while addr < 0x2040CA80:
     data = data[:end].rstrip(b'\x00').rstrip(b'\x20')
     try:
         text = tool.dictionary.decode(data, one=True) or ''
-    except:
+    except Exception:
         text = hex(addr) + ': err'
     result.append(text)
 copy('\n'.join(result))

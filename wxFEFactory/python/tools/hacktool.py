@@ -30,7 +30,7 @@ class BaseHackTool(NestedTool):
                     self.begin_group()
                     try:
                         self.render_main()
-                    except:
+                    except Exception:
                         win.close()
                         raise
                     self.end_group()
@@ -67,7 +67,6 @@ class BaseHackTool(NestedTool):
     @property
     def WINDOW_NAME(self):
         return getattr(self.handler, 'WINDOW_NAME', None) or self.CLASS_NAME
-    
 
     def onClose(self, *args):
         if self.handler.active:
@@ -233,7 +232,7 @@ class ProxyHackTool(BaseHackTool):
     def check_attach(self, _=None):
         if self.handler.active:
             self.ondetach()
-            
+
         for Handler in self.handlers:
             handler = Handler()
             if handler.attach():

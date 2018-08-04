@@ -82,7 +82,7 @@ def u32bytes(n):
     """32位整型转bytes"""
     try:
         return n.to_bytes(4, 'little')
-    except:
+    except Exception:
         return struct.pack('L', n)
 
 

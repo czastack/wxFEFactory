@@ -110,7 +110,7 @@ class Vehicle(Entity, GTA3Vehicle):
         try:
             item = next(filter(lambda x: x[1] == model_id, VEHICLE_LIST))
             return item[0]
-        except:
+        except Exception:
             return None
 
     @property

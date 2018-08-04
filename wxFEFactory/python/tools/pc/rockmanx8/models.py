@@ -20,6 +20,6 @@ class Global(Model):
     back_zero_white_axl = ByteField(0x0428D328)
     ultimate_x = ByteField(0x0428D330)
 
-    zero_jump = ByteField(0x0485A6FC) # 锁住2
+    zero_jump = ByteField(0x0485A6FC)  # 锁住2
     resurgence = ByteField(0x0428D772)
     joint_attack = ByteField(0x04882D98)

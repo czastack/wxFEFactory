@@ -197,7 +197,7 @@ class NativeContext64(NativeContext):
 
                     try:
                         data = struct.pack(fmt, arg)
-                    except:
+                    except Exception:
                         print(fmt, arg)
                         raise
                     data_size = len(data)

@@ -1001,7 +1001,7 @@ class Main(BaseGTATool):
             i = self.player_models.index(self.player.model_id)
             self.native_call('STAT_GET_INT', '2Ql', self.money_keys[i], self.native_context.get_temp_addr(), -1)
             return self.native_context.get_temp_value(size=4)
-        except:
+        except Exception:
             print('请确保当前人物模型是三主角之一')
 
     @money.setter
@@ -1009,7 +1009,7 @@ class Main(BaseGTATool):
         try:
             i = self.player_models.index(self.player.model_id)
             self.native_call('STAT_SET_INT', 'Q2l', self.money_keys[i], int(value), 1)
-        except:
+        except Exception:
             print('请确保当前人物模型是三主角之一')
 
     @property

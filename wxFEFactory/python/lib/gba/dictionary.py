@@ -8,7 +8,7 @@ class Dictionary:
         :param code_table: 码表文件路径或字典
         :param low_range: 双字节码的低字节判定范围: 长度为2的元组
         :param ctrl_table: 控制码表: 字典{code: fn(bytes, i) -> (word, i)}
-        :param end_code: 结束符 
+        :param end_code: 结束符
         """
         self._code_char = code_char = {}
         self._char_code = char_code = {}
@@ -99,7 +99,7 @@ class Dictionary:
                     char = char << 8 | byte # 低字节在左边
                     try:
                         words.append(self._code_char[char])
-                    except:
+                    except Exception:
                         # 尝试双字节控制码
                         if self.ctrl_table and char in self.ctrl_table:
                             word, i = self.ctrl_table[char].decode(data, i)
@@ -220,7 +220,7 @@ class Dictionary:
                         # 读到单字节控制码
                         try:
                             word = self.ctrl_table[byte].decode_it(it)
-                        except:
+                        except Exception:
                             print(data)
                             word = '[??]'
                             # raise
@@ -232,7 +232,7 @@ class Dictionary:
                 char = char << 8 | byte # 低字节在左边
                 try:
                     words.append(self._code_char[char])
-                except:
+                except Exception:
                     # 尝试双字节控制码
                     if self.ctrl_table and char in self.ctrl_table:
                         word = self.ctrl_table[char].decode_it(it)

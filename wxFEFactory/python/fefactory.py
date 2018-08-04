@@ -29,7 +29,7 @@ def reload(start_option=None, callback=None):
 
     try:
         del __builtins__['fpy']
-    except:
+    except Exception:
         pass
 
     if start_option:

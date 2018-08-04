@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import json
 
+
 class Configurable(ABC):
     __slots__ = ('config_file', 'config_changed', 'observers')
 
@@ -47,7 +48,7 @@ class Configurable(ABC):
         try:
             with open(self.config_file) as file:
                 self.config = json.load(file)
-        except:
+        except Exception:
             self.config = {}
 
     def writeConfig(self):
