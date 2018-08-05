@@ -1,3 +1,6 @@
+from lib.utils import split_label_value
+
+
 class BaseItemProvider:
     def __init__(self):
         self._choices = None
@@ -8,7 +11,7 @@ class BaseItemProvider:
         if self._choices is None:
             self.generate()
         return self._choices
-        
+
     @property
     def values(self):
         if self._values is None:
@@ -17,6 +20,7 @@ class BaseItemProvider:
 
 
 class ItemProvider(BaseItemProvider):
+    """截取部分items提供器"""
     def __init__(self, datas, start, end, can_empty=True):
         super().__init__()
         self.datas = datas
@@ -43,6 +47,7 @@ class ItemProvider(BaseItemProvider):
 
 
 class ItemProviders(BaseItemProvider):
+    """多个ItemProvider组合"""
     def __init__(self, *args):
         self.elems = list(args)
         super().__init__()
@@ -60,6 +65,16 @@ class ItemProviders(BaseItemProvider):
     def __add__(self, items):
         self.elems.append(items)
         return self
+
+
+class OptionProvider(BaseItemProvider):
+    """分隔labels, values提供器"""
+    def __init__(self, datas):
+        super().__init__()
+        self.datas = datas
+
+    def generate(self):
+        self._choices, self._values = split_label_value(self.datas)
 
 
 def strhex(n, size=0):

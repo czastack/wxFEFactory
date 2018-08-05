@@ -66,17 +66,21 @@ def float32(f):
     """浮点数保留6位小数"""
     return round(f, 6)
 
+
 def u32(n):
     """截取32位整型"""
     return n & 0xFFFFFFFF
+
 
 def LOWORD(n):
     """低字"""
     return n & 0xFFFF
 
+
 def HIWORD(n):
     """高字"""
     return (n >> 16) & 0xFFFF
+
 
 def u32bytes(n):
     """32位整型转bytes"""
@@ -90,34 +94,42 @@ def tuple2rgb(rgbtuple):
     """颜色3元组转整型rgb"""
     return rgbtuple[0] << 16 | rgbtuple[1] << 8 | rgbtuple[2]
 
+
 def rgb2tuple(rgb):
     """整型rgb转颜色3元组"""
     return ((rgb >> 16) & 0xff), ((rgb >> 8) & 0xff), (rgb & 0xff)
+
 
 def rgb2bgr(rgb):
     """rgb颜色转bgr颜色"""
     return ((rgb & 0xff) << 16 | ((rgb >> 8) & 0xff) << 8 | ((rgb >> 16) & 0xff))
 
+
 def gen_values(items):
     """生成自然数元组"""
     return tuple(range(len(items)))
+
 
 def gen_flag(items):
     """生成标记元组 1, 2, 4, 8..."""
     return tuple(1 << i for i in range(len(items)))
 
+
 def flag_generator(n):
     """标记生成器"""
     return (1 << i for i in range(n))
+
 
 def split_value_label(options):
     """把(value, label)分开"""
     return tuple(item[1] for item in options), tuple(item[0] for item in options)
 
+
 def split_label_value(options):
     """把(label, value)分开"""
-    a, b = split_value_label()
+    a, b = split_value_label(options)
     return b, a
+
 
 def prepare_option(choices, values):
     """预处理选项"""

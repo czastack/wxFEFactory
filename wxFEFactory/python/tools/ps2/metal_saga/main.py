@@ -86,7 +86,8 @@ class Main(BasePs2Hack):
     def render_person_equips(self):
         for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
             prop = "equips.%d" % i
-            select = ModelChoiceDisplay(prop + ".item", label, choices=datasets.ALL_EQUIP.choices, values=datasets.ALL_EQUIP.values)
+            select = ModelChoiceDisplay(prop + ".item", label, choices=datasets.ALL_EQUIP.choices,
+                values=datasets.ALL_EQUIP.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
                     ins=self.person, prop=prop))
@@ -143,7 +144,8 @@ class Main(BasePs2Hack):
 
     def render_wanted(self):
         for i, name in enumerate(datasets.WANTED_LIST):
-            ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS, values=datasets.WANTED_STATUS_VALUES)
+            ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
+                values=datasets.WANTED_STATUS_VALUES)
 
     def render_functions_group(self):
         self.render_functions(('fake_down',))
@@ -169,8 +171,8 @@ class Main(BasePs2Hack):
         name = 'item_info_dialog'
         dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup(name, "物品详情", self.item_info, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+            with DialogGroup(name, "物品详情", self.item_info, cols=1, dialog_style={'width': 600, 'height': 1200},
+                    closable=False, horizontal=False, button=False) as dialog:
                 ModelChoiceDisplay("item", choices=datasets.ITEMS, ins=self.item_info)
                 ModelInput("attr1")
                 ModelInput("status")
@@ -186,8 +188,8 @@ class Main(BasePs2Hack):
         name = 'static_item_dialog'
         dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup(None, "静态物品", self.static_item, cols=1,
-                    dialog_style={'width': 600, 'height': 1200}, closable=False, horizontal=False, button=False) as dialog:
+            with DialogGroup(None, "静态物品", self.static_item, cols=1, dialog_style={'width': 600, 'height': 1200},
+                    closable=False, horizontal=False, button=False) as dialog:
                 ModelChoiceDisplay("item", choices=datasets.ITEMS, ins=self.item_info)
                 ModelInput("weight")
                 ModelInput("load")
