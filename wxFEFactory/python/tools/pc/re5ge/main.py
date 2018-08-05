@@ -4,12 +4,12 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.hacktool import BaseHackTool
+from tools.assembly_hacktool import AssemblyHacktool
 from fefactory_api import ui
 from . import models, datasets
 
 
-class Main(BaseHackTool):
+class Main(AssemblyHacktool):
     CLASS_NAME = 'MTFramework'
     WINDOW_NAME = 'RESIDENT EVIL 5'
 
@@ -36,6 +36,7 @@ class Main(BaseHackTool):
             ModelCheckBox("invincible")
 
         self.lazy_group(Group("person_items", "角色物品", self.person, cols=4), self.render_person_items)
+        self.lazy_group(Group("assembly_function", "代码插入", None, cols=8), self.render_assembly_functions)
 
     def render_person_items(self):
         for i in range(self.person.slot_items.length):
@@ -45,6 +46,13 @@ class Main(BaseHackTool):
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_slot_item, self.weak,
                     ins=self.person, prop=prop))
+
+    def render_assembly_functions(self):
+        functions = (
+            ('无限子弹', ('infinity_ammo', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
+                        b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', True, True)),
+        )
+        super().render_assembly_functions(functions)
 
     def get_slot_item_dialog(self):
         """物品信息对话框"""
@@ -76,6 +84,17 @@ class Main(BaseHackTool):
         self.character_struct.addr = self.handler.read_ptr(proc_base + 0x00DA2A5C)
         self.money.addr = self.handler.read_ptr(proc_base + 0x00DA23D8)
         self.person.addr = self.character_struct.players[0].addr
+
+    def ondetach(self):
+        memory = getattr(self, 'allocated_memory', None)
+        if memory is not None:
+            self.handler.free_memory(memory)
+            self.allocated_memory = None
+            self.next_usable_memory = None
+            for key, value in self.registed_assembly.items():
+                self.unregister_assembly_item(value)
+            self.registed_assembly = []
+            print(memory)
 
     def on_person_change(self, lb):
         self.person.addr = self.character_struct.players[lb.index].addr

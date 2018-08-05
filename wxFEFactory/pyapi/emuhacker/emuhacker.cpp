@@ -93,12 +93,17 @@ namespace emuhacker {
 		return self.alloc_data(buff, size);
 	}
 
-	addr_t find_bytes(ProcessHandler &self, py::bytes buf, addr_t start, addr_t end, int ordinal)
+	pyobj find_bytes(ProcessHandler &self, py::bytes buf, addr_t start, addr_t end, int ordinal)
 	{
 		char *buff;
 		ssize_t size;
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
-		return self.find_bytes((BYTE*)buff, size, start, end, ordinal);
+		addr_t result = self.find_bytes((BYTE*)buff, size, start, end, ordinal);
+		if (result != -1)
+		{
+			return py::int_(result);
+		}
+		return py::int_(-1);
 	}
 
 	wxString getModuleFile(ProcessHandler &self, addr_t module = 0)

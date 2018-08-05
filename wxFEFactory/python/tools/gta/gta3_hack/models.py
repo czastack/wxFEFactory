@@ -1,4 +1,5 @@
 from lib.hack.models import Model, Field, ByteField, WordField, CoordField, ManagedModelPtrField
+from lib.utils import u32
 from ..gta_base.models import Physicle, WeaponSet, Pool
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 from . import address
@@ -57,7 +58,7 @@ class Vehicle(Entity, GTA3Vehicle):
         if ignore:
             self.flags |= 4
         else:
-            self.flags &= (~4 & 0xFFFFFFFF)
+            self.flags &= u32(~4)
 
 
 class Player(Entity, GTA3Player):

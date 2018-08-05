@@ -87,3 +87,30 @@ def strhex(n, size=0):
                 break
         size = x >> 3
     return "%0*X" % ((size << 1), n)
+
+
+def table_size_for(c):
+    """求大于c的最小2次幂"""
+    n = c - 1
+    n |= n >> 1
+    n |= n >> 2
+    n |= n >> 4
+    n |= n >> 8
+    n |= n >> 16
+    return n + 1
+
+
+def align4(n):
+    """对齐4字节"""
+    tail = n & 3
+    if tail:
+        n += 4 - tail
+    return n
+
+
+def align8(n):
+    """对齐8字节"""
+    tail = n & 7
+    if tail:
+        n += 8 - tail
+    return n

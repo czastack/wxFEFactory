@@ -46,7 +46,6 @@ class Main(BaseGTATool):
     # use x64 native_call
     FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
 
-
     def __init__(self):
         super().__init__()
 
@@ -63,7 +62,7 @@ class Main(BaseGTATool):
         self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
         self.lazy_group(StaticGroup("武器配件"), self.render_weapon_components)
         self.lazy_group(StaticGroup("测试"), self.render_functions)
-        
+
         with Group(None, "设置", None, hasfooter=False):
             self.render_config()
 

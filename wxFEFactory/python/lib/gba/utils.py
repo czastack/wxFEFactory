@@ -35,15 +35,16 @@ def r1(data):
 
 def rol(a, n, N=32):
     # 循环左移
-    return ((a >> (N - n)) | (a << n)) & ((1<<N)-1)
+    return ((a >> (N - n)) | (a << n)) & ((1 << N) - 1)
 
 
 def ror(a, n, N=32):
     # 循环右移
-    return ((a << (N - n)) | (a >> n)) & ((1<<N)-1)
+    return ((a << (N - n)) | (a >> n)) & ((1 << N) - 1)
 
 
 REG_HEX = re.compile('([\\da-fA-F]+)')
+
 
 def compute_hex(expr):
     """计算16进制算式"""
