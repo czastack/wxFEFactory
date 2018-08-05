@@ -51,7 +51,7 @@ class Main(AssemblyHacktool):
                     ins=self.person, prop=prop))
 
     def render_saved_items(self):
-        for i in range(self.person.slot_items.length):
+        for i in range(self.saved_items.items.length):
             prop = "items.%d" % i
             select = ModelChoiceDisplay(prop + ".type", "物品%d" % (i + 1), choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
