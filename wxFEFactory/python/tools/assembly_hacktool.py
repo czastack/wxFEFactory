@@ -29,15 +29,16 @@ class AssemblyHacktool(BaseHackTool):
             self.unregister_assembly(args[0])
 
     def register_assembly(self, key, original, find_start, find_end, raplace, assembly,
-            find_range_from_base=True, is_inserted=False):
+            find_range_from_base=True, is_inserted=False, only_replace_jump=False):
         """注册机器码修改
         :param original: 原始数据
         :param find_start: 原始数据查找起始
         :param find_end: 原始数据查找结束
-        :param raplace: 原始数据替换为
+        :param raplace: 原始数据替换为的内容
         :param assembly: 写到新内存的内容
         :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
         :param is_inserted: 是否自动加入jmp代码
+        :param only_replace_jump: 只替换original前5个字节为jmp的内容
         """
         if is_inserted and (len(original) - len(raplace)) < 5:
             print("需要可用间隔大于5")
@@ -55,6 +56,8 @@ class AssemblyHacktool(BaseHackTool):
         if memory is None:
             self.next_usable_memory = self.allocated_memory = memory = self.handler.alloc_memory(2048)
             self.registed_assembly = {}
+        if only_replace_jump:
+            original = original[:len(raplace) + 5]
         self.registed_assembly[key] = {
             'addr': addr,
             'original': original,

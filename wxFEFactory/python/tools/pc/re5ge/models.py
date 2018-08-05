@@ -20,16 +20,16 @@ class SlotItem(Model):
 class SavedItem(Model):
     """存档中的个人物品"""
     SIZE = 0x2C
-    type = WordField(0x0)
-    quantity = Field(0x4)
-    max_quantity = Field(0x8)
-    reload_speed = Field(0x1C)
-    fire_power = Field(0x1E)
-    capacity = Field(0x1F)
-    piercing = Field(0x21)
-    scope = Field(0x22)
-    critical = Field(0x23)
-    attack_range = Field(0x24)
+    type = WordField(0x0, label="种类")
+    quantity = Field(0x4, label="容量")
+    max_quantity = Field(0x8, label="最大容量")
+    fire_power = WordField(0x1C, label="火力升级")
+    reload_speed = ByteField(0x1E, label="装弹速度升级")
+    capacity = ByteField(0x1F, label="容量升级")
+    piercing = ByteField(0x21, label="爆头率升级")
+    scope = ByteField(0x22, label="瞄准镜升级")
+    critical = ByteField(0x23, label="Critical")
+    attack_range = ByteField(0x24, label="攻击范围升级")
 
 
 class InventoryTreasureItem(Model):
