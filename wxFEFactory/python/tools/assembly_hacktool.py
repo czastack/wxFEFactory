@@ -15,8 +15,8 @@ class AssemblyHacktool(BaseHackTool):
             self.next_usable_memory = None
             for key, value in self.registed_assembly.items():
                 self.unregister_assembly_item(value)
-            self.registed_assembly = []
-            print(memory)
+            self.registed_assembly = None
+            self.registed_assembly_log = None
 
     def render_assembly_functions(self, functions):
         for label, args in functions:
@@ -52,16 +52,20 @@ class AssemblyHacktool(BaseHackTool):
         addr = self.handler.find_bytes(original, find_start, find_end)
         if addr is -1:
             return
-        memory = getattr(self, 'next_usable_memory', None)
-        if memory is None:
-            self.next_usable_memory = self.allocated_memory = memory = self.handler.alloc_memory(2048)
+        if getattr(self, 'allocated_memory', None) is None:
+            # 初始化
+            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048)
             self.registed_assembly = {}
+            self.registed_assembly_memory = {}
+
+        if key in self.registed_assembly_memory:
+            memory = self.registed_assembly_memory[key]
+        else:
+            memory = self.registed_assembly_memory[key] = self.next_usable_memory
+
         if only_replace_jump:
             original = original[:len(raplace) + 5]
-        self.registed_assembly[key] = {
-            'addr': addr,
-            'original': original,
-        }
+        self.registed_assembly[key] = {'addr': addr, 'original': original}
         if is_inserted:
             # 计算jump地址, 5是jmp opcode的长度
             diff_new = u32(memory - (addr + 5))
@@ -76,12 +80,14 @@ class AssemblyHacktool(BaseHackTool):
         # print(bytes_beautify(assembly))
         self.handler.write(addr, raplace)
         self.handler.write(memory, assembly)
-        self.next_usable_memory += align4(len(assembly))
+        if memory == self.next_usable_memory:
+            self.next_usable_memory += align4(len(assembly))
 
     def unregister_assembly(self, key):
         """恢复机器码修改"""
-        if hasattr(self, 'registed_assembly'):
-            item = self.registed_assembly.pop(key, None)
+        items = getattr(self, 'registed_assembly', None)
+        if items:
+            item = items.pop(key, None)
             if item is not None:
                 self.unregister_assembly_item(item)
 

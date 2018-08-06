@@ -29,7 +29,7 @@ class Main(AssemblyHacktool):
             ModelInput("money", "金钱", ins=self.money)
 
         with Group("player", "角色", self.person):
-            Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.on_person_change)
+            self.person_select = Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
             ModelInput("hp")
             ModelInput("hpmax")
             ModelCoordWidget("moving_coord", savable=True)
@@ -38,7 +38,7 @@ class Main(AssemblyHacktool):
             ModelCheckBox("invincible")
 
         self.lazy_group(Group("person_items", "角色物品", self.person, cols=4), self.render_person_items)
-        self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, cols=4), self.render_saved_items)
+        self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, cols=6), self.render_saved_items)
         self.lazy_group(Group("assembly_function", "代码插入", None, cols=8), self.render_assembly_functions)
 
     def render_person_items(self):
@@ -53,7 +53,7 @@ class Main(AssemblyHacktool):
     def render_saved_items(self):
         for i in range(self.saved_items.items.length):
             prop = "items.%d" % i
-            select = ModelChoiceDisplay(prop + ".type", "物品%d" % (i + 1), choices=datasets.INVENTORY_ITEMS.choices,
+            select = ModelChoiceDisplay(prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
@@ -119,7 +119,7 @@ class Main(AssemblyHacktool):
         # print(hex(self.health_check))
         self.character_struct.addr = self.handler.read_ptr(proc_base + 0x00DA2A5C)
         self.money.addr = self.handler.read_ptr(proc_base + 0x00DA23D8)
-        self.switch_person(0)
+        self.switch_person(self.person_select.index)
 
     def ondetach(self):
         memory = getattr(self, 'allocated_memory', None)
@@ -130,7 +130,6 @@ class Main(AssemblyHacktool):
             for key, value in self.registed_assembly.items():
                 self.unregister_assembly_item(value)
             self.registed_assembly = []
-            print(memory)
 
     def on_person_change(self, lb):
         self.switch_person(lb.index)

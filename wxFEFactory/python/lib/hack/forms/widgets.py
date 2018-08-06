@@ -710,7 +710,7 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
 
 def Choice(laebl, choices, onselect):
     exui.Label(laebl)
-    ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
+    return ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
 
 
 class BaseFlagWidget(TwoWayWidget):

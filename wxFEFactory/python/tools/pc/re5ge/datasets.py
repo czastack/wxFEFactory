@@ -4,6 +4,7 @@ from lib.hack.utils import OptionProvider
 PERSONS = ('Chris', 'Sheva')
 
 INVENTORY_OPTIONS = (
+    ('小刀', 0x0101),
     ('M92F手枪（HG）', 0x0102),
     ('VZ61冲锋手枪（MG）', 0x0103),
     ('伊萨卡M37（SG）', 0x0104),
