@@ -7,29 +7,26 @@ class Global(Model):
     pass
 
 
-class SlotItem(Model):
-    """游戏中物品"""
-    SIZE = 0x30
-    type = Field(0, label="种类")
-    ammo = Field(4, label="数量/武器弹药")
-    ammo_max = Field(8, label="最大数量/武器弹药")
-    slot = Field(0x14, label="槽位")
-    status = Field(0x18, label="状态")  # 01: 装备中, 02:未装备
-
-
 class SavedItem(Model):
-    """存档中的个人物品"""
+    """整理界面个人物品"""
     SIZE = 0x2C
     type = WordField(0x0, label="种类")
-    quantity = Field(0x4, label="容量")
-    max_quantity = Field(0x8, label="最大容量")
+    quantity = Field(0x4, label="数量/武器弹药")
+    max_quantity = Field(0x8, label="最大数量/武器弹药")
     fire_power = WordField(0x1C, label="火力升级")
     reload_speed = ByteField(0x1E, label="装弹速度升级")
     capacity = ByteField(0x1F, label="容量升级")
     piercing = ByteField(0x21, label="爆头率升级")
-    scope = ByteField(0x22, label="瞄准镜升级")
-    critical = ByteField(0x23, label="Critical")
+    critical = ByteField(0x22, label="贯穿伤害升级")
+    scope = ByteField(0x23, label="瞄准镜升级")
     attack_range = ByteField(0x24, label="攻击范围升级")
+
+
+class SlotItem(SavedItem):
+    """游戏中物品"""
+    SIZE = 0x30
+    slot = Field(0x14, label="槽位")
+    status = Field(0x18, label="状态")  # 01: 装备中, 02:未装备
 
 
 class InventoryTreasureItem(Model):
@@ -41,7 +38,7 @@ class InventoryTreasureItem(Model):
 
 class SavedItemHolder(Model):
     SIZE = 0x420
-    """存档中的每个角色物品栏"""
+    """整理界面每个角色物品栏"""
     items = ArrayField(0, 9, ModelField(0, SavedItem))
 
 

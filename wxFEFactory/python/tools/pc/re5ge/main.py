@@ -1,6 +1,7 @@
 from functools import partial
 from lib.hack.forms import (
-    Group, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget, ModelChoiceDisplay
+    Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
+    ModelChoiceDisplay
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -42,7 +43,7 @@ class Main(AssemblyHacktool):
 
         self.lazy_group(Group("person_items", "角色物品", self.person, cols=4), self.render_person_items)
         self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, cols=6), self.render_saved_items)
-        self.lazy_group(Group("assembly_function", "代码插入", None, cols=8), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_person_items(self):
         for i in range(self.person.slot_items.length):
@@ -64,12 +65,14 @@ class Main(AssemblyHacktool):
 
     def render_assembly_functions(self):
         functions = (
-            ('无限子弹', ('infinity_ammo', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
+            ('无限弹药', ('infinity_ammo', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
                 b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', True, True)),
+            ('弹药不减', ('ammo_keep', b'\x2B\x44\x24\x08\x89\x41\x08', 0x84B8FB, 0x900000,
+                b'\x90' * 7, None, True)),
             ('快速发射', ('fast_shoot', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, 0x900000,
-                b'', b'\xC7\x46\x20\x00\xC0\x79\x44\xF3\x0F\x58\x46\x20', True, True, True)),
+                b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', True, True, True)),
         )
-        super().render_assembly_functions(functions)
+        super().render_assembly_functions(functions, cols=6)
 
     def get_slot_item_dialog(self):
         """物品信息对话框"""
@@ -80,9 +83,15 @@ class Main(AssemblyHacktool):
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
                     ins=self.slot_item)
-                ModelInput("ammo")
-                ModelInput("ammo_max")
-                ModelInput("slot")
+                ModelInput("quantity")
+                ModelInput("max_quantity")
+                ModelInput("fire_power")
+                ModelInput("reload_speed")
+                ModelInput("capacity")
+                ModelInput("piercing")
+                ModelInput("critical")
+                ModelInput("scope")
+                ModelInput("attack_range")
 
             setattr(self, name, dialog)
         return dialog

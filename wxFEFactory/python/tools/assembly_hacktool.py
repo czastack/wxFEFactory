@@ -18,9 +18,10 @@ class AssemblyHacktool(BaseHackTool):
             self.registed_assembly = None
             self.registed_assembly_log = None
 
-    def render_assembly_functions(self, functions):
-        for label, args in functions:
-            ui.ToggleButton(label=label, onchange=partial(__class__.toggle_assembly_function, self.weak, args=args))
+    def render_assembly_functions(self, functions, cols=4, vgap=10):
+        with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
+            for label, args in functions:
+                ui.ToggleButton(label=label, onchange=partial(__class__.toggle_assembly_function, self.weak, args=args))
 
     def toggle_assembly_function(self, btn, args):
         if btn.checked:
@@ -28,7 +29,7 @@ class AssemblyHacktool(BaseHackTool):
         else:
             self.unregister_assembly(args[0])
 
-    def register_assembly(self, key, original, find_start, find_end, raplace, assembly,
+    def register_assembly(self, key, original, find_start, find_end, raplace, assembly=None,
             find_range_from_base=True, is_inserted=False, only_replace_jump=False):
         """注册机器码修改
         :param original: 原始数据
@@ -75,13 +76,15 @@ class AssemblyHacktool(BaseHackTool):
             raplace = raplace + b'\xe9' + diff_new.to_bytes(4, 'little') + replace_padding
             assembly = assembly + b'\xe9' + diff_back.to_bytes(4, 'little')
 
+            if memory == self.next_usable_memory:
+                self.next_usable_memory += align4(len(assembly))
+
+            self.handler.write(memory, assembly)
+
         # from lib.gba.utils import bytes_beautify
-        # print(bytes_beautify(raplace))
         # print(bytes_beautify(assembly))
+        # print(bytes_beautify(raplace))
         self.handler.write(addr, raplace)
-        self.handler.write(memory, assembly)
-        if memory == self.next_usable_memory:
-            self.next_usable_memory += align4(len(assembly))
 
     def unregister_assembly(self, key):
         """恢复机器码修改"""
