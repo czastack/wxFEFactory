@@ -23,6 +23,7 @@ class BaseHackTool(NestedTool):
             with ui.Vertical():
                 with ui.Horizontal(className="expand container"):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
+                    self.render_top_button()
                     self.attach_status_view = ui.Text("", className="vcenter grow left_padding")
                     ui.CheckBox("保持最前", className="vcenter", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill") as book:
@@ -163,12 +164,9 @@ class BaseHackTool(NestedTool):
     def set_cfn(self, btn, m=None):
         self.cfn = btn.click
 
-    def set_buttons_contextmenu(self):
-        parent = ui.View.get_active_layout()
-        with ui.ContextMenu() as contextmenu:
-            ui.MenuItem("设为alt+c快捷键(&C)", onselect=self.set_cfn)
-        for btn in parent.children:
-            btn.setContextMenu(contextmenu)
+    def render_top_button(self):
+        """渲染额外顶部按钮"""
+        pass
 
     def render_functions(self, names):
         """渲染功能按钮"""
@@ -176,6 +174,13 @@ class BaseHackTool(NestedTool):
             for name in names:
                 func = getattr(self.weak, name)
                 ui.Button(func.__doc__, onclick=func)
+
+    def set_buttons_contextmenu(self):
+        parent = ui.View.get_active_layout()
+        with ui.ContextMenu() as contextmenu:
+            ui.MenuItem("设为alt+c快捷键(&C)", onselect=self.set_cfn)
+        for btn in parent.children:
+            btn.setContextMenu(contextmenu)
 
     def load_model_fields(self, model):
         """导入模型字段数据"""

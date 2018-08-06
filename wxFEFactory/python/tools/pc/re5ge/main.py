@@ -24,6 +24,9 @@ class Main(AssemblyHacktool):
         self.saved_items = models.SavedItemHolder(0, self.handler)
         self.money = models.Money(0, self.handler)
 
+    def render_top_button(self):
+        ui.Button("读取地址", className="vcenter", onclick=self.reload_address)
+
     def render_main(self):
         with Group("player", "全局", self._global):
             ModelInput("money", "金钱", ins=self.money)
@@ -110,13 +113,11 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.R, this.reload_address),
         )
 
     def onattach(self):
         proc_base = self.handler.proc_base
-        # self.health_check = self.handler.find_bytes(b'\x66\x83\xB9\x64\x13\x00\x00\x00\x0F\x9E\xC0\xC3',
-        #     proc_base + 0x00700000, proc_base + 0x00800000)
-        # print(hex(self.health_check))
         self.character_struct.addr = self.handler.read_ptr(proc_base + 0x00DA2A5C)
         self.money.addr = self.handler.read_ptr(proc_base + 0x00DA23D8)
         self.switch_person(self.person_select.index)
@@ -163,3 +164,6 @@ class Main(AssemblyHacktool):
     def pull_through(self, _=None):
         for i in range(self.character_struct.players_count):
             self.character_struct.players[i].set_with('hp', 'hpmax')
+
+    def reload_address(self, _):
+        self.onattach()
