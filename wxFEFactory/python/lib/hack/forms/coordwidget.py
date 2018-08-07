@@ -8,7 +8,8 @@ ui = fefactory_api.ui
 
 
 class CoordWidget(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), length=3, type=float, size=4, savable=False, preset=None):
+    def __init__(self, name, label, addr, offsets=(), length=3, type=float, size=4,
+            labels=None, savable=False, preset=None):
         """
         :param length: 坐标维数
         :param saveble: 是否支持存取文件
@@ -17,6 +18,7 @@ class CoordWidget(TwoWayWidget):
         self.length = length
         self.type = type
         self.size = size
+        self.labels = labels
         self.savable = savable
         self.preset = preset
         if savable:
@@ -40,8 +42,8 @@ class CoordWidget(TwoWayWidget):
                     with ui.Vertical(style={'flex': 2}):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
-                            for i, v in zip(range(self.length), ('X', 'Y', 'Z')):
-                                exui.Label("%s坐标" % v)
+                            for label in self.labels or ('X坐标', 'Y坐标', 'Z坐标'):
+                                exui.Label(label)
                                 views.append(ui.TextInput(className="fill"))
                             exui.Label("名称")
                             self.name_view = ui.TextInput(className="fill")

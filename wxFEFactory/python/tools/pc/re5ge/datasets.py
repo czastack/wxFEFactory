@@ -1,4 +1,4 @@
-from lib.hack.utils import OptionProvider
+from lib.hack.utils import ItemProviders, OptionProvider
 
 
 PERSONS = ('Chris', 'Sheva')
@@ -31,6 +31,7 @@ INVENTORY_OPTIONS = (
     ('AK-74冲锋枪（MG）', 0x011D),
     ('M93R冲锋手枪（HG）', 0x011E),
     ('Dragunov SVD狙击枪', 0x0120),
+    ('火焰喷射器(临时)', 0x0121),
     ('电棒', 0x0122),
     ('榴弹发射器（爆炸弹）', 0x0125),
     ('榴弹发射器（硫酸弹）', 0x0126),
@@ -118,3 +119,4 @@ TREASURE_OPTIONS = (
 
 INVENTORY_ITEMS = OptionProvider(INVENTORY_OPTIONS)
 TREASURE_ITEMS = OptionProvider(TREASURE_OPTIONS)
+INVENTORY_TREASURE_ITEMS = ItemProviders(INVENTORY_ITEMS, TREASURE_ITEMS)

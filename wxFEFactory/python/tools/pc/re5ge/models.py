@@ -17,9 +17,10 @@ class SavedItem(Model):
     reload_speed = ByteField(0x1E, label="装弹速度升级")
     capacity = ByteField(0x1F, label="容量升级")
     piercing = ByteField(0x21, label="爆头率升级")
+    attack_range = ByteField(0x21, label="攻击范围升级")
     critical = ByteField(0x22, label="贯穿伤害升级")
-    scope = ByteField(0x23, label="瞄准镜升级")
-    attack_range = ByteField(0x24, label="攻击范围升级")
+    scope = ByteField(0x24, label="瞄准镜升级")
+    model = Field(0x28, label="模型")
 
 
 class SlotItem(SavedItem):
@@ -32,8 +33,8 @@ class SlotItem(SavedItem):
 class InventoryTreasureItem(Model):
     """物品箱/宝物箱物品"""
     SIZE = 0x48
-    type = WordField(0)
-    quantity = WordField(2)
+    type = WordField(0, label="种类")
+    quantity = WordField(2, label="数量/武器弹药")
 
 
 class SavedItemHolder(Model):
@@ -51,14 +52,13 @@ class InventoryTreasureItemHolder(Model):
 class Player(Model):
     hp = WordField(0x1364, label="HP")
     hpmax = WordField(0x1366, label="最大HP")
-    moving_coord = CoordField(0x2AD0, label="移动坐标")
-    melee_coord = CoordField(0x2E10, label="坐标")
-    idle = Field(0x10E0)
-    target = Field(0x2DA4, label="目标")
-    ai = Field(0x2DA8, label="AI")
-    attack_reaction = Field(0x1358)
+    coord = CoordField(0x30, label="坐标")
+    # idle = Field(0x10E0)
+    # target = Field(0x2DA4, label="目标")
+    # ai = Field(0x2DA8, label="AI")
+    # attack_reaction = Field(0x1358)
+    # merce_kill_counter = Field(0x25BC)
     invincible = ToggleField(0x135C, label="无敌", enableData=0, disableData=1)
-    merce_kill_counter = Field(0x25BC)
     slot_items = ArrayField(0x21A8, 24, ModelField(0, SlotItem))
 
 
@@ -66,7 +66,7 @@ class CharacterStruct(Model):
     players = ArrayField(0x24, 4, ModelPtrField(0, Player))
     players_count = Field(0x34, label="角色数量")
     saved_items = ArrayField(0x714D0, 4, ModelField(0, SavedItemHolder))
-    inventory_treasure = ModelPtrField(0x168F0, InventoryTreasureItemHolder)
+    inventory_treasure_holder = ModelPtrField(0x168F0, InventoryTreasureItemHolder)
 
 
 class Inventory(Model):

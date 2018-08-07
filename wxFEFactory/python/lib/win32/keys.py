@@ -47,9 +47,9 @@ class VK(KEY):
         ';': 186,
         '[': 219,
         '\\': 220,
-         ']': 221,
+        ']': 221,
         "'": 222,
-        '`': 192 
+        '`': 192
     }
 
     BACK = 8
@@ -114,7 +114,6 @@ class VK(KEY):
                 return code - 32
         name = name.upper()
         return VK.ASCII.get(name, 0) or getattr(VK, name, 0)
-
 
     def getName(code, mod=None):
         """根据windows的keyCode和modifiers得到名称"""

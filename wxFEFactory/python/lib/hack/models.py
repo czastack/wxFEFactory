@@ -66,7 +66,7 @@ class Model:
             if field is None:
                 return
 
-        if isinstance(field, Field):
+        if isinstance(field, FieldType):
             return field.offset
         else:
             raise TypeError('expected a Field object, got ' + str(field))
