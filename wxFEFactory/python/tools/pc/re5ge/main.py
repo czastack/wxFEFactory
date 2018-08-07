@@ -95,9 +95,7 @@ class Main(AssemblyHacktool):
                 b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', True, True, True)),
             ('佣兵模式时间不减', ('merce_timer_keep', b'\xF3\x0F\x11\x87\xDC\x04\x00\x00', 0x300000, 0x400000,
                 NOP_8, None, True)),
-            ('连击时间不减', ('combo_timer_keep', b'\xF3\x0F\x11\x84\x31\xA0\x06\x00\x00', 0x800000, 0x900000,
-                NOP_9, None, True)),
-            ('连击分数不减', ('combo_bonus_keep', b'\xF3\x0F\x11\x84\x32\xA8\x06\x00\x00', 0x800000, 0x900000,
+            ('连击时间不减', ('combo_timer_keep', b'\xF3\x0F\x11\x84\x31\xA0\x06\x00\x00\x5F', 0x300000, 0x400000,
                 NOP_9, None, True)),
         )
         super().render_assembly_functions(functions)
