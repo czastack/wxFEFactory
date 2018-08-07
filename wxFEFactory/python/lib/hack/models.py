@@ -27,6 +27,10 @@ class Model:
     def to_bytes(self):
         return self.handler.read(self.addr, bytes, self.SIZE)
 
+    def to_bytes_str(self):
+        from . import utils
+        return utils.bytes_beautify(self.to_bytes())
+
     def clone(self):
         return self.__class__(self.addr, self.handler)
 

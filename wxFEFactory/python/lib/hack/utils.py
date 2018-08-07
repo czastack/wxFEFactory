@@ -114,3 +114,25 @@ def align8(n):
     if tail:
         n += 8 - tail
     return n
+
+
+def bytes_hex(data, sep=''):
+    return sep.join(("%02X" % b for b in data))
+
+
+def bytes_beautify(data, offset=0, step=1):
+    if offset == 0 and step == 1:
+        return bytes_hex(data, " ")
+
+    length = len(data)
+    i = offset
+    result = []
+    fmt = "%%0%dX" % (step << 1)
+    while i < length:
+        data = j = 0
+        while j < step:
+            data |= data[i] << (j << 3)
+            j += 1
+            i += 1
+        result.append(fmt % data)
+    return " ".join(result)

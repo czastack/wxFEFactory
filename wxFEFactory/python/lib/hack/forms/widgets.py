@@ -260,10 +260,12 @@ class Group(BaseGroup):
     cols = 2
     horizontal = True
 
-    def __init__(self, *args, flexgrid=True, hasheader=False, hasfooter=True, horizontal=True, cols=None, **kwargs):
+    def __init__(self, *args, flexgrid=True, hasheader=False, hasfooter=True,
+            horizontal=True, serializable=True, cols=None, **kwargs):
         self.flexgrid = flexgrid
         self.hasheader = hasheader
         self.hasfooter = hasfooter
+        self.serializable = serializable
         if cols:
             self.cols = cols
         if not horizontal:
@@ -297,10 +299,11 @@ class Group(BaseGroup):
                 with ui.Horizontal(className="expand container") as footer:
                     ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
                     ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
-                    ui.Button(label="导入", className="btn_sm", onclick=lambda btn: this.load())
-                    ui.Button(label="导出", className="btn_sm", onclick=lambda btn: this.export())
+                    if self.serializable:
+                        ui.Button(label="导入", className="btn_sm", onclick=lambda btn: this.load())
+                        ui.Button(label="导出", className="btn_sm", onclick=lambda btn: this.export())
                 self.footer = footer
-        del self.flexgrid, self.hasheader, self.hasfooter
+        del self.flexgrid, self.hasheader, self.hasfooter, self.serializable
         return root
 
     def after_lazy(self):
@@ -687,14 +690,17 @@ class BaseChoiceDisplay(Widget):
     def read(self):
         self.input_value = self.mem_value
 
+    @property
+    def input_value(self):
+        return None
+
+    @input_value.setter
     def input_value(self, value):
         try:
             index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
         except ValueError:
             index = -1
         self.view.value = self.choices[index] if index is not -1 else ''
-
-    input_value = property(None, input_value)
 
 
 class ChoiceDisplay(BaseChoiceDisplay, OffsetsWidget):

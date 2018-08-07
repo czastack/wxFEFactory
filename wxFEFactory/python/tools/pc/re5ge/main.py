@@ -40,8 +40,10 @@ class Main(AssemblyHacktool):
             ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", self.person, cols=4), self.render_person_items)
-        self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, cols=6), self.render_saved_items)
+        self.lazy_group(Group("person_items", "角色物品", self.person, serializable=False, cols=4),
+            self.render_person_items)
+        self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, serializable=False, cols=6),
+            self.render_saved_items)
         # self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
