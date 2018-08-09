@@ -17,8 +17,8 @@ class Pcsx2Handler(MemHandler):
         succeed = self.attach_window(self.CLASS_NAME, self.WINDOW_NAME)
         if succeed:
             # with self.raw_env():
-            #     self.eeMem = self.read_addr(self.proc_base + 0x8252AC)
-            self.eeHw = self.proc_base + 0x828000 # size: 0x10000(64kb)
+            #     self.eeMem = self.read_addr(self.base_addr + 0x8252AC)
+            self.eeHw = self.base_addr + 0x828000  # size: 0x10000(64kb)
             self.Main = self.eeMem
             self.ROM = self.eeMem + 0x02004000
             self.ROM1 = self.eeMem + 0x02404000

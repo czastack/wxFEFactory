@@ -16,9 +16,9 @@ class SavedItem(Model):
     fire_power = WordField(0x1C, label="火力升级")
     reload_speed = ByteField(0x1E, label="装弹速度升级")
     capacity = ByteField(0x1F, label="容量升级")
-    piercing = ByteField(0x21, label="爆头率升级")
+    critical = ByteField(0x21, label="爆头率升级")
     attack_range = ByteField(0x21, label="攻击范围升级")
-    critical = ByteField(0x22, label="贯穿伤害升级")
+    piercing = ByteField(0x22, label="贯穿伤害升级")
     scope = ByteField(0x24, label="瞄准镜升级")
     model = Field(0x28, label="模型")
 

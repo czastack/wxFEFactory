@@ -181,7 +181,7 @@ class Main(BaseGTATool):
 
     def render_object_model(self):
         from .datasets.object_models import OBJECT_MODELS
-        self.object_model_book  = render_tab_list(OBJECT_MODELS)
+        self.object_model_book = render_tab_list(OBJECT_MODELS)
 
     def render_weapon_components(self):
         from .datasets.weapon_components import WEAPON_COMPONENTS
@@ -197,7 +197,7 @@ class Main(BaseGTATool):
             weapon_components.append((weapon[1], item[1], weapon[2]))
 
         with ui.Vertical(className="fill container"):
-            self.weapon_component_book  = render_tab_list(weapon_components)
+            self.weapon_component_book = render_tab_list(weapon_components)
             # self.weapon_component_book.setToolTip("选中后回车键给与配件")
             with ui.Horizontal():
                 ui.Button("给予", onclick=self.give_weapon_component)
@@ -315,7 +315,7 @@ class Main(BaseGTATool):
 
     def init_addr(self):
         """初始化地址信息"""
-        self.MODULE_BASE = self.handler.proc_base - 0x140000000
+        self.MODULE_BASE = self.handler.base_addr - 0x140000000
 
         version = self.get_version()
         version_depend = address.VERSION_DEPEND.get(version, None)
@@ -355,7 +355,7 @@ class Main(BaseGTATool):
         """初始化远程函数"""
         self.init_addr()
         super().onattach()
-        self.near_entity_buff = self.handler.alloc_memory(8*40)
+        self.near_entity_buff = self.handler.alloc_memory(8 * 40)
 
     def ondetach(self):
         """释放远程函数"""
@@ -369,7 +369,8 @@ class Main(BaseGTATool):
     #     if addr is 0:
     #         # 获取原生函数地址
     #         hash = address.NATIVE_HASH[name]
-    #         registration = self.NativeRegistration(self.handler.read64(address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
+    #         registration = self.NativeRegistration(self.handler.read64(
+    #             address.REGISTRATION_TABLE + (hash & 0xff) * 8), self.handler)
     #         addr = registration.get_func(hash)
     #         if addr:
     #             address.NATIVE_ADDRS[name] = addr
@@ -402,7 +403,7 @@ class Main(BaseGTATool):
     #                 time.sleep(0.02)
     #                 while try_count:
     #                     if self.handler.read64(self.script_hook_helper_ctx_ptr) == 0:
-    #                         
+    #
 
     #                         return
 
@@ -524,7 +525,8 @@ class Main(BaseGTATool):
 
     def get_nearest_ped(self, distance=50):
         """获取最近的人"""
-        self.native_call('GET_CLOSEST_PED', '4f3Q3l', *self.entity.coord, distance, 1, 1, self.native_context.get_temp_addr(), 0, 1, -1)
+        self.native_call('GET_CLOSEST_PED', '4f3Q3l', *self.entity.coord, distance, 1, 1,
+            self.native_context.get_temp_addr(), 0, 1, -1)
         ped = self.native_context.get_temp_value()
         if ped:
             return Player(0, ped, self)
@@ -779,8 +781,8 @@ class Main(BaseGTATool):
 
     def get_yellow_checkpoints(self):
         """获取所有的黄色检查点标记"""
-        return self.get_blips(models.Blip.BLIP_CIRCLE,
-            (models.Blip.BLIP_COLOR_YELLOWMISSION, models.Blip.BLIP_COLOR_YELLOWMISSION2, models.Blip.BLIP_COLOR_MISSION))
+        return self.get_blips(models.Blip.BLIP_CIRCLE, (models.Blip.BLIP_COLOR_YELLOWMISSION,
+            models.Blip.BLIP_COLOR_YELLOWMISSION2, models.Blip.BLIP_COLOR_MISSION))
 
     def get_enemy_blips(self):
         """获取红色标记"""
@@ -822,8 +824,8 @@ class Main(BaseGTATool):
                     coord[2] = 1024
                     coord[2] = self.GetGroundZ(coord) or 36
                 entity = self.entity
-                self.last_coord = Vector3(entity.coord) # 上次瞬移前的坐标
-                self.last_teleport_coord = Vector3(coord) # 上次瞬移后的坐标
+                self.last_coord = Vector3(entity.coord)  # 上次瞬移前的坐标
+                self.last_teleport_coord = Vector3(coord)  # 上次瞬移后的坐标
                 entity.coord = coord
                 return True
 
@@ -1047,7 +1049,8 @@ class Main(BaseGTATool):
         """生成载具"""
         m = models.VModel(model_id, self)
         m.request()
-        handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model_id, *(coord or self.get_front_coord()), self.player.heading, 0, 1)
+        handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model_id, *(coord or self.get_front_coord()),
+            self.player.heading, 0, 1)
         return Vehicle(handle, self)
 
     def spawn_choosed_vehicle_and_enter(self, _=None):
@@ -1066,7 +1069,8 @@ class Main(BaseGTATool):
         """生成角色"""
         m = models.VModel(model, self)
         m.request()
-        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *(coord or self.get_front_coord()), self.player.heading, 0, 1)
+        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *(coord or self.get_front_coord()),
+            self.player.heading, 0, 1)
         return Player(0, handle, self)
 
     def create_object(self, model, coord=None, on_ground=True):
@@ -1100,14 +1104,16 @@ class Main(BaseGTATool):
         """前面起火"""
         self._fire = self.create_fire(self.get_front_coord())
 
-    def _create_explosion(self, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET, fRadius=12, bSound=True, bInvisible=False, fCameraShake=0):
+    def _create_explosion(self, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET,
+            fRadius=12, bSound=True, bInvisible=False, fCameraShake=0):
         """产生爆炸"""
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def create_owned_explosion(self, ped, coord, explosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET,
             fRadius=12, bSound=True, bInvisible=False, fCameraShake=0):
         """产生有所有者的爆炸"""
-        self.script_call('ADD_OWNED_EXPLOSION', 'Q3fLfLLf', ped, *coord, explosionType, fRadius, bSound, bInvisible, fCameraShake)
+        self.script_call('ADD_OWNED_EXPLOSION', 'Q3fLfLLf', ped, *coord, explosionType, fRadius, bSound, bInvisible,
+            fCameraShake)
 
     def create_explosion(self, *args, **kwargs):
         """产生爆炸适配"""
@@ -1175,8 +1181,10 @@ class Main(BaseGTATool):
                 vertical_1 *= 0.5
                 vertical_2 *= 0.5
             for i in range(1, count + 1):
-                self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1), target, damage, weapon, ped, speed, False)
-                self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1), target, damage, weapon, ped, speed, False)
+                self.shoot_between(coord + (vertical_1[0] * i, vertical_1[1] * i, 1),
+                    target, damage, weapon, ped, speed, False)
+                self.shoot_between(coord + (vertical_2[1] * i, vertical_2[1] * i, 1),
+                    target, damage, weapon, ped, speed, False)
         else:
             self.shoot_between(coord, target, damage, weapon, ped, speed, False)
 
@@ -1220,7 +1228,7 @@ class Main(BaseGTATool):
             if p.handle:
                 coord0 = p.coord.values()
                 coord1 = tuple(coord0)
-                coord0[0] += 0.1 # 如果xy坐标一样，有些武器子弹会无法移动
+                coord0[0] += 0.1  # 如果xy坐标一样，有些武器子弹会无法移动
                 coord0[2] += height
                 self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
 
@@ -1251,8 +1259,10 @@ class Main(BaseGTATool):
                         rot = Vector3(self.get_camera_rot())
                     vertical_1, vertical_2 = rot.get_vetical_xy()
                     for i in range(1, count + 1):
-                        self.shoot_between(coord0 + (vertical_1[0] * i, vertical_1[1] * i, 1), coord1, damage, weapon, ped, speed, False)
-                        self.shoot_between(coord0 + (vertical_2[1] * i, vertical_2[1] * i, 1), coord1, damage, weapon, ped, speed, False)
+                        self.shoot_between(coord0 + (vertical_1[0] * i, vertical_1[1] * i, 1), coord1, damage, weapon,
+                            ped, speed, False)
+                        self.shoot_between(coord0 + (vertical_2[1] * i, vertical_2[1] * i, 1), coord1, damage, weapon,
+                            ped, speed, False)
 
     def rocket_attack_enemy(self, _=None, *args, **kwargs):
         """天降正义(导弹攻击敌人)"""
@@ -1474,7 +1484,8 @@ class Main(BaseGTATool):
 
     def vehilce_attach_to(self, entity):
         """当前车附上目标"""
-        distance = self.config.attach_distance_vehilce if isinstance(entity, Vehicle) else self.config.attach_distance_ped
+        distance = (self.config.attach_distance_vehilce if isinstance(entity, Vehicle)
+            else self.config.attach_distance_ped)
         direction = self.config.attach_direction
         if direction is datasets.DIRECTION_FRONT:
             offset = (0, distance, 0)
@@ -1518,7 +1529,8 @@ class Main(BaseGTATool):
 
     @property
     def entity_aiming_at(self):
-        self.native_call('GET_ENTITY_PLAYER_IS_FREE_AIMING_AT', '2Q', self.player_id, self.native_context.get_temp_addr())
+        self.native_call('GET_ENTITY_PLAYER_IS_FREE_AIMING_AT', '2Q', self.player_id,
+            self.native_context.get_temp_addr())
         entity = models.NativeEntity(self.native_context.get_temp_value(), self)
         return entity.subtype_instance()
 

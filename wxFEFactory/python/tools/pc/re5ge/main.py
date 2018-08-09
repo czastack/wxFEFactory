@@ -176,9 +176,9 @@ class Main(AssemblyHacktool):
         )
 
     def onattach(self):
-        proc_base = self.handler.proc_base
-        self.character_struct.addr = self.handler.read_ptr(proc_base + 0x00DA2A5C)
-        self.money.addr = self.handler.read_ptr(proc_base + 0x00DA23D8)
+        base_addr = self.handler.base_addr
+        self.character_struct.addr = self.handler.read_ptr(base_addr + 0x00DA2A5C)
+        self.money.addr = self.handler.read_ptr(base_addr + 0x00DA23D8)
         self.switch_person(self.person_select.index)
 
     def ondetach(self):

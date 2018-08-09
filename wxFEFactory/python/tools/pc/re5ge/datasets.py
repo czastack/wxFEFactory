@@ -31,6 +31,7 @@ INVENTORY_OPTIONS = (
     ('H&K PSG-1狙击枪（RIF）', 0x011C),
     ('AK-74冲锋枪（MG）', 0x011D),
     ('M93R冲锋手枪（HG）', 0x011E),
+    ('Px4手枪(HG)', 0x011F),
     ('Dragunov SVD狙击枪', 0x0120),
     ('火焰喷射器(临时)', 0x0121),
     ('电棒', 0x0122),

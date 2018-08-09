@@ -6,16 +6,16 @@ class VirtuaNesHandler(MemHandler):
     CLASS_NAME = 'VirtuaNESwndclass'
     WINDOW_NAME = 'VirtuaNES'
 
-    RAM = 0x59E3B0 # size=0x2000
-    WRAM = 0x57C398 # size=0x20000
-    # DRAM = 0x5692EC # size=0xa000
-    # XRAM = 0x59C398 # size=0x2000
-    # ERAM = 0x573320 # size=0x8000
-    # CRAM = 0x5612EC # size=0x8000
-    # VRAM = 0x57B360 # size=0x1000
-    # SPRAM = 0x5A0424 # size=0x100
-    # PROM = 0x57C364 # ptr
-    # VROM = 0x5A0420 # ptr
+    RAM = 0x59E3B0  # size=0x2000
+    WRAM = 0x57C398  # size=0x20000
+    # DRAM = 0x5692EC  # size=0xa000
+    # XRAM = 0x59C398  # size=0x2000
+    # ERAM = 0x573320  # size=0x8000
+    # CRAM = 0x5612EC  # size=0x8000
+    # VRAM = 0x57B360  # size=0x1000
+    # SPRAM = 0x5A0424  # size=0x100
+    # PROM = 0x57C364  # ptr
+    # VROM = 0x5A0420  # ptr
     CPU_MEM_BANKS = 0x57B340
     PPU_MEM_BANKS = 0x5732EC
 
@@ -53,13 +53,13 @@ class NestopiaHandler(MemHandler):
 
         if succeed:
             with self.raw_env():
-                pMsgHandler = self.read_ptr(self.read_ptr(self.proc_base + 0x1b1334)) + 4
-                size = self.read_ptr(pMsgHandler + 8) # msgHandler 列表数量
+                pMsgHandler = self.read_ptr(self.read_ptr(self.base_addr + 0x1b1334)) + 4
+                size = self.read_ptr(pMsgHandler + 8)  # msgHandler 列表数量
                 if size > 0x1000:
                     return False
                 start = self.read_ptr(pMsgHandler)
                 for i in range(size):
-                    if self.read32(start) == 0x0218: # WM_POWERBROADCAST
+                    if self.read32(start) == 0x0218:  # WM_POWERBROADCAST
                         pMain = self.read_ptr(start + 4)
                         pEmulator = self.read_ptr(pMain)
                         pMachine = self.read_ptr(pEmulator)

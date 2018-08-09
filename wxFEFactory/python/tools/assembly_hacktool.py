@@ -45,11 +45,11 @@ class AssemblyHacktool(BaseHackTool):
             print("需要可用间隔大于5")
             return
 
-        proc_base = self.handler.proc_base
+        base_addr = self.handler.base_addr
         if find_start and find_range_from_base:
-            find_start += proc_base
+            find_start += base_addr
         if find_end and find_range_from_base:
-            find_end += proc_base
+            find_end += base_addr
         addr = self.handler.find_bytes(original, find_start, find_end)
         if addr is -1:
             return

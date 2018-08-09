@@ -170,7 +170,7 @@ class Main(BaseGTATool):
 
     def init_addr(self):
         """初始化地址信息"""
-        self.MODULE_BASE = self.handler.proc_base - 0x400000
+        self.MODULE_BASE = self.handler.base_addr - 0x400000
         version = self.get_version()
         version_depend = address.VERSION_DEPEND.get(version, None)
         if version_depend:

@@ -26,18 +26,16 @@ class DolphinHandler(BigendHandler):
                 offset = OFFSET_MAP.get(self.version, None)
                 if offset:
                     with self.raw_env():
-                        self.ram_addr = self.read_addr(self.proc_base + offset)
+                        self.ram_addr = self.read_addr(self.base_addr + offset)
                     return True
         return False
-
 
     def _enum_window(self, hwnd, title):
         if len(title) < 20 and title[8].isdigit():
             self.window_name = title
-            self.hwnd = hwnd 
+            self.hwnd = hwnd
             return False
         return True
-
 
 
 class BaseDolphinHack(BaseHackTool):
@@ -58,6 +56,6 @@ class BaseDolphinHack(BaseHackTool):
                 self.onattach()
             return True
         else:
-            self.attach_status_view.label = (('绑定失败, 不支持的版本: %s' % self.handler.window_name) 
+            self.attach_status_view.label = (('绑定失败, 不支持的版本: %s' % self.handler.window_name)
                 if self.handler.window_name else '绑定失败')
             return False
