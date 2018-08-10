@@ -2,7 +2,7 @@ from functools import partial
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
-from ...hacktool import BaseHackTool
+from tools.hacktool import BaseHackTool
 from .models import Pool
 from .native import NativeContext
 import base64
