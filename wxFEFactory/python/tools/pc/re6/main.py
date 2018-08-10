@@ -124,7 +124,9 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
             (VK.MOD_ALT, VK.R, this.reload_address),
+            (VK.MOD_ALT, VK.T, this.set_ammo_full),
             (VK.MOD_ALT, VK.getCode(','), this.save_coord),
             (VK.MOD_ALT, VK.getCode('.'), this.load_coord),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(','), this.undo_coord),
@@ -181,11 +183,17 @@ class Main(AssemblyHacktool):
             print("没有数据")
 
     def pull_through(self, _=None):
+        self.person.set_with('health', 'health_max')
+
+    def pull_through_all(self, _=None):
         for i in range(self.character_struct.chars_count):
-            self.character_struct.chars[i].set_with('hp', 'hpmax')
+            self.character_struct.chars[i].set_with('health', 'health_max')
 
     def reload_address(self, _):
         self.onattach()
+
+    def set_ammo_full(self, _):
+        self.person.items[self.person.cur_item].set_with('quantity', 'max_quantity')
 
     def save_coord(self, _):
         self.last_coord = self.person.coord.values()
@@ -211,4 +219,4 @@ class Main(AssemblyHacktool):
         config = self.character_config.chars[self.char_index]
         for i in range(7):
             if config.weapon_ability[i]:
-                self.person.weapons[i].enabled = True
+                self.person.items[i].enabled = True

@@ -8,7 +8,7 @@ class IngameItem(Model):
     SIZE = 28
     enabled = ToggleField(0, size=1, enableData=1, disableData=0, label="激活")
     type = WordField(2, label="种类")
-    quantity = Field(6, label="数量/武器弹药")
+    quantity = WordField(6, label="数量/武器弹药")
     max_quantity = WordField(12, label="最大数量/武器弹药")
     model = Field(20, label="模型")
 
@@ -33,6 +33,7 @@ class Character(Model):
     melee_max = Field(0x3B04, float, label="体术值上限")
     coord = CoordField(0x50, label="坐标")
     moving_speed = Field(0x54, float, label="移动速度")
+    cur_item = ByteField(0x46D8)  # 当前使用的物品序号(只读)
     items = ArrayField(0x46E4, 24, ModelField(0, IngameItem))  # 水平武器: 0~6, 药丸: 7, 垂直武器: 8~12 其他物品: 15~23
     rapid_fire = Field(0x4F4C, float, label="快速开火")
     fix_weapon_switch = Field(0x46D0, float)  # 竖行武器切换至横行武器时的修正？
