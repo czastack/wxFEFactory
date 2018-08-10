@@ -3,10 +3,6 @@ from lib.hack.models import (
 )
 
 
-class Global(Model):
-    pass
-
-
 class SavedItem(Model):
     """整理界面个人物品"""
     SIZE = 0x2C
@@ -23,7 +19,7 @@ class SavedItem(Model):
     model = Field(0x28, label="模型")
 
 
-class SlotItem(SavedItem):
+class IngameItem(SavedItem):
     """游戏中物品"""
     SIZE = 0x30
     slot = Field(0x14, label="槽位")
@@ -59,7 +55,7 @@ class Player(Model):
     # attack_reaction = Field(0x1358)
     # merce_kill_counter = Field(0x25BC)
     invincible = ToggleField(0x135C, label="无敌", enableData=0, disableData=1)
-    slot_items = ArrayField(0x21A8, 24, ModelField(0, SlotItem))
+    items = ArrayField(0x21A8, 24, ModelField(0, IngameItem))
 
 
 class CharacterStruct(Model):
@@ -75,3 +71,8 @@ class Inventory(Model):
 
 class Money(Model):
     money = Field(0x01C0, label="金钱")
+
+
+class Global(Model):
+    character_struct = ModelPtrField(0x013C4428, CharacterStruct)
+    money = ModelPtrField(0x013C345C, Money)

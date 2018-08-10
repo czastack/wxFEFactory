@@ -174,26 +174,26 @@ class CoordWidget(TwoWayWidget):
                     data = [{'name': name % (i + 1), 'value': data[i]} for i in range(len(data))]
                 self.load(data)
 
-    def onListBoxSel(self, lb):
+    def onListBoxSel(self, v):
         pos = self.listbox.index
         data = self.data_list[pos]
         self.name_view.value = data['name']
         self.input_value = data['value']
 
-    def onListBoxKey(self, lb, event):
+    def onListBoxKey(self, v, event):
         """按键监听"""
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == WXK.MOD_CONTROL:
             if code == WXK.UP:
-                self.moveUp()
+                self.move_up()
             elif code == WXK.DOWN:
-                self.moveDown()
-        elif code == WXK.W:
-            self.write()
+                self.move_down()
+        elif super().onKey(v, event):
+            return True
         event.Skip()
 
-    def moveUp(self):
+    def move_up(self):
         """上移一项"""
         index = self.listbox.index
         if index != 0:
@@ -201,7 +201,7 @@ class CoordWidget(TwoWayWidget):
             self.listbox.setText(self.data_list[index]['name'], index)
             self.listbox.setText(self.data_list[index - 1]['name'], index - 1)
 
-    def moveDown(self):
+    def move_down(self):
         """下移一项"""
         index = self.listbox.index
         if index != self.listbox.count - 1:

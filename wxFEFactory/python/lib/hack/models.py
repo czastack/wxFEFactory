@@ -309,6 +309,10 @@ class QWordField(Field):
     __init__ = partialmethod(Field.__init__, size=8)
 
 
+class FloatField(Field):
+    __init__ = partialmethod(Field.__init__, float)
+
+
 DWordField = Field
 U8Field = ByteField
 U16Field = WordField
