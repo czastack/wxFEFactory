@@ -1,4 +1,4 @@
-from ..tool import BaseTool
+from tools.tool import BaseTool
 from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 from fefactory_api import ui
