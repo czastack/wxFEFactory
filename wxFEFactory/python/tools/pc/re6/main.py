@@ -73,11 +73,15 @@ class Main(AssemblyHacktool):
                     instance=self.saved_items, prop=prop))
 
     def render_assembly_functions(self):
-        NOP_7 = b'\x90' * 7
+        # NOP_7 = b'\x90' * 7
         NOP_8 = b'\x90' * 8
-        NOP_9 = b'\x90' * 9
+        # NOP_9 = b'\x90' * 9
         functions = (
-            # ('生命不减', ('hp_keep', b'\x66\x29\x8E\x64\x13\x00\x00', 0x700000, 0x800000, NOP_7, None, True)),
+            ('子弹不减', ('ammo_keep', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
+                b'\x66\x4A\x90\x90\x90', None, True)),
+            ('无后坐力', ('no_recoil', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8, None, True)),
+            ('佣兵模式时间不减', ('merce_timer_keep', b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00',
+                0x100000, 0x200000, NOP_8, None, True)),
         )
         super().render_assembly_functions(functions)
 
@@ -164,9 +168,11 @@ class Main(AssemblyHacktool):
     def on_person_change(self, lb):
         self.char_index = self._global.char_index = lb.index
 
-    def show_ingame_item(self, view, ins, prop):
+    def show_ingame_item(self, view, instance, prop):
         """显示物品详情对话框"""
-        item = getattr(ins, prop)
+        if callable(instance):
+            instance = instance()
+        item = getattr(instance, prop)
         if item and item.addr:
             self.ingame_item.addr = item.addr
             dialog = self.get_ingame_item_dialog()
@@ -175,9 +181,11 @@ class Main(AssemblyHacktool):
         else:
             print("没有数据")
 
-    def show_saved_item(self, view, ins, prop):
+    def show_saved_item(self, view, instance, prop):
         """显示整理界面物品详情对话框"""
-        item = getattr(ins, prop)
+        if callable(instance):
+            instance = instance()
+        item = getattr(instance, prop)
         if item and item.addr:
             self.saved_item.addr = item.addr
             dialog = self.get_saved_item_dialog()

@@ -504,7 +504,7 @@ class CoordField(Cachable, FieldType):
         super().__init__(label)
 
     def create_cache(self, instance):
-        return CoordData(instance, self)
+        return CoordData(self, instance)
 
     def __set__(self, instance, value):
         if isinstance(value, CoordData) and value.addr == self.get_addr(instance):
