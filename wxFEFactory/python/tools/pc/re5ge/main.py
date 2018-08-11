@@ -18,60 +18,56 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
-        self.character_struct = models.CharacterStruct(0, self.handler)
-        self.person = models.Player(0, self.handler)
         self.ingame_item = models.IngameItem(0, self.handler)
         self.saved_item = models.SavedItem(0, self.handler)
-        self.saved_items = models.SavedItemHolder(0, self.handler)
-        self.inventory_treasure_item = models.InventoryTreasureItem(0, self.handler)
-        self.money = models.Money(0, self.handler)
-
-    def render_top_button(self):
-        ui.Button("读取地址", className="vcenter", onclick=self.reload_address)
+        # self.inventory_treasure_item = models.InventoryTreasureItem(0, self.handler)
+        self.char_index = self._global.char_index = 0
 
     def render_main(self):
-        with Group("player", "全局", self._global):
-            ModelInput("money", "金钱", instance=self.money)
+        person = (self._person, models.Character)
 
-        with Group("player", "角色", self.person):
-            self.person_select = Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
-            ModelInput("hp")
-            ModelInput("hpmax")
+        with Group("player", "全局", self._global):
+            ModelInput("money.money", "金钱")
+
+        with Group("player", "角色", person):
+            Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
+            ModelInput("health")
+            ModelInput("health_max")
             ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", self.person, serializable=False, cols=4),
+        self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4),
             self.render_person_items)
-        self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, serializable=False, cols=6),
+        self.lazy_group(Group("saved_items", "整理界面物品", self._saved_items, serializable=False, cols=6),
             self.render_saved_items)
         # self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_person_items(self):
         """游戏中物品"""
-        for i in range(self.person.items.length):
+        for i in range(models.Character.items.length):
             prop = "items.%d" % i
             select = ModelChoiceDisplay(prop + ".type", "物品%d" % (i + 1), choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
-                    instance=self.person, prop=prop))
+                    instance=self._person, prop=prop))
 
     def render_saved_items(self):
         """整理界面个人物品"""
-        for i in range(self.saved_items.items.length):
+        for i in range(models.SavedItemHolder.items.length):
             prop = "items.%d" % i
             select = ModelChoiceDisplay(prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
-                    instance=self.saved_items, prop=prop))
+                    instance=self._saved_items, prop=prop))
 
     # def render_inventory_treasure_items(self):
     #     """仓库中的物品"""
     #     with ui.Notebook(className="fill") as book:
     #         for label, key in (('物品箱', 'inventory_items'), ('宝物箱', 'treasure_items')):
-    #             with Group(None, label, self.character_struct, cols=6):
+    #             with Group(None, label, self._gloabl.character_struct, cols=6):
     #                 for i in range(54):
     #                     prop = "inventory_treasure_holder.%s.%d" % (key, i)
     #                     select = ModelChoiceDisplay(prop + ".type", "",
@@ -80,7 +76,7 @@ class Main(AssemblyHacktool):
     #                     with select.container:
     #                         ui.Button("详情", className="btn_sm",
     #                             onclick=partial(__class__.show_inventory_treasure_item, self.weak,
-    #                                 instance=self.character_struct, prop=prop))
+    #                                 instance=self._gloabl.character_struct, prop=prop))
 
     def render_assembly_functions(self):
         NOP_7 = b'\x90' * 7
@@ -166,7 +162,7 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
-            (VK.MOD_ALT, VK.R, this.reload_address),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
             (VK.MOD_ALT, VK.getCode(','), this.save_coord),
             (VK.MOD_ALT, VK.getCode('.'), this.load_coord),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(','), this.undo_coord),
@@ -177,9 +173,6 @@ class Main(AssemblyHacktool):
 
     def onattach(self):
         self._global.addr = self.handler.base_addr
-        self.character_struct.addr = self._global.character_struct.addr
-        self.money.addr = self._global.money.addr
-        self.switch_person(self.person_select.index)
 
     def ondetach(self):
         memory = getattr(self, 'allocated_memory', None)
@@ -191,16 +184,23 @@ class Main(AssemblyHacktool):
                 self.unregister_assembly_item(value)
             self.registed_assembly = []
 
+    def _person(self):
+        if self.handler.active:
+            return self._global.character_struct.chars[self.char_index]
+
+    def _saved_items(self):
+        if self.handler.active:
+            return self._global.character_struct.saved_items[self.char_index]
+
+    person = property(_person)
+    saved_items = property(_saved_items)
+
     def on_person_change(self, lb):
-        self.switch_person(lb.index)
+        self.char_index = self._global.char_index = lb.index
 
-    def switch_person(self, index):
-        self.person.addr = self.character_struct.players[index].addr
-        self.saved_items.addr = self.character_struct.saved_items[index].addr
-
-    def show_ingame_item(self, view, ins, prop):
+    def show_ingame_item(self, view, instance, prop):
         """显示物品详情对话框"""
-        item = getattr(ins, prop)
+        item = getattr(instance, prop)
         if item and item.addr:
             self.ingame_item.addr = item.addr
             dialog = self.get_ingame_item_dialog()
@@ -209,9 +209,11 @@ class Main(AssemblyHacktool):
         else:
             print("没有数据")
 
-    def show_saved_item(self, view, ins, prop):
+    def show_saved_item(self, view, instance, prop):
         """显示整理界面物品详情对话框"""
-        item = getattr(ins, prop)
+        if callable(instance):
+            instance = instance()
+        item = getattr(instance, prop)
         if item and item.addr:
             self.saved_item.addr = item.addr
             dialog = self.get_saved_item_dialog()
@@ -220,9 +222,9 @@ class Main(AssemblyHacktool):
         else:
             print("没有数据")
 
-    # def show_inventory_treasure_item(self, view, ins, prop):
+    # def show_inventory_treasure_item(self, view, instance, prop):
     #     """显示整理界面物品详情对话框"""
-    #     item = getattr(ins, prop)
+    #     item = getattr(instance, prop)
     #     if item and item.addr:
     #         self.inventory_treasure_item.addr = item.addr
     #         dialog = self.get_inventory_treasure_item_dialog()
@@ -232,11 +234,12 @@ class Main(AssemblyHacktool):
     #         print("没有数据")
 
     def pull_through(self, _=None):
-        for i in range(self.character_struct.players_count):
-            self.character_struct.players[i].set_with('hp', 'hpmax')
+        self.person.set_with('health', 'health_max')
 
-    def reload_address(self, _):
-        self.onattach()
+    def pull_through_all(self, _=None):
+        character_struct = self._global.character_struct
+        for i in range(character_struct.chars_count):
+            character_struct.chars[i].set_with('health', 'health_max')
 
     def save_coord(self, _):
         self.last_coord = self.person.coord.values()
@@ -252,7 +255,9 @@ class Main(AssemblyHacktool):
         self.person.coord = self.last_coord
 
     def p1_go_p2(self, _):
-        self.character_struct.players[0].coord = self.character_struct.players[1].coord.values()
+        chars = self._global.character_struct.chars
+        chars[0].coord = chars[1].coord.values()
 
     def p2_go_p1(self, _):
-        self.character_struct.players[1].coord = self.character_struct.players[0].coord.values()
+        chars = self._global.character_struct.chars
+        chars[1].coord = chars[0].coord.values()

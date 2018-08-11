@@ -8,6 +8,7 @@ from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool
 from fefactory_api import ui
 from . import models, datasets
+import fefactory_api
 
 
 class Main(AssemblyHacktool):
@@ -22,6 +23,7 @@ class Main(AssemblyHacktool):
 
     def render_main(self):
         person = (self._person, models.Character)
+
         with Group("player", "全局", self._global):
             # ModelInput("money", "金钱", instance=self.money)
             pass
@@ -40,8 +42,6 @@ class Main(AssemblyHacktool):
 
         self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4), self.render_person_items)
         self.lazy_group(Group("person_skills", "角色技能", self._global, cols=4), self.render_person_skills)
-        # self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, serializable=False, cols=6),
-        #     self.render_saved_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
@@ -61,16 +61,6 @@ class Main(AssemblyHacktool):
     def render_person_skills(self):
         for i in range(3):
             ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
-
-    def render_saved_items(self):
-        """整理界面个人物品"""
-        for i in range(self.saved_items.items.length):
-            prop = "items.%d" % i
-            select = ModelChoiceDisplay(prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices,
-                values=datasets.INVENTORY_ITEMS.values)
-            with select.container:
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
-                    instance=self.saved_items, prop=prop))
 
     def render_assembly_functions(self):
         # NOP_7 = b'\x90' * 7
@@ -93,36 +83,16 @@ class Main(AssemblyHacktool):
         name = 'ingame_item_dialog'
         dialog = getattr(self, name, None)
         if dialog is None:
-            with DialogGroup(name, "物品详情", self.ingame_item, cols=1, dialog_style={'width': 600, 'height': 1400},
+            with DialogGroup(name, "物品详情", self.ingame_item, cols=1, dialog_style={'width': 800, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelCheckBox("enabled")
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
                     instance=self.ingame_item)
                 ModelInput("quantity")
                 ModelInput("max_quantity")
-
-            setattr(self, name, dialog)
-        return dialog
-
-    def get_saved_item_dialog(self):
-        """整理界面物品信息对话框"""
-        name = 'saved_item_dialog'
-        dialog = getattr(self, name, None)
-        if dialog is None:
-            with DialogGroup(name, "物品详情", self.saved_item, cols=1, dialog_style={'width': 600, 'height': 1400},
-                    closable=False, horizontal=False, button=False) as dialog:
-                ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    instance=self.saved_item).view.setToolTip('移动后生效')
-                ModelInput("quantity")
-                ModelInput("max_quantity")
-                ModelInput("fire_power")
-                ModelInput("reload_speed")
-                ModelInput("capacity")
-                ModelInput("piercing")
-                ModelInput("scope")
-                ModelInput("critical")
-                ModelInput("attack_range")
-                ModelInput("model", hex=True)
+            with dialog.footer:
+                ui.Button("复制", className='btn_sm', onclick=self.weak.ingame_item_copy)
+                ui.Button("粘贴", className='btn_sm', onclick=self.weak.ingame_item_paste)
 
             setattr(self, name, dialog)
         return dialog
@@ -181,18 +151,11 @@ class Main(AssemblyHacktool):
         else:
             print("没有数据")
 
-    def show_saved_item(self, view, instance, prop):
-        """显示整理界面物品详情对话框"""
-        if callable(instance):
-            instance = instance()
-        item = getattr(instance, prop)
-        if item and item.addr:
-            self.saved_item.addr = item.addr
-            dialog = self.get_saved_item_dialog()
-            dialog.read()
-            dialog.show()
-        else:
-            print("没有数据")
+    def ingame_item_copy(self, _):
+        fefactory_api.set_clipboard(self.ingame_item.hex())
+
+    def ingame_item_paste(self, _):
+        self.ingame_item.fromhex(fefactory_api.get_clipboard())
 
     def pull_through(self, _=None):
         self.person.set_with('health', 'health_max')

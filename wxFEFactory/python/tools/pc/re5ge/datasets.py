@@ -1,7 +1,7 @@
 from lib.hack.utils import ItemProviders, OptionProvider
 
 
-PERSONS = ('Chris', 'Sheva')
+CHARACTERS = ('克里斯', '莎娃')
 
 INVENTORY_OPTIONS = (
     ('小刀(不可见)', 0x0101),

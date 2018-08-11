@@ -27,9 +27,15 @@ class Model:
     def to_bytes(self):
         return self.handler.read(self.addr, bytes, self.SIZE)
 
-    def to_bytes_str(self):
+    def to_hex_str(self):
         from . import utils
         return utils.bytes_beautify(self.to_bytes())
+
+    def hex(self):
+        return self.to_bytes().hex()
+
+    def fromhex(self, hexstr):
+        return self.handler.write(self.addr, bytes.fromhex(hexstr), self.SIZE)
 
     def clone(self):
         return self.__class__(self.addr, self.handler)
@@ -43,7 +49,9 @@ class Model:
                 else:
                     return item & attr
 
-            return self.handle_comlex_attr(field, func)
+            result = self.handle_comlex_attr(field, func)
+            if result is not COMLEX_ATTR_NONE:
+                return result
         else:
             return self.addr + offset
 
@@ -631,6 +639,10 @@ class ArrayData:
     @property
     def addr(self):
         return self.owner.get_addr(self.instance)
+
+    @property
+    def length(self):
+        return self.owner.length
 
     @property
     def size(self):

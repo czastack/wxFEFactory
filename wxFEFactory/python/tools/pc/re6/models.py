@@ -15,6 +15,7 @@ class IngameItem(Model):
 
 class Character(Model):
     """角色"""
+    id = Field((0x010C, 0x16), bytes, 6)
     health = WordField(0x0F10, label="生命值")
     health_max = WordField(0x0F12, label="生命值上限")
     invincible = ToggleField(0x0FC4, enableData=0, disableData=1, label="无敌")
@@ -44,6 +45,21 @@ class CharacterConfig(Model):
     chars = ArrayField(0x42d7c, 8, ModelField(0, CharacterConfigItem))
 
 
+class Enemy(Character):
+    """敌人"""
+    pass
+
+
+class EnemyItem(Model):
+    """敌人"""
+    enemy = ModelPtrField(0, Enemy)
+
+
+class EnemyData(Model):
+    count = Field(0x30, label="敌人数量")
+    enemy_items = ArrayField(0x3C, 10, ModelPtrField(0, EnemyItem))
+
+
 class Money(Model):
     money = Field(0x01C0, label="金钱")
 
@@ -51,5 +67,5 @@ class Money(Model):
 class Global(Model):
     character_struct = ModelPtrField(0x013C4428, CharacterStruct)
     character_config = ModelPtrField(0x013C345C, CharacterConfig)
-
+    enemy_data = ModelPtrField(0x13C33CC, EnemyData)
     char_skills = ArrayField((0x013C3414, 1832), 8, ArrayField(0, 3, Field(0)))
