@@ -1,6 +1,6 @@
 from lib.hack.models import (
-    Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField, 
-    ModelField, ModelPtrField, OffsetsField, FieldPrep, SignedField, ManagedModel
+    Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField,
+    ModelField, ModelPtrField, FieldPrep, SignedField, ManagedModel
 )
 from lib.hack.handlers.localhandler import LocalHandler, LocalModel
 from lib.utils import LOWORD, HIWORD
@@ -41,25 +41,25 @@ class PokemonStructHeader(Model):
 
 class PokemonStructBreedInfo(Model):
     SIZE = 12
-    wBreed = WordField(0x00) # 种族ID
-    wItem = WordField(0x02) # 持有物
-    dwExp = DWordField(0x04) # 
+    wBreed = WordField(0x00)  # 种族ID
+    wItem = WordField(0x02)  # 持有物
+    dwExp = DWordField(0x04)
     bPointUp0, bPointUp1, bPointUp2, bPointUp3 = \
         BitsField.create(0x08, 1, (2, 2, 2, 2))
-    bIntimate = ByteField(0x09) # 亲密度
+    bIntimate = ByteField(0x09)  # 亲密度
     # unk0 = WordField(0x10)
 
 
 class PokemonStructSkillInfo(Model):
     SIZE = 12
-    rgwSkillId = ArrayField(0x00, 4, WordField(0)) # ID of the Skill
-    rgbPoints = ArrayField(0x08, 4, ByteField(0)) # Skill Points
+    rgwSkillId = ArrayField(0x00, 4, WordField(0))  # ID of the Skill
+    rgbPoints = ArrayField(0x08, 4, ByteField(0))  # Skill Points
 
 
 class PokemonStructAcquiredInfo(Model):
     SIZE = 12
-    rgbBattleBonuses = ArrayField(0x00, 6, ByteField(0)) # 努力值(ＨＰ, 攻击, 防御, 敏捷, 特攻, 特防)
-    rgbApealPoints = ArrayField(0x06, 6, ByteField(0)) # 魅力值(帅气, 美丽, 可爱, 聪明, 坚强, 软弱)
+    rgbBattleBonuses = ArrayField(0x00, 6, ByteField(0))  # 努力值(ＨＰ, 攻击, 防御, 敏捷, 特攻, 特防)
+    rgbApealPoints = ArrayField(0x06, 6, ByteField(0))  # 魅力值(帅气, 美丽, 可爱, 聪明, 坚强, 软弱)
 
 
 class PokemonStructInnateInfo(Model):
@@ -116,7 +116,7 @@ class PokemonStruct(LocalModel):
     def attach(self):
         if (self.Header.bBadEgg & 0x05) != 0:
             self.Header.bBadEgg &= (~0x05) & 0xFF
-        
+
         self.CalculatePokemonStructInfoPtr()
 
     def CalculatePokemonStructInfoPtr(self):
@@ -219,7 +219,7 @@ class PokemonStruct(LocalModel):
         if self.bEncoded:
             return
         dwChar, dwID = self.Header[('dwChar', 'dwID')]
-        wShiny = LOWORD(dwChar) ^ HIWORD(dwChar) ^ LOWORD(dwID)   ^ HIWORD(dwID)
+        wShiny = LOWORD(dwChar) ^ HIWORD(dwChar) ^ LOWORD(dwID) ^ HIWORD(dwID)
         return wShiny <= 0x07
 
     def GenShinyID(self):
@@ -291,9 +291,8 @@ class PokemonStruct(LocalModel):
     def SetSex(self, bType, bFemaleRatio):
         if self.bEncoded:
             return
-        if (bFemaleRatio == 0xFF or # 性別不明
-            bFemaleRatio == 0xFE or # 雌のみ
-            bFemaleRatio == 0x00):  # 雄のみ
+        if (bFemaleRatio == 0xFF or bFemaleRatio == 0xFE or bFemaleRatio == 0x00):
+            # 性別不明 or 雌のみ or 雄のみ
             return
         if bType is PM_FEMALE:
             bSex = random.randint(0, bFemaleRatio + 1)
@@ -393,7 +392,7 @@ class BaseGlobal(Model):
     battle_points_trainer_card = battle_points_current
     backpack_type = 'item_normal'
 
-    
+
 MaskedField = FieldPrep(BaseGlobal.mask)
 ManagedMaskedField = FieldPrep(BaseGlobal.managed_mask)
 
@@ -530,7 +529,7 @@ class SapphireEn(RubySapphireEn):
 class FireLeafJp(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x020241E4, PokemonStructActives)
-    stored_pokemon = OffsetsField((0x03005050, 4))
+    stored_pokemon = Field((0x03005050, 4))
     dust = 0
     decorate = 0
     clock_adjustment = 0
@@ -560,7 +559,6 @@ class FireLeafJp(PointerGlobal):
         item_berry = ArrayField(0x000014F0, 0x2B, _iemfield)
         item_pokeblock = None
 
-
     inner = ModelPtrField(0x0300504C, Inner)
 
 
@@ -585,7 +583,7 @@ class LeafJp(FireLeafJp):
 class FireLeafEn(PointerGlobal):
     active_pokemon_count = 0
     active_pokemon = ModelField(0x02024284, PokemonStructActives)
-    stored_pokemon = OffsetsField((0x03005010, 4))
+    stored_pokemon = Field((0x03005010, 4))
     dust = 0
     decorate = 0
     clock_adjustment = 0
@@ -621,7 +619,7 @@ class EmeraldJp(PointerGlobal):
 
     active_pokemon_count = Field(0x0202418D)
     active_pokemon = ModelField(0x02024190, PokemonStructActives)
-    stored_pokemon = OffsetsField((0x03005AF4, 4))
+    stored_pokemon = Field((0x03005AF4, 4))
     safari_balls = ByteField(0x02039D18)
     safari_time = WordField(0x02039D1A)
     exp_gain = SignedField(0x02023E94, size=2)
@@ -652,7 +650,6 @@ class EmeraldJp(PointerGlobal):
         item_machine = ArrayField(0x0000163C, 0x40, _iemfield)
         item_berry = ArrayField(0x0000173C, 0x46, _iemfield)
         item_pokeblock = ArrayField(0x000017F4, 0x28, _iemfield)
-        
 
     inner = ModelPtrField(0x03005AF0, Inner)
 
@@ -668,7 +665,7 @@ class EmeraldEn(PointerGlobal):
 
     active_pokemon_count = Field(0x020244E9)
     active_pokemon = ModelField(0x020244EC, PokemonStructActives)
-    stored_pokemon = OffsetsField((0x03005D94, 4))
+    stored_pokemon = Field((0x03005D94, 4))
     safari_balls = ByteField(0x0203A9FC)
     safari_time = WordField(0x0203A076)
     exp_gain = SignedField(0x020241F0, size=2)

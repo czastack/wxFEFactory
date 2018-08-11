@@ -18,7 +18,7 @@ class Main(AssemblyHacktool):
         self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
         self.ingame_item = models.IngameItem(0, self.handler)
-        self.char_index = 0
+        self.char_index = self._global.char_index = 0
 
     def render_main(self):
         person = (self._person, models.Character)
@@ -38,8 +38,8 @@ class Main(AssemblyHacktool):
             ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4),
-            self.render_person_items)
+        self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4), self.render_person_items)
+        self.lazy_group(Group("person_skills", "角色技能", self._global, cols=4), self.render_person_skills)
         # self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, serializable=False, cols=6),
         #     self.render_saved_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
@@ -57,6 +57,10 @@ class Main(AssemblyHacktool):
                     ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
                         instance=self._person, prop=prop))
                 r += 1
+
+    def render_person_skills(self):
+        for i in range(3):
+            ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
 
     def render_saved_items(self):
         """整理界面个人物品"""
@@ -150,10 +154,15 @@ class Main(AssemblyHacktool):
         if self.handler.active:
             return self._global.character_struct.chars[self.char_index]
 
+    def _person_config(self):
+        if self.handler.active:
+            return self._global.character_config.chars[self.char_index]
+
     person = property(_person)
+    person_config = property(_person_config)
 
     def on_person_change(self, lb):
-        self.char_index = lb.index
+        self.char_index = self._global.char_index = lb.index
 
     def show_ingame_item(self, view, ins, prop):
         """显示物品详情对话框"""

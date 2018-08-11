@@ -44,6 +44,12 @@ class Model:
                 i = 0
                 last = len(data.attrs) - 1
                 for attr in data.attrs:
+                    if isinstance(attr, str):
+                        # 动态attr
+                        if attr.startswith('$$'):
+                            attr = getattr(item, attr[2:])
+                        elif attr.startswith('$'):
+                            attr = getattr(self, attr[1:])
                     if isinstance(attr, int):
                         offset = data.offsets and data.offsets.get(i, None)
                         if offset is not None:
@@ -108,6 +114,12 @@ class Model:
             prev = None  # 取offset的对象
             i = 0
             for attr in data.attrs:
+                if isinstance(attr, str):
+                    # 动态attr
+                    if attr.startswith('$$'):
+                        attr = getattr(item, attr[2:])
+                    elif attr.startswith('$'):
+                        attr = getattr(self, attr[1:])
                 if isinstance(attr, int):
                     offset = data.offsets and data.offsets.get(i, None)
                     if offset is not None:
@@ -134,6 +146,12 @@ class Model:
             i = 0
             last = len(data.attrs) - 1
             for attr in data.attrs:
+                if isinstance(attr, str):
+                    # 动态attr
+                    if attr.startswith('$$'):
+                        attr = getattr(item, attr[2:])
+                    elif attr.startswith('$'):
+                        attr = getattr(self, attr[1:])
                 if isinstance(attr, int):
                     offset = data.offsets and data.offsets.get(i, None)
                     if offset is not None:
@@ -218,6 +236,14 @@ class FieldType:
     def __init__(self, label):
         self.label = label
 
+    def get_addr(self, instance):
+        offset = self.offset
+        if isinstance(offset, tuple):
+            if len(offset) == 2:
+                return instance.handler.read_ptr(instance.addr + offset[0]) + offset[1]
+            return instance.handler.read_last_addr(instance.addr + offset[0], offset[1:])
+        return instance.addr + offset
+
 
 class Field(FieldType):
     def __init__(self, offset, type=int, size=4, label=None):
@@ -229,7 +255,7 @@ class Field(FieldType):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
+        ret = instance.handler.read(self.get_addr(instance), self.type, self.size)
         if self.type is float:
             ret = float32(ret)
         return ret
@@ -239,11 +265,11 @@ class Field(FieldType):
             value = self.type(value)
         if self.type is int and value < 0:
             value &= (1 << (self.size << 3)) - 1
-        instance.handler.write(instance.addr + self.offset, value, self.size)
+        instance.handler.write(self.get_addr(instance), value, self.size)
 
     def __str__(self):
         return "{}(offset={}, size={})".format(self.__class__.__name__,
-            hex(self.offset) if self.offset > 0xFF else self.offset, self.size)
+            hex(self.offset) if isinstance(self.offset, int) and self.offset > 0xFF else self.offset, self.size)
 
     __repr__ = __str__
 
@@ -300,7 +326,7 @@ class PtrField(Field):
         if self.size is 0:
             # 对于ProcessHandler，根据目标进程获取指针大小
             self.size = instance.handler.ptr_size
-        return instance.handler.read_uint(instance.addr + self.offset, self.size)
+        return instance.handler.read_uint(self.get_addr(instance), self.size)
 
 
 class ByteField(Field):
@@ -331,12 +357,12 @@ class SignedField(Field):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        return instance.handler.read_int(instance.addr + self.offset, self.type, self.size)
+        return instance.handler.read_int(self.get_addr(instance), self.type, self.size)
 
     def __set__(self, instance, value):
         if not isinstance(value, self.type):
             value = self.type(value)
-        instance.handler.write_int(instance.addr + self.offset, value, self.size)
+        instance.handler.write_int(self.get_addr(instance), value, self.size)
 
 
 class ToggleField(Field):
@@ -411,21 +437,6 @@ class BitsField(Field):
         return (cls(offset, size, bitoffset.add(bit), bit) for bit in bits)
 
 
-class OffsetsField(Field):
-    def __get__(self, instance, owner=None):
-        if instance is None:
-            return self
-        ret = instance.handler.ptrs_read(instance.addr + self.offset[0], self.offset[1:], self.type, self.size)
-        if self.type is float:
-            ret = float32(ret)
-        return ret
-
-    def __set__(self, instance, value):
-        if not isinstance(value, self.type):
-            value = self.type(value)
-        instance.handler.ptrs_write(instance.addr + self.offset[0], self.offset[1:], value, self.size)
-
-
 class ModelPtrField(Cachable, PtrField):
     """模型指针字段"""
     def __init__(self, offset, modelClass, size=0, label=None):
@@ -458,18 +469,18 @@ class ModelField(Cachable, Field):
         self.modelClass = modelClass
 
     def create_cache(self, instance):
-        return self.modelClass(instance.addr + self.offset, instance.handler)
+        return self.modelClass(self.get_addr(instance), instance.handler)
 
     def update_cache(self, instance, cache):
-        cache.addr = instance.addr + self.offset
+        cache.addr = self.get_addr(instance)
 
     def __set__(self, instance, value):
         if isinstance(value, self.modelClass):
-            instance.handler.write(instance.addr + self.offset, value.to_bytes())
+            instance.handler.write(self.get_addr(instance), value.to_bytes())
         elif isinstance(value, bytes):
             if len(value) != self.size:
                 raise ValueError("value size {} not match Model size {}".format(len(value), self.size))
-            instance.handler.write(instance.addr + self.offset, value)
+            instance.handler.write(self.get_addr(instance), value)
         else:
             raise ValueError("can't set attribute, except bytes or Model object")
 
@@ -477,7 +488,7 @@ class ModelField(Cachable, Field):
 class ManagedModelField(ModelField):
     """托管模型字段"""
     def create_cache(self, instance):
-        return self.modelClass(instance.addr + self.offset, instance.context)
+        return self.modelClass(self.get_addr(instance), instance.context)
 
 
 class CoordField(Cachable, FieldType):
@@ -496,57 +507,57 @@ class CoordField(Cachable, FieldType):
         return CoordData(instance, self)
 
     def __set__(self, instance, value):
-        if isinstance(value, CoordData) and value.addr == instance.addr + self.offset:
+        if isinstance(value, CoordData) and value.addr == self.get_addr(instance):
             print('The value is a copy of this CoordData')
         elif isinstance(value, bytes):
-            instance.handler.write(instance.addr + self.offset, value)
+            instance.handler.write(self.get_addr(instance), value)
         else:
             it = iter(value)
             for i in range(self.length):
                 item = next(it)
                 if item is None or item == '':
                     continue
-                instance.handler.write(instance.addr + self.offset + i * self.field_size, self.type(item))
+                instance.handler.write(self.get_addr(instance) + i * self.field_size, self.type(item))
 
 
 class CoordData:
-    def __init__(self, instance, field):
+    def __init__(self, owner, instance):
+        self.owner = owner
         self.instance = instance
-        self.field = field
         self._pos = 0
 
     @property
     def addr(self):
-        return self.instance.addr + self.field.offset
+        return self.instance.addr + self.owner.offset
 
     def values(self):
         addr = self.addr
-        return [self.instance.handler.read(addr + i * self.field.field_size, self.field.type)
-            for i in range(self.field.length)]
+        return [self.instance.handler.read(addr + i * self.owner.field_size, self.owner.type)
+            for i in range(self.owner.length)]
 
     def set(self, value):
         it = iter(value)
-        for i in range(self.field.length):
+        for i in range(self.owner.length):
             item = next(it)
             if item is None or item == '':
                 continue
             self[i] = item
 
     def to_bytes(self):
-        return self.instance.handler.read(self.addr, bytes, self.field.size)
+        return self.instance.handler.read(self.addr, bytes, self.owner.size)
 
     def __getitem__(self, i):
-        return self.instance.handler.read(self.addr + i * self.field.field_size, self.field.type)
+        return self.instance.handler.read(self.addr + i * self.owner.field_size, self.owner.type)
 
     def __setitem__(self, i, value):
-        return self.instance.handler.write(self.addr + i * self.field.field_size, self.field.type(value))
+        return self.instance.handler.write(self.addr + i * self.owner.field_size, self.owner.type(value))
 
     def __iter__(self):
         self._pos = 0
         return self
 
     def __next__(self):
-        if self._pos < self.field.length:
+        if self._pos < self.owner.length:
             ret = self[self._pos]
             self._pos += 1
             return ret
@@ -574,11 +585,11 @@ class ArrayField(Cachable, Field):
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
     def create_cache(self, instance):
-        return ArrayData(instance, self.offset, self.length, self.field, self.itemkeys)
+        return ArrayData(self, instance, self.itemkeys)
 
     def __set__(self, instance, value):
         if isinstance(value, bytes):
-            instance.handler.write(instance.addr + self.offset, value)
+            instance.handler.write(self.get_addr(instance), value)
         else:
             # iterable
             data = self.__get__(instance, type(instance))
@@ -596,46 +607,45 @@ class ArrayField(Cachable, Field):
 
 
 class ArrayData:
-    def __init__(self, instance, offset, length, field, itemkeys):
+    def __init__(self, owner, instance, itemkeys):
         """
         :param itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
         """
+        self.owner = owner
         self.instance = instance
-        self.offset = offset
-        self.length = length
-        self.field = field
         self.itemkeys = itemkeys
-        if field.size is 0:
+        if owner.field.size is 0:
             """传入了延迟设置size的field"""
-            field.__get__(instance)
+            owner.field.__get__(instance)
 
     def __len__(self):
-        return self.length
+        return self.owner.length
+
+    def get_field(self, i):
+        if i >= self.owner.length:
+            raise IndexError("array index out of range")
+        field = self.owner.field
+        offset = self.owner.offset
+        if isinstance(offset, tuple):
+            field.offset = offset[0:-1] + ((offset[-1] + field.size * i),)
+        else:
+            field.offset = offset + field.size * i
+        if self.itemkeys:
+            field.key = self.itemkeys[i]
+        return field
 
     def __getitem__(self, i):
-        if i >= self.length:
-            raise IndexError("array index out of range")
-        field = self.field
-        field.offset = self.offset + field.size * i
-        if self.itemkeys:
-            field.key = self.itemkeys[i]
-        return field.__get__(self.instance)
+        return self.get_field(i).__get__(self.instance)
 
     def __setitem__(self, i, value):
-        if i >= self.length:
-            raise IndexError("array index out of range")
-        field = self.field
-        field.offset = self.offset + field.size * i
-        if self.itemkeys:
-            field.key = self.itemkeys[i]
-        return field.__set__(self.instance, value)
+        return self.get_field(i).__set__(self.instance, value)
 
     def __iter__(self):
         self._pos = 0
         return self
 
     def __next__(self):
-        if self._pos < self.length:
+        if self._pos < self.owner.length:
             ret = self[self._pos]
             self._pos += 1
             return ret
@@ -643,28 +653,28 @@ class ArrayData:
 
     @property
     def addr(self):
-        return self.instance.addr + self.offset
+        return self.owner.get_addr(self.instance)
 
     @property
     def size(self):
-        return self.length * self.field.size
+        return self.owner.length * self.owner.field.size
 
     def fill(self, value):
-        if isinstance(value, int) and isinstance(self.field, Field) and self.field.type is int:
-            data = value.to_bytes(self.field.size, 'little') * self.length
+        if isinstance(value, int) and isinstance(self.owner.field, Field) and self.owner.field.type is int:
+            data = value.to_bytes(self.owner.field.size, 'little') * self.owner.length
             self.instance.handler.write(self.addr, data)
         else:
-            for i in range(self.length):
+            for i in range(self.owner.length):
                 self[i] = value
 
     def addr_at(self, i):
         if i < 0:
-            i += self.length
+            i += self.owner.length
 
-        if i < 0 or i >= self.length:
+        if i < 0 or i >= self.owner.length:
             raise IndexError
 
-        return self.addr + self.field.size * i
+        return self.addr + self.owner.field.size * i
 
     def to_bytes(self):
         return self.instance.handler.read(self.addr, bytes, self.size)
@@ -678,7 +688,7 @@ class StringField(Field):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
+        ret = instance.handler.read(self.get_addr(instance), self.type, self.size)
         return ret.rstrip(b'\x00').decode(self.encoding)
 
     def __set__(self, instance, value):

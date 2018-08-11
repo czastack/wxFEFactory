@@ -13,17 +13,6 @@ class IngameItem(Model):
     model = Field(20, label="模型")
 
 
-class CharacterConfigItem(Model):
-    SIZE = 112
-    model = Field(0)
-    weapon_ability = ArrayField(16, 7, Field(0))
-    skills = ArrayField(0x0728, 3, Field(0))
-
-
-class CharacterConfig(Model):
-    chars = ArrayField(0x42d7c, 7, ModelField(0, CharacterConfigItem))
-
-
 class Character(Model):
     """角色"""
     health = WordField(0x0F10, label="生命值")
@@ -41,8 +30,18 @@ class Character(Model):
 
 
 class CharacterStruct(Model):
-    chars = ArrayField(0x24, 4, ModelPtrField(0, Character))
+    chars = ArrayField(0x24, 8, ModelPtrField(0, Character))
     chars_count = Field(0x44, label="角色数量")
+
+
+class CharacterConfigItem(Model):
+    SIZE = 112
+    model = Field(0)
+    weapon_ability = ArrayField(16, 7, Field(0))
+
+
+class CharacterConfig(Model):
+    chars = ArrayField(0x42d7c, 8, ModelField(0, CharacterConfigItem))
 
 
 class Money(Model):
@@ -52,3 +51,5 @@ class Money(Model):
 class Global(Model):
     character_struct = ModelPtrField(0x013C4428, CharacterStruct)
     character_config = ModelPtrField(0x013C345C, CharacterConfig)
+
+    char_skills = ArrayField((0x013C3414, 1832), 8, ArrayField(0, 3, Field(0)))
