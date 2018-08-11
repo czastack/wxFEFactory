@@ -37,36 +37,13 @@ class Model:
     def addrof(self, field):
         offset = self.offsetof(field)
         if offset is None:
-            data = test_comlex_attr(field)
-            if data is not None:
-                item = self
-                prev = None  # 取offset的对象
-                i = 0
-                last = len(data.attrs) - 1
-                for attr in data.attrs:
-                    if isinstance(attr, str):
-                        # 动态attr
-                        if attr.startswith('$$'):
-                            attr = getattr(item, attr[2:])
-                        elif attr.startswith('$'):
-                            attr = getattr(self, attr[1:])
-                    if isinstance(attr, int):
-                        offset = data.offsets and data.offsets.get(i, None)
-                        if offset is not None:
-                            attr += getattr(prev, offset)
-                        if i == last:
-                            return item.addr_at(attr)
-                        else:
-                            item = item[attr]
-                    else:
-                        prev = item
-                        if i == last:
-                            return item & attr
-                        else:
-                            item = getattr(item, attr)
-                    i += 1
-            else:
-                return None
+            def func(item, attr, is_int):
+                if is_int:
+                    return item.addr_at(attr)
+                else:
+                    return item & attr
+
+            return self.handle_comlex_attr(field, func)
         else:
             return self.addr + offset
 
@@ -108,77 +85,77 @@ class Model:
                 setattr(self, attr, next(valueiter))
 
     def __getattr__(self, name):
-        data = test_comlex_attr(name)
-        if data is not None:
-            item = self
-            prev = None  # 取offset的对象
-            i = 0
-            for attr in data.attrs:
-                if isinstance(attr, str):
-                    # 动态attr
-                    if attr.startswith('$$'):
-                        attr = getattr(item, attr[2:])
-                    elif attr.startswith('$'):
-                        attr = getattr(self, attr[1:])
-                if isinstance(attr, int):
-                    offset = data.offsets and data.offsets.get(i, None)
-                    if offset is not None:
-                        attr += getattr(prev, offset)
-                    try:
-                        item = item[attr]
-                    except IndexError:
-                        item = 0
-                        break
-                else:
-                    prev = item
-                    item = getattr(item, attr)
-                if item is None or item is 0:
-                    break
-                i += 1
+        def func(item, attr, is_int):
+            if is_int:
+                try:
+                    item = item[attr]
+                except IndexError:
+                    item = 0
+            else:
+                item = getattr(item, attr)
             return item
+
+        result = self.handle_comlex_attr(name, func)
+        if result is not COMLEX_ATTR_NONE:
+            return result
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
+        def func(item, attr, is_int):
+            if is_int:
+                item[attr] = value
+            else:
+                if item is not None:
+                    setattr(item, attr, value)
+                else:
+                    print("目标为空，无法设置")
+
+            return True
+
+        if self.handle_comlex_attr(name, func) is COMLEX_ATTR_NONE:
+            super().__setattr__(name, value)
+
+    def handle_comlex_attr(self, name, func, out_range_warn=False):
+        """func(item, attr, is_int) 最后一项的处理"""
         data = test_comlex_attr(name)
         if data is not None:
             item = self
             prev = None  # 取offset的对象
             i = 0
             last = len(data.attrs) - 1
+            result = None
             for attr in data.attrs:
-                if isinstance(attr, str):
+                is_last = i == last
+                if isinstance(attr, str) and attr.startswith('$'):
                     # 动态attr
                     if attr.startswith('$$'):
                         attr = getattr(item, attr[2:])
-                    elif attr.startswith('$'):
+                    else:
                         attr = getattr(self, attr[1:])
                 if isinstance(attr, int):
                     offset = data.offsets and data.offsets.get(i, None)
                     if offset is not None:
                         attr += getattr(prev, offset)
                     try:
-                        if i is last:
-                            item[attr] = value
+                        if is_last:
+                            result = func(item, attr, True)
                         else:
                             item = item[attr]
                     except IndexError:
-                        print("下标{}超过限制，长度为{}".format(attr, item.length))
+                        if out_range_warn:
+                            print("下标{}超过限制，长度为{}".format(attr, item.length))
                         break
                 else:
-                    if i is last:
-                        if item is not None:
-                            setattr(item, attr, value)
-                        else:
-                            print("目标为空，无法设置")
+                    if is_last:
+                        result = func(item, attr, False)
                     else:
                         prev = item
                         item = getattr(item, attr)
                         if item is None or item is 0:
                             break
-
                 i += 1
-        else:
-            super().__setattr__(name, value)
+            return result
+        return COMLEX_ATTR_NONE
 
     def datasnap(self, fields=None):
         data = SimpleNamespace()
@@ -759,8 +736,8 @@ class MinuendFieldPrep(FieldPrep):
 :param offsets {level: 偏移字段名}
 """
 CAttr = DataClass("CAttr", ("attrs", "offsets"))
-
 COMLEX_ATTR_MAP = {}
+COMLEX_ATTR_NONE = object()
 
 
 def test_comlex_attr(text):
