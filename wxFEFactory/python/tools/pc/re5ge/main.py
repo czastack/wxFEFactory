@@ -31,7 +31,7 @@ class Main(AssemblyHacktool):
 
     def render_main(self):
         with Group("player", "全局", self._global):
-            ModelInput("money", "金钱", ins=self.money)
+            ModelInput("money", "金钱", instance=self.money)
 
         with Group("player", "角色", self.person):
             self.person_select = Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
@@ -55,7 +55,7 @@ class Main(AssemblyHacktool):
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
-                    ins=self.person, prop=prop))
+                    instance=self.person, prop=prop))
 
     def render_saved_items(self):
         """整理界面个人物品"""
@@ -65,7 +65,7 @@ class Main(AssemblyHacktool):
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
-                    ins=self.saved_items, prop=prop))
+                    instance=self.saved_items, prop=prop))
 
     # def render_inventory_treasure_items(self):
     #     """仓库中的物品"""
@@ -80,7 +80,7 @@ class Main(AssemblyHacktool):
     #                     with select.container:
     #                         ui.Button("详情", className="btn_sm",
     #                             onclick=partial(__class__.show_inventory_treasure_item, self.weak,
-    #                                 ins=self.character_struct, prop=prop))
+    #                                 instance=self.character_struct, prop=prop))
 
     def render_assembly_functions(self):
         NOP_7 = b'\x90' * 7
@@ -108,7 +108,7 @@ class Main(AssemblyHacktool):
             with DialogGroup(name, "物品详情", self.ingame_item, cols=1, dialog_style={'width': 600, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    ins=self.ingame_item)
+                    instance=self.ingame_item)
                 ModelInput("quantity")
                 ModelInput("max_quantity")
                 ModelInput("fire_power")
@@ -131,7 +131,7 @@ class Main(AssemblyHacktool):
             with DialogGroup(name, "物品详情", self.saved_item, cols=1, dialog_style={'width': 600, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    ins=self.saved_item).view.setToolTip('移动后生效')
+                    instance=self.saved_item).view.setToolTip('移动后生效')
                 ModelInput("quantity")
                 ModelInput("max_quantity")
                 ModelInput("fire_power")
@@ -156,7 +156,7 @@ class Main(AssemblyHacktool):
     #                 closable=False, horizontal=False, button=False) as dialog:
     #             ModelSelect("type", choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
     #                 values=datasets.INVENTORY_TREASURE_ITEMS.values,
-    #                 ins=self.inventory_treasure_item).view.setToolTip('移动后生效')
+    #                 instance=self.inventory_treasure_item).view.setToolTip('移动后生效')
     #             ModelInput("quantity")
 
     #         setattr(self, name, dialog)

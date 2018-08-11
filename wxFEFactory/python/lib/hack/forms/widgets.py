@@ -36,6 +36,8 @@ class Widget:
             if parent.handler:
                 self.handler = parent.handler
 
+        self.oninit()
+
         if isinstance(parent, Group) and not parent.horizontal:
             self.horizontal = False
             with ui.Vertical(className="expand"):
@@ -47,6 +49,10 @@ class Widget:
     @classmethod
     def active_group(cls):
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
+
+    def oninit(self):
+        """依赖parent的参数都初始化后，render之前执行一些操作"""
+        pass
 
     def render(self):
         ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
@@ -106,52 +112,63 @@ class TwoWayWidget(Widget):
 
 
 class ModelWidget:
-    def __init__(self, name, label=None, ins=None, prop=None, **kwargs):
+    def __init__(self, name, label=None, instance=None, prop=None, **kwargs):
         """
-        :param ins: Model实例，或者返回Model实例的函数，在Widget中用addr占位
+        :param instance: Model实例，或者返回Model实例的函数，在Widget中用addr占位
         :param prop: Widget对应Field的属性名称，在Widget中用offsets占位
         """
-        super().__init__(name, label, addr=ins, offsets=prop or name, **kwargs)
+        super().__init__(name, label, instance, prop or name, **kwargs)
+
+    def oninit(self):
+        if isinstance(self.addr, tuple):
+            self.addr, self.instance_type = self.addr
+        elif not callable(self.addr):
+            self.instance_type = type(self.addr)
+        else:
+            self.instance_type = None
 
     def render(self):
-        if self.label is self.name and not callable(self.addr):
+        if self.label is self.name:
             # 从Field读取label
-            field = self.addr.field(self.offsets)
+            field = None
+            if self.instance_type:
+                field = getattr(self.instance_type, self.offsets, None)
             if field and field.label:
                 self.label = field.label
         super().render()
+        del self.instance_type
 
     @property
-    def ins(self):
+    def instance(self):
         return self.addr() if callable(self.addr) else self.addr
 
     @property
     def mem_value(self):
-        ins = self.ins
-        if ins:
-            return getattr(ins, self.offsets)
+        instance = self.instance
+        if instance:
+            return getattr(instance, self.offsets)
 
     @mem_value.setter
     def mem_value(self, value):
-        ins = self.ins
-        if ins:
-            setattr(ins, self.offsets, value)
+        instance = self.instance
+        if instance:
+            setattr(instance, self.offsets, value)
 
     @mem_value.deleter
     def mem_value(self):
-        ins = self.ins
-        if ins:
-            delattr(ins, self.offsets)
+        instance = self.instance
+        if instance:
+            delattr(instance, self.offsets)
 
     @property
     def field(self):
         # 尝试获取对应的模型字段
-        ins = self.ins
-        if ins and hasattr(ins, 'field'):
-            return ins.field(self.offsets)
+        instance = self.instance
+        if instance and hasattr(instance, 'field'):
+            return instance.field(self.offsets)
 
     def get_addr(self):
-        return self.ins & self.offsets
+        return self.instance & self.offsets
 
 
 class OffsetsWidget:
@@ -172,26 +189,34 @@ class BaseGroup(Widget):
 
     def __init__(self, name, label, addr, handler=None, cachable=True):
         """
+        :param addr: 子元素使用ModelWidget时，addr可以是Model实例或者getter或者(instance_getter, instance_type)
+            instance_type 方便子元素取label
         :param cachable: 子元素是ModelWidget时有用
         """
         self.children = []
+        origin_addr = addr
+        if isinstance(origin_addr, tuple):
+            # (instance_getter, instance_type)
+            addr = origin_addr[0]
         cachable = cachable and callable(addr)
         if not cachable:
             self.cachable = False
             if handler is None:
                 handler = getattr(addr, 'handler', None)
 
-        if cachable:
+        else:
             self._ins_getter = addr
             self._ins_cached = False
             self._ins = None
 
         self.handler = handler
 
-        super().__init__(name, label, addr)
+        super().__init__(name, label, origin_addr)
 
         if cachable:
             self.addr = self.weak.cached_ins_getter
+            if isinstance(origin_addr, tuple):
+                self.addr = (self.addr, origin_addr[1])
 
     def appendChild(self, child):
         self.children.append(child)
@@ -625,21 +650,21 @@ class BaseSelect(TwoWayWidget):
 
     def onTextDrop(self, i):
         if i.isdigit():
-            ins = self.search_map.get(int(i), None)
-            if ins and self != ins:
-                if ins.choices == self.choices:
+            instance = self.search_map.get(int(i), None)
+            if instance and self != instance:
+                if instance.choices == self.choices:
                     ctrl = fefactory_api.getKeyState(WXK.CONTROL)
-                    value = ins.view.index
+                    value = instance.view.index
                     if not ctrl:
                         alt = fefactory_api.getKeyState(WXK.ALT)
                         if not alt:
                             # 交换
-                            ins.view.index = self.view.index
+                            instance.view.index = self.view.index
                         else:
                             # 区域变化
                             try:
                                 sibling = self.parent.children
-                                a = sibling.index(ins)
+                                a = sibling.index(instance)
                                 b = sibling.index(self)
                                 if a < b:
                                     # 往下拖动

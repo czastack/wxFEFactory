@@ -105,7 +105,7 @@ class Model:
         data = test_comlex_attr(name)
         if data is not None:
             item = self
-            prev = None # 取offset的对象
+            prev = None  # 取offset的对象
             i = 0
             for attr in data.attrs:
                 if isinstance(attr, int):
@@ -227,6 +227,8 @@ class Field(FieldType):
         super().__init__(label)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
         if self.type is float:
             ret = float32(ret)
@@ -265,6 +267,8 @@ class Cachable:
     key = None
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         cache = None
         key = self.key
         if key is not None:
@@ -291,6 +295,8 @@ class PtrField(Field):
     __init__ = partialmethod(Field.__init__, size=0)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         if self.size is 0:
             # 对于ProcessHandler，根据目标进程获取指针大小
             self.size = instance.handler.ptr_size
@@ -323,6 +329,8 @@ U64Field = QWordField
 class SignedField(Field):
     """有符号字段"""
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         return instance.handler.read_int(instance.addr + self.offset, self.type, self.size)
 
     def __set__(self, instance, value):
@@ -343,6 +351,8 @@ class ToggleField(Field):
             self.size = len(enableData)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         value = super().__get__(instance, owner)
         if self.enableData is not None:
             return value == self.enableData
@@ -363,6 +373,8 @@ class ToggleFields(FieldType):
         super().__init__(label)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         for field in self.fields:
             if field.__get__(instance, owner) is False:
                 return False
@@ -382,12 +394,15 @@ class BitsField(Field):
         super().__init__(offset, int, size, label)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         value = super().__get__(instance)
         return (value >> self.bitoffset) & self.mask
 
     def __set__(self, instance, value):
         old = super().__get__(instance)
-        value = old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF) | ((int(value) & self.mask) << self.bitoffset)
+        value = (old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF)
+            | ((int(value) & self.mask) << self.bitoffset))
         super().__set__(instance, value)
 
     @classmethod
@@ -398,6 +413,8 @@ class BitsField(Field):
 
 class OffsetsField(Field):
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         ret = instance.handler.ptrs_read(instance.addr + self.offset[0], self.offset[1:], self.type, self.size)
         if self.type is float:
             ret = float32(ret)
@@ -659,6 +676,8 @@ class StringField(Field):
         self.encoding = encoding
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         ret = instance.handler.read(instance.addr + self.offset, self.type, self.size)
         return ret.rstrip(b'\x00').decode(self.encoding)
 

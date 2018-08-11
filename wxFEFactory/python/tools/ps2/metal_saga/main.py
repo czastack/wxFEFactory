@@ -90,9 +90,9 @@ class Main(BasePs2Hack):
                 values=datasets.ALL_EQUIP.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
-                    ins=self.person, prop=prop))
+                    instance=self.person, prop=prop))
                 ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
-                    ins=self.person, prop=prop))
+                    instance=self.person, prop=prop))
 
     def render_human_items(self):
         for i in range(self.HUMEN_ITEMS_PAGE_LENGTH):
@@ -101,9 +101,9 @@ class Main(BasePs2Hack):
                 choices=datasets.ALL_HUMEN_ITEM.choices, values=datasets.ALL_HUMEN_ITEM.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
-                    ins=self._global, prop=prop))
+                    instance=self._global, prop=prop))
                 ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
-                    ins=self._global, prop=prop))
+                    instance=self._global, prop=prop))
         with Group.active_group().footer:
             Pagination(self.on_human_items_page, self.HUMEN_ITEMS_PAGE_TOTAL)
 
@@ -127,9 +127,9 @@ class Main(BasePs2Hack):
                 choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
-                    ins=self.chariot, prop=prop))
+                    instance=self.chariot, prop=prop))
                 ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
-                    ins=self.chariot, prop=prop))
+                    instance=self.chariot, prop=prop))
 
     def render_special_bullets(self):
         for i in range(self.chariot.special_bullets.length):
@@ -138,9 +138,9 @@ class Main(BasePs2Hack):
                 choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
-                    ins=self.chariot, prop=prop))
+                    instance=self.chariot, prop=prop))
                 ui.Button("选择", className="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
-                    ins=self.chariot, prop=prop))
+                    instance=self.chariot, prop=prop))
 
     def render_wanted(self):
         for i, name in enumerate(datasets.WANTED_LIST):
@@ -173,7 +173,7 @@ class Main(BasePs2Hack):
         if dialog is None:
             with DialogGroup(name, "物品详情", self.item_info, cols=1, dialog_style={'width': 600, 'height': 1200},
                     closable=False, horizontal=False, button=False) as dialog:
-                ModelChoiceDisplay("item", choices=datasets.ITEMS, ins=self.item_info)
+                ModelChoiceDisplay("item", choices=datasets.ITEMS, instance=self.item_info)
                 ModelInput("attr1")
                 ModelInput("status")
                 ModelInput("atk_addition")
@@ -190,7 +190,7 @@ class Main(BasePs2Hack):
         if dialog is None:
             with DialogGroup(None, "静态物品", self.static_item, cols=1, dialog_style={'width': 600, 'height': 1200},
                     closable=False, horizontal=False, button=False) as dialog:
-                ModelChoiceDisplay("item", choices=datasets.ITEMS, ins=self.item_info)
+                ModelChoiceDisplay("item", choices=datasets.ITEMS, instance=self.item_info)
                 ModelInput("weight")
                 ModelInput("load")
                 ModelInput("atk")

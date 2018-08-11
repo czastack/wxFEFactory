@@ -42,7 +42,7 @@ class Character(Model):
 
 class CharacterStruct(Model):
     chars = ArrayField(0x24, 4, ModelPtrField(0, Character))
-    chars_count = Field(0x34, label="角色数量")
+    chars_count = Field(0x44, label="角色数量")
 
 
 class Money(Model):

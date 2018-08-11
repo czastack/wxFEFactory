@@ -15,13 +15,13 @@ class FeHack(BaseNdsHack):
         self._global.train_items_offset = 0
         self._personins = self.models.Person(0, self.handler)
         self.item_index = 1
-    
+
     def render_main(self):
         datasets = self.datasets
         weak = self.weak
-        
+
         with Group("global", "全局", self._global, cols=4):
-            ModelInput("money", "金钱", ins=weak._config)
+            ModelInput("money", "金钱", instance=weak._config)
             ModelInput("turns", "回合")
             ModelCheckBox("ourturn", "总是我方回合")
             ModelCheckBox("control_enemy", "可控制敌人")

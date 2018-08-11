@@ -219,8 +219,8 @@ class MetalMaxHack(BaseNdsHack):
                 "○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
 
         for i in range(4):
-            ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), ins=self._global, choices=datasets.MONSTERS)
-            ModelInput("enemy_case.%d.count" % i, "数量", ins=self._global)
+            ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), instance=self._global, choices=datasets.MONSTERS)
+            ModelInput("enemy_case.%d.count" % i, "数量", instance=self._global)
 
     def render_ext(self):
         pass

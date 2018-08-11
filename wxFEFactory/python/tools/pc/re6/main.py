@@ -17,22 +17,17 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
-        self.character_struct = models.CharacterStruct(0, self.handler)
-        self.character_config = models.CharacterConfig(0, self.handler)
-        self.person = models.Character(0, self.handler)
         self.ingame_item = models.IngameItem(0, self.handler)
-        self.money = models.Money(0, self.handler)
-
-    def render_top_button(self):
-        ui.Button("读取地址", className="vcenter", onclick=self.reload_address)
+        self.char_index = 0
 
     def render_main(self):
+        person = (self._person, models.Character)
         with Group("player", "全局", self._global):
-            # ModelInput("money", "金钱", ins=self.money)
+            # ModelInput("money", "金钱", instance=self.money)
             pass
 
-        with Group("player", "角色", self.person):
-            self.person_select = Choice("角色", datasets.PERSONS, self.weak.on_person_change)
+        with Group("player", "角色", person):
+            Choice("角色", datasets.PERSONS, self.weak.on_person_change)
             ModelInput("health")
             ModelInput("health_max")
             ModelInput("melee")
@@ -43,11 +38,12 @@ class Main(AssemblyHacktool):
             ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", self.person, serializable=False, cols=4),
+        self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4),
             self.render_person_items)
         # self.lazy_group(Group("saved_items", "整理界面物品", self.saved_items, serializable=False, cols=6),
         #     self.render_saved_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("功能"), self.render_functions)
 
     def render_person_items(self):
         """游戏中物品"""
@@ -59,7 +55,7 @@ class Main(AssemblyHacktool):
                     choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values)
                 with select.container:
                     ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
-                        ins=self.person, prop=prop))
+                        instance=self._person, prop=prop))
                 r += 1
 
     def render_saved_items(self):
@@ -70,7 +66,7 @@ class Main(AssemblyHacktool):
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
                 ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
-                    ins=self.saved_items, prop=prop))
+                    instance=self.saved_items, prop=prop))
 
     def render_assembly_functions(self):
         NOP_7 = b'\x90' * 7
@@ -81,6 +77,9 @@ class Main(AssemblyHacktool):
         )
         super().render_assembly_functions(functions)
 
+    def render_functions(self):
+        super().render_functions(('unlock_guns',))
+
     def get_ingame_item_dialog(self):
         """物品信息对话框"""
         name = 'ingame_item_dialog'
@@ -90,7 +89,7 @@ class Main(AssemblyHacktool):
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelCheckBox("enabled")
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    ins=self.ingame_item)
+                    instance=self.ingame_item)
                 ModelInput("quantity")
                 ModelInput("max_quantity")
 
@@ -105,7 +104,7 @@ class Main(AssemblyHacktool):
             with DialogGroup(name, "物品详情", self.saved_item, cols=1, dialog_style={'width': 600, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    ins=self.saved_item).view.setToolTip('移动后生效')
+                    instance=self.saved_item).view.setToolTip('移动后生效')
                 ModelInput("quantity")
                 ModelInput("max_quantity")
                 ModelInput("fire_power")
@@ -125,8 +124,7 @@ class Main(AssemblyHacktool):
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
-            (VK.MOD_ALT, VK.R, this.reload_address),
-            (VK.MOD_ALT, VK.T, this.set_ammo_full),
+            (VK.MOD_ALT, VK.R, this.set_ammo_full),
             (VK.MOD_ALT, VK.getCode(','), this.save_coord),
             (VK.MOD_ALT, VK.getCode('.'), this.load_coord),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(','), this.undo_coord),
@@ -137,10 +135,6 @@ class Main(AssemblyHacktool):
 
     def onattach(self):
         self._global.addr = self.handler.base_addr
-        self.character_struct.addr = self._global.character_struct.addr
-        self.character_config.addr = self._global.character_config.addr
-        # self.money.addr = self.handler.read_ptr(base_addr + 0x00DA23D8)
-        self.switch_person(self.person_select.index)
 
     def ondetach(self):
         memory = getattr(self, 'allocated_memory', None)
@@ -152,13 +146,14 @@ class Main(AssemblyHacktool):
                 self.unregister_assembly_item(value)
             self.registed_assembly = []
 
-    def on_person_change(self, lb):
-        self.switch_person(lb.index)
+    def _person(self):
+        if self.handler.active:
+            return self._global.character_struct.chars[self.char_index]
 
-    def switch_person(self, index):
-        self.person.addr = self.character_struct.chars[index].addr
-        # self.saved_items.addr = self.character_struct.saved_items[index].addr
-        self.char_index = index
+    person = property(_person)
+
+    def on_person_change(self, lb):
+        self.char_index = lb.index
 
     def show_ingame_item(self, view, ins, prop):
         """显示物品详情对话框"""
@@ -186,21 +181,21 @@ class Main(AssemblyHacktool):
         self.person.set_with('health', 'health_max')
 
     def pull_through_all(self, _=None):
-        for i in range(self.character_struct.chars_count):
-            self.character_struct.chars[i].set_with('health', 'health_max')
-
-    def reload_address(self, _):
-        self.onattach()
+        character_struct = self._global.character_struct
+        for i in range(character_struct.chars_count):
+            character_struct.chars[i].set_with('health', 'health_max')
 
     def set_ammo_full(self, _):
-        self.person.items[self.person.cur_item].set_with('quantity', 'max_quantity')
+        person = self.person
+        person.items[person.cur_item].set_with('quantity', 'max_quantity')
 
     def save_coord(self, _):
         self.last_coord = self.person.coord.values()
 
     def load_coord(self, _):
-        self.prev_coord = self.person.coord.values()
-        self.person.coord = self.last_coord
+        person = self.person
+        self.prev_coord = person.coord.values()
+        person.coord = self.last_coord
 
     def undo_coord(self, _):
         self.person.coord = self.prev_coord
@@ -209,14 +204,17 @@ class Main(AssemblyHacktool):
         self.person.coord = self.last_coord
 
     def p1_go_p2(self, _):
-        self.character_struct.chars[0].coord = self.character_struct.chars[1].coord.values()
+        chars = self._global.character_struct.chars
+        chars[0].coord = chars[1].coord.values()
 
     def p2_go_p1(self, _):
-        self.character_struct.chars[1].coord = self.character_struct.chars[0].coord.values()
+        chars = self._global.character_struct.chars
+        chars[1].coord = chars[0].coord.values()
 
-    def unlock_guns(self):
+    def unlock_guns(self, _):
         """解锁横向武器"""
-        config = self.character_config.chars[self.char_index]
+        config = self._global.character_config.chars[self.char_index]
+        person = self.person
         for i in range(7):
             if config.weapon_ability[i]:
-                self.person.items[i].enabled = True
+                person.items[i].enabled = True
