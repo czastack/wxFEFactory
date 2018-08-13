@@ -53,6 +53,13 @@ class MemHandler(ProcessHandler):
     def write_float(self, addr, data):
         return self.write(addr, float(data), 4)
 
+    def read_double(self, addr):
+        data = self.read(addr, bytes, 8)
+        return struct.unpack('d', data)[0]
+
+    def write_double(self, addr, data):
+        return self.read(addr, struct.pack('d', data), 8)
+
     def ptr_read(self, addr, offset, type, size=0):
         addr = self.read_addr(addr)
         if addr:
@@ -134,6 +141,13 @@ class BigendHandler(MemHandler):
 
     def write_uint(self, addr, data, size=0):
         return ProcessHandler.write(self, addr, data.to_bytes(size, 'big'), size)
+
+    def read_double(self, addr):
+        data = ProcessHandler.read(self, addr, bytes, 8)
+        return struct.unpack('>d', data)[0]
+
+    def write_double(self, addr, data):
+        return ProcessHandler.write(self, addr, struct.pack('>d', data), 8)
 
 
 class _RawEnv:

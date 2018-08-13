@@ -14,7 +14,7 @@ class BaseScene:
         ins = self.__class__.__dict__.get('INS', None)
         if ins is None:
             ins = self.__class__.INS = []
-        
+
         try:
             self.index = ins.index(None)
             ins[self.index] = self

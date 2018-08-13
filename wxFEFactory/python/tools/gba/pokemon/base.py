@@ -78,6 +78,7 @@ class BasePMHack(BaseGbaHack):
             self.pokemon_group = pokemon_group
 
     def onattach(self):
+        super().onattach()
         rom_title = self.handler.getRomTitle()
 
         item = models.GAME_VERSON.get(rom_title, None)

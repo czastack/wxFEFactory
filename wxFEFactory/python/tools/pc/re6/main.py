@@ -5,13 +5,13 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.assembly_hacktool import AssemblyHacktool
+from tools.native_hacktool import NativeHacktool
 from fefactory_api import ui
 from . import models, datasets
 import fefactory_api
 
 
-class Main(AssemblyHacktool):
+class Main(NativeHacktool):
     CLASS_NAME = WINDOW_NAME = 'RESIDENT EVIL 6'
 
     def __init__(self):
@@ -88,10 +88,12 @@ class Main(AssemblyHacktool):
             with DialogGroup(name, "物品详情", self.ingame_item, cols=1, dialog_style={'width': 800, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelCheckBox("enabled")
+                ModelInput("slot")
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
                     instance=self.ingame_item)
                 ModelInput("quantity")
                 ModelInput("max_quantity")
+                ModelInput("model", hex=True)
             with dialog.footer:
                 ui.Button("复制", className='btn_sm', onclick=self.weak.ingame_item_copy)
                 ui.Button("粘贴", className='btn_sm', onclick=self.weak.ingame_item_paste)
@@ -114,17 +116,8 @@ class Main(AssemblyHacktool):
         )
 
     def onattach(self):
+        super().onattach()
         self._global.addr = self.handler.base_addr
-
-    def ondetach(self):
-        memory = getattr(self, 'allocated_memory', None)
-        if memory is not None:
-            self.handler.free_memory(memory)
-            self.allocated_memory = None
-            self.next_usable_memory = None
-            for key, value in self.registed_assembly.items():
-                self.unregister_assembly_item(value)
-            self.registed_assembly = []
 
     def _person(self):
         if self.handler.active:
@@ -200,3 +193,7 @@ class Main(AssemblyHacktool):
         for i in range(7):
             if config.weapon_ability[i]:
                 person.items[i].enabled = True
+
+    def set_ingame_item(self, slot, type, a4):
+        func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
+        self.native_call_auto(func_addr, '5L', slot, type, a4, 0, 0, this=self.person.addr)

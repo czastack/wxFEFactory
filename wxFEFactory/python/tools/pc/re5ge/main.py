@@ -172,17 +172,8 @@ class Main(AssemblyHacktool):
         )
 
     def onattach(self):
+        super().onattach()
         self._global.addr = self.handler.base_addr
-
-    def ondetach(self):
-        memory = getattr(self, 'allocated_memory', None)
-        if memory is not None:
-            self.handler.free_memory(memory)
-            self.allocated_memory = None
-            self.next_usable_memory = None
-            for key, value in self.registed_assembly.items():
-                self.unregister_assembly_item(value)
-            self.registed_assembly = []
 
     def _person(self):
         if self.handler.active:
