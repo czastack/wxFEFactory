@@ -901,13 +901,13 @@ class Main(BaseGTATool):
         :return: (x, y, pitch)
         """
         data = self.script_call_vector('GET_GAMEPLAY_CAM_ROT', 'Q', 2)
-        tX = data[0] * 0.0174532924
-        tZ = data[2] * 0.0174532924
-        absX = abs(math.cos(tX))
+        tx = data[0] * 0.0174532924
+        tz = data[2] * 0.0174532924
+        absx = abs(math.cos(tx))
         return (
-            -math.sin(tZ) * absX,
-            math.cos(tZ) * absX,
-            math.sin(tX)
+            -math.sin(tz) * absx,
+            math.cos(tz) * absx,
+            math.sin(tx)
         )
 
     def get_camera_pos(self):
@@ -1132,7 +1132,10 @@ class Main(BaseGTATool):
     def get_shoot_weapon(self):
         """获取要射击的武器模型"""
         weapon = self.config.shoot_weapon_hash
-        self.request_weapon_model(weapon)
+        if weapon:
+            self.request_weapon_model(weapon)
+        else:
+            weapon = self.player.weapon
         return weapon
 
     def shoot_between(self, v1, v2, demage, weapon, owner, speed, check_model=True):

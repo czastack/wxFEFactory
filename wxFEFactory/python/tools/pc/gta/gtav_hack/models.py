@@ -80,7 +80,8 @@ class NativeEntity(NativeModel):
     @speed.setter
     def turn_speed(self, value):
         # 结果还是speed...
-        self.script_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value, 0, 0, 0, True, False, True, True, True, True)
+        self.script_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value,
+            0, 0, 0, True, False, True, True, True, True)
 
     max_speed = property(None, setter('SET_ENTITY_MAX_SPEED', float))
 
@@ -131,7 +132,7 @@ class NativeEntity(NativeModel):
     @rotation3f.setter
     def rotation3f(self, value):
         self.native_call('SET_ENTITY_ROTATION', 'Q3f2Q', self.handle, *value, 2, True)
-    
+
     def flip(self):
         """翻转"""
         x, y, z = self.rotation3f
@@ -151,7 +152,7 @@ class NativeEntity(NativeModel):
 
     def set_proofs(self, bp, fp, ep, cp, mp, un6, un7, dp):
         """设置实体的免疫 bulletProof, fireProof, explosionProof, collisionProof, meleeProof, p6, p7, drownProof"""
-        self.native_call("SET_ENTITY_PROOFS", '9Q', self.handle, 
+        self.native_call("SET_ENTITY_PROOFS", '9Q', self.handle,
             bp, fp, ep, cp, mp, un6, un7, dp)
 
     def add_marker(self):
@@ -167,11 +168,13 @@ class NativeEntity(NativeModel):
     get_offset_coord = get_offset_coord_m
 
     def go_to_entity(self, entity, speed=10):
-        self.script_call('TASK_GO_TO_ENTITY', '2Ql3fl', self.handle, self.make_handle(entity), -1, 0.1, speed, 1073741824.0, 0)
+        self.script_call('TASK_GO_TO_ENTITY', '2Ql3fl', self.handle, self.make_handle(entity),
+            -1, 0.1, speed, 1073741824.0, 0)
 
     def attach_to_entity(self, entity, offset):
         """附上实体"""
-        self.script_call('ATTACH_ENTITY_TO_ENTITY', '3Q6f6Q', self.handle, self.make_handle(entity), 0, *offset, 0, 0, 0, False, True, True, True, 0, True)
+        self.script_call('ATTACH_ENTITY_TO_ENTITY', '3Q6f6Q', self.handle, self.make_handle(entity), 0, *offset,
+            0, 0, 0, False, True, True, True, 0, True)
 
     def detach_entity(self):
         self.script_call('DETACH_ENTITY', '3Q', self.handle, False, False)
@@ -261,6 +264,7 @@ class Player(NativeEntity):
 
     # 通缉等级
     wanted_level = property(player_getter('GET_PLAYER_WANTED_LEVEL'))
+
     @wanted_level.setter
     def wanted_level(self, level):
         level = int(level)
@@ -365,11 +369,11 @@ class Player(NativeEntity):
     def remove_all_weapons(self):
         """移除所有武器"""
         self.script_call('REMOVE_ALL_PED_WEAPONS', '2Q', self.handle, True)
-        
+
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""
         return self.native_call('GET_AMMO_IN_PED_WEAPON', '2Q', self.handle, weapon)
-        
+
     def set_ammo(self, weapon, ammo):
         """设置指定武器的弹药数"""
         self.native_call('SET_PED_AMMO', '3Q', self.handle, weapon, ammo)
@@ -408,7 +412,7 @@ class Player(NativeEntity):
     def weapon(self, weapon):
         """设置当前武器种类"""
         self.script_call('SET_CURRENT_PED_WEAPON', '3Q', self.handle, weapon, 1)
-    
+
     def get_vehicle_weapon(self):
         """当前车载武器种类"""
         self.script_call('GET_CURRENT_PED_VEHICLE_WEAPON', '2Q', self.handle, self.native_context.get_temp_addr())
@@ -458,12 +462,12 @@ class Player(NativeEntity):
 
     def follow_to_entity(self, entity, speed=2, timeout=-1):
         """跟着实体"""
-        self.script_call('TASK_FOLLOW_TO_OFFSET_OF_ENTITY', '2Q4flfq', 
+        self.script_call('TASK_FOLLOW_TO_OFFSET_OF_ENTITY', '2Q4flfq',
             self.handle, self.make_handle(entity), 1.5, 1.5, 1.5, speed, timeout, 2, 1)
 
     def go_straight_to_coord(self, coord, speed=2, timeout=-1):
         """径直走向坐标"""
-        self.script_call('TASK_GO_STRAIGHT_TO_COORD', 'Q4fl2f', 
+        self.script_call('TASK_GO_STRAIGHT_TO_COORD', 'Q4fl2f',
             self.handle, *coord, speed, timeout, 0, 0)
 
     def parachute_to(self, coord):
@@ -473,7 +477,8 @@ class Player(NativeEntity):
     def reset_stamina(self):
         self.script_call('RESET_PLAYER_STAMINA', 'Q', self.index)
 
-    stamina = property(player_getter('GET_PLAYER_SPRINT_STAMINA_REMAINING', float), player_setter('RESTORE_PLAYER_STAMINA', float))
+    stamina = property(player_getter('GET_PLAYER_SPRINT_STAMINA_REMAINING', float),
+        player_setter('RESTORE_PLAYER_STAMINA', float))
 
     del getter, getter_ptr, setter
 
@@ -508,6 +513,7 @@ class Vehicle(NativeEntity):
 
     # 前进速度
     forard_speed = property(getter('GET_ENTITY_SPEED', float))
+
     @forard_speed.setter
     def forard_speed(self, value):
         if self.model.is_train:
@@ -661,12 +667,12 @@ class Vehicle(NativeEntity):
 
     def drive_to(self, coord, speed, driving_style):
         """驾驶到坐标"""
-        self.script_call('TASK_VEHICLE_DRIVE_TO_COORD', '2Q4fl2Q2f', 
+        self.script_call('TASK_VEHICLE_DRIVE_TO_COORD', '2Q4fl2Q2f',
             self.driver.handle, self.handle, *coord, speed, 1, self.model_id, driving_style, 10.0, -1.0)
 
     def drive_follow(self, entity, speed, driving_style):
         """跟着目标"""
-        self.script_call('_TASK_VEHICLE_FOLLOW', '3Qf2Q', 
+        self.script_call('_TASK_VEHICLE_FOLLOW', '3Qf2Q',
             self.driver.handle, self.handle, self.make_handle(entity), speed, driving_style, 10)
 
     def clear_driver_tasks(self):
@@ -768,7 +774,7 @@ class Blip(NativeModel):
     existed = property(NativeModel.getter('DOES_BLIP_EXIST', bool))
     entity_index = property(NativeModel.getter('GET_BLIP_INFO_ID_ENTITY_INDEX'))
     pickup_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PICKUP_INDEX'))
-    
+
     def remove(self):
         self.script_call('REMOVE_BLIP', 'Q', self.handle, ret_type=None)
 
