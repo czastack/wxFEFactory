@@ -50,8 +50,8 @@ class AssemblyHacktool(BaseHackTool):
             return
 
         if getattr(self, 'allocated_memory', None) is None:
-            # 初始化
-            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048)
+            # 初始化代码区 PAGE_EXECUTE_READWRITE
+            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, 0x40)
             self.registed_assembly = {}
             self.registed_assembly_memory = {}
 

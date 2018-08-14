@@ -70,8 +70,9 @@ class Main(NativeHacktool):
             ('子弹不减', ('ammo_keep', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
                 b'\x66\x4A\x90\x90\x90', None, True)),
             ('无后坐力', ('no_recoil', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8, None, True)),
-            ('快速射击', ('rapid_fire', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
-                0x680000, 0x700000, b'\x66\x0F\xEF\xC0', None, True)),
+            ('快速射击', ('rapid_fire', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, 0x700000, b'',
+                b'\xF3\x0F\x58\xD2\xF3\x0F\x58\xD2\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
+                True, True)),
             ('佣兵模式时间不减', ('merce_timer_keep', b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00',
                 0x100000, 0x200000, NOP_8, None, True)),
         )
