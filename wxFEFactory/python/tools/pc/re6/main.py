@@ -128,6 +128,10 @@ class Main(NativeHacktool):
         if self.handler.active:
             return self._global.character_config.chars[self.char_index]
 
+    @property
+    def saved_items(self):
+        return self._global.character_config.saved_items[self.char_index].items
+
     person = property(_person)
     person_config = property(_person_config)
 
@@ -195,6 +199,6 @@ class Main(NativeHacktool):
             if config.weapon_ability[i]:
                 person.items[i].enabled = True
 
-    def set_ingame_item(self, slot, type, a4):
+    def set_ingame_item(self, slot, type, ammo, character=0):
         func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
-        self.native_call_auto(func_addr, '5L', slot, type, a4, 0, 0, this=self.person.addr)
+        self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.person.addr)

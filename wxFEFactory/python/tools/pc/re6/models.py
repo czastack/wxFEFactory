@@ -10,6 +10,7 @@ class IngameItem(Model):
     slot = ByteField(5, label="槽位")
     type = WordField(6, label="种类")
     quantity = WordField(0x0A, label="数量/武器弹药")
+    double_quantity = WordField(0x0C, label="双枪弹药")
     max_quantity = WordField(0x10, label="最大数量/武器弹药")
     model = Field(0x18, label="模型")
 
@@ -31,6 +32,17 @@ class Character(Model):
     is_wet = Field(0x2E34, label="是否湿了")
 
 
+class SavedItem(Model):
+    SIZE = 4
+    type = WordField(0, label="种类")
+    quantity = WordField(2, label="数量/武器弹药")
+
+
+class SavedItems(Model):
+    SIZE = 0x70
+    items = ArrayField(0x35E4 + 0x10, 24, ModelField(0, SavedItem))
+
+
 class CharacterStruct(Model):
     chars = ArrayField(0x24, 8, ModelPtrField(0, Character))
     chars_count = Field(0x44, label="角色数量")
@@ -44,6 +56,7 @@ class CharacterConfigItem(Model):
 
 class CharacterConfig(Model):
     chars = ArrayField(0x42d7c, 8, ModelField(0, CharacterConfigItem))
+    saved_items = ArrayField(0x3F798, 8, ModelField(0, SavedItems))  # 0x3CE4 * *(_DWORD *)(dword_17C345C + 0x20)
 
 
 class Enemy(Character):

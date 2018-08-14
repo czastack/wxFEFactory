@@ -42,7 +42,11 @@ class NativeContext(Model):
         # P: void *
         # 写入栈的地址
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
-        self.handler.write(addr, struct.pack(signature, *args))
+        try:
+            self.handler.write(addr, struct.pack(signature, *args))
+        except Exception as e:
+            print('打包参数出错', signature, *args)
+            raise e
         self.m_nArgCount += len(args)
 
     def push_manual(self, index, signature, *args):

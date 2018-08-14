@@ -6,8 +6,8 @@ import base64
 class NativeHacktool(AssemblyHacktool):
     NativeContext = NativeContext
 
-    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GF/'
-        b'3QDi034/1X0iUUIhf91DItGBMHgAolF9ANl9IsOi0UIX16JAYvlXcM=')
+    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GD/'
+        b'wF2A4tN+P9V9IlFCIX/dQyLRgTB4AKJRfQDZfSLDotFCF9eiQGL5V3DuAAQFADD')
 
     # x64 native_call
     FUNCTION_NATIVE_CALL_64 = base64.b64decode(
@@ -44,9 +44,9 @@ class NativeHacktool(AssemblyHacktool):
                 return self.native_context.get_result(ret_type, ret_size)
 
     def native_call_auto(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=4):
-        """ 以cdcel或thiscall形式调用远程函数(x86)
+        """ 以cdcel,stdcall或thiscall形式调用远程函数(x86)
         :param addr: 目标函数地址
-        :param this: this指针，若不为0，则以thiscall形式调用，否则以cdcel形式调用
+        :param this: this指针，为0时使用cdecl, 1时使用stdcall, 大于1时使用thiscall
         :param arg_sign: 参数签名
         """
         return self.native_call(self.NativeCall, '2L' + (arg_sign if arg_sign is not None else ''),
