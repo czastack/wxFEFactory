@@ -188,10 +188,7 @@ void init_containers(py::module & m)
 
 	py::class_t<StaticBox, Layout>(m, "StaticBox")
 		.def(py::init<wxcstr, pyobj, pyobj, pyobj>(),
-			"label"_a, styles, className, style)
-		.def("getLabel", &StaticBox::getLabel)
-		.def("setLabel", &StaticBox::setLabel)
-		.def_property("label", &StaticBox::getLabel, &StaticBox::setLabel);
+			"label"_a, styles, className, style);
 
 	py::class_t<BookCtrlBase, Layout>(m, "BookCtrlBase")
 		.def("getPage", &BookCtrlBase::getPage, "n"_a = -1)

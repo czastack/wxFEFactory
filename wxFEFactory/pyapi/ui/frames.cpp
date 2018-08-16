@@ -4,7 +4,7 @@
 
 void BaseTopLevelWindow::__exit__(py::args & args)
 {
-	show();
+	ptr()->Show();
 
 	// 引用加一
 	py::cast(this).inc_ref();
@@ -221,31 +221,6 @@ void Dialog::dismiss(bool ok)
 }
 
 
-/*pyobj StdModalDialog::__enter__()
-{
-	long style = ptr()->GetWindowStyle();
-	style |= wxRESIZE_BORDER | wxCLIP_CHILDREN;
-	ptr()->SetWindowStyle(style);
-
-	auto ret = Layout::__enter__();
-	wxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
-	ptr()->SetSizer(topsizer);
-	return ret;
-}
-
-void StdModalDialog::__exit__(py::args & args)
-{
-	wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
-	buttonSizer->AddButton(new wxButton(ptr(), wxID_OK));
-	buttonSizer->AddButton(new wxButton(ptr(), wxID_CANCEL));
-	buttonSizer->Realize();
-
-	wxSizer* topsizer = ptr()->GetSizer();
-	topsizer->Add(buttonSizer, wxSizerFlags(0).Right().Border(wxBOTTOM | wxRIGHT, 5));
-	Dialog::__exit__(args);
-}*/
-
-
 void init_frames(py::module & m)
 {
 	using namespace py::literals;
@@ -259,14 +234,17 @@ void init_frames(py::module & m)
 	auto menubar_a = "menubar"_a = nullptr;
 
 	py::class_t<BaseTopLevelWindow, Layout>(m, "BaseTopLevelWindow")
-		.def("close", &BaseTopLevelWindow::close)
+		.def("close", [](View *self) { return self->ptr()->Close(); })
 		.def("setOnClose", &BaseTopLevelWindow::setOnClose)
 		.def("setIcon", &BaseTopLevelWindow::setIcon)
 		.def_property("title", &BaseTopLevelWindow::getTitle, &BaseTopLevelWindow::setTitle)
 		.def_property("size", &BaseTopLevelWindow::getSize, &BaseTopLevelWindow::setSize)
 		.def_property("position", &BaseTopLevelWindow::getPosition, &BaseTopLevelWindow::setPosition);
 	py::class_t<BaseFrame, BaseTopLevelWindow>(m, "BaseFrame")
-		.def_property("keeptop", &Window::isKeepTop, &Window::keepTop)
+		.def_property("keeptop",
+			[](View *self) { return self->has_wxstyle(wxSTAY_ON_TOP); },
+			[](View *self, bool toggle) { self->toggle_wxstyle(wxSTAY_ON_TOP, toggle); }
+		)
 		.def_property_readonly("menubar", &Window::getMenuBar)
 		.def_property_readonly("statusbar", &Window::getStatusBar);
 

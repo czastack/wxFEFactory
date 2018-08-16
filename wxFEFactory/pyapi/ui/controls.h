@@ -657,9 +657,9 @@ public:
 		bindEvt(wxEVT_TEXT_ENTER, fn, reset);
 	}
 
-	void autoComplete()
+	void auto_complete()
 	{
-		if (!(ctrl().GetWindowStyle() & wxCB_READONLY))
+		if (!has_wxstyle(wxCB_READONLY))
 		{
 			ctrl().AutoComplete(ctrl().GetStrings());
 		}

@@ -209,7 +209,7 @@ class MainFrame:
         isShow = not p1.isShow()
         p1.show(isShow)
         self.aui.showPane("multiline_console", not isShow)
-        self.console.reLayout()
+        self.console.relayout()
 
     def consol_input_multi_run(self, _=None):
         try:

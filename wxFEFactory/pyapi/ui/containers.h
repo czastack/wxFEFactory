@@ -19,7 +19,7 @@ public:
 
 	void doAdd(View &child) override;
 
-	void reLayout() override
+	void relayout() override
 	{
 		layout();
 	}

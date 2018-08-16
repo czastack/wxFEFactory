@@ -43,11 +43,6 @@ public:
 		_bindEvt((int)wxEVT_CLOSE_WINDOW, onclose, true, false);
 	}
 
-	void close()
-	{
-		m_elem->Close();
-	}
-
 	void _onClose(class wxCloseEvent &event);
 
 	bool onClose(class wxCloseEvent &event);
@@ -88,25 +83,6 @@ public:
 	}
 
 	void onRelease() override;
-
-	bool isKeepTop()
-	{
-		long style = m_elem->GetWindowStyle();
-		return (style & wxSTAY_ON_TOP) != 0;
-	}
-
-	void keepTop(bool top)
-	{
-		long style = m_elem->GetWindowStyle();
-		if (top)
-		{
-			style |= wxSTAY_ON_TOP;
-		}
-		else {
-			style &= ~wxSTAY_ON_TOP;
-		}
-		m_elem->SetWindowStyle(style);
-	}
 };
 
 
@@ -116,7 +92,7 @@ public:
 	template <class... Args>
 	Window(wxcstr title, MenuBar *menubar, long wxstyle/*=wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL*/, Args ...args) : BaseFrame(args...)
 	{
-		bindElem(new wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
+		bindElem(new wxFrame(getActiveWindow(), wxID_ANY, title, wxDefaultPosition, getStyleSize(), wxstyle));
 		if (menubar)
 		{
 			setMenu(*menubar);

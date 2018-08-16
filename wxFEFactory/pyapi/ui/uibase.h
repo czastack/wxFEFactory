@@ -103,58 +103,11 @@ public:
 		return m_elem->GetBackgroundColour().GetRGB();
 	}
 
-	View& setToolTip(wxcstr text)
-	{
-		m_elem->SetToolTip(text);
-		return *this;
-	}
-
-	bool getEnabaled()
-	{
-		return ptr()->IsEnabled();
-	}
-
-	bool setEnabaled(bool enabled=true)
-	{
-		return ptr()->Enable(enabled);
-	}
-
-	wxString getLabel()
-	{
-		return m_elem->GetLabel();
-	}
-
-	void setLabel(wxcstr label)
-	{
-		m_elem->SetLabel(label);
-	}
-
-	View& show(bool show_=true)
-	{
-		ptr()->Show(show_);
-		return *this;
-	}
-
-	bool isShow()
-	{
-		return ptr()->IsShown();
-	}
-
-	void destroy()
-	{
-		ptr()->Destroy();
-	}
-
 	void setContextMenu(ContextMenu &menu);
 
 	void onPopMenu(wxContextMenuEvent& event);
 
 	void onContextMenu(wxCommandEvent& event);
-
-	void refresh()
-	{
-		m_elem->Refresh();
-	}
 
 	pyobj getTypeName() {
 		pyobj self = py::cast(this);
@@ -171,6 +124,25 @@ public:
 	operator wxWindow*()
 	{
 		return m_elem;
+	}
+
+	bool has_wxstyle(long flag)
+	{
+		long style = m_elem->GetWindowStyle();
+		return (style & style) != 0;
+	}
+
+	void toggle_wxstyle(long flag, bool toggle)
+	{
+		long style = m_elem->GetWindowStyle();
+		if (toggle)
+		{
+			style |= flag;
+		}
+		else {
+			style &= ~flag;
+		}
+		m_elem->SetWindowStyle(style);
 	}
 
 	bool hasEventHandler(const wxEvent& event)
@@ -366,13 +338,13 @@ public:
 		return tmp_styles_list;
 	}
 
-	virtual void reLayout() {}
+	virtual void relayout() {}
 
-	void removeChild(View &child);
+	void remove_child(View &child);
 
-	void clearChildren();
+	void clear_children();
 
-	View* findFocus();
+	View* find_focus();
 
 	friend void init_uibase(py::module &m);
 protected:

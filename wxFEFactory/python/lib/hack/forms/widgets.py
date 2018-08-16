@@ -333,7 +333,7 @@ class Group(BaseGroup):
 
     def after_lazy(self):
         if isinstance(self.view, ui.FlexGridLayout):
-            self.view.parent.reLayout()
+            self.view.parent.relayout()
 
 
 class DialogGroup(Group):

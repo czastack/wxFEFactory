@@ -493,16 +493,16 @@ void Layout::setStyles(pycref styles)
 			py::cast<View*>(child)->testStyles(styles);
 		}
 	}
-	reLayout();
+	relayout();
 }
 
-void Layout::removeChild(View & child)
+void Layout::remove_child(View & child)
 {
 	m_elem->RemoveChild(child);
 	m_children.attr("remove")(child);
 }
 
-void Layout::clearChildren()
+void Layout::clear_children()
 {
 	for (auto child: m_elem->GetChildren())
 	{
@@ -511,7 +511,7 @@ void Layout::clearChildren()
 	m_children.attr("clear")();
 }
 
-View * Layout::findFocus()
+View * Layout::find_focus()
 {
 	auto pChild = m_elem->FindFocus();
 	return pChild ? (View*)pChild->GetClientData() : nullptr;
@@ -535,34 +535,47 @@ void init_uibase(py::module & m)
 	using namespace py::literals;
 
 	auto view = py::class_<View>(m, "View")
-		.def("isShow", &View::isShow)
-		.def("show", &View::show, "show"_a = true)
-		.def("destroy", &View::destroy)
-		.def("refresh", &View::refresh)
-		.def("setToolTip", &View::setToolTip)
+		.def("isShow", [](View *self) { return self->ptr()->IsShown(); })
+		.def("show", [](View *self, bool show) { self->ptr()->Show(show); return self; }, "show"_a = true)
+		.def("destroy", [](View *self) { self->ptr()->Destroy(); })
+		.def("refresh", [](View *self) { self->ptr()->Refresh(); })
+		.def("setToolTip", [](View *self, wxcstr tip) { self->ptr()->SetToolTip(tip); return self; })
 		.def("setContextMenu", &View::setContextMenu)
 		.def("setOnKeyDown", &View::setOnKeyDown)
 		.def("setOnFileDrop", &View::setOnFileDrop)
 		.def("setOnTextDrop", &View::setOnTextDrop)
 		.def("startTextDrag", &View::startTextDrag, "text"_a, "callback"_a=None)
-		.def("setOnLeftDown", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_DOWN, fn, true, true); })
-		.def("setOnLeftUp", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_UP, fn, true, true); })
-		.def("setOnRightDown", [](View &self, pycref fn) { self.bindEvt(wxEVT_RIGHT_DOWN, fn, true, true); })
-		.def("setOnRightUp", [](View &self, pycref fn) { self.bindEvt(wxEVT_RIGHT_UP, fn, true, true); })
-		.def("setOnDoubleClick", [](View &self, pycref fn) { self.bindEvt(wxEVT_LEFT_DCLICK, fn, true, true); })
+		.def("setOnLeftDown", [](View *self, pycref fn) { self->bindEvt(wxEVT_LEFT_DOWN, fn, true, true); })
+		.def("setOnLeftUp", [](View *self, pycref fn) { self->bindEvt(wxEVT_LEFT_UP, fn, true, true); })
+		.def("setOnRightDown", [](View *self, pycref fn) { self->bindEvt(wxEVT_RIGHT_DOWN, fn, true, true); })
+		.def("setOnRightUp", [](View *self, pycref fn) { self->bindEvt(wxEVT_RIGHT_UP, fn, true, true); })
+		.def("setOnDoubleClick", [](View *self, pycref fn) { self->bindEvt(wxEVT_LEFT_DCLICK, fn, true, true); })
 		.def("setOnDestroy", &View::setOnDestroy)
-		.def("freeze", [](View &self) { return self.ptr()->Freeze(); })
-		.def("thaw", [](View &self) { return self.ptr()->Thaw(); })
+		.def("freeze", [](View *self) { return self->ptr()->Freeze(); })
+		.def("thaw", [](View *self) { return self->ptr()->Thaw(); })
+		.def("lower", [](View *self) { return self->ptr()->Lower(); })
+		.def("raise", [](View *self) { return self->ptr()->Raise(); })
 		.def_static("get_active_layout", &View::getActiveLayout)
 		.def_readwrite("style", &View::m_style)
 		.def_readwrite("className", &View::m_class)
-		.def_property("enabled", &View::getEnabaled, &View::setEnabaled)
+		.def_property("id",
+			[](View *self) { return self->ptr()->GetId(); },
+			[](View *self, int value) { self->ptr()->SetId(value); }
+		)
+		.def_property("enabled",
+			[](View *self) { return self->ptr()->IsEnabled(); },
+			[](View *self, bool value) { self->ptr()->Enable(value); }
+		)
+		.def_property("label",
+			[](View *self) { return self->ptr()->GetLabel(); },
+			[](View *self, wxcstr value) { self->ptr()->SetLabel(value); }
+		)
+		.def_property("window_style",
+			[](View *self) { return self->ptr()->GetWindowStyle(); },
+			[](View *self, long value) { self->ptr()->SetWindowStyle(value); }
+		)
 		.def_property("background", &View::getBackground, &View::setBackground)
 		.def_property("color", &View::getForeground, &View::setForeground)
-		.def_property("id",
-			[](View &self) { return self.ptr()->GetId(); },
-			[](View &self, int id) { self.ptr()->SetId(id); }
-		)
 		.def_property_readonly("parent", &View::getParent);
 
 	py::class_<Control, View>(m, "Control");
@@ -571,9 +584,9 @@ void init_uibase(py::module & m)
 		.def("__enter__", &Layout::__enter__)
 		.def("__exit__", &Layout::__exit__)
 		.def("styles", &Layout::setStyles)
-		.def("removeChild", &Layout::removeChild)
-		.def("clearChildren", &Layout::clearChildren)
-		.def("reLayout", &Layout::reLayout)
-		.def("findFocus", &Layout::findFocus)
+		.def("removeChild", &Layout::remove_child)
+		.def("clear_children", &Layout::clear_children)
+		.def("relayout", &Layout::relayout)
+		.def("find_focus", &Layout::find_focus)
 		.def_readonly("children", &Layout::m_children);
 }

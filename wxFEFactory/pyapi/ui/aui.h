@@ -31,7 +31,7 @@ public:
 
 	void __exit__(py::args &args) override;
 
-	void reLayout() override
+	void relayout() override
 	{
 		layout();
 	}

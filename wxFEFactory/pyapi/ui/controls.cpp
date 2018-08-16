@@ -189,10 +189,7 @@ void init_controls(py::module & m)
 		.def(py::init<wxcstr, pyobj, pyobj, pyobj>(),
 			label, "onclick"_a = None, className, style)
 		.def("setOnClick", &Button::setOnClick, "onclick"_a, evt_reset)
-		.def("getLabel", &Button::getLabel)
-		.def("setLabel", &Button::setLabel)
-		.def("click", &Button::click)
-		.def_property("label", &Button::getLabel, &Button::setLabel);
+		.def("click", &Button::click);
 
 	auto pyBitmapButton = py::class_t<BitmapButton, Button>(m, "BitmapButton")
 		.def(py::init<pycref, pyobj, pyobj, pyobj>(),
@@ -203,33 +200,24 @@ void init_controls(py::module & m)
 	py::class_t<ToggleButton, Control>(m, "ToggleButton")
 		.def(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "onchange"_a = None, className, style)
-		.def("getLabel", &ToggleButton::getLabel)
-		.def("setLabel", &ToggleButton::setLabel)
 		.def("trigger", &ToggleButton::trigger)
 		.def("setOnChange", &ToggleButton::setOnChange, "onchange"_a, evt_reset)
-		.def_property("label", &ToggleButton::getLabel, &ToggleButton::setLabel)
 		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked);
 
 	py::class_t<CheckBox, Control>(m, "CheckBox")
 		.def(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "alignRight"_a = false, "onchange"_a = None, className, style)
-		.def("getLabel", &CheckBox::getLabel)
-		.def("setLabel", &CheckBox::setLabel)
 		.def("trigger", &CheckBox::trigger)
-		.def_property("label", &CheckBox::getLabel, &CheckBox::setLabel)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked);
 
 	py::class_t<Img, Control>(m, "Img")
 		.def(py::init<pycref, pyobj, pyobj>(), "src"_a, className, style)
 		.def_property("scalemode",
-			[](Img &self) { return (int)self.ctrl().GetScaleMode(); },
-			[](Img &self, int value) { return self.ctrl().SetScaleMode((wxStaticBitmap::ScaleMode)value); });
+			[](Img *self) { return (int)self->ctrl().GetScaleMode(); },
+			[](Img *self, int value) { return self->ctrl().SetScaleMode((wxStaticBitmap::ScaleMode)value); });
 
 	py::class_t<Text, Control>(m, "Text")
-		.def(py::init<wxcstr, pyobj, pyobj>(), label, className, style)
-		.def("getLabel", &Text::getLabel)
-		.def("setLabel", &Text::setLabel)
-		.def_property("label", &Text::getLabel, &Text::setLabel);
+		.def(py::init<wxcstr, pyobj, pyobj>(), label, className, style);
 
 	py::class_t<TextInput, Control>(m, "TextInput")
 		.def(py::init<wxcstr, wxcstr, bool, bool, long, pyobj, pyobj>(),
@@ -256,14 +244,14 @@ void init_controls(py::module & m)
 		.def("setOnChange", &SpinCtrl::setOnChange, evt_fn, evt_reset)
 		.def("setOnEnter", &SpinCtrl::setOnEnter, evt_fn, evt_reset)
 		.def_property("value", 
-			[](SpinCtrl &self) { return self.ctrl().GetValue(); },
-			[](SpinCtrl &self, int value) { return self.ctrl().SetValue(value); })
+			[](SpinCtrl *self) { return self->ctrl().GetValue(); },
+			[](SpinCtrl *self, int value) { return self->ctrl().SetValue(value); })
 		.def_property("min",
-			[](SpinCtrl &self) { return self.ctrl().GetMin(); },
-			[](SpinCtrl &self, int value) { return self.ctrl().SetMin(value); })
+			[](SpinCtrl *self) { return self->ctrl().GetMin(); },
+			[](SpinCtrl *self, int value) { return self->ctrl().SetMin(value); })
 		.def_property("max",
-			[](SpinCtrl &self) { return self.ctrl().GetMax(); },
-			[](SpinCtrl &self, int value) { return self.ctrl().SetMax(value); });
+			[](SpinCtrl *self) { return self->ctrl().GetMax(); },
+			[](SpinCtrl *self, int value) { return self->ctrl().SetMax(value); });
 
 	py::class_t<ColorPicker, Control>(m, "ColorPicker")
 		.def(py::init<uint, pyobj, pyobj, pyobj>(),
@@ -325,9 +313,9 @@ void init_controls(py::module & m)
 		.def(py::init<wxcstr, pyobj, pyobj, pyobj, pyobj>(),
 			"type"_a="readonly", choices, onselect, className, style)
 		.def("setOnEnter", &ComboBox::setOnEnter, evt_fn, evt_reset)
-		.def("autoComplete", &ComboBox::autoComplete)
-		.def("popup", [](ComboBox &self) { self.ctrl().Popup(); })
-		.def("dismiss", [](ComboBox &self) { self.ctrl().Dismiss(); })
+		.def("auto_complete", &ComboBox::auto_complete)
+		.def("popup", [](ComboBox *self) { self->ctrl().Popup(); })
+		.def("dismiss", [](ComboBox *self) { self->ctrl().Dismiss(); })
 		.def_property("value", &ComboBox::getValue, &ComboBox::setValue);
 
 	py::class_t<RadioBox, ItemContainer>(m, "RadioBox")
@@ -362,55 +350,55 @@ void init_controls(py::module & m)
 	py::class_t<TreeCtrl, Control>(m, "TreeCtrl")
 		.def(py::init<long, pyobj, pyobj>(),
 			"wxstyle"_a=0, className, style)
-		.def("AssignImageList", [](TreeCtrl &self, wxImageList *imageList) {
-			self.ctrl().AssignImageList(imageList);
+		.def("AssignImageList", [](TreeCtrl *self, wxImageList *imageList) {
+			self->ctrl().AssignImageList(imageList);
 		})
-		.def("AddRoot", [](TreeCtrl &self, wxcstr text, int image, int selectedImage, pycref data) {
-			return self.ctrl().AddRoot(text, image, selectedImage, data.is_none() ? NULL: new PyTreeItemData(data));
+		.def("AddRoot", [](TreeCtrl *self, wxcstr text, int image, int selectedImage, pycref data) {
+			return self->ctrl().AddRoot(text, image, selectedImage, data.is_none() ? NULL: new PyTreeItemData(data));
 		}, text, image, selectedImage, data)
-		.def("InsertItem", [](TreeCtrl &self, const wxTreeItemId& parent, wxcstr text, int image, int selectedImage, pycref data, int pos) {
-			return self.ctrl().InsertItem(parent, pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
+		.def("InsertItem", [](TreeCtrl *self, const wxTreeItemId& parent, wxcstr text, int image, int selectedImage, pycref data, int pos) {
+			return self->ctrl().InsertItem(parent, pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
 		}, "parent"_a, text, image, selectedImage, data, pos)
 
-		.def("GetItemData", [](TreeCtrl &self, const wxTreeItemId& item) { 
-			PyTreeItemData *data = (PyTreeItemData*)self.ctrl().GetItemData(item);
+		.def("GetItemData", [](TreeCtrl *self, const wxTreeItemId& item) { 
+			PyTreeItemData *data = (PyTreeItemData*)self->ctrl().GetItemData(item);
 			return data ? data->GetData(): None;
 		})
 
-		.def("Delete", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Delete(item); })
-		.def("DeleteChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().DeleteChildren(item); })
-		.def("DeleteAllItems", [](TreeCtrl &self) { self.ctrl().DeleteAllItems(); })
+		.def("Delete", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().Delete(item); })
+		.def("DeleteChildren", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().DeleteChildren(item); })
+		.def("DeleteAllItems", [](TreeCtrl *self) { self->ctrl().DeleteAllItems(); })
 
-		.def("Expand", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Expand(item); })
-		.def("ExpandAllChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().ExpandAllChildren(item); })
-		.def("ExpandAll", [](TreeCtrl &self) { self.ctrl().ExpandAll(); })
-		.def("Collapse", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Collapse(item); })
-		.def("CollapseAllChildren", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().CollapseAllChildren(item); })
-		.def("CollapseAll", [](TreeCtrl &self) { self.ctrl().CollapseAll(); })
-		.def("CollapseAndReset", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().CollapseAndReset(item); })
-		.def("Toggle", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().Toggle(item); })
+		.def("Expand", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().Expand(item); })
+		.def("ExpandAllChildren", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().ExpandAllChildren(item); })
+		.def("ExpandAll", [](TreeCtrl *self) { self->ctrl().ExpandAll(); })
+		.def("Collapse", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().Collapse(item); })
+		.def("CollapseAllChildren", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().CollapseAllChildren(item); })
+		.def("CollapseAll", [](TreeCtrl *self) { self->ctrl().CollapseAll(); })
+		.def("CollapseAndReset", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().CollapseAndReset(item); })
+		.def("Toggle", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().Toggle(item); })
 
-		.def("Unselect", [](TreeCtrl &self) { self.ctrl().Unselect(); })
-		.def("UnselectAll", [](TreeCtrl &self) { self.ctrl().UnselectAll(); })
-		.def("SelectItem", [](TreeCtrl &self, const wxTreeItemId& item, bool select = true) { self.ctrl().SelectItem(item, select); }, "item"_a, "select"_a=true)
-		.def("SelectChildren", [](TreeCtrl &self, const wxTreeItemId& parent) { self.ctrl().SelectChildren(parent); })
-		.def("ToggleItemSelection", [](TreeCtrl &self, const wxTreeItemId& item) { self.ctrl().ToggleItemSelection(item); })
+		.def("Unselect", [](TreeCtrl *self) { self->ctrl().Unselect(); })
+		.def("UnselectAll", [](TreeCtrl *self) { self->ctrl().UnselectAll(); })
+		.def("SelectItem", [](TreeCtrl *self, const wxTreeItemId& item, bool select = true) { self->ctrl().SelectItem(item, select); }, "item"_a, "select"_a=true)
+		.def("SelectChildren", [](TreeCtrl *self, const wxTreeItemId& parent) { self->ctrl().SelectChildren(parent); })
+		.def("ToggleItemSelection", [](TreeCtrl *self, const wxTreeItemId& item) { self->ctrl().ToggleItemSelection(item); })
 		.def("setOnItemActivated", &TreeCtrl::setOnItemActivated, evt_fn, evt_reset)
 
-		/*.def("GetCount", [](TreeCtrl &self) { return self.ctrl().GetCount(); })
-		.def("GetIndent", [](TreeCtrl &self) { return self.ctrl().GetIndent(); })
-		.def("SetIndent", [](TreeCtrl &self, unsigned int indent) { self.ctrl().SetIndent(indent); })
-		.def("GetSpacing", [](TreeCtrl &self) { return self.ctrl().GetSpacing(); })
-		.def("SetSpacing", [](TreeCtrl &self, unsigned int spacing) { self.ctrl().SetSpacing(spacing); })*/
+		/*.def("GetCount", [](TreeCtrl *self) { return self->ctrl().GetCount(); })
+		.def("GetIndent", [](TreeCtrl *self) { return self->ctrl().GetIndent(); })
+		.def("SetIndent", [](TreeCtrl *self, unsigned int indent) { self->ctrl().SetIndent(indent); })
+		.def("GetSpacing", [](TreeCtrl *self) { return self->ctrl().GetSpacing(); })
+		.def("SetSpacing", [](TreeCtrl *self, unsigned int spacing) { self->ctrl().SetSpacing(spacing); })*/
 		
-		.def_property_readonly("count", [](TreeCtrl &self) { return self.ctrl().GetCount(); })
+		.def_property_readonly("count", [](TreeCtrl *self) { return self->ctrl().GetCount(); })
 		.def_property("indent", 
-			[](TreeCtrl &self) { return self.ctrl().GetIndent(); },
-			[](TreeCtrl &self, unsigned int indent) { self.ctrl().SetIndent(indent); }
+			[](TreeCtrl *self) { return self->ctrl().GetIndent(); },
+			[](TreeCtrl *self, unsigned int indent) { self->ctrl().SetIndent(indent); }
 		)
 		.def_property("spacing",
-			[](TreeCtrl &self) { return self.ctrl().GetSpacing(); },
-			[](TreeCtrl &self, unsigned int spacing) { self.ctrl().SetSpacing(spacing); }
+			[](TreeCtrl *self) { return self->ctrl().GetSpacing(); },
+			[](TreeCtrl *self, unsigned int spacing) { self->ctrl().SetSpacing(spacing); }
 		);
 
 		py::class_<wxTreeEvent, wxEvent>(m, "TreeEvent")

@@ -314,8 +314,8 @@ void init_datacontrols(py::module &m)
 		.def("setOnColClick", &ListView::setOnColClick, "callback"_a, evt_reset)
 		.def("setOnColRightClick", &ListView::setOnColRightClick, "callback"_a, evt_reset)
 		.def_property("focused_item",
-			[](ListView &self) { return self.ctrl().GetFocusedItem(); },
-			[](ListView &self, long value) { self.ctrl().Focus(value); });
+			[](ListView *self) { return self->ctrl().GetFocusedItem(); },
+			[](ListView *self, long value) { self->ctrl().Focus(value); });
 
 	py::class_<wxListEvent, wxEvent>(m, "ListEvent")
 		.def_property_readonly("keycode", &wxListEvent::GetKeyCode)

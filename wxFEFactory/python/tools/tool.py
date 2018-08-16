@@ -21,7 +21,9 @@ class BaseTool(BaseScene):
                     if win:
                         ui.AuiItem(win, caption=self.unique_title)
             else:
-                win = self.render()
+                with frame.win:
+                    win = self.render()
+                win.float_on_parent = True
             if win:
                 win.setOnClose({'callback': self.onClose, 'arg_event': True})
                 self.win = win

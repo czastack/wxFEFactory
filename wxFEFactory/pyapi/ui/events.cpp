@@ -15,5 +15,5 @@ void init_events(py::module & m)
 
 	py::class_<wxKeyEvent, wxEvent>(m, "KeyEvent")
 		.def("GetKeyCode", &wxKeyEvent::GetKeyCode)
-		.def("GetModifiers", [](wxKeyEvent &event) {return event.GetModifiers(); event.ResumePropagation(1); });
+		.def("GetModifiers", [](wxKeyEvent *event) {return event->GetModifiers(); event->ResumePropagation(1); });
 }
