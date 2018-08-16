@@ -167,7 +167,10 @@ View * AuiNotebook::getPage(int n)
 
 void AuiNotebook::_removePage(int n)
 {
-	pyCall(m_children.attr("remove"), py::cast(getPage(n)));
+	auto page = py::cast(getPage(n));
+	if (m_children.contains(page)) {
+		pyCall(m_children.attr("remove"), page);
+	}
 }
 
 void AuiNotebook::OnPageClose(wxAuiNotebookEvent & event)

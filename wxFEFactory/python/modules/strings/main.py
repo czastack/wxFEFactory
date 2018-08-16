@@ -20,7 +20,7 @@ class Module(BaseListBoxModuel):
             count += 1
 
     def render_main(self):
-        with ui.FlexGridLayout(cols=2, vgap=10, className="expand container") as infobar:
+        with ui.FlexGridLayout(cols=2, vgap=10, className="expand padding") as infobar:
             ui.Text("地址", className="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True, className="expand")
             ui.Text("代码", className="vcenter input_label")
@@ -28,7 +28,7 @@ class Module(BaseListBoxModuel):
 
             infobar.AddGrowableCol(1)
             infobar.AddGrowableRow(1)
-            
+
         self.textarea = ui.TextInput(multiline=True, className="fill")
         with ui.Horizontal(className="expand"):
             ui.ComboBox(type="readonly", className="fill")
@@ -120,7 +120,7 @@ class Module(BaseListBoxModuel):
 
     def readFrom(self, reader):
         unique = False
-        
+
         choice = exui.CheckChoiceDialog(self.unique_title, (
             ('unique', '是否过滤重复文本？'),
             ('show_addr', '是否显示文本在rom中的地址'),
@@ -130,10 +130,10 @@ class Module(BaseListBoxModuel):
         if not choice.showModal():
             print("取消操作")
             return
-        
+
         ptr = reader.text_table_start
         i = 0
-        names = [] # ListBox中显示的列表项文本
+        names = []  # ListBox中显示的列表项文本
         codes = None
         cur_count = self.listbox.count
 
@@ -147,7 +147,7 @@ class Module(BaseListBoxModuel):
         while True:
             addr = reader.read32(ptr)
             high = (addr >> 24) & 0xF
-            
+
             if not (high is 8 or high is 9):
                 # 读取结束
                 break

@@ -21,7 +21,7 @@ class BaseHackTool(NestedTool):
     def render(self):
         with self.render_win() as win:
             with ui.Vertical():
-                with ui.Horizontal(className="expand container"):
+                with ui.Horizontal(className="expand padding"):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
                     self.render_top_button()
                     self.attach_status_view = ui.Text("", className="vcenter grow left_padding")

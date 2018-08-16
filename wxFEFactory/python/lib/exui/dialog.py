@@ -16,9 +16,9 @@ class StdDialog(ui.Dialog):
 
         super().__enter__()
         with ui.Vertical(className="fill"):
-            self.view = (ui.ScrollView if scrollable else ui.Vertical)(className="fill container")
+            self.view = (ui.ScrollView if scrollable else ui.Vertical)(className="fill padding")
 
-            with ui.Horizontal(className="container right") as footer:
+            with ui.Horizontal(className="padding right") as footer:
                 if cancel:
                     ui.Button(label="取消").id = wxconst.ID_CANCEL
                 if ok:

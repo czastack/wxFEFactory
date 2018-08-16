@@ -117,12 +117,12 @@ class Main(BaseGTATool):
     def render_weapon(self):
         self.weapon_views = []
         player = self.weak._player
-        with ui.Vertical(className="fill container"):
+        with ui.Vertical(className="fill padding"):
             self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
             with self.weapon_model_book:
                 for category in datasets.WEAPON_LIST:
                     with ui.Vertical():
-                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as view:
+                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as view:
                             view.AddGrowableCol(1)
                             for item in category[1]:
                                 self.weapon_views.append(WeaponWidget(player, *item))
@@ -166,9 +166,9 @@ class Main(BaseGTATool):
 
     def render_ped_model(self):
         from .datasets.player_models import PLAYER_MODELS
-        with ui.Horizontal(className="fill container"):
+        with ui.Horizontal(className="fill padding"):
             self.player_model_book = render_tab_list(PLAYER_MODELS)
-            with ui.ScrollView(className="fill container"):
+            with ui.ScrollView(className="fill padding"):
                 ui.Text("1. 切换模型会失去武器")
                 ui.Text("2. 切换动物模型容易引发bug，请慎用")
                 ui.Text("3. 在陆地上使用鱼类模型会突然失去梦想，请注意")
@@ -196,7 +196,7 @@ class Main(BaseGTATool):
             weapon = weapon_map[item[0]]
             weapon_components.append((weapon[1], item[1], weapon[2]))
 
-        with ui.Vertical(className="fill container"):
+        with ui.Vertical(className="fill padding"):
             self.weapon_component_book = render_tab_list(weapon_components)
             # self.weapon_component_book.setToolTip("选中后回车键给与配件")
             with ui.Horizontal():

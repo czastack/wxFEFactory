@@ -1,6 +1,6 @@
 from lib.hack.models import Model, Field, CoordField, ArrayField
 from lib.lazy import lazy
-from lib.utils import float32, u32, tuple2rgb, rgb2tuple
+from lib.utils import float32, tuple2rgb, rgb2tuple
 from ..gta_base import utils
 from ..gta_base.models import Physicle, Pool, NativeModel64 as NativeModel
 import math

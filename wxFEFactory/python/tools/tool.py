@@ -16,14 +16,13 @@ class BaseTool(BaseScene):
     def attach(self, frame):
         try:
             if self.nested:
-                with frame.book:
-                    win = self.render()
-                    if win:
+                win = self.render()
+                if win:
+                    with frame.book:
                         ui.AuiItem(win, caption=self.unique_title)
             else:
                 with frame.win:
                     win = self.render()
-                win.float_on_parent = True
             if win:
                 win.setOnClose({'callback': self.onClose, 'arg_event': True})
                 self.win = win
@@ -102,10 +101,13 @@ class BaseTool(BaseScene):
         2. 手动调用self.closeWindow(菜单)，由parent.closePage内调用window的onClose触发
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
-        if self.nested and event and event.id is not 0:
-            # 第一种情况阻止关闭
-            alert('请通过菜单过Tab上的关闭按钮关闭')
-            return False
+        if self.nested:
+            if event and event.id is not 0:
+                # 第一种情况阻止关闭
+                alert('请通过菜单过Tab上的关闭按钮关闭')
+                return False
+        elif self.win.parent:
+            self.win.parent.children.remove(self.win)
 
         close_callbacks = getattr(self, '_close_callbacks', None)
         if close_callbacks:

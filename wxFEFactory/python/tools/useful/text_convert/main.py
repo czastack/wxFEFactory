@@ -7,14 +7,10 @@ from fefactory_api import ui
 
 class Main(BaseTool):
     def render(self):
-        input_style = {
-            'height': 60,
-        }
-
         with ui.Window(self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
                 wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT) as win:
             with ui.Vertical():
-                with ui.FlexGridLayout(cols=2, vgap=10, className="fill container") as container:
+                with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as container:
                     ui.Text("Rom", className="vcenter")
                     self.rom_picker = ui.FilePickerCtrl(wildcard="*.gba|*.gba", className="fill")
                     ui.Text("码表", className="vcenter")
@@ -22,7 +18,7 @@ class Main(BaseTool):
                     ui.Text("文本")
                     self.text_view = ui.TextInput(className="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
                     ui.Text("码表编码")
-                    self.code_view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, multiline=True)
+                    self.code_view = ui.TextInput(className="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
                     ui.Text("哈夫曼编码  ")
                     self.haff_view = ui.TextInput(className="fill", multiline=True, readonly=True,
                         wxstyle=wxconst.TE_PROCESS_ENTER)

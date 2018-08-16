@@ -3,7 +3,7 @@ from lib.hack.models import (
     ModelField, ModelPtrField, FieldPrep, SignedField, ManagedModel
 )
 from lib.hack.handlers.localhandler import LocalHandler, LocalModel
-from lib.utils import LOWORD, HIWORD
+from lib.hack.utils import loword, hiword
 import random
 
 
@@ -168,9 +168,9 @@ class PokemonStruct(LocalModel):
                 temp = pdwPokemon[n]
                 temp ^= dwXorMask
                 pdwPokemon[n] = temp
-                wChecksum += LOWORD(temp) + HIWORD(temp)
+                wChecksum += loword(temp) + hiword(temp)
 
-            Header.wChecksum = LOWORD(wChecksum)
+            Header.wChecksum = loword(wChecksum)
             self.bEncoded = False
 
     def Encode(self):
@@ -191,10 +191,10 @@ class PokemonStruct(LocalModel):
 
         for n in range(len(pdwPokemon)):
             temp = pdwPokemon[n]
-            wChecksum += LOWORD(temp) + HIWORD(temp)
+            wChecksum += loword(temp) + hiword(temp)
             pdwPokemon[n] = temp ^ dwXorMask
 
-        Header.wChecksum = LOWORD(wChecksum)
+        Header.wChecksum = loword(wChecksum)
         self.bEncoded = True
 
     def SetChar(self, char):
@@ -219,13 +219,13 @@ class PokemonStruct(LocalModel):
         if self.bEncoded:
             return
         dwChar, dwID = self.Header[('dwChar', 'dwID')]
-        wShiny = LOWORD(dwChar) ^ HIWORD(dwChar) ^ LOWORD(dwID) ^ HIWORD(dwID)
+        wShiny = loword(dwChar) ^ hiword(dwChar) ^ loword(dwID) ^ hiword(dwID)
         return wShiny <= 0x07
 
     def GenShinyID(self):
         dwChar, dwID = self.Header[('dwChar', 'dwID')]
-        dwShinyId = LOWORD(dwID) ^ LOWORD(dwChar) ^ HIWORD(dwChar) ^ random.randint(0, 7)
-        dwShinyId = (dwShinyId << 16) | LOWORD(dwID)
+        dwShinyId = loword(dwID) ^ loword(dwChar) ^ hiword(dwChar) ^ random.randint(0, 7)
+        dwShinyId = (dwShinyId << 16) | loword(dwID)
         return dwShinyId
 
     def GenNoShinyID(self):
@@ -233,8 +233,8 @@ class PokemonStruct(LocalModel):
         if wNoShinyRand == 0:
             wNoShinyRand = 8
         dwChar, dwID = self.Header[('dwChar', 'dwID')]
-        dwNoShinyId = LOWORD(dwID) ^ LOWORD(dwChar) ^ HIWORD(dwChar)
-        dwNoShinyId = ((dwNoShinyId ^ wNoShinyRand) << 16) | LOWORD(dwID)
+        dwNoShinyId = loword(dwID) ^ loword(dwChar) ^ hiword(dwChar)
+        dwNoShinyId = ((dwNoShinyId ^ wNoShinyRand) << 16) | loword(dwID)
         return dwNoShinyId
 
     def GetPersonality(self):

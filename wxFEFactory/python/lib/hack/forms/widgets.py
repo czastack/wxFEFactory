@@ -306,9 +306,9 @@ class Group(BaseGroup):
         this = self.weak
         with ui.Vertical(className="fill") as root:
             if self.hasheader:
-                self.header = ui.Horizontal(className="expand container")
+                self.header = ui.Horizontal(className="expand padding")
 
-            with ui.ScrollView(className="fill container") as content:
+            with ui.ScrollView(className="fill padding") as content:
                 if self.flexgrid:
                     self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
                     if self.horizontal:
@@ -321,7 +321,7 @@ class Group(BaseGroup):
                     self.view = content
 
             if self.hasfooter:
-                with ui.Horizontal(className="expand container") as footer:
+                with ui.Horizontal(className="expand padding") as footer:
                     ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
                     ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
                     if self.serializable:
@@ -373,7 +373,7 @@ class StaticGroup(Group):
 class GroupBox(BaseGroup):
     def render(self):
         with ui.StaticBox(self.label, className="fill") as root:
-            self.view = ui.ScrollView(className="fill container")
+            self.view = ui.ScrollView(className="fill padding")
 
         self.root = root
 

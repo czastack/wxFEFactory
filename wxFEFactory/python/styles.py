@@ -16,7 +16,7 @@ elif screen_width <= 2560:
     btn_md_width = 100
     dialog_width = 800
     dialog_height = 600
-else: # elif screen_width <= 3840:
+else:  # elif screen_width <= 3840:
     btn_width = 100
     btn_xs_width = 60
     btn_sm_width = 100
@@ -48,36 +48,36 @@ styles = {
         },
         'grow': {'flex': 1},
         'expand': {'expand': True},
-        'vcenter': {'verticalAlign': 'middle'},
+        'vcenter': {'vertical-align': 'middle'},
         'right': {'align': 'right'},
         'button': {
             'flex': 1,
             'width': btn_width,
         },
-        'container': {
+        'padding': {
             'padding': 10,
-            'showPadding': '1',
+            'padding-flag': '1',
         },
         'padding_label': {
             'padding': 8,
-            'showPadding': '1 1 0 1',
+            'padding-flag': '1 1 0 1',
         },
         'input_label': {
             'padding': 8,
-            'showPadding': '1 1 0 1',
-            'textAlign': 'right',
+            'padding-flag': '1 1 0 1',
+            'text-align': 'right',
         },
         'input_label_vertical': {
             'padding': 5,
-            'showPadding': '0 0 1 0',
+            'padding-flag': '0 0 1 0',
         },
         'form_label': {
             'padding': 8,
-            'showPadding': '0 1 0 1',
-            'textAlign': 'right',
+            'padding-flag': '0 1 0 1',
+            'text-align': 'right',
         },
-        'top_padding': {'padding': 10, 'showPadding': '1 0 0 0'},
-        'left_padding': {'padding': 10, 'showPadding': '0 0 0 1'},
+        'top_padding': {'padding': 10, 'padding-flag': '1 0 0 0'},
+        'left_padding': {'padding': 10, 'padding-flag': '0 0 0 1'},
         'btn_xs': btn_xs_style,
         'btn_sm': btn_sm_style,
         'btn_md': btn_md_style,

@@ -71,10 +71,10 @@ class Main(BaseGTA3Tool):
             Input("money", "金钱", address.MONEY)
 
         with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill container"):
+            with ui.Horizontal(className="fill padding"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill container"):
+                with ui.ScrollView(className="fill padding"):
                     self.render_common_text()
 
         with StaticGroup("测试"):
@@ -83,7 +83,7 @@ class Main(BaseGTA3Tool):
                 self.set_buttons_contextmenu()
 
         with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
-            with ui.Vertical(className="fill container"):
+            with ui.Vertical(className="fill padding"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def weapon_max(self, _=None):

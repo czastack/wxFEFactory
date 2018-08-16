@@ -1,6 +1,7 @@
 from functools import partial
 from lib import utils
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelCoordWidget
+from lib.hack.utils import u32bytes
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
@@ -181,7 +182,7 @@ class Main(BaseGTATool):
 
         # script hash获取native函数地址的机器码
         self.FUNCTION_FIND_NATIVE_ADDRESS = (
-            b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + utils.u32bytes(address.FindNativeAddress) +
+            b'\x55\x8B\xEC\x83\xEC\x08\x56\xC7\x45\xF8' + u32bytes(address.FindNativeAddress) +
             b'\xC7\x45\xFC\x00\x00\x00\x00\x56\x8B\x75\x08\xFF\x55\xF8\x5E\x89\x45\xFC\x8B\x45\xFC\x5E\x8B\xE5\x5D\xC3'
         )
 

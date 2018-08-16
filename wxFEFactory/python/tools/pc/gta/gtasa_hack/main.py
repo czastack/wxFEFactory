@@ -148,7 +148,7 @@ class Main(BaseGTA3_VC_SA_Tool):
             Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
         with StaticGroup("作弊"):
-            with ui.Vertical(className="fill container"):
+            with ui.Vertical(className="fill padding"):
                 with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     self.cheat_views = [
                         ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
@@ -159,7 +159,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                     ]
                     ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
                     ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
-                with ui.Horizontal(className="container"):
+                with ui.Horizontal(className="padding"):
                     ui.Button("同步", onclick=self.cheat_sync)
 
         with Group(None, "女友进度", 0):
@@ -169,10 +169,10 @@ class Main(BaseGTA3_VC_SA_Tool):
                 Input(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
 
         with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill container"):
+            with ui.Horizontal(className="fill padding"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill container"):
+                with ui.ScrollView(className="fill padding"):
                     self.render_common_text()
                     ui.Text("根据左边列表生产载具: alt+V")
                     ui.Text("瞬移到地图指针处: ctrl+alt+g")
@@ -193,7 +193,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                 self.set_buttons_contextmenu()
 
         with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
-            with ui.Vertical(className="fill container"):
+            with ui.Vertical(className="fill padding"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):

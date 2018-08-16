@@ -9,13 +9,13 @@
 
 #define STYLE_WIDTH          wxT("width")
 #define STYLE_HEIGHT         wxT("height")
-#define STYLE_MAXWIDTH       wxT("maxWidth")
-#define STYLE_MAXHEIGHT      wxT("maxHeight")
-#define STYLE_MINWIDTH       wxT("minWidth")
-#define STYLE_MINHEIGHT      wxT("minHeight")
+#define STYLE_MAXWIDTH       wxT("max-width")
+#define STYLE_MAXHEIGHT      wxT("max-height")
+#define STYLE_MINWIDTH       wxT("min-width")
+#define STYLE_MINHEIGHT      wxT("min-height")
 #define STYLE_BACKGROUND     wxT("background")
 #define STYLE_COLOR          wxT("color")
-#define STYLE_FONTSIZE       wxT("fontSize")
+#define STYLE_FONTSIZE       wxT("font-size")
 #define STYLE_FONT           wxT("font")
 #define STYLE_LEFT           wxT("left")
 #define STYLE_RIGHT          wxT("right")
@@ -24,11 +24,11 @@
 #define STYLE_EXPAND         wxT("expand")
 #define STYLE_FLEX           wxT("flex")
 #define STYLE_PADDING        wxT("padding")
-#define STYLE_SHOWPADDING    wxT("showPadding")
+#define STYLE_SHOWPADDING    wxT("padding-flag")
 #define STYLE_ALIGN          wxT("align")
-#define STYLE_VERTICALALIGN  wxT("verticalAlign")
-#define STYLE_TEXTALIGN      wxT("textAlign")
-#define STYLE_FLEXDIRECTION  wxT("flexDirection")
+#define STYLE_VERTICALALIGN  wxT("vertical-align")
+#define STYLE_TEXTALIGN      wxT("text-align")
+#define STYLE_FLEXDIRECTION  wxT("flex-direction")
 
 /**
 styles {
@@ -44,7 +44,7 @@ styles {
 	margin,
 	padding,
 	flex,
-	verticalAlign: ['top', 'bottom', 'center'],
+	vertical-align: ['top', 'bottom', 'center'],
 	align: ['left', 'right', 'center'],
 }
 */

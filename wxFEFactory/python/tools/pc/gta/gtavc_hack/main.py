@@ -73,7 +73,7 @@ class Main(BaseGTA3Tool):
                 )
 
         with StaticGroup("作弊"):
-            with ui.Vertical(className="fill container"):
+            with ui.Vertical(className="fill padding"):
                 with ui.GridLayout(cols=4, vgap=10, className="expand"):
                     SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                     SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
@@ -84,11 +84,11 @@ class Main(BaseGTA3Tool):
                     SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
         with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill container"):
+            with ui.Horizontal(className="fill padding"):
                 self.spawn_vehicle_id_view = ui.ListBox(className="expand",
                     onselect=self.on_spawn_vehicle_id_change,
                     choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill container"):
+                with ui.ScrollView(className="fill padding"):
                     self.render_common_text()
                     ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
 
@@ -98,7 +98,7 @@ class Main(BaseGTA3Tool):
                 self.set_buttons_contextmenu()
 
         with StaticGroup("工具"):
-            with ui.Vertical(className="fill container"):
+            with ui.Vertical(className="fill padding"):
                 ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):

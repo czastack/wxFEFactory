@@ -22,18 +22,17 @@ class Main(BaseTool):
     def render(self):
         with ui.HotkeyWindow(self.title, style=win_style, styles=styles, menubar=self.render_menu(),
                 wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT) as win:
-            with ui.Vertical(className="container"):
-                with ui.Vertical(className="container fill"):
+            with ui.Vertical(className="padding"):
+                with ui.Vertical(className="fill padding"):
                     self.input = ui.TextInput(className="expand", multiline=True, style={'height': 200})
                     self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
                     with ui.Horizontal(className="expand top_padding"):
                         ui.Button("输入", onclick=self.input_text)
-                    with ui.ScrollView(className="fill container"):
+                    with ui.ScrollView(className="fill padding"):
                         ui.Text("切换上一个: alt+[")
                         ui.Text("切换下一个: alt+]")
                         ui.Text("切换并粘贴上一个: alt+shift+[")
                         ui.Text("切换并粘贴下一个: alt+shift+]")
-        # win.keeptop = True
         return win
 
     def input_text(self, _=None):

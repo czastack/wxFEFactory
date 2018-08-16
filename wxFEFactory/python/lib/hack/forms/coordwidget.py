@@ -47,7 +47,7 @@ class CoordWidget(TwoWayWidget):
                                 views.append(ui.TextInput(className="fill"))
                             exui.Label("名称")
                             self.name_view = ui.TextInput(className="fill")
-                        with ui.Horizontal(className="expand container") as container:
+                        with ui.Horizontal(className="expand padding") as container:
                             self.render_btn()
                             ui.Button(label="添加", className="button", onclick=this.onAdd)
                             ui.Button(label="更新", className="button", onclick=this.onUpdate)

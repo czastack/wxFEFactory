@@ -1,5 +1,5 @@
 from lib.hack.models import Model, Field, ByteField, WordField, CoordField, ManagedModelPtrField
-from lib.utils import u32
+from lib.hack.utils import u32
 from ..gta_base.models import Physicle, WeaponSet, Pool
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 from . import address

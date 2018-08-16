@@ -77,6 +77,29 @@ class OptionProvider(BaseItemProvider):
         self._choices, self._values = split_label_value(self.datas)
 
 
+def u32(n):
+    """截取32位整型"""
+    return n & 0xFFFFFFFF
+
+
+def loword(n):
+    """低字"""
+    return n & 0xFFFF
+
+
+def hiword(n):
+    """高字"""
+    return (n >> 16) & 0xFFFF
+
+
+def u32bytes(n):
+    """32位整型转bytes"""
+    try:
+        return n.to_bytes(4, 'little')
+    except Exception:
+        return struct.pack('L', n)
+
+
 def strhex(n, size=0):
     """把整型转成对齐的hex字符串
     :param size: 字节数

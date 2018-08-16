@@ -67,29 +67,6 @@ def float32(f):
     return round(f, 6)
 
 
-def u32(n):
-    """截取32位整型"""
-    return n & 0xFFFFFFFF
-
-
-def LOWORD(n):
-    """低字"""
-    return n & 0xFFFF
-
-
-def HIWORD(n):
-    """高字"""
-    return (n >> 16) & 0xFFFF
-
-
-def u32bytes(n):
-    """32位整型转bytes"""
-    try:
-        return n.to_bytes(4, 'little')
-    except Exception:
-        return struct.pack('L', n)
-
-
 def tuple2rgb(rgbtuple):
     """颜色3元组转整型rgb"""
     return rgbtuple[0] << 16 | rgbtuple[1] << 8 | rgbtuple[2]

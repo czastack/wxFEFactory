@@ -1,6 +1,5 @@
 from functools import partial
-from lib.hack.utils import align4
-from lib.utils import u32
+from lib.hack import utils
 from fefactory_api import ui
 from .hacktool import BaseHackTool
 
@@ -71,21 +70,18 @@ class AssemblyHacktool(BaseHackTool):
 
         if is_inserted:
             # 计算jump地址, 5是jmp opcode的长度
-            diff_new = u32(memory - (addr + 5))
-            diff_back = u32(addr + len(original) - (memory + len(assembly) + 5))
+            diff_new = utils.u32(memory - (addr + 5))
+            diff_back = utils.u32(addr + len(original) - (memory + len(assembly) + 5))
             # 填充的NOP
             replace_padding = b'\x90' * (len(original) - len(raplace) - 5)
             raplace = raplace + b'\xe9' + diff_new.to_bytes(4, 'little') + replace_padding
             assembly = assembly + b'\xe9' + diff_back.to_bytes(4, 'little')
 
             if memory == self.next_usable_memory:
-                self.next_usable_memory += align4(len(assembly))
+                self.next_usable_memory += utils.align4(len(assembly))
 
             self.handler.write(memory, assembly)
 
-        # from lib.gba.utils import bytes_beautify
-        # print(bytes_beautify(assembly))
-        # print(bytes_beautify(raplace))
         self.handler.write(addr, raplace)
 
     def unregister_assembly(self, key):
