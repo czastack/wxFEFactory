@@ -1,14 +1,8 @@
 import re
-import struct
 
 
 def is_bytes(data):
     return data and hasattr(data, '__iter__') and type(data[0]) is int
-
-
-def r1(data):
-    """先输出低字节的HEX"""
-    return bytes_hex(struct.pack('L', data))
 
 
 def rol(a, n, N=32):

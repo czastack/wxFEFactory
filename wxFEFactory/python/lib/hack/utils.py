@@ -78,7 +78,7 @@ class OptionProvider(BaseItemProvider):
 
 
 def strhex(n, size=0):
-    """
+    """把整型转成对齐的hex字符串
     :param size: 字节数
     """
     if size is 0:

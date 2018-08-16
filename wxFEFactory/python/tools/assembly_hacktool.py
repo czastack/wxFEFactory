@@ -58,6 +58,7 @@ class AssemblyHacktool(BaseHackTool):
         if key in self.registed_assembly:
             data = self.registed_assembly[key]
             addr = data['addr']
+            original = data['original']
             memory = data['memory']
         else:
             addr = self.find_address(original, find_start, find_end, find_range_from_base)
