@@ -67,5 +67,4 @@ class Main(BaseNesHack):
 
     def pull_through(self, _=None):
         for person in self.persons():
-            person.set_with("体力最大值", "体力当前值")
-            person.set_with("气力最大值", "气力当前值")
+            person.set_with("体力最大值", "体力当前值").set_with("气力最大值", "气力当前值")

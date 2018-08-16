@@ -67,8 +67,7 @@ class Main(BaseGbaHack):
         )
 
     def pull_through(self, _):
-        self._global.set_with('hp', 'hpmax')
-        self._global.set_with('mp', 'mpmax')
+        self._global.set_with('hp', 'hpmax').set_with('mp', 'mpmax')
 
     def set_monster_flag(self, _):
         """全怪物数据"""

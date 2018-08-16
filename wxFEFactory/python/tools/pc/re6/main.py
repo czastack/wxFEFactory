@@ -32,8 +32,8 @@ class Main(NativeHacktool):
             Choice("角色", datasets.PERSONS, self.weak.on_person_change)
             ModelInput("health")
             ModelInput("health_max")
-            ModelInput("melee")
-            ModelInput("melee_max")
+            ModelInput("stamina")
+            ModelInput("stamina_max")
             ModelInput("moving_speed")
             ModelInput("rapid_fire")
             ModelInput("is_wet")
@@ -158,7 +158,7 @@ class Main(NativeHacktool):
         self.ingame_item.fromhex(fefactory_api.get_clipboard())
 
     def pull_through(self, _=None):
-        self.person.set_with('health', 'health_max')
+        self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
 
     def pull_through_all(self, _=None):
         character_struct = self._global.character_struct

@@ -68,6 +68,7 @@ class Model:
 
     def set_with(self, nameto, namefrom):
         setattr(self, nameto, getattr(self, namefrom))
+        return self
 
     def set_addr_by_index(self, i):
         self.addr = self.SIZE * i
