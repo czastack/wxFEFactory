@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from lib import extypes
+from lib import extypes, wxconst
 from styles import btn_xs_style
 from lib import exui
 from lib.extypes import WeakBinder
@@ -97,7 +97,7 @@ class InputConfig(ConfigCtrl):
     def render(self):
         self.render_lable()
         with ui.Horizontal(className="fill"):
-            self.view = ui.TextInput(className="fill", wxstyle=0x0400)
+            self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
 

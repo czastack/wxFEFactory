@@ -120,7 +120,7 @@ class SearchDialog(StdDialog):
 
         with self:
             with ui.Horizontal(className='expand'):
-                self.input = ui.TextInput(className='fill', wxstyle=0x0400)
+                self.input = ui.TextInput(className='fill', wxstyle=wxconst.TE_PROCESS_ENTER)
                 ui.Button(label="搜索", className='btn_sm', onclick=self.weak.onenter)
             self.listbox = ui.ListBox(className='fill', onselect=onselect)
             self.input.setOnEnter(self.weak.onenter)

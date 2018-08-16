@@ -3,7 +3,7 @@ from application import app
 from project import Project
 from modules import modules
 from fe.ferom import FeRomRW
-from lib import exui, extypes
+from lib import exui, extypes, wxconst
 from lib.win32.keys import WXK
 import os
 import traceback
@@ -76,7 +76,8 @@ class MainFrame:
                 with ui.Vertical(className="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
-                        self.console_input = ui.TextInput(wxstyle=0x0400, className="expand console-input")
+                        self.console_input = ui.TextInput(wxstyle=wxconst.TE_PROCESS_ENTER,
+                            className="expand console-input")
                         ui.Button("∧", className="btn-sm", onclick=self.toggle_consol_input_multi)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)

@@ -1,4 +1,4 @@
-from lib import exui, utils, lazy
+from lib import exui, utils, lazy, wxconst
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from styles import btn_xs_style
@@ -417,10 +417,10 @@ class BaseInput(TwoWayWidget):
         super().render()
         with ui.Horizontal(className="fill") as container:
             if self.spin:
-                self.view = ui.SpinCtrl(className="fill", wxstyle=0x4400, min=self.min,
-                    max=self.max or (1 << (self.size << 3) - 1) - 1)
+                self.view = ui.SpinCtrl(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER | wxconst.SP_ARROW_KEYS,
+                    min=self.min, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
-                self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=self.readonly)
+                self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
@@ -702,7 +702,7 @@ class BaseChoiceDisplay(Widget):
     def render(self):
         super().render()
         with ui.Horizontal(className="fill") as container:
-            self.view = ui.TextInput(className="fill", wxstyle=0x0400, readonly=True)
+            self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
         self.container = container

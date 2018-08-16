@@ -20,11 +20,12 @@ class Main(BaseTool):
                     ui.Text("码表", className="vcenter")
                     self.dict_picker = ui.FilePickerCtrl(className="fill")
                     ui.Text("文本")
-                    self.text_view = ui.TextInput(className="fill", multiline=True, wxstyle=0x0400)
+                    self.text_view = ui.TextInput(className="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
                     ui.Text("码表编码")
-                    self.code_view = ui.TextInput(className="fill", wxstyle=0x0400, multiline=True)
+                    self.code_view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, multiline=True)
                     ui.Text("哈夫曼编码  ")
-                    self.haff_view = ui.TextInput(className="fill", multiline=True, readonly=True, wxstyle=0x0400)
+                    self.haff_view = ui.TextInput(className="fill", multiline=True, readonly=True,
+                        wxstyle=wxconst.TE_PROCESS_ENTER)
                     container.AddGrowableCol(1)
                     for i in (2, 3, 4):
                         container.AddGrowableRow(i)
