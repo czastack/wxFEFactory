@@ -1,4 +1,5 @@
 from styles import dialog_style, styles
+from lib import wxconst
 from lib.win32.keys import VK
 from fefactory_api import auto, ui
 from tools.tool import BaseTool
