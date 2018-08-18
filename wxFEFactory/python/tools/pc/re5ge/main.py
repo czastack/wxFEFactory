@@ -5,12 +5,12 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.assembly_hacktool import AssemblyHacktool
+from tools.native_hacktool import NativeHacktool
 from fefactory_api import ui
 from . import models, datasets
 
 
-class Main(AssemblyHacktool):
+class Main(NativeHacktool):
     CLASS_NAME = 'MTFramework'
     WINDOW_NAME = 'RESIDENT EVIL 5'
 
@@ -87,7 +87,7 @@ class Main(AssemblyHacktool):
             ('弹药不减', ('ammo_keep', b'\x2B\x44\x24\x08\x89\x41\x08', 0x800000, 0x900000, NOP_7, None, True)),
             ('无限弹药', ('infinity_ammo', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
                 b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', True, True)),
-            ('快速发射', ('fast_shoot', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, 0x900000,
+            ('快速射击', ('fast_shoot', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, 0x900000,
                 b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', True, True, True)),
             ('佣兵模式时间不减', ('merce_timer_keep', b'\xF3\x0F\x11\x87\xDC\x04\x00\x00', 0x300000, 0x400000,
                 NOP_8, None, True)),
@@ -191,6 +191,8 @@ class Main(AssemblyHacktool):
 
     def show_ingame_item(self, view, instance, prop):
         """显示物品详情对话框"""
+        if callable(instance):
+            instance = instance()
         item = getattr(instance, prop)
         if item and item.addr:
             self.ingame_item.addr = item.addr
@@ -215,6 +217,8 @@ class Main(AssemblyHacktool):
 
     # def show_inventory_treasure_item(self, view, instance, prop):
     #     """显示整理界面物品详情对话框"""
+    #     if callable(instance):
+    #         instance = instance()
     #     item = getattr(instance, prop)
     #     if item and item.addr:
     #         self.inventory_treasure_item.addr = item.addr
