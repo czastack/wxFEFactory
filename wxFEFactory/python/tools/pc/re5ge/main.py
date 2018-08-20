@@ -256,3 +256,12 @@ class Main(NativeHacktool):
     def p2_go_p1(self, _):
         chars = self._global.character_struct.chars
         chars[1].coord = chars[0].coord.values()
+
+    def set_ingame_item(self, type, quantity, max_quantity, slot, fire_power=0, reload_speed=0, capacity=0,
+            critical=0, piercing=0, scope=0, char_addr=0):
+        char_addr = char_addr or self.person.addr
+        func_addr = self.get_cached_address('_set_ingame_item', b'\x8B\x44\x24\x48\x8B\x54\x24\x44\x50',
+            0x800000, 0x900000)
+        if func_addr > 0:
+            self.native_call_auto(func_addr, '18L', type, quantity, max_quantity, 0, 0, slot, fire_power, 0,
+                reload_speed, capacity, 0, critical, piercing, 0, scope, char_addr, 8, 0, this=char_addr + 0x21A0)

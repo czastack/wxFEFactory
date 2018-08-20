@@ -199,6 +199,29 @@ class Main(NativeHacktool):
             if config.weapon_ability[i]:
                 person.items[i].enabled = True
 
+    @property
+    def saved_item_manager(self):
+        addr = self.handler.remote_call(0x4F7230, 0)
+        addr = self.handler.read32(addr + 0x658)
+        return models.SavedItemManager(addr, self.handler)
+
     def set_ingame_item(self, slot, type, ammo, character=0):
+        """设置物品 TODO: 加载物品模型"""
         func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
         self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.person.addr)
+
+    def set_ingame_saved_item(self, slot, type, quantity=0):
+        """检查点间有效"""
+        targets = []
+        temp = self.saved_item_manager
+        targets.append(temp.saved_items[self.char_index].items[slot])
+        targets.append(temp.saved_items2[self.char_index].items[slot])
+        targets.append(self._global.character_config.saved_item_manager.saved_items2[self.char_index].items[slot])
+        for item in targets:
+            item.type = type
+            if quantity:
+                item.quantity = quantity
+
+    def give_rocket_launcher(self):
+        """给予火箭发射器，从检查点重新开始生效"""
+        self.set_ingame_saved_item(12, 0x11b, 1)

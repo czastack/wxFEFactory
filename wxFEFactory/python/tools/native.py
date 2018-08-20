@@ -8,12 +8,12 @@ class NativeContext(Model):
     """原生函数调用的环境
     GTAIV中的实现拿来用
     """
-    SIZE = 76
+    SIZE = 140
 
     m_pReturn = Field(0)                                               # void * m_pReturn;              // 00-04
     m_nArgCount = Field(4)                                             # unsigned int m_nArgCount;      // 04-08
     m_pArgs = Field(8)                                                 # void * m_pArgs;                // 08-0C
-    m_TempStack = ArrayField(0x0C, 16, Field(0))                       # int m_TempStack[16];           // 0C-4C
+    m_TempStack = ArrayField(0x0C, 32, Field(0))                       # int m_TempStack[20];           // 0C-8C
 
     def __init__(self, addr, handler):
         super().__init__(addr, handler)

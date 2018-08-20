@@ -40,7 +40,25 @@ class SavedItem(Model):
 
 class SavedItems(Model):
     SIZE = 0x70
-    items = ArrayField(0x35E4 + 0x10, 24, ModelField(0, SavedItem))
+    items = ArrayField(0x10, 24, ModelField(0, SavedItem))
+
+
+class SavedItemManager(Model):
+    SIZE = 0
+    # 0x3CE4 * *(_DWORD *)(dword_17C345C + 0x20)
+    saved_items0 = ArrayField(0x5E8, 8, ModelField(0, SavedItems))
+    saved_items = ArrayField(0x20D8, 8, ModelField(0, SavedItems))
+    saved_items2 = ArrayField(0x35E4, 8, ModelField(0, SavedItems))
+
+
+class SavedItems2(Model):
+    SIZE = 0x60
+    items = ArrayField(0x4, 24, ModelField(0, SavedItem))
+
+
+class SavedItemManager2(Model):
+    SIZE = 40
+    saved_items = ArrayField(0, 24, ModelPtrField(0, SavedItems2))
 
 
 class CharacterStruct(Model):
@@ -56,7 +74,7 @@ class CharacterConfigItem(Model):
 
 class CharacterConfig(Model):
     chars = ArrayField(0x42d7c, 8, ModelField(0, CharacterConfigItem))
-    saved_items = ArrayField(0x3F798, 8, ModelField(0, SavedItems))  # 0x3CE4 * *(_DWORD *)(dword_17C345C + 0x20)
+    saved_item_manager = ModelField(0x3F798, SavedItemManager)
 
 
 class Enemy(Character):
@@ -83,3 +101,4 @@ class Global(Model):
     character_config = ModelPtrField(0x013C345C, CharacterConfig)
     enemy_data = ModelPtrField(0x13C33CC, EnemyData)
     char_skills = ArrayField((0x013C3414, 1832), 8, ArrayField(0, 3, Field(0)))
+    saved_item_manager2 = ModelField(0x1388D58, SavedItemManager2)
