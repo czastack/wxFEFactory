@@ -66,14 +66,7 @@ class CharacterStruct(Model):
     chars_count = Field(0x44, label="角色数量")
 
 
-class CharacterConfigItem(Model):
-    SIZE = 112
-    model = Field(0)
-    weapon_ability = ArrayField(16, 7, Field(0))
-
-
 class CharacterConfig(Model):
-    chars = ArrayField(0x42d7c, 8, ModelField(0, CharacterConfigItem))
     saved_item_manager = ModelField(0x3F798, SavedItemManager)
 
 

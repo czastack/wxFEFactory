@@ -568,10 +568,11 @@ class ArrayField(Cachable, Field):
     def __set_name__(self, owner, name):
         super().__set_name__(owner, name)
         if self.itemcachable:
+            # itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
     def create_cache(self, instance):
-        return ArrayData(self, instance, self.itemkeys)
+        return ArrayData(self, instance)
 
     def __set__(self, instance, value):
         if isinstance(value, bytes):
@@ -593,13 +594,9 @@ class ArrayField(Cachable, Field):
 
 
 class ArrayData:
-    def __init__(self, owner, instance, itemkeys):
-        """
-        :param itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
-        """
+    def __init__(self, owner, instance):
         self.owner = owner
         self.instance = instance
-        self.itemkeys = itemkeys
         if owner.field.size is 0:
             """传入了延迟设置size的field"""
             owner.field.__get__(instance)
@@ -616,8 +613,8 @@ class ArrayData:
             field.offset = offset[0:-1] + ((offset[-1] + field.size * i),)
         else:
             field.offset = offset + field.size * i
-        if self.itemkeys:
-            field.key = self.itemkeys[i]
+        if self.owner.itemkeys:
+            field.key = self.owner.itemkeys[i]
         return field
 
     def __getitem__(self, i):

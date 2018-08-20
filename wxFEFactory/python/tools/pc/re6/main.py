@@ -193,10 +193,10 @@ class Main(NativeHacktool):
 
     def unlock_guns(self, _):
         """解锁横向武器"""
-        config = self._global.character_config.chars[self.char_index]
+        items = self._global.character_config.saved_item_manager.saved_items2[self.char_index].items
         person = self.person
         for i in range(7):
-            if config.weapon_ability[i]:
+            if items[i].type:
                 person.items[i].enabled = True
 
     @property
