@@ -94,7 +94,7 @@ class Dicts:
     def __iter__(self):
         if not self._ref:
             self._ref = Dict()
-        
+
         for item in self.data:
             self._ref.__init__(item)
             yield self._ref
@@ -152,7 +152,16 @@ class BaseDataClass:
         return {field: getattr(self, field) for field in self.__slots__}
 
     def to_tuple(self):
-        return tuple(getattr(self, field) for field in self.__slots__)
+        return tuple(self)
+
+    def __iter__(self):
+        return (getattr(self, field) for field in self.__slots__)
+
+    def __getitem__(self, i):
+        return getattr(self, self.__slots__[i], self.default)
+
+    def __setitem__(self, i, value):
+        return setattr(self, self.__slots__[i], value)
 
     def __str__(self):
         return str(self.to_tuple())
@@ -161,8 +170,10 @@ class BaseDataClass:
         return self.__class__.__name__ + self.__str__()
 
     def __getattr__(self, name):
+        if self.defaults:
+            return self.defaults.get(name, self.default)
         return self.default
 
 
-def DataClass(name, fields, default=None):
-    return type(name, (BaseDataClass,), {'__slots__': tuple(fields), 'default': default})
+def DataClass(name, fields, default=None, defaults=None):
+    return type(name, (BaseDataClass,), {'__slots__': tuple(fields), 'default': default, 'defaults': defaults})

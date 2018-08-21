@@ -1,4 +1,5 @@
 from functools import partial
+from lib.extypes import DataClass
 from lib.hack import utils
 from fefactory_api import ui
 from .hacktool import BaseHackTool
@@ -23,14 +24,15 @@ class AssemblyHacktool(BaseHackTool):
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
-            for label, args in functions:
-                ui.ToggleButton(label=label, onchange=partial(__class__.toggle_assembly_function, self.weak, args=args))
+            for item in functions:
+                ui.ToggleButton(label=item.label, onchange=partial(
+                    __class__.toggle_assembly_function, self.weak, item=item))
 
-    def toggle_assembly_function(self, btn, args):
+    def toggle_assembly_function(self, btn, item):
         if btn.checked:
-            self.register_assembly(*args)
+            self.register_assembly(item)
         else:
-            self.unregister_assembly(args[0])
+            self.unregister_assembly(item.key)
 
     def insure_memory(self):
         if self.allocated_memory is None:
@@ -39,48 +41,44 @@ class AssemblyHacktool(BaseHackTool):
             self.registed_assembly = {}
             self.registed_variable = {}
 
-    def register_assembly(self, key, original, find_start, find_end, raplace, assembly=None,
-            find_range_from_base=True, is_inserted=False, only_replace_jump=False, args=()):
+    def register_assembly(self, item):
         """注册机器码修改
-        :param original: 原始数据
-        :param find_start: 原始数据查找起始
-        :param find_end: 原始数据查找结束
-        :param raplace: 原始数据替换为的内容
-        :param assembly: 写到新内存的内容
-        :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
-        :param is_inserted: 是否自动加入jmp代码
-        :param only_replace_jump: 只替换original前5个字节为jmp的内容
+        :param item: AssemblyItem
         """
         if not self.handler.active:
             return
 
-        if is_inserted and (len(original) - len(raplace)) < 5:
+        original = item.original
+        raplace = item.raplace
+        assembly = item.assembly
+
+        if item.is_inserted and (len(original) - len(raplace)) < 5:
             print("需要可用间隔大于5")
             return
 
         self.insure_memory()
 
-        if key in self.registed_assembly:
-            data = self.registed_assembly[key]
+        if item.key in self.registed_assembly:
+            data = self.registed_assembly[item.key]
             addr = data['addr']
             original = data['original']
             memory = data['memory']
         else:
-            addr = self.find_address(original, find_start, find_end, find_range_from_base)
+            addr = self.find_address(original, item.find_start, item.find_end, item.find_range_from_base)
             if addr is -1:
                 return
             memory = self.next_usable_memory
-            if only_replace_jump:
+            if item.only_replace_jump:
                 original = original[:len(raplace) + 5]
-            self.registed_assembly[key] = {'addr': addr, 'original': original, 'memory': memory, 'active': True}
+            self.registed_assembly[item.key] = {'addr': addr, 'original': original, 'memory': memory, 'active': True}
 
-        if is_inserted:
+        if item.is_inserted:
             # 使用参数(暂时支持4字节)
-            if args:
+            if item.args:
                 memory_conflict = memory == self.next_usable_memory
-                assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in args)
+                assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in item.args)
                 if memory_conflict:
-                    self.registed_assembly[key]['memory'] = memory = self.next_usable_memory
+                    self.registed_assembly[item.key]['memory'] = memory = self.next_usable_memory
 
             # 计算jump地址, 5是jmp opcode的长度
             diff_new = utils.u32(memory - (addr + 5))
@@ -129,3 +127,27 @@ class AssemblyHacktool(BaseHackTool):
     def get_variable(self, name):
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
+
+
+""" register_assembly 的参数类型
+    :param original: 原始数据
+    :param find_start: 原始数据查找起始
+    :param find_end: 原始数据查找结束
+    :param raplace: 原始数据替换为的内容
+    :param assembly: 写到新内存的内容
+    :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
+    :param is_inserted: 是否自动加入jmp代码
+    :param only_replace_jump: 只替换original前5个字节为jmp的内容
+"""
+AssemblyItem = DataClass(
+    'AssemblyItem',
+    ('key', 'label', 'original', 'find_start', 'find_end', 'raplace', 'assembly',
+        'find_range_from_base', 'is_inserted', 'only_replace_jump', 'args'),
+    defaults={
+        'assembly': None,
+        'find_range_from_base': True,
+        'is_inserted': False,
+        'only_replace_jump': False,
+        'args': ()
+    }
+)

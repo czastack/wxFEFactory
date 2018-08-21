@@ -1,4 +1,4 @@
-from .assembly_hacktool import AssemblyHacktool
+from .assembly_hacktool import AssemblyHacktool, AssemblyItem
 from .native import NativeContext
 import base64
 
