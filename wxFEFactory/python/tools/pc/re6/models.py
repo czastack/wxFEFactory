@@ -85,8 +85,8 @@ class EnemyData(Model):
     enemy_items = ArrayField(0x3C, 10, ModelPtrField(0, EnemyItem))
 
 
-class Money(Model):
-    money = Field(0x01C0, label="金钱")
+class SkillPoints(Model):
+    skill_points = Field(0x588, label="技能点数")
 
 
 class Global(Model):

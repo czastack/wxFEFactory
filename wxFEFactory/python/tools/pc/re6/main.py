@@ -25,8 +25,7 @@ class Main(NativeHacktool):
         person = (self._person, models.Character)
 
         with Group("player", "全局", self._global):
-            # ModelInput("money", "金钱", instance=self.money)
-            pass
+            ModelInput("skill_points", instance=(self._skill_points, models.SkillPoints))
 
         with Group("player", "角色", person):
             Choice("角色", datasets.PERSONS, self.weak.on_person_change)
@@ -75,11 +74,16 @@ class Main(NativeHacktool):
                 True, True)),
             ('佣兵模式时间不减', ('merce_timer_keep', b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00',
                 0x100000, 0x200000, NOP_8, None, True)),
+            ('血不减+一击必杀', ('god_on_hit_kill', b'\x66\x8b\x44\x24\x04\x66\x29\x81\x10\x0f\x00\x00', 0x600000, 0x700000,
+                b'', b'\x83\x79\x38\x01\x75\x0A\xC7\x81\x10\x0F\x00\x00\x00\x00\x00\x00', True, True)),
+            ('技能点数', ('skill_points', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00', 0x580000, 0x640000,
+                b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
+                True, True, False, ('skill_points_base',))),
         )
         super().render_assembly_functions(functions)
 
     def render_functions(self):
-        super().render_functions(('unlock_guns',))
+        super().render_functions(('unlock_guns', 'give_rocket_launcher'))
 
     def get_ingame_item_dialog(self):
         """物品信息对话框"""
@@ -128,6 +132,12 @@ class Main(NativeHacktool):
         if self.handler.active:
             return self._global.character_config.chars[self.char_index]
 
+    def _skill_points(self):
+        skill_points_base = self.get_variable('skill_points_base')
+        if skill_points_base:
+            return models.SkillPoints(self.handler.read32(skill_points_base), self.handler)
+        print('未初始化')
+
     @property
     def saved_items(self):
         return self._global.character_config.saved_items[self.char_index].items
@@ -150,6 +160,29 @@ class Main(NativeHacktool):
             dialog.show()
         else:
             print("没有数据")
+
+    @property
+    def saved_item_manager(self):
+        addr = self.handler.remote_call(0x4F7230, 0)
+        addr = self.handler.read32(addr + 0x658)
+        return models.SavedItemManager(addr, self.handler)
+
+    def set_ingame_item(self, slot, type, ammo, character=0):
+        """设置物品 TODO: 加载物品模型"""
+        func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
+        self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.person.addr)
+
+    def set_ingame_saved_item(self, slot, type, quantity=0):
+        """检查点间有效"""
+        targets = []
+        temp = self.saved_item_manager
+        targets.append(temp.saved_items[self.char_index].items[slot])
+        targets.append(temp.saved_items2[self.char_index].items[slot])
+        targets.append(self._global.character_config.saved_item_manager.saved_items2[self.char_index].items[slot])
+        for item in targets:
+            item.type = type
+            if quantity:
+                item.quantity = quantity
 
     def ingame_item_copy(self, _):
         fefactory_api.set_clipboard(self.ingame_item.hex())
@@ -185,11 +218,11 @@ class Main(NativeHacktool):
 
     def p1_go_p2(self, _):
         chars = self._global.character_struct.chars
-        chars[0].coord = chars[1].coord.values()
+        chars[self.char_index].coord = chars[self.char_index + 1].coord.values()
 
     def p2_go_p1(self, _):
         chars = self._global.character_struct.chars
-        chars[1].coord = chars[0].coord.values()
+        chars[self.char_index + 1].coord = chars[self.char_index].coord.values()
 
     def unlock_guns(self, _):
         """解锁横向武器"""
@@ -199,29 +232,6 @@ class Main(NativeHacktool):
             if items[i].type:
                 person.items[i].enabled = True
 
-    @property
-    def saved_item_manager(self):
-        addr = self.handler.remote_call(0x4F7230, 0)
-        addr = self.handler.read32(addr + 0x658)
-        return models.SavedItemManager(addr, self.handler)
-
-    def set_ingame_item(self, slot, type, ammo, character=0):
-        """设置物品 TODO: 加载物品模型"""
-        func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
-        self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.person.addr)
-
-    def set_ingame_saved_item(self, slot, type, quantity=0):
-        """检查点间有效"""
-        targets = []
-        temp = self.saved_item_manager
-        targets.append(temp.saved_items[self.char_index].items[slot])
-        targets.append(temp.saved_items2[self.char_index].items[slot])
-        targets.append(self._global.character_config.saved_item_manager.saved_items2[self.char_index].items[slot])
-        for item in targets:
-            item.type = type
-            if quantity:
-                item.quantity = quantity
-
-    def give_rocket_launcher(self):
-        """给予火箭发射器，从检查点重新开始生效"""
+    def give_rocket_launcher(self, _):
+        """火箭发射器(检查点)"""
         self.set_ingame_saved_item(12, 0x11b, 1)

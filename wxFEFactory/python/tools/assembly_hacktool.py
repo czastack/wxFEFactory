@@ -5,10 +5,12 @@ from .hacktool import BaseHackTool
 
 
 class AssemblyHacktool(BaseHackTool):
+    allocated_memory = None
+
     """现在支持x86 jmp"""
     def ondetach(self):
         super().ondetach()
-        memory = getattr(self, 'allocated_memory', None)
+        memory = self.allocated_memory
         if memory is not None:
             self.handler.free_memory(memory)
             self.allocated_memory = None
@@ -17,6 +19,7 @@ class AssemblyHacktool(BaseHackTool):
                 if value['active']:
                     self.unregister_assembly_item(value)
             self.registed_assembly = None
+            self.registed_variable = None
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
@@ -29,8 +32,15 @@ class AssemblyHacktool(BaseHackTool):
         else:
             self.unregister_assembly(args[0])
 
+    def insure_memory(self):
+        if self.allocated_memory is None:
+            # 初始化代码区 PAGE_EXECUTE_READWRITE
+            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, 0x40)
+            self.registed_assembly = {}
+            self.registed_variable = {}
+
     def register_assembly(self, key, original, find_start, find_end, raplace, assembly=None,
-            find_range_from_base=True, is_inserted=False, only_replace_jump=False):
+            find_range_from_base=True, is_inserted=False, only_replace_jump=False, args=()):
         """注册机器码修改
         :param original: 原始数据
         :param find_start: 原始数据查找起始
@@ -48,11 +58,7 @@ class AssemblyHacktool(BaseHackTool):
             print("需要可用间隔大于5")
             return
 
-        if getattr(self, 'allocated_memory', None) is None:
-            # 初始化代码区 PAGE_EXECUTE_READWRITE
-            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, 0x40)
-            self.registed_assembly = {}
-            self.registed_assembly_memory = {}
+        self.insure_memory()
 
         if key in self.registed_assembly:
             data = self.registed_assembly[key]
@@ -69,6 +75,13 @@ class AssemblyHacktool(BaseHackTool):
             self.registed_assembly[key] = {'addr': addr, 'original': original, 'memory': memory, 'active': True}
 
         if is_inserted:
+            # 使用参数(暂时支持4字节)
+            if args:
+                memory_conflict = memory == self.next_usable_memory
+                assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in args)
+                if memory_conflict:
+                    self.registed_assembly[key]['memory'] = memory = self.next_usable_memory
+
             # 计算jump地址, 5是jmp opcode的长度
             diff_new = utils.u32(memory - (addr + 5))
             diff_back = utils.u32(addr + len(original) - (memory + len(assembly) + 5))
@@ -103,3 +116,16 @@ class AssemblyHacktool(BaseHackTool):
         if find_end and find_range_from_base:
             find_end += base_addr
         return self.handler.find_bytes(original, find_start, find_end)
+
+    def register_variable(self, name, size=4):
+        """注册变量"""
+        self.insure_memory()
+        memory = self.registed_variable.get(name, None)
+        if memory is None:
+            memory = self.registed_variable[name] = self.next_usable_memory
+            self.next_usable_memory += utils.align4(size)
+        return memory
+
+    def get_variable(self, name):
+        if self.allocated_memory:
+            return self.registed_variable.get(name, None)
