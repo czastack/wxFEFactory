@@ -99,7 +99,7 @@ class MainFrame:
         self.win = win
         self.aui = aui
         self.console = console
-        fefactory_api.setConsoleElem(self.console_input, self.console_output)
+        fefactory_api.console.bind_elem(self.console_input, self.console_output)
         self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 

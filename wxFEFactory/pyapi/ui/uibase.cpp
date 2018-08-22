@@ -300,14 +300,14 @@ void View::applyStyle()
 	}
 }
 
-void View::setContextMenu(ContextMenu & menu)
+void View::setContextMenu(ContextMenu *menu)
 {
 	m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
 	m_elem->Bind(wxEVT_MENU, &View::onContextMenu, this);
 	m_contextmenu = py::cast(menu);
 }
 
-void View::onPopMenu(wxContextMenuEvent & event)
+void View::onPopMenu(wxContextMenuEvent &event)
 {
 	if (m_contextmenu)
 	{
@@ -315,7 +315,7 @@ void View::onPopMenu(wxContextMenuEvent & event)
 	}
 }
 
-void View::onContextMenu(wxCommandEvent & event)
+void View::onContextMenu(wxCommandEvent &event)
 {
 	if (m_contextmenu)
 	{
@@ -496,9 +496,9 @@ void Layout::setStyles(pycref styles)
 	relayout();
 }
 
-void Layout::remove_child(View & child)
+void Layout::remove_child(View *child)
 {
-	m_elem->RemoveChild(child);
+	m_elem->RemoveChild(*child);
 	m_children.attr("remove")(child);
 }
 

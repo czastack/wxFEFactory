@@ -5,21 +5,15 @@ class ConsoleHandler
 public:
 	ConsoleHandler();
 	~ConsoleHandler();
-
-	void setConsoleElem(wxTextCtrl* input, wxTextCtrl* output);
-
-	void OnConsoleInput(class wxCommandEvent &event) { consoleInput(event.GetString()); }
-	void OnConsoleInputKey(class wxKeyEvent &event);
-	void OnConsoleInputPaste(class wxClipboardTextEvent &event);
-	void consoleInput(wxcstr line);
-	void consoleWrite(wxcstr text);
-	void consoleWriteln(wxcstr text);
-	void setConsoleInput(wxcstr text = wxEmptyString);
-
-	bool check()
-	{
-		return true;
-	}
+	void bindElem(wxTextCtrl* input, wxTextCtrl* output);
+	void input(wxcstr line);
+	void write(wxcstr text);
+	void writeln(wxcstr text);
+	void setInputValue (wxcstr text = wxEmptyString);
+	auto getHistory() { return m_history; }
+	void onInput(class wxCommandEvent &event) { input(event.GetString()); }
+	void onInputKey(class wxKeyEvent &event);
+	void onInputPaste(class wxClipboardTextEvent &event);
 private:
 	wxTextCtrl *m_input;
 	wxTextCtrl *m_output;

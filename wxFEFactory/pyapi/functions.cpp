@@ -11,7 +11,7 @@
 
 void log_message(wxcstr text)
 {
-	pyConsole.consoleWrite(text);
+	pyConsole.write(text);
 }
 
 
@@ -50,19 +50,19 @@ pyobj input_dialog(wxcstr title, wxcstr msg, wxcstr defaultValue)
 pyobj longtext_dialog(wxcstr title, wxcstr defaultValue, bool readonly, bool sm)
 {
 	// launch editor dialog
-	wxLongTextDialog dlg(title, defaultValue, readonly, sm);
+	wxLongTextDialog dialog(title, defaultValue, readonly, sm);
 
 	pyobj ret;
 	
-	if (dlg.ShowModal() == wxID_OK)
+	if (dialog.ShowModal() == wxID_OK)
 	{
-		ret = py::cast(dlg.GetValue());
+		ret = py::cast(dialog.GetValue());
 	}
 	else
 	{
 		ret = None;
 	}
-	dlg.Destroy();
+	dialog.Destroy();
 	return ret;
 }
 

@@ -28,35 +28,35 @@ ConsoleHandler::~ConsoleHandler() {
 	}
 }
 
-void ConsoleHandler::setConsoleElem(wxTextCtrl* input, wxTextCtrl* output)
+void ConsoleHandler::bindElem(wxTextCtrl* input, wxTextCtrl* output)
 {
 	m_input = input;
 	m_output = output;
 
-	input->Bind(wxEVT_TEXT_ENTER, &ConsoleHandler::OnConsoleInput, this);
-	input->Bind(wxEVT_CHAR, &ConsoleHandler::OnConsoleInputKey, this);
-	input->Bind(wxEVT_TEXT_PASTE, &ConsoleHandler::OnConsoleInputPaste, this);
+	input->Bind(wxEVT_TEXT_ENTER, &ConsoleHandler::onInput, this);
+	input->Bind(wxEVT_CHAR, &ConsoleHandler::onInputKey, this);
+	input->Bind(wxEVT_TEXT_PASTE, &ConsoleHandler::onInputPaste, this);
 
 	std::cout.rdbuf(output);
 	std::cerr.rdbuf(output);
 }
 
-void ConsoleHandler::OnConsoleInputKey(wxKeyEvent & event)
+void ConsoleHandler::onInputKey(wxKeyEvent & event)
 {
 	int code = event.GetKeyCode();
 	if (code == WXK_TAB)
 		m_input->AppendText(_T("    "));
 	else if (code == WXK_UP)
-		setConsoleInput(m_history->prev());
+		setInputValue(m_history->prev());
 	else if (code == WXK_DOWN)
-		setConsoleInput(m_history->next());
+		setInputValue(m_history->next());
 	else if (code == WXK_CONTROL_L && event.m_controlDown)
 		m_output->Clear();
 	else
 		event.Skip();
 }
 
-void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
+void ConsoleHandler::onInputPaste(wxClipboardTextEvent & event)
 {
 	wxcstr text = get_clipboard();
 	if (text.Contains('\n'))
@@ -75,7 +75,7 @@ void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
 
 			if (i < text.size())
 			{
-				consoleInput(line);
+				input(line);
 			}
 			else
 			{
@@ -84,7 +84,7 @@ void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
 			++i;
 			start = i;
 		}
-		setConsoleInput(line);
+		setInputValue(line);
 	}
 	else
 	{
@@ -92,7 +92,7 @@ void ConsoleHandler::OnConsoleInputPaste(wxClipboardTextEvent & event)
 	}
 }
 
-void ConsoleHandler::consoleWrite(wxcstr text)
+void ConsoleHandler::write(wxcstr text)
 {
 	if (m_output)
 	{
@@ -113,12 +113,12 @@ void ConsoleHandler::consoleWrite(wxcstr text)
 	}
 }
 
-void ConsoleHandler::consoleWriteln(wxcstr text)
+void ConsoleHandler::writeln(wxcstr text)
 {
-	consoleWrite(text + _T('\n'));
+	write(text + _T('\n'));
 }
 
-void ConsoleHandler::setConsoleInput(wxcstr text)
+void ConsoleHandler::setInputValue(wxcstr text)
 {
 	int n = text.Length();
 	if (n)
@@ -128,10 +128,10 @@ void ConsoleHandler::setConsoleInput(wxcstr text)
 	}
 }
 
-void ConsoleHandler::consoleInput(wxcstr line)
+void ConsoleHandler::input(wxcstr line)
 {
-	consoleWrite(PS1);
-	consoleWriteln(line);
+	write(PS1);
+	writeln(line);
 	if (!line.IsEmpty())
 	{
 		m_history->Add(line);

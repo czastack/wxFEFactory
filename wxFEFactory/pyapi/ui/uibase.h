@@ -103,11 +103,11 @@ public:
 		return m_elem->GetBackgroundColour().GetRGB();
 	}
 
-	void setContextMenu(ContextMenu &menu);
+	void setContextMenu(ContextMenu *menu);
 
-	void onPopMenu(wxContextMenuEvent& event);
+	void onPopMenu(wxContextMenuEvent &event);
 
-	void onContextMenu(wxCommandEvent& event);
+	void onContextMenu(wxCommandEvent & vent);
 
 	pyobj getTypeName() {
 		pyobj self = py::cast(this);
@@ -340,7 +340,7 @@ public:
 
 	virtual void relayout() {}
 
-	void remove_child(View &child);
+	void remove_child(View *child);
 
 	void clear_children();
 
