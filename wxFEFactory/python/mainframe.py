@@ -371,7 +371,7 @@ styles = {
         'console-input': {'expand': True, 'flex': 1},
         'console-input-bar': {'show-padding': '1 0 0 0'},
         'console-input-multi': {'height': 100},
-        'btn-sm': {'width': 30},
+        'btn-sm': {'width': 34},
     }
 }
 

@@ -6,21 +6,27 @@ from .hacktool import BaseHackTool
 
 
 class AssemblyHacktool(BaseHackTool):
+    """现在支持x86 jmp"""
     allocated_memory = None
 
-    """现在支持x86 jmp"""
+    def reset(self):
+        self.allocated_memory = None
+        self.next_usable_memory = None
+        self.registed_assembly = None
+        self.registed_variable = None
+
+    def onattach(self):
+        super().onattach()
+        self.reset()
+
     def ondetach(self):
         super().ondetach()
-        memory = self.allocated_memory
-        if memory is not None:
-            self.handler.free_memory(memory)
-            self.allocated_memory = None
-            self.next_usable_memory = None
+        if self.allocated_memory is not None:
+            self.handler.free_memory(self.allocated_memory)
             for key, value in self.registed_assembly.items():
                 if value['active']:
                     self.unregister_assembly_item(value)
-            self.registed_assembly = None
-            self.registed_variable = None
+            self.reset()
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
