@@ -50,6 +50,12 @@ public:
 		m_index = 0;
 	}
 
+	void clear()
+	{
+		m_index = 0;
+		wxArrayString::clear();
+	}
+
 	void save(wxcstr fileName)
 	{
 		wxFile file(fileName, wxFile::write);

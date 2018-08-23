@@ -25,7 +25,7 @@ class Module(BaseListBoxModuel):
     def render_main(self):
         this = self.weak
         with ui.Horizontal(className="padding expand") as infobar:
-            ui.ComboBox(type="readonly", choices=('地址预览', *(key for key in config.ADDR_MAP)),
+            ui.ComboBox(wxstyle=wxconst.CB_READONLY, choices=('地址预览', *(key for key in config.ADDR_MAP)),
                 onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
             ui.Text("地址", className="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True)

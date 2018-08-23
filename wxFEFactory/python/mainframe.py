@@ -76,7 +76,7 @@ class MainFrame:
                 with ui.Vertical(className="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
                     with ui.Horizontal(className="expand console-input-bar"):
-                        self.console_input = ui.TextInput(wxstyle=wxconst.TE_PROCESS_ENTER,
+                        self.console_input = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
                             className="expand console-input")
                         ui.Button("∧", className="btn-sm", onclick=self.toggle_consol_input_multi)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
@@ -102,6 +102,9 @@ class MainFrame:
         fefactory_api.console.bind_elem(self.console_input, self.console_output)
         self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
+
+    def on_enter(self, _):
+        print(_)
 
     @property
     def module_names(self):

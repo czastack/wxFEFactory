@@ -609,26 +609,10 @@ class ComboBox : public ControlWithItems
 {
 public:
 	template <class... Args>
-	ComboBox(wxcstr type, pycref choices, pycref onselect, Args ...args) :
+	ComboBox(long wxstyle, pycref choices, pycref onselect, Args ...args) :
 		ControlWithItems(args...)
 	{
-		long style = 0L;
-		if (type == wxT("simple"))
-		{
-			style |= wxCB_SIMPLE;
-		}
-		else if (type == wxT("dropdown"))
-		{
-			style |= wxCB_DROPDOWN;
-		}
-		else if (type == wxT("processenter"))
-		{
-			style |= wxTE_PROCESS_ENTER;
-		}
-		else if (type == wxT("readonly")) {
-			style |= wxCB_READONLY;
-		}
-		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), style));
+		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), wxstyle));
 		bindEvt(wxEVT_COMBOBOX, onselect);
 	}
 

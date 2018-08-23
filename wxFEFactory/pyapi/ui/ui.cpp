@@ -10,7 +10,7 @@
 
 void Console__bind_elem(ConsoleHandler* self, View *input, View *output)
 {
-	self->bindElem((wxTextCtrl*)input->ptr(), (wxTextCtrl*)output->ptr());
+	self->bindElem((wxComboBox*)input->ptr(), (wxTextCtrl*)output->ptr());
 }
 
 

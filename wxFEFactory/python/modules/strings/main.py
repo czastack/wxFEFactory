@@ -1,7 +1,7 @@
 from ..module import BaseListBoxModuel
 from mainframe import ui
 from styles import dialog_style
-from lib import exui
+from lib import exui, wxconst
 import fefactory_api
 
 
@@ -31,7 +31,7 @@ class Module(BaseListBoxModuel):
 
         self.textarea = ui.TextInput(multiline=True, className="fill")
         with ui.Horizontal(className="expand"):
-            ui.ComboBox(type="readonly", className="fill")
+            ui.ComboBox(wxstyle=wxconst.CB_READONLY, className="fill")
             ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
             ui.Button(label="保存文件", className="button", onclick=self.onSave)
             ui.Button(label="另存为", className="button", onclick=self.onSaveAs)

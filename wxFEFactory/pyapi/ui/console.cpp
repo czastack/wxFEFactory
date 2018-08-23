@@ -1,3 +1,4 @@
+#include <wx/combobox.h>
 #include <wx/textctrl.h>
 #include "../pyutils.h"
 #include "../functions.h"
@@ -28,7 +29,7 @@ ConsoleHandler::~ConsoleHandler() {
 	}
 }
 
-void ConsoleHandler::bindElem(wxTextCtrl* input, wxTextCtrl* output)
+void ConsoleHandler::bindElem(wxComboBox* input, wxTextCtrl* output)
 {
 	m_input = input;
 	m_output = output;
@@ -36,6 +37,7 @@ void ConsoleHandler::bindElem(wxTextCtrl* input, wxTextCtrl* output)
 	input->Bind(wxEVT_TEXT_ENTER, &ConsoleHandler::onInput, this);
 	input->Bind(wxEVT_CHAR, &ConsoleHandler::onInputKey, this);
 	input->Bind(wxEVT_TEXT_PASTE, &ConsoleHandler::onInputPaste, this);
+	input->Bind(wxEVT_COMBOBOX_DROPDOWN, &ConsoleHandler::onDropdown, this);
 
 	std::cout.rdbuf(output);
 	std::cerr.rdbuf(output);
@@ -50,10 +52,21 @@ void ConsoleHandler::onInputKey(wxKeyEvent & event)
 		setInputValue(m_history->prev());
 	else if (code == WXK_DOWN)
 		setInputValue(m_history->next());
-	else if (code == WXK_CONTROL_L && event.m_controlDown)
+	else if (code == WXK_CONTROL_L && event.m_shiftDown)
+	{
+		m_output->Clear();
+		m_history->clear();
+	}
+	else if (code == WXK_CONTROL_L)
 		m_output->Clear();
 	else
 		event.Skip();
+}
+
+void ConsoleHandler::onDropdown(wxCommandEvent & event)
+{
+	m_input->Clear();
+	m_input->Insert(*m_history, 0);
 }
 
 void ConsoleHandler::onInputPaste(wxClipboardTextEvent & event)

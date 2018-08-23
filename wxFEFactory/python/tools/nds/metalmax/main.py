@@ -3,7 +3,7 @@ from lib.hack.forms import (
     Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
 )
 from lib.win32.keys import VK
-from lib import exui
+from lib import exui, wxconst
 from lib.exui.components import Pagination
 from fefactory_api import ui
 from functools import partial
@@ -254,7 +254,7 @@ class MetalMaxHack(BaseNdsHack):
             datasets = self.datasets
             with exui.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(type="dropdown", className="fill",
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(className="fill")

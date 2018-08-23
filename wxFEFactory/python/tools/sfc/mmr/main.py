@@ -4,7 +4,7 @@ from lib.hack.forms import (
     ModelChoiceDisplay, Choice
 )
 from lib.win32.keys import VK
-from lib import exui
+from lib import exui, wxconst
 from lib.exui.components import Pagination
 from functools import partial
 from fefactory_api import ui
@@ -139,7 +139,7 @@ class Main(BaseSfcHack):
         if dialog is None:
             with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(type="dropdown", className="fill",
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(className="fill")

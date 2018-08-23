@@ -1,6 +1,6 @@
 from fefactory_api import ui
 from lib.extypes import WeakBinder
-from lib import exui
+from lib import exui, wxconst
 
 
 class PresetDialog:
@@ -20,7 +20,7 @@ class PresetDialog:
             with exui.StdDialog(self.label, style={'width': 1300, 'height': 900},
                     closable=False, cancel=False) as dialog:
                 with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(type="dropdown", className="fill", 
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
                         onselect=weak.on_search_select)
                     ui.Button("搜索", onclick=weak.on_search)
                 dialog.listview = listview = ui.ListView(className="fill")
