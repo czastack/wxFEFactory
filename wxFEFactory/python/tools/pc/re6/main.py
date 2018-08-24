@@ -112,6 +112,7 @@ class Main(NativeHacktool):
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
+            (VK.MOD_ALT, VK.E, this.set_ammo_one),
             (VK.MOD_ALT, VK.R, this.set_ammo_full),
             (VK.MOD_ALT, VK.getCode(','), this.save_coord),
             (VK.MOD_ALT, VK.getCode('.'), this.load_coord),
@@ -202,6 +203,10 @@ class Main(NativeHacktool):
     def set_ammo_full(self, _):
         person = self.person
         person.items[person.cur_item].set_with('quantity', 'max_quantity')
+
+    def set_ammo_one(self, _):
+        person = self.person
+        person.items[person.cur_item].quantity = 1
 
     def save_coord(self, _):
         self.last_coord = self.person.coord.values()
