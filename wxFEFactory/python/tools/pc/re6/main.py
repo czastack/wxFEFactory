@@ -234,10 +234,12 @@ class Main(NativeHacktool):
             self.person.coord = self.last_coord
 
     def p1_go_p2(self, _):
+        self._person()  # 确保当前角色正确
         chars = self._global.character_struct.chars
         chars[self.char_index].coord = chars[self.char_index + 1].coord.values()
 
     def p2_go_p1(self, _):
+        self._person()  # 确保当前角色正确
         chars = self._global.character_struct.chars
         chars[self.char_index + 1].coord = chars[self.char_index].coord.values()
 
