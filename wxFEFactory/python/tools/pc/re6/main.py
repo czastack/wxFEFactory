@@ -28,7 +28,7 @@ class Main(NativeHacktool):
             ModelInput("skill_points", instance=(self._skill_points, models.SkillPoints))
 
         with Group("player", "角色", person):
-            Choice("角色", datasets.PERSONS, self.weak.on_person_change)
+            self.char_choice = Choice("角色", datasets.PERSONS, self.weak.on_person_change)
             ModelInput("health")
             ModelInput("health_max")
             ModelInput("stamina")
@@ -128,7 +128,15 @@ class Main(NativeHacktool):
 
     def _person(self):
         if self.handler.active:
-            return self._global.character_struct.chars[self.char_index]
+            chars = self._global.character_struct.chars
+            person = chars[self.char_index]
+            if person.addr is 0:
+                for i in range(len(datasets.PERSONS)):
+                    if chars[i].addr:
+                        self.char_choice.index = self.char_index = i
+                        person = chars[i]
+                        break
+            return person
 
     def _person_config(self):
         if self.handler.active:
@@ -212,15 +220,18 @@ class Main(NativeHacktool):
         self.last_coord = self.person.coord.values()
 
     def load_coord(self, _):
-        person = self.person
-        self.prev_coord = person.coord.values()
-        person.coord = self.last_coord
+        if hasattr(self, 'last_coord'):
+            person = self.person
+            self.prev_coord = person.coord.values()
+            person.coord = self.last_coord
 
     def undo_coord(self, _):
-        self.person.coord = self.prev_coord
+        if hasattr(self, 'prev_coord'):
+            self.person.coord = self.prev_coord
 
     def reload_coord(self, _):
-        self.person.coord = self.last_coord
+        if hasattr(self, 'last_coord'):
+            self.person.coord = self.last_coord
 
     def p1_go_p2(self, _):
         chars = self._global.character_struct.chars
