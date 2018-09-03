@@ -29,7 +29,7 @@ class Main(BaseHackTool):
             ModelInput("hp_zero", "ZERO HP")
             ModelInput("hpmax_zero", "ZERO最大HP")
 
-        with Group("player", "全局", self._global, handler=self.handler):
+        with Group("global", "全局", self._global, handler=self.handler):
             ModelInput("metal", "金属")
             ModelInput("resurgence", "复活晶片")
             ModelInput("joint_attack", "双人合击气槽")
