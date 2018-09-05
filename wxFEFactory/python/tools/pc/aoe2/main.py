@@ -29,6 +29,7 @@ class Main(BaseHackTool):
 
         with Group("unit", "选中单位", (self._unit, models.Unit), handler=self.handler):
             ModelInput("hp")
+            ModelInput("resource")
             ModelInput("selected")
 
         with Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), handler=self.handler):
@@ -67,7 +68,7 @@ class Main(BaseHackTool):
 
     def _unit(self):
         if self.handler.active:
-            return self._global.select_units[0]
+            return self._global.selected_units[0]
 
     def _unit_type(self):
         if self.handler.active:
@@ -75,6 +76,14 @@ class Main(BaseHackTool):
             return unit and unit.type
 
     resources = property(_resources)
+
+    @property
+    def selected_units(self):
+        for unit in self._global.selected_units:
+            if not unit.addr:
+                break
+            if unit.selected:
+                yield unit
 
     def pull_through(self, _=None):
         _global = self._global
