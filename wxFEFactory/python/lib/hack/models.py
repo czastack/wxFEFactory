@@ -41,19 +41,23 @@ class Model:
         return self.__class__(self.addr, self.handler)
 
     def addrof(self, field):
-        offset = self.offsetof(field)
-        if offset is None:
-            def func(item, attr, is_int):
-                if is_int:
-                    return item.addr_at(attr)
-                else:
-                    return item & attr
+        if isinstance(field, str):
+            temp = self.field(field)
+            if temp is None:
+                def func(item, attr, is_int):
+                    if is_int:
+                        return item.addr_at(attr)
+                    else:
+                        return item & attr
 
-            result = self.handle_comlex_attr(field, func)
-            if result is not COMLEX_ATTR_NONE:
-                return result
-        else:
-            return self.addr + offset
+                result = self.handle_comlex_attr(field, func)
+                if result is not COMLEX_ATTR_NONE:
+                    return result
+            else:
+                field = temp
+
+        if field:
+            return field.get_addr(self)
 
     def offsetof(self, field):
         if isinstance(field, str):

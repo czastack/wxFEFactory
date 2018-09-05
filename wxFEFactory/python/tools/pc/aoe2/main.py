@@ -25,9 +25,27 @@ class Main(BaseHackTool):
         with Group("population", "人口", (self._population_mgr, models.PopulationManager), handler=self.handler):
             ModelInput("current")
             ModelInput("total")
+            ModelInput("max")
 
-        with Group("unit", "选中单位", self._global, handler=self.handler):
-            pass
+        with Group("unit", "选中单位", (self._unit, models.Unit), handler=self.handler):
+            ModelInput("hp")
+            ModelInput("selected")
+
+        with Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), handler=self.handler):
+            ModelInput("hp_max")
+            ModelInput("view")
+            ModelInput("collision")
+            ModelInput("move_speed")
+            ModelInput("search")
+            ModelInput("work_efficiency")
+            ModelInput("short_defense")
+            ModelInput("far_defense")
+            ModelInput("atk")
+            ModelInput("range_max")
+            ModelInput("damage_radius")
+            ModelInput("damage_type")
+            ModelInput("atk_spped")
+            ModelInput("range_min")
 
     def onattach(self):
         super().onattach()
@@ -46,6 +64,15 @@ class Main(BaseHackTool):
     def _population_mgr(self):
         if self.handler.active:
             return self._global.population_mgr
+
+    def _unit(self):
+        if self.handler.active:
+            return self._global.select_units[0]
+
+    def _unit_type(self):
+        if self.handler.active:
+            unit = self._unit()
+            return unit and unit.type
 
     resources = property(_resources)
 
