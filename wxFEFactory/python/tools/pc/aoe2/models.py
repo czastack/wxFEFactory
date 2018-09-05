@@ -22,19 +22,26 @@ class PopulationManager(Model):
 class UnitType(Model):
     hp_max = WordField(0x2A, label="HP上限")
     view = FloatField(0x2C, label="视野")
+    shipload = ByteField(0x30, label="Shipload")
     collision = FloatField(0x34, label="碰撞")
     move_speed = FloatField(0xC8, label="移动速度")
     search = FloatField(0x104, label="搜索")
     work_efficiency = FloatField(0x108, label="工作效率")
-    short_defense = WordField((0x128, 2), label="近战防御")  # 近战防御指针(+2=近战防御)
+    short_def = WordField((0x128, 2), label="近战防御")  # 近战防御指针(+2=近战防御)
     atk = WordField((0x130, 6), label="攻击力")  # 攻击力指针？(+6=攻击)
+    atk2 = WordField((0x130, 10), label="攻击力2")
+    atk3 = WordField((0x130, 14), label="攻击力3")
     range_max = FloatField(0x138, label="最大射程")
     damage_radius = FloatField(0x13C, label="攻击范围")
     damage_type = Field(0x140, label="伤害方式")
     atk_spped = FloatField(0x144, label="攻击速度")
     range_min = FloatField(0x15C, label="最小射程")
+    base_def = WordField(0x160, label="基础防御")
+    base_atk = WordField(0x162, label="基础攻击")
+    range_base = FloatField(0x164, label="基础射程")
+    construction_time = WordField(0x182, label="建造时间")
 
-    def far_defense_addr(self, field):
+    def far_def_addr(self, field):
         """获取远程防御地址"""
         # 在近战防御基地址开始，往后对齐4字节检查数值3，3的后两个字节就是远程防御地址
         addr = self.handler.read_addr(self.addr + 0x128) + 4
@@ -43,7 +50,7 @@ class UnitType(Model):
                 return addr + 2
             addr += 4
 
-    far_defense = WordField(far_defense_addr, label="远程防御")
+    far_def = WordField(far_def_addr, label="远程防御")
 
 
 class Unit(Model):
@@ -54,6 +61,8 @@ class Unit(Model):
     selected = ByteField(0x36, label='选中状态')
     resource = FloatField(0x44, label='资源')
     ptr_unknow2 = Field(0x6C, label='不明指针2')
+    player_class = WordField((0xC, 0x9C), label='Player Class')
+    construction_progress = FloatField(0x1FC, label="建造进度")
 
 
 class Global(Model):
