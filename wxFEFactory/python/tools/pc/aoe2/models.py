@@ -65,7 +65,20 @@ class Unit(Model):
     construction_progress = FloatField(0x1FC, label="建造进度")
 
 
+class PlayerManager(Model):
+    population_mgr = ModelPtrField((0x4C, 0x4, 0xA8), PopulationManager)
+
+    v2 = Field(0x4C)
+    v3 = WordField(0x94)
+
+    @property
+    def adv_selected_unit(self):
+        addr = self.handler.read32(self.v2 + 4 * self.v3)
+        addr = self.handler.read32(addr + 0x01C0)
+        return Unit(addr, self.handler)
+
+
 class Global(Model):
     resources = ModelPtrField((0x00295794, 0xFC, 0xA8), ResourceManager)
-    population_mgr = ModelPtrField((0x003912A0, 0x424, 0x4C, 0x4, 0xA8), PopulationManager)
+    player_mgr = ModelPtrField((0x003912A0, 0x424), PlayerManager)
     selected_units = ArrayField(0x002B71A0, 30, ModelPtrField(0, Unit))

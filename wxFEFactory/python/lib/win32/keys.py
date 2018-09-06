@@ -69,7 +69,7 @@ class VK(KEY):
     DOWN = 40
     PRINT_SCREEN = 44
     INS = 45
-    DEL = 46
+    DELETE = 46
     LWIN = 91
     RWIN = 92
     NUMPAD0 = 96
