@@ -4,7 +4,7 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.native_hacktool import NativeHacktool
 from fefactory_api import ui
-from . import models
+from . import models, datasets
 import base64
 
 
@@ -64,7 +64,13 @@ class Main(NativeHacktool):
         ModelInput("construction_time")
 
     def render_functions(self):
-        super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy'))
+        with ui.Horizontal(className="fill padding"):
+            ui.ListBox(className="expand",
+                onselect=self.on_spawn_unit_type_change,
+                choices=(item[1] for item in datasets.UNITS))
+            with ui.Vertical(className="fill padding"):
+                super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
+                    'create_selected_unit_type'))
 
     def onattach(self):
         super().onattach()
@@ -122,6 +128,11 @@ class Main(NativeHacktool):
         if self.handler.active:
             return self._global.player_mgr.adv_selected_unit
 
+    def create_unit(self, type):
+        """创作指定类别单位"""
+        if self.handler.active:
+            self.handler.remote_call(self._create_unit, type)
+
     def pull_through(self, _):
         """选中单位恢复HP"""
         for unit in self.selected_units:
@@ -140,6 +151,9 @@ class Main(NativeHacktool):
         unit = self._adv_selected_unit
         if unit:
             unit.hp = 0
+
+    def on_spawn_unit_type_change(self, view):
+        self._spawn_unit_type = datasets.UNITS[view.index][0]
 
     def excute_cheet_code(self, code):
         """执行作弊代码
@@ -172,7 +186,8 @@ class Main(NativeHacktool):
         """暴怒男孩"""
         self.excute_cheet_code(0x7d)
 
-    def create_unit(self, type):
-        """创作指定类别单位"""
-        if self.handler.active:
-            self.handler.remote_call(self._create_unit, type)
+    def create_selected_unit_type(self, _):
+        """生成单位"""
+        type = getattr(self, '_spawn_unit_type', None)
+        if type:
+            self.create_unit(type)

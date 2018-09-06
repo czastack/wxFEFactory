@@ -34,7 +34,7 @@ class UnitType(Model):
     range_max = FloatField(0x138, label="最大射程")
     damage_radius = FloatField(0x13C, label="攻击范围")
     damage_type = Field(0x140, label="伤害方式")
-    atk_spped = FloatField(0x144, label="攻击速度")
+    atk_spped = FloatField(0x144, label="攻击硬直")  # 越小攻速越快(>0)
     range_min = FloatField(0x15C, label="最小射程")
     base_def = WordField(0x160, label="基础防御")
     base_atk = WordField(0x162, label="基础攻击")
