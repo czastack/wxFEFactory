@@ -5,10 +5,14 @@ from lib.win32.keys import VK
 from tools.native_hacktool import NativeHacktool
 from fefactory_api import ui
 from . import models
+import base64
 
 
 class Main(NativeHacktool):
     CLASS_NAME = WINDOW_NAME = 'Age of Empires II Expansion'
+
+    FUNC_CREATE_UNIT = base64.b64decode(b'VYvsoaASeQBWV2oAi4AkBAAAagJqAYPsCItATMdEJAQAAIC/i3AEuGB+VgDHBCQAAIC/am2LTnj/'
+        b'0Iv4hf90PotXQIvOiwZqAVL/dzyLgKwAAABS/3UI/9CL8GoAV4vOixaLkuAAAAD/0mgAAIC/aAAAgL9WuOCwTACLz//QX15dww==')
 
     def __init__(self):
         super().__init__()
@@ -65,6 +69,11 @@ class Main(NativeHacktool):
     def onattach(self):
         super().onattach()
         self._global.addr = self.handler.base_addr
+        self._create_unit = self.handler.write_function(self.FUNC_CREATE_UNIT)
+
+    def ondetach(self):
+        super().ondetach()
+        self.handler.free_memory(self._create_unit)
 
     def get_hotkeys(self):
         this = self.weak
@@ -162,3 +171,8 @@ class Main(NativeHacktool):
     def angry_boy(self, _):
         """暴怒男孩"""
         self.excute_cheet_code(0x7d)
+
+    def create_unit(self, type):
+        """创作指定类别单位"""
+        if self.handler.active:
+            self.handler.remote_call(self._create_unit, type)
