@@ -30,7 +30,7 @@ bool Is64Bit_OS()
 bool ProcessHandler::m_is64os = Is64Bit_OS();
 
 
-ProcessHandler::ProcessHandler():m_process(nullptr), m_funcGetProcAddress(0), m_raw_addr(false)
+ProcessHandler::ProcessHandler():m_process(nullptr), m_raw_addr(false)
 {
 	HANDLE	hProcess;
 	HANDLE	hToken;
@@ -147,6 +147,42 @@ bool ProcessHandler::write(addr_t addr, LPCVOID buffer, size_t size){
 		if (addr) {
 			return raw_write(addr, buffer, size);
 		}
+	}
+	return false;
+}
+
+
+struct EnumWindowsArg
+{
+	HWND    hwndWindow;     // 窗口句柄
+	DWORD   dwProcessID;    // 进程ID
+};
+///< 枚举窗口回调函数
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+	EnumWindowsArg *pArg = (EnumWindowsArg *)lParam;
+	DWORD  dwProcessID = 0;
+	// 通过窗口句柄取得进程ID
+	::GetWindowThreadProcessId(hwnd, &dwProcessID);
+	if (dwProcessID == pArg->dwProcessID)
+	{
+		pArg->hwndWindow = hwnd;
+		// 找到了返回FALSE
+		return FALSE;
+	}
+	// 没找到，继续找，返回TRUE
+	return TRUE;
+}
+
+bool ProcessHandler::bring_target_top()
+{
+	EnumWindowsArg ewa;
+	ewa.dwProcessID = getProcessId();
+	ewa.hwndWindow = NULL;
+	::EnumWindows(EnumWindowsProc, (LPARAM)&ewa);
+	if (ewa.hwndWindow)
+	{
+		return ::SetForegroundWindow(ewa.hwndWindow) && ::BringWindowToTop(ewa.hwndWindow);
 	}
 	return false;
 }

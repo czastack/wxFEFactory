@@ -39,6 +39,7 @@ class Main(NativeHacktool):
 
         self.lazy_group(Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), handler=self.handler, cols=4),
             self.render_unit_type)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
     def render_unit_type(self):
@@ -63,14 +64,20 @@ class Main(NativeHacktool):
         ModelInput("atk_spped")
         ModelInput("construction_time")
 
-    def render_functions(self):
+    def render_hotkeys(self):
         with ui.Horizontal(className="fill padding"):
             ui.ListBox(className="expand",
                 onselect=self.on_spawn_unit_type_change,
                 choices=(item[1] for item in datasets.UNITS))
-            with ui.Vertical(className="fill padding"):
-                super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
-                    'create_selected_unit_type'))
+            with ui.ScrollView(className="fill padding"):
+                ui.Text("选中单位恢复HP: alt+h")
+                ui.Text("选中建筑完成修建: alt+b")
+                ui.Text("选中单位死亡: alt+delete")
+                ui.Text("生成指定兵种单位: alt+v")
+
+    def render_functions(self):
+        super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
+            'create_all_unit'))
 
     def onattach(self):
         super().onattach()
@@ -87,6 +94,7 @@ class Main(NativeHacktool):
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT, VK.B, this.selected_finish),
             (VK.MOD_ALT, VK.DELETE, this.selected_die),
+            (VK.MOD_ALT, VK.V, this.create_selected_unit_type),
         )
 
     def _resources(self):
@@ -155,6 +163,12 @@ class Main(NativeHacktool):
     def on_spawn_unit_type_change(self, view):
         self._spawn_unit_type = datasets.UNITS[view.index][0]
 
+    def create_selected_unit_type(self, _):
+        """生成单位"""
+        type = getattr(self, '_spawn_unit_type', None)
+        if type:
+            self.create_unit(type)
+
     def excute_cheet_code(self, code):
         """执行作弊代码
         0x75 地图全开
@@ -186,8 +200,7 @@ class Main(NativeHacktool):
         """暴怒男孩"""
         self.excute_cheet_code(0x7d)
 
-    def create_selected_unit_type(self, _):
-        """生成单位"""
-        type = getattr(self, '_spawn_unit_type', None)
-        if type:
-            self.create_unit(type)
+    def create_all_unit(self, _):
+        """生成全部单位"""
+        for item in datasets.UNITS:
+            self.create_unit(item[0])

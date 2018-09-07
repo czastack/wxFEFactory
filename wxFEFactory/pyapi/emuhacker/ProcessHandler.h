@@ -11,7 +11,6 @@ class ProcessHandler
 {
 protected:
 	HANDLE		m_process;
-	addr_t      m_funcGetProcAddress;
 	static bool m_is64os;
 	bool        m_is32process; // 目标是32位进程
 	bool        m_raw_addr;
@@ -208,6 +207,8 @@ public:
 		addr = read_last_addr(addr, offsets);
 		return addr && write(addr, buffer, size);
 	}
+
+	bool bring_target_top();
 
 	addr_t getProcessBaseAddress();
 
