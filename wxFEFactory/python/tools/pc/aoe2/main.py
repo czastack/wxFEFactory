@@ -73,6 +73,7 @@ class Main(NativeHacktool):
                 ui.Text("选中单位恢复HP: alt+h")
                 ui.Text("选中建筑完成修建: alt+b")
                 ui.Text("选中单位死亡: alt+delete")
+                ui.Text("选中单位投诚: alt+f")
                 ui.Text("生成指定兵种单位: alt+v")
 
     def render_functions(self):
@@ -94,13 +95,14 @@ class Main(NativeHacktool):
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT, VK.B, this.selected_finish),
             (VK.MOD_ALT, VK.DELETE, this.selected_die),
+            (VK.MOD_ALT, VK.F, this.selected_join),
             (VK.MOD_ALT, VK.V, this.create_selected_unit_type),
         )
 
     def _resources(self):
         """资源管理器"""
         if self.handler.active:
-            return self._global.resources
+            return self._global.player.resources
 
     def _population_mgr(self):
         """人口管理器"""
@@ -159,6 +161,12 @@ class Main(NativeHacktool):
         unit = self._adv_selected_unit
         if unit:
             unit.hp = 0
+
+    def selected_join(self, _):
+        """选中单位投诚"""
+        unit = self._adv_selected_unit
+        if unit:
+            unit.player = self._global.player
 
     def on_spawn_unit_type_change(self, view):
         self._spawn_unit_type = datasets.UNITS[view.index][0]

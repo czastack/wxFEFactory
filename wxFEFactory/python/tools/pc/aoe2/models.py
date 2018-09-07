@@ -19,6 +19,12 @@ class PopulationManager(Model):
     max = FloatField(0x80, label='上限')
 
 
+class Player(Model):
+    SIZE = 0
+    id = Field(0x9C, label='玩家ID')
+    resources = ModelPtrField(0xA8, ResourceManager)
+
+
 class UnitType(Model):
     hp_max = WordField(0x2A, label="HP上限")
     view = FloatField(0x2C, label="视野")
@@ -56,6 +62,7 @@ class UnitType(Model):
 class Unit(Model):
     SIZE = 0
     type = ModelPtrField(8, UnitType)
+    player = ModelPtrField(0xC, Player)
     hp = FloatField(0x30, label='HP')
     ptr_unknow1 = Field(0x18, label='不明指针')
     selected = ByteField(0x36, label='选中状态')
@@ -79,6 +86,6 @@ class PlayerManager(Model):
 
 
 class Global(Model):
-    resources = ModelPtrField((0x00295794, 0xFC, 0xA8), ResourceManager)
+    player = ModelPtrField((0x00295794, 0xFC), Player)
     player_mgr = ModelPtrField((0x003912A0, 0x424), PlayerManager)
     selected_units = ArrayField(0x002B71A0, 30, ModelPtrField(0, Unit))

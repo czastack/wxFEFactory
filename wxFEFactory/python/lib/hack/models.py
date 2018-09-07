@@ -446,7 +446,8 @@ class ModelPtrField(Cachable, PtrField):
 
     def __set__(self, instance, value):
         if isinstance(value, Model):
-            super().__set__(instance, value.addr)
+            value = value.addr
+        super().__set__(instance, value)
 
 
 class ManagedModelPtrField(ModelPtrField):
