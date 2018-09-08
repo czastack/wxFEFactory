@@ -1,6 +1,7 @@
+from lib import wxconst
 from lib.scene import BaseScene
 from lib.lazy import ClassLazy
-from styles import styles
+from styles import styles, dialog_style
 from fefactory_api import ui, alert
 import traceback
 import __main__
@@ -34,6 +35,11 @@ class BaseTool(BaseScene):
         :return: 返回根元素
         """
         pass
+
+    def render_float_win(self):
+        """浮动的窗口"""
+        return ui.HotkeyWindow(self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
+            wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT)
 
     def render_menu(self):
         """ 渲染基本菜单

@@ -68,7 +68,6 @@ class Unit(Model):
     selected = ByteField(0x36, label='选中状态')
     resource = FloatField(0x44, label='资源')
     ptr_unknow2 = Field(0x6C, label='不明指针2')
-    player_class = WordField((0xC, 0x9C), label='Player Class')
     construction_progress = FloatField(0x1FC, label="建造进度")
 
 

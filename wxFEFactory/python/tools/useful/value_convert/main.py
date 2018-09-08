@@ -1,7 +1,6 @@
 from lib import wxconst
 from lib.hack.utils import bytes_beautify
 from tools.tool import BaseTool
-from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 from fefactory_api import ui
 import struct
@@ -16,8 +15,7 @@ class Main(BaseTool):
 
     def render(self):
         self.text_inputs = []
-        with ui.Window(self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
-                wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT) as win:
+        with self.render_float_win() as win:
             with ui.Vertical():
                 ui.Text("按回车转换", className="padding")
                 self.int_format = ui.RadioBox("整型格式", className="expand padding",

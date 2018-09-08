@@ -1,14 +1,12 @@
 from lib import wxconst
 from tools.tool import BaseTool
-from styles import styles, dialog_style
 from fe.ferom import FeRomRW
 from fefactory_api import ui
 
 
 class Main(BaseTool):
     def render(self):
-        with ui.Window(self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
-                wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT) as win:
+        with self.render_float_win() as win:
             with ui.Vertical():
                 with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as container:
                     ui.Text("Rom", className="vcenter")

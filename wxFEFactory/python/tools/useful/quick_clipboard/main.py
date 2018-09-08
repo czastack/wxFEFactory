@@ -1,5 +1,3 @@
-from styles import dialog_style, styles
-from lib import wxconst
 from lib.win32.keys import VK
 from fefactory_api import auto, ui
 from tools.tool import BaseTool
@@ -20,8 +18,7 @@ class Main(BaseTool):
         ))
 
     def render(self):
-        with ui.HotkeyWindow(self.title, style=win_style, styles=styles, menubar=self.render_menu(),
-                wxstyle=wxconst.FRAME_BASE | wxconst.FRAME_FLOAT_ON_PARENT) as win:
+        with self.render_float_win() as win:
             with ui.Vertical(className="padding"):
                 with ui.Vertical(className="fill padding"):
                     self.input = ui.TextInput(className="expand", multiline=True, style={'height': 200})
