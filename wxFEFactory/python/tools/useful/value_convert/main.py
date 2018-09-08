@@ -1,7 +1,6 @@
 from lib import wxconst
 from lib.hack.utils import bytes_beautify
 from tools.tool import BaseTool
-from fe.ferom import FeRomRW
 from fefactory_api import ui
 import struct
 

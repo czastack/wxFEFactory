@@ -375,7 +375,7 @@ styles = {
     }
 }
 
-if __name__ == 'mainframe':
+if __name__ == 'main':
     frame = MainFrame(app.start_option)
 
     __main__.app = app

@@ -68,6 +68,7 @@ def json_dump_file(owner, data, dumper=None):
             else:
                 dumper(data, file)
 
+
 def json_load_file(owner):
     """选择json文件导入"""
     path = fefactory_api.choose_file("选择要读取的文件", file=getattr(owner, 'lastfile', None), wildcard='*.json')
@@ -111,5 +112,6 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
     __builtins__['input'] = partial(fefactory_api.input, '输入')
 
 
-__builtins__['fpy'] = sys.modules[__name__]
-import mainframe
+if __name__ == 'fefactory':
+    __builtins__['fpy'] = sys.modules[__name__]
+    import main

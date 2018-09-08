@@ -2,7 +2,7 @@ from lib import wxconst
 from ..module import BaseListBoxModuel
 from . import forms
 from . import config
-from mainframe import ui
+from fefactory_api import ui
 import fefactory_api
 
 

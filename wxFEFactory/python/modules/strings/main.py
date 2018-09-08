@@ -1,5 +1,5 @@
 from ..module import BaseListBoxModuel
-from mainframe import ui
+from fefactory_api import ui
 from styles import dialog_style
 from lib import exui, wxconst
 import fefactory_api
