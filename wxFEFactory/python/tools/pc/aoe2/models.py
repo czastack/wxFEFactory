@@ -25,7 +25,30 @@ class Player(Model):
     resources = ModelPtrField(0xA8, ResourceManager)
 
 
+class AtkDefItem(Model):
+    SIZE = 4
+    type = WordField(0, label="类型")
+    value = WordField(2, label="值")
+
+
+class AtkDefItems(Model):
+    SIZE = 24
+    items = ArrayField(0, 6, ModelField(0, AtkDefItem))
+
+
 class UnitType(Model):
+    # type = ByteField(0x4, label="类型") # 类型
+    # dll_name = WordField(0xC, label="语言DLL:名称")
+    # dll_hint = WordField(0xE, label="语言DLL:创建提示")
+    # id1 = WordField(0x10, label="ID 1")
+    # id2 = WordField(0x12, label="ID 2")
+    # id3 = WordField(0x14, label="ID 3")
+    # type2 = WordField(0x16, label="类别")
+    # fn_str = ModelPtrField(0x18, StringField(0), 'fn名称指针')
+    # name_str = ModelPtrField(0x20, StringField(0), '名称指针')
+    # dll_help = Field(0xA8, label="语言DLL:帮助说明")
+    # dll_hot_text = Field(0xAC, label="语言DLL:热键文字")
+    # dll_hot_text_ = Field(0xB0, label="热键文字")
     hp_max = WordField(0x2A, label="HP上限")
     view = FloatField(0x2C, label="视野")
     shipload = ByteField(0x30, label="Shipload")
@@ -33,30 +56,17 @@ class UnitType(Model):
     move_speed = FloatField(0xC8, label="移动速度")
     search = FloatField(0x104, label="搜索")
     work_efficiency = FloatField(0x108, label="工作效率")
-    short_def = WordField((0x128, 2), label="近战防御")  # 近战防御指针(+2=近战防御)
-    atk = WordField((0x130, 6), label="对人攻击力")  # 攻击力指针？(+6=攻击)
-    atk2 = WordField((0x130, 10), label="对建筑攻击力")
-    atk3 = WordField((0x130, 14), label="攻击力3")
+    def_items = ModelPtrField(0x128, AtkDefItems)  # 防御列表
+    atk_items = ModelPtrField(0x130, AtkDefItems)  # 攻击列表
     range_max = FloatField(0x138, label="最大射程")
     damage_radius = FloatField(0x13C, label="攻击范围")
     damage_type = Field(0x140, label="伤害方式")
-    atk_spped = FloatField(0x144, label="攻击硬直")  # 越小攻速越快(>0)
+    atk_spped = FloatField(0x144, label="攻击间隔")  # 越小攻速越快(>0)
     range_min = FloatField(0x15C, label="最小射程")
-    base_def = WordField(0x160, label="基础防御")
-    base_atk = WordField(0x162, label="基础攻击")
+    base_def = WordField(0x160, label="显示的防御")
+    base_atk = WordField(0x162, label="显示的攻击")
     range_base = FloatField(0x164, label="基础射程")
     construction_time = WordField(0x182, label="建造时间")
-
-    def far_def_addr(self, field):
-        """获取远程防御地址"""
-        # 在近战防御基地址开始，往后对齐4字节检查数值3，3的后两个字节就是远程防御地址
-        addr = self.handler.read_addr(self.addr + 0x128) + 4
-        for i in range(3):
-            if self.handler.read16(addr) == 3:
-                return addr + 2
-            addr += 4
-
-    far_def = WordField(far_def_addr, label="远程防御")
 
 
 class Unit(Model):

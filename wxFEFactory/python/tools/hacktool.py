@@ -24,7 +24,7 @@ class BaseHackTool(NestedTool):
                 with ui.Horizontal(className="expand padding"):
                     ui.Button("检测", className="vcenter", onclick=self.check_attach)
                     self.render_top_button()
-                    self.attach_status_view = ui.Text("", className="vcenter grow left_padding")
+                    self.attach_status_view = ui.Text("", className="vcenter grow padding_left")
                     ui.CheckBox("保持最前", className="vcenter", onchange=self.swith_keeptop)
                 with ui.Notebook(className="fill") as book:
                     book.setOnPageChange(self.onNotePageChange)
@@ -99,7 +99,7 @@ class BaseHackTool(NestedTool):
         ConfigGroup.GROUPS.append(self)
         self.groups = []
 
-    def appendChild(self, child):
+    def append_child(self, child):
         if isinstance(child, (BaseGroup, ConfigGroup)):
             self.groups.append(child)
         else:

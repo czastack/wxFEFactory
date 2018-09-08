@@ -14,28 +14,28 @@ void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPaddi
 		flag |= wxEXPAND;
 	}
 
-	wxcstr showPad = child.getStyle(STYLE_SHOWPADDING, wxNoneString);
+	wxcstr padding_flag = child.getStyle(STYLE_SHOWPADDING, wxNoneString);
 
-	if (showPad != wxNoneString)
+	if (padding_flag != wxNoneString)
 	{
-		if (showPad.size() == 1)
+		if (padding_flag.size() == 1)
 		{
-			if (showPad[0] != '0')
+			if (padding_flag[0] != '0')
 				flag |= wxALL;
 		}
-		else if (showPad.size() == 7)
+		else if (padding_flag.size() == 7)
 		{
-			if (showPad[0] != '0')
+			if (padding_flag[0] != '0')
 				flag |= wxTOP;
-			if (showPad[2] != '0')
+			if (padding_flag[2] != '0')
 				flag |= wxRIGHT;
-			if (showPad[4] != '0')
+			if (padding_flag[4] != '0')
 				flag |= wxBOTTOM;
-			if (showPad[6] != '0')
+			if (padding_flag[6] != '0')
 				flag |= wxLEFT;
 		}
 		else {
-			log_message(wxString::Format(wxT("%s: %s not available"), STYLE_SHOWPADDING, showPad));
+			log_message(wxString::Format(wxT("%s: %s not available"), STYLE_SHOWPADDING, padding_flag));
 		}
 	}
 

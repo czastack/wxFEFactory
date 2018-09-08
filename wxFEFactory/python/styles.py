@@ -35,6 +35,7 @@ btn_sm_style = {'width': btn_sm_width}
 btn_md_style = {'width': btn_md_width}
 
 
+# padding-flag: top right bottom left
 styles = {
     'class': {
         'fill': {
@@ -57,6 +58,12 @@ styles = {
             'padding': 8,
             'padding-flag': '1 1 0 1',
         },
+        'padding_top': {'padding': 10, 'padding-flag': '1 0 0 0'},
+        'padding_left': {'padding': 10, 'padding-flag': '0 0 0 1'},
+        'padding_right': {
+            'padding': 8,
+            'padding-flag': '1 1 1 0',
+        },
         'input_label': {
             'padding': 8,
             'padding-flag': '1 1 0 1',
@@ -71,8 +78,6 @@ styles = {
             'padding-flag': '0 1 0 1',
             'text-align': 'right',
         },
-        'top_padding': {'padding': 10, 'padding-flag': '1 0 0 0'},
-        'left_padding': {'padding': 10, 'padding-flag': '0 0 0 1'},
         'btn_xs': btn_xs_style,
         'btn_sm': btn_sm_style,
         'btn_md': btn_md_style,

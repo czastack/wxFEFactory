@@ -22,7 +22,7 @@ class ConfigCtrl(ABC):
         self.name = name
         self.label = label
         self.default = default
-        parent.appendChild(self)
+        parent.append_child(self)
         self.owner = parent.owner
         self.owner.setDefault(name, default)
         self.owner.registerObserver(name, self.weak._onConfigChange)

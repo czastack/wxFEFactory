@@ -11,9 +11,9 @@ class ConfigGroup:
         self.children = []
         parent = self.active_group()
         if parent:
-            parent.appendChild(self)
+            parent.append_child(self)
 
-    def appendChild(self, child):
+    def append_child(self, child):
         self.children.append(child)
 
     @classmethod

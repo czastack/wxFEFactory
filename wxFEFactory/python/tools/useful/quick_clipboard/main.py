@@ -23,7 +23,7 @@ class Main(BaseTool):
                 with ui.Vertical(className="fill padding"):
                     self.input = ui.TextInput(className="expand", multiline=True, style={'height': 200})
                     self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
-                    with ui.Horizontal(className="expand top_padding"):
+                    with ui.Horizontal(className="expand padding_top"):
                         ui.Button("输入", onclick=self.input_text)
                     with ui.ScrollView(className="fill padding"):
                         ui.Text("切换上一个: alt+[")

@@ -39,6 +39,7 @@ class Main(NativeHacktool):
 
         self.lazy_group(Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), handler=self.handler, cols=4),
             self.render_unit_type)
+        self.lazy_group(StaticGroup("选中单位兵种攻防"), self.render_unit_type_atk_def)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
@@ -51,11 +52,6 @@ class Main(NativeHacktool):
         ModelInput("work_efficiency")
         ModelInput("base_def")
         ModelInput("base_atk")
-        ModelInput("atk")
-        ModelInput("atk2")
-        ModelInput("atk3")
-        ModelInput("short_def")
-        ModelInput("far_def")
         ModelInput("range_min")
         ModelInput("range_max")
         ModelInput("range_base")
@@ -63,6 +59,10 @@ class Main(NativeHacktool):
         ModelInput("damage_type")
         ModelInput("atk_spped")
         ModelInput("construction_time")
+
+    def render_unit_type_atk_def(self):
+        AtkDefItemsMgr(self.weak, '攻击', 'atk_items').render()
+        AtkDefItemsMgr(self.weak, '防御', 'def_items').render()
 
     def render_hotkeys(self):
         with ui.Horizontal(className="fill padding"):
@@ -212,3 +212,45 @@ class Main(NativeHacktool):
         """生成全部单位"""
         for item in datasets.UNITS:
             self.create_unit(item[0])
+
+
+class AtkDefItemsMgr:
+    def __init__(self, owner, label, items_key):
+        self.owner = owner
+        self.label = label
+        self.items_key = items_key
+
+    def render(self):
+        with ui.Horizontal(className="fill padding"):
+            self.listbox = ui.ListBox(className="expand", style={'width': 400},
+                onselect=self.on_listbox_change)
+            with Group(None, None, (self.get_item, models.AtkDefItem),
+                    handler=self.owner.handler, hasfooter=False) as group:
+                self.group = group
+                ModelSelect("type", "%s类型" % self.label, choices=datasets.ATK_TYPES)
+                ModelInput("value", "%s力" % self.label)
+                ui.Hr()
+                ui.Button("读取列表", onclick=self.read_list)
+
+    def on_listbox_change(self, _):
+        self.group.read()
+
+    def read_list(self, _):
+        """读取选中单位兵种攻击项列表"""
+        result = []
+        unit_type = self.owner._unit_type()
+        if unit_type:
+            for item in getattr(unit_type, self.items_key).items:
+                item_type = item.type
+                if not item_type:
+                    break
+                if 0 < item_type < len(datasets.ATK_TYPES):
+                    result.append("类别: %s, 值: %d" % (datasets.ATK_TYPES[item_type], item.value))
+                else:
+                    result.append("类别: %d, 值: %d" % (item_type, item.value))
+            self.listbox.setItems(result)
+
+    def get_item(self):
+        unit_type = self.owner._unit_type()
+        if unit_type:
+            return getattr(unit_type, self.items_key).items[self.listbox.index]

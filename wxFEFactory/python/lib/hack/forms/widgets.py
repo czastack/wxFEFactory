@@ -29,7 +29,7 @@ class Widget:
 
         parent = self.active_group()
         if parent:
-            parent.appendChild(self)
+            parent.append_child(self)
             if self.addr is None:
                 self.addr = getattr(parent, 'addr', None)
 
@@ -194,6 +194,7 @@ class BaseGroup(Widget):
         :param cachable: 子元素是ModelWidget时有用
         """
         self.children = []
+        self.view = None
         origin_addr = addr
         if isinstance(origin_addr, tuple):
             # (instance_getter, instance_type)
@@ -203,7 +204,6 @@ class BaseGroup(Widget):
             self.cachable = False
             if handler is None:
                 handler = getattr(addr, 'handler', None)
-
         else:
             self._ins_getter = addr
             self._ins_cached = False
@@ -218,16 +218,16 @@ class BaseGroup(Widget):
             if isinstance(origin_addr, tuple):
                 self.addr = (self.addr, origin_addr[1])
 
-    def appendChild(self, child):
+    def append_child(self, child):
         self.children.append(child)
 
     def __enter__(self):
-        self.view.__enter__()
+        self.view and self.view.__enter__()
         self.GROUPS.append(self)
         return self
 
     def __exit__(self, *args):
-        self.view.__exit__(*args)
+        self.view and self.view.__exit__(*args)
         if self.GROUPS.pop() is not self:
             raise ValueError('GROUPS层次校验失败')
 
@@ -299,7 +299,9 @@ class Group(BaseGroup):
 
     def render(self):
         root = self.render_root()
-        ui.Item(root, caption=self.label)
+        if self.label:
+            # 作为Tab标签
+            ui.Item(root, caption=self.label)
         self.root = root
 
     def render_root(self):
@@ -376,6 +378,15 @@ class GroupBox(BaseGroup):
             self.view = ui.ScrollView(className="fill padding")
 
         self.root = root
+
+
+class VirtualGroup(BaseGroup):
+    """虚拟分组"""
+    def __init__(self, addr, handler=None, cachable=True):
+        super().__init__(None, None, addr, handler, cachable)
+
+    def render(self):
+        pass
 
 
 class Groups(BaseGroup):
