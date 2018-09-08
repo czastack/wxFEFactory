@@ -61,12 +61,17 @@ class UnitType(Model):
     range_max = FloatField(0x138, label="最大射程")
     damage_radius = FloatField(0x13C, label="攻击范围")
     damage_type = Field(0x140, label="伤害方式")
-    atk_spped = FloatField(0x144, label="攻击间隔")  # 越小攻速越快(>0)
+    atk_interval = FloatField(0x144, label="攻击间隔")  # 越小攻速越快(>0)
+    atk_interval2 = FloatField(0x168, label="攻击间隔2")
     range_min = FloatField(0x15C, label="最小射程")
     base_def = WordField(0x160, label="显示的防御")
     base_atk = WordField(0x162, label="显示的攻击")
-    range_base = FloatField(0x164, label="基础射程")
+    range_base = FloatField(0x164, label="显示的射程")
     construction_time = WordField(0x182, label="建造时间")
+    thrown_object = WordField(0x148, label="抛掷物单位")
+    addition_thrown_object = WordField(0x1AC, label="附加抛掷物单位")
+    min_thrown_object_count = WordField(0x19C, label="最小附加弹药数")
+    thrown_object_area = CoordField(0x1A0, label="抛掷物产生区域")
 
 
 class Unit(Model):

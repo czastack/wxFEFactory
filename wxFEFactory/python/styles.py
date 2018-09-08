@@ -59,11 +59,9 @@ styles = {
             'padding-flag': '1 1 0 1',
         },
         'padding_top': {'padding': 10, 'padding-flag': '1 0 0 0'},
+        'padding_right': {'padding': 8, 'padding-flag': '1 1 1 0'},
+        'padding_bottom': {'padding': 10, 'padding-flag': '0 0 1 0'},
         'padding_left': {'padding': 10, 'padding-flag': '0 0 0 1'},
-        'padding_right': {
-            'padding': 8,
-            'padding-flag': '1 1 1 0',
-        },
         'input_label': {
             'padding': 8,
             'padding-flag': '1 1 0 1',

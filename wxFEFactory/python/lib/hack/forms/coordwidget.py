@@ -9,10 +9,11 @@ ui = fefactory_api.ui
 
 class CoordWidget(TwoWayWidget):
     def __init__(self, name, label, addr, offsets=(), length=3, type=float, size=4,
-            labels=None, savable=False, preset=None):
+            labels=None, savable=False, wrap=False, preset=None):
         """
         :param length: 坐标维数
         :param saveble: 是否支持存取文件
+        :param wrap: saveble为False时是否折行
         :param preset: 预设坐标模块(要读__file__属性)
         """
         self.length = length
@@ -20,6 +21,7 @@ class CoordWidget(TwoWayWidget):
         self.size = size
         self.labels = labels
         self.savable = savable
+        self.wrap = wrap
         self.preset = preset
         if savable:
             self.data_list = []
@@ -32,9 +34,14 @@ class CoordWidget(TwoWayWidget):
         super().render()
         if not self.savable:
             with ui.Horizontal(className="expand") as container:
-                self.views = tuple(ui.TextInput(className="fill") for i in range(self.length))
+                if self.wrap:
+                    with ui.Vertical(className="fill"):
+                        style = {'height': 54}
+                        self.views = tuple(ui.TextInput(className="fill padding_bottom", style=style)
+                            for i in range(self.length))
+                else:
+                    self.views = tuple(ui.TextInput(className="fill") for i in range(self.length))
                 self.render_btn()
-
         else:
             views = []
             with ui.Vertical(className="fill") as root:

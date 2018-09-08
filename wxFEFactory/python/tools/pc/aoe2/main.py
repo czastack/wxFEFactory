@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.native_hacktool import NativeHacktool
@@ -56,9 +56,14 @@ class Main(NativeHacktool):
         ModelInput("range_max")
         ModelInput("range_base")
         ModelInput("damage_radius")
-        ModelInput("damage_type")
-        ModelInput("atk_spped")
+        ModelSelect("damage_type", choices=datasets.DAMAGE_TYPE)
+        ModelInput("atk_interval")
+        ModelInput("atk_interval2")
         ModelInput("construction_time")
+        ModelInput("thrown_object")
+        ModelInput("addition_thrown_object")
+        ModelInput("min_thrown_object_count")
+        ModelCoordWidget("thrown_object_area", savable=False, wrap=True)
 
     def render_unit_type_atk_def(self):
         AtkDefItemsMgr(self.weak, '攻击', 'atk_items').render()
@@ -215,6 +220,7 @@ class Main(NativeHacktool):
 
 
 class AtkDefItemsMgr:
+    """攻击防御项管理器"""
     def __init__(self, owner, label, items_key):
         self.owner = owner
         self.label = label
