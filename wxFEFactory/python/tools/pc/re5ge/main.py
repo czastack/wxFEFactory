@@ -88,7 +88,7 @@ class Main(NativeHacktool):
             AssemblyItem('infinity_ammo', '无限弹药', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
                 b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', is_inserted=True),
             AssemblyItem('fast_shoot', '快速射击', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, 0x900000,
-                b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', is_inserted=True, only_replace_jump=True),
+                b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', is_inserted=True, replace_len=5),
             AssemblyItem('merce_timer_keep', '佣兵模式时间不减', b'\xF3\x0F\x11\x87\xDC\x04\x00\x00',
                 0x300000, 0x400000, NOP_8),
             AssemblyItem('combo_timer_keep', '连击时间不减', b'\xF3\x0F\x11\x84\x31\xA0\x06\x00\x00\x5F',

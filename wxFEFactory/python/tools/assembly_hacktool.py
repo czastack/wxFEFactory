@@ -18,6 +18,7 @@ class AssemblyHacktool(BaseHackTool):
     def onattach(self):
         super().onattach()
         self.reset()
+        self.jmp_len = 5 if self.handler.is32process else 14
 
     def ondetach(self):
         super().ondetach()
@@ -58,8 +59,8 @@ class AssemblyHacktool(BaseHackTool):
         raplace = item.raplace
         assembly = item.assembly
 
-        if item.is_inserted and (len(original) - len(raplace)) < 5:
-            print("需要可用间隔大于5")
+        if item.is_inserted and ((item.replace_len or len(original)) - len(raplace)) < self.jmp_len:
+            print("需要可用间隔大于%d" % self.jmp_len)
             return
 
         self.insure_memory()
@@ -74,8 +75,8 @@ class AssemblyHacktool(BaseHackTool):
             if addr is -1:
                 return
             memory = self.next_usable_memory
-            if item.only_replace_jump:
-                original = original[:len(raplace) + 5]
+            if item.replace_len:
+                original = original[:item.replace_len]
             data = self.registed_assembly[item.key] = {'addr': addr, 'original': original,
                 'memory': memory, 'active': True}
 
@@ -87,13 +88,23 @@ class AssemblyHacktool(BaseHackTool):
                 if memory_conflict:
                     memory = data['memory'] = self.next_usable_memory
 
-            # 计算jump地址, 5是jmp opcode的长度
-            diff_new = utils.u32(memory - (addr + 5))
-            diff_back = utils.u32(addr + len(original) - (memory + len(assembly) + 5))
             # 填充的NOP
-            replace_padding = b'\x90' * (len(original) - len(raplace) - 5)
-            raplace = raplace + b'\xE9' + diff_new.to_bytes(4, 'little') + replace_padding
-            assembly = assembly + b'\xE9' + diff_back.to_bytes(4, 'little')
+            replace_padding = b'\x90' * (len(original) - len(raplace) - self.jmp_len)
+
+            if self.jmp_len == 5:
+                # # E9 relative address
+                # 计算jump地址, 5是jmp opcode的长度
+                diff_new = utils.u32(memory - (addr + self.jmp_len))
+                diff_back = utils.u32(addr + len(original) - (memory + len(assembly) + self.jmp_len))
+                raplace = raplace + b'\xE9' + diff_new.to_bytes(4, 'little') + replace_padding
+                assembly = assembly + b'\xE9' + diff_back.to_bytes(4, 'little')
+            else:
+                # FF25 00000000 absolute address
+                raplace = raplace + b'\xFF\x25\x00\x00\x00\x00' + memory.to_bytes(8, 'little') + replace_padding
+                assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + len(original)).to_bytes(8, 'little')
+
+            if item.replace_len and item.replace_len < len(raplace):
+                raise ValueError("replace_len需大于等于raplace长度")
 
             if memory == self.next_usable_memory:
                 self.next_usable_memory += utils.align4(len(assembly))
@@ -144,17 +155,17 @@ class AssemblyHacktool(BaseHackTool):
     :param assembly: 写到新内存的内容
     :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
     :param is_inserted: 是否自动加入jmp代码
-    :param only_replace_jump: 只替换original前5个字节为jmp的内容
+    :param replace_len: 只记录original前n个字节
 """
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'raplace', 'assembly',
-        'find_range_from_base', 'is_inserted', 'only_replace_jump', 'args'),
+        'find_range_from_base', 'is_inserted', 'replace_len', 'args'),
     defaults={
         'assembly': None,
         'find_range_from_base': True,
         'is_inserted': False,
-        'only_replace_jump': False,
+        'replace_len': 0,
         'args': ()
     }
 )

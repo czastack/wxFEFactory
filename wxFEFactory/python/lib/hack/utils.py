@@ -82,6 +82,11 @@ def u32(n):
     return n & 0xFFFFFFFF
 
 
+def qword(n):
+    """截取64位整型"""
+    return n & 0xFFFFFFFFFFFFFFFF
+
+
 def loword(n):
     """低字"""
     return n & 0xFFFF
