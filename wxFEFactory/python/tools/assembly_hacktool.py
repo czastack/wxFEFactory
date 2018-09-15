@@ -3,6 +3,7 @@ from lib.extypes import DataClass
 from lib.hack import utils
 from fefactory_api import ui
 from .hacktool import BaseHackTool
+from .assembly_code import AssemblyCodes
 
 
 class AssemblyHacktool(BaseHackTool):
@@ -36,10 +37,14 @@ class AssemblyHacktool(BaseHackTool):
                     __class__.toggle_assembly_function, self.weak, item=item))
 
     def toggle_assembly_function(self, btn, item):
-        if btn.checked:
-            self.register_assembly(item)
-        else:
-            self.unregister_assembly(item.key)
+        checked = btn.checked
+        if isinstance(item, AssemblyItem):
+            if checked:
+                self.register_assembly(item)
+            else:
+                self.unregister_assembly(item.key)
+        elif isinstance(item, AssemblySwitch):
+            self.set_variable_value(item.key, int(checked))
 
     def insure_memory(self):
         if self.allocated_memory is None:
@@ -84,12 +89,19 @@ class AssemblyHacktool(BaseHackTool):
             # 使用参数(暂时支持4字节)
             if item.args:
                 memory_conflict = memory == self.next_usable_memory
-                assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in item.args)
+                if isinstance(assembly, AssemblyCodes):
+                    for arg in item.args:
+                        self.register_variable(arg)
+                else:
+                    assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in item.args)
                 if memory_conflict:
                     memory = data['memory'] = self.next_usable_memory
 
             # 填充的NOP
             replace_padding = b'\x90' * (len(original) - len(raplace) - self.jmp_len)
+            # 动态生成机器码
+            if isinstance(assembly, AssemblyCodes):
+                assembly = assembly.generate(self, memory)
 
             if self.jmp_len == 5:
                 # # E9 relative address
@@ -146,6 +158,16 @@ class AssemblyHacktool(BaseHackTool):
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
 
+    def get_variable_value(self, name, value):
+        addr = self.get_variable(name)
+        if addr:
+            return self.handler.read32(addr)
+
+    def set_variable_value(self, name, value):
+        addr = self.get_variable(name)
+        if addr:
+            self.handler.write32(addr, value)
+
 
 """ register_assembly 的参数类型
     :param original: 原始数据
@@ -169,3 +191,6 @@ AssemblyItem = DataClass(
         'args': ()
     }
 )
+
+
+AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
