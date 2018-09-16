@@ -19,7 +19,7 @@ class AssemblyHacktool(BaseHackTool):
     def onattach(self):
         super().onattach()
         self.reset()
-        self.jmp_len = 5 if self.handler.is32process else 14
+        self.is32process = self.handler.is32process
 
     def ondetach(self):
         super().ondetach()
@@ -70,10 +70,6 @@ class AssemblyHacktool(BaseHackTool):
         raplace = item.raplace
         assembly = item.assembly
 
-        if item.is_inserted and ((item.replace_len or len(original)) - len(raplace)) < self.jmp_len:
-            print("需要可用间隔大于%d" % self.jmp_len)
-            return
-
         self.insure_memory()
 
         if item.key in self.registed_assembly:
@@ -81,6 +77,7 @@ class AssemblyHacktool(BaseHackTool):
             addr = data['addr']
             original = data['original']
             memory = data['memory']
+            data['active'] = True
         else:
             addr = self.find_address(original, item.find_start, item.find_end, item.find_range_from_base)
             if addr is -1:
@@ -92,6 +89,8 @@ class AssemblyHacktool(BaseHackTool):
                 'memory': memory, 'active': True}
 
         if item.is_inserted:
+            original_len = len(original)
+            available_len = original_len - len(raplace)  # 可用于跳转到插入的代码的jmp指令的长度
             # 使用参数(暂时支持4字节)
             if item.args:
                 memory_conflict = memory == self.next_usable_memory
@@ -99,30 +98,46 @@ class AssemblyHacktool(BaseHackTool):
                     for arg in item.args:
                         self.register_variable(arg)
                 else:
+                    if self.next_usable_memory > 0xFFFFFFFF:
+                        raise ValueError('目前只支持32位参数地址')
                     assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little') for arg in item.args)
                 if memory_conflict:
                     memory = data['memory'] = self.next_usable_memory
 
-            # 填充的NOP
-            replace_padding = b'\x90' * (len(original) - len(raplace) - self.jmp_len)
             # 动态生成机器码
             if isinstance(assembly, AssemblyCodes):
                 assembly = assembly.generate(self, memory)
 
-            if self.jmp_len == 5:
-                # # E9 relative address
+            if self.is32process:
+                # E9 relative address
                 # 计算jump地址, 5是jmp opcode的长度
-                diff_new = utils.u32(memory - (addr + self.jmp_len))
-                diff_back = utils.u32(addr + len(original) - (memory + len(assembly) + self.jmp_len))
-                raplace = raplace + b'\xE9' + diff_new.to_bytes(4, 'little') + replace_padding
+                jmp_len = 5
+                diff_new = utils.u32(memory - (addr + 5))
+                diff_back = utils.u32(addr + original_len - (memory + len(assembly) + 5))
+                raplace += raplace + b'\xE9' + diff_new.to_bytes(4, 'little')
                 assembly = assembly + b'\xE9' + diff_back.to_bytes(4, 'little')
             else:
-                # FF25 00000000 absolute address
-                raplace = raplace + b'\xFF\x25\x00\x00\x00\x00' + memory.to_bytes(8, 'little') + replace_padding
-                assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + len(original)).to_bytes(8, 'little')
+                if available_len >= 14:
+                    jmp_len = 14
+                    # FF25 00000000 absolute address
+                    raplace += raplace + b'\xFF\x25\x00\x00\x00\x00' + memory.to_bytes(8, 'little')
+                elif available_len >= 7 and self.next_usable_memory < 0xFFFFFFFF:
+                    # ptr jmp
+                    jmp_len = 7
+                    memory_conflict = memory == self.next_usable_memory
+                    temp = self.register_variable(item.key + '_jmp', 8)
+                    if memory_conflict:
+                        memory = data['memory'] = self.next_usable_memory
+                        self.handler.write_ptr(temp, memory)
+                    raplace += b'\xFF\x24\x25' + temp.to_bytes(4, 'little')
 
-            if item.replace_len and item.replace_len < len(raplace):
-                raise ValueError("replace_len需大于等于raplace长度")
+                assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + original_len).to_bytes(8, 'little')
+
+            if available_len < jmp_len:
+                raise ValueError("可用长度不足以插入jmp代码")
+
+            # 填充的NOP
+            raplace += b'\x90' * (available_len - jmp_len)
 
             if memory == self.next_usable_memory:
                 self.next_usable_memory += utils.align4(len(assembly))
@@ -154,6 +169,8 @@ class AssemblyHacktool(BaseHackTool):
     def register_variable(self, name, size=4):
         """注册变量"""
         self.insure_memory()
+        if isinstance(name, tuple):
+            name, size = name
         memory = self.registed_variable.get(name, None)
         if memory is None:
             memory = self.registed_variable[name] = self.next_usable_memory

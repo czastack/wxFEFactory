@@ -3,7 +3,7 @@ from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelS
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
-from tools.assembly_code import AssemblyCodes, Cmp, Dec
+from tools.assembly_code import AssemblyCodes, Variable, Cmp, Dec
 from fefactory_api import ui
 from . import models
 
@@ -39,8 +39,6 @@ class Main(AssemblyHacktool):
                 b'\x90\x90\x90'),
             AssemblyItem('ammo_inf', '无限弹药/手雷', b'\x41\x39\xE8\x41\x0F\x4C\xE8', 0x3B00000, 0x3C00000,
                 b'\x41\x39\xE8\x90\x90\x90\x90'),
-            AssemblyItem('freeze_time', '冻结时间', b'\xF3\x0F\x5C\xF7\x48\x89\xD9', 0x3D00000, 0x3E00000,
-                b'\x90\x90\x90\x90'),
             # AssemblyItem('player_address', '角色地址', b'\x4C\x89\x41\x04\x44\x89\x41\x0C\x66\x0F\x6E\xC8',
             #     0x3A00000, 0x3B00000, b'', b'\x48\x89\x15\x16\x00\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
             #     is_inserted=True, args=('player_address',)),
@@ -58,6 +56,28 @@ class Main(AssemblyHacktool):
                     0x3E00000, 0x3F00000, b'\x90\x90\x90\x90'),
                 AssemblyItem('challenge_time3', None, b'\xF3\x41\x0F\x2C\xC1\x01\x87\xC8\x00\x00\x00',
                     0x3E00000, 0x3F00000, b'\xF3\x41\x0F\x2C\xC1\x90\x90\x90\x90\x90\x90')),
+            AssemblyItems('快速射击',
+                AssemblyItem('rapid_fire1', None, b'\x41\x83\xBC\x24\x24\x02\x00\x00\x04\x0F\x87',
+                    0x4680000, 0x4780000, b'',
+                    AssemblyCodes(
+                        b'\x51\x52\x53\x4C\x89\x24\x25',
+                        Variable('rapid_fire_temp'),
+                        b'\x41\x8B\x94\x24\x24\x02\x00\x00\x48\x8B\x4E\x60'
+                        b'\x48\x81\xC1\x80\x09\x00\x00\x41\x8B\x94\x24\x24\x02\x00\x00\x8B\x9C\x91\xF0\x01\x00\x00'
+                        b'\x89\x9C\x91\xB0\x01\x00\x00\x41\xC7\x84\x24\x28\x02\x00\x00\x63\x00\x00\x00\x5B\x5A\x59'
+                        b'\x41\x83\xBC\x24\x24\x02\x00\x00\x04'),
+                    args=(('rapid_fire_temp', 8),),
+                    is_inserted=True,
+                    replace_len=9),
+                AssemblyItem('rapid_fire2', None, b'\xF3\x0F\x10\x87\x98\x01\x00\x00\x0F\x2F\xC6',
+                    0x3C00000, 0x3D00000, b'',
+                    AssemblyCodes(
+                        b'\x50\x48\xA1',
+                        Variable('rapid_fire_temp'),
+                        b'\x00\x00\x00\x00\x48\x39\xF8\x75\x0C\xC7\x87\x98\x01\x00\x00\x00\xC0\x79\x44'
+                        b'\xEB\x07\x83\xA7\x98\x01\x00\x00\x00\x58\xF3\x0F\x10\x87\x98\x01\x00\x00'),
+                    is_inserted=True,
+                    replace_len=8)),
             # TODO 没法保证Alloc的地址是32位的
             AssemblyItem('challenge_points', '挑战分数',
                 b'\x48\x03\x7B\x18\x48\x8B\x1B\x49\x3B\x9C\x24\x88\x01\x00\x00',
