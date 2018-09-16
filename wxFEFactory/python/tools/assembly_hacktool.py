@@ -43,6 +43,12 @@ class AssemblyHacktool(BaseHackTool):
                 self.register_assembly(item)
             else:
                 self.unregister_assembly(item.key)
+        elif isinstance(item, AssemblyItems):
+            for item in item.children:
+                if checked:
+                    self.register_assembly(item)
+                else:
+                    self.unregister_assembly(item.key)
         elif isinstance(item, AssemblySwitch):
             self.set_variable_value(item.key, int(checked))
 
@@ -167,6 +173,12 @@ class AssemblyHacktool(BaseHackTool):
         addr = self.get_variable(name)
         if addr:
             self.handler.write32(addr, value)
+
+
+class AssemblyItems:
+    def __init__(self, label, *children):
+        self.label = label
+        self.children = children
 
 
 """ register_assembly 的参数类型
