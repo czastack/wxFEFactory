@@ -3,7 +3,8 @@ from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelS
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
-from tools.assembly_code import AssemblyCodes, Variable, Cmp, Dec
+from tools.assembly_code import AssemblyGroup, Variable
+from tools import assembly_code
 from fefactory_api import ui
 from . import models
 
@@ -59,8 +60,12 @@ class Main(AssemblyHacktool):
             AssemblyItems('快速射击',
                 AssemblyItem('rapid_fire1', None, b'\x41\x83\xBC\x24\x24\x02\x00\x00\x04\x0F\x87',
                     0x4680000, 0x4780000, b'',
-                    AssemblyCodes(
-                        b'\x51\x52\x53\x4C\x89\x24\x25', Variable('rapid_fire_temp'),
+                    AssemblyGroup(
+                        b'\x51\x52\x53',
+                        assembly_code.IfInt64('rapid_fire_temp',
+                            AssemblyGroup(b'\x4C\x89\x25', assembly_code.Offset('rapid_fire_temp', 7)),
+                            AssemblyGroup(b'\x4C\x89\x24\x25', assembly_code.Variable('rapid_fire_temp'))
+                        ),
                         b'\x41\x8B\x94\x24\x24\x02\x00\x00\x48\x8B\x4E\x60\x48\x81\xC1\x80\x09\x00\x00'
                         b'\x8B\x9C\x91\xF0\x01\x00\x00\x89\x9C\x91\xB0\x01\x00\x00\x5B\x5A\x59'
                         b'\x41\x83\xBC\x24\x24\x02\x00\x00\x04'),
@@ -69,9 +74,9 @@ class Main(AssemblyHacktool):
                     replace_len=9),
                 AssemblyItem('rapid_fire2', None, b'\xF3\x0F\x10\x87\x98\x01\x00\x00\x0F\x2F\xC6',
                     0x3C00000, 0x3D00000, b'',
-                    AssemblyCodes(
-                        b'\x50\x48\xA1', Variable('rapid_fire_temp'),
-                        b'\x00\x00\x00\x00\x48\x39\xF8\x75\x0A\xC7\x87\x98\x01\x00\x00\x00\xC0\x79\x44'
+                    AssemblyGroup(
+                        b'\x50\x48\xA1', assembly_code.Variable('rapid_fire_temp', 8),
+                        b'\x48\x39\xF8\x75\x0A\xC7\x87\x98\x01\x00\x00\x00\xC0\x79\x44'
                         b'\x58\xF3\x0F\x10\x87\x98\x01\x00\x00'),
                     is_inserted=True,
                     replace_len=8)),
@@ -79,13 +84,19 @@ class Main(AssemblyHacktool):
             AssemblyItem('challenge_points', '挑战分数',
                 b'\x48\x03\x7B\x18\x48\x8B\x1B\x49\x3B\x9C\x24\x88\x01\x00\x00',
                 0x3D00000, 0x3E00000, b'',
-                AssemblyCodes(Cmp('challenge_points_add', 0),
+                AssemblyGroup(assembly_code.Cmp('challenge_points_add', 0),
                     b'\x7E\x0D\x81\x43\x18\x10\x27\x00\x00',
-                    Dec('challenge_points_add'),
+                    assembly_code.Dec('challenge_points_add'),
                     b'\x48\x03\x7B\x18\x48\x8B\x1B\x49\x3B\x9C\x24\x88\x01\x00\x00'),
                 args=('challenge_points_add',),
                 is_inserted=True),
             AssemblySwitch('challenge_points_add', '挑战分数+10000'),
+            AssemblyItem('unlock_all_rebel_drops', '解锁全部叛军空投', b'\x80\xB9\x78\x01\x00\x00\x00',
+                0x3F00000, 0x4000000, b'\x80\xB9\x78\x01\x00\x00\xFF'),
+            AssemblyItem('rebel_drop_cool_down', '呼叫叛军空投', b'\x66\x0F\x6E\x8B\x38\x01\x00\x00',
+                0x4500000, 0x4600000, b'',
+                b'\xC7\x83\x38\x01\x00\x00\x00\x00\x00\x00\x66\x0F\x6E\x8B\x38\x01\x00\x00',
+                is_inserted=True),
         )
         super().render_assembly_functions(functions)
 

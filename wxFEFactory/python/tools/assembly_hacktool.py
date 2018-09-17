@@ -3,7 +3,7 @@ from lib.extypes import DataClass
 from lib.hack import utils
 from fefactory_api import ui
 from .hacktool import BaseHackTool
-from .assembly_code import AssemblyCodes
+from .assembly_code import AssemblyGroup
 
 
 class AssemblyHacktool(BaseHackTool):
@@ -94,7 +94,7 @@ class AssemblyHacktool(BaseHackTool):
             # 使用参数(暂时支持4字节)
             if item.args:
                 memory_conflict = memory == self.next_usable_memory
-                if isinstance(assembly, AssemblyCodes):
+                if isinstance(assembly, AssemblyGroup):
                     for arg in item.args:
                         self.register_variable(arg)
                 else:
@@ -105,7 +105,7 @@ class AssemblyHacktool(BaseHackTool):
                     memory = data['memory'] = self.next_usable_memory
 
             # 动态生成机器码
-            if isinstance(assembly, AssemblyCodes):
+            if isinstance(assembly, AssemblyGroup):
                 assembly = assembly.generate(self, memory)
 
             if self.is32process:
@@ -130,6 +130,8 @@ class AssemblyHacktool(BaseHackTool):
                         memory = data['memory'] = self.next_usable_memory
                         self.handler.write_ptr(temp, memory)
                     raplace += b'\xFF\x24\x25' + temp.to_bytes(4, 'little')
+                else:
+                    raise ValueError('不支持当前情况jmp')
 
                 assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + original_len).to_bytes(8, 'little')
 
@@ -186,10 +188,10 @@ class AssemblyHacktool(BaseHackTool):
         if addr:
             return self.handler.read32(addr)
 
-    def set_variable_value(self, name, value):
+    def set_variable_value(self, name, value, size=4):
         addr = self.get_variable(name)
         if addr:
-            self.handler.write32(addr, value)
+            self.handler.write_uint(addr, value, size)
 
 
 class AssemblyItems:
