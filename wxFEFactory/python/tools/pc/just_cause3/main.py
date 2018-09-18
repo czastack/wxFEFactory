@@ -63,7 +63,7 @@ class Main(AssemblyHacktool):
                     AssemblyGroup(
                         b'\x51\x52\x53',
                         assembly_code.IfInt64('rapid_fire_temp',
-                            AssemblyGroup(b'\x4C\x89\x25', assembly_code.Offset('rapid_fire_temp', 7)),
+                            AssemblyGroup(b'\x4C\x89\x25', assembly_code.Offset('rapid_fire_temp', 4)),
                             AssemblyGroup(b'\x4C\x89\x24\x25', assembly_code.Variable('rapid_fire_temp'))
                         ),
                         b'\x41\x8B\x94\x24\x24\x02\x00\x00\x48\x8B\x4E\x60\x48\x81\xC1\x80\x09\x00\x00'
@@ -79,7 +79,11 @@ class Main(AssemblyHacktool):
                         b'\x48\x39\xF8\x75\x0A\xC7\x87\x98\x01\x00\x00\x00\xC0\x79\x44'
                         b'\x58\xF3\x0F\x10\x87\x98\x01\x00\x00'),
                     is_inserted=True,
-                    replace_len=8)),
+                    replace_len=8),
+                AssemblyItem('rapid_fire3', None, b'\x80\xB9\x5D\x01\x00\x00\x00',
+                    0x3C00000, 0x3D00000, b'',
+                    b'\xC7\x81\x5D\x01\x00\x00\x00\x00\x00\x00\x80\xB9\x5D\x01\x00\x00\x00',
+                    is_inserted=True)),
             # TODO 没法保证Alloc的地址是32位的
             AssemblyItem('challenge_points', '挑战分数',
                 b'\x48\x03\x7B\x18\x48\x8B\x1B\x49\x3B\x9C\x24\x88\x01\x00\x00',

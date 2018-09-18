@@ -79,18 +79,18 @@ namespace emuhacker {
 		return self.read_last_addr(addr, offsets);
 	}
 
-	auto write_function(ProcessHandler &self, py::bytes buf) {
+	auto write_function(ProcessHandler &self, py::bytes buf, size_t start) {
 		char *buff;
 		ssize_t size;
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
-		return self.write_function(buff, size);
+		return self.write_function(buff, size, start);
 	}
 
-	auto alloc_data(ProcessHandler &self, py::bytes buf) {
+	auto alloc_data(ProcessHandler &self, py::bytes buf, size_t start) {
 		char *buff;
 		ssize_t size;
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
-		return self.alloc_data(buff, size);
+		return self.alloc_data(buff, size, start);
 	}
 
 	pyobj find_bytes(ProcessHandler &self, py::bytes buf, addr_t start, addr_t end, int ordinal)
@@ -211,8 +211,9 @@ void init_emuhacker(pybind11::module & m)
 
 	auto addr_a = "addr"_a;
 	auto offsets_a = "offsets"_a;
-	auto size_a = "size"_a;
 	auto data_a = "data"_a;
+	auto size_a = "size"_a;
+	auto start_a = "start"_a;
 	auto type_a = "type"_a;
 
 	py::class_<ProcessHandler, PyProcessHandler>(emuhacker, "ProcessHandler")
@@ -235,11 +236,11 @@ void init_emuhacker(pybind11::module & m)
 		.def("get_module", &ProcessHandler::getModuleHandle)
 		.def("get_module_file", &emuhacker::getModuleFile, "module"_a = 0)
 		.def("get_module_version", &emuhacker::getModuleVersion)
-		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a, "protect"_a=PAGE_READWRITE)
-		.def("free_memory", &ProcessHandler::free_memory)
-		.def("write_function", &emuhacker::write_function)
-		.def("alloc_data", &emuhacker::alloc_data)
-		.def("find_bytes", &emuhacker::find_bytes, "data"_a, "start"_a, "end"_a, "ordinal"_a=1)
+		.def("alloc_memory", &ProcessHandler::alloc_memory, size_a, start_a=0, "protect"_a=PAGE_READWRITE)
+		.def("alloc_data", &emuhacker::alloc_data, data_a, start_a=0)
+		.def("write_function", &emuhacker::write_function, data_a, start_a = 0)
+		.def("free_memory", &ProcessHandler::free_memory, addr_a)
+		.def("find_bytes", &emuhacker::find_bytes, data_a, start_a, "end"_a, "ordinal"_a=1)
 		.def("remote_call", &ProcessHandler::remote_call, addr_a, "arg"_a)
 		.def("bring_target_top", &ProcessHandler::bring_target_top)
 		.def("enum_windows", &emuhacker::enum_windows, "callback"_a, "prefix"_a=None)

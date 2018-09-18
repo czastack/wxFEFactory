@@ -101,4 +101,4 @@ class Offset(AssemblyNode):
 
     def generate(self, owner, addr):
         target = self.get_target(owner)
-        return self.offset(offset, addr, self.size)
+        return self.offset(target, addr, self.size)

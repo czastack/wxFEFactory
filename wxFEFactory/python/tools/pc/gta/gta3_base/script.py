@@ -60,7 +60,7 @@ class BaseRunningScript(ManagedModel):
         """压入参数"""
         if isinstance(signature, str):
             signature = signature.encode()
-        
+
         repeat = 0
         arg_it = iter(args)
 
@@ -133,11 +133,11 @@ class BaseRunningScript(ManagedModel):
             for i in range(len(self.variables)):
                 self.handler.write32(self.variables[i], self.handler.read32(var_addr))
                 var_addr += 4
-    
+
     def reset(self):
         self.buff.clear()
         self.variables.clear()
-    
+
     def __enter__(self):
         self.reset()
         return self
@@ -175,7 +175,7 @@ class RunningScript(BaseRunningScript):
             self.push(signature, *args)
         self.push_end()
         self.handler.write(self.buff_addr, self.buff)
-        
+
         ip = self.buff_addr - self.script_space_base
         if ip < 0:
             raise ValueError('申请的内存不太对，重新按下检测按钮吧')

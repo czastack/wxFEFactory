@@ -214,11 +214,11 @@ public:
 
 	addr_t getModuleHandle(LPCTSTR name);
 
-	addr_t alloc_memory(size_t size, DWORD protect = PAGE_READWRITE);
+	addr_t alloc_memory(size_t start, size_t size, DWORD protect = PAGE_READWRITE);
 	void free_memory(addr_t addr);
 
-	addr_t write_function(LPCVOID buf, size_t size);
-	addr_t alloc_data(LPCVOID buf, size_t size);
+	addr_t alloc_data(LPCVOID buf, size_t size, size_t start=0);
+	addr_t write_function(LPCVOID buf, size_t size, size_t start=0);
 
 	DWORD remote_call(addr_t addr, LONG_PTR arg);
 	class ProcAddressHelper* getProcAddressHelper(addr_t module);

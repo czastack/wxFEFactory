@@ -55,7 +55,7 @@ class AssemblyHacktool(BaseHackTool):
     def insure_memory(self):
         if self.allocated_memory is None:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
-            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, 0x40)
+            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, protect=0x40)
             self.registed_assembly = {}
             self.registed_variable = {}
 
@@ -108,11 +108,12 @@ class AssemblyHacktool(BaseHackTool):
             if isinstance(assembly, AssemblyGroup):
                 assembly = assembly.generate(self, memory)
 
-            if self.is32process:
+            jmp_offset = memory - (addr + 5)
+            if abs(jmp_offset) < 0x7FFFFFFF or self.is32process:
                 # E9 relative address
                 # 计算jump地址, 5是jmp opcode的长度
                 jmp_len = 5
-                diff_new = utils.u32(memory - (addr + 5))
+                diff_new = utils.u32(jmp_offset)
                 diff_back = utils.u32(addr + original_len - (memory + len(assembly) + 5))
                 raplace += raplace + b'\xE9' + diff_new.to_bytes(4, 'little')
                 assembly = assembly + b'\xE9' + diff_back.to_bytes(4, 'little')

@@ -225,9 +225,9 @@ addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
 	return 0;
 }
 
-addr_t ProcessHandler::alloc_memory(size_t size, DWORD protect)
+addr_t ProcessHandler::alloc_memory(size_t size, size_t start, DWORD protect)
 {
-	return (addr_t)VirtualAllocEx(m_process, NULL, size, MEM_COMMIT | MEM_RESERVE, protect);
+	return (addr_t)VirtualAllocEx(m_process, (LPVOID)start, size, MEM_COMMIT | MEM_RESERVE, protect);
 }
 
 void ProcessHandler::free_memory(addr_t addr)
@@ -235,20 +235,20 @@ void ProcessHandler::free_memory(addr_t addr)
 	VirtualFreeEx(m_process, (LPVOID)addr, 0, MEM_RELEASE);
 }
 
-addr_t ProcessHandler::write_function(LPCVOID buf, size_t size)
+addr_t ProcessHandler::alloc_data(LPCVOID buf, size_t size, size_t start)
 {
-	addr_t fnAddr = alloc_memory(size, PAGE_EXECUTE_READWRITE);
-	if (!fnAddr || !raw_write(fnAddr, buf, size))
+	addr_t addr = alloc_memory(size, start);
+	if (!addr || !raw_write(addr, buf, size))
 	{
 		// std::cout << "Write failed" << std::endl;
 		return 0;
 	}
-	return fnAddr;
+	return addr;
 }
 
-addr_t ProcessHandler::alloc_data(LPCVOID buf, size_t size)
+addr_t ProcessHandler::write_function(LPCVOID buf, size_t size, size_t start)
 {
-	addr_t addr = alloc_memory(size);
+	addr_t addr = alloc_memory(size, start, PAGE_EXECUTE_READWRITE);
 	if (!addr || !raw_write(addr, buf, size))
 	{
 		// std::cout << "Write failed" << std::endl;
