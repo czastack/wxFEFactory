@@ -101,6 +101,11 @@ class Main(AssemblyHacktool):
                 0x4500000, 0x4600000, b'',
                 b'\xC7\x83\x38\x01\x00\x00\x00\x00\x00\x00\x66\x0F\x6E\x8B\x38\x01\x00\x00',
                 is_inserted=True),
+            AssemblyItem('clear_hot_level', '清除热度', b'\x44\x39\xA8\x60\x03\x00\x00',
+                0x4800000, 0x4900000, b'',
+                b'\xC7\x80\x5C\x03\x00\x00\x00\x00\x00\x00\xC7\x80\x60\x03\x00\x00\x00\x00\x00\x00'
+                    b'\x44\x39\xA8\x60\x03\x00\x00',
+                is_inserted=True),
         )
         super().render_assembly_functions(functions)
 
