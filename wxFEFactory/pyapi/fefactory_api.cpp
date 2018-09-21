@@ -57,6 +57,7 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 		.def("set_clipboard", set_clipboard)
 		.def("mem_read", mem_read, "address"_a, "size"_a)
 		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a)
+		.def("get_bit", get_bit)
 		// .def("getMouseState", []() {return wxGetMouseState(); })
 		.def("getKeyState", [](int key) {return wxGetKeyState((wxKeyCode)key); });
 

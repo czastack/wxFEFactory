@@ -41,7 +41,7 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         """HP恢复"""
         # self._global.hp = 0x2F
         self._global.ability += 1

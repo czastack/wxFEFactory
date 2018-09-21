@@ -106,6 +106,7 @@ void AuiNotebook::doAdd(View & child)
 		child.ptr()->SetClientData(&child);
 
 		wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
+		child.ptr()->Reparent(NULL);
 		ctrl().AddPage(child, caption);
 
 		pycref onclose = pyDictGet(item->m_kwargs, wxT("onclose"));
@@ -181,7 +182,7 @@ void AuiNotebook::OnPageClose(wxAuiNotebookEvent & event)
 		event.Veto();
 	}
 	else {
-		_removePage(event.GetSelection());
+		_removePage(selection);
 	}
 }
 

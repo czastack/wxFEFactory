@@ -62,10 +62,10 @@ class Main(BaseGbaHack):
             (VK.MOD_ALT, VK.I, this.invincible),
         )
 
-    def pull_through(self, _):
+    def pull_through(self):
         self._global.set_with('hp', 'hpmax')
 
-    def invincible(self, _=None):
+    def invincible(self):
         self._global.invincible = 0xFF
 
     def max_weapon_level(self, _):

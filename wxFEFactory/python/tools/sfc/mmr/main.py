@@ -243,21 +243,21 @@ class Main(BaseSfcHack):
             chariot.set_addr_by_index(i)
             yield chariot
 
-    def move_left(self, _):
+    def move_left(self):
         self.chariot.posx -= 24
 
-    def move_right(self, _):
+    def move_right(self):
         self.chariot.posx += 24
 
-    def move_up(self, _):
+    def move_up(self):
         self.chariot.posy -= 24
 
-    def move_down(self, _):
+    def move_down(self):
         self.chariot.posy += 24
 
-    def pull_through(self, _):
+    def pull_through(self):
         for person in self.persons():
             person.hp = person.hpmax
 
-    def equip_all(self, _):
+    def equip_all(self):
         self.person.equip_all()

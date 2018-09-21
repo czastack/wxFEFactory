@@ -30,8 +30,8 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.M, this.shoot_arrow),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         self._global.hp = 6
 
-    def shoot_arrow(self, _=None):
+    def shoot_arrow(self):
         self._global.arrow = 2

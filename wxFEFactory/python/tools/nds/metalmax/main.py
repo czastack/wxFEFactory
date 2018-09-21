@@ -379,7 +379,7 @@ class MetalMaxHack(BaseNdsHack):
     def on_enemy_change(self, lb):
         self.enemy.set_addr_by_index(lb.index)
 
-    def pull_through(self, _):
+    def pull_through(self):
         for person in self._global.persons:
             person.set_with('hp', 'hpmax')
         for item in self._global.chariot_battle_status:

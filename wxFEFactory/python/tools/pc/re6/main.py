@@ -200,45 +200,45 @@ class Main(NativeHacktool):
     def ingame_item_paste(self, _):
         self.ingame_item.fromhex(fefactory_api.get_clipboard())
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
 
-    def pull_through_all(self, _=None):
+    def pull_through_all(self):
         character_struct = self._global.character_struct
         for i in range(character_struct.chars_count):
             character_struct.chars[i].set_with('health', 'health_max')
 
-    def set_ammo_full(self, _):
+    def set_ammo_full(self):
         person = self.person
         person.items[person.cur_item].set_with('quantity', 'max_quantity')
 
-    def set_ammo_one(self, _):
+    def set_ammo_one(self):
         person = self.person
         person.items[person.cur_item].quantity = 1
 
-    def save_coord(self, _):
+    def save_coord(self):
         self.last_coord = self.person.coord.values()
 
-    def load_coord(self, _):
+    def load_coord(self):
         if hasattr(self, 'last_coord'):
             person = self.person
             self.prev_coord = person.coord.values()
             person.coord = self.last_coord
 
-    def undo_coord(self, _):
+    def undo_coord(self):
         if hasattr(self, 'prev_coord'):
             self.person.coord = self.prev_coord
 
-    def reload_coord(self, _):
+    def reload_coord(self):
         if hasattr(self, 'last_coord'):
             self.person.coord = self.last_coord
 
-    def p1_go_p2(self, _):
+    def p1_go_p2(self):
         self._person()  # 确保当前角色正确
         chars = self._global.character_struct.chars
         chars[self.char_index].coord = chars[self.char_index + 1].coord.values()
 
-    def p2_go_p1(self, _):
+    def p2_go_p1(self):
         self._person()  # 确保当前角色正确
         chars = self._global.character_struct.chars
         chars[self.char_index + 1].coord = chars[self.char_index].coord.values()

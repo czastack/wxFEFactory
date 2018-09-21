@@ -46,7 +46,8 @@ class FeHack(BaseGbaHack):
             ModelSelect("status", "状态种类", choices=datasets.STATUS)
             ModelInput("status_turn", "状态持续")
             for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
-                ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip("E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
+                ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip(
+                    "E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
 
         with Group("items", "角色物品", self._person, cols=4):
             for i in range(5):
@@ -78,11 +79,11 @@ class FeHack(BaseGbaHack):
 
     person = property(_person)
 
-    def continue_move(self, _=None):
+    def continue_move(self):
         """再移动"""
         self.person.moved = False
 
-    def move_to_cursor(self, _=None):
+    def move_to_cursor(self):
         person = self.person
         _global = self._global
         person.posx = _global.curx

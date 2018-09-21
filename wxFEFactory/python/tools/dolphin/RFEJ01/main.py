@@ -71,11 +71,11 @@ class Main(BaseDolphinHack):
 
     person = property(_person)
 
-    def continue_move(self, _=None):
+    def continue_move(self):
         """再移动"""
         self.person.moved = False
 
-    def move_to_cursor(self, _=None):
+    def move_to_cursor(self):
         person = self.person
         ram = self._global
         person.posx = ram.curx

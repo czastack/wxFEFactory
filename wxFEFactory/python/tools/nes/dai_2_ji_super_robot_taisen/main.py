@@ -63,11 +63,11 @@ class Main(BaseNesHack):
     #     ModelInput("atk_land", "陆攻击力")
     #     ModelInput("atk_sea", "海攻击力")
 
-    def get_hotkeys(self):
-        this = self.weak
-        return (
-            (VK.MOD_ALT, VK.H, this.pull_through),
-        )
+    # def get_hotkeys(self):
+    #     this = self.weak
+    #     return (
+    #         (VK.MOD_ALT, VK.H, this.pull_through),
+    #     )
 
     def on_person_change(self, lb):
         self.person.addr = lb.index

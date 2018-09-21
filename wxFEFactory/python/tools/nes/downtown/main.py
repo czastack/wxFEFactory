@@ -53,6 +53,6 @@ class Main(BaseNesHack):
             person.addr = i
             yield person
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         for person in self.persons():
             person.set_with("生命上限", "生命")

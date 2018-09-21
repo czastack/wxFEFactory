@@ -148,12 +148,12 @@ class Main(NativeHacktool):
         if self.handler.active:
             self.handler.remote_call(self._create_unit, type)
 
-    def pull_through(self, _):
+    def pull_through(self):
         """选中单位恢复HP"""
         for unit in self.selected_units:
             unit.hp = unit.type.hp_max
 
-    def selected_finish(self, _):
+    def selected_finish(self):
         """选中单位完成建造"""
         unit = self._adv_selected_unit
         if unit:
@@ -161,13 +161,13 @@ class Main(NativeHacktool):
             unit.construction_progress = unit_type.construction_time
             unit.hp = unit_type.hp_max
 
-    def selected_die(self, _):
+    def selected_die(self):
         """选中单位死亡"""
         unit = self._adv_selected_unit
         if unit:
             unit.hp = 0
 
-    def selected_join(self, _):
+    def selected_join(self):
         """选中单位投诚"""
         unit = self._adv_selected_unit
         if unit:
@@ -176,7 +176,7 @@ class Main(NativeHacktool):
     def on_spawn_unit_type_change(self, view):
         self._spawn_unit_type = datasets.UNITS[view.index][0]
 
-    def create_selected_unit_type(self, _):
+    def create_selected_unit_type(self):
         """生成单位"""
         type = getattr(self, '_spawn_unit_type', None)
         if type:

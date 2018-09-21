@@ -65,6 +65,6 @@ class Main(BaseNesHack):
             person.addr = i
             yield person
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         for person in self.persons():
             person.set_with("体力最大值", "体力当前值").set_with("气力最大值", "气力当前值")

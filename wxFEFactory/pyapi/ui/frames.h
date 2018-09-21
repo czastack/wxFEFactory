@@ -175,6 +175,53 @@ public:
 };
 
 
+class KeyHookWindow : public Window
+{
+protected:
+	py::dict m_hotkey_map;
+	static HMODULE hookDll;
+	static HHOOK (*SetHook)(DWORD ownerThreadID, DWORD targetThreadID, bool onKeyUp);
+	static void (*UnsetHook)();
+public:
+	friend class KeyHookThread;
+	using Window::Window;
+
+	virtual ~KeyHookWindow()
+	{
+		m_hotkey_map.clear();
+		m_hotkey_map.release();
+	}
+
+	void setHook(DWORD dwThreadId, bool onKeyUp);
+	void unsetHook();
+	void RegisterHotKeys(py::iterable &items);
+
+	void onKeyMsg(WXWPARAM wParam, WXLPARAM lParam);
+
+	void onRelease() override;
+
+	pyobj getHotkeys()
+	{
+		return py::module::import("types").attr("MappingProxyType")(m_hotkey_map);
+	}
+};
+
+
+class KeyHookThread : public wxThread
+{
+private:
+	KeyHookWindow *m_owner = nullptr;
+	DWORD dwThreadId;
+	bool onKeyUp;
+public:
+	KeyHookThread(KeyHookWindow *owner, DWORD dwThreadId, bool onKeyUp) :
+		m_owner(owner), dwThreadId(dwThreadId), onKeyUp(onKeyUp)
+	{}
+
+	void* Entry() override;
+};
+
+
 class Dialog : public BaseTopLevelWindow
 {
 public:

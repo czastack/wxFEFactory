@@ -70,7 +70,7 @@ class Main(BaseGbaHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         self._global.hp = 0x32
         if self._global.tankhp:
             self._global.tankhp = 0x32

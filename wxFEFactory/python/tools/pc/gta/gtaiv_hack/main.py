@@ -424,11 +424,11 @@ class Main(BaseGTATool):
         """不被通缉"""
         self.native_call('SET_WANTED_MULTIPLIER', 'f', 0 if tb.checked else 1)
 
-    def max_cur_weapon(self, _=None):
+    def max_cur_weapon(self):
         """当前武器子弹全满"""
         self.player.max_cur_ammo()
 
-    def explode_nearest_vehicle(self, _=None):
+    def explode_nearest_vehicle(self):
         """爆破最近的车"""
         vehicle = self.get_nearest_vehicle()
         if vehicle:
@@ -482,7 +482,7 @@ class Main(BaseGTATool):
                 if vehicle:
                     vehicle.freeze_position()
 
-    def enemys_harmless(self, _=None):
+    def enemys_harmless(self):
         """敌人缴械+定住"""
         self.enemys_remove_weapon()
         self.enemys_freeze_position()
@@ -591,7 +591,7 @@ class Main(BaseGTATool):
                 entity.coord = coord
                 return True
 
-    def teleport_to_waypoint(self, _=None):
+    def teleport_to_waypoint(self):
         """瞬移到标记点"""
         if not self.teleport_to_blip(self.get_first_blip(models.Blip.BLIP_WAYPOINT)):
             entity = self.entity
@@ -651,7 +651,7 @@ class Main(BaseGTATool):
         data = self.get_camera_rot_raw()
         return degreeToRadian(data[2])
 
-    def dir_correct(self, _=None):
+    def dir_correct(self):
         """根据摄像机朝向设置当前实体的朝向"""
         yaw = self.get_camera_yaw()
         if yaw < 0:
@@ -718,7 +718,7 @@ class Main(BaseGTATool):
         else:
             print('该模型不支持或不是载具模型')
 
-    def spawn_choosed_vehicle_and_enter(self, _=None):
+    def spawn_choosed_vehicle_and_enter(self):
         """生成选中的载具并进入"""
         car = self.spawn_choosed_vehicle()
         if car:

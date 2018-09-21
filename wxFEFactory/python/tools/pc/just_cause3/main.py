@@ -6,7 +6,9 @@ from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItem
 from tools.assembly_code import AssemblyGroup, Variable
 from tools import assembly_code
 from fefactory_api import ui
+from styles import styles
 from . import models
+import fefactory_api
 
 
 class Main(AssemblyHacktool):
@@ -111,16 +113,16 @@ class Main(AssemblyHacktool):
     def get_hotkeys(self):
         this = self.weak
         return (
-            (VK.MOD_ALT, VK.H, this.pull_through),
-            (VK.MOD_ALT, VK.P, this.challenge_points_add),
-            (VK.MOD_ALT, VK.T, this.toggle_challenge_time),
+            (0, VK.H, this.pull_through),
+            (0, VK.P, this.challenge_points_add),
+            (0, VK.T, this.toggle_challenge_time),
         )
 
-    def pull_through(self, _):
+    def pull_through(self):
         _global = self._global
 
-    def challenge_points_add(self, _):
+    def challenge_points_add(self):
         self.toggle_assembly_button('challenge_points_add')
 
-    def toggle_challenge_time(self, _):
+    def toggle_challenge_time(self):
         self.toggle_assembly_button('challenge_time')

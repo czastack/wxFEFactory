@@ -39,6 +39,6 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.I, this.invincible),
         )
 
-    def invincible(self, _=None):
+    def invincible(self):
         self._global.invincible_1 = 0xFF
         self._global.invincible_2 = 0xFF

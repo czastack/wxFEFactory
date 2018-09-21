@@ -161,6 +161,11 @@ void mem_write(size_t address, py::bytes value, size_t size)
 	}
 }
 
+int get_bit()
+{
+	return (sizeof(size_t) == 8) ? 64: 32;
+}
+
 wxItemKind getItemKind(wxcstr kindStr)
 {
 	wxItemKind kind = wxITEM_NORMAL;

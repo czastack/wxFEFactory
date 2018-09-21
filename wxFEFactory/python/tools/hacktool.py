@@ -46,7 +46,7 @@ class BaseHackTool(NestedTool):
 
         succeed = self.handler.attach()
         if succeed or succeed is None and self.handler.attach_window(self.CLASS_NAME, self.WINDOW_NAME):
-            self.attach_status_view.label = self.WINDOW_NAME + ' 正在运行'
+            self.attach_status_view.label = (self.WINDOW_NAME or self.CLASS_NAME) + ' 正在运行'
 
             if not self.win.hotkeys:
                 hotkeys = self.get_hotkeys()
@@ -55,7 +55,7 @@ class BaseHackTool(NestedTool):
             self.onattach()
             return True
         else:
-            self.attach_status_view.label = '没有检测到 ' + self.WINDOW_NAME or self.WINDOW_TITLE
+            self.attach_status_view.label = '没有检测到 ' + (self.WINDOW_NAME or self.CLASS_NAME)
             return False
 
     def get_hotkeys(self):
@@ -130,7 +130,8 @@ class BaseHackTool(NestedTool):
         return (r(addr), r(addr + 4), r(addr + 8))
 
     def onattach(self):
-        pass
+        if self.key_hook:
+            self.win.setHook(self.handler.thread_id)
 
     def ondetach(self):
         pass

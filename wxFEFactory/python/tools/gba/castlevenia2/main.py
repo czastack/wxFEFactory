@@ -66,7 +66,7 @@ class Main(BaseGbaHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def pull_through(self, _):
+    def pull_through(self):
         self._global.set_with('hp', 'hpmax').set_with('mp', 'mpmax')
 
     def set_monster_flag(self, _):

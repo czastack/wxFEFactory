@@ -135,7 +135,7 @@ class Main(BaseGTA3Tool):
         time.sleep(0.01)
         self.handler.ptrs_write(TEXT2_ADDR, (), text)
 
-    def bigbang(self, _=None):
+    def bigbang(self):
         self.inputCheat('bigbang')
 
     def vehicle_fix(self, vehicle):

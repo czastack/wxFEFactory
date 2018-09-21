@@ -117,7 +117,7 @@ class FeHack(BaseNdsHack):
         ModelInput("lucky_add", "幸运+")
         ModelInput("defense_add", "防御+")
         ModelInput("magicdef_add", "魔防+")
-        
+
         i = 0
         for item in datasets.ITEM_ATTRS:
             hint, labels = item
@@ -167,26 +167,26 @@ class FeHack(BaseNdsHack):
             item_from = self._global.iteminfos[index - 1]
             self.handler.write(self._global.iteminfos.addr_at(self.item_index - 1), item_from.to_bytes())
 
-    def continue_move(self, _=None):
+    def continue_move(self):
         """再移动"""
         self.person.moved = False
 
-    def move_to_cursor(self, _=None):
+    def move_to_cursor(self):
         person = self.person
         _global = self._global
         person.posx = _global.curx
         person.posy = _global.cury
 
-    def move_left(self, _=None):
+    def move_left(self):
         self.person.posx -= 1
 
-    def move_right(self, _=None):
+    def move_right(self):
         self.person.posx += 1
 
-    def move_up(self, _=None):
+    def move_up(self):
         self.person.posy -= 1
 
-    def move_down(self, _=None):
+    def move_down(self):
         self.person.posy += 1
 
     def on_train_items_page(self, page):

@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include "frames.h"
+#include "keyhook/keyhook.h"
 
 
 void BaseTopLevelWindow::__exit__(py::args & args)
@@ -191,11 +192,108 @@ void HotkeyWindow::stopHotkey()
 void HotkeyWindow::onHotkey(wxKeyEvent & event)
 {
 	pycref hotkeyId = py::cast(event.GetId());
-	pycref ret = pyCall(m_hotkey_map[hotkeyId], hotkeyId);
+	pycref ret = pyCall(m_hotkey_map[hotkeyId]);
 	if (!PyObject_IsTrue(ret.ptr()))
 	{
 		event.Skip();
 	}
+}
+
+
+void * KeyHookThread::Entry()
+{
+	MSG msg;
+	PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+	if (m_owner->SetHook(GetCurrentThreadId(), dwThreadId, onKeyUp))
+	{
+		while (GetMessage(&msg, NULL, 0, 0) > 0)
+		{
+			if (WM_HOOK_KEY == msg.message)
+			{
+				m_owner->onKeyMsg(msg.wParam, msg.lParam);
+			}
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		m_owner->UnsetHook();
+	}
+	return nullptr;
+}
+
+
+HMODULE KeyHookWindow::hookDll = nullptr;
+decltype(KeyHookWindow::SetHook) KeyHookWindow::SetHook = nullptr;
+decltype(KeyHookWindow::UnsetHook) KeyHookWindow::UnsetHook = nullptr;
+
+void KeyHookWindow::setHook(DWORD dwThreadId, bool onKeyUp)
+{
+	if (!hookDll)
+	{
+		hookDll = LoadLibrary(L"keyhook.dll");
+		if (!hookDll)
+		{
+			py::print(L"无法加载keyhook.dll");
+			return;
+		}
+		SetHook = (decltype(KeyHookWindow::SetHook))GetProcAddress(hookDll, "SetHook");
+		UnsetHook = (decltype(KeyHookWindow::UnsetHook))GetProcAddress(hookDll, "UnsetHook");
+	}
+	auto pThread = new KeyHookThread(this, dwThreadId, onKeyUp);
+	pThread->Run();
+}
+
+void KeyHookWindow::unsetHook()
+{
+	if (hookDll)
+	{
+		UnsetHook();
+	}
+}
+
+void KeyHookWindow::RegisterHotKeys(py::iterable & items)
+{
+	for (auto e : items)
+	{
+		const py::tuple &item = e.cast<py::tuple>();
+		int modifiers = item[0].cast<int>();
+		int virtualKeyCode = item[1].cast<int>();
+		pycref onhotkey = item[2];
+		py::int_ key((modifiers << 16) | virtualKeyCode);
+
+		if (m_hotkey_map.contains(key))
+		{
+			py::print(key, "已经在使用了");
+			return;
+		}
+		else
+		{
+			m_hotkey_map[key] = onhotkey;
+		}
+	}
+}
+
+void KeyHookWindow::onKeyMsg(WXWPARAM wParam, WXLPARAM lParam)
+{
+	DWORD modifiers = 0;
+	if ((lParam & 0x20000000) != 0)
+		modifiers |= MOD_ALT;
+	if (GetKeyState(VK_CONTROL) < 0)
+		modifiers |= MOD_CONTROL;
+	if (GetKeyState(VK_SHIFT) < 0)
+		modifiers |= MOD_SHIFT;
+
+	py::int_ key(modifiers << 16 | wParam);
+	if (m_hotkey_map.contains(key))
+	{
+		pyCall(m_hotkey_map[key]);
+	}
+}
+
+void KeyHookWindow::onRelease()
+{
+	unsetHook();
+	BaseFrame::onRelease();
 }
 
 
@@ -263,6 +361,13 @@ void init_frames(py::module & m)
 		.def("RegisterHotKeys", &HotkeyWindow::RegisterHotKeys, "items"_a)
 		.def("UnregisterHotKey", &HotkeyWindow::UnregisterHotKey, "hotkeyId"_a, "force"_a = false)
 		.def_property_readonly("hotkeys", &HotkeyWindow::getHotkeys);
+
+	py::class_t<KeyHookWindow, Window>(m, "KeyHookWindow")
+		.def(base_frame_init, label, menubar_a, base_frame_wxstyle_a, styles, className, style)
+		.def("setHook", &KeyHookWindow::setHook, "thread_id"_a, "onkeyup"_a=false)
+		.def("unsetHook", &KeyHookWindow::unsetHook)
+		.def("RegisterHotKeys", &KeyHookWindow::RegisterHotKeys, "items"_a)
+		.def_property_readonly("hotkeys", &KeyHookWindow::getHotkeys);
 
 	py::class_t<Dialog, BaseTopLevelWindow>(m, "Dialog")
 		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(),

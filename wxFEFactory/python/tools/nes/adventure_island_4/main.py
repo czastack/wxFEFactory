@@ -28,26 +28,27 @@ class Main(BaseNesHack):
             ModelSelect("dragon", "当前龙", choices=DRAGONS)
 
         with StaticGroup("功能"):
-            self.render_functions(('pull_through', 'hp_max', 'all_dragons', 'all_tools'))
+            self.render_functions(('hp_max', 'all_dragons', 'all_tools'))
 
     def get_hotkeys(self):
         this = self.weak
         return (
+            (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT, VK.I, this.invincible),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         """HP恢复"""
         self._global.set_with('hp', 'hpmax')
+
+    def invincible(self):
+        """无敌"""
+        self._global.invincible = 0xFF
 
     def hp_max(self, _=None):
         """HP最大"""
         self._global.hp = 0x20
         self._global.hpmax = 0x20
-
-    def invincible(self, _=None):
-        """无敌"""
-        self._global.invincible = 0xFF
 
     def all_dragons(self, _=None):
         """所有恐龙"""

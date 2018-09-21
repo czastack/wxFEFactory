@@ -30,7 +30,7 @@ bool Is64Bit_OS()
 bool ProcessHandler::m_is64os = Is64Bit_OS();
 
 
-ProcessHandler::ProcessHandler():m_process(nullptr), m_raw_addr(false)
+ProcessHandler::ProcessHandler():m_process(nullptr), m_thread_id(NULL), m_raw_addr(false)
 {
 	HANDLE	hProcess;
 	HANDLE	hToken;
@@ -75,7 +75,7 @@ bool ProcessHandler::attach_handle(HWND hWnd){
 	{
 		DWORD	dwProcessId;
 		close();
-		GetWindowThreadProcessId(hWnd, &dwProcessId);
+		m_thread_id = GetWindowThreadProcessId(hWnd, &dwProcessId);
 		m_process = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 		m_is32process = is32Process();
 		return m_process != nullptr;

@@ -95,30 +95,30 @@ class BaseGSTool(BaseGbaHack):
         self.person.skills_offset = (page - 1) * self.SKILLS_PAGE_LENGTH
         self.skills_group.read()
 
-    def move_left(self, _=None):
+    def move_left(self):
         if self._global.map_x is 0:
             self._global.town_x -= 10
         else:
             self._global.map_x -= 10
 
-    def move_right(self, _=None):
+    def move_right(self):
         if self._global.map_x is 0:
             self._global.town_x += 10
         else:
             self._global.map_x += 10
 
-    def move_up(self, _=None):
+    def move_up(self):
         if self._global.map_x is 0:
             self._global.town_y -= 10
         else:
             self._global.map_y -= 10
 
-    def move_down(self, _=None):
+    def move_down(self):
         if self._global.map_x is 0:
             self._global.town_y += 10
         else:
             self._global.map_y += 10
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         for person in self.persons():
             person.hp = person.hpmax

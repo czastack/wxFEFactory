@@ -11,6 +11,7 @@ class ProcessHandler
 {
 protected:
 	HANDLE		m_process;
+	DWORD       m_thread_id;
 	static bool m_is64os;
 	bool        m_is32process; // 目标是32位进程
 	bool        m_raw_addr;

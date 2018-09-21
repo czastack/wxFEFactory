@@ -34,8 +34,8 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.SPACE, this.one_hit_kill),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         self._global.hp = self._global.maxhp
 
-    def one_hit_kill(self, _=None):
+    def one_hit_kill(self):
         self._global.enemy_hp = 0

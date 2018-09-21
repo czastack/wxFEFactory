@@ -17,9 +17,9 @@ class BaseTool(BaseScene):
     def attach(self, frame):
         try:
             if self.nested:
-                win = self.render()
-                if win:
-                    with frame.book:
+                with frame.book:
+                    win = self.render()
+                    if win:
                         ui.AuiItem(win, caption=self.unique_title)
             else:
                 with frame.win:
@@ -139,9 +139,11 @@ class BaseTool(BaseScene):
 
 class NestedTool(BaseTool):
     nested = True
+    key_hook = True
 
     def render_win(self):
         menubar = self.render_menu()
-        self.win = ui.HotkeyWindow(self.title, styles=styles, menubar=menubar, wxstyle=0x80804)
+        Window = ui.KeyHookWindow if self.key_hook else ui.HotkeyWindow
+        self.win = Window(self.title, styles=styles, menubar=menubar, wxstyle=0x80804)
         self.win.position = (70, 4)
         return self.win

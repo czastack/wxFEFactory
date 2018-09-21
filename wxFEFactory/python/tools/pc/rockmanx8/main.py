@@ -45,7 +45,7 @@ class Main(BaseHackTool):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         _global = self._global
         _global.hp_axl = _global.hpmax_axl
         _global.hp_x = _global.hpmax_x

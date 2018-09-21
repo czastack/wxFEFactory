@@ -81,7 +81,7 @@ class Main(BaseGbaHack):
             person.addr = i * models.Person.SIZE
             yield person
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         for person in self.persons():
             person.hp = person.hpmax
 

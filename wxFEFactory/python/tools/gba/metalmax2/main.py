@@ -121,18 +121,18 @@ class Main(BaseGbaHack):
             chariot.addr = i * models.chariot.SIZE
             yield chariot
 
-    def move_left(self, _=None):
+    def move_left(self):
         self._global.posx -= 1
 
-    def move_right(self, _=None):
+    def move_right(self):
         self._global.posx += 1
 
-    def move_up(self, _=None):
+    def move_up(self):
         self._global.posy -= 1
 
-    def move_down(self, _=None):
+    def move_down(self):
         self._global.posy += 1
 
-    def pull_through(self, _=None):
+    def pull_through(self):
         for person in self.persons():
             person.hp = person.hpmax

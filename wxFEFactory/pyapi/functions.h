@@ -18,6 +18,8 @@ void exec_file(py::str file, pyobj scope);
 py::bytes mem_read(size_t address, size_t size);
 void mem_write(size_t address, py::bytes value, size_t size);
 
+int get_bit();
+
 wxItemKind getItemKind(wxcstr kindStr);
 
 long getBitmapTypeByExt(wxcstr path);

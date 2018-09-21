@@ -180,9 +180,7 @@ namespace emuhacker {
 class PyProcessHandler: public ProcessHandler
 {
 public:
-	using ProcessHandler::m_is64os;
-	using ProcessHandler::m_is32process;
-	using ProcessHandler::m_raw_addr;
+	friend void init_emuhacker(py::module &m);
 
 	bool attach() override {
 		PYBIND11_OVERLOAD_PURE(
@@ -200,6 +198,8 @@ public:
 			addr                /* Argument(s) */
 		);
 	};
+
+
 };
 
 
@@ -250,6 +250,7 @@ void init_emuhacker(pybind11::module & m)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process)
+		.def_readonly("thread_id", &PyProcessHandler::m_thread_id)
 		.def_readwrite("raw_addr", &PyProcessHandler::m_raw_addr);
 
 	py::class_<ProcAddressHelper>(emuhacker, "ProcAddressHelper")
