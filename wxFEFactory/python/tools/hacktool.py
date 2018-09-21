@@ -31,6 +31,7 @@ class BaseHackTool(NestedTool):
                     self.begin_group()
                     try:
                         self.render_main()
+                        self.onNotePageChange(book)
                     except Exception:
                         win.close()
                         raise

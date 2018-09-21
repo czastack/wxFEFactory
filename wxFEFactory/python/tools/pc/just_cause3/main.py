@@ -19,9 +19,8 @@ class Main(AssemblyHacktool):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
-        with Group("global", "全局", self._global, handler=self.handler):
-            pass
-            # ModelInput("metal", "金属")
+        # with Group("global", "全局", self._global, handler=self.handler):
+        #     pass
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_assembly_functions(self):
@@ -51,7 +50,7 @@ class Main(AssemblyHacktool):
             AssemblyItem('falcula_inf', '无限钩爪', b'\xFF\xC7\x48\x83\xC0\x10\x4C\x39\xC0',
                 0x3C00000, 0x3D00000, b'\x31\xFF'),
             AssemblyItems('挑战时间不减',
-                AssemblyItem('challenge_time1', None, b'\x29\xC1\x89\x8B\xC8\x00\x00\x00',
+                AssemblyItem('challenge_time', None, b'\x29\xC1\x89\x8B\xC8\x00\x00\x00',
                     0x3D00000, 0x3E00000, b'\x90\x90'),
                 AssemblyItem('challenge_time2', None, b'\xF3\x0F\x5C\xC7\x0F\x2F\xC6\x77\x03',
                     0x3E00000, 0x3F00000, b'\x90\x90\x90\x90'),
@@ -114,10 +113,14 @@ class Main(AssemblyHacktool):
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT, VK.P, this.challenge_points_add),
+            (VK.MOD_ALT, VK.T, this.toggle_challenge_time),
         )
 
     def pull_through(self, _):
         _global = self._global
 
     def challenge_points_add(self, _):
-        self.set_variable_value('challenge_points_add', 1)
+        self.toggle_assembly_button('challenge_points_add')
+
+    def toggle_challenge_time(self, _):
+        self.toggle_assembly_button('challenge_time')

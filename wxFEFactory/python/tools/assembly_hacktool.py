@@ -32,9 +32,10 @@ class AssemblyHacktool(BaseHackTool):
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
-            for item in functions:
-                ui.ToggleButton(label=item.label, onchange=partial(
-                    __class__.toggle_assembly_function, self.weak, item=item))
+            self.assembly_buttons = {
+                item.key: ui.ToggleButton(label=item.label,
+                    onchange=partial(__class__.toggle_assembly_function, self.weak, item=item)) for item in functions
+            }
 
     def toggle_assembly_function(self, btn, item):
         checked = btn.checked
@@ -51,6 +52,9 @@ class AssemblyHacktool(BaseHackTool):
                     self.unregister_assembly(item.key)
         elif isinstance(item, AssemblySwitch):
             self.set_variable_value(item.key, int(checked))
+
+    def toggle_assembly_button(self, key):
+        self.assembly_buttons[key].trigger()
 
     def insure_memory(self):
         if self.allocated_memory is None:
@@ -199,6 +203,10 @@ class AssemblyItems:
     def __init__(self, label, *children):
         self.label = label
         self.children = children
+
+    @property
+    def key(self):
+        return self.children[0].key
 
 
 """ register_assembly 的参数类型
