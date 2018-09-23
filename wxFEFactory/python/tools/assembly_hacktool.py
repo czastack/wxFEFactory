@@ -188,7 +188,7 @@ class AssemblyHacktool(BaseHackTool):
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
 
-    def get_variable_value(self, name, value):
+    def get_variable_value(self, name):
         addr = self.get_variable(name)
         if addr:
             return self.handler.read32(addr)

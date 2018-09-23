@@ -149,7 +149,7 @@ class Main(AssemblyHacktool):
         self.toggle_assembly_button('health_inf')
 
     def challenge_points_add(self):
-        self.toggle_assembly_button('challenge_points_add')
+        self.set_variable_value('challenge_points_add', 1)
 
     def toggle_challenge_time(self):
         self.toggle_assembly_button('challenge_time')

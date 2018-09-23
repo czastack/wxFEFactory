@@ -200,6 +200,9 @@ void HotkeyWindow::onHotkey(wxKeyEvent & event)
 }
 
 
+wxDEFINE_EVENT(EVT_KEYHOOK, ParamEvent);
+
+
 void * KeyHookThread::Entry()
 {
 	MSG msg;
@@ -210,7 +213,7 @@ void * KeyHookThread::Entry()
 		{
 			if (WM_HOOK_KEY == msg.message)
 			{
-				m_owner->onKeyMsg(msg.wParam, msg.lParam);
+				wxQueueEvent(m_owner->ptr(), new ParamEvent(EVT_KEYHOOK, msg.wParam, msg.lParam));
 			}
 
 			TranslateMessage(&msg);
@@ -273,17 +276,17 @@ void KeyHookWindow::RegisterHotKeys(py::iterable & items)
 	}
 }
 
-void KeyHookWindow::onKeyMsg(WXWPARAM wParam, WXLPARAM lParam)
+void KeyHookWindow::onKeyMsg(const ParamEvent &event)
 {
 	DWORD modifiers = 0;
-	if ((lParam & 0x20000000) != 0)
+	if ((event.lParam & 0x20000000) != 0)
 		modifiers |= MOD_ALT;
 	if (GetKeyState(VK_CONTROL) < 0)
 		modifiers |= MOD_CONTROL;
 	if (GetKeyState(VK_SHIFT) < 0)
 		modifiers |= MOD_SHIFT;
 
-	py::int_ key(modifiers << 16 | wParam);
+	py::int_ key(modifiers << 16 | event.wParam);
 	if (m_hotkey_map.contains(key))
 	{
 		pyCall(m_hotkey_map[key]);

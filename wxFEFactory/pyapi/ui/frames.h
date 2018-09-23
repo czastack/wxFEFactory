@@ -175,6 +175,19 @@ public:
 };
 
 
+class ParamEvent : public wxThreadEvent
+{
+public:
+	ParamEvent(wxEventType eventType, WXWPARAM wParam, WXLPARAM lParam): wxThreadEvent(eventType), wParam(wParam), lParam(lParam) {}
+
+	WXWPARAM wParam;
+	WXLPARAM lParam;
+};
+
+
+wxDECLARE_EVENT(EVT_KEYHOOK, ParamEvent);
+
+
 class KeyHookWindow : public Window
 {
 protected:
@@ -184,7 +197,12 @@ protected:
 	static void (*UnsetHook)();
 public:
 	friend class KeyHookThread;
-	using Window::Window;
+
+	template <class... Args>
+	KeyHookWindow(Args ...args) : Window(args...)
+	{
+		m_elem->Bind(EVT_KEYHOOK, &KeyHookWindow::onKeyMsg, this);
+	}
 
 	virtual ~KeyHookWindow()
 	{
@@ -196,7 +214,7 @@ public:
 	void unsetHook();
 	void RegisterHotKeys(py::iterable &items);
 
-	void onKeyMsg(WXWPARAM wParam, WXLPARAM lParam);
+	void onKeyMsg(const ParamEvent &event);
 
 	void onRelease() override;
 
