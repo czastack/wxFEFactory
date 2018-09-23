@@ -28,14 +28,34 @@ class Main(AssemblyHacktool):
     def render_assembly_functions(self):
         functions = (
             AssemblyItems('无限生命',
-                AssemblyItem('health_inf1', '无限生命1', b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
+                AssemblyItem('health_inf', None, b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
                     0x3A00000, 0x3B00000, b'',
                     b'\x66\x8B\x82\xB0\x01\x00\x00\x66\x89\x82\x32\x02\x00\x00'
                         b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
                     is_inserted=True),
-                AssemblyItem('health_inf2', '无限生命2', b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00',
+                AssemblyItem('health_inf2', None, b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00',
                     0x3A00000, 0x3B00000, b'',
                     b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00\x66\xC7\x81\x32\x02\x00\x00\x0F\x27',
+                    is_inserted=True)),
+            AssemblyItems('载具无限生命',
+                AssemblyItem('vehicle_health_inf', None, b'\x48\x83\xB9\xD0\x01\x00\x00\x00',
+                    0x3A00000, 0x3B00000, b'',
+                    AssemblyGroup(
+                        b'\x53\x48\x8B\x99\xD0\x01\x00\x00',
+                        assembly_code.IfInt64('vehicle_addr',
+                            AssemblyGroup(b'\x48\x89\x1D', assembly_code.Offset('vehicle_addr', 4)),
+                            AssemblyGroup(b'\x48\x89\x1C\x25', assembly_code.Variable('vehicle_addr'))
+                        ),
+                        b'\x48\x85\xDB\x74\x09\x66\xC7\x83\x32\x02\x00\x00\x0F\x27\x5B\x48\x83\xB9\xD0\x01\x00\x00\x00'
+                    ),
+                    args=(('vehicle_addr', 8),),
+                    is_inserted=True),
+                AssemblyItem('vehicle_health_inf2', None, b'\x0F\xB7\x97\x32\x02\x00\x00\x48\x8B\x07',
+                    0x3B00000, 0x3C00000, b'',
+                    AssemblyGroup(
+                        b'\x48\xBA', assembly_code.Variable('vehicle_addr', 8),
+                        b'\x48\x39\x3A\x75\x09\x66\x83\xFD\x00\x7E\x03\x66\x31\xED'
+                        b'\x0F\xB7\x97\x32\x02\x00\x00\x48\x8B\x07'),
                     is_inserted=True)),
             AssemblyItem('ammo_keep', '子弹不减', b'\x44\x29\xC0\x4C\x8B\x01', 0x3C00000, 0x3D00000,
                 b'\x90\x90\x90'),
@@ -116,13 +136,17 @@ class Main(AssemblyHacktool):
             (0, VK.H, this.pull_through),
             (0, VK.P, this.challenge_points_add),
             (0, VK.T, this.toggle_challenge_time),
+            (0, VK._0, this.clear_hot_level),
         )
 
     def pull_through(self):
-        _global = self._global
+        self.toggle_assembly_button('health_inf')
 
     def challenge_points_add(self):
         self.toggle_assembly_button('challenge_points_add')
 
     def toggle_challenge_time(self):
         self.toggle_assembly_button('challenge_time')
+
+    def clear_hot_level(self):
+        self.toggle_assembly_button('clear_hot_level')
