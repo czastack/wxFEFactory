@@ -3,8 +3,11 @@ from lib import wxconst
 from lib.win32.keys import WXK
 
 
-class HotkeyCtrl(ui.TextInput):
+def Label(text):
+    return ui.Text(text, className="input_label expand")
 
+
+class HotkeyCtrl(ui.TextInput):
     def __init__(self, *args, **kwargs):
         kwargs['wxstyle'] = wxconst.TE_PROCESS_ENTER
         super().__init__(*args, **kwargs)
@@ -24,5 +27,34 @@ class HotkeyCtrl(ui.TextInput):
         self.mode = mod
 
 
-def Label(text):
-    return ui.Text(text, className="input_label expand")
+class SearchListBox(ui.Vertical):
+    """带搜索功能列表框"""
+    def __init__(self, choices, onselect, *args, **kwargs):
+        if not isinstance(choices, (list, tuple)):
+            choices = tuple(choices)
+        self.choices = choices
+        super().__init__(*args, **kwargs)
+        with self:
+            self.input = ui.ComboBox(className='expand', wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
+                onselect=self.onsearch_select)
+            self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
+            self.input.setOnEnter(self.onsearch)
+
+    def onsearch(self, input):
+        value = input.value
+        choices = []
+        values = []
+        i = 0
+        if value:
+            for item in self.choices:
+                if value in item:
+                    choices.append(item)
+                    values.append(i)
+                i += 1
+        self.search_values = values
+        self.input.setItems(choices)
+        self.input.value = value
+
+    def onsearch_select(self, view):
+        # 搜索结果选择后切换到对应的序号
+        self.listbox.setSelection(self.search_values[view.index], True)

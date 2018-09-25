@@ -58,7 +58,8 @@ class Dict:
             if isinstance(value, (list, tuple)):
                 val = iter(value).__next__
             else:
-                val = lambda: value
+                def val():
+                    return value
             for k in key:
                 self._data[k] = val()
         else:
@@ -119,15 +120,15 @@ class INum:
 
 
 class WeakBinder:
-    __slots__ = ('ref',)
-
     def __init__(self, obj):
         self.ref = weakref.proxy(obj)
 
     def __getattr__(self, name):
         attr = getattr(self.ref.__class__, name, None)
         if isinstance(attr, types.FunctionType):
-            return types.MethodType(attr, self.ref)
+            method = types.MethodType(attr, self.ref)
+            setattr(self, name, method)
+            return method
         return getattr(self.ref, name)
 
 

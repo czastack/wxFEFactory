@@ -14,8 +14,8 @@ class CArray:
 
     @lazy
     def buffer(self):
-        length  = ctypes.sizeof(self.array)
-        ptr     = ctypes.cast(ctypes.pointer(self.array), ctypes.POINTER(ctypes.c_char * length))
+        length = ctypes.sizeof(self.array)
+        ptr = ctypes.cast(ctypes.pointer(self.array), ctypes.POINTER(ctypes.c_char * length))
         return ptr.contents
 
     def to_bytes(self):
@@ -33,7 +33,7 @@ class CArray:
 
 class Uint8Array(CArray):
     TYPE = ctypes.c_uint8
-    
+
 
 class Uint16Array(CArray):
     TYPE = ctypes.c_uint16
@@ -119,23 +119,30 @@ class cint:
 class int8(ctypes.c_int8, cint):
     MAX = 127
 
+
 class int16(ctypes.c_int16, cint):
     MAX = 32767
+
 
 class int32(ctypes.c_int32, cint):
     MAX = 2147483647
 
+
 class int64(ctypes.c_int64, cint):
     MAX = 9223372036854775807
+
 
 class u8(ctypes.c_uint8, cint):
     MAX = 255
 
+
 class u16(ctypes.c_uint16, cint):
     MAX = 65535
 
+
 class u32(ctypes.c_uint32, cint):
     MAX = 4294967295
+
 
 class u64(ctypes.c_uint64, cint):
     MAX = 18446744073709551615

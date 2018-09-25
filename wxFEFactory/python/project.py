@@ -3,6 +3,7 @@ import json
 import os
 Path = os.path
 
+
 class Project(Configurable):
 
     def __init__(self, path, title=None):
@@ -23,4 +24,3 @@ class Project(Configurable):
     def title(self, title):
         if title:
             self.setConfig('title', title)
-

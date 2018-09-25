@@ -1,4 +1,5 @@
 from functools import partial
+from lib.exui.controls import SearchListBox
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -71,9 +72,9 @@ class Main(NativeHacktool):
 
     def render_hotkeys(self):
         with ui.Horizontal(className="fill padding"):
-            ui.ListBox(className="expand",
-                onselect=self.on_spawn_unit_type_change,
-                choices=(item[1] for item in datasets.UNITS))
+            SearchListBox(className="expand",
+                choices=(item[1] for item in datasets.UNITS),
+                onselect=self.on_spawn_unit_type_change)
             with ui.ScrollView(className="fill padding"):
                 ui.Text("选中单位恢复HP: alt+h")
                 ui.Text("选中建筑完成修建: alt+b")
