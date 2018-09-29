@@ -53,6 +53,16 @@ bool BaseTopLevelWindow::setIcon(wxcstr path)
 	return false;
 }
 
+/* bool BaseTopLevelWindow::bring_top()
+{
+#ifdef __WXMSW__
+	wxWindow *win = wxGetApp().GetTopWindow();
+	return ::SetForegroundWindow(win->GetHWND()) && ::BringWindowToTop(win->GetHWND());
+#else
+	return false;
+#endif
+} */
+
 void BaseTopLevelWindow::_onClose(wxCloseEvent & event) {
 	onClose(event);
 }
@@ -338,6 +348,7 @@ void init_frames(py::module & m)
 		.def("close", [](View *self) { return self->ptr()->Close(); })
 		.def("setOnClose", &BaseTopLevelWindow::setOnClose)
 		.def("setIcon", &BaseTopLevelWindow::setIcon)
+		// .def("bring_top", &BaseTopLevelWindow::bring_top)
 		.def_property("title", &BaseTopLevelWindow::getTitle, &BaseTopLevelWindow::setTitle)
 		.def_property("size", &BaseTopLevelWindow::getSize, &BaseTopLevelWindow::setSize)
 		.def_property("position", &BaseTopLevelWindow::getPosition, &BaseTopLevelWindow::setPosition);

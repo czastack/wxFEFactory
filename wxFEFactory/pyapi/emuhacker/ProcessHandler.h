@@ -13,7 +13,7 @@ protected:
 	HANDLE		m_process;
 	DWORD       m_thread_id;
 	static bool m_is64os;
-	bool        m_is32process; // 目标是32位进程
+	bool        m_is32process; // target is 32bit process
 	bool        m_raw_addr;
 
 public:
@@ -104,7 +104,7 @@ public:
 	}
 
 	/**
-	 * 读取数据到数组
+	 * read data to array
 	 */
 	template<size_t size, typename TYPE>
 	bool read(addr_t addr, TYPE(&arr)[size]) {
@@ -112,7 +112,7 @@ public:
 	}
 
 	/**
-	 * 写入数组中的数据
+	 * write data in array
 	 */
 	template<size_t size, typename TYPE>
 	bool write(addr_t addr, TYPE(&arr)[size]) {
@@ -120,7 +120,7 @@ public:
 	}
 
 	/**
-	 * 读取数据
+	 * read data to buffer
 	 */
 	template<typename TYPE>
 	bool read(addr_t addr, TYPE &buff) {
@@ -128,7 +128,7 @@ public:
 	}
 
 	/**
-	 * 写入数据
+	 * write data in buff
 	 */
 	template<typename ValueType>
 	bool write(addr_t addr, const ValueType &buff) {
@@ -136,7 +136,7 @@ public:
 	}
 
 	/**
-	 * 读取数据
+	 * read data of type
 	 */
 	template<typename ValueType=u8>
 	ValueType read(addr_t addr) {
@@ -192,7 +192,7 @@ public:
 	}
 
 	/**
-	 * 多级指针读取数据
+	 * read data from pointers
 	 */
 	template<typename ListType>
 	bool ptrs_read(addr_t addr, const ListType &offsets, size_t size, LPVOID buffer) {
@@ -201,7 +201,7 @@ public:
 	}
 
 	/**
-	 * 多级指针写入数据
+	 * write data by pointers
 	 */
 	template<typename ListType>
 	bool ptrs_write(addr_t addr, const ListType &offsets, size_t size, LPCVOID buffer) {
@@ -209,7 +209,7 @@ public:
 		return addr && write(addr, buffer, size);
 	}
 
-	bool bring_target_top();
+	// bool bring_target_top();
 
 	addr_t getProcessBaseAddress();
 

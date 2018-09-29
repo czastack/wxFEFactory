@@ -174,7 +174,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-bool ProcessHandler::bring_target_top()
+/* bool ProcessHandler::bring_target_top()
 {
 	EnumWindowsArg ewa;
 	ewa.dwProcessID = getProcessId();
@@ -185,7 +185,7 @@ bool ProcessHandler::bring_target_top()
 		return ::SetForegroundWindow(ewa.hwndWindow) && ::BringWindowToTop(ewa.hwndWindow);
 	}
 	return false;
-}
+} */
 
 /**
  * Get MainModuleAddress

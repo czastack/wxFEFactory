@@ -38,6 +38,8 @@ public:
 
 	bool setIcon(wxcstr path);
 
+	// bool bring_top();
+
 	void setOnClose(pycref onclose)
 	{
 		_bindEvt((int)wxEVT_CLOSE_WINDOW, onclose, true, false);
