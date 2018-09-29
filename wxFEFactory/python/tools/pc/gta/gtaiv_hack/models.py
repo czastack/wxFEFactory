@@ -66,13 +66,6 @@ class MemObject(Entity):
 class NativeEntity(NativeModel):
     distance = Physicle.distance
 
-    EXPLOSION_TYPE_GRENADE = 0
-    EXPLOSION_TYPE_MOLOTOV = 1
-    EXPLOSION_TYPE_ROCKET = 2
-    EXPLOSION_TYPE_HI_OCTANE = 3
-    EXPLOSION_TYPE_CAR = 4
-    EXPLOSION_TYPE_PLANE = 5
-
     @property
     def speed(self):
         values = self.context.get_move_speed(self.addr)
@@ -155,8 +148,10 @@ class Player(NativeEntity):
             s = '?'
         else:
             raise ValueError('not support type: ' + type.__name__)
+
         def setter(self, value):
             self.native_call(name, 'L' + s, self.index, value)
+
         return setter
 
     @property
@@ -176,6 +171,8 @@ class Player(NativeEntity):
     ap = property(getter_ptr('GET_CHAR_ARMOUR'), setter('ADD_ARMOUR_TO_CHAR'))
     max_health = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_HEALTH'))
     max_armor = property(None, player_getter_ptr('INCREASE_PLAYER_MAX_ARMOUR'))
+    # 射击比率
+    shoot_rate = property(None, setter('SET_CHAR_SHOOT_RATE'))
 
     money = property(player_getter_ptr('STORE_SCORE'))
 
@@ -200,6 +197,7 @@ class Player(NativeEntity):
 
     # 通缉等级
     wanted_level = property(player_getter_ptr('STORE_WANTED_LEVEL'))
+
     @wanted_level.setter
     def wanted_level(self, level):
         level = int(level)
@@ -230,7 +228,8 @@ class Player(NativeEntity):
         self.script_call('SET_CHAR_COORDINATES', 'L3f', self.handle, *pos, sync=False)
 
     def get_offset_coord(self, offset):
-        self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L', self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
+        self.native_call('GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS', 'L3f3L',
+            self.handle, *offset, *self.native_context.get_temp_addrs(1, 3))
         return self.native_context.get_temp_values(1, 3, float, mapfn=float32)
 
     get_vehicle_handle = getter_ptr('GET_CAR_CHAR_IS_USING')
@@ -264,22 +263,23 @@ class Player(NativeEntity):
     def get_weapon_in_slot(self, slot):
         """获取指定武器槽中的武器种类和弹药数"""
         ctx = self.native_context
-        self.native_call('GET_CHAR_WEAPON_IN_SLOT', '5L', self.handle, slot, ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
+        self.native_call('GET_CHAR_WEAPON_IN_SLOT', '5L', self.handle, slot,
+            ctx.get_temp_addr(1), ctx.get_temp_addr(2), ctx.get_temp_addr(3))
         return (
-            ctx.get_temp_value(1), # weapon_type
-            ctx.get_temp_value(2), # ammo
+            ctx.get_temp_value(1),  # weapon_type
+            ctx.get_temp_value(2),  # ammo
         )
 
     def remove_all_weapons(self):
         """移除所有武器"""
         self.native_call('REMOVE_ALL_CHAR_WEAPONS', 'L', self.handle)
-        
+
     def get_ammo(self, weapon):
         """获取指定武器的弹药数"""
         ctx = self.native_context
         self.native_call('GET_AMMO_IN_CHAR_WEAPON', '3L', self.handle, weapon, ctx.get_temp_addr())
         return ctx.get_temp_value()
-        
+
     def set_ammo(self, weapon, ammo):
         """设置指定武器的弹药数"""
         self.native_call('SET_CHAR_AMMO', '3L', self.handle, weapon, ammo)
@@ -339,11 +339,13 @@ class Player(NativeEntity):
 
     def attach_to_object(self, obj):
         """附上一个物体"""
-        self.script_call('ATTACH_PED_TO_OBJECT', '3L5f2L', self.handle, self.make_handle(obj), 0,-2.5,0.0,0,0,0,0,0)
+        self.script_call('ATTACH_PED_TO_OBJECT', '3L5f2L',
+            self.handle, self.make_handle(obj), 0, -2.5, 0.0, 0, 0, 0, 0, 0)
 
     def attach_to_vehicle(self, vehicle):
         """附上一辆车"""
-        self.script_call('ATTACH_PED_TO_CAR', '3L5f2L', self.handle, self.make_handle(vehicle), 0,-2.5,0.0,0,0,0,1,1)
+        self.script_call('ATTACH_PED_TO_CAR', '3L5f2L',
+            self.handle, self.make_handle(vehicle), 0, -2.5, 0.0, 0, 0, 0, 1, 1)
 
     def create_fire(self):
         self._fire = self.script_call('START_CHAR_FIRE', 'L', self.handle)
@@ -443,6 +445,7 @@ class Vehicle(NativeEntity):
 
     # 前进速度
     forard_speed = property(getter_ptr('GET_CAR_SPEED', float))
+
     @forard_speed.setter
     def forard_speed(self, value):
         if self.model.is_train:
@@ -450,7 +453,7 @@ class Vehicle(NativeEntity):
             self.native_call('SET_TRAIN_CRUISE_SPEED', 'Lf', self.handle, value)
         else:
             self.native_call('SET_CAR_FORWARD_SPEED', 'Lf', self.handle, value)
-    
+
     @property
     def coord(self):
         ctx = self.native_context
@@ -481,16 +484,16 @@ class Vehicle(NativeEntity):
     @property
     def rotation3f(self):
         x, y, z, w = self.quaternion
-        pitch = math.atan2(2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
-        yaw   = math.atan2(2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
-        roll  = math.asin(-2.0 * (x*z - w*y))
+        pitch = math.atan2(2.0 * (y * z + w * x), w * w - x * x - y * y + z * z)
+        yaw = math.atan2(2.0 * (x * y + w * z), w * w + x * x - y * y - z * z)
+        roll = math.asin(-2.0 * (x * z - w * y))
 
         return utils.VectorField(self, (pitch, roll, yaw), 'rotation3f')
 
     @rotation3f.setter
     def rotation3f(self, value):
         self.quaternion = utils.Quaternion.from_rotation(utils.Vector3(value))
-    
+
     def flip(self):
         """翻转"""
         x, y, z = self.rotation3f
@@ -606,7 +609,7 @@ class Vehicle(NativeEntity):
 
     def drive_to(self, coord, speed):
         """驾驶到坐标"""
-        self.script_call('TASK_CAR_DRIVE_TO_COORD', '2Q4f3lfl', 
+        self.script_call('TASK_CAR_DRIVE_TO_COORD', '2Q4f3lfl',
             self.driver.handle, self.handle, *coord, speed, 1, 0, 0, 10.0, -1)
 
     def clear_driver_tasks(self):
@@ -615,11 +618,11 @@ class Vehicle(NativeEntity):
 
     def attach_to_object(self, obj):
         """附上一个物体"""
-        self.script_call('ATTACH_PED_TO_OBJECT', '3L6f', self.handle, self.make_handle(obj), 0,-2.5,0.0,0,0,0,0)
+        self.script_call('ATTACH_PED_TO_OBJECT', '3L6f', self.handle, self.make_handle(obj), 0, -2.5, 0.0, 0, 0, 0, 0)
 
     def attach_to_vehicle(self, vehicle):
         """附上一辆车"""
-        self.script_call('ATTACH_PED_TO_CAR', '3L6f', self.handle, self.make_handle(vehicle), 0,-2.5,0.0,0,0,0,0)
+        self.script_call('ATTACH_PED_TO_CAR', '3L6f', self.handle, self.make_handle(vehicle), 0, -2.5, 0.0, 0, 0, 0, 0)
 
     del getter, getter_ptr, setter
 
@@ -710,7 +713,7 @@ class Blip(NativeModel):
     object_index = property(NativeModel.getter('GET_BLIP_INFO_ID_OBJECT_INDEX'))
     pickup_index = property(NativeModel.getter('GET_BLIP_INFO_ID_PICKUP_INDEX'))
     is_short_range = property(NativeModel.getter('IS_BLIP_SHORT_RANGE'))
-    
+
     def remove(self):
         self.script_call('REMOVE_BLIP', 'L', self.handle, ret_type=None)
 

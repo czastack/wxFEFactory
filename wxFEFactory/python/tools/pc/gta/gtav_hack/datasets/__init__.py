@@ -30,7 +30,7 @@ WEAPON_LIST = [
         ("ASSAULTSHOTGUN", "突击霰弹枪", 0xE284C527),
         ("MUSKET", "老式火枪", 0xA89CB99E),
         ("HEAVYSHOTGUN", "重型霰弹枪", 0x3AABBBAA),
-        )),
+    )),
     ("SMG 微冲 / MG 冲锋枪", (
         ("MICROSMG", "小型冲锋枪", 0x13532244),
         ("SMG", "冲锋枪", 0x2BE6766B),

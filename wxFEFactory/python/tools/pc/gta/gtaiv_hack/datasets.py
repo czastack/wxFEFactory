@@ -1,7 +1,7 @@
 # 无弹药数的武器分组
 SLOT_NO_AMMO = [0, 1]
 
-WEAPON_NONE = ( 0, 0, "无" )
+WEAPON_NONE = (0, 0, "无")
 
 WEAPON_LIST = [
     [
@@ -168,7 +168,7 @@ VEHICLE_LIST = (
         ("WILLARD", 0x737DAEC2),
         ("YANKEE", 0xBE6FF06A),
     )),
-    
+
     ("摩托车", (
         ("BOBBER", 0x92E56A2C),
         ("FAGGIO", 0x9229E4EB),
@@ -178,14 +178,14 @@ VEHICLE_LIST = (
         ("SANCHEZ", 0x2EF89E46),
         ("ZOMBIEB", 0xDE05FB87),
     )),
-    
+
     ("直升机", (
         ("ANNIHILATOR", 0x31F0B376),
         ("MAVERICK", 0x9D0450CA),
         ("POLMAV", 0x1517D4D9),
         ("TOURMAV", 0x78D70477),
     )),
-    
+
     ("船", (
         ("DINGHY", 0x3D961290),
         ("JETMAX", 0x33581161),
@@ -196,13 +196,13 @@ VEHICLE_LIST = (
         ("TUGA", 0x3F724E66),
         ("TROPIC", 0x1149422F),
     )),
-    
+
     ("列车(开不了)", (
         ("CABLECAR", 0xC6C3242D),
         ("SUBWAY_LO", 0x2FBC4D30),
         ("SUBWAY_HI", 0x8B887FDB),
     )),
-    
+
     ("TBoGT 汽车", (
         ("SLAMVAN", 0x2B7F9DE3),
         ("CADDY", 0x44623884),
@@ -225,7 +225,7 @@ VEHICLE_LIST = (
         ("POLICE4", 0x8A63C7B9),
         ("POLICEB", 0xFDEFAEC3),
     )),
-    
+
     ("TBoGT 摩托车", (
         ("HEXER", 0x11F76C14),
         ("FAGGIO2", 0x0350D1AB),
@@ -235,19 +235,19 @@ VEHICLE_LIST = (
         ("HAKUCHOU", 0x4B6C568A),
         ("DOUBLE", 0x9C669788),
     )),
-    
+
     ("TBoGT 直升机", (
         ("BUZZARD", 0x2F03547B),
         ("SWIFT", 0xEBC24DF2),
         ("SKYLIFT", 0x3E48BF23),
     )),
-    
+
     ("TBoGT 船", (
         ("SMUGGLER", 0x38527DEC),
         ("FLOATER", 0x98CC6F33),
         ("BLADE", 0xB820ED5E),
     )),
-    
+
     ("TLAD 汽车", (
         ("GBURRITO", 0x97FA4F36),
         ("SLAMVAN", 0x2B7F9DE3),
@@ -259,7 +259,7 @@ VEHICLE_LIST = (
         ("REGINA", 0xFF22D208),
         ("TAMPA", 0x39F9C898),
     )),
-    
+
     ("TLAD 摩托车", (
         ("ANGEL", 0xDDF716D8),
         ("BATI", 0xF9300CC5),
@@ -279,3 +279,5 @@ VEHICLE_LIST = (
         ("WOLFSBANE", 0xDB20A373),
     )),
 )
+
+EXPLOTION_TYPE = ('GRENADE', 'MOLOTOV', 'ROCKET', 'HI_OCTANE', 'CAR', 'PLANE')

@@ -10,8 +10,7 @@ from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
 from ..gta_base.utils import degreeToRadian
-from . import address, models, coords
-from .datasets import VEHICLE_LIST
+from . import address, datasets, models, coords
 from .models import Player, Vehicle
 from .native import NativeContext
 from fefactory_api import ui
@@ -42,109 +41,18 @@ class Main(BaseGTATool):
     from .datasets import WEAPON_LIST, SLOT_NO_AMMO
 
     def render_main(self):
-        player = self.weak._player
-        vehicle = self.weak._vehicle
-        with Group("player", "角色", player):
-            ModelInput("hp", "生命")
-            ModelInput("ap", "防弹衣")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            # ModelInput("gravity", "重量")
-            ModelCoordWidget("speed", "速度")
-            ModelInput("rotation", "旋转")
-            ModelInput("wanted_level", "通缉等级")
-            self.money = ModelInput("money", "金钱")
-            ui.Text("")
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
-                ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_block_switch_weapons)
-                ui.ToggleButton(label="不会被拽出车", onchange=self.set_ped_can_be_dragged_out_of_vehicle)
-                ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
-                ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
+        with Group("player", "角色", self.weak._player):
+            self.render_player()
 
-        with Group("vehicle", "汽车", vehicle):
-            ModelInput("hp", "HP")
-            ModelCoordWidget("roll", "滚动")
-            ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ui.Text("")
-            with ui.Horizontal(className="expand"):
-                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
-                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
-                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-
-        with Group("weapon", "武器槽", None):
-            self.weapon_views = []
-            for i in range(1, len(self.WEAPON_LIST)):
-                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
-                    self.SLOT_NO_AMMO, self.WEAPON_LIST))
-
-            ui.Button(label="一键最大", onclick=self.weapon_max)
-
-        with Group("global", "全局", self):
-            ModelInput("game_hour", "当前小时")
-            ModelInput("game_minute", "当前分钟")
-            exui.Label("日期")
-            with ui.Horizontal(className="expand"):
-                ui.Button("回退一天", onclick=self.day_back)
-                ui.Button("前进一天", onclick=self.day_forward)
-
-        with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                self.render_common_text()
-                ui.Text("大加速: alt+shift+m")
-                ui.Text("生成选中的载具并进入: alt+shift+v")
-                ui.Text("当前武器子弹全满: alt+g")
-                ui.Text("瞬移到标记点: alt+shift+g")
-                ui.Text("瞬移到目的地: alt+1")
-                ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
-                ui.Text("爆破最近的车: alt+o")
-
-        with StaticGroup("载具模型"):
-            with ui.Horizontal(className="fill"):
-                self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
-                with self.vehicle_model_book:
-                    for category in VEHICLE_LIST:
-                        ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])),
-                            caption=category[0])
-
-        with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                self.render_common_button()
-                ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
-                ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
-                ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
-                ui.Button("敌人着火", onclick=self.enemys_make_fire)
-                ui.Button("敌人爆头", onclick=self.enemys_explode_head)
-                ui.Button("敌人爆炸", onclick=self.enemys_explode)
-                ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
-                ui.Button("敌人定住", onclick=self.enemys_freeze_position)
-                ui.Button("警车爆炸", onclick=self.police_car_explode)
-                ui.Button("警察和直升机爆炸", onclick=self.police_and_helicopter_explode)
-                ui.Button("保存菜单", onclick=self.activate_save_menu)
-                ui.Button("停止计时", onclick=self.freeze_timer)
-                ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
-                ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
-                ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
-                # ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
-                # ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
-                ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
-                ui.Button("修复衣服", onclick=self.repair_cloth)
-                ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
-                ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
-                ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
-                ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
-                self.set_buttons_contextmenu()
+        self.lazy_group(Group("vehicle", "汽车", self.weak._vehicle), self.render_vehicle)
+        self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
+        self.lazy_group(Group("global", "全局", self), self.render_global)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
+        self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
+        self.lazy_group(StaticGroup("功能"), self.render_func)
 
         with Group(None, "设置", None, hasfooter=False):
-            with ConfigGroup(self.config):
-                FloatConfig('auto_driving_speed', '自动驾驶速度', 10)
-            ui.Hr()
-            ui.Button("放弃本次配置修改", onclick=self.discard_config)
+            self.render_config()
 
     def get_hotkeys(self):
         return (
@@ -156,6 +64,111 @@ class Main(BaseGTATool):
             (VK.MOD_ALT, VK.O, self.explode_nearest_vehicle),
             (VK.MOD_ALT, VK.S, self.enemys_harmless),
         ) + self.get_common_hotkeys()
+
+    def render_player(self):
+        ModelInput("hp", "生命")
+        ModelInput("ap", "防弹衣")
+        self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        # ModelInput("gravity", "重量")
+        ModelCoordWidget("speed", "速度")
+        ModelInput("rotation", "旋转")
+        ModelInput("wanted_level", "通缉等级")
+        self.money = ModelInput("money", "金钱")
+        ui.Text("")
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+            ui.ToggleButton(label="可以切换武器", onchange=self.set_ped_block_switch_weapons)
+            ui.ToggleButton(label="不会被拽出车", onchange=self.set_ped_can_be_dragged_out_of_vehicle)
+            ui.ToggleButton(label="摩托车老司机", onchange=self.set_ped_keep_bike)
+            ui.ToggleButton(label="不被通缉", onchange=self.set_never_wanted)
+
+    def render_vehicle(self):
+        ModelInput("hp", "HP")
+        ModelCoordWidget("roll", "滚动")
+        ModelCoordWidget("dir", "方向")
+        self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ui.Text("")
+        with ui.Horizontal(className="expand"):
+            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+            ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
+            ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+            ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+
+    def render_weapon(self):
+        player = self.weak._player
+        self.weapon_views = []
+        for i in range(1, len(self.WEAPON_LIST)):
+            self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
+                self.SLOT_NO_AMMO, self.WEAPON_LIST))
+
+        ui.Button(label="一键最大", onclick=self.weapon_max)
+
+    def render_global(self):
+        ModelInput("game_hour", "当前小时")
+        ModelInput("game_minute", "当前分钟")
+        exui.Label("日期")
+        with ui.Horizontal(className="expand"):
+            ui.Button("回退一天", onclick=self.day_back)
+            ui.Button("前进一天", onclick=self.day_forward)
+
+    def render_hotkey(self):
+        with ui.ScrollView(className="fill"):
+            self.render_common_text()
+            ui.Text("大加速: alt+shift+m")
+            ui.Text("生成选中的载具并进入: alt+shift+v")
+            ui.Text("当前武器子弹全满: alt+g")
+            ui.Text("瞬移到标记点: alt+shift+g")
+            ui.Text("瞬移到目的地: alt+1")
+            ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
+            ui.Text("爆破最近的车: alt+o")
+
+    def render_vehicle_model(self):
+        with ui.Horizontal(className="fill"):
+            self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
+            with self.vehicle_model_book:
+                for category in datasets.VEHICLE_LIST:
+                    ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])),
+                        caption=category[0])
+
+    def render_func(self):
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            self.render_common_button()
+            ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
+            ui.Button("附近的人着火", onclick=self.near_peds_make_fire)
+            ui.Button("附近的人爆炸", onclick=self.near_peds_explode)
+            ui.Button("敌人着火", onclick=self.enemys_make_fire)
+            ui.Button("敌人爆头", onclick=self.enemys_explode_head)
+            ui.Button("敌人爆炸", onclick=self.enemys_explode)
+            ui.Button("敌人缴械", onclick=self.enemys_remove_weapon)
+            ui.Button("敌人定住", onclick=self.enemys_freeze_position)
+            ui.Button("警车爆炸", onclick=self.police_car_explode)
+            ui.Button("警察和直升机爆炸", onclick=self.police_and_helicopter_explode)
+            ui.Button("保存菜单", onclick=self.activate_save_menu)
+            ui.Button("停止计时", onclick=self.freeze_timer)
+            ui.Button("恢复计时", onclick=partial(self.freeze_timer, freeze=False))
+            ui.Button("附近的人吹飞", onclick=self.near_peds_go_away)
+            ui.Button("附近的车吹飞", onclick=self.near_vehicles_go_away)
+            # ui.Button("驾驶到到目的地", onclick=self.drive_to_destination)
+            # ui.Button("驾驶到到标记点", onclick=self.drive_to_waypoint)
+            ui.Button("停止自动驾驶", onclick=self.clear_driver_tasks)
+            ui.Button("修复衣服", onclick=self.repair_cloth)
+            ui.Button("清空区域内的载具", onclick=self.clear_area_of_vehicles)
+            ui.Button("清空区域内的角色", onclick=self.clear_area_of_peds)
+            ui.Button("清空区域内的警察", onclick=self.clear_area_of_cops)
+            ui.Button("清空区域内的火焰", onclick=self.clear_area_of_fire)
+            self.set_buttons_contextmenu()
+
+    def render_config(self):
+        with ConfigGroup(self.config):
+            FloatConfig('auto_driving_speed', '自动驾驶速度', 10)
+            SelectConfig('explotion_type', '爆炸类型', datasets.EXPLOTION_TYPE)
+            IntConfig('explotion_radius', '爆炸半径', 3)
+        ui.Hr()
+        ui.Button("放弃本次配置修改", onclick=self.discard_config)
 
     def get_addr(self, addr):
         """原始地址转模块装载后的真实地址"""
@@ -688,7 +701,7 @@ class Main(BaseGTATool):
 
     def get_selected_vehicle_list(self):
         """当前刷车器活动的载具模型列表"""
-        return VEHICLE_LIST[self.vehicle_model_book.index][1]
+        return datasets.VEHICLE_LIST[self.vehicle_model_book.index][1]
 
     # 兼容继承自BaseGTATool的方法
     VEHICLE_LIST = property(get_selected_vehicle_list)
@@ -702,7 +715,7 @@ class Main(BaseGTATool):
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.getPage(page_index).index
         if item_index is not -1:
-            return VEHICLE_LIST[page_index][1][item_index][1]
+            return datasets.VEHICLE_LIST[page_index][1][item_index][1]
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
@@ -732,9 +745,13 @@ class Main(BaseGTATool):
         """熄灭生成的火焰"""
         self.native_call('REMOVE_SCRIPT_FIRE', 'L', fire)
 
-    def create_explosion(self, coord, uiExplosionType=models.NativeEntity.EXPLOSION_TYPE_ROCKET,
-            fRadius=5, bSound=True, bInvisible=False, fCameraShake=0):
+    def create_explosion(self, coord, uiExplosionType=None,
+            fRadius=0, bSound=True, bInvisible=False, fCameraShake=0):
         """产生爆炸"""
+        if uiExplosionType is None:
+            uiExplosionType = self.config.explotion_type
+        if fRadius is 0:
+            fRadius = self.config.explotion_radius
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 
     def create_throwable_object(self, modelHash):

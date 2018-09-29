@@ -16,45 +16,45 @@ VERSION = 0x608C34
 
 VERSION_DEPEND = {
     VERSION_104: {
-        'PED_POOL'             : 0x0175B77C,
-        'VEHICLE_POOL'         : 0x011F4F30,
-        'OBJECT_POOL'          : 0x011FADD8,
-        'BLIP_LIST'            : 0x00FCFC70,
-        'LOCAL_PLAYER_ID'      : 0x00EA68A8,
-        'PLAYER_INFO_ARRAY'    : 0x01033058,
-        'FindNativeAddress'    : 0x00617280,
-        'SetMoveSpeed'         : 0x0, # TODO
-        'GetMoveSpeed'         : 0x0, # TODO
-        'SetTurnSpeed'         : 0x0, # TODO
-        'GetTurnSpeed'         : 0x0, # TODO
+        'PED_POOL': 0x0175B77C,
+        'VEHICLE_POOL': 0x011F4F30,
+        'OBJECT_POOL': 0x011FADD8,
+        'BLIP_LIST': 0x00FCFC70,
+        'LOCAL_PLAYER_ID': 0x00EA68A8,
+        'PLAYER_INFO_ARRAY': 0x01033058,
+        'FindNativeAddress': 0x00617280,
+        'SetMoveSpeed': 0x0,  # TODO
+        'GetMoveSpeed': 0x0,  # TODO
+        'SetTurnSpeed': 0x0,  # TODO
+        'GetTurnSpeed': 0x0,  # TODO
     },
     VERSION_107: {
-        'PED_POOL'             : 0x018A82AC,
-        'VEHICLE_POOL'         : 0x01619240,
-        'OBJECT_POOL'          : 0x01350CE0,
-        'BLIP_LIST'            : 0x0119ED50,
-        'LOCAL_PLAYER_ID'      : 0x00F1CC68,
-        'PLAYER_INFO_ARRAY'    : 0x011A7008,
-        'FindNativeAddress'    : 0x005A76D0,
-        'SetMoveSpeed'         : 0x00A47750,
-        'GetMoveSpeed'         : 0x00A477F0,
-        'SetTurnSpeed'         : 0x00A47840,
-        'GetTurnSpeed'         : 0x00A478E0,
+        'PED_POOL': 0x018A82AC,
+        'VEHICLE_POOL': 0x01619240,
+        'OBJECT_POOL': 0x01350CE0,
+        'BLIP_LIST': 0x0119ED50,
+        'LOCAL_PLAYER_ID': 0x00F1CC68,
+        'PLAYER_INFO_ARRAY': 0x011A7008,
+        'FindNativeAddress': 0x005A76D0,
+        'SetMoveSpeed': 0x00A47750,
+        'GetMoveSpeed': 0x00A477F0,
+        'SetTurnSpeed': 0x00A47840,
+        'GetTurnSpeed': 0x00A478E0,
     },
     VERSION_EFLC2: {
-        'PED_POOL'             : 0x018219EC,
-        'VEHICLE_POOL'         : 0x015C17B0,
-        'OBJECT_POOL'          : 0x0118A660,
-        'BLIP_LIST'            : 0x010C3EA0,
-        'LOCAL_PLAYER_ID'      : 0x00F16134,
-        'PLAYER_INFO_ARRAY'    : 0x010D9458,
-        'FindNativeAddress'    : 0x004CF760,
-        'SetMoveSpeed'         : 0x00A7C040,
-        'GetMoveSpeed'         : 0x00A7C0E0,
-        'SetTurnSpeed'         : 0x00A7C130,
-        'GetTurnSpeed'         : 0x00A7C1D0,
-        'SetTimeOfDay'         : 0x00846970,
-        'TimeOfDay'            : 0x010A4EA8,
+        'PED_POOL': 0x018219EC,
+        'VEHICLE_POOL': 0x015C17B0,
+        'OBJECT_POOL': 0x0118A660,
+        'BLIP_LIST': 0x010C3EA0,
+        'LOCAL_PLAYER_ID': 0x00F16134,
+        'PLAYER_INFO_ARRAY': 0x010D9458,
+        'FindNativeAddress': 0x004CF760,
+        'SetMoveSpeed': 0x00A7C040,
+        'GetMoveSpeed': 0x00A7C0E0,
+        'SetTurnSpeed': 0x00A7C130,
+        'GetTurnSpeed': 0x00A7C1D0,
+        'SetTimeOfDay': 0x00846970,
+        'TimeOfDay': 0x010A4EA8,
     }
 }
 

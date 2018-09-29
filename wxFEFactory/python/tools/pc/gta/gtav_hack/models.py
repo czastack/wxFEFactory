@@ -292,7 +292,7 @@ class Player(NativeEntity):
     keep_bike = property(None, setter('SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE', bool))
     # 产生噪声比例 (默认1.0)
     noise_rate = property(None, player_setter('SET_PLAYER_NOISE_MULTIPLIER', float))
-    # 射击比例
+    # 射击比率
     shoot_rate = property(None, setter('SET_PED_SHOOT_RATE'))
 
     def _fast_run(self, toggle=True):
@@ -458,7 +458,7 @@ class Player(NativeEntity):
 
     @property
     def head_coord(self):
-        return self.get_bone_coord(12844) # IK_Head
+        return self.get_bone_coord(12844)  # IK_Head
 
     def follow_to_entity(self, entity, speed=2, timeout=-1):
         """跟着实体"""

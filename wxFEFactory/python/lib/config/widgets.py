@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from lib import extypes, wxconst
+from lib import extypes, wxconst, utils
 from styles import btn_xs_style
 from lib import exui
 from lib.extypes import WeakBinder
@@ -131,24 +131,26 @@ class FloatConfig(InputConfig):
 
 
 class SelectConfig(ConfigCtrl):
-    def __init__(self, name, label, choices, default=None):
-        super().__init__(name, label, default)
-        if default is None:
-            default = choices[0][1]
+    def __init__(self, name, label, choices, values=None, default=None):
+        self.choices, self.values = utils.prepare_option(choices, values)
         self.choices = choices
+        if default is None:
+            default = values[1] if values else 0
+        super().__init__(name, label, default)
 
     def render(self):
         self.render_lable()
-        self.view = ui.Choice((item[0] for item in self.choices), className="fill", onselect=self.weak.write)
+        self.view = ui.Choice(self.choices, className="fill", onselect=self.weak.write)
         self.view.setSelection(0, True)
 
     def get_input_value(self):
-        return self.choices[self.view.index][1]
+        index = self.view.index
+        if index is -1:
+            return None
+        return self.values[index] if self.values else index
 
     def set_input_value(self, value):
-        for i, item in enumerate(self.choices):
-            if value == item[1]:
-                break
-        else:
-            return
-        self.view.index = i
+        try:
+            self.view.index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
+        except ValueError:
+            self.view.index = -1
