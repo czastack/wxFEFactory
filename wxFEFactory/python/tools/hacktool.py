@@ -100,7 +100,7 @@ class BaseHackTool(NestedTool):
         if groups:
             root = book.getPage()
             if root:
-                self.handle_lazy_group()
+                self.handle_lazy_group(root)
 
     def begin_group(self):
         Widget.GROUPS.append(self)

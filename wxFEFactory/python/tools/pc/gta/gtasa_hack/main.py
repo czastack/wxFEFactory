@@ -35,166 +35,179 @@ class Main(BaseGTA3_VC_SA_Tool):
     RunningScript = RunningScript
 
     def render_main(self):
-        player = self.weak._player
-        vehicle = self.weak._vehicle
-        with Group("player", "角色", player):
-            ModelInput("hp", "生命")
-            self.maxhp_view = ModelInput("maxhp", "最大生命")
-            ModelInput("ap", "防弹衣")
-            ModelInput("rotation", "旋转")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
-            ui.Hr()
-            with ui.Vertical(className="fill"):
-                with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                    ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                    ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
-                    ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+        with Group("player", "角色", self.weak._player):
+            self.render_player()
 
-                ui.Text("防止主角受到来自以下的伤害")
-                with ui.Horizontal(className="fill"):
-                    self.player_proof_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof,
-                            bitindex=Player.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof,
-                            bitindex=Player.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof,
-                            bitindex=Player.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof,
-                            bitindex=Player.SPECIAL_FP)),
-                    ]
-                    ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip(
-                        "死亡或者重新读档后需要再次应用")
-        with Group("vehicle", "汽车", vehicle):
-            ModelInput("hp", "HP")
-            ModelCoordWidget("dir", "方向")
-            self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ui.Text("")
-            with ui.Vertical(className="fill"):
-                with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                    ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                    ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
-                    ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
-                    ui.Button(label="锁车", onclick=self.vehicle_lock_door)
-                    ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-                ui.Hr()
-                ui.Text("防止当前载具受到来自以下的伤害")
-                with ui.Horizontal(className="fill"):
-                    self.vehicle_proof_views = [
-                        ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof,
-                            bitindex=Vehicle.SPECIAL_EP)),
-                        ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof,
-                            bitindex=Vehicle.SPECIAL_DP)),
-                        ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof,
-                            bitindex=Vehicle.SPECIAL_BP)),
-                        ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof,
-                            bitindex=Vehicle.SPECIAL_FP)),
-                    ]
-                    ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
-                    ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip(
-                        "切换载具后需要再次应用")
-            ui.Text("颜色")
+        self.lazy_group(Group("vehicle", "载具", self.weak._vehicle), self.render_vehicle)
+        self.lazy_group(Group("weapon", "武器槽", None), self.render_weapon)
+        self.lazy_group(Group("weapon_prop", "武器熟练度", None), self.render_weapon_prop)
+        self.lazy_group(Group("global", "全局", 0, cols=4), self.render_global)
+        self.lazy_group(StaticGroup("作弊"), self.render_cheat)
+        self.lazy_group(Group(None, "女友进度", 0), self.render_girl_friend)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
+        self.lazy_group(StaticGroup("功能"), self.render_func)
+        self.lazy_group(StaticGroup("工具"), self.render_tool)
+
+    def render_player(self):
+        ModelInput("hp", "生命")
+        self.maxhp_view = ModelInput("maxhp", "最大生命")
+        ModelInput("ap", "防弹衣")
+        ModelInput("rotation", "旋转")
+        self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
+        ui.Hr()
+        with ui.Vertical(className="fill"):
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+                ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+
+            ui.Text("防止主角受到来自以下的伤害")
             with ui.Horizontal(className="fill"):
-                self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color",
-                    datasets.COLOR_LIST)
-                self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color",
-                    datasets.COLOR_LIST)
-                self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", vehicle, "stripe_color",
-                    datasets.COLOR_LIST)
-                self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", vehicle, "stripe2_color",
-                    datasets.COLOR_LIST)
+                self.player_proof_views = [
+                    ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof,
+                        bitindex=Player.SPECIAL_EP)),
+                    ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof,
+                        bitindex=Player.SPECIAL_DP)),
+                    ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof,
+                        bitindex=Player.SPECIAL_BP)),
+                    ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof,
+                        bitindex=Player.SPECIAL_FP)),
+                ]
+                ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
+                ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip(
+                    "死亡或者重新读档后需要再次应用")
 
-        with Group("weapon", "武器槽", None):
-            self.weapon_views = []
-            for i in range(13):
-                self.weapon_views.append(
-                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO,
-                        datasets.WEAPON_LIST, self.on_weapon_change)
-                )
-            ui.Button(label="一键最大", onclick=self.weapon_max)
+    def render_vehicle(self):
+        vehicle = self.weak._vehicle
+        ModelInput("hp", "HP")
+        ModelCoordWidget("dir", "方向")
+        self.vehicle_grad_view = ModelCoordWidget("grad", "旋转")
+        self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ui.Text("")
+        with ui.Vertical(className="fill"):
+            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+                ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
+                ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
+                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+            ui.Hr()
+            ui.Text("防止当前载具受到来自以下的伤害")
+            with ui.Horizontal(className="fill"):
+                self.vehicle_proof_views = [
+                    ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                        bitindex=Vehicle.SPECIAL_EP)),
+                    ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                        bitindex=Vehicle.SPECIAL_DP)),
+                    ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                        bitindex=Vehicle.SPECIAL_BP)),
+                    ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                        bitindex=Vehicle.SPECIAL_FP)),
+                ]
+                ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
+                ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip(
+                    "切换载具后需要再次应用")
+        ui.Text("颜色")
+        with ui.Horizontal(className="fill"):
+            self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color",
+                datasets.COLOR_LIST)
+            self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color",
+                datasets.COLOR_LIST)
+            self.vehicle_stripe_color_view = ColorWidget("stripe_color", "条纹1", vehicle, "stripe_color",
+                datasets.COLOR_LIST)
+            self.vehicle_stripe2_color_view = ColorWidget("stripe2_color", "条纹2", vehicle, "stripe2_color",
+                datasets.COLOR_LIST)
 
-        with Group("weapon_prop", "武器熟练度", None):
-            self.weapon_prop_views = [
-                ProxyInput("weapon_prop_%d" % i, label, partial(self.get_weapon_prop, index=i),
-                    partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
-                        '手枪', '消音手枪', '沙漠之鹰', '霰弹枪', '短管霰弹枪', '战斗霰弹枪', 'MP5', 'Tech9', 'AK47', 'M4',
-                    ))
-            ]
+    def render_weapon(self):
+        player = self.weak._player
+        self.weapon_views = []
+        for i in range(13):
+            self.weapon_views.append(
+                WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO,
+                    datasets.WEAPON_LIST, self.on_weapon_change)
+            )
+        ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        with Group("global", "全局", 0):
-            Input("money", "金钱", address.MONEY)
-            Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
-            Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
-            Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, type=float)
-            Input("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, type=float)
-            Input("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, type=float)
-            Input("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
-            Input("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
-            Input("car_prof", "驾驶技术", address.CAR_PROF_ADDR)
-            Input("bike_prof", "摩托车技术", address.BIKE_PROF_ADDR)
-            Input("cycle_prof", "自行车技术", address.CYCLE_PROF_ADDR)
-            Input("cycle_prof", "飞机技术", address.FLYING_PROF_ADDR)
-            Input("days_in_game", "天数", address.DAYS_IN_GAME_ADDR)
-            Input("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
-            Input("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
-            Input("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
-            Select("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, choices=datasets.WEATHER_LIST)
-            Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
+    def render_weapon_prop(self):
+        self.weapon_prop_views = [
+            ProxyInput("weapon_prop_%d" % i, label, partial(self.get_weapon_prop, index=i),
+                partial(self.set_weapon_prop, index=i)) for i, label in enumerate((
+                    '手枪', '消音手枪', '沙漠之鹰', '霰弹枪', '短管霰弹枪', '战斗霰弹枪', 'MP5', 'Tech9', 'AK47', 'M4',
+                ))
+        ]
 
-        with StaticGroup("作弊"):
-            with ui.Vertical(className="fill padding"):
-                with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                    self.cheat_views = [
-                        ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
-                            '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃',
-                            '最大威望', '最大引力', '满街跑车', '满街破车', '无限奔跑', '主角防火', '完美操控', '交通通畅',
-                            '超级兔跳', '液压装置', '船可以飞', '车可以飞'
-                        ))
-                    ]
-                    ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
-                    ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
-                with ui.Horizontal(className="padding"):
-                    ui.Button("同步", onclick=self.cheat_sync)
+    def render_global(self):
+        Input("money", "金钱", address.MONEY)
+        Input("cheat_count", "作弊次数", address.CHEAT_COUNT_ADDR)
+        Input("cheat_stat", "作弊状态", address.CHEAT_STAT_ADDR)
+        Input("fat_stat", "肥胖度", address.FAT_STAT_ADDR, type=float)
+        Input("stamina_stat", "耐力值", address.STAMINA_STAT_ADDR, type=float)
+        Input("muscle_stat", "肌肉值", address.MUSCLE_STAT_ADDR, type=float)
+        Input("lung_capacity", "肺活量", address.LUNG_CAPACITY_ADDR)
+        Input("gambling_stat", "赌博技术", address.GAMBLING_STAT_ADDR)
+        Input("car_prof", "驾驶技术", address.CAR_PROF_ADDR)
+        Input("bike_prof", "摩托车技术", address.BIKE_PROF_ADDR)
+        Input("cycle_prof", "自行车技术", address.CYCLE_PROF_ADDR)
+        Input("cycle_prof", "飞机技术", address.FLYING_PROF_ADDR)
+        Input("days_in_game", "天数", address.DAYS_IN_GAME_ADDR)
+        Input("curr_hour", "当前小时", address.CURR_HOUR_ADDR, size=1)
+        Input("curr_minute", "当前分钟", address.CURR_MINUTE_ADDR, size=1)
+        Input("curr_weekday", "当前星期", address.CURR_WEEKDAY_ADDR, size=1)
+        Select("curr_weather", "当前天气", address.WEATHER_CURRENT_ADDR, choices=datasets.WEATHER_LIST)
+        Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
-        with Group(None, "女友进度", 0):
-            # TODO
-            address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
-            for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
-                Input(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
-
-        with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill padding"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
-                    choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill padding"):
-                    self.render_common_text()
-                    ui.Text("根据左边列表生产载具: alt+V")
-                    ui.Text("瞬移到地图指针处: ctrl+alt+g")
-                    ui.Text("瞬移到标记点: alt+shift+g")
-                    ui.Text("切换转向并加速: alt+shift+m")
-                    ui.Text("附近的车大风车: alt+r")
-                    ui.Text("附近的人大风车: alt+shift+r")
-
-        with StaticGroup("测试"):
+    def render_cheat(self):
+        with ui.Vertical(className="fill padding"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                self.render_common_button()
-                ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
-                ui.Button("敌人爆炸", onclick=self.enemys_explode)
-                ui.Button("附近的车大风车", onclick=self.near_vehicles_pinwheel)
-                ui.Button("瞬移到目的地(红)", onclick=self.teleport_to_destination)
-                ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
-                ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
-                self.set_buttons_contextmenu()
+                self.cheat_views = [
+                    ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
+                        '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃',
+                        '最大威望', '最大引力', '满街跑车', '满街破车', '无限奔跑', '主角防火', '完美操控', '交通通畅',
+                        '超级兔跳', '液压装置', '船可以飞', '车可以飞'
+                    ))
+                ]
+                ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
+                ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
+            with ui.Horizontal(className="padding"):
+                ui.Button("同步", onclick=self.cheat_sync)
 
-        with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
-            with ui.Vertical(className="fill padding"):
-                ui.Button("g3l坐标转json", onclick=self.g3l2json)
+    def render_girl_friend(self):
+        address.GIRL_FRIEND_PROGRESS_ADDR = self.get_cheat_config()['GIRL_FRIEND_PROGRESS_ADDR']
+        for i, label in enumerate(['Denise', 'Michelle', 'Helena', 'Katie', 'Barbara', 'Millie']):
+            Input(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
+
+    def render_hotkey(self):
+        with ui.Horizontal(className="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
+                choices=(item[0] for item in VEHICLE_LIST))
+            with ui.ScrollView(className="fill padding"):
+                self.render_common_text()
+                ui.Text("根据左边列表生产载具: alt+V")
+                ui.Text("瞬移到地图指针处: ctrl+alt+g")
+                ui.Text("瞬移到标记点: alt+shift+g")
+                ui.Text("切换转向并加速: alt+shift+m")
+                ui.Text("附近的车大风车: alt+r")
+                ui.Text("附近的人大风车: alt+shift+r")
+
+    def render_func(self):
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            self.render_common_button()
+            ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
+            ui.Button("敌人爆炸", onclick=self.enemys_explode)
+            ui.Button("附近的车大风车", onclick=self.near_vehicles_pinwheel)
+            ui.Button("瞬移到目的地(红)", onclick=self.teleport_to_destination)
+            ui.Button("瞬移到目的地(绿)", onclick=partial(self.teleport_to_destination, color=1))
+            ui.Button("瞬移到目的地(黄/蓝)", onclick=partial(self.teleport_to_destination, color=8))
+            self.set_buttons_contextmenu()
+
+    def render_tool(self):
+        with ui.Vertical(className="fill padding"):
+            ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):
         return (

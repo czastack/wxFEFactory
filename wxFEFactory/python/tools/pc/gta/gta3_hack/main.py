@@ -31,60 +31,71 @@ class Main(BaseGTA3Tool):
     VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
+        with Group("player", "角色", self.weak._player):
+            self.render_player()
+
+        self.lazy_group(Group("vehicle", "载具", self.weak._vehicle), self.render_vehicle)
+        self.lazy_group(Group("weapon", "武器槽", None), self.render_weapon)
+        self.lazy_group(Group("global", "全局", 0, cols=4), self.render_global)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
+        self.lazy_group(StaticGroup("功能"), self.render_func)
+        self.lazy_group(StaticGroup("工具"), self.render_tool)
+
+    def render_player(self):
+        ModelInput("hp", "生命")
+        ModelInput("ap", "防弹衣")
+        ModelInput("rotation", "旋转")
+        self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ModelInput("wanted_level", "通缉等级")
+        ui.Hr()
+        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+
+    def render_vehicle(self):
+        ModelInput("hp", "HP")
+        ModelCoordWidget("roll", "滚动")
+        ModelCoordWidget("dir", "方向")
+        self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ui.Hr()
+        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
+            ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+            ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+
+    def render_weapon(self):
         player = self.weak._player
-        vehicle = self.weak._vehicle
-        with Group("player", "角色", player, handler=self.handler):
-            ModelInput("hp", "生命")
-            ModelInput("ap", "防弹衣")
-            ModelInput("rotation", "旋转")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ModelInput("wanted_level", "通缉等级")
-            ui.Hr()
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
-        with Group("vehicle", "汽车", vehicle, handler=self.handler):
-            ModelInput("hp", "HP")
-            ModelCoordWidget("roll", "滚动")
-            ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ui.Hr()
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
-                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
-                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+        self.weapon_views = []
+        for i in range(1, 13):
+            self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
+                SLOT_NO_AMMO, WEAPON_LIST))
 
-        with Group("weapon", "武器槽", None, handler=self.handler):
-            self.weapon_views = []
-            for i in range(1, 13):
-                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
-                    SLOT_NO_AMMO, WEAPON_LIST))
-
+        with Group.active_group().footer:
             ui.Button(label="一键最大", onclick=self.weapon_max)
 
-        with Group("global", "全局", 0, handler=self.handler):
-            Input("money", "金钱", address.MONEY)
+    def render_global(self):
+        Input("money", "金钱", address.MONEY)
 
-        with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill padding"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
-                    choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill padding"):
-                    self.render_common_text()
+    def render_hotkey(self):
+        with ui.Horizontal(className="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
+                choices=(item[0] for item in VEHICLE_LIST))
+            with ui.ScrollView(className="fill padding"):
+                self.render_common_text()
 
-        with StaticGroup("测试"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                self.render_common_button()
-                self.set_buttons_contextmenu()
+    def render_func(self):
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            self.render_common_button()
+            self.set_buttons_contextmenu()
 
-        with Group(None, "工具", 0, flexgrid=False, hasfooter=False):
-            with ui.Vertical(className="fill padding"):
-                ui.Button("g3l坐标转json", onclick=self.g3l2json)
+    def render_tool(self):
+        with ui.Vertical(className="fill padding"):
+            ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def weapon_max(self, _=None):
         for v in self.weapon_views:

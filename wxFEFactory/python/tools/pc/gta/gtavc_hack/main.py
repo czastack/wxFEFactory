@@ -32,74 +32,83 @@ class Main(BaseGTA3Tool):
     VEHICLE_LIST = VEHICLE_LIST
 
     def render_main(self):
+        with Group("player", "角色", self.weak._player):
+            self.render_player()
+
+        self.lazy_group(Group("vehicle", "载具", self.weak._vehicle), self.render_vehicle)
+        self.lazy_group(Group("weapon", "武器槽", None), self.render_weapon)
+        self.lazy_group(StaticGroup("作弊"), self.render_cheat)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
+        self.lazy_group(StaticGroup("功能"), self.render_func)
+        self.lazy_group(StaticGroup("工具"), self.render_tool)
+
+    def render_player(self):
+        ModelInput("hp", "生命")
+        ModelInput("ap", "防弹衣")
+        ModelInput("rotation", "旋转")
+        self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelInput("weight", "重量")
+        ModelInput("stamina", "体力")
+        ModelInput("wanted_level", "通缉等级")
+        Input("money", "金钱", address.MONEY)
+        ui.Hr()
+        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+            ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+
+    def render_vehicle(self):
+        ModelInput("hp", "HP")
+        ModelCoordWidget("roll", "滚动")
+        ModelCoordWidget("dir", "方向")
+        self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
+        ModelCoordWidget("speed", "速度")
+        ModelCoordWidget("turn", "Turn")
+        ModelInput("weight", "重量")
+        ui.Hr()
+        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+            ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
+            ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
+            ui.Button(label="锁车", onclick=self.vehicle_lock_door)
+            ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
+
+    def render_weapon(self):
         player = self.weak._player
-        vehicle = self.weak._vehicle
-        with Group("player", "角色", player):
-            ModelInput("hp", "生命")
-            ModelInput("ap", "防弹衣")
-            ModelInput("rotation", "旋转")
-            self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelInput("weight", "重量")
-            ModelInput("stamina", "体力")
-            ModelInput("wanted_level", "通缉等级")
-            Input("money", "金钱", address.MONEY)
-            ui.Hr()
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
+        self.weapon_views = []
+        for i in range(11):
+            self.weapon_views.append(
+                WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST,
+                    self.on_weapon_change)
+            )
 
-        with Group("vehicle", "汽车", vehicle):
-            ModelInput("hp", "HP")
-            ModelCoordWidget("roll", "滚动")
-            ModelCoordWidget("dir", "方向")
-            self.vehicle_coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
-            ModelCoordWidget("speed", "速度")
-            ModelCoordWidget("turn", "Turn")
-            ModelInput("weight", "重量")
-            ui.Hr()
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
-                ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
-                ui.Button(label="锁车", onclick=self.vehicle_lock_door)
-                ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
-
-        with Group("weapon", "武器槽", None):
-            self.weapon_views = []
-            for i in range(11):
-                self.weapon_views.append(
-                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST,
-                        self.on_weapon_change)
-                )
-
-        with StaticGroup("作弊"):
-            with ui.Vertical(className="fill padding"):
-                with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                    SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
-                    SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-                    SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
-                        b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
-                    SimpleCheckBox("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
-                    SimpleCheckBox("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
-                    SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
-
-        with StaticGroup("快捷键"):
-            with ui.Horizontal(className="fill padding"):
-                self.spawn_vehicle_id_view = ui.ListBox(className="expand",
-                    onselect=self.on_spawn_vehicle_id_change,
-                    choices=(item[0] for item in VEHICLE_LIST))
-                with ui.ScrollView(className="fill padding"):
-                    self.render_common_text()
-                    ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
-
-        with StaticGroup("测试"):
+    def render_cheat(self):
+        with ui.Vertical(className="fill padding"):
             with ui.GridLayout(cols=4, vgap=10, className="expand"):
-                self.render_common_button()
-                self.set_buttons_contextmenu()
+                SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
+                SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
+                SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
+                    b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
+                SimpleCheckBox("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
+                SimpleCheckBox("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
+                SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
-        with StaticGroup("工具"):
-            with ui.Vertical(className="fill padding"):
-                ui.Button("g3l坐标转json", onclick=self.g3l2json)
+    def render_hotkey(self):
+        with ui.Horizontal(className="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(className="expand",
+                onselect=self.on_spawn_vehicle_id_change,
+                choices=(item[0] for item in VEHICLE_LIST))
+            with ui.ScrollView(className="fill padding"):
+                self.render_common_text()
+                ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
+
+    def render_func(self):
+        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+            self.render_common_button()
+            self.set_buttons_contextmenu()
+
+    def render_tool(self):
+        with ui.Vertical(className="fill padding"):
+            ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):
         return (

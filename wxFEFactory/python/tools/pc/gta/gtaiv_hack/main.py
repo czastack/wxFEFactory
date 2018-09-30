@@ -45,7 +45,7 @@ class Main(BaseGTATool):
             self.render_player()
 
         self.lazy_group(Group("vehicle", "载具", self.weak._vehicle), self.render_vehicle)
-        self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
+        self.lazy_group(Group("weapon", "武器槽", None), self.render_weapon)
         self.lazy_group(Group("global", "全局", self), self.render_global)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
         self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
