@@ -116,5 +116,6 @@ def prepare_option(choices, values):
             if not isinstance(choices, list_tuple):
                 choices = tuple(choices)
             if choices and isinstance(choices[0], list_tuple):
-                choices, values = split_value_label(choices)
+                fn = split_label_value if isinstance(choices[0][0], str) else split_value_label
+                choices, values = fn(choices)
     return choices, values

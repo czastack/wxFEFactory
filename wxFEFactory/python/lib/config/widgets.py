@@ -133,9 +133,8 @@ class FloatConfig(InputConfig):
 class SelectConfig(ConfigCtrl):
     def __init__(self, name, label, choices, values=None, default=None):
         self.choices, self.values = utils.prepare_option(choices, values)
-        self.choices = choices
         if default is None:
-            default = values[1] if values else 0
+            default = self.values[1] if self.values else 0
         super().__init__(name, label, default)
 
     def render(self):

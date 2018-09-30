@@ -44,7 +44,7 @@ class Main(BaseGTATool):
         with Group("player", "角色", self.weak._player):
             self.render_player()
 
-        self.lazy_group(Group("vehicle", "汽车", self.weak._vehicle), self.render_vehicle)
+        self.lazy_group(Group("vehicle", "载具", self.weak._vehicle), self.render_vehicle)
         self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
         self.lazy_group(Group("global", "全局", self), self.render_global)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkey)
@@ -104,8 +104,8 @@ class Main(BaseGTATool):
         for i in range(1, len(self.WEAPON_LIST)):
             self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
                 self.SLOT_NO_AMMO, self.WEAPON_LIST))
-
-        ui.Button(label="一键最大", onclick=self.weapon_max)
+        with Group.active_group().footer:
+            ui.Button(label="一键最大", onclick=self.weapon_max)
 
     def render_global(self):
         ModelInput("game_hour", "当前小时")

@@ -76,24 +76,31 @@ class BaseHackTool(NestedTool):
         self.config.write()
         return super().onClose(*args)
 
-    def lazy_group(self, group, fn):
+    def lazy_group(self, group, fn, depend=None):
         groups = getattr(self, 'lazy_groups', None)
         if groups is None:
             self.lazy_groups = groups = {}
 
-        groups[group.root] = group, fn
+        item = groups[group.root] = group, fn, depend
+        return item
+
+    def handle_lazy_group(self, root):
+        item = self.lazy_groups.get(root, None)
+        if item:
+            group, fn, depend = item
+            if depend:
+                self.handle_lazy_group(depend)
+            with group:
+                fn()
+            group.after_lazy()
+            del self.lazy_groups[root]
 
     def onNotePageChange(self, book):
         groups = getattr(self, 'lazy_groups', None)
         if groups:
             root = book.getPage()
-            item = groups.get(root, None)
-            if item:
-                group, fn = item
-                with group:
-                    fn()
-                group.after_lazy()
-                del groups[root]
+            if root:
+                self.handle_lazy_group()
 
     def begin_group(self):
         Widget.GROUPS.append(self)
