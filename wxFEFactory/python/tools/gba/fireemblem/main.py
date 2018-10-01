@@ -16,46 +16,49 @@ class FeHack(BaseGbaHack):
         self._personins = self.models.Person(0, self.handler)
 
     def render_main(self):
-        datasets = self.datasets
-
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("turns", "回合")
             ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
-            ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
+            ModelSelect("chapter", "章节", choices=self.datasets.CHAPTERS)
 
-        with Group("player", "角色", self._person, cols=4):
-            ModelInput("addr_hex", "地址", readonly=True)
-            ModelInput("no", "序号")
-            ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
-            ModelInput("level", "等级")
-            ModelInput("exp", "经验")
-            ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
-            ModelInput("posx", "X坐标")
-            ModelInput("posy", "Y坐标")
-            ModelInput("hpmax", "HP最大值")
-            ModelInput("hp", "ＨＰ")
-            ModelInput("power", "力量")
-            ModelInput("skill", "技术")
-            ModelInput("speed", "速度")
-            ModelInput("defense", "守备")
-            ModelInput("magicdef", "魔防")
-            ModelInput("lucky", "幸运")
-            ModelInput("physical_add", "体格+")
-            ModelInput("move_add", "移动+")
-            ModelSelect("status", "状态种类", choices=datasets.STATUS)
-            ModelInput("status_turn", "状态持续")
-            for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
-                ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip(
-                    "E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
-
-        with Group("items", "角色物品", self._person, cols=4):
-            for i in range(5):
-                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items.%d.count" % i, "数量")
+        self.lazy_group(Group("player", "角色", self._person, cols=4), self.render_char)
+        self.lazy_group(Group("items", "角色物品", self._person, cols=4), self.render_char_items)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
+
+    def render_char(self):
+        datasets = self.datasets
+        ModelInput("addr_hex", "R键地址", readonly=True).view.setToolTip("R键人物详情中人物属性")
+        ModelInput("no", "序号")
+        ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
+        ModelInput("level", "等级")
+        ModelInput("exp", "经验")
+        ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
+        ModelInput("posx", "X坐标")
+        ModelInput("posy", "Y坐标")
+        ModelInput("hpmax", "HP最大值")
+        ModelInput("hp", "ＨＰ")
+        ModelInput("power", "力量")
+        ModelInput("skill", "技术")
+        ModelInput("speed", "速度")
+        ModelInput("defense", "守备")
+        ModelInput("magicdef", "魔防")
+        ModelInput("lucky", "幸运")
+        ModelInput("physical_add", "体格+")
+        ModelInput("move_add", "移动+")
+        ModelSelect("status", "状态种类", choices=datasets.STATUS)
+        ModelInput("status_turn", "状态持续")
+        for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
+            ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip(
+                "E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
+
+    def render_char_items(self):
+        datasets = self.datasets
+        for i in range(5):
+            ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+            ModelInput("items.%d.count" % i, "数量")
 
     def render_train_items(self):
         datasets = self.datasets
@@ -67,8 +70,15 @@ class FeHack(BaseGbaHack):
 
     def get_hotkeys(self):
         return (
-            (VK.MOD_ALT, VK.M, self.continue_move),
-            (VK.MOD_ALT, VK.G, self.move_to_cursor),
+            (0, VK.M, self.continue_move),
+            (0, VK.G, self.move_to_cursor),
+            (0, VK.T, self.toggle_random),
+            (0, VK.R, self.reload_ammo),
+            (0, VK.N, self.remove_weapon),
+            (0, VK.LEFT, self.move_left),
+            (0, VK.RIGHT, self.move_right),
+            (0, VK.UP, self.move_up),
+            (0, VK.DOWN, self.move_down),
         )
 
     def _person(self):
@@ -88,6 +98,39 @@ class FeHack(BaseGbaHack):
         _global = self._global
         person.posx = _global.curx
         person.posy = _global.cury
+
+    def toggle_random(self):
+        """切换乱数"""
+        last_random = self._global.random
+        if last_random != 0:
+            self.last_random = last_random
+            self._global.random = 0
+        else:
+            self._global.random = self.last_random
+
+    def reload_ammo(self):
+        for item in self._person().items:
+            if not item.item:
+                break
+            item.count = 99
+
+    def remove_weapon(self):
+        for item in self._person().items:
+            if not item.item:
+                break
+            item.value = 0
+
+    def move_left(self):
+        self.person.posx -= 1
+
+    def move_right(self):
+        self.person.posx += 1
+
+    def move_up(self):
+        self.person.posy -= 1
+
+    def move_down(self):
+        self.person.posy += 1
 
     def on_train_items_page(self, page):
         self._global.train_items_offset = (page - 1) * self.TRAIN_ITEMS_PAGE_LENGTH

@@ -9,4 +9,4 @@ class ItemSlot(Model):
 
 
 class BaseGlobal(Model):
-    random = Field(0x03000000, size=8) # 乱数
+    random = Field(0x03000000, size=8)  # 乱数
