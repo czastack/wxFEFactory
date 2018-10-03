@@ -50,4 +50,11 @@ class Global(BaseGlobal):
     ability_up_1 = ToggleField(0x080250CC, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
     ability_up_2 = ToggleField(0x080250CC, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
     got_100exp = ToggleField(0x080258D0, size=2, enable=0x2464, disable=0x1824)  # 战后升级
+    # got_100exp = ToggleFields(
+    #     ToggleField(0x080258BA, size=2, enable=0x2064, disable=0x2001),
+    #     ToggleField(0x080258D0, size=2, enable=0x2464, disable=0x1824),
+    #     ToggleField(0x08025994, size=2, enable=0x46C0, disable=0xDD00),
+    #     ToggleField(0x080259C6, size=2, enable=0x2064, disable=0x200A)
+    #     ToggleField(0x080259CC, size=2, enable=0x3064, disable=0x300A)
+    # )
     support_quickly = ToggleField(0x08022B72, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升

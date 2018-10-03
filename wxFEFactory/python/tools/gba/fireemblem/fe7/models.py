@@ -50,6 +50,13 @@ class Global(BaseGlobal):
     ability_up_1 = ToggleField(0x080295FC, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
     ability_up_2 = ToggleField(0x080295FC, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
     got_100exp = ToggleField(0x08029F64, size=2, enable=0x2464, disable=0x1824)  # 战后升级
+    # got_100exp = ToggleFields(
+    #     ToggleField(0x08029F4E, size=2, enable=0x2064, disable=0x2001),
+    #     ToggleField(0x08029F64, size=2, enable=0x2464, disable=0x1824),
+    #     ToggleField(0x0802A050, size=2, enable=0x46C0, disable=0xDD00),
+    #     ToggleField(0x0802A086, size=2, enable=0x2064, disable=0x200A)
+    #     ToggleField(0x0802A08C, size=2, enable=0x3064, disable=0x300A)
+    # )
     support_quickly = ToggleField(0x08026724, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升
 
     # Hack code ZH
@@ -64,4 +71,11 @@ class Global(BaseGlobal):
     ability_up_1 = ToggleField(0x08029AAC, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
     ability_up_2 = ToggleField(0x08029AAC, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
     got_100exp = ToggleField(0x0802A414, size=2, enable=0x2464, disable=0x1824)  # 战后升级
+    # got_100exp = ToggleFields(
+    #     ToggleField(0x0802A3FE, size=2, enable=0x2064, disable=0x2001),
+    #     ToggleField(0x0802A414, size=2, enable=0x2464, disable=0x1824),
+    #     ToggleField(0x0802A500, size=2, enable=0x46C0, disable=0xDD00),
+    #     ToggleField(0x0802A536, size=2, enable=0x2064, disable=0x200A)
+    #     ToggleField(0x0802A53C, size=2, enable=0x3064, disable=0x300A)
+    # )
     support_quickly = ToggleField(0x08026BB0, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升
