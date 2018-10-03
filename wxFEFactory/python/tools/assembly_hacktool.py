@@ -54,7 +54,7 @@ class AssemblyHacktool(BaseHackTool):
             self.set_variable_value(item.key, int(checked))
 
     def toggle_assembly_button(self, key):
-        self.assembly_buttons[key].trigger()
+        self.assembly_buttons[key].toggle()
 
     def insure_memory(self):
         if self.allocated_memory is None:

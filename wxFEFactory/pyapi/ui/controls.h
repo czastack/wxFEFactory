@@ -75,7 +75,7 @@ public:
 		return *(wxToggleButton*)m_elem;
 	}
 
-	void trigger()
+	void toggle()
 	{
 		setChecked(!getChecked());
 		addPendingEvent(wxEVT_TOGGLEBUTTON);
@@ -124,7 +124,7 @@ public:
 		return *(wxCheckBox*)m_elem;
 	}
 
-	void trigger()
+	void toggle()
 	{
 		setChecked(!getChecked());
 		addPendingEvent(wxEVT_CHECKBOX);

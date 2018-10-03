@@ -200,14 +200,14 @@ void init_controls(py::module & m)
 	py::class_t<ToggleButton, Control>(m, "ToggleButton")
 		.def(py::init<wxcstr, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "onchange"_a = None, className, style)
-		.def("trigger", &ToggleButton::trigger)
+		.def("toggle", &ToggleButton::toggle)
 		.def("setOnChange", &ToggleButton::setOnChange, "onchange"_a, evt_reset)
 		.def_property("checked", &ToggleButton::getChecked, &ToggleButton::setChecked);
 
 	py::class_t<CheckBox, Control>(m, "CheckBox")
 		.def(py::init<wxcstr, bool, bool, pyobj, pyobj, pyobj>(),
 			label, "checked"_a = false, "alignRight"_a = false, "onchange"_a = None, className, style)
-		.def("trigger", &CheckBox::trigger)
+		.def("toggle", &CheckBox::toggle)
 		.def_property("checked", &CheckBox::getChecked, &CheckBox::setChecked);
 
 	py::class_t<Img, Control>(m, "Img")

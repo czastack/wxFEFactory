@@ -522,6 +522,9 @@ class BaseCheckBox(TwoWayWidget):
             self.render_btn()
         self.container = container
 
+    def toggle(self):
+        self.view.toggle()
+
     @property
     def input_value(self):
         return self.enable if self.view.checked else self.disable
