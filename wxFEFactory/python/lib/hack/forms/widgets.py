@@ -481,17 +481,17 @@ class ProxyInput(BaseInput):
 
 class SimpleCheckBox(Widget):
     """采用切换事件的立即模式"""
-    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None, size=None):
+    def __init__(self, name, label, addr, offsets=(), enable=None, disable=None, size=None):
         """
-        :param enableData: 激活时写入的数据
-        :param disableData: 关闭时写入的数据
+        :param enable: 激活时写入的数据
+        :param disable: 关闭时写入的数据
         """
         super().__init__(name, label, addr, offsets)
-        self.enableData = enableData
-        self.disableData = disableData
+        self.enable = enable
+        self.disable = disable
         if size is None:
-            if isinstance(enableData, bytes):
-                size = len(enableData)
+            if isinstance(enable, bytes):
+                size = len(enable)
             else:
                 size = 4
         self.size = size
@@ -500,20 +500,20 @@ class SimpleCheckBox(Widget):
         self.view = ui.CheckBox(self.label, onchange=self.weak.onChange)
 
     def onChange(self, checkbox):
-        data = self.enableData if checkbox.checked else self.disableData
+        data = self.enable if checkbox.checked else self.disable
         self.handler.ptrs_write(self.addr, self.offsets, data, self.size)
 
 
 class BaseCheckBox(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), enableData=None, disableData=None):
+    def __init__(self, name, label, addr, offsets=(), enable=None, disable=None):
         """
-        :param enableData: 激活时写入的数据
-        :param disableData: 关闭时写入的数据
+        :param enable: 激活时写入的数据
+        :param disable: 关闭时写入的数据
         """
         super().__init__(name, label, addr, offsets)
-        self.enableData = enableData
-        self.disableData = disableData
-        self.type = type(enableData)
+        self.enable = enable
+        self.disable = disable
+        self.type = type(enable)
 
     def render(self):
         super().render()
@@ -524,13 +524,13 @@ class BaseCheckBox(TwoWayWidget):
 
     @property
     def input_value(self):
-        return self.enableData if self.view.checked else self.disableData
+        return self.enable if self.view.checked else self.disable
 
     @input_value.setter
     def input_value(self, value):
-        if value == self.enableData:
+        if value == self.enable:
             self.view.checked = True
-        elif self.disableData is None or value == self.disableData:
+        elif self.disable is None or value == self.disable:
             self.view.checked = False
 
 
@@ -541,13 +541,13 @@ class CheckBox(BaseCheckBox, OffsetsWidget):
 class ModelCheckBox(ModelWidget, BaseCheckBox):
     @property
     def input_value(self):
-        if self.enableData is None:
+        if self.enable is None:
             return self.view.checked
         return super().input_value
 
     @input_value.setter
     def input_value(self, value):
-        if self.enableData is None:
+        if self.enable is None:
             self.view.checked = value
         else:
             super().input_value = value
@@ -600,7 +600,8 @@ class BaseSelect(TwoWayWidget):
     @input_value.setter
     def input_value(self, value):
         try:
-            self.view.index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
+            self.view.index = self.values.index(value) if self.values else (
+                value if value and value < len(self.choices) else -1)
         except ValueError:
             self.view.index = -1
             # print(hex(value), "不在%s的可选值中" % self.label)

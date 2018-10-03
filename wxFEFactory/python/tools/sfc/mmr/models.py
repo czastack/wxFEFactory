@@ -79,7 +79,7 @@ class Global(Model):
     posy = ByteField(0x035c)
     offx = ByteField(0x0062)
     offy = ByteField(0x0063)
-    no_battle = ToggleField(0x7E0685, size=1, enableData=0xFF, disableData=0x00, label="不遇敌")
+    no_battle = ToggleField(0x7E0685, size=1, enable=0xFF, disable=0x00, label="不遇敌")
 
     after_exp = WordField(0x7E4170, label="战后经验")
     bs_flag = WordField(0x7E4170, label="BS全功能") # 0x3FFF
@@ -94,7 +94,7 @@ class Global(Model):
     wanted_status = ArrayField(0x7E910F, 16, ByteField(0)) # 0=未击破, 63=未领奖金, E3=已领奖金
     parter_flag = ArrayField(0x7E9106, 3, ByteField(0)) # 1=加入, FF=离队
     parter_count = ByteField(0x7E9168)
-    auto_battle = ToggleField(0x7E8017, size=1, enableData=0x40, disableData=0x00, label="自动战斗")
+    auto_battle = ToggleField(0x7E8017, size=1, enable=0x40, disable=0x00, label="自动战斗")
 
     # 敌人情况
     enemys = ArrayField(0, 10, ModelField(0, Enemy))

@@ -361,27 +361,27 @@ class SignedField(Field):
 class ToggleField(Field):
     """开关字段"""
     # 几种情况: 1. data在Widget中, get, set使用真实值; 2. data在Field中，get, set使用布尔值
-    def __init__(self, *args, enableData=None, disableData=None, **kwargs):
+    def __init__(self, *args, enable=None, disable=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.enableData = enableData
-        self.disableData = disableData
-        self.type = type(enableData)
+        self.enable = enable
+        self.disable = disable
+        self.type = type(enable)
         if self.type is bytes:
-            self.size = len(enableData)
+            self.size = len(enable)
 
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
         value = super().__get__(instance, owner)
-        if self.enableData is not None:
-            return value == self.enableData
+        if self.enable is not None:
+            return value == self.enable
         return value
 
     def __set__(self, instance, value):
         if value is True:
-            value = self.enableData
+            value = self.enable
         elif value is False:
-            value = self.disableData
+            value = self.disable
         super().__set__(instance, value)
 
 

@@ -24,8 +24,8 @@ class Main(BaseNesHack):
         self._global = Global(0, self.handler)
 
         with Group("global", "全局", self._global):
-            ModelCheckBox("invincible_1", "1P无敌", enableData=0xff, disableData=0)
-            ModelCheckBox("invincible_2", "2P无敌", enableData=0xff, disableData=0)
+            ModelCheckBox("invincible_1", "1P无敌", enable=0xff, disable=0)
+            ModelCheckBox("invincible_2", "2P无敌", enable=0xff, disable=0)
             ModelSelect("weapon_1", "1P武器", choices=BULLETS, values=BULLET_VALUES)
             ModelSelect("weapon_2", "2P武器", choices=BULLETS, values=BULLET_VALUES)
             ModelInput("lives_1", "1P生命")

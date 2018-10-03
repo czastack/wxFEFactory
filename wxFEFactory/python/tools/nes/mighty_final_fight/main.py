@@ -20,7 +20,7 @@ class Main(BaseNesHack):
             ModelInput("exp", "总经验")
             ModelInput("tool_count", "手持物数量")
             ModelInput("play_level", "关卡")
-            ModelCheckBox("invincible", "无伤", enableData=0xffff, disableData=0)
+            ModelCheckBox("invincible", "无伤", enable=0xffff, disable=0)
 
         with StaticGroup("快捷键"):
             with ui.ScrollView(className="fill"):

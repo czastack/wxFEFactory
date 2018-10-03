@@ -23,8 +23,8 @@ class Main(BaseNesHack):
         with Group("global", "全局", self._global):
             ModelInput("lives_1", "1P生命")
             ModelInput("lives_2", "2P生命")
-            ModelCheckBox("invincible_1", "1P无敌", enableData=0xFF, disableData=0)
-            ModelCheckBox("invincible_2", "2P无敌", enableData=0xFF, disableData=0)
+            ModelCheckBox("invincible_1", "1P无敌", enable=0xFF, disable=0)
+            ModelCheckBox("invincible_2", "2P无敌", enable=0xFF, disable=0)
             # ModelInput("level", "关卡(0-4)")
             ModelFlagWidget("medicine_1", "1P药水效果", labels=MEDICINE)
             ModelFlagWidget("medicine_2", "2P药水效果", labels=MEDICINE)

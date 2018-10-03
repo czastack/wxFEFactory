@@ -49,7 +49,7 @@ class Main(BaseGbaHack):
             ModelInput("weapon_level_4")
             ModelSelect("level", choices=LEVELS)
             ModelFlagWidget("weapon_flag", labels=WEAPONS)
-            ModelCheckBox("invincible", enableData=0xFF, disableData=0)
+            ModelCheckBox("invincible", enable=0xFF, disable=0)
 
         with StaticGroup("功能"):
             self.render_functions(('max_weapon_level', 'all_weapon', 'all_element', 'all_fairy',

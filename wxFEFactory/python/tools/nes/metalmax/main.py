@@ -20,7 +20,7 @@ class Main(BaseNesHack):
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("battlein", "遇敌率")
-            ModelCheckBox("battlein", "不遇敌", enableData=0xFF, disableData=0)
+            ModelCheckBox("battlein", "不遇敌", enable=0xFF, disable=0)
 
         with Group("player", "角色", person, cols=4):
             Choice("角色", datasets.PERSONS, self.on_person_change)

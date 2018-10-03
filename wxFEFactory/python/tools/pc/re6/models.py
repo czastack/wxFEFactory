@@ -6,7 +6,7 @@ from lib.hack.models import (
 class IngameItem(Model):
     """游戏中个人物品"""
     SIZE = 0x1C
-    enabled = ToggleField(4, size=1, enableData=1, disableData=0, label="激活")
+    enabled = ToggleField(4, size=1, enable=1, disable=0, label="激活")
     slot = ByteField(5, label="槽位")
     type = WordField(6, label="种类")
     quantity = WordField(0x0A, label="数量/武器弹药")
@@ -20,7 +20,7 @@ class Character(Model):
     id = Field((0x010C, 0x16), bytes, 6)
     health = WordField(0x0F10, label="生命值")
     health_max = WordField(0x0F12, label="生命值上限")
-    invincible = ToggleField(0x0FC4, enableData=0, disableData=1, label="无敌")
+    invincible = ToggleField(0x0FC4, enable=0, disable=1, label="无敌")
     stamina = Field(0x3B00, float, label="体力")
     stamina_max = Field(0x3B04, float, label="体力上限")
     coord = CoordField(0x50, label="坐标")

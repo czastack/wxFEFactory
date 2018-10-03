@@ -64,7 +64,7 @@ class FeHack(BaseNdsHack):
         ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
         ModelInput("level", "等级")
         ModelInput("exp", "经验")
-        ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
+        ModelCheckBox("moved", "已行动", enable=1, disable=0)
         ModelInput("posx", "X坐标")
         ModelInput("posy", "Y坐标")
         ModelInput("hpmax", "HP上限+")

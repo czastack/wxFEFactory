@@ -35,7 +35,7 @@ class FeHack(BaseGbaHack):
         ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
         ModelInput("level", "等级")
         ModelInput("exp", "经验")
-        ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
+        ModelCheckBox("moved", "已行动", enable=1, disable=0)
         ModelInput("posx", "X坐标")
         ModelInput("posy", "Y坐标")
         ModelInput("hpmax", "HP最大值")
@@ -70,6 +70,7 @@ class FeHack(BaseGbaHack):
 
     def get_hotkeys(self):
         return (
+            (0, VK.H, self.pull_through),
             (0, VK.M, self.continue_move),
             (0, VK.G, self.move_to_cursor),
             (0, VK.T, self.toggle_random),
@@ -83,11 +84,16 @@ class FeHack(BaseGbaHack):
 
     def _person(self):
         person_addr = self._global.person_addr
-        if person_addr:
+        if person_addr and (person_addr & 0xFFFF0000 == 0x02020000):
             self._personins.addr = person_addr
+        if self._personins.addr:
             return self._personins
 
     person = property(_person)
+
+    def pull_through(self):
+        """再移动"""
+        self.person.set_with('hp', 'hpmax')
 
     def continue_move(self):
         """再移动"""
@@ -109,12 +115,14 @@ class FeHack(BaseGbaHack):
             self._global.random = self.last_random
 
     def reload_ammo(self):
+        """恢复耐久"""
         for item in self._person().items:
             if not item.item:
                 break
             item.count = 99
 
     def remove_weapon(self):
+        """移除物品"""
         for item in self._person().items:
             if not item.item:
                 break

@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -39,3 +39,4 @@ class Global(BaseGlobal):
     cury = WordField(0x0202bcc2)
     persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot))  # 运输队
+    item_count_keep = ToggleField(0x080168B0, enable=0x0448, disable=0xC046)

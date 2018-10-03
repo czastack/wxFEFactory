@@ -42,7 +42,7 @@ class Main(BaseDolphinHack):
             ModelInput("lucky_add", "幸运+")
             ModelInput("defense_add", "守备+")
             ModelInput("magicdef_add", "魔防+")
-            ModelCheckBox("moved", "已行动", enableData=1, disableData=0)
+            ModelCheckBox("moved", "已行动", enable=1, disable=0)
 
         self.lazy_group(Group("skills", "角色技能", person), self.render_skills)
         self.lazy_group(Group("items", "角色物品", person, handler=self.handler), self.render_items)

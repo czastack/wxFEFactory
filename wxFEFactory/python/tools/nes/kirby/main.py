@@ -10,8 +10,8 @@ class Global(Model):
     star = ByteField(0x0598)  # 音波等形态次数
     lives = ByteField(0x0599)
     credits = ByteField(0x07BB)  # 无限Credits, 02
-    invincible = ToggleField(0x05F9, size=1, enableData=0xFF, disableData=0)
-    invincible2 = ToggleField(0x05FB, size=1, enableData=0x44, disableData=0)
+    invincible = ToggleField(0x05F9, size=1, enable=0xFF, disable=0)
+    invincible2 = ToggleField(0x05FB, size=1, enable=0x44, disable=0)
     form = ByteField(0x05E0)
     ability = ByteField(0x05E3)
 

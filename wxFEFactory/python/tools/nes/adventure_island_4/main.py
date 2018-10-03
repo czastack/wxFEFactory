@@ -24,7 +24,7 @@ class Main(BaseNesHack):
         with Group("global", "全局", self._global):
             ModelInput("hp", "HP")
             ModelInput("hpmax", "最大HP")
-            ModelCheckBox("invincible", "无敌", enableData=0xFF, disableData=0)
+            ModelCheckBox("invincible", "无敌", enable=0xFF, disable=0)
             ModelSelect("dragon", "当前龙", choices=DRAGONS)
 
         with StaticGroup("功能"):

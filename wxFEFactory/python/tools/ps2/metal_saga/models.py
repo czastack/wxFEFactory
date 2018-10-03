@@ -111,7 +111,7 @@ class Enemy(Model):
 class Global(Model):
     money = Field(0x007D0A64, label="金钱")
     battlein = ByteField(0x7E0685, label="不遇敌率")
-    no_battle = ToggleField(0x7E0685, size=1, enableData=0xFF, disableData=0x00, label="不遇敌")
+    no_battle = ToggleField(0x7E0685, size=1, enable=0xFF, disable=0x00, label="不遇敌")
 
     # wanted_status = ArrayField(0x7E910F, 16, ByteField(0)) # 0=未击破, 63=未领奖金, E3=已领奖金
 

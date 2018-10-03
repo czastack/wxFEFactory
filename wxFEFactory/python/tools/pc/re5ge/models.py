@@ -54,7 +54,7 @@ class Character(Model):
     # ai = Field(0x2DA8, label="AI")
     # attack_reaction = Field(0x1358)
     # merce_kill_counter = Field(0x25BC)
-    invincible = ToggleField(0x135C, label="无敌", enableData=0, disableData=1)
+    invincible = ToggleField(0x135C, label="无敌", enable=0, disable=1)
     items = ArrayField(0x21A8, 24, ModelField(0, IngameItem))
 
 

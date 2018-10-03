@@ -19,9 +19,9 @@ class Main(BaseHackTool):
     def render_main(self):
 
         with Group("player", "角色", self._global, handler=self.handler):
-            ModelCheckBox("x_invincible", "X无敌", enableData=0xFF, disableData=0)
-            ModelCheckBox("zero_invincible", "ZEOR无敌", enableData=0xFF, disableData=0)
-            ModelCheckBox("axl_invincible", "AXL无敌", enableData=0xFF, disableData=0)
+            ModelCheckBox("x_invincible", "X无敌", enable=0xFF, disable=0)
+            ModelCheckBox("zero_invincible", "ZEOR无敌", enable=0xFF, disable=0)
+            ModelCheckBox("axl_invincible", "AXL无敌", enable=0xFF, disable=0)
             ModelInput("hp_axl", "AXL HP")
             ModelInput("hpmax_axl", "AXL最大HP")
             ModelInput("hp_x", "X HP")
@@ -33,11 +33,11 @@ class Main(BaseHackTool):
             ModelInput("metal", "金属")
             ModelInput("resurgence", "复活晶片")
             ModelInput("joint_attack", "双人合击气槽")
-            ModelCheckBox("zero_jump", "ZERO无限跳", enableData=0x02, disableData=0)
-            ModelCheckBox("all_weapon", "解锁全部武器", enableData=0xFF, disableData=0)
-            ModelCheckBox("super_x", "超级装甲X", enableData=0xFF, disableData=0)
-            ModelCheckBox("back_zero_white_axl", "暗黑ZERO和坠天使AXL", enableData=0xFF, disableData=0)
-            ModelCheckBox("ultimate_x", "终极装甲X", enableData=0xFF, disableData=0)
+            ModelCheckBox("zero_jump", "ZERO无限跳", enable=0x02, disable=0)
+            ModelCheckBox("all_weapon", "解锁全部武器", enable=0xFF, disable=0)
+            ModelCheckBox("super_x", "超级装甲X", enable=0xFF, disable=0)
+            ModelCheckBox("back_zero_white_axl", "暗黑ZERO和坠天使AXL", enable=0xFF, disable=0)
+            ModelCheckBox("ultimate_x", "终极装甲X", enable=0xFF, disable=0)
 
     def get_hotkeys(self):
         this = self.weak

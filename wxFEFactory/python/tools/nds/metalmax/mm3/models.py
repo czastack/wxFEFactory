@@ -128,49 +128,49 @@ class Global(BaseGlobal):
     game_turn = ByteField(0x021AA3E4, label="通关次数") # TODO
     game_time = Field(0x022AC6FC, label="游戏时间")
 
-    # allfax = ToggleField(0x0219E90B, size=6, enableData=0xFFFFFFFFFFFF, label="传真全开") # TODO
+    # allfax = ToggleField(0x0219E90B, size=6, enable=0xFFFFFFFFFFFF, label="传真全开") # TODO
     # allmap = ToggleFields()
     enemy_flash = ToggleFields(
-        ToggleField(0x02087ADE, enableData=0x2109, size=2, disableData=0x7E81),
-        ToggleField(0x02087DBA, enableData=0x46C0, size=2, disableData=0xDA40),
+        ToggleField(0x02087ADE, enable=0x2109, size=2, disable=0x7E81),
+        ToggleField(0x02087DBA, enable=0x46C0, size=2, disable=0xDA40),
         label="敌人闪光"
     )
 
-    quick_switch = ToggleField(0x0202460C, enableData=0x47702001, disableData=0x47702000, label="画面切换高速化")
-    quick_move = ToggleField(0x020C2A58, size=2, enableData=0x2994, disableData=0x14CD, label="高速移动")
-    must_winning = ToggleField(0x020442F0, enableData=0x2007E008, disableData=0x2007DD08, label="贩卖机绝对会中奖")
-    tool_count_keep = ToggleField(0x0207681E, enableData=0x46C00049, disableData=0x54420049, label="消费道具用后不减")
+    quick_switch = ToggleField(0x0202460C, enable=0x47702001, disable=0x47702000, label="画面切换高速化")
+    quick_move = ToggleField(0x020C2A58, size=2, enable=0x2994, disable=0x14CD, label="高速移动")
+    must_winning = ToggleField(0x020442F0, enable=0x2007E008, disable=0x2007DD08, label="贩卖机绝对会中奖")
+    tool_count_keep = ToggleField(0x0207681E, enable=0x46C00049, disable=0x54420049, label="消费道具用后不减")
 
     weight_zero = ToggleFields(
-        ToggleField(0x02076A30, enableData=0x84C82000, disableData=0x18248CC8),
-        ToggleField(0x02076A50, enableData=0x80022200, disableData=0x18248800),
+        ToggleField(0x02076A30, enable=0x84C82000, disable=0x18248CC8),
+        ToggleField(0x02076A50, enable=0x80022200, disable=0x18248800),
         label="装甲除底盘外重量为0"
     )
 
     equip_limit_remove = ToggleFields(
-        ToggleField(0x0207B9B2, size=2, enableData=0x46C0, disableData=0xD00A),
-        ToggleField(0x02073AD0, size=2, enableData=0x46C0, disableData=0xD055),
-        ToggleField(0x02073BA8, size=2, enableData=0x46C0, disableData=0xD003),
-        ToggleField(0x02073C7E, size=2, enableData=0x46C0, disableData=0xD037),
-        ToggleField(0x02073D16, size=2, enableData=0x46C0, disableData=0xD015),
-        ToggleField(0x02073FD0, size=2, enableData=0x46C0, disableData=0xD005),
-        ToggleField(0x0204E0EC, size=2, enableData=0x46C0, disableData=0xD030),
+        ToggleField(0x0207B9B2, size=2, enable=0x46C0, disable=0xD00A),
+        ToggleField(0x02073AD0, size=2, enable=0x46C0, disable=0xD055),
+        ToggleField(0x02073BA8, size=2, enable=0x46C0, disable=0xD003),
+        ToggleField(0x02073C7E, size=2, enable=0x46C0, disable=0xD037),
+        ToggleField(0x02073D16, size=2, enable=0x46C0, disable=0xD015),
+        ToggleField(0x02073FD0, size=2, enable=0x46C0, disable=0xD005),
+        ToggleField(0x0204E0EC, size=2, enable=0x46C0, disable=0xD030),
         label="装备限制解除"
     )
 
     without_material = ToggleFields(
-        ToggleField(0x02051CD0, enableData=0xE0141884, disableData=0x88681885),
-        ToggleField(0x02051EC0, enableData=0xE00AFCCF, disableData=0x8868F90B),
+        ToggleField(0x02051CD0, enable=0xE0141884, disable=0x88681885),
+        ToggleField(0x02051EC0, enable=0xE00AFCCF, disable=0x8868F90B),
         label="艺术家制作不需要素材",
     )
 
-    drop_item_three_star = ToggleField(0x020773B0, enableData=0x46C02003, disableData=0xFBB2F00F, label="敌人掉落的都是3星")
-    no_battle = ToggleField(0x020BBE60, size=2, enableData=0x46C0, disableData=0x1C40, label="不遇敌")
+    drop_item_three_star = ToggleField(0x020773B0, enable=0x46C02003, disable=0xFBB2F00F, label="敌人掉落的都是3星")
+    no_battle = ToggleField(0x020BBE60, size=2, enable=0x46C0, disable=0x1C40, label="不遇敌")
     # 战后获得金钱倍数(2: 00C8, 4: 0190, 8: 0320, 16: 0640, 32: 0C80, 64: 1900, 128: 3200)
     after_money_rate = WordField(0x021A5CA8, label="战后获得金钱倍数")
-    ammo_keep = ToggleField(0x0208FA1C, enableData=0x46C0D302, disableData=0x1E52D302, label="车辆弹药不减")
+    ammo_keep = ToggleField(0x0208FA1C, enable=0x46C0D302, disable=0x1E52D302, label="车辆弹药不减")
 
-    through_wall = ToggleField(0x020BE4C4, size=2, enableData=0x2000, disableData=0x1C28, label="穿墙")
+    through_wall = ToggleField(0x020BE4C4, size=2, enable=0x2000, disable=0x1C28, label="穿墙")
 
     # 回复道具
     potions = ArrayField(0x0219F918, 27, ModelField(0, ItemInfo))
@@ -189,27 +189,27 @@ class Global(BaseGlobal):
     reward = Field(0x21AB4FE, size=3, label="获得赏金")
     fame = WordField(0x021AB501, label="有名度")
 
-    use_humen_weapon_1 = ToggleField(0x0208425C, enableData=0xE0012801, disableData=0xD12C2801, label="战车中能用人武器v1")
-    use_humen_weapon_2 = ToggleField(0x02085374, enableData=0xD00AE004, disableData=0xD00AD004, label="战车中能用人武器v2")
-    buy_chariot_item_three_star = ToggleField(0x02077378, enableData=0x72602003, disableData=0x7260D101, label="店内购入车用品必3星")
-    can_buy_not_for_sale = ToggleField(0x0204E618, enableData=0x48B8E001, disableData=0x48B8D101, label="可以购入非卖车用品")
+    use_humen_weapon_1 = ToggleField(0x0208425C, enable=0xE0012801, disable=0xD12C2801, label="战车中能用人武器v1")
+    use_humen_weapon_2 = ToggleField(0x02085374, enable=0xD00AE004, disable=0xD00AD004, label="战车中能用人武器v2")
+    buy_chariot_item_three_star = ToggleField(0x02077378, enable=0x72602003, disable=0x7260D101, label="店内购入车用品必3星")
+    can_buy_not_for_sale = ToggleField(0x0204E618, enable=0x48B8E001, disable=0x48B8D101, label="可以购入非卖车用品")
 
-    can_change_even_overweight = ToggleField(0x02043064, enableData=0x1EE4E000, disableData=0x1EE4D100, label="车身超过重量也可以改造")
+    can_change_even_overweight = ToggleField(0x02043064, enable=0x1EE4E000, disable=0x1EE4D100, label="车身超过重量也可以改造")
     can_always_special_bullet = ToggleFields(
-        ToggleField(0x0208EFEC, size=2, enableData=0x46C0, disableData=0xD111),
-        ToggleField(0x0208EFFE, size=2, enableData=0xE007, disableData=0xD007),
+        ToggleField(0x0208EFEC, size=2, enable=0x46C0, disable=0xD111),
+        ToggleField(0x0208EFFE, size=2, enable=0xE007, disable=0xD007),
         label="都能用特殊砲弾"
     )
 
     skill_count_keep = ToggleFields(
-        ToggleField(0x0208F070, size=2, enableData=0x46C0, disableData=0x1E40),
-        ToggleField(0x0207C2B2, size=2, enableData=0x46C0, disableData=0x1E40),
+        ToggleField(0x0208F070, size=2, enable=0x46C0, disable=0x1E40),
+        ToggleField(0x0207C2B2, size=2, enable=0x46C0, disable=0x1E40),
         label="特技使用次数不减"
     )
 
     can_go_hear = ToggleFields(
-        ToggleField(0x020686F0, size=8, enableData=0x00C9314521F0E046, disableData=0xF009A9008B30E046),
-        ToggleField(0x020686F8, size=8, enableData=0xA902688868081861, disableData=0xA90298019800FEAD),
+        ToggleField(0x020686F0, size=8, enable=0x00C9314521F0E046, disable=0xF009A9008B30E046),
+        ToggleField(0x020686F8, size=8, enable=0xA902688868081861, disable=0xA90298019800FEAD),
         label="传送系统可以移動到现在地"
     )
 

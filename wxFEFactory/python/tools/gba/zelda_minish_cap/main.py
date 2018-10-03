@@ -22,9 +22,9 @@ class Global(Model):
     items_flag = Field(0x02002B32, size=8, label="物品")
     bodysize = ByteField(0x03003FB0, label="身体大小")
 
-    all_scrolls = ToggleField(scrolls_flag.offset, enableData=0xFFFF, label="全卷轴")
-    all_skills = ToggleField(skills_flag.offset, enableData=0xFFFF, label="全剑技")
-    all_map = ToggleField(0x02002A80, enableData=0x1FFFF, label="地图全开")
+    all_scrolls = ToggleField(scrolls_flag.offset, enable=0xFFFF, label="全卷轴")
+    all_skills = ToggleField(skills_flag.offset, enable=0xFFFF, label="全剑技")
+    all_map = ToggleField(0x02002A80, enable=0x1FFFF, label="地图全开")
     guide_falg = Field(0x02002B0E, bytes, 20, label="全图鉴")
 
 

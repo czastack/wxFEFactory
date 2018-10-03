@@ -50,7 +50,7 @@ class Main(BaseGbaHack):
         with Group("global", "全局", self._global):
             ModelInput("hp")
             # ModelInput("tankhp")
-            ModelCheckBox("invincible", enableData=0x20, disableData=0)
+            ModelCheckBox("invincible", enable=0x20, disable=0)
             ModelInput("ammo")
             ModelInput("bomb")
             ModelInput("shell")
