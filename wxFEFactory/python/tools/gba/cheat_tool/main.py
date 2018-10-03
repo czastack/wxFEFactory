@@ -21,7 +21,7 @@ class Main(NestedTool):
     def analyse(self, _=None):
         self.code.clear()
         for line in self.textinput.value.split('\n'):
-            self.code.from_string(line)
+            self.code.from_string(line.strip())
             if not self.code.wait_second:
                 self.code.set_cb()
         self.textoutput.value = self.code.get_text()

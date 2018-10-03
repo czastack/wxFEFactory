@@ -263,5 +263,5 @@ void init_aui(py::module & m)
 		.def("closePage", &AuiNotebook::closePage, "n"_a = -1)
 		.def("closeAllPage", &AuiNotebook::closeAllPage)
 		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
-		.def_property_readonly("index", &AuiNotebook::getPageCount);
+		.def_property_readonly("count", &AuiNotebook::getPageCount);
 }

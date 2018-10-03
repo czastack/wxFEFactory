@@ -317,6 +317,7 @@ class MainFrame:
         Tool = self.get_tool(name)
         tool = Tool()
         tool.attach(self)
+        self.book.index = self.book.count - 1
 
         __main__.tool = tool
 

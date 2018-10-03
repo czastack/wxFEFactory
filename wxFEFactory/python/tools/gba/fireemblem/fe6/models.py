@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -38,3 +38,16 @@ class Global(BaseGlobal):
     cury = WordField(0x0202AA1E)
     persons = ArrayField(0x202AB78, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x02039430, 100, ModelField(0, ItemSlot))  # 运输队
+    # Hack code
+    inf_move = ToggleFields(
+        ToggleField(0x08017B80, size=2, enable=0x2000, disable=0x2002),
+        ToggleField(0x08017EEA, size=2, enable=0x2100, disable=0x2102),
+        ToggleField(0x0801B976, size=2, enable=0x2000, disable=0x2040),
+        ToggleField(0x0802A0C8, size=2, enable=0x2000, disable=0x2040)
+    )  # 无限行动
+    item_count_keep = ToggleField(0x08016940, size=2, enable=0x46C0, disable=0x1812)  # 武器耐久度不减
+    proficiency_max = ToggleField(0x080256CC, size=2, enable=0x22FB, disable=0x1C02)  # 武器熟练度最大
+    ability_up_1 = ToggleField(0x080250CC, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
+    ability_up_2 = ToggleField(0x080250CC, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
+    got_100exp = ToggleField(0x080258D0, size=2, enable=0x2464, disable=0x1824)  # 战后升级
+    support_quickly = ToggleField(0x08022B72, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升

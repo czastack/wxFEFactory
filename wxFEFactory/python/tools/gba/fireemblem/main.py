@@ -17,16 +17,26 @@ class FeHack(BaseGbaHack):
 
     def render_main(self):
         with Group("global", "全局", self._global):
-            ModelInput("money", "金钱")
-            ModelInput("turns", "回合")
-            ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
-            ModelSelect("chapter", "章节", choices=self.datasets.CHAPTERS)
+            self.render_global()
 
         self.lazy_group(Group("player", "角色", self._person, cols=4), self.render_char)
         self.lazy_group(Group("items", "角色物品", self._person, cols=4), self.render_char_items)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
+
+    def render_global(self):
+        ModelInput("money", "金钱")
+        ModelInput("turns", "回合")
+        ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
+        ModelSelect("chapter", "章节", choices=self.datasets.CHAPTERS)
+        ModelCheckBox("inf_move", "无限行动")
+        ModelCheckBox("item_count_keep", "武器耐久度不减")
+        ModelCheckBox("proficiency_max", "武器熟练度最大")
+        ModelCheckBox("ability_up_1", "全能力成长1点")
+        ModelCheckBox("ability_up_2", "全能力成长2点")
+        ModelCheckBox("got_100exp", "战后升级")
+        ModelCheckBox("support_quickly", "好感度快速提升")
 
     def render_char(self):
         datasets = self.datasets

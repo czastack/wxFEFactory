@@ -30,7 +30,7 @@ import re
 # 4AAAAAAA YYYY - Slide code
 # XXXXCCCC IIII   (C is count and I is address increment, X is value increment.)
 # 5AAAAAAA CCCC - Super code (Write bytes to address, CCCC is count)
-# BBBBBBBB BBBB 
+# BBBBBBBB BBBB
 # 6AAAAAAA YYYY - 16-bit and
 # 7AAAAAAA YYYY - if address contains 16-bit value enable next code
 # 8AAAAAAA YYYY - 16-bit constant write
@@ -54,7 +54,7 @@ GSA_16_BIT_GS_WRITE = 5
 GSA_32_BIT_GS_WRITE = 6
 CBA_IF_KEYS_PRESSED = 7
 CBA_IF_TRUE = 8
-CBA_SLIDE_CODE = 9 # CB压缩码
+CBA_SLIDE_CODE = 9  # CB压缩码
 CBA_IF_FALSE = 10
 CBA_AND = 11
 GSA_8_BIT_GS_WRITE2 = 12
@@ -79,8 +79,8 @@ GSA_32_BIT_IF_FALSE2 = 30
 GSA_SLOWDOWN = 31
 CBA_ADD = 32
 CBA_OR = 33
-CBA_LT = 34 # 小于
-CBA_GT = 35 # 大于
+CBA_LT = 34  # 小于
+CBA_GT = 35  # 大于
 CBA_SUPER = 36
 
 TYPE_CB = 0
@@ -88,7 +88,7 @@ TYPE_V1 = 1
 TYPE_V3 = 2
 
 
-MASK_8  = 0x000000FF
+MASK_8 = 0x000000FF
 MASK_16 = 0x0000FFFF
 MASK_28 = 0x0FFFFFFF
 MASK_32 = 0xFFFFFFFF
@@ -97,16 +97,16 @@ SEED_INCREMENT = 0x9E3779B9
 SEEDS_V1 = (0x09F4FBBD, 0x9681884A, 0x352027E9, 0xF3DEE5A7)
 SEEDS_V3 = (0x7AA9648F, 0x7FAE6994, 0xC0EFAAD5, 0x42712C57)
 
-REG_GS = re.compile("(?i)\\b([0-9a-f]{8}) ?([0-9a-f]{8})\\b$") # Gameshark
+REG_GS = re.compile("(?i)\\b([0-9a-f]{8}) ?([0-9a-f]{8})\\b$")  # Gameshark
 REG_CB = re.compile("(?i)([0-9a-f]{8}) ([0-9a-f]{4})$")
 REG_RAW = re.compile("(?i)(0[23][0-9a-f]{6})[ :]([0-9a-f]{1,8})$")
 
-TYPE_8BIT = {INT_8_BIT_WRITE, GSA_8_BIT_GS_WRITE, GSA_8_BIT_GS_WRITE2, GSA_8_BIT_SLIDE, GSA_8_BIT_IF_TRUE, 
+TYPE_8BIT = {INT_8_BIT_WRITE, GSA_8_BIT_GS_WRITE, GSA_8_BIT_GS_WRITE2, GSA_8_BIT_SLIDE, GSA_8_BIT_IF_TRUE,
     GSA_8_BIT_IF_FALSE, GSA_8_BIT_FILL, GSA_8_BIT_IF_TRUE2, GSA_8_BIT_IF_FALSE2, GSA_SLOWDOWN}
-TYPE_16BIT = {INT_16_BIT_WRITE, GSA_16_BIT_ROM_PATCH, GSA_16_BIT_GS_WRITE, CBA_IF_KEYS_PRESSED, CBA_IF_TRUE, 
-    CBA_SLIDE_CODE, CBA_IF_FALSE, CBA_AND, GSA_16_BIT_GS_WRITE2, GSA_16_BIT_ROM_PATCH2, GSA_16_BIT_SLIDE, 
+TYPE_16BIT = {INT_16_BIT_WRITE, GSA_16_BIT_ROM_PATCH, GSA_16_BIT_GS_WRITE, CBA_IF_KEYS_PRESSED, CBA_IF_TRUE,
+    CBA_SLIDE_CODE, CBA_IF_FALSE, CBA_AND, GSA_16_BIT_GS_WRITE2, GSA_16_BIT_ROM_PATCH2, GSA_16_BIT_SLIDE,
     GSA_16_BIT_FILL, GSA_16_BIT_IF_TRUE2, GSA_16_BIT_IF_FALSE2, CBA_ADD, CBA_OR, CBA_LT, CBA_GT, CBA_SUPER}
-TYPE_32BIT = {INT_32_BIT_WRITE, GSA_32_BIT_GS_WRITE, GSA_32_BIT_GS_WRITE2, GSA_32_BIT_SLIDE, 
+TYPE_32BIT = {INT_32_BIT_WRITE, GSA_32_BIT_GS_WRITE, GSA_32_BIT_GS_WRITE2, GSA_32_BIT_SLIDE,
     GSA_32_BIT_IF_TRUE, GSA_32_BIT_IF_FALSE, GSA_32_BIT_IF_TRUE2, GSA_32_BIT_IF_FALSE2}
 
 CB_TYPE = {
@@ -150,6 +150,7 @@ GSV3_TYPE = {
     GSA_32_BIT_SLIDE: 0x42,
 }
 
+
 def getBit(type):
     if type in TYPE_8BIT:
         return 8
@@ -158,6 +159,7 @@ def getBit(type):
     elif type in TYPE_32BIT:
         return 32
     return 0
+
 
 def getBitMask(bit):
     if bit is 8:
@@ -168,14 +170,18 @@ def getBitMask(bit):
         return MASK_32
     return -1
 
+
 def getTypeMask(type):
     return getBitMask(getBit(type))
+
 
 def getTypeSize(type):
     return getBit(type) >> 3
 
+
 def high4(num):
     return (num >> 28) & 0xF
+
 
 def gsdecode(address, value, isv3):
     """GS解码"""
@@ -229,6 +235,7 @@ def gsencode(address, value, isv3):
 
     return address, value
 
+
 def gsencode_string(address, value, isv3):
     address, value = gsencode(address, value)
     address = "%08X" % address
@@ -236,6 +243,7 @@ def gsencode_string(address, value, isv3):
     if isv3:
         return address + " " + value
     return address + value
+
 
 def rawstr2gs(code, isv3):
     """原始代码转GS代码
@@ -246,8 +254,10 @@ def rawstr2gs(code, isv3):
     value = int(code[9:17], 16)
     return gsencode_string(address, value, isv3)
 
+
 def cb_string(address, value):
     return "%08X %04X" % (address, value)
+
 
 def decode(src, code):
     """解析金手指"""
@@ -292,7 +302,7 @@ def decode(src, code):
                 if GSA_8_BIT_GS_WRITE2 <= code.func <= GSA_16_BIT_ROM_PATCH2:
                     code.value = address
                 elif GSA_8_BIT_SLIDE <= code.func <= GSA_32_BIT_SLIDE:
-                    code.value = address;
+                    code.value = address
                     code.addrInc = value & MASK_16
                     value >>= 16
                     code.dataSize = value & MASK_8
@@ -371,7 +381,7 @@ def decode(src, code):
                 if 1 <= subtype <= 3:
                     if subtype is 1:
                         codeFunc = GSA_8_BIT_GS_WRITE
-                    elif subtype is 2: 
+                    elif subtype is 2:
                         codeFunc = GSA_16_BIT_GS_WRITE
                     else:
                         codeFunc = GSA_32_BIT_GS_WRITE
@@ -387,6 +397,7 @@ def decode(src, code):
     code.value = value
     code.type = codeType
     code.func = codeFunc
+
 
 def encode(code):
     """生成作弊码"""
@@ -416,9 +427,9 @@ def encode(code):
         if GSA_8_BIT_FILL <= func <= GSA_16_BIT_FILL:
             code.value = code.value | ((code.dataSize - 1) << getBit(type))
             code.set_gs(True)
-        elif func in {INT_32_BIT_WRITE, GSA_8_BIT_IF_TRUE, CBA_IF_TRUE, 
-                GSA_32_BIT_IF_TRUE, GSA_8_BIT_IF_FALSE, CBA_IF_FALSE, GSA_32_BIT_IF_FALSE, 
-                GSA_8_BIT_IF_TRUE2, GSA_16_BIT_IF_TRUE2, GSA_32_BIT_IF_TRUE2, 
+        elif func in {INT_32_BIT_WRITE, GSA_8_BIT_IF_TRUE, CBA_IF_TRUE,
+                GSA_32_BIT_IF_TRUE, GSA_8_BIT_IF_FALSE, CBA_IF_FALSE, GSA_32_BIT_IF_FALSE,
+                GSA_8_BIT_IF_TRUE2, GSA_16_BIT_IF_TRUE2, GSA_32_BIT_IF_TRUE2,
                 GSA_8_BIT_IF_FALSE2, GSA_16_BIT_IF_FALSE2, GSA_32_BIT_IF_FALSE2}:
             code.set_gs(True)
         elif GSA_8_BIT_GS_WRITE2 <= func <= GSA_32_BIT_GS_WRITE2:
@@ -429,7 +440,7 @@ def encode(code):
             code.set_text(gsencode_string(0, code.address, True))
             code.add_line(gsencode_string(code.value, 0, True))
         elif GSA_8_BIT_SLIDE <= func <= GSA_32_BIT_SLIDE:
-            # Example: 
+            # Example:
             # raw=02001234:12345678
             # data=10; Value Inc=1; Address Inc=2
             # unencrypted:

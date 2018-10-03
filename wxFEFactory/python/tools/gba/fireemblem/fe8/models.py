@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField
+from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -39,4 +39,31 @@ class Global(BaseGlobal):
     cury = WordField(0x0202bcc2)
     persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
     train_items = ArrayField(0x0203A818, 100, ModelField(0, ItemSlot))  # 运输队
-    item_count_keep = ToggleField(0x080168B0, enable=0x0448, disable=0xC046)
+
+    # # Hack code EN
+    # inf_move = ToggleFields(
+    #     ToggleField(0x080183A8, size=2, enable=0x2000, disable=0x2002),
+    #     ToggleField(0x08018750, size=2, enable=0x2100, disable=0x2102),
+    #     ToggleField(0x0801D2BC, size=2, enable=0x2100, disable=0x2140),
+    #     ToggleField(0x080320DE, size=2, enable=0x2100, disable=0x2140)
+    # )  # 无限行动
+    # item_count_keep = ToggleField(0x08016B0A, size=2, enable=0x46C0, disable=0x1812)  # 武器耐久度不减
+    # proficiency_max = ToggleField(0x0802C280, size=2, enable=0x22FB, disable=0x1C02)  # 武器熟练度最大
+    # ability_up_1 = ToggleField(0x0802B9BC, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
+    # ability_up_2 = ToggleField(0x0802B9BC, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
+    # got_100exp = ToggleField(0x0802C58C, size=2, enable=0x2164, disable=0x1809)  # 战后升级
+    # support_quickly = ToggleField(0x080282C2, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升
+
+    # Hack code ZH
+    inf_move = ToggleFields(
+        ToggleField(0x080183A8, size=2, enable=0x2000, disable=0x2002),
+        ToggleField(0x08018464, size=2, enable=0x2100, disable=0x2102),
+        ToggleField(0x0801CF20, size=2, enable=0x2100, disable=0x2140),
+        ToggleField(0x0803202A, size=2, enable=0x2100, disable=0x2140)
+    )  # 无限行动
+    item_count_keep = ToggleField(0x080168B2, size=2, enable=0x46C0, disable=0x1812)  # 武器耐久度不减
+    proficiency_max = ToggleField(0x0802C1C8, size=2, enable=0x22FB, disable=0x1C02)  # 武器熟练度最大
+    ability_up_1 = ToggleField(0x0802B904, size=2, enable=0x2001, disable=0x1C20)  # 全能力成长1点
+    ability_up_2 = ToggleField(0x0802B904, size=2, enable=0x2002, disable=0x1C20)  # 全能力成长2点
+    got_100exp = ToggleField(0x0802C4C4, size=2, enable=0x2164, disable=0x1809)  # 战后升级
+    support_quickly = ToggleField(0x08028256, size=2, enable=0x7039, disable=0x7038)  # 好感度快速提升
