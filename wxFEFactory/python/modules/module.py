@@ -28,13 +28,13 @@ class BaseModule(BaseScene):
 
     def onClose(self, _=None):
         """标签页关闭回调，返回False会取消关闭"""
-        super().onClose()
-
         if self.menu:
             __main__.win.menubar.remove(self.menu)
 
         if getattr(__main__, 'module', None) == self:
             del __main__.module
+
+        super().onClose()
 
         return True
 
@@ -102,7 +102,7 @@ class BaseListBoxModuel(BaseModule):
     左侧显示一个ListBox，右侧显示主视图（重载 render_main 方法 ）
     """
     def render(self):
-        self.weak = this
+        this = self.weak
         with ui.SplitterWindow(False, 220, styles=styles) as panel:
             with ui.Vertical():
                 self.listbox = ui.RearrangeList(className="fill", onselect=this.onListSelect)
@@ -113,7 +113,7 @@ class BaseListBoxModuel(BaseModule):
                     ui.Button(label="删除", className="button", onclick=this.onDel)
             with ui.Vertical():
                 self.render_main()
-        ui.AuiItem(panel, caption=self.unique_title, onclose=this.onClose)
+        ui.AuiItem(panel, caption=self.unique_title, onclose=self.onClose)
 
         self.listbox.setOnKeyDown(this.onListBoxKey)
 
