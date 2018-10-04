@@ -108,7 +108,7 @@ class MetalMaxHack(BaseNdsHack):
         ModelSelect("chassis.equip", "底盘", choices=datasets.CHARIOT_CHASSIS.choices,
             values=datasets.CHARIOT_CHASSIS.values)
         ModelInput("chassis.defense", "底盘防御")
-        ModelInput("chassis.attr1", "荷台").view.setToolTip('道具容量，最大18个')
+        ModelInput("chassis.attr1", "荷台").set_help('道具容量，最大18个')
         ModelInput("chassis.attr2", "弹舱")
         ModelSelect("chassis.change", "双持类型", choices=datasets.DOUBLE_TYPE)
         ModelInput("chassis.weight", "底盘重量")
@@ -215,7 +215,7 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("avoid")
         ModelInput("speed")
         for i, label in enumerate("物火光电音气冷"):
-            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).view.setToolTip(
+            ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).set_help(
                 "○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
 
         for i in range(4):

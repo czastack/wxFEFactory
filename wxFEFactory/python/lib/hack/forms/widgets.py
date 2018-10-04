@@ -64,6 +64,10 @@ class Widget:
             if not self.readonly else None)
         return btn_read, btn_write
 
+    def set_help(self, help):
+        if self.view:
+            self.view.setToolTip(help)
+
     def onKey(self, v, event):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
@@ -310,17 +314,7 @@ class Group(BaseGroup):
             if self.hasheader:
                 self.header = ui.Horizontal(className="expand padding")
 
-            with ui.ScrollView(className="fill padding") as content:
-                if self.flexgrid:
-                    self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
-                    if self.horizontal:
-                        for i in range(self.cols >> 1):
-                            self.view.AddGrowableCol((i << 1) + 1)
-                    else:
-                        for i in range(self.cols):
-                            self.view.AddGrowableCol(i)
-                else:
-                    self.view = content
+            self.render_main()
 
             if self.hasfooter:
                 with ui.Horizontal(className="expand padding") as footer:
@@ -332,6 +326,19 @@ class Group(BaseGroup):
                 self.footer = footer
         del self.flexgrid, self.hasheader, self.hasfooter, self.serializable
         return root
+
+    def render_main(self):
+        with ui.ScrollView(className="fill padding") as content:
+            if self.flexgrid:
+                self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
+                if self.horizontal:
+                    for i in range(self.cols >> 1):
+                        self.view.AddGrowableCol((i << 1) + 1)
+                else:
+                    for i in range(self.cols):
+                        self.view.AddGrowableCol(i)
+            else:
+                self.view = content
 
     def after_lazy(self):
         if isinstance(self.view, ui.FlexGridLayout):
@@ -467,16 +474,16 @@ class ModelInput(ModelWidget, BaseInput):
 class ProxyInput(BaseInput):
     def __init__(self, name, label, read, write):
         super().__init__(name, label, None, None)
-        self.doRead = read
-        self.doWrite = write
+        self.do_read = read
+        self.do_write = write
 
     @property
     def mem_value(self):
-        return self.doRead()
+        return self.do_read()
 
     @mem_value.setter
     def mem_value(self, value):
-        self.doWrite(value)
+        self.do_write(value)
 
 
 class SimpleCheckBox(Widget):
@@ -553,7 +560,7 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
         if self.enable is None:
             self.view.checked = value
         else:
-            super().input_value = value
+            BaseCheckBox.input_value.__set__(self, value)
 
 
 class BaseSelect(TwoWayWidget):

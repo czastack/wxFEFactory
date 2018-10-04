@@ -106,7 +106,7 @@ class Module(BaseListBoxModuel):
     def onListSelect(self, _):
         if self._pg_inited is False:
             self._pg_inited = True
-            self.form.initPg(self.pg)
+            self.form.init_pg(self.pg)
 
         self._lastpos = self.listbox.index
         self.pg.bindData(self.getCurData())

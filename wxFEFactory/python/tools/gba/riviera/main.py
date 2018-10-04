@@ -15,7 +15,7 @@ class Main(BaseGbaHack):
         person = self.person
         with Group("global", "全局", self._global):
             ModelInput("tp", "TP")
-            ModelInput("kill_slot", "必杀槽").view.setToolTip("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
+            ModelInput("kill_slot", "必杀槽").set_help("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
             ModelInput("rage", "RAGE")
             ModelInput("member_num", "队伍人数")
             for i in range(5):

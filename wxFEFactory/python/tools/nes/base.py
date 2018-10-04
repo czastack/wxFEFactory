@@ -51,7 +51,7 @@ class SimpleNesHack(BaseNesHack):
             for item in self.fields:
                 input = ModelInput(item.name)
                 if item.max:
-                    input.view.setToolTip('max:%d' % item.max)
+                    input.set_help('max:%d' % item.max)
 
     def _get_hotkeys(self):
         return (

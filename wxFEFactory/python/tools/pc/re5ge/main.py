@@ -127,7 +127,7 @@ class Main(NativeHacktool):
             with DialogGroup(name, "物品详情", self.saved_item, cols=1, dialog_style={'width': 600, 'height': 1400},
                     closable=False, horizontal=False, button=False) as dialog:
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    instance=self.saved_item).view.setToolTip('移动后生效')
+                    instance=self.saved_item).set_help('移动后生效')
                 ModelInput("quantity")
                 ModelInput("max_quantity")
                 ModelInput("fire_power")
@@ -152,7 +152,7 @@ class Main(NativeHacktool):
     #                 closable=False, horizontal=False, button=False) as dialog:
     #             ModelSelect("type", choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
     #                 values=datasets.INVENTORY_TREASURE_ITEMS.values,
-    #                 instance=self.inventory_treasure_item).view.setToolTip('移动后生效')
+    #                 instance=self.inventory_treasure_item).set_help('移动后生效')
     #             ModelInput("quantity")
 
     #         setattr(self, name, dialog)

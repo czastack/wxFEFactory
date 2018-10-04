@@ -50,7 +50,7 @@ void PropertyGrid::addFlagsProperty(wxcstr title, wxcstr name, pycref help, pycr
 	Append(property, help);
 }
 
-pyobj PropertyGrid::getValue(const wxVariant & value) {
+pyobj PropertyGrid::castValue(const wxVariant & value) {
 	wxcstr type = value.GetType();
 	if (type == "long")
 		return py::cast(value.GetLong());
@@ -71,7 +71,7 @@ pyobj PropertyGrid::getValue(const wxVariant & value) {
 	return None;
 }
 
-void PropertyGrid::setValue(const wxPGProperty * p, pycref pyval) {
+void PropertyGrid::_setValue(const wxPGProperty * p, pycref pyval) {
 	/*
 	The built-in types are:
 	"bool"
@@ -139,40 +139,40 @@ void PropertyGrid::setValue(const wxPGProperty * p, pycref pyval) {
 	}
 }
 
-pyobj PropertyGrid::getValues(pycref obj)
+pyobj PropertyGrid::getValues(pycref data)
 {
-	pycref data = obj.is_none() ? m_data : obj;
+	pycref result = data.is_none() ? m_data : data;
 
 	wxPropertyGridConstIterator it = ctrl().GetIterator();
 	for (; !it.AtEnd(); ++it)
 	{
 		const wxPGProperty* p = *it;
-		data[p->GetName()] = getValue(p);
+		result[p->GetName()] = _getValue(p);
 	}
-	return data;
+	return result;
 }
 
 void PropertyGrid::setValues(pycref data, bool all)
 {
-	wxString text;
-
 	if (all)
 	{
 		wxPropertyGridIterator it = ctrl().GetIterator();
 		for (; !it.AtEnd(); ++it)
 		{
 			wxPGProperty* p = *it;
-			setValue(p, pyDictGet(data, p->GetName()));
+			_setValue(p, pyDictGet(data, p->GetName()));
 		}
 	}
 	else
 	{
+		wxString text;
+
 		for (auto &item : data) {
 			pystrcpy(text, item);
 			wxPGProperty* p = ctrl().GetPropertyByName(text);
 			if (p)
 			{
-				setValue(p, data[item]);
+				_setValue(p, data[item]);
 			}
 		}
 	}
@@ -276,10 +276,13 @@ void init_datacontrols(py::module &m)
 		.def("addFlagsProperty", &PropertyGrid::addFlagsProperty, title_arg, name_arg, help_arg, "labels"_a, "values"_a = None, value_0)
 		.def("addLongStringProperty", &PropertyGrid::addLongStringProperty, title_arg, name_arg, help_arg, "value"_a = None)
 		.def("addArrayStringProperty", &PropertyGrid::addArrayStringProperty, title_arg, name_arg, help_arg, "values"_a)
-		.def("setEnumChoices", &PropertyGrid::setEnumChoices, "name"_a, "labels"_a, "values"_a = None)
+		.def("setEnumChoices", &PropertyGrid::setEnumChoices, name_arg, "labels"_a, "values"_a = None)
+		.def("getValue", &PropertyGrid::getValue, name_arg)
+		.def("setValue", &PropertyGrid::setValue, name_arg, "value"_a)
 		.def("getValues", &PropertyGrid::getValues, "data"_a = None)
 		.def("setValues", &PropertyGrid::setValues, "data"_a, "all"_a = false)
-		.def("setReadonly", &PropertyGrid::setReadonly)
+		.def("setReadonly", &PropertyGrid::setReadonly, name_arg, "readonly"_a=true)
+		.def("setHelp", &PropertyGrid::setHelp, name_arg, "help"_a)
 		.def("bindData", &PropertyGrid::bindData)
 		.def("setOnChange", &PropertyGrid::setOnChange)
 		.def("setOnHighlight", &PropertyGrid::setOnHighlight)

@@ -1,6 +1,7 @@
 from .fields import Field, Group
 import ctypes
 
+
 class FormMetaclass(type):
     SLOTS = ()
 
@@ -8,7 +9,7 @@ class FormMetaclass(type):
         # 排除抽象类:
         if not attrs.get('__abstract__', False):
             # 获取所有的Field
-            
+
             base_fields = []
 
             def handle(children, parent=None):
@@ -54,7 +55,7 @@ class BaseForm(metaclass=FormMetaclass):
         """
         pass
 
-    def initPg(self, pg):
+    def init_pg(self, pg):
         self.elem = pg
         for field in self.fields:
             field.createProperty(pg)
@@ -75,12 +76,12 @@ class BaseForm(metaclass=FormMetaclass):
     @classmethod
     def ptr_from_bytes(class_, data, length=0):
         """
-        :param data: bytes 
+        :param data: bytes
         """
-        length      = length or ctypes.sizeof(class_.structure)
-        stream      = (ctypes.c_char * length)()
-        stream.raw  = data
-        ptr         = ctypes.cast(stream, ctypes.POINTER(class_.structure))
+        length = length or ctypes.sizeof(class_.structure)
+        stream = (ctypes.c_char * length)()
+        stream.raw = data
+        ptr = ctypes.cast(stream, ctypes.POINTER(class_.structure))
         return ptr
 
     @classmethod
@@ -88,8 +89,8 @@ class BaseForm(metaclass=FormMetaclass):
         """
         :param s: struct object
         """
-        length  = ctypes.sizeof(s)
-        ptr     = ctypes.cast(ctypes.pointer(s), ctypes.POINTER(ctypes.c_char * length))
+        length = ctypes.sizeof(s)
+        ptr = ctypes.cast(ctypes.pointer(s), ctypes.POINTER(ctypes.c_char * length))
         return ptr.contents.raw
 
     @classmethod
@@ -106,4 +107,3 @@ class BaseForm(metaclass=FormMetaclass):
             if name in data:
                 setattr(s, name, data[name])
         return s
-

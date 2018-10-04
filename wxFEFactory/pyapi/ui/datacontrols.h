@@ -105,7 +105,9 @@ public:
 	}
 
 	void addBoolProperty(wxcstr title, wxcstr name, pycref help, bool value = false) {
-		Append(new wxBoolProperty(title, name, value), help);
+		wxPGProperty* property = new wxBoolProperty(title, name, value);
+		property->SetAttribute(wxPG_BOOL_USE_CHECKBOX, true);
+		Append(property, help);
 	}
 
 	void addEnumProperty(wxcstr title, wxcstr name, pycref help, pyobj labels, pyobj values, int value = 0) {
@@ -134,29 +136,34 @@ public:
 		}
 	}
 
-	pyobj getValue(const wxVariant& value);
+	pyobj castValue(const wxVariant& value);
 
-	pyobj getValue(const wxPGProperty* p) {
-		return getValue(p->GetValue());
+	pyobj _getValue(const wxPGProperty* p) {
+		return castValue(p->GetValue());
 	}
 
 	pyobj getValue(wxcstr name) {
-		return getValue(ctrl().GetPropertyByName(name));
+		return _getValue(ctrl().GetPropertyByName(name));
 	}
 
-	void setValue(const wxPGProperty* p, pycref pyval);
+	void _setValue(const wxPGProperty* p, pycref pyval);
 
 	void setValue(wxcstr name, pycref value) {
-		return setValue(ctrl().GetPropertyByName(name), value);
+		return _setValue(ctrl().GetPropertyByName(name), value);
 	}
 
-	pyobj getValues(pycref obj);
+	pyobj getValues(pycref data);
 
 	void setValues(pycref data, bool all = false);
 
 	void setReadonly(wxcstr name, bool readonly = true)
 	{
 		ctrl().GetPropertyByName(name)->SetFlagRecursively(wxPG_PROP_READONLY, readonly);
+	}
+
+	void setHelp(wxcstr name, wxcstr help)
+	{
+		ctrl().GetPropertyByName(name)->SetHelpString(help);
 	}
 
 	/**

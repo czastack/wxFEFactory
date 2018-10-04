@@ -37,7 +37,7 @@ class FeHack(BaseNdsHack):
             ModelCheckBox("enemy_item_drop", "敌人全道具掉落")
             ModelSelect("exp_rate", "经验值倍数", choices=datasets.RATE, values=datasets.EXP_RATE_VALUES)
             ModelSelect("pro_rate", "熟练度倍数", choices=datasets.RATE, values=datasets.PRO_RATE_VALUES)
-            # ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
+            # ModelInput("random", "乱数").set_help("设成0: 招招命中、必杀、贯通等，升级7点成长")
             # ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
 
         self.lazy_group(Group("config", "配置", weak._config, cols=4), self.render_config)
@@ -81,7 +81,7 @@ class FeHack(BaseNdsHack):
         # ModelSelect("status", "状态种类", choices=datasets.STATUS)
         # ModelInput("status_turn", "状态持续")
         for i, label in enumerate(("剑", "枪", "斧", "弓", "书", "杖")):
-            ModelInput("proficiency.%d" % i, "%s熟练度+" % label).view.setToolTip(datasets.PROFICIENCY_HINT)
+            ModelInput("proficiency.%d" % i, "%s熟练度+" % label).set_help(datasets.PROFICIENCY_HINT)
 
     def render_items(self):
         datasets = self.datasets
@@ -101,7 +101,7 @@ class FeHack(BaseNdsHack):
         ModelInput("desc_ptr", "介绍文本", hex=True)
         ModelInput("icon", "图标序号")
         ModelSelect("type", "类型", choices=datasets.WEAPONTYPES)
-        ModelInput("level", "要求熟练度", hex=True, size=1).view.setToolTip(datasets.PROFICIENCY_HINT)
+        ModelInput("level", "要求熟练度", hex=True, size=1).set_help(datasets.PROFICIENCY_HINT)
         ModelInput("power", "威力")
         ModelInput("hit", "命中")
         ModelInput("kill", "必杀")
