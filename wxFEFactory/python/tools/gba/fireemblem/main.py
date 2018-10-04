@@ -21,6 +21,7 @@ class FeHack(BaseGbaHack):
 
         self.lazy_group(Group("player", "角色", self._person, cols=4), self.render_char)
         self.lazy_group(Group("items", "角色物品", self._person, cols=4), self.render_char_items)
+        self.lazy_group(Group("support", "角色支援", self._person, cols=4), self.render_char_support)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
@@ -69,6 +70,10 @@ class FeHack(BaseGbaHack):
         for i in range(5):
             ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
             ModelInput("items.%d.count" % i, "数量")
+
+    def render_char_support(self):
+        for i in range(self._personins.support.length):
+            ModelInput("support.%d" % i, "好感度%d" % (i + 1)).set_help('80~160: C, 160~240: B, 240~255: A')
 
     def render_train_items(self):
         datasets = self.datasets
