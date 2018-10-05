@@ -2,6 +2,7 @@ from lib.form import fm, BaseForm
 from . import strings
 from ..item.options import itemLevel
 
+
 class CharacterForm(BaseForm):
     addr = 0x00858288
     title = "角色"

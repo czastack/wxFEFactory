@@ -27,6 +27,7 @@ class Person(Model):
     status = ByteField(48)  # 状态种类
     status_turn = ByteField(49)  # 状态持续回合数
     support = ArrayField(50, 10, ByteField(0))  # 支援等级
+    unkonw_ptr = Field(60)
 
 
 class Global(BaseGlobal):

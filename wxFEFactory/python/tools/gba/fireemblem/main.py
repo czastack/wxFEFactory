@@ -95,6 +95,8 @@ class FeHack(BaseGbaHack):
             (0, VK.RIGHT, self.move_right),
             (0, VK.UP, self.move_up),
             (0, VK.DOWN, self.move_down),
+            (0, VK._0, self.hp_zero),
+            (0, VK.DELETE, self.delete_unit),
         )
 
     def _person(self):
@@ -154,6 +156,17 @@ class FeHack(BaseGbaHack):
 
     def move_down(self):
         self.person.posy += 1
+
+    def hp_zero(self):
+        self.person.hp = 1
+
+    def delete_unit(self):
+        unit = self.person
+        if unit.no >= 64:
+            unit.unkonw_ptr = 0
+            unit.prof = 0
+            unit.moved = 1
+            unit.hp = 0
 
     def on_train_items_page(self, page):
         self._global.train_items_offset = (page - 1) * self.TRAIN_ITEMS_PAGE_LENGTH
