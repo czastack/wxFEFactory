@@ -16,6 +16,7 @@ class BaseGTATool(NativeHacktool):
     GO_DOWN_SPEED = 0.5
     TO_UP_DELTA = 10
     TO_DOWN_DELTA = 6
+    key_hook = False
 
     def __init__(self):
         super().__init__()

@@ -295,7 +295,11 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
 	return new ProcAddressHelper(this, &ides, module);
 }
 
-addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, addr_t end, int ordinal)
+/**
+ * ordinal: 第n次出现，默认为1
+ * fuzzy: 模糊查询，?(\x3F)为通配符
+ */
+addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, addr_t end, int ordinal, bool fuzzy)
 {
 	const DWORD PAGE_SIZE = 4096;
 	bool finded = false;
@@ -313,7 +317,7 @@ addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, ad
 		for (page_cursor = page; page_cursor < page_end; ++page_cursor)
 		{
 			for (i = 0; i < data_size; ++i) {
-				if (page_cursor[i] != data[i])
+				if (page_cursor[i] != data[i] && (!fuzzy || data[i] != '?'))
 				{
 					break;
 				}

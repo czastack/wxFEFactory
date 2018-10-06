@@ -83,7 +83,7 @@ class AssemblyHacktool(BaseHackTool):
             memory = data['memory']
             data['active'] = True
         else:
-            addr = self.find_address(original, item.find_start, item.find_end, item.find_range_from_base)
+            addr = self.find_address(original, item.find_start, item.find_end, item.find_range_from_base, item.fuzzy)
             if addr is -1:
                 return
             memory = self.next_usable_memory
@@ -92,7 +92,7 @@ class AssemblyHacktool(BaseHackTool):
             data = self.registed_assembly[item.key] = {'addr': addr, 'original': original,
                 'memory': memory, 'active': True}
 
-        if item.is_inserted:
+        if item.inserted:
             original_len = len(original)
             available_len = original_len - len(raplace)  # 可用于跳转到插入的代码的jmp指令的长度
             # 使用参数(暂时支持4字节)
@@ -165,13 +165,13 @@ class AssemblyHacktool(BaseHackTool):
         self.handler.write(item['addr'], item['original'])
         item['active'] = False
 
-    def find_address(self, original, find_start, find_end, find_range_from_base=True):
+    def find_address(self, original, find_start, find_end, find_range_from_base=True, fuzzy=False):
         base_addr = self.handler.base_addr
         if find_start and find_range_from_base:
             find_start += base_addr
         if find_end and find_range_from_base:
             find_end += base_addr
-        return self.handler.find_bytes(original, find_start, find_end)
+        return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
 
     def register_variable(self, name, size=4):
         """注册变量"""
@@ -216,17 +216,18 @@ class AssemblyItems:
     :param raplace: 原始数据替换为的内容
     :param assembly: 写到新内存的内容
     :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
-    :param is_inserted: 是否自动加入jmp代码
+    :param inserted: 是否自动加入jmp代码
     :param replace_len: 只记录original前n个字节
 """
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'raplace', 'assembly',
-        'find_range_from_base', 'is_inserted', 'replace_len', 'args'),
+        'find_range_from_base', 'inserted', 'fuzzy', 'replace_len', 'args'),
     defaults={
         'assembly': None,
         'find_range_from_base': True,
-        'is_inserted': False,
+        'inserted': False,
+        'fuzzy': False,
         'replace_len': 0,
         'args': ()
     }

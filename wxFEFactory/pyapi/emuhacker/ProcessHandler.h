@@ -224,7 +224,7 @@ public:
 	DWORD remote_call(addr_t addr, LONG_PTR arg);
 	class ProcAddressHelper* getProcAddressHelper(addr_t module);
 
-	addr_t find_bytes(BYTE * data, addr_t data_size, addr_t start, addr_t end, int ordinal = 1);
+	addr_t find_bytes(BYTE * data, addr_t data_size, addr_t start, addr_t end, int ordinal=1, bool fuzzy=false);
 };
 
 
