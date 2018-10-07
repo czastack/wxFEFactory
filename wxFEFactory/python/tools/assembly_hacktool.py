@@ -197,15 +197,21 @@ class AssemblyHacktool(BaseHackTool):
             find_end += base_addr
         return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
 
-    def register_variable(self, name, size=4):
+    def register_variable(self, name, size=4, value=0):
         """注册变量"""
         self.insure_memory()
         if isinstance(name, tuple):
-            name, size = name
+            if len(name) > 1:
+                size = name[1]
+            if len(name) > 2:
+                value = name[2]
+            name = name[0]
         memory = self.registed_variable.get(name, None)
         if memory is None:
             memory = self.registed_variable[name] = self.next_usable_memory
             self.next_usable_memory += utils.align4(size)
+        if value is not 0:
+            self.handler.write_uint(memory, value, size)
         return memory
 
     def get_variable(self, name):

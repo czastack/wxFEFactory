@@ -567,15 +567,15 @@ class CoordData:
 class ArrayField(Cachable, Field):
     itemkeys = None
 
-    def __init__(self, offset, length, field, itemcachable=False, label=None):
+    def __init__(self, offset, length, field, cachable=False, label=None):
         self.length = length
         self.field = field
-        self.itemcachable = itemcachable and isinstance(field, Cachable)
+        self.cachable = cachable and isinstance(field, Cachable)
         super().__init__(offset, field, length * field.size, label)
 
     def __set_name__(self, owner, name):
         super().__set_name__(owner, name)
-        if self.itemcachable:
+        if self.cachable:
             # itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
