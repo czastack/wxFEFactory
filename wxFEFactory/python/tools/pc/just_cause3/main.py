@@ -21,7 +21,7 @@ class Main(AssemblyHacktool):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
-        # with Group("global", "全局", self._global, handler=self.handler):
+        # with Group("global", "全局", self._global):
         #     pass
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 

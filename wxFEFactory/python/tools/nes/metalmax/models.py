@@ -2,8 +2,6 @@ from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Mode
 
 
 class PersonChariot(Model):
-    SIZE = 0
-
     @classmethod
     def _init_fields(cls):
         fields = []

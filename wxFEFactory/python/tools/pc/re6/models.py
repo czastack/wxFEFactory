@@ -44,7 +44,6 @@ class SavedItems(Model):
 
 
 class SavedItemManager(Model):
-    SIZE = 0
     # 0x3CE4 * *(_DWORD *)(dword_17C345C + 0x20)
     saved_items0 = ArrayField(0x5E8, 8, ModelField(0, SavedItems))
     saved_items = ArrayField(0x20D8, 8, ModelField(0, SavedItems))

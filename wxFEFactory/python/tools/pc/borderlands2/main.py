@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Title
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
@@ -7,7 +7,7 @@ from tools.assembly_code import AssemblyGroup, Variable
 from tools import assembly_code
 from fefactory_api import ui
 from styles import styles
-from . import models
+from . import models, datasets
 import fefactory_api
 
 
@@ -21,13 +21,46 @@ class Main(AssemblyHacktool):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
-        with Group("global", "全局", self._global, handler=self.handler):
+        with Group("global", "全局", self._global):
             self.render_global()
-        self.lazy_group(Group("weapon", "武器", self._global, handler=self.handler), self.render_weapon)
+        self.lazy_group(Group("character", "角色", (self._character, models.Character), cols=4), self.render_character)
+        self.lazy_group(Group("weapon", "武器", self._global), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_global(self):
         pass
+
+    def render_character(self):
+        health = (self._character_health, models.ShieldHealth)
+        shield = (self._character_shield, models.ShieldHealth)
+        experience = (self._experience, models.Experience)
+
+        Title('生命')
+        ModelInput('value', instance=health)
+        ModelInput('scaled_maximum', instance=health)
+        ModelInput('base_maximum', instance=health)
+        ModelInput('regen_rate', instance=health)
+        ModelSelect('status', instance=health,
+            choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
+
+        Title('护甲')
+        ModelInput('value', instance=shield)
+        ModelInput('scaled_maximum', instance=shield)
+        ModelInput('base_maximum', instance=shield)
+        ModelInput('regen_rate', instance=shield)
+        ModelSelect('status', instance=shield,
+            choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
+
+        ModelInput('scaled_maximum', instance=experience)
+        ModelInput('base_maximum', instance=experience)
+        ModelInput('multiplier', instance=experience)
+        ModelInput('to_next_level', instance=experience)
+
+        ModelInput('money')
+        ModelInput('eridium')
+        ModelInput('seraph_crystals')
+        ModelInput('torgue_tokens')
+        ModelInput('value')
 
     def render_weapon(self):
         ModelInput('mgr.weapon_mgrs.0.ammo', '突击步枪子弹')
@@ -93,6 +126,21 @@ class Main(AssemblyHacktool):
         return (
             (0, VK.H, this.pull_through),
         )
+
+    def _character(self):
+        return self._global.mgr.character
+
+    def _character_health(self):
+        character = self._character()
+        return character and character.health
+
+    def _character_shield(self):
+        character = self._character()
+        return character and character.shield
+
+    def _experience(self):
+        character = self._character()
+        return character and character.experience
 
     def pull_through(self):
         self.toggle_assembly_button('health_inf')

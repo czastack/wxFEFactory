@@ -459,7 +459,7 @@ class ManagedModelPtrField(ModelPtrField):
 class ModelField(Cachable, Field):
     """模型字段"""
     def __init__(self, offset, modelClass, size=0, label=None):
-        super().__init__(offset, None, size or modelClass.SIZE, label)
+        super().__init__(offset, None, size or getattr(modelClass, 'SIZE', 0), label)
         self.modelClass = modelClass
 
     def create_cache(self, instance):

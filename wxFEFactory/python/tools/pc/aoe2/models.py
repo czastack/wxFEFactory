@@ -13,14 +13,12 @@ class ResourceManager(Model):
 
 
 class PopulationManager(Model):
-    SIZE = 0
     current = FloatField(0x2C, label='当前')
     total = FloatField(0x10, label='剩余')
     max = FloatField(0x80, label='上限')
 
 
 class Player(Model):
-    SIZE = 0
     id = Field(0x9C, label='玩家ID')
     resources = ModelPtrField(0xA8, ResourceManager)
 
@@ -75,7 +73,6 @@ class UnitType(Model):
 
 
 class Unit(Model):
-    SIZE = 0
     type = ModelPtrField(8, UnitType)
     player = ModelPtrField(0xC, Player)
     hp = FloatField(0x30, label='HP')

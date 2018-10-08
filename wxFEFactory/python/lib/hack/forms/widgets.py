@@ -766,6 +766,11 @@ def Choice(laebl, choices, onselect):
     return ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
 
 
+def Title(label):
+    ui.Hr()
+    return ui.Text(label)
+
+
 class BaseFlagWidget(TwoWayWidget):
     def __init__(self, *args, labels=None, helps=None, values=None, checkbtn=False, cols=None, **kwargs):
         """size: hex为True时有用"""

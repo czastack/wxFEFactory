@@ -13,7 +13,7 @@ class Main(BaseDolphinHack):
         self.count_data = {}
 
     def render_main(self):
-        with Group("player", "角色", self._global, handler=self.handler):
+        with Group("player", "角色", self._global):
             ModelInput("level", "等级(1+)")
             ModelInput("hp", "生命")
             ModelInput("max_hp", "最大生命")

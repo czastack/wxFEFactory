@@ -21,24 +21,24 @@ class Main(NativeHacktool):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
-        with Group("global", "全局", (self._resources, models.ResourceManager), handler=self.handler):
+        with Group("global", "全局", (self._resources, models.ResourceManager)):
             ModelInput("food")
             ModelInput("wood")
             ModelInput("rock")
             ModelInput("gold")
 
-        with Group("population", "人口", (self._population_mgr, models.PopulationManager), handler=self.handler):
+        with Group("population", "人口", (self._population_mgr, models.PopulationManager)):
             ModelInput("current")
             ModelInput("total")
             ModelInput("max")
 
-        with Group("unit", "选中单位", (self._unit, models.Unit), handler=self.handler):
+        with Group("unit", "选中单位", (self._unit, models.Unit)):
             ModelInput("hp")
             ModelInput("resource")
             ModelInput("selected")
             ModelInput("construction_progress")
 
-        self.lazy_group(Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), handler=self.handler, cols=4),
+        self.lazy_group(Group("unit", "选中单位兵种", (self._unit_type, models.UnitType), cols=4),
             self.render_unit_type)
         self.lazy_group(StaticGroup("选中单位兵种攻防"), self.render_unit_type_atk_def)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)

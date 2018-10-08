@@ -18,7 +18,7 @@ class Main(BaseHackTool):
 
     def render_main(self):
 
-        with Group("player", "角色", self._global, handler=self.handler):
+        with Group("player", "角色", self._global):
             ModelCheckBox("x_invincible", "X无敌", enable=0xFF, disable=0)
             ModelCheckBox("zero_invincible", "ZEOR无敌", enable=0xFF, disable=0)
             ModelCheckBox("axl_invincible", "AXL无敌", enable=0xFF, disable=0)
@@ -29,7 +29,7 @@ class Main(BaseHackTool):
             ModelInput("hp_zero", "ZERO HP")
             ModelInput("hpmax_zero", "ZERO最大HP")
 
-        with Group("global", "全局", self._global, handler=self.handler):
+        with Group("global", "全局", self._global):
             ModelInput("metal", "金属")
             ModelInput("resurgence", "复活晶片")
             ModelInput("joint_attack", "双人合击气槽")

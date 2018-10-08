@@ -45,7 +45,7 @@ class Main(BaseDolphinHack):
             ModelCheckBox("moved", "已行动", enable=1, disable=0)
 
         self.lazy_group(Group("skills", "角色技能", person), self.render_skills)
-        self.lazy_group(Group("items", "角色物品", person, handler=self.handler), self.render_items)
+        self.lazy_group(Group("items", "角色物品", person), self.render_items)
 
     def render_skills(self):
         skill_values = (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
