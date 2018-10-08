@@ -51,11 +51,14 @@ class Main(AssemblyHacktool):
         ModelSelect('status', instance=shield,
             choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
 
+        Title('经验值')
+        ModelInput('value', instance=experience)
         ModelInput('scaled_maximum', instance=experience)
         ModelInput('base_maximum', instance=experience)
         ModelInput('multiplier', instance=experience)
         ModelInput('to_next_level', instance=experience)
 
+        ModelInput('level')
         ModelInput('money')
         ModelInput('eridium')
         ModelInput('seraph_crystals')
