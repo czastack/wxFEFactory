@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Title
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Title
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
@@ -21,10 +21,14 @@ class Main(AssemblyHacktool):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
+        character = (self._character, models.Character)
+
         with Group("global", "全局", self._global):
             self.render_global()
-        self.lazy_group(Group("character", "角色", (self._character, models.Character), cols=4), self.render_character)
-        self.lazy_group(Group("weapon", "武器", self._global), self.render_weapon)
+        self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
+        self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
+        self.lazy_group(Group("ammo", "弹药", self._global), self.render_ammo)
+        self.lazy_group(Group("weapon", "武器", (self._current_weapon, models.Weapon)), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_global(self):
@@ -63,9 +67,13 @@ class Main(AssemblyHacktool):
         ModelInput('eridium')
         ModelInput('seraph_crystals')
         ModelInput('torgue_tokens')
-        ModelInput('value')
+        ModelInput('skill_points')
 
-    def render_weapon(self):
+    def render_character_ext(self):
+        player_config = (self._player_config, models.PlayerConfig)
+        ModelCoordWidget('coord', instance=player_config, savable=True)
+
+    def render_ammo(self):
         ModelInput('mgr.weapon_mgrs.0.ammo', '突击步枪子弹')
         ModelInput('mgr.weapon_mgrs.1.ammo', '霰弹枪子弹')
         ModelInput('mgr.weapon_mgrs.2.ammo', '手雷')
@@ -73,6 +81,24 @@ class Main(AssemblyHacktool):
         ModelInput('mgr.weapon_mgrs.4.ammo', '手枪子弹')
         ModelInput('mgr.weapon_mgrs.5.ammo', '火箭炮弹药')
         ModelInput('mgr.weapon_mgrs.6.ammo', '狙击步枪子弹')
+
+    def render_weapon(self):
+        ModelInput('actual_level')
+        ModelInput('base_damage')
+        ModelInput('base_accuracy')
+        ModelInput('base_fire_rate')
+        ModelInput('base_projectile_speed')
+        ModelInput('base_reload_speed')
+        ModelInput('base_burst_length')
+        ModelInput('base_projectiles_per_shot')
+        ModelInput('base_bullets_used')
+        ModelInput('base_extra_shot_chance')
+        ModelInput('magazine_size')
+        ModelInput('current_bullets')
+        ModelInput('clip_ammo')
+        ModelInput('item_price')
+        ModelInput('item_quantity')
+        ModelInput('item_state')
 
     def render_assembly_functions(self):
         functions = (
@@ -144,6 +170,13 @@ class Main(AssemblyHacktool):
     def _experience(self):
         character = self._character()
         return character and character.experience
+
+    def _player_config(self):
+        return self._global.mgr.player_mgr.player_config
+
+    def _current_weapon(self):
+        player_config = self._player_config()
+        return player_config and player_config.current_weapon
 
     def pull_through(self):
         self.toggle_assembly_button('health_inf')
