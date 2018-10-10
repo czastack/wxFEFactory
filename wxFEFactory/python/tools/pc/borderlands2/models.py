@@ -10,7 +10,7 @@ class Value(Model):
     base_maximum = FloatField(0x5C, label='最大值')
 
     def value_max(self):
-        self.set_with('value', 'base_maximum')
+        self.set_with('value', 'scaled_maximum')
 
 
 class WeaponManager(Model):

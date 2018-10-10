@@ -244,3 +244,6 @@ class Main(AssemblyHacktool):
         health = self._character_health()
         if health:
             health.value_max()
+        shield = self._character_shield()
+        if shield:
+            shield.value_max()
