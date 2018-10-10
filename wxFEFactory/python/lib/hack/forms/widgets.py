@@ -19,7 +19,7 @@ class Widget:
     GROUPS = []
     horizontal = True
 
-    def __init__(self, name, label, addr, offsets=(), readonly=False):
+    def __init__(self, name, label, addr=None, offsets=(), readonly=False):
         self.weak = WeakBinder(self)
         self.name = name
         self.label = name if label is None else label
@@ -191,7 +191,7 @@ class OffsetsWidget:
 class BaseGroup(Widget):
     cachable = True
 
-    def __init__(self, name, label, addr, handler=None, cachable=True):
+    def __init__(self, name, label, addr=None, handler=None, cachable=True):
         """
         :param addr: 子元素使用ModelWidget时，addr可以是Model实例或者getter或者(instance_getter, instance_type)
             instance_type 方便子元素取label
@@ -389,7 +389,7 @@ class GroupBox(BaseGroup):
 
 class VirtualGroup(BaseGroup):
     """虚拟分组"""
-    def __init__(self, addr, handler=None, cachable=True):
+    def __init__(self, addr=None, handler=None, cachable=True):
         super().__init__(None, None, addr, handler, cachable)
 
     def render(self):
@@ -398,9 +398,9 @@ class VirtualGroup(BaseGroup):
 
 class Groups(BaseGroup):
     """可容纳子Group"""
-    def __init__(self, caption, onPageChange=None):
+    def __init__(self, caption, onPageChange=None, **kwargs):
         self.onPageChange = onPageChange
-        return super().__init__(None, caption, 0)
+        return super().__init__(None, caption, **kwargs)
 
     def render(self):
         with ui.Vertical(className="fill") as root:
@@ -488,7 +488,7 @@ class ProxyInput(BaseInput):
 
 class SimpleCheckBox(Widget):
     """采用切换事件的立即模式"""
-    def __init__(self, name, label, addr, offsets=(), enable=None, disable=None, size=None):
+    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, size=None):
         """
         :param enable: 激活时写入的数据
         :param disable: 关闭时写入的数据
@@ -512,7 +512,7 @@ class SimpleCheckBox(Widget):
 
 
 class BaseCheckBox(TwoWayWidget):
-    def __init__(self, name, label, addr, offsets=(), enable=None, disable=None):
+    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None):
         """
         :param enable: 激活时写入的数据
         :param disable: 关闭时写入的数据

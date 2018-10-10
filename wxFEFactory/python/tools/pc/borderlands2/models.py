@@ -105,12 +105,12 @@ class SkillItem(Model):
 class SkillManager(Model):
     main_skill = Field(0x1C, label='主技能状态')
     main_skill_duration = FloatField((0, 0x74), label='主技能持续时间')
-    skills = ArrayField(0x40, 32, ModelField(0, SkillItem))
+    skills = ArrayField(0x40, 33, ModelField(0, SkillItem))
 
 
 class TeamConfig(Model):
     """团队属性"""
-    skill_mgr = ModelPtrField((0xB74, 0x58), ModelPtrField(0, SkillManager), label='技能')
+    skill_mgr = ModelPtrField((0xB74, 0x58), SkillManager, label='技能')
     main_skill_cooldown_timer = FloatField((0xB64, 0x6C), label='主技能冷却时间')
     main_skill_cooldown_mult = FloatField((0xB64, 0x60), label='主技能冷却倍数')
     damage_heals_self = FloatField(0xBF4)

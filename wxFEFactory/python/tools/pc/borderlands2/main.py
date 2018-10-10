@@ -1,5 +1,7 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Title
+from lib.hack.forms import (
+    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Title
+)
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
@@ -29,6 +31,8 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
         self.lazy_group(Group("ammo", "弹药", self._global), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", (self._current_weapon, models.Weapon)), self.render_weapon)
+        self.lazy_group(Groups("技能", self.weak.onNotePageChange,
+            addr=(self._team_config, models.TeamConfig)), self.render_skill)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_global(self):
@@ -99,6 +103,24 @@ class Main(AssemblyHacktool):
         ModelInput('item_price')
         ModelInput('item_quantity')
         ModelInput('item_state')
+
+    def render_skill(self):
+        with Group('main_skill', "主技能"):
+            ModelInput('skill_mgr.main_skill', '主技能状态')
+            ModelInput('skill_mgr.main_skill_duration', '主技能持续时间')
+            ModelInput('main_skill_cooldown_timer')
+            ModelInput('main_skill_cooldown_mult')
+
+        def render_sub_skill(data):
+            i = 0
+            for page in data:
+                with Group(None, page[0], cols=4):
+                    for item in page[1]:
+                        ModelInput('skill_mgr.skills.%d.status' % i, item)
+                        i += 1
+
+        for i, item in enumerate(datasets.SKILL_NAMES):
+            self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
 
     def render_assembly_functions(self):
         functions = (
@@ -177,6 +199,9 @@ class Main(AssemblyHacktool):
     def _current_weapon(self):
         player_config = self._player_config()
         return player_config and player_config.current_weapon
+
+    def _team_config(self):
+        return self._global.mgr.team_config
 
     def pull_through(self):
         self.toggle_assembly_button('health_inf')

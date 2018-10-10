@@ -274,6 +274,8 @@ class Fields(FieldType):
         super().__init__(label)
 
     def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
         return self.fields[0].__get__(instance, owner)
 
     def __set__(self, instance, value):
