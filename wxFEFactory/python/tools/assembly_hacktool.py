@@ -247,6 +247,7 @@ class AssemblyHacktool(BaseHackTool):
 
 
 class VariableModel:
+    """主要用于ModelWidget绑定变量"""
     def __init__(self, owner):
         object.__setattr__(self, 'owner', owner)
 

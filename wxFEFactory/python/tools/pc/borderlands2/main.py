@@ -157,10 +157,9 @@ class Main(AssemblyHacktool):
                 inserted=True, replace_len=5, replace_offset=7),
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
                 0x001A0000, 0x001B0000, b'',
-                b'\x83\x3D\x3B\x00\x37\x3E\x01\x75\x25\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00'
-                b'\x89\x8F\x14\x0E\x00\x00\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00\xE9\xD1\x64\xE9\xC2'
-                b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
-                inserted=True, replace_len=5),
+                b'\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00'
+                    b'\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00',
+                inserted=True, replace_len=8),
             AssemblyItem('without_golden_keys', '无需金钥匙', b'\x74\x1D\x8A\x54',
                 0x00500000, 0x00510000, b'\xEB\x1D\x8A\x54'),
             AssemblyItem('raid_boss_before', '无限刷BOSS（杀怪前）', b'\x89\x44\xF7\x04\x5E\x5F',
@@ -183,6 +182,21 @@ class Main(AssemblyHacktool):
                     ('super_jump_mult', 4, 0x3FA00000, float),
                     ('super_jump_store', 4, 0x441D8000, float),
                 )),
+            AssemblyItem('instant_main_skill_timer', '主动技能时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
+                0x002B0000, 0x002C0000, b'',
+                b'\x8B\x84\x90\x88\x01\x00\x00\x85\xC0\x74\x0C\x83\xFA\x09\x75\x07\xC7\x40\x6C\x00\x00\x00\x00',
+                inserted=True, replace_len=7),
+            AssemblyItem('mission_timer_freeze', '任务时间锁定', b'\xF3\x0F\x2C\x54\x03\x04\x89\x11',
+                0x00EF0000, 0x00F00000, b'',
+                AssemblyGroup(b'\xF3\x0F\x2C\x54\x18\x04\x80\x7C\x18\x08\x00\x74\x2E\x83\x3D',
+                    assembly_code.Variable('mission_timer_loaded'),
+                    b'\x01\x74\x10\x89\x15', assembly_code.Variable('mission_timer_temp'),
+                    b'\xC7\x05', assembly_code.Variable('mission_timer_loaded'),
+                    b'\x01\x00\x00\x00\xDB\x05', assembly_code.Variable('mission_timer_temp'),
+                    b'\xD9\x5C\x18\x04\x8B\x15', assembly_code.Variable('mission_timer_temp'),
+                    b'\xE9\x0A\x00\x00\x00\xC7\x05', assembly_code.Variable('mission_timer_loaded'),
+                    b'\x00\x00\x00\x00',),
+                inserted=True, replace_len=6, args=('mission_timer_loaded', 'mission_timer_temp')),
         )
         super().render_assembly_functions(functions)
 
