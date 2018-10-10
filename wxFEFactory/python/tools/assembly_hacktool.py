@@ -10,6 +10,10 @@ class AssemblyHacktool(BaseHackTool):
     """现在支持x86 jmp"""
     allocated_memory = None
 
+    def __init__(self):
+        super().__init__()
+        self.variable_model = VariableModel(self.weak)
+
     def reset(self):
         self.allocated_memory = None
         self.next_usable_memory = None
@@ -125,7 +129,7 @@ class AssemblyHacktool(BaseHackTool):
                     else:
                         if self.next_usable_memory > 0xFFFFFFFF:
                             raise ValueError('目前只支持32位参数地址')
-                        assembly = assembly % tuple(self.register_variable(arg).to_bytes(4, 'little')
+                        assembly = assembly % tuple(self.register_variable(arg).addr.to_bytes(4, 'little')
                             for arg in item.args)
                     if memory_conflict:
                         memory = self.next_usable_memory
@@ -152,7 +156,7 @@ class AssemblyHacktool(BaseHackTool):
                         # ptr jmp
                         jmp_len = 7
                         memory_conflict = memory == self.next_usable_memory
-                        temp = self.register_variable(item.key + '_jmp', 8)
+                        temp = self.register_variable(item.key + '_jmp', 8).addr
                         if memory_conflict:
                             memory = self.next_usable_memory
                             self.handler.write_ptr(temp, memory)
@@ -200,33 +204,57 @@ class AssemblyHacktool(BaseHackTool):
     def register_variable(self, name, size=4, value=0):
         """注册变量"""
         self.insure_memory()
+        type = int
         if isinstance(name, tuple):
             if len(name) > 1:
                 size = name[1]
             if len(name) > 2:
                 value = name[2]
+            if len(name) > 3:
+                type = name[3]
+            if size > 8:
+                type = bytes
             name = name[0]
-        memory = self.registed_variable.get(name, None)
-        if memory is None:
-            memory = self.registed_variable[name] = self.next_usable_memory
+        variable = self.registed_variable.get(name, None)
+        if variable is None:
+            if isinstance(name, VariableType):
+                variable = name.clone()
+                variable.addr = self.next_usable_memory
+            else:
+                variable = VariableType(self.next_usable_memory, size, type)
+            self.registed_variable[name] = variable
             self.next_usable_memory += utils.align4(size)
         if value is not 0:
-            self.handler.write_uint(memory, value, size)
-        return memory
+            self.handler.write(variable.addr, value, size)
+        return variable
 
     def get_variable(self, name):
+        """获取变量地址"""
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
 
     def get_variable_value(self, name):
-        addr = self.get_variable(name)
-        if addr:
-            return self.handler.read32(addr)
+        """变量值读取"""
+        variable = self.get_variable(name)
+        if variable:
+            return self.handler.read(variable.addr, variable.type, variable.size)
 
-    def set_variable_value(self, name, value, size=4):
-        addr = self.get_variable(name)
-        if addr:
-            self.handler.write_uint(addr, value, size)
+    def set_variable_value(self, name, value):
+        """变量值写入"""
+        variable = self.get_variable(name)
+        if variable:
+            self.handler.write(variable, value, variable.size)
+
+
+class VariableModel:
+    def __init__(self, owner):
+        object.__setattr__(self, 'owner', owner)
+
+    def __getattr__(self, name):
+        return self.owner.get_variable_value(name)
+
+    def __setattr__(self, name, value):
+        return self.owner.set_variable_value(name, value)
 
 
 class AssemblyItems:
@@ -266,3 +294,5 @@ AssemblyItem = DataClass(
 
 
 AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
+
+VariableType = DataClass('VariableType', ('addr', 'size', 'type'))

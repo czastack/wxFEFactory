@@ -138,7 +138,7 @@ def weakmethod(method):
     return method
 
 
-class BaseDataClass:
+class _DataClass:
     __slots__ = ()
 
     def __init__(self, *args, **kwargs):
@@ -154,6 +154,9 @@ class BaseDataClass:
 
     def to_tuple(self):
         return tuple(self)
+
+    def clone(self):
+        return self.__class__(self)
 
     def __iter__(self):
         return (getattr(self, field) for field in self.__slots__)
@@ -177,4 +180,4 @@ class BaseDataClass:
 
 
 def DataClass(name, fields, default=None, defaults=None):
-    return type(name, (BaseDataClass,), {'__slots__': tuple(fields), 'default': default, 'defaults': defaults})
+    return type(name, (_DataClass,), {'__slots__': tuple(fields), 'default': default, 'defaults': defaults})

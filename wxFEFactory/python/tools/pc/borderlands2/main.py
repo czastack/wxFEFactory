@@ -34,6 +34,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Groups("技能", self.weak.onNotePageChange,
             addr=(self._team_config, models.TeamConfig)), self.render_skill)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
 
     def render_global(self):
         pass
@@ -139,22 +140,21 @@ class Main(AssemblyHacktool):
             #         b'\x9C\x60\x8B\x0D\x04\x09\xB7\x03\x8B\x89\x70\x04\x00\x00\x39\xC8\x0F\x85\x08\x00\x00\x00'
             #         b'\xC7\x44\x24\x2C\x00\x00\x00\x00\x61\x9D\x55\x8B\xEC\x6A\xFF',
             #         inserted=True, replace_len=5, replace_offset=-0x2F, fuzzy=True)),
-            AssemblyItems('无需换弹+精准不减',
-                AssemblyItem('ammo_inf', None, b'\xF3\x0F\x58\x45\x08\x51',
-                    0x007F0000, 0x00810000, b'',
-                    AssemblyGroup(
-                        b'\x83\x79\x48\x00\x75\x24\x83\x79\x4C\x00\x75\x1E\x0F\xAE\x05',
-                        assembly_code.Variable('fxbuff'),
-                        b'\xF3\x0F\x10\x4D\x08\x0F\x57\xDB\x0F\x2F\xCB\x7E\x31\xF3\x0F\x11\x5D\x08\xE9\x27\x00\x00\x00'
-                        b'\x0F\xAE\x05', assembly_code.Variable('fxbuff'),
-                        b'\xF3\x0F\x10\x4D\x08\x0F\x57\xDB\x0F\x2F\xCB\x7A\x13\x72\x11\xF3\x0F\x10\x25',
-                        assembly_code.Variable('minus_one'), b'\xF3\x0F\x59\xCC\xF3\x0F\x11\x4D\x08\x0F\xAE\x0D',
-                        assembly_code.Variable('fxbuff'), b'\xF3\x0F\x58\x45\x08'
-                    ),
-                    inserted=True, replace_len=5, args=(('fxbuff', 512), ('minus_one', 4, 0xBF800000))),
-                AssemblyItem('ammo_inf2', None, b'\x3B\xC1\x7C\x0B\x8B\x55\x0C\x89\x02\x8B\xE5\x5D\xC2\x08\x00',
-                    0x002A0000, 0x002B0000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
-                    inserted=True, replace_len=5, replace_offset=7)),
+            AssemblyItem('ammo_inf', '子弹不减+精准不减', b'\xF3\x0F\x58\x45\x08\x51',
+                0x007F0000, 0x00810000, b'',
+                AssemblyGroup(
+                    b'\x83\x79\x48\x00\x75\x24\x83\x79\x4C\x00\x75\x1E\x0F\xAE\x05',
+                    assembly_code.Variable('fxbuff'),
+                    b'\xF3\x0F\x10\x4D\x08\x0F\x57\xDB\x0F\x2F\xCB\x7E\x31\xF3\x0F\x11\x5D\x08\xE9\x27\x00\x00\x00'
+                    b'\x0F\xAE\x05', assembly_code.Variable('fxbuff'),
+                    b'\xF3\x0F\x10\x4D\x08\x0F\x57\xDB\x0F\x2F\xCB\x7A\x13\x72\x11\xF3\x0F\x10\x25',
+                    assembly_code.Variable('minus_one'), b'\xF3\x0F\x59\xCC\xF3\x0F\x11\x4D\x08\x0F\xAE\x0D',
+                    assembly_code.Variable('fxbuff'), b'\xF3\x0F\x58\x45\x08'
+                ),
+                inserted=True, replace_len=5, args=(('fxbuff', 512), ('minus_one', 4, 0xBF800000))),
+            AssemblyItem('ammo_inf2', '无需换弹', b'\x3B\xC1\x7C\x0B\x8B\x55\x0C\x89\x02\x8B\xE5\x5D\xC2\x08\x00',
+                0x002A0000, 0x002B0000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
+                inserted=True, replace_len=5, replace_offset=7),
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
                 0x001A0000, 0x001B0000, b'',
                 b'\x83\x3D\x3B\x00\x37\x3E\x01\x75\x25\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00'
@@ -165,8 +165,31 @@ class Main(AssemblyHacktool):
                 0x00500000, 0x00510000, b'\xEB\x1D\x8A\x54'),
             AssemblyItem('raid_boss_before', '无限刷BOSS（杀怪前）', b'\x89\x44\xF7\x04\x5E\x5F',
                 0x00080000, 0x00090000, b'\x90\x90\x90\x90'),
+            AssemblyItem('ammo_upgrade_mod', '弹药上限升级', b'\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00',
+                0x003B0000, 0x003C0000, b'',
+                AssemblyGroup(b'\x83\xFE\x07\x0F\x84\x14\x00\x00\x00\x83\xFE\x08\x0F\x84\x0B\x00\x00\x00\x8B\x0D',
+                    assembly_code.Variable('ammo_upgrade_level'),
+                    b'\x01\x0C\xB0\xEB\x03\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00'),
+                inserted=True, args=(('ammo_upgrade_level', 4, 100),)),
+            AssemblyItem('super_speed_jump', '超级速度和跳跃', b'\xF3\x0F\x11\x44\x24\x04\xF3\x0F\x10\x43\x08\x8D\x95',
+                0x00DF0000, 0x00E00000, b'',
+                AssemblyGroup(b'\xF3\x0F\x10\x05', assembly_code.Variable('super_jump_mult'),
+                    b'\xF3\x0F\x59\x05', assembly_code.Variable('super_jump_store'),
+                    b'\xF3\x0F\x11\x86\xEC\x02\x00\x00\xF3\x0F\x10\x86\xA8\x02\x00\x00',
+                    b'\xF3\x0F\x59\x05', assembly_code.Variable('super_speed_mult'),
+                    b'\xF3\x0F\x11\x44\x24\x04',),
+                inserted=True, replace_len=6, args=(
+                    ('super_speed_mult', 4, 0x40000000, float),
+                    ('super_jump_mult', 4, 0x3FA00000, float),
+                    ('super_jump_store', 4, 0x441D8000, float),
+                )),
         )
         super().render_assembly_functions(functions)
+
+    def render_assembly_variable(self):
+        ModelInput('ammo_upgrade_level', '弹药上限等级')
+        ModelInput('super_speed_mult', '超级速度倍数')
+        ModelInput('super_jump_mult', '超级跳跃倍数')
 
     def onattach(self):
         super().onattach()
@@ -204,4 +227,6 @@ class Main(AssemblyHacktool):
         return self._global.mgr.team_config
 
     def pull_through(self):
-        self.toggle_assembly_button('health_inf')
+        health = self._character_health()
+        if health:
+            health.value_max()

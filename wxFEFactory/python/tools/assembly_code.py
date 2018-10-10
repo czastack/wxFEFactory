@@ -31,7 +31,7 @@ class AssemblyNode:
     def get_target(self, owner):
         target = self.target
         if isinstance(self.target, str):
-            target = owner.get_variable(target)
+            target = owner.get_variable(target).addr
         return target
 
 
@@ -41,10 +41,10 @@ class Variable(AssemblyNode):
         self.size = size
 
     def generate(self, owner, addr):
-        variable = owner.get_variable(self.key)
-        if variable >= (1 << (self.size << 3)):
+        addr = owner.get_variable(self.key).addr
+        if addr >= (1 << (self.size << 3)):
             raise ValueError('变量%s长度超过%d字节' % (self.key, self.size))
-        return variable.to_bytes(self.size, 'little')
+        return addr.to_bytes(self.size, 'little')
 
 
 class Cmp(AssemblyNode):

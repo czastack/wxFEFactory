@@ -145,7 +145,7 @@ class Main(NativeHacktool):
     def _skill_points(self):
         skill_points_base = self.get_variable('skill_points_base')
         if skill_points_base:
-            return models.SkillPoints(self.handler.read32(skill_points_base), self.handler)
+            return models.SkillPoints(self.handler.read32(skill_points_base.addr), self.handler)
         print('未初始化')
 
     @property
