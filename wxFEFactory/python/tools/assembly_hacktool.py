@@ -243,7 +243,7 @@ class AssemblyHacktool(BaseHackTool):
         """变量值写入"""
         variable = self.get_variable(name)
         if variable:
-            self.handler.write(variable, value, variable.size)
+            self.handler.write(variable.addr, value, variable.size)
 
 
 class VariableModel:
