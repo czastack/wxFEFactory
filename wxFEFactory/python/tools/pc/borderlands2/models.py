@@ -13,9 +13,9 @@ class Value(Model):
         self.set_with('value', 'scaled_maximum')
 
 
-class WeaponManager(Model):
+class WeaponAmmo(Value):
     """武器管理器"""
-    ammo = FloatField(0x6C, label='弹药')
+    regen_rate = FloatField(0x84, label='回复速度')
 
 
 class Weapon(Model):
@@ -174,7 +174,7 @@ class Manager(Model):
     character = ModelPtrField(0x24, Character)
     team_config = ModelPtrField((0x2C, 0xA4), TeamConfig)
     player_mgr = ModelPtrField(0x30, PlayerManager)
-    weapon_mgrs = ArrayField((0x2C, 0x188), 7, ModelPtrField(0, WeaponManager), cachable=True)
+    weapon_ammos = ArrayField((0x2C, 0x188), 7, ModelPtrField(0, WeaponAmmo), cachable=True)
     vehicle_mgrs = ArrayField((0x10, 0x358), 2, ModelPtrField(0, VehicleManager), cachable=True)
 
 

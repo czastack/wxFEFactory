@@ -29,7 +29,7 @@ class Main(AssemblyHacktool):
             self.render_global()
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
-        self.lazy_group(Group("ammo", "弹药", self._global), self.render_ammo)
+        self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", (self._current_weapon, models.Weapon)), self.render_weapon)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange,
             addr=(self._team_config, models.TeamConfig)), self.render_skill)
@@ -43,6 +43,7 @@ class Main(AssemblyHacktool):
         health = (self._character_health, models.ShieldHealth)
         shield = (self._character_shield, models.ShieldHealth)
         experience = (self._experience, models.Experience)
+        player_mgr = (self._player_mgr, models.PlayerManager)
 
         Title('生命')
         ModelInput('value', instance=health)
@@ -74,18 +75,20 @@ class Main(AssemblyHacktool):
         ModelInput('torgue_tokens')
         ModelInput('skill_points')
 
+        ModelInput('bank_size', instance=player_mgr)
+        ModelInput('weapon_deck_size', instance=player_mgr)
+        ModelInput('backpack_size', instance=player_mgr)
+        ModelInput('backpack_used_space', instance=player_mgr)
+
     def render_character_ext(self):
         player_config = (self._player_config, models.PlayerConfig)
         ModelCoordWidget('coord', instance=player_config, savable=True)
 
     def render_ammo(self):
-        ModelInput('mgr.weapon_mgrs.0.ammo', '突击步枪子弹')
-        ModelInput('mgr.weapon_mgrs.1.ammo', '霰弹枪子弹')
-        ModelInput('mgr.weapon_mgrs.2.ammo', '手雷')
-        ModelInput('mgr.weapon_mgrs.3.ammo', '冲锋枪子弹')
-        ModelInput('mgr.weapon_mgrs.4.ammo', '手枪子弹')
-        ModelInput('mgr.weapon_mgrs.5.ammo', '火箭炮弹药')
-        ModelInput('mgr.weapon_mgrs.6.ammo', '狙击步枪子弹')
+        for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹')):
+            with ModelInput('mgr.weapon_ammos.%d.value' % i, label).container:
+                ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
+            ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度')
 
     def render_weapon(self):
         ModelInput('actual_level')
@@ -230,8 +233,12 @@ class Main(AssemblyHacktool):
         character = self._character()
         return character and character.experience
 
+    def _player_mgr(self):
+        return self._global.mgr.player_mgr
+
     def _player_config(self):
-        return self._global.mgr.player_mgr.player_config
+        player_mgr = self._player_mgr()
+        return player_mgr and player_mgr.player_config
 
     def _current_weapon(self):
         player_config = self._player_config()
@@ -239,6 +246,11 @@ class Main(AssemblyHacktool):
 
     def _team_config(self):
         return self._global.mgr.team_config
+
+    def weapon_ammo_max(self, _=None, i=0):
+        weapon = self._current_weapon()
+        if weapon:
+            self._global.mgr.weapon_ammos[i].value_max()
 
     def pull_through(self):
         health = self._character_health()
