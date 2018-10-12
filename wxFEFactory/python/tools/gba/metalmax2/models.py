@@ -32,8 +32,8 @@ class Chariot(Model):
     bullet = ByteField(0x0300404C, label="弹仓容量")
     defense = ByteField(0x0300404A, label="守备力")
     weight = WordField(0x0300404F, label="底盘重量")
-    special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
-    special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
+    special_bullets = ArrayField(0x03003DE1, 8, ByteField(0))  # 特殊炮弹
+    special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0))  # 特殊炮弹
 
 
 class Global(Model):

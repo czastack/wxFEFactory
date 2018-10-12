@@ -11,22 +11,22 @@ class ArgType:
     INT8 = 4
     INT16 = 5
     FLOAT = 6
-    STRING = 10 # 自己定义的
+    STRING = 10  # 自己定义的
 
     ARG_TYPE = {
-        0x63: INT8,    # c
-        0x62: INT8,    # b
-        0x68: INT16,   # h
-        0x48: INT16,   # H
-        0x69: INT32,   # i
-        0x49: INT32,   # I
-        0x6c: INT32,   # l
-        0x4c: INT32,   # L
-        0x66: FLOAT,   # f
-        0x64: FLOAT,   # d
-        0x50: LOCAL_I, # P
-        # 0x50: GLOBAL_I, # P
-        
+        0x63: INT8,      # c
+        0x62: INT8,      # b
+        0x68: INT16,     # h
+        0x48: INT16,     # H
+        0x69: INT32,     # i
+        0x49: INT32,     # I
+        0x6c: INT32,     # l
+        0x4c: INT32,     # L
+        0x66: FLOAT,     # f
+        0x64: FLOAT,     # d
+        0x50: LOCAL_I,   # P
+        # 0x50: GLOBAL_I,  # P
+
         0x70: STRING,  # p
         0x73: STRING,  # s
     }

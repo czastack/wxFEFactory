@@ -5,7 +5,7 @@ class Skill(Model):
     """精神力"""
     SIZE = 4
     _value = WordField(0)
-    
+
     @property
     def value(self):
         return self._value & 0x7FFF
@@ -41,7 +41,7 @@ class ItemSlot(Model):
 
     @count.setter
     def count(self, value):
-        self._count = ((int(value) - 1) << 3 ) | (self._count & 0b11)
+        self._count = ((int(value) - 1) << 3) | (self._count & 0b11)
 
 
 class BasePerson(Model):
@@ -70,23 +70,23 @@ class BasePerson(Model):
     lucky = ByteField(0x42)
     skills = ArrayField(0x58, 32, ModelField(0, Skill))
     items = ArrayField(0xD8, 15, ModelField(0, ItemSlot))
-    # djinni1 = Field(0xF8) # 精灵
+    # djinni1 = Field(0xF8)  # 精灵
     # djinni2 = Field(0x108)
     # djinni3 = Field(0x118)
     # djinni4 = Field(0x11C)
-    djinni_ground = Field(0xF8) # 地精灵
-    djinni_water = Field(0xFC) # 水精灵
-    djinni_fire = Field(0x100) # 火精灵
-    djinni_wind = Field(0x104) # 风精灵
-    djinni_ground_on = Field(0x108) # 地精灵附身状态
-    djinni_water_on = Field(0x10C) # 地精灵附身状态
-    djinni_fire_on = Field(0x110) # 地精灵附身状态
-    djinni_wind_on = Field(0x114) # 地精灵附身状态
-    djinni_ground_count = ByteField(0x118) # 拥有的精灵数
+    djinni_ground = Field(0xF8)  # 地精灵
+    djinni_water = Field(0xFC)  # 水精灵
+    djinni_fire = Field(0x100)  # 火精灵
+    djinni_wind = Field(0x104)  # 风精灵
+    djinni_ground_on = Field(0x108)  # 地精灵附身状态
+    djinni_water_on = Field(0x10C)  # 地精灵附身状态
+    djinni_fire_on = Field(0x110)  # 地精灵附身状态
+    djinni_wind_on = Field(0x114)  # 地精灵附身状态
+    djinni_ground_count = ByteField(0x118)  # 拥有的精灵数
     djinni_water_count = ByteField(0x119)
     djinni_fire_count = ByteField(0x11A)
     djinni_wind_count = ByteField(0x11B)
-    djinni_ground_on_count = Field(0x11C) # 精灵附身数
+    djinni_ground_on_count = Field(0x11C)  # 精灵附身数
     djinni_water_on_count = Field(0x11D)
     djinni_fire_on_count = Field(0x11E)
     djinni_wind_on_count = Field(0x11F)

@@ -28,13 +28,13 @@ class PersonBattle(Model):
 
 class Global(Model):
     tp = ByteField(0x020091CF)
-    favors = ArrayField(0x020091A0, 8, ByteField(0)) # 好感度
+    favors = ArrayField(0x020091A0, 8, ByteField(0))  # 好感度
     member_num = ByteField(0x020069DC)
-    members = ArrayField(0x020069DD, 5, ByteField(0)) # 好感度
+    members = ArrayField(0x020069DD, 5, ByteField(0))  # 好感度
     item_num = ByteField(0x020091DD)
-    items = ArrayField(0x020069DD, 5, ByteField(0)) # 好感度
+    items = ArrayField(0x020069DD, 5, ByteField(0))  # 好感度
     items = ArrayField(0x02006DBC, 16, ModelField(0, ItemSlot))
     kill_slot = WordField(0x020028E2)
     rage = WordField(0x020028EC)
-    person_battles = ArrayField(0, 6, ModelField(0, PersonBattle)) # 战斗中人物信息
-    event_items = ArrayField(0x02008170, 10, WordField(0)) # 事件道具
+    person_battles = ArrayField(0, 6, ModelField(0, PersonBattle))  # 战斗中人物信息
+    event_items = ArrayField(0x02008170, 10, WordField(0))  # 事件道具

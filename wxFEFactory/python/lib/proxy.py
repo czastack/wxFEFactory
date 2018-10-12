@@ -23,7 +23,7 @@ class ProxyMetaclass(type):
 
 
 class Proxy(metaclass=ProxyMetaclass):
-    """ 
+    """
     classfield __proxy__: name of proxy member
     """
     def __init__(self, obj=None):

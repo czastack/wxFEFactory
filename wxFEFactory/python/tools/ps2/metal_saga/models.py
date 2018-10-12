@@ -64,7 +64,7 @@ class Person(Model):
     drive = ByteField(0x007F86DC, label="运转")
     # hair = ByteField(0x007F86E8, label="毛色光泽")
     title = ByteField(0x007F86EC, label="称号")
-    # status = ByteField(0x007F86C0, label="状态") # 1:正常, 2:死亡 (除1外车会消失?)
+    # status = ByteField(0x007F86C0, label="状态")  # 1:正常, 2:死亡 (除1外车会消失?)
     driving = ByteField(0x007F86C0)  # 1: 乘车中, 其他: 下车状态
     skills = ArrayField(0x007F86F4, 6, Field(0))  # 技能
     equips = ArrayField(0x007F8744, 6, ModelPtrField(0, ItemInfo))  # 武器,头部,躯干,手臂,脚部,胸甲
@@ -113,7 +113,7 @@ class Global(Model):
     battlein = ByteField(0x7E0685, label="不遇敌率")
     no_battle = ToggleField(0x7E0685, size=1, enable=0xFF, disable=0x00, label="不遇敌")
 
-    # wanted_status = ArrayField(0x7E910F, 16, ByteField(0)) # 0=未击破, 63=未领奖金, E3=已领奖金
+    # wanted_status = ArrayField(0x7E910F, 16, ByteField(0))  # 0=未击破, 63=未领奖金, E3=已领奖金
 
     persons = ArrayField(0, 10, ModelField(0, Person))
     # 敌人情况

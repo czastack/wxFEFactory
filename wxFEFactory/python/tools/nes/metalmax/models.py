@@ -39,7 +39,7 @@ class Person(PersonChariot):
     drive = ByteField(0x6493)
     equips = ArrayField(0x6496, 8, ByteField(0))
     items = ArrayField(0x64AE, 8, ByteField(0))
-    equip_flag = ByteField(0x64C6) # 第一个装备状态是最高位0x80
+    equip_flag = ByteField(0x64C6)  # 第一个装备状态是最高位0x80
 
 
 class ChariotEquip(Model):
@@ -54,9 +54,9 @@ class Chariot(PersonChariot):
     weight = WordField(0x64D2)
     defense = WordField(0x64FE)
     bullet = ByteField(0x651F)
-    special_bullets = ArrayField(0x03003DE1, 8, ByteField(0)) # 特殊炮弹
-    special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0)) # 特殊炮弹
-    main_bullets_count = ByteField(0x6535) # 主炮数量
+    special_bullets = ArrayField(0x03003DE1, 8, ByteField(0))  # 特殊炮弹
+    special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0))  # 特殊炮弹
+    main_bullets_count = ByteField(0x6535)  # 主炮数量
 
     def set_index(self, i):
         super().set_index(i)

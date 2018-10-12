@@ -35,7 +35,7 @@ class AtkDefItems(Model):
 
 
 class UnitType(Model):
-    # type = ByteField(0x4, label="类型") # 类型
+    # type = ByteField(0x4, label="类型")  # 类型
     # dll_name = WordField(0xC, label="语言DLL:名称")
     # dll_hint = WordField(0xE, label="语言DLL:创建提示")
     # id1 = WordField(0x10, label="ID 1")

@@ -180,7 +180,7 @@ HUMAN_ITEMS = (
     "柔软果子",
     "瘫软种子",
     "冻肉",
-) # END is 0xFF
+)  # END is 0xFF
 
 HUMAN_EQUIPS = (
     "钢珠弹弓",
@@ -304,7 +304,7 @@ HUMAN_EQUIPS = (
     "抗激光背心",
     "全能护甲",
     "无(只能放在最后)"
-) # END is 0x7F
+)  # END is 0x7F
 
 CHASSIS = (
     "蛇式坦克",
@@ -359,7 +359,7 @@ CHARIOT_ITEMS = (
     "鸟粪",
     "小兔挂饰",
     "一路平安护符",
-) # END is 0x3F
+)  # END is 0x3F
 
 CHARIOT_EQUIP_HEADS = (
     ("名称", "防御", "重量", "攻击/命中/积载", "弹仓/回避", "攻击范围/特性"),
@@ -498,7 +498,7 @@ CHARIOT_EQUIP_INFOS = (
     ("最强苦力劳工", 80, 70, 3200, "", ""),
 )
 
-CHARIOT_EQUIPS = tuple(item[0] for item in CHARIOT_EQUIP_INFOS) # END is 0x7F
+CHARIOT_EQUIPS = tuple(item[0] for item in CHARIOT_EQUIP_INFOS)  # END is 0x7F
 
 SPECIAL_BULLETS = ()
 

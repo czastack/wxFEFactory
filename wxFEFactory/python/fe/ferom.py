@@ -64,56 +64,56 @@ ctrl_table = (
     CtrlCode(0x1b01, "ShopContinueBr"),
     CtrlCode(0x1c01, "SendToBackBr"),
 
-    CtrlCode(0x80000400, "LoadOverworldFaces"), # 在世界地图载入XX号头像
-    CtrlCode(0x80000500, "G"),                  # 显示玩家持有金钱数额
-    CtrlCode(0x80000a00, "MoveFarLeft"),        # 移动头像至最左
-    CtrlCode(0x80000b00, "MoveMidLeft"),        # 移动头像至偏左
-    CtrlCode(0x80000c00, "MoveLeft"),           # 移动头像至左
-    CtrlCode(0x80000d00, "MoveRight"),          # 移动头像至右
-    CtrlCode(0x80000e00, "MoveMidRight"),       # 移动头像至偏右
-    CtrlCode(0x80000f00, "MoveFarRight"),       # 移动头像至最右
-    CtrlCode(0x80001000, "MoveFarFarLeft"),     # 移动头像至最最左以至于超出屏幕范围
-    CtrlCode(0x80001100, "MoveFarFarRight"),    # 移动头像至最最右以至于超出屏幕范围
-    CtrlCode(0x80001600, "EnableBlinking"),     # 眨眼
-    CtrlCode(0x80001800, "DelayBlinking"),      
-    CtrlCode(0x80001900, "PauseBlinking"),      
-    CtrlCode(0x80001b00, "DisableBlinking"),    # 停止眨眼
-    CtrlCode(0x80001c00, "OpenEyes"),           # 睁眼
-    CtrlCode(0x80001d00, "CloseEyes"),          # 闭眼
-    CtrlCode(0x80001e00, "HalfCloseEyes"),      # 半闭眼
-    CtrlCode(0x80001f00, "Wink"),               # 眨眼一下
-    CtrlCode(0x80002000, "Tact"),               # 显示玩家姓名
-    CtrlCode(0x80002100, "ToggleRed"),          # 开始/结束红色文本
-    CtrlCode(0x80002200, "Item"),               # 显示载入的物品名称
-    CtrlCode(0x80002300, "SetName"),            # 用于CG画面时的对话，显示说话者姓名
-    CtrlCode(0x80002500, "ToggleColorInvert"),  # 开始/结束语言框反色
+    CtrlCode(0x80000400, "LoadOverworldFaces"),    # 在世界地图载入XX号头像
+    CtrlCode(0x80000500, "G"),                     # 显示玩家持有金钱数额
+    CtrlCode(0x80000a00, "MoveFarLeft"),           # 移动头像至最左
+    CtrlCode(0x80000b00, "MoveMidLeft"),           # 移动头像至偏左
+    CtrlCode(0x80000c00, "MoveLeft"),              # 移动头像至左
+    CtrlCode(0x80000d00, "MoveRight"),             # 移动头像至右
+    CtrlCode(0x80000e00, "MoveMidRight"),          # 移动头像至偏右
+    CtrlCode(0x80000f00, "MoveFarRight"),          # 移动头像至最右
+    CtrlCode(0x80001000, "MoveFarFarLeft"),        # 移动头像至最最左以至于超出屏幕范围
+    CtrlCode(0x80001100, "MoveFarFarRight"),       # 移动头像至最最右以至于超出屏幕范围
+    CtrlCode(0x80001600, "EnableBlinking"),        # 眨眼
+    CtrlCode(0x80001800, "DelayBlinking"),
+    CtrlCode(0x80001900, "PauseBlinking"),
+    CtrlCode(0x80001b00, "DisableBlinking"),       # 停止眨眼
+    CtrlCode(0x80001c00, "OpenEyes"),              # 睁眼
+    CtrlCode(0x80001d00, "CloseEyes"),             # 闭眼
+    CtrlCode(0x80001e00, "HalfCloseEyes"),         # 半闭眼
+    CtrlCode(0x80001f00, "Wink"),                  # 眨眼一下
+    CtrlCode(0x80002000, "Tact"),                  # 显示玩家姓名
+    CtrlCode(0x80002100, "ToggleRed"),             # 开始/结束红色文本
+    CtrlCode(0x80002200, "Item"),                  # 显示载入的物品名称
+    CtrlCode(0x80002300, "SetName"),               # 用于CG画面时的对话，显示说话者姓名
+    CtrlCode(0x80002500, "ToggleColorInvert"),     # 开始/结束语言框反色
 
-    CtrlCode(0x80001700, "Unknow80001700"),     # 似乎是fe8特有
+    CtrlCode(0x80001700, "Unknow80001700"),        # 似乎是fe8特有
 
     # 最低位为1的一般都会带有换行行为，名称以Br结尾区分
-    CtrlCode(0x80000401, "LoadOverworldFacesBr"), # 在世界地图载入XX号头像
-    CtrlCode(0x80000501, "GBr"),                  # 显示玩家持有金钱数额后换行
-    CtrlCode(0x80000a01, "MoveFarLeftBr"),        # 移动头像至最左
-    CtrlCode(0x80000b01, "MoveMidLeftBr"),        # 移动头像至偏左
-    CtrlCode(0x80000c01, "MoveLeftBr"),           # 移动头像至左
-    CtrlCode(0x80000d01, "MoveRightBr"),          # 移动头像至右
-    CtrlCode(0x80000e01, "MoveMidRightBr"),       # 移动头像至偏右
-    CtrlCode(0x80000f01, "MoveFarRightBr"),       # 移动头像至最右
-    CtrlCode(0x80001001, "MoveFarFarLeftBr"),     # 移动头像至最最左以至于超出屏幕范围
-    CtrlCode(0x80001101, "MoveFarFarRightBr"),    # 移动头像至最最右以至于超出屏幕范围
-    CtrlCode(0x80001601, "EnableBlinkingBr"),     # 眨眼
-    CtrlCode(0x80001801, "DelayBlinkingBr"),      
-    CtrlCode(0x80001901, "PauseBlinkingBr"),      
-    CtrlCode(0x80001b01, "DisableBlinkingBr"),    # 停止眨眼
-    CtrlCode(0x80001c01, "OpenEyesBr"),           # 睁眼
-    CtrlCode(0x80001d01, "CloseEyesBr"),          # 闭眼
-    CtrlCode(0x80001e01, "HalfCloseEyesBr"),      # 半闭眼
-    CtrlCode(0x80001f01, "WinkBr"),               # 眨眼一下
-    CtrlCode(0x80002001, "TactBr"),               # 显示玩家姓名
-    CtrlCode(0x80002101, "ToggleRedBr"),          # 开始/结束红色文本
-    CtrlCode(0x80002201, "ItemBr"),               # 显示载入的物品名称
-    CtrlCode(0x80002301, "SetNameBr"),            # 用于CG画面时的对话，显示说话者姓名
-    CtrlCode(0x80002501, "ToggleColorInvertBr"),  # 开始/结束语言框反色
+    CtrlCode(0x80000401, "LoadOverworldFacesBr"),  # 在世界地图载入XX号头像
+    CtrlCode(0x80000501, "GBr"),                   # 显示玩家持有金钱数额后换行
+    CtrlCode(0x80000a01, "MoveFarLeftBr"),         # 移动头像至最左
+    CtrlCode(0x80000b01, "MoveMidLeftBr"),         # 移动头像至偏左
+    CtrlCode(0x80000c01, "MoveLeftBr"),            # 移动头像至左
+    CtrlCode(0x80000d01, "MoveRightBr"),           # 移动头像至右
+    CtrlCode(0x80000e01, "MoveMidRightBr"),        # 移动头像至偏右
+    CtrlCode(0x80000f01, "MoveFarRightBr"),        # 移动头像至最右
+    CtrlCode(0x80001001, "MoveFarFarLeftBr"),      # 移动头像至最最左以至于超出屏幕范围
+    CtrlCode(0x80001101, "MoveFarFarRightBr"),     # 移动头像至最最右以至于超出屏幕范围
+    CtrlCode(0x80001601, "EnableBlinkingBr"),      # 眨眼
+    CtrlCode(0x80001801, "DelayBlinkingBr"),
+    CtrlCode(0x80001901, "PauseBlinkingBr"),
+    CtrlCode(0x80001b01, "DisableBlinkingBr"),     # 停止眨眼
+    CtrlCode(0x80001c01, "OpenEyesBr"),            # 睁眼
+    CtrlCode(0x80001d01, "CloseEyesBr"),           # 闭眼
+    CtrlCode(0x80001e01, "HalfCloseEyesBr"),       # 半闭眼
+    CtrlCode(0x80001f01, "WinkBr"),                # 眨眼一下
+    CtrlCode(0x80002001, "TactBr"),                # 显示玩家姓名
+    CtrlCode(0x80002101, "ToggleRedBr"),           # 开始/结束红色文本
+    CtrlCode(0x80002201, "ItemBr"),                # 显示载入的物品名称
+    CtrlCode(0x80002301, "SetNameBr"),             # 用于CG画面时的对话，显示说话者姓名
+    CtrlCode(0x80002501, "ToggleColorInvertBr"),   # 开始/结束语言框反色
 
     # 接在0x1000后时表示头像序号
     # FE7 0201~bd01, df, e0, e4 -> faceid
@@ -153,7 +153,7 @@ class FeRomHandler(RomHandler):
 
         huffstart = self.read32(self.FONT_POINTER)
         huffsize = self.read32(self.TEXT_TABLE_POINTER) - huffstart
-        self._dict = FeDict(self.read(huffstart, bytes, huffsize), 
+        self._dict = FeDict(self.read(huffstart, bytes, huffsize),
             path, (0x8180, 0x9f00), ctrl_table)
 
     @lazy

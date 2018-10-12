@@ -125,28 +125,28 @@ SHOOT_WEAPON_CHOICES = (
 
 
 # 载具种类
-# VC_Compacts = 0 # 小型汽车
-# VC_Sedans = 1 # 轿车
-# VC_Suv = 2 # 运动休旅车
-# VC_Coupes = 3 # 轿跑车
-# VC_Muscle = 4 # 美式肌肉车
-# VC_SportClassics = 5 # 跑车
-# VC_Sports = 6 # 经典跑车
-# VC_Super = 7 # 超级跑车
-# VC_Motorcycles = 8 # 摩托车
-# VC_OffRoad = 9 # 越野车
-# VC_Industrial = 10 # 工业用车
-# VC_Utility = 11 # 工作车辆
-# VC_Van = 12 # 厢型车
-# VC_Cycle = 13 # 单车
-# VC_Boats = 14 # 船
-# VC_Helicopters = 15 # 直升机
-# VC_Planes = 16 # 飞机
-# VC_Service = 17 # 服务
-# VC_Emergency = 18 # 紧急车辆
-# VC_Military = 19 # 军队
-# VC_Commercial = 20 # 商务用
-# VC_Train = 21 # 列车
+# VC_Compacts = 0  # 小型汽车
+# VC_Sedans = 1  # 轿车
+# VC_Suv = 2  # 运动休旅车
+# VC_Coupes = 3  # 轿跑车
+# VC_Muscle = 4  # 美式肌肉车
+# VC_SportClassics = 5  # 跑车
+# VC_Sports = 6  # 经典跑车
+# VC_Super = 7  # 超级跑车
+# VC_Motorcycles = 8  # 摩托车
+# VC_OffRoad = 9  # 越野车
+# VC_Industrial = 10  # 工业用车
+# VC_Utility = 11  # 工作车辆
+# VC_Van = 12  # 厢型车
+# VC_Cycle = 13  # 单车
+# VC_Boats = 14  # 船
+# VC_Helicopters = 15  # 直升机
+# VC_Planes = 16  # 飞机
+# VC_Service = 17  # 服务
+# VC_Emergency = 18  # 紧急车辆
+# VC_Military = 19  # 军队
+# VC_Commercial = 20  # 商务用
+# VC_Train = 21  # 列车
 
 # PICKUP_TYPE = (
 #     ("CustomScript", 0x2C014CA6),

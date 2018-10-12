@@ -7,7 +7,7 @@ class Person(Model):
     prof = Field(0x44)
     level = ByteField(0x5A)
     exp = ByteField(0x5B)
-    no = ByteField(0x41) # 头像、身份？
+    no = ByteField(0x41)  # 头像、身份？
     moved = ByteField(0x94)
     posx = ByteField(0x5E)
     posy = ByteField(0x5F)
@@ -21,13 +21,13 @@ class Person(Model):
     magicdef = ByteField(0x52)
     lucky = ByteField(0x55)
     # physical_add = ByteField(26)
-    # together = ByteField(27) # 同行人物序号
+    # together = ByteField(27)  # 同行人物序号
     move_add = ByteField(0x5D)
     items = ArrayField(0x60, 5, ModelField(0, ItemSlot))
-    proficiency = ArrayField(0x74, 6, ByteField(0)) # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
-    # status = ByteField(48) # 状态种类
-    # status_turn = ByteField(49) # 状态持续回合数
-    # support = ArrayField(50, 10, ByteField(0)) # 支援等级
+    proficiency = ArrayField(0x74, 6, ByteField(0))  # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
+    # status = ByteField(48)  # 状态种类
+    # status_turn = ByteField(49)  # 状态持续回合数
+    # support = ArrayField(50, 10, ByteField(0))  # 支援等级
 
 
 class Config(Model):
@@ -42,18 +42,18 @@ class Config(Model):
 
 class ItemInfo(Model):
     SIZE = 0x3C
-    name_ptr = Field(0x04) # 名称指针
-    desc_ptr = Field(0x08) # 介绍文本指针
-    icon = ByteField(0x0C) # 图标序号
-    type = ByteField(0x10) # 类型 0: 剑, 枪, 斧, 弓, 魔, 杖, 龙石, 弩车
-    level = ByteField(0x12) # 要求熟练度 00: -, 01: E, 1F: D, 4C: C, 88: B
-    power = ByteField(0x15) # 威力
-    hit = ByteField(0x16) # 命中
-    kill = ByteField(0x17) # 必杀
-    weight = ByteField(0x18) # 重量
-    range_min = ByteField(0x19) # 最小射程
-    range_max = ByteField(0x1A) # 最大射程
-    move_add = ByteField(0x1B) # 属性增加效果
+    name_ptr = Field(0x04)  # 名称指针
+    desc_ptr = Field(0x08)  # 介绍文本指针
+    icon = ByteField(0x0C)  # 图标序号
+    type = ByteField(0x10)  # 类型 0: 剑, 枪, 斧, 弓, 魔, 杖, 龙石, 弩车
+    level = ByteField(0x12)  # 要求熟练度 00: -, 01: E, 1F: D, 4C: C, 88: B
+    power = ByteField(0x15)  # 威力
+    hit = ByteField(0x16)  # 命中
+    kill = ByteField(0x17)  # 必杀
+    weight = ByteField(0x18)  # 重量
+    range_min = ByteField(0x19)  # 最小射程
+    range_max = ByteField(0x1A)  # 最大射程
+    move_add = ByteField(0x1B)  # 属性增加效果
     hp_add = ByteField(0x1C)
     power_add = ByteField(0x1D)
     magic_add = ByteField(0x1E)
@@ -80,10 +80,10 @@ class Global(BaseGlobal):
     # chapter = ByteField(0x0202BCFA)
     # turns = WordField(0x0202BCFC)
     person_addr = Field(0x021BED30)
-    curx = ByteField(0x02273BD4) # 0x02272EA4
-    cury = ByteField(0x02273BD5) # 0x02272EA5
+    curx = ByteField(0x02273BD4)  # 0x02272EA4
+    cury = ByteField(0x02273BD5)  # 0x02272EA5
     # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
-    train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot)) # 运输队
+    train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot))  # 运输队
     ourturn = ToggleField(0x021CC278, enable=0xE3A01001, disable=0xE5D01000)
     control_enemy = ToggleField(0x021D5674, enable=0xE1500000, disable=0xE1510000)
     upgrade_max = ToggleField(0x02050AC0, enable=0xB1A06004, disable=0xB2866001)

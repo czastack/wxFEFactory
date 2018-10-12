@@ -3,6 +3,7 @@ from functools import partial
 
 def lazy(func, type_=property, indict=False):
     name = '_' + func.__name__
+
     def _deco(self):
         value = self.__dict__.get(name, None) if indict else getattr(self, name, None)
         if value is None:

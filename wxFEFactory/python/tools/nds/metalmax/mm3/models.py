@@ -27,12 +27,12 @@ class Person(Model):
     equip_hand = WordField(0x021A0C00, label="手部装备")
     equip_foot = WordField(0x021A0C02, label="脚部装备")
     equip_orn = WordField(0x021A0C04, label="装饰")
-    skills = ArrayField(0x021A0C06, 9, ModelField(0, ItemInfo)) # (技能, 次数)数组
+    skills = ArrayField(0x021A0C06, 9, ModelField(0, ItemInfo))  # (技能, 次数)数组
     atk1 = WordField(0x021A0C20, label="武器1攻击力")
     atk2 = WordField(0x021A0C22, label="武器2攻击力")
     atk3 = WordField(0x021A0C24, label="武器3攻击力")
     defense = WordField(0x021A0C28, label="总防御力")
-    resistance = ArrayField(0x021A0C30, 6, MinuendFieldPrep(100, WordField(0))) # 火光电声气冰
+    resistance = ArrayField(0x021A0C30, 6, MinuendFieldPrep(100, WordField(0)))  # 火光电声气冰
 
 
 class ChariotEquipInfo(Model):
@@ -59,7 +59,7 @@ class Chariot(Model):
     # name = Field(0x021A1B8C, type=bytes, size=10)
     sp = WordField(0x21A1B9E, label="装甲")
     chassis = ModelField(0x021A1BA0, ChariotEquipInfo, label="底盘")
-    equips = ArrayField(0x021A1BB4, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,引擎2,洞1,洞2,洞3,洞4,洞5
+    equips = ArrayField(0x021A1BB4, 8, ModelField(0, ChariotEquipInfo), label="装备")  # C装置,引擎,引擎2,洞1~5
     items = ArrayField(0x021A1C54, 9, ModelField(0, ChariotItemInfo), label="道具")
     special_bullets = ArrayField(0x21A1DC6, 15, ModelField(0, ItemInfo), label="特殊炮弹")
 
@@ -89,7 +89,7 @@ class ChariotBattleStatus(Model):
 
 class BattleStatus(Model):
     SIZE = 0xB0
-    status = Field(0x021A5EF0) # 角色状态
+    status = Field(0x021A5EF0)  # 角色状态
     hp = WordField(0x021A5FE2, label="HP")
     hpmax = WordField(0x021A5FE0, label="HP最大值")
 
@@ -123,12 +123,12 @@ class Global(BaseGlobal):
     chariots = ArrayField(0, 12, ModelField(0, Chariot))
     chariot_battle_status = ArrayField(0, 4, ModelField(0, ChariotBattleStatus))
     money = Field(0x0219F768, label="金钱")
-    difficulty = ByteField(0x0219483D, label="难易度") # TODO
+    difficulty = ByteField(0x0219483D, label="难易度")  # TODO
     stamp = WordField(0x0219F7BE, label="印章")
-    game_turn = ByteField(0x021AA3E4, label="通关次数") # TODO
+    game_turn = ByteField(0x021AA3E4, label="通关次数")  # TODO
     game_time = Field(0x022AC6FC, label="游戏时间")
 
-    # allfax = ToggleField(0x0219E90B, size=6, enable=0xFFFFFFFFFFFF, label="传真全开") # TODO
+    # allfax = ToggleField(0x0219E90B, size=6, enable=0xFFFFFFFFFFFF, label="传真全开")  # TODO
     # allmap = ToggleFields()
     enemy_flash = ToggleFields(
         ToggleField(0x02087ADE, enable=0x2109, size=2, disable=0x7E81),
@@ -217,7 +217,7 @@ class Global(BaseGlobal):
     # 好感度
     favorability = ArrayField(0x021AB52E, 12, ByteField(0))
 
-    # 通缉名单状态01=逃走, 03=击破 
+    # 通缉名单状态01=逃走, 03=击破
     wanted_status = ArrayField(0x021AB503, 30, ByteField(0))
 
     # 连射

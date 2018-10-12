@@ -54,7 +54,7 @@ class Dictionary:
         """
         if is_bytes(data):
             char = 0
-            words = [] # 一句话
+            words = []  # 一句话
             result = []
             i = offset = -1
             length = len(data) - 1
@@ -65,8 +65,8 @@ class Dictionary:
 
                 if char == 0:
                     if (
-                        (not self.low_range) or (self.low_range[0] <= byte < self.low_range[1]) or
-                        (self.ctrl_low_range and self.ctrl_low_range[0] <= byte < self.ctrl_low_range[1])
+                        (not self.low_range) or (self.low_range[0] <= byte < self.low_range[1])
+                        or (self.ctrl_low_range and self.ctrl_low_range[0] <= byte < self.ctrl_low_range[1])
                     ):
                         # 读取到双字节码的低字节
                         char = byte
@@ -96,7 +96,7 @@ class Dictionary:
                             word = '[?%X]' % byte
                         words.append(word)
                 else:
-                    char = char << 8 | byte # 低字节在左边
+                    char = char << 8 | byte  # 低字节在左边
                     try:
                         words.append(self._code_char[char])
                     except Exception:
@@ -149,7 +149,7 @@ class Dictionary:
                     if con:
                         continue
                 print("warning: %s不在码表中" % ch)
-                
+
             if code > 0xFF:
                 result.append(code >> 8)
                 result.append(code & 0xFF)
@@ -171,13 +171,12 @@ class Dictionary:
 
         return [get_code(ch) for ch in text]
 
-
     def decode_it(self, data, buf=None, ignore_zero=False):
         """ 读到一句就返回
         :param ignore_zero: 不把00当作结束符
         """
         char = 0
-        words = [] # 一句话
+        words = []  # 一句话
         i = offset = -1
         it = iter(data)
 
@@ -194,8 +193,8 @@ class Dictionary:
 
             if char == 0:
                 if (
-                    (not self.low_range) or (self.low_range[0] <= byte < self.low_range[1]) or
-                    (self.ctrl_low_range and self.ctrl_low_range[0] <= byte < self.ctrl_low_range[1])
+                    (not self.low_range) or (self.low_range[0] <= byte < self.low_range[1])
+                    or (self.ctrl_low_range and self.ctrl_low_range[0] <= byte < self.ctrl_low_range[1])
                 ):
                     # 读取到双字节码的低字节
                     char = byte
@@ -229,7 +228,7 @@ class Dictionary:
                         word = '[?%X]' % byte
                     words.append(word)
             else:
-                char = char << 8 | byte # 低字节在左边
+                char = char << 8 | byte  # 低字节在左边
                 try:
                     words.append(self._code_char[char])
                 except Exception:
@@ -243,7 +242,6 @@ class Dictionary:
         return ''.join(words)
 
 
-
 def fmt2reg(fmt):
     return re.compile(re.escape(fmt).replace('\\%d', '(\\w+)'))
 
@@ -254,9 +252,9 @@ class CtrlCode:
     # print(cc.encode('多亏了{no.1 name[1]}的帮助', 3))
 
     FMT_START = '{'
-    FMT_END   = '}'
+    FMT_END = '}'
     FMT_START_LEN = len(FMT_START)
-    FMT_END_LEN   = len(FMT_END)
+    FMT_END_LEN = len(FMT_END)
 
     __slots__ = ('code', 'fmt', 'argc', 'reg')
 

@@ -1,14 +1,14 @@
-PED_POOL   = 0x00B74490
-ACTOR_POINTER_SELF   = 0x00B7CD98
+PED_POOL = 0x00B74490
+ACTOR_POINTER_SELF = 0x00B7CD98
 VEHICLE_POOL = 0x00B74494
 OBJECT_POOL = 0x00B7449C
 VEHICLE_POINTER_SELF = 0x00B6F980
 MAP_X_ADDR = 0x00BA67B8
 MAP_Y_ADDR = 0x00BA67BC
 
-PLAYER_PTR  = 0xB6F5F0
+PLAYER_PTR = 0xB6F5F0
 VEHICLE_PTR = 0xB6F3B8
-MONEY   = 0xB7CE50
+MONEY = 0xB7CE50
 WANTED_LEVEL_ADDR = 0xB7CD9C
 
 MAX_HEALTH_STAT_ADDR = 0xB793E0
@@ -32,9 +32,9 @@ FLYING_PROF_ADDR = 0xB7919C
 DAYS_IN_GAME_ADDR = 0xB79038
 CURR_HOUR_ADDR = 0xB70153
 CURR_MINUTE_ADDR = 0xB70152
-CURR_WEEKDAY_ADDR = 0xB7014E # 1 to 7
-GAME_SPEED_MS_ADDR = 0xB7015C # Defines how many ms = 1 second... default 1000, set to 1 for a headache
-GAME_SPEED_PCT_ADDR = 0xB7CB64 # defines the speed of the game, 1 = 100%, float
+CURR_WEEKDAY_ADDR = 0xB7014E  # 1 to 7
+GAME_SPEED_MS_ADDR = 0xB7015C  # Defines how many ms = 1 second... default 1000, set to 1 for a headache
+GAME_SPEED_PCT_ADDR = 0xB7CB64  # defines the speed of the game, 1 = 100%, float
 WEATHER_LOCK_ADDR = 0xC81318
 WEATHER_TO_GO_ADDR = 0xC8131C
 WEATHER_CURRENT_ADDR = 0xC81320
@@ -49,18 +49,18 @@ SYSTEM_TIME = 0xB7CB84
 
 FUNC_AddExplosion = 0x736A50
 
-FUNC_IsBoatModel         = 0x4c5a70
-FUNC_IsCarModel          = 0x4c5aa0
-FUNC_IsPlaneModel        = 0x4c5b30
-FUNC_IsBikeModel         = 0x4c5b60
+FUNC_IsBoatModel = 0x4c5a70
+FUNC_IsCarModel = 0x4c5aa0
+FUNC_IsPlaneModel = 0x4c5b30
+FUNC_IsBikeModel = 0x4c5b60
 FUNC_IsMonsterTruckModel = 0x4c5bc0
-FUNC_IsTrailerModel      = 0x4c5c50
-FUNC_IsHeliModel         = 0x4c5b00
+FUNC_IsTrailerModel = 0x4c5c50
+FUNC_IsHeliModel = 0x4c5b00
 
-FUNC_CAutomobile__Fix    = 0x6A3440
-FUNC_CPlane__Fix         = 0x6CABB0
-FUNC_CHeli__Fix          = 0x6C4530
-FUNC_CBike_Fix           = 0x6B7050
+FUNC_CAutomobile__Fix = 0x6A3440
+FUNC_CPlane__Fix = 0x6CABB0
+FUNC_CHeli__Fix = 0x6C4530
+FUNC_CBike_Fix = 0x6B7050
 
 FUNC_CStreaming__HasModelLoaded = 0x4044C0
 FUNC_CStreaming__RequestModel = 0x4087E0

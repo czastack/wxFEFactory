@@ -27,16 +27,16 @@ class Person(Model):
     equip_hand = WordField(0x02195DF4, label="手部装备")
     equip_foot = WordField(0x02195DF6, label="脚部装备")
     equip_orn = WordField(0x02195DF8, label="装饰")
-    skill_counts = ArrayField(0x02195DFB, 9, ByteField(0)) # 主职业技能剩余次数数组
-    subskill_counts = ArrayField(0x02195E16, 9, ByteField(0)) # 副职业技能剩余次数数组
+    skill_counts = ArrayField(0x02195DFB, 9, ByteField(0))  # 主职业技能剩余次数数组
+    subskill_counts = ArrayField(0x02195E16, 9, ByteField(0))  # 副职业技能剩余次数数组
     subprof = ByteField(0x02195E39, label="副职业")
-    subprof_levels = ArrayField(0x02195E3A, 6, ByteField(0)) # 副职业等级(猎人、机械师、战士、护士、摔跤手、艺术家)
-    subprof_exps = ArrayField(0x02195E40, 6, Field(0)) # 副职业经验
+    subprof_levels = ArrayField(0x02195E3A, 6, ByteField(0))  # 副职业等级(猎人、机械师、战士、护士、摔跤手、艺术家)
+    subprof_exps = ArrayField(0x02195E40, 6, Field(0))  # 副职业经验
     atk1 = WordField(0x02195E62, label="武器1攻击力")
     atk2 = WordField(0x02195E64, label="武器2攻击力")
     atk3 = WordField(0x02195E66, label="武器3攻击力")
     defense = WordField(0x02195E6A, label="总防御力")
-    resistance = ArrayField(0x02195E73, 6, MinuendFieldPrep(100, WordField(0))) # 火光电声气冰
+    resistance = ArrayField(0x02195E73, 6, MinuendFieldPrep(100, WordField(0)))  # 火光电声气冰
 
 
 class ChariotEquipInfo(Model):
@@ -64,7 +64,7 @@ class Chariot(Model):
     sp = WordField(0x02196D1C, label="装甲")
     hole_type = ArrayField(0x02196D1F, 5, ByteField(0), label="炮穴类型")
     chassis = ModelField(0x02196D24, ChariotEquipInfo, label="底盘")
-    equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo), label="装备") # C装置,引擎,C装置2/引擎2,洞1,洞2,洞3,洞4,洞5
+    equips = ArrayField(0x02196D38, 8, ModelField(0, ChariotEquipInfo), label="装备")  # C装置,引擎,C装置2/引擎2,洞1~5
     items = ArrayField(0x02196DD8, 9, ModelField(0, ChariotItemInfo), label="道具")
     special_bullets = ArrayField(0x02196F40, 15, ModelField(0, ItemInfo), label="特殊炮弹")
 

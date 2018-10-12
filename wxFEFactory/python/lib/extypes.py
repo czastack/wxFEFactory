@@ -24,7 +24,7 @@ class Dict:
     """
     usage:
         data = Dict({'a': 1})
-        print(data.a) # get 1
+        print(data.a)  # get 1
     """
     __slots__ = ('_data',)
 
