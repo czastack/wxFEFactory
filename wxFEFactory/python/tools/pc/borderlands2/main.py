@@ -29,6 +29,7 @@ class Main(AssemblyHacktool):
             self.render_global()
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
+        self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", (self._current_weapon, models.Weapon)), self.render_weapon)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange,
@@ -83,6 +84,12 @@ class Main(AssemblyHacktool):
     def render_character_ext(self):
         player_config = (self._player_config, models.PlayerConfig)
         ModelCoordWidget('coord', instance=player_config, savable=True)
+
+    def render_vehicle(self):
+        ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
+        ModelInput('mgr.vehicle_mgrs.0.boost.value', '载具1推进')
+        ModelInput('mgr.vehicle_mgrs.1.health.value', '载具2血量')
+        ModelInput('mgr.vehicle_mgrs.1.boost.value', '载具2推进')
 
     def render_ammo(self):
         for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹')):
