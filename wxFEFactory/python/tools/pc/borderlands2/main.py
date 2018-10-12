@@ -24,6 +24,8 @@ class Main(AssemblyHacktool):
 
     def render_main(self):
         character = (self._character, models.Character)
+        team_config = (self._team_config, models.TeamConfig)
+        weapon = (self._current_weapon, models.Weapon)
 
         with Group("global", "全局", self._global):
             self.render_global()
@@ -31,14 +33,23 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
         self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
-        self.lazy_group(Group("weapon", "武器", (self._current_weapon, models.Weapon)), self.render_weapon)
-        self.lazy_group(Groups("技能", self.weak.onNotePageChange,
-            addr=(self._team_config, models.TeamConfig)), self.render_skill)
+        self.lazy_group(Group("weapon", "武器", weapon), self.render_weapon)
+        self.lazy_group(Group("team", "团队", team_config), self.render_team)
+        self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
 
     def render_global(self):
-        pass
+        system_config = (lambda: self._global.mgr.system_config, models.SystemConfig)
+        physics_config = (lambda: self._global.mgr.player_mgr.physics_config, models.PhysicsConfig)
+
+        ModelInput('time_scale_multiplier', instance=system_config)
+        ModelInput('gravity', instance=system_config)
+
+        ModelInput('move_speed', instance=physics_config)
+        ModelInput('jump_height', instance=physics_config)
+        ModelInput('friction', instance=physics_config)
+        ModelInput('viewing_height', instance=physics_config)
 
     def render_character(self):
         health = (self._character_health, models.ShieldHealth)
@@ -67,8 +78,8 @@ class Main(AssemblyHacktool):
         ModelInput('scaled_maximum', instance=experience)
         ModelInput('base_maximum', instance=experience)
         ModelInput('multiplier', instance=experience)
-        ModelInput('to_next_level', instance=experience)
 
+        ModelInput('exp_next_level')
         ModelInput('level')
         ModelInput('money')
         ModelInput('eridium')
@@ -84,6 +95,9 @@ class Main(AssemblyHacktool):
     def render_character_ext(self):
         player_config = (self._player_config, models.PlayerConfig)
         ModelCoordWidget('coord', instance=player_config, savable=True)
+
+        ModelInput('player_visibility', instance=player_config).set_help('216: 对敌人不可见')
+        ModelInput('move_speed_mult', instance=player_config)
 
     def render_vehicle(self):
         ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
@@ -114,6 +128,10 @@ class Main(AssemblyHacktool):
         ModelInput('item_price')
         ModelInput('item_quantity')
         ModelInput('item_state')
+
+    def render_team(self):
+        ModelInput('team_ammo_regen')
+        ModelInput('badass_tokens')
 
     def render_skill(self):
         with Group('main_skill', "主技能"):

@@ -61,7 +61,6 @@ class ShieldHealth(Value):
 class Experience(Value):
     """经验值"""
     multiplier = FloatField(0x118, label='经验倍数')
-    to_next_level = Field(0x25C, label='到下级经验值')
 
 
 class Character(Model):
@@ -75,6 +74,7 @@ class Character(Model):
     experience = ModelPtrField((0xA4, 0xB58), Experience)
     melee_overide_cooldown = FloatField((0xA4, 0xB70, 0x6C))
     level = Field(0x258, label='等级')
+    exp_next_level = Field(0x25C, label='到下级经验值')
     skill_points = Field(0x274, label='技能点数')
     head = Field(0x55C, label='头像')
     skin = Field(0x56C, label='皮肤')
@@ -89,7 +89,7 @@ class SecondWind(Model):
 class PlayerConfig(Model):
     """玩家属性"""
     player_model_scale = FloatField(0x78, label='角色模型大小')
-    player_visibility = FloatField(0xBF, label='角色能见度')
+    player_visibility = ByteField(0xBF, label='角色能见度')
     move_speed_mult = FloatField(0x310, label='移动速度倍数')
     current_weapon = ModelPtrField(0x470, Weapon)
     second_wind = ModelPtrField((0x6A4, 0x68), SecondWind)
@@ -156,7 +156,7 @@ class PhysicsConfig(Model):
     """物理属性"""
     move_speed = FloatField(0x2A8, label='移动速度')
     jump_height = FloatField(0x2EC, label='跳跃高度')
-    friction = FloatField(0x2D8, label='移动速度')
+    friction = FloatField(0x2D8, label='摩擦力')
     viewing_height = FloatField(0x350, label='可视高度')
 
 
