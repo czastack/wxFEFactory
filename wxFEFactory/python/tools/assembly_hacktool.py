@@ -227,11 +227,12 @@ class AssemblyHacktool(BaseHackTool):
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
 
-    def get_variable_value(self, name):
+    def get_variable_value(self, name, default=None):
         """变量值读取"""
         variable = self.get_variable(name)
         if variable:
             return self.handler.read(variable.addr, variable.type, variable.size)
+        return default
 
     def set_variable_value(self, name, value):
         """变量值写入"""

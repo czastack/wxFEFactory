@@ -115,7 +115,10 @@ class Main(AssemblyHacktool):
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)
+        ModelInput('display_level')
         ModelInput('actual_level')
+        ModelInput('item_actual_level')
+        ModelInput('specification_level')
         ModelInput('base_damage')
         ModelInput('base_accuracy')
         ModelInput('base_fire_rate')
@@ -230,6 +233,10 @@ class Main(AssemblyHacktool):
                     b'\xE9\x0A\x00\x00\x00\xC7\x05', assembly_code.Variable('mission_timer_loaded'),
                     b'\x00\x00\x00\x00',),
                 inserted=True, replace_len=6, args=('mission_timer_loaded', 'mission_timer_temp')),
+            AssemblyItem('selected_item', '选中的物品', b'\x8B\x81\xD0\x01\x00\x00\xC3\xCC\xCC',
+                0x00EA0000, 0x00EB0000, b'',
+                AssemblyGroup(b'\x89\x0D', assembly_code.Variable('selected_item_addr'), b'\x8B\x81\xD0\x01\x00\x00'),
+                inserted=True, replace_len=6, args=('selected_item_addr',)),
         )
         super().render_assembly_functions(functions)
 
@@ -247,6 +254,7 @@ class Main(AssemblyHacktool):
         return (
             (0, VK.H, this.pull_through),
             (0, VK.P, this.vehicle_full),
+            (0, VK.B, this.go_forward),
         )
 
     def _character(self):
@@ -273,7 +281,11 @@ class Main(AssemblyHacktool):
 
     def _current_weapon(self):
         player_config = self._player_config()
-        return player_config and player_config.current_weapon
+        weapon = player_config and player_config.current_weapon
+        if weapon:
+            if not weapon.addr:
+                weapon.addr = self.get_variable_value('selected_item_addr', 0)
+        return weapon
 
     def _team_config(self):
         return self._global.mgr.team_config
@@ -290,6 +302,13 @@ class Main(AssemblyHacktool):
         shield = self._character_shield()
         if shield:
             shield.value_max()
+
+    def go_forward(self):
+        player_config = self._player_config()
+        if player_config:
+            vector = player_config.move_vector.values()
+            coord = player_config.coord
+            coord += (vector[0] * 5, vector[1] * 5, vector[2] * 3)
 
     def vehicle_full(self):
         vehicle_mgrs = self._global.mgr.vehicle_mgrs

@@ -20,7 +20,9 @@ class WeaponAmmo(Value):
 
 class Weapon(Model):
     display_level = Field(0x1E0, label='显示等级')
-    actual_level = Field(0xE3C, label='实际等级')
+    specification_level = Field(0x1E4, label='作用等级')
+    actual_level = Field(0xE3C, label='武器实际等级')
+    item_actual_level = Field(0x8B4, label='物品实际等级')
     calculated_damage = FloatField(0x8E8, label='计算伤害')
     base_damage = FloatField(0x8EC, label='基本伤害')
     calculated_accuracy = FloatField(0x8D4, label='计算精准率')

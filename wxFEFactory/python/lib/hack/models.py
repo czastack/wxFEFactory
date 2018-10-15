@@ -548,6 +548,24 @@ class CoordData:
     def __setitem__(self, i, value):
         return self.instance.handler.write(self.addr + i * self.owner.field_size, self.owner.type(value))
 
+    def __iadd__(self, value):
+        if hasattr(value, '__iter__'):
+            for i, it in enumerate(value):
+                self[i] += it
+        else:
+            for i in range(self.len):
+                self[i] += value
+        return self
+
+    def __imul__(self, value):
+        if hasattr(value, '__iter__'):
+            for i, it in enumerate(value):
+                self[i] *= it
+        else:
+            for i in range(self.len):
+                self[i] *= value
+        return self
+
     def __iter__(self):
         self._pos = 0
         return self
@@ -564,6 +582,20 @@ class CoordData:
 
     def __repr__(self):
         return self.__class__.__name__ + str(tuple(self.values()))
+
+    class Item:
+        def __init__(self, i):
+            self.i = i
+
+        def __get__(self, instance, ownner=None):
+            return instance[self.i]
+
+        def __set__(self, instance, value):
+            instance[self.i] = value
+
+    x = Item(0)
+    y = Item(1)
+    z = Item(2)
 
 
 class ArrayField(Cachable, Field):

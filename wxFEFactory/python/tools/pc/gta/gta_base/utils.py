@@ -2,15 +2,19 @@ from functools import reduce
 import math
 PI = math.pi
 
+
 def degreeToRadian(degrees):
     return degrees * (PI / 180.0)
+
 
 def radianToDegree(radian):
     return radian / PI * 180.0
 
+
 def headingToDirection(heading):
     heading = degreeToRadian(heading)
     return -math.sin(heading), math.cos(heading)
+
 
 def get_vertical_vector(v):
     """获取一个垂直的向量"""
@@ -94,11 +98,11 @@ class Vector:
 
     @property
     def length(self):
-        return math.sqrt(reduce(lambda a, b: a + b*b, self, 0))
+        return math.sqrt(reduce(lambda a, b: a + b * b, self, 0))
 
     def normalize(self):
         length = self.length
-        
+
         if length == 0 or length == 1:
             return
 
@@ -116,11 +120,11 @@ class Vector:
         def __init__(self, i):
             self.i = i
 
-        def __get__(self, obj, type):
-            return obj[self.i]
+        def __get__(self, instance, ownner=None):
+            return instance[self.i]
 
-        def __set__(self, obj, value):
-            obj[self.i] = value
+        def __set__(self, instance, value):
+            instance[self.i] = value
 
 
 class Vector2(Vector):
@@ -161,9 +165,9 @@ class Quaternion(Vector3):
 
     def to_rotation(self):
         x, y, z, w = self
-        pitch = math.atan2(2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
-        yaw   = math.atan2(2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
-        roll  = math.asin(-2.0 * (x*z - w*y))
+        pitch = math.atan2(2.0 * (y * z + w * x), w * w - x * x - y * y + z * z)
+        yaw = math.atan2(2.0 * (x * y + w * z), w * w + x * x - y * y - z * z)
+        roll = math.asin(-2.0 * (x * z - w * y))
         return Vector3((pitch, roll, yaw))
 
     @classmethod
@@ -171,11 +175,11 @@ class Quaternion(Vector3):
         """
         :param rotation: Vector3 object
         """
-        WorldUp    = Vector3((0.0, 0.0, 1.0))
-        WorldEast  = Vector3((1.0, 0.0, 0.0))
+        WorldUp = Vector3((0.0, 0.0, 1.0))
+        WorldEast = Vector3((1.0, 0.0, 0.0))
         WorldNorth = Vector3((0.0, 1.0, 0.0))
 
-        qyaw  = cls.rotation_axis(WorldUp, rotation.x)
+        qyaw = cls.rotation_axis(WorldUp, rotation.x)
         qyaw.normalize()
         qpitch = cls.rotation_axis(WorldEast, rotation.y)
         qpitch.normalize()
@@ -184,7 +188,7 @@ class Quaternion(Vector3):
         yawpitch = qyaw * qpitch * qroll
         yawpitch.normalize()
         return yawpitch
-    
+
     @classmethod
     def rotation_axis(cls, axis, angle):
         """
