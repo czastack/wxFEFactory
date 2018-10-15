@@ -29,7 +29,7 @@ class FeHack(BaseGbaHack):
     def render_global(self):
         ModelInput("money", "金钱")
         ModelInput("turns", "回合")
-        ModelInput("random", "乱数").view.setToolTip("设成0: 招招命中、必杀、贯通等，升级7点成长")
+        ModelInput("random", "乱数").set_help("设成0: 招招命中、必杀、贯通等，升级7点成长")
         ModelSelect("chapter", "章节", choices=self.datasets.CHAPTERS)
         ModelCheckBox("inf_move", "无限行动")
         ModelCheckBox("item_count_keep", "武器耐久度不减")
@@ -41,7 +41,7 @@ class FeHack(BaseGbaHack):
 
     def render_char(self):
         datasets = self.datasets
-        ModelInput("addr_hex", "R键地址", readonly=True).view.setToolTip("R键人物详情中人物属性")
+        ModelInput("addr_hex", "R键地址", readonly=True).set_help("R键人物详情中人物属性")
         ModelInput("no", "序号")
         ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
         ModelInput("level", "等级")
@@ -62,7 +62,7 @@ class FeHack(BaseGbaHack):
         ModelSelect("status", "状态种类", choices=datasets.STATUS)
         ModelInput("status_turn", "状态持续")
         for i, label in enumerate(("剑", "枪", "斧", "弓", "杖", "理", "光", "暗")):
-            ModelInput("proficiency.%d" % i, "%s熟练度" % label).view.setToolTip(
+            ModelInput("proficiency.%d" % i, "%s熟练度" % label).set_help(
                 "E级:1 D级:31 C级:71 B级:121 A级:181 S级:251")
 
     def render_char_items(self):

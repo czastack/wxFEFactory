@@ -136,11 +136,11 @@ def align4(n):
     return n
 
 
-def align8(n):
+def align_size(n, p):
     """对齐8字节"""
-    tail = n & 7
+    tail = n & (p - 1)
     if tail:
-        n += 8 - tail
+        n += p - tail
     return n
 
 

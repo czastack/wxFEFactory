@@ -156,7 +156,7 @@ class AssemblyHacktool(BaseHackTool):
                         # ptr jmp
                         jmp_len = 7
                         memory_conflict = memory == self.next_usable_memory
-                        temp = self.register_variable(item.key + '_jmp', 8).addr
+                        temp = self.register_variable(VariableType(item.key + '_jmp', size=8)).addr
                         if memory_conflict:
                             memory = self.next_usable_memory
                             self.handler.write_ptr(temp, memory)
@@ -201,29 +201,23 @@ class AssemblyHacktool(BaseHackTool):
             find_end += base_addr
         return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
 
-    def register_variable(self, name, size=4, value=0):
+    def register_variable(self, variable, value=0):
         """注册变量"""
         self.insure_memory()
-        type = int
-        if isinstance(name, tuple):
-            if len(name) > 1:
-                size = name[1]
-            if len(name) > 2:
-                value = name[2]
-            if len(name) > 3:
-                type = name[3]
-            if size > 8:
-                type = bytes
-            name = name[0]
-        variable = self.registed_variable.get(name, None)
-        if variable is None:
-            if isinstance(name, VariableType):
-                variable = name.clone()
-                variable.addr = self.next_usable_memory
-            else:
-                variable = VariableType(self.next_usable_memory, size, type)
-            self.registed_variable[name] = variable
-            self.next_usable_memory += utils.align4(size)
+        if isinstance(variable, str):
+            variable = VariableType(variable)
+        elif isinstance(variable, tuple):
+            variable = VariableType(*variable)
+        temp = self.registed_variable.get(variable.name, None)
+        if temp is None:
+            if variable.addr:
+                variable = variable.clone()
+            align = variable.align or variable.size
+            variable.addr = utils.align_size(self.next_usable_memory, align)
+            self.registed_variable[variable.name] = variable
+            self.next_usable_memory += utils.align_size(variable.size, align)
+        else:
+            variable = temp
         if value is not 0:
             self.handler.write(variable.addr, value, size)
         return variable
@@ -296,4 +290,5 @@ AssemblyItem = DataClass(
 
 AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
 
-VariableType = DataClass('VariableType', ('addr', 'size', 'type'))
+VariableType = DataClass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
+    defaults={'size': 4, 'type': int, 'value': 0})

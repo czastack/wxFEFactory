@@ -2,7 +2,7 @@ from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
+from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
 from tools.assembly_code import AssemblyGroup, Variable
 from tools import assembly_code
 from fefactory_api import ui
@@ -48,7 +48,7 @@ class Main(AssemblyHacktool):
                         ),
                         b'\x48\x85\xDB\x74\x09\x66\xC7\x83\x32\x02\x00\x00\x0F\x27\x5B\x48\x83\xB9\xD0\x01\x00\x00\x00'
                     ),
-                    args=(('vehicle_addr', 8),),
+                    args=(VariableType('vehicle_addr', size=8),),
                     inserted=True),
                 AssemblyItem('vehicle_health_inf2', None, b'\x0F\xB7\x97\x32\x02\x00\x00\x48\x8B\x07',
                     0x3B00000, 0x3C00000, b'',
@@ -81,7 +81,7 @@ class Main(AssemblyHacktool):
                         b'\x41\x8B\x94\x24\x24\x02\x00\x00\x48\x8B\x4E\x60\x48\x81\xC1\x80\x09\x00\x00'
                         b'\x8B\x9C\x91\xF0\x01\x00\x00\x89\x9C\x91\xB0\x01\x00\x00\x5B\x5A\x59'
                         b'\x41\x83\xBC\x24\x24\x02\x00\x00\x04'),
-                    args=(('rapid_fire_temp', 8),),
+                    args=(VariableType('rapid_fire_temp', size=8),),
                     inserted=True,
                     replace_len=9),
                 AssemblyItem('rapid_fire2', None, b'\xF3\x0F\x10\x87\x98\x01\x00\x00\x0F\x2F\xC6',

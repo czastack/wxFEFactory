@@ -31,8 +31,8 @@ class Weapon(Model):
     base_projectile_speed = FloatField(0xEB8, label='基本子弹速')
     calculated_reload_speed = FloatField(0xA30, label='计算换弹速')
     base_reload_speed = FloatField(0xA34, label='基本换弹速')
-    calculated_burst_length = Field(0xAFC, label='计算爆发长度 (0=Auto)')
-    base_burst_length = Field(0xB00, label='基本爆发长度 (0=Auto)')
+    calculated_burst_length = Field(0xAFC, label='计算爆发长度')  # 0: Auto
+    base_burst_length = Field(0xB00, label='基本爆发长度')
     calculated_projectiles_per_shot = Field(0xDB8, label='计算射击子弹数')
     base_projectiles_per_shot = Field(0xDBC, label='基本射击子弹数')
     calculated_bullets_used = Field(0x9DC, label='计算使用子弹')
@@ -81,9 +81,9 @@ class Character(Model):
 
 
 class SecondWind(Model):
-    """恢复元气"""
-    multiplier = FloatField(0x650, label='倍数')
-    fight_time_multiplier = FloatField(0x434, label='倍数')
+    """原地复活"""
+    multiplier = FloatField(0x650, label='生命倍数')
+    fight_time_multiplier = FloatField(0x434, label='时间倍数')
 
 
 class PlayerConfig(Model):

@@ -4,7 +4,7 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch
+from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
 from tools.assembly_code import AssemblyGroup, Variable
 from tools import assembly_code
 from fefactory_api import ui
@@ -33,7 +33,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
         self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
-        self.lazy_group(Group("weapon", "武器", weapon), self.render_weapon)
+        self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("team", "团队", team_config), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
@@ -94,10 +94,12 @@ class Main(AssemblyHacktool):
 
     def render_character_ext(self):
         player_config = (self._player_config, models.PlayerConfig)
-        ModelCoordWidget('coord', instance=player_config, savable=True)
 
+        ModelCoordWidget('coord', instance=player_config, savable=True)
         ModelInput('player_visibility', instance=player_config).set_help('216: 对敌人不可见')
         ModelInput('move_speed_mult', instance=player_config)
+        ModelInput('second_wind.multiplier', '原地复活生命倍数', instance=player_config)
+        ModelInput('second_wind.fight_time_multiplier', '原地复活时间倍数', instance=player_config)
 
     def render_vehicle(self):
         ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
@@ -112,11 +114,13 @@ class Main(AssemblyHacktool):
             ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度')
 
     def render_weapon(self):
+        ModelInput('addr_hex', '地址', readonly=True)
         ModelInput('actual_level')
         ModelInput('base_damage')
         ModelInput('base_accuracy')
         ModelInput('base_fire_rate')
         ModelInput('base_projectile_speed')
+        ModelInput('calculated_projectile_speed')
         ModelInput('base_reload_speed')
         ModelInput('base_burst_length')
         ModelInput('base_projectiles_per_shot')
@@ -179,7 +183,8 @@ class Main(AssemblyHacktool):
                     assembly_code.Variable('minus_one'), b'\xF3\x0F\x59\xCC\xF3\x0F\x11\x4D\x08\x0F\xAE\x0D',
                     assembly_code.Variable('fxbuff'), b'\xF3\x0F\x58\x45\x08'
                 ),
-                inserted=True, replace_len=5, args=(('fxbuff', 512), ('minus_one', 4, 0xBF800000))),
+                inserted=True, replace_len=5,
+                args=(VariableType('fxbuff', size=512, align=16), VariableType('minus_one', value=0xBF800000))),
             AssemblyItem('ammo_inf2', '无需换弹', b'\x3B\xC1\x7C\x0B\x8B\x55\x0C\x89\x02\x8B\xE5\x5D\xC2\x08\x00',
                 0x002A0000, 0x002B0000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
                 inserted=True, replace_len=5, replace_offset=7),
@@ -197,7 +202,7 @@ class Main(AssemblyHacktool):
                 AssemblyGroup(b'\x83\xFE\x07\x0F\x84\x14\x00\x00\x00\x83\xFE\x08\x0F\x84\x0B\x00\x00\x00\x8B\x0D',
                     assembly_code.Variable('ammo_upgrade_level'),
                     b'\x01\x0C\xB0\xEB\x03\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00'),
-                inserted=True, args=(('ammo_upgrade_level', 4, 100),)),
+                inserted=True, args=(VariableType('ammo_upgrade_level', value=100),)),
             AssemblyItem('super_speed_jump', '超级速度和跳跃', b'\xF3\x0F\x11\x44\x24\x04\xF3\x0F\x10\x43\x08\x8D\x95',
                 0x00DF0000, 0x00E00000, b'',
                 AssemblyGroup(b'\xF3\x0F\x10\x05', assembly_code.Variable('super_jump_mult'),
@@ -206,9 +211,9 @@ class Main(AssemblyHacktool):
                     b'\xF3\x0F\x59\x05', assembly_code.Variable('super_speed_mult'),
                     b'\xF3\x0F\x11\x44\x24\x04',),
                 inserted=True, replace_len=6, args=(
-                    ('super_speed_mult', 4, 0x40000000, float),
-                    ('super_jump_mult', 4, 0x3FA00000, float),
-                    ('super_jump_store', 4, 0x441D8000, float),
+                    VariableType('super_speed_mult', type=float, value=0x40000000),
+                    VariableType('super_jump_mult', type=float, value=0x3FA00000),
+                    VariableType('super_jump_store', type=float, value=0x441D8000),
                 )),
             AssemblyItem('instant_main_skill_timer', '主动技能时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
                 0x002B0000, 0x002C0000, b'',
@@ -241,6 +246,7 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (0, VK.H, this.pull_through),
+            (0, VK.P, this.vehicle_full),
         )
 
     def _character(self):
@@ -284,3 +290,13 @@ class Main(AssemblyHacktool):
         shield = self._character_shield()
         if shield:
             shield.value_max()
+
+    def vehicle_full(self):
+        vehicle_mgrs = self._global.mgr.vehicle_mgrs
+        if vehicle_mgrs.addr:
+            if vehicle_mgrs[0].addr:
+                vehicle_mgrs[0].boost.value_max()
+                vehicle_mgrs[0].health.value_max()
+            if vehicle_mgrs[1].addr:
+                vehicle_mgrs[1].boost.value_max()
+                vehicle_mgrs[1].health.value_max()
