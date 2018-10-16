@@ -138,6 +138,14 @@ def weakmethod(method):
     return method
 
 
+class classproperty:
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, instance, owner):
+        return self.method(owner)
+
+
 class _DataClass:
     __slots__ = ()
 

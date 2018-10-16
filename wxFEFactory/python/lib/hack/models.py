@@ -1,5 +1,5 @@
 from lib.utils import float32, Accumulator
-from lib.extypes import DataClass
+from lib.extypes import DataClass, classproperty
 from functools import partialmethod
 from types import SimpleNamespace
 
@@ -15,6 +15,21 @@ class Model:
             field = base.__dict__.get(name, None)
             if field:
                 return field
+
+    @classproperty
+    def field_names(cls):
+        field_names = getattr(cls, '_field_names', None)
+        if field_names is None:
+            field_names = cls._field_names = tuple(name for name, value in cls.__dict__.items()
+                if isinstance(value, FieldType))
+        return field_names
+
+    @classproperty
+    def fields(cls):
+        fields = getattr(cls, '_fields', None)
+        if fields is None:
+            fields = cls._fields = tuple(cls.field(name) for name in cls.field_names)
+        return fields
 
     @property
     def addr_hex(self):
@@ -172,13 +187,8 @@ class Model:
 
     def datasnap(self, fields=None):
         data = SimpleNamespace()
-        if fields:
-            for name in fields:
-                setattr(data, name, getattr(self, name))
-        else:
-            for name, value in self.__class__.__dict__:
-                if isinstance(value, Field):
-                    setattr(data, name, getattr(self, name))
+        for name in (fields if fields else self.field_names):
+            setattr(data, name, getattr(self, name))
         return data
 
 
@@ -192,6 +202,7 @@ class ManagedModel(Model):
 
 
 class LookAfterModel(Model):
+    """带字段拦截功能的Model"""
     own_fields = ()
 
     def __init_subclass__(cls):
