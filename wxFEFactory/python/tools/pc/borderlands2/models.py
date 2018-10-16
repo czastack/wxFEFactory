@@ -48,6 +48,14 @@ class Weapon(Model):
     item_quantity = Field(0x1D8, label='物品数量')
     item_state = Field(0x224, label='物品状态')  # Favorited, Crossed, Equipped, ect
 
+    def set_level(self, level):
+        """设置等级"""
+        self.display_level = self.specification_level = level
+        if self.actual_level:
+            self.actual_level = level
+        elif self.item_actual_level:
+            self.item_actual_level = level
+
 
 class VehicleManager(Model):
     boost = ModelPtrField((0x37C, 0x188), Value, label='推进剂')

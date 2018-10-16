@@ -36,6 +36,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("team", "团队", team_config), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
+        self.lazy_group(StaticGroup("功能"), self.render_functions)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
 
@@ -158,6 +159,9 @@ class Main(AssemblyHacktool):
         for i, item in enumerate(datasets.SKILL_NAMES):
             self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
 
+    def render_functions(self):
+        super().render_functions(('sync_weapon_level',))
+
     def render_assembly_functions(self):
         functions = (
             # AssemblyItems('子弹不减+精准+无后坐',
@@ -200,6 +204,9 @@ class Main(AssemblyHacktool):
                 0x00500000, 0x00510000, b'\xEB\x1D\x8A\x54'),
             AssemblyItem('raid_boss_before', '无限刷BOSS（杀怪前）', b'\x89\x44\xF7\x04\x5E\x5F',
                 0x00080000, 0x00090000, b'\x90\x90\x90\x90'),
+            AssemblyItem('raid_boss_after', '无限刷BOSS（杀怪后）', b'\x8B\x44\xF7\x04\x53\x50\xe8',
+                0x00850000, 0x00860000, b'', b'\xC7\x44\xF7\x04\x00\x00\x00\x00\x8B\x44\xF7\x04\x53',
+                replace_len=5, inserted=True),
             AssemblyItem('ammo_upgrade_mod', '弹药上限升级', b'\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00',
                 0x003B0000, 0x003C0000, b'',
                 AssemblyGroup(b'\x83\xFE\x07\x0F\x84\x14\x00\x00\x00\x83\xFE\x08\x0F\x84\x0B\x00\x00\x00\x8B\x0D',
@@ -237,6 +244,10 @@ class Main(AssemblyHacktool):
                 0x00EA0000, 0x00EB0000, b'',
                 AssemblyGroup(b'\x89\x0D', assembly_code.Variable('selected_item_addr'), b'\x8B\x81\xD0\x01\x00\x00'),
                 inserted=True, replace_len=6, args=('selected_item_addr',)),
+            AssemblyItem('faster_collecting', '快速收集任务物品', b'\xFF\x04\x99\x8B\x14\x99\x8D\x1C\x99\x89\x55\xFC',
+                0x00DA0000, 0x00DB0000, b'',
+                b'\x8B\x14\x99\x83\xC2\x05\x3B\x56\x44\x7E\x03\x8B\x56\x44\x89\x14\x99',
+                inserted=True, replace_len=6),
         )
         super().render_assembly_functions(functions)
 
@@ -319,3 +330,12 @@ class Main(AssemblyHacktool):
             if vehicle_mgrs[1].addr:
                 vehicle_mgrs[1].boost.value_max()
                 vehicle_mgrs[1].health.value_max()
+
+    def sync_weapon_level(self, _):
+        """同步武器等级"""
+        character = self._character()
+        level = character and character.level
+        if level:
+            weapon = self._current_weapon()
+            if weapon and weapon.addr:
+                weapon.set_level(level)
