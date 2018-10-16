@@ -39,6 +39,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(StaticGroup("功能"), self.render_functions)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
         system_config = (lambda: self._global.mgr.system_config, models.SystemConfig)
@@ -256,6 +257,13 @@ class Main(AssemblyHacktool):
         ModelInput('super_speed_mult', '超级速度倍数')
         ModelInput('super_jump_mult', '超级跳跃倍数')
 
+    def render_hotkeys(self):
+        ui.Text("H: 回复护甲+血量")
+        ui.Text("P: 回复推进+血量")
+        ui.Text("B: 前进")
+        ui.Text(";: 弹药全满")
+        ui.Text("/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
+
     def onattach(self):
         super().onattach()
         self._global.addr = self.handler.base_addr
@@ -266,6 +274,8 @@ class Main(AssemblyHacktool):
             (0, VK.H, this.pull_through),
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
+            (0, VK.getCode(';'), this.all_ammo_full),
+            (0, VK.getCode('/'), this.sync_weapon_level),
         )
 
     def _character(self):
@@ -319,7 +329,7 @@ class Main(AssemblyHacktool):
         if player_config:
             vector = player_config.move_vector.values()
             coord = player_config.coord
-            coord += (vector[0] * 5, vector[1] * 5, vector[2] * 3)
+            coord += (vector[0] * 5, vector[1] * 5, abs(vector[2] * 3))
 
     def vehicle_full(self):
         vehicle_mgrs = self._global.mgr.vehicle_mgrs
@@ -331,7 +341,11 @@ class Main(AssemblyHacktool):
                 vehicle_mgrs[1].boost.value_max()
                 vehicle_mgrs[1].health.value_max()
 
-    def sync_weapon_level(self, _):
+    def all_ammo_full(self):
+        for ammo in self._global.mgr.weapon_ammos:
+            ammo.value_max()
+
+    def sync_weapon_level(self, _=None):
         """同步武器等级"""
         character = self._character()
         level = character and character.level
