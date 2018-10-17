@@ -71,16 +71,15 @@ class Main(NativeHacktool):
         AtkDefItemsMgr(self.weak, '防御', 'def_items').render()
 
     def render_hotkeys(self):
-        with ui.Horizontal(className="fill padding"):
+        with ui.Horizontal(className="fill"):
             SearchListBox(className="expand",
                 choices=(item[1] for item in datasets.UNITS),
                 onselect=self.on_spawn_unit_type_change)
-            with ui.ScrollView(className="fill padding"):
-                ui.Text("选中单位恢复HP: alt+h")
-                ui.Text("选中建筑完成修建: alt+b")
-                ui.Text("选中单位死亡: alt+delete")
-                ui.Text("选中单位投诚: alt+f")
-                ui.Text("生成指定兵种单位: alt+v")
+            ui.Text("选中单位恢复HP: alt+h\n"
+                "选中建筑完成修建: alt+b\n"
+                "选中单位死亡: alt+delete\n"
+                "选中单位投诚: alt+f\n"
+                "生成指定兵种单位: alt+v", className="padding")
 
     def render_functions(self):
         super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',

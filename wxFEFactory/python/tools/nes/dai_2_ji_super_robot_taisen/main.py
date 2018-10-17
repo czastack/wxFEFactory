@@ -47,8 +47,7 @@ class Main(BaseNesHack):
         #         Input(name, None, addr, size=1)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("恢复HP: alt+h")
+            ui.Text("恢复HP: alt+h")
 
     def render_items(self):
         for i, item in enumerate(datasets.ITEMS):

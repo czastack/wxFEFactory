@@ -61,8 +61,7 @@ class Main(BaseGbaHack):
             self.render_functions(('max_ammo', 'fast_shoot'))
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("恢复HP: alt+h")
+            ui.Text("恢复HP: alt+h")
 
     def get_hotkeys(self):
         this = self.weak

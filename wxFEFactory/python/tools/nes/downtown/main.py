@@ -33,8 +33,7 @@ class Main(BaseNesHack):
                     ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("恢复HP: alt+h")
+            ui.Text("恢复HP: alt+h")
 
     def get_hotkeys(self):
         this = self.weak

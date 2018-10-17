@@ -36,10 +36,13 @@ class AssemblyHacktool(BaseHackTool):
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
-            self.assembly_buttons = {
-                item.key: ui.ToggleButton(label=item.label,
-                    onchange=partial(__class__.toggle_assembly_function, self.weak, item=item)) for item in functions
-            }
+            self.assembly_buttons = {}
+            for item in functions:
+                button = ui.ToggleButton(label=item.label,
+                    onchange=partial(__class__.toggle_assembly_function, self.weak, item=item))
+                if item.help:
+                    button.setToolTip(item.help)
+                self.assembly_buttons[item.key] = button
 
     def toggle_assembly_function(self, btn, item):
         checked = btn.checked
@@ -254,9 +257,10 @@ class VariableModel:
 
 
 class AssemblyItems:
-    def __init__(self, label, *children):
+    def __init__(self, label, *children, help=None):
         self.label = label
         self.children = children
+        self.help = help
 
     @property
     def key(self):
@@ -276,7 +280,7 @@ class AssemblyItems:
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly',
-        'find_range_from_base', 'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args'),
+        'find_range_from_base', 'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help'),
     defaults={
         'assembly': None,
         'find_range_from_base': True,

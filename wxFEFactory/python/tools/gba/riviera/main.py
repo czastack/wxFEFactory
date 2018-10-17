@@ -38,7 +38,8 @@ class Main(BaseGbaHack):
 
         with Group("event_items", "事件道具", self._global):
             for i, labels in enumerate(datasets.EVENT_ITEMS):
-                ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS, checkbtn=True)
+                ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
+                    checkbtn=True)
 
         with Group("person_battles", "战斗中", self._global, cols=4):
             for i in range(3):
@@ -61,11 +62,10 @@ class Main(BaseGbaHack):
 
         with StaticGroup("功能"):
             self.render_functions(('enable_addition', 'all_cg', 'all_item_book', 'all_music',
-                        'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'))
+                'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'))
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("恢复HP: alt+h")
+            ui.Text("恢复HP: alt+h")
 
     def get_hotkeys(self):
         return (

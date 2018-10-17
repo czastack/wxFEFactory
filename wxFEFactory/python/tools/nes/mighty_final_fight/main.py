@@ -23,9 +23,8 @@ class Main(BaseNesHack):
             ModelCheckBox("invincible", "无伤", enable=0xffff, disable=0)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("恢复HP: alt+h")
-                ui.Text("敌人一击必杀: alt+空格")
+            ui.Text("恢复HP: alt+h\n"
+                "敌人一击必杀: alt+空格")
 
     def get_hotkeys(self):
         this = self.weak

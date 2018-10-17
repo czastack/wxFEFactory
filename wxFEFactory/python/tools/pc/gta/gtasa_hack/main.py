@@ -187,12 +187,12 @@ class Main(BaseGTA3_VC_SA_Tool):
                 choices=(item[0] for item in VEHICLE_LIST))
             with ui.ScrollView(className="fill padding"):
                 self.render_common_text()
-                ui.Text("根据左边列表生产载具: alt+V")
-                ui.Text("瞬移到地图指针处: ctrl+alt+g")
-                ui.Text("瞬移到标记点: alt+shift+g")
-                ui.Text("切换转向并加速: alt+shift+m")
-                ui.Text("附近的车大风车: alt+r")
-                ui.Text("附近的人大风车: alt+shift+r")
+                ui.Text("根据左边列表生产载具: alt+V\n"
+                    "瞬移到地图指针处: ctrl+alt+g\n"
+                    "瞬移到标记点: alt+shift+g\n"
+                    "切换转向并加速: alt+shift+m\n"
+                    "附近的车大风车: alt+r\n"
+                    "附近的人大风车: alt+shift+r")
 
     def render_func(self):
         with ui.GridLayout(cols=4, vgap=10, className="expand"):

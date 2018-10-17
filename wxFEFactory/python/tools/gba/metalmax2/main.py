@@ -44,14 +44,7 @@ class Main(BaseGbaHack):
         self.lazy_group(Group("special_bullets", "特殊炮弹", self.chariot, cols=4), self.render_special_bullets)
         self.storage_group = Group("storage", "保管物品", self._global)
         self.lazy_group(self.storage_group, self.render_storage)
-
-        with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("左移: alt+left")
-                ui.Text("右移: alt+right")
-                ui.Text("上移: alt+up")
-                ui.Text("下移: alt+right")
-                ui.Text("恢复HP: alt+h")
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_human_items(self):
         for i in range(self.person.equips.length):
@@ -88,6 +81,13 @@ class Main(BaseGbaHack):
             ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values, dragable=True)
         with Group.active_group().footer:
             Pagination(self.on_storage_page, self.STORAGE_PAGE_TOTAL)
+
+    def render_hotkeys(self):
+        ui.Text("左移: alt+left\n"
+            "右移: alt+right\n"
+            "上移: alt+up\n"
+            "下移: alt+right\n"
+            "恢复HP: alt+h")
 
     def get_hotkeys(self):
         this = self.weak

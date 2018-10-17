@@ -226,7 +226,7 @@ class Main(AssemblyHacktool):
                     VariableType('super_jump_mult', type=float, value=0x3FA00000),
                     VariableType('super_jump_store', type=float, value=0x441D8000),
                 )),
-            AssemblyItem('instant_main_skill_timer', '主动技能时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
+            AssemblyItem('instant_main_skill_timer', '主动技能冷却时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
                 0x002B0000, 0x002C0000, b'',
                 b'\x8B\x84\x90\x88\x01\x00\x00\x85\xC0\x74\x0C\x83\xFA\x09\x75\x07\xC7\x40\x6C\x00\x00\x00\x00',
                 inserted=True, replace_len=7),
@@ -258,11 +258,11 @@ class Main(AssemblyHacktool):
         ModelInput('super_jump_mult', '超级跳跃倍数')
 
     def render_hotkeys(self):
-        ui.Text("H: 回复护甲+血量")
-        ui.Text("P: 回复推进+血量")
-        ui.Text("B: 前进")
-        ui.Text(";: 弹药全满")
-        ui.Text("/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
+        ui.Text("H: 回复护甲+血量\n"
+            "P: 回复推进+血量\n"
+            "B: 前进\n"
+            ";: 弹药全满\n"
+            "/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
 
     def onattach(self):
         super().onattach()

@@ -43,12 +43,11 @@ class Main(BaseNesHack):
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("左移: alt+left")
-                ui.Text("右移: alt+right")
-                ui.Text("上移: alt+up")
-                ui.Text("下移: alt+right")
-                ui.Text("恢复HP: alt+h")
+            ui.Text("左移: alt+left\n"
+                "右移: alt+right\n"
+                "上移: alt+up\n"
+                "下移: alt+right\n"
+                "恢复HP: alt+h")
 
     def render_human_items(self):
         for i in range(self.person.equips.length):

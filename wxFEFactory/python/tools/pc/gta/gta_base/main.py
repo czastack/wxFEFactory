@@ -653,42 +653,42 @@ class BaseGTATool(NativeHacktool):
         ui.Button("锁定载具迭代", onclick=self.iter_vehicle_lock)
 
     def render_common_text(self):
-        ui.Text("生产选中的载具: alt+v")
-        ui.Text("选中上一个载具: alt+[")
-        ui.Text("选中下一个载具: alt+]")
-        ui.Text("向前穿墙: alt+w")
-        ui.Text("向前穿墙大: alt+shift+w")
-        ui.Text("弹射起步: alt+m")
-        ui.Text("上天（有速度）: alt+空格")
-        ui.Text("往上（无速度）: alt+.")
-        ui.Text("下坠: alt+shift+空格")
-        ui.Text("停止移动: alt+x")
-        ui.Text("恢复HP: alt+h")
-        ui.Text("恢复大量HP: alt+shift+h")
-        ui.Text("跳上一辆车: alt+j")
-        ui.Text("附近的人上天: alt+f")
-        ui.Text("附近的人和载具上天: alt+shift+f")
-        ui.Text("自己的载具翻转: alt+k")
-        ui.Text("附近的载具翻转: alt+shift+k")
-        ui.Text("附近的人移到眼前: alt+shift+p")
-        ui.Text("附近的载具移到眼前: alt+p")
-        ui.Text("瞬移到上一个地点: alt+shift+,")
-        ui.Text("瞬移到下一个地点: alt+shift+.")
-        ui.Text("重新获取雷达上标记的目标: alt+'")
-        ui.Text("瞬移到下一个标记目标处: alt+/")
-        ui.Text("把获取到的标记目标移到眼前: alt+shift+/")
-        ui.Text("上一辆车锁门: alt+l")
-        ui.Text("上一辆车解锁: alt+shift+l")
-        ui.Text("载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d")
-        ui.Text("载具发射台(重新扫描): alt+shift+d")
-        ui.Text("生产载具并发射: alt+a")
-        ui.Text("爆破上次发射的载具: alt+shift+a")
-        ui.Text("把一辆车移到眼前: alt+b")
-        ui.Text("清除通缉等级: alt+0")
-        ui.Text("红莲之炼金术 (向前生成数个爆炸): alt+`")
-        ui.Text("红莲之炼金术 (长): alt+shift+`")
-        ui.Text("瞬移到目的地: alt+1")
-        ui.Text("自定义临时热键(执行tool.cfn): alt+c")
+        ui.Text("生产选中的载具: alt+v\n"
+            "选中上一个载具: alt+[\n"
+            "选中下一个载具: alt+]\n"
+            "向前穿墙: alt+w\n"
+            "向前穿墙大: alt+shift+w\n"
+            "弹射起步: alt+m\n"
+            "上天（有速度）: alt+空格\n"
+            "往上（无速度）: alt+.\n"
+            "下坠: alt+shift+空格\n"
+            "停止移动: alt+x\n"
+            "恢复HP: alt+h\n"
+            "恢复大量HP: alt+shift+h\n"
+            "跳上一辆车: alt+j\n"
+            "附近的人上天: alt+f\n"
+            "附近的人和载具上天: alt+shift+f\n"
+            "自己的载具翻转: alt+k\n"
+            "附近的载具翻转: alt+shift+k\n"
+            "附近的人移到眼前: alt+shift+p\n"
+            "附近的载具移到眼前: alt+p\n"
+            "瞬移到上一个地点: alt+shift+,\n"
+            "瞬移到下一个地点: alt+shift+.\n"
+            "重新获取雷达上标记的目标: alt+'\n"
+            "瞬移到下一个标记目标处: alt+/\n"
+            "把获取到的标记目标移到眼前: alt+shift+/\n"
+            "上一辆车锁门: alt+l\n"
+            "上一辆车解锁: alt+shift+l\n"
+            "载具发射台(扫描附件的车，依次把一辆车发射出去): alt+d\n"
+            "载具发射台(重新扫描): alt+shift+d\n"
+            "生产载具并发射: alt+a\n"
+            "爆破上次发射的载具: alt+shift+a\n"
+            "把一辆车移到眼前: alt+b\n"
+            "清除通缉等级: alt+0\n"
+            "红莲之炼金术 (向前生成数个爆炸): alt+`\n"
+            "红莲之炼金术 (长): alt+shift+`\n"
+            "瞬移到目的地: alt+1\n"
+            "自定义临时热键(执行tool.cfn): alt+c")
 
     def get_common_hotkeys(self):
         return (

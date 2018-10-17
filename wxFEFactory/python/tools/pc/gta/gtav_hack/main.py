@@ -152,17 +152,17 @@ class Main(BaseGTATool):
     def render_hotkey(self):
         with ui.ScrollView(className="fill"):
             self.render_common_text()
-            ui.Text("大加速: alt+shift+m")
-            ui.Text("生成选中的载具并进入: alt+shift+v")
-            ui.Text("当前武器子弹全满: alt+g")
-            ui.Text("瞬移到标记点: alt+shift+g")
-            ui.Text("瞬移到目的地: alt+1")
-            ui.Text("根据摄像机朝向设置当前实体的朝向: alt+e")
-            ui.Text("爆破最近的车: alt+o")
-            ui.Text("发射车载火箭: alt+r")
-            ui.Text("发射多枚车载火箭: alt+shift+r")
-            ui.Text("天降正义(导弹攻击敌人): alt+enter")
-            ui.Text("特殊能力能量充满: alt+capslock")
+            ui.Text("大加速: alt+shift+m\n"
+                "生成选中的载具并进入: alt+shift+v\n"
+                "当前武器子弹全满: alt+g\n"
+                "瞬移到标记点: alt+shift+g\n"
+                "瞬移到目的地: alt+1\n"
+                "根据摄像机朝向设置当前实体的朝向: alt+e\n"
+                "爆破最近的车: alt+o\n"
+                "发射车载火箭: alt+r\n"
+                "发射多枚车载火箭: alt+shift+r\n"
+                "天降正义(导弹攻击敌人): alt+enter\n"
+                "特殊能力能量充满: alt+capslock")
 
     def render_ped_model(self):
         from .datasets.player_models import PLAYER_MODELS

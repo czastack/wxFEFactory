@@ -50,12 +50,11 @@ class Main(BasePs2Hack):
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
         with StaticGroup("快捷键"):
-            with ui.ScrollView(className="fill"):
-                ui.Text("左移(目标战车坐标): alt+left")
-                ui.Text("右移: alt+right")
-                ui.Text("上移: alt+up")
-                ui.Text("下移: alt+right")
-                ui.Text("恢复HP: alt+h")
+            ui.Text("左移(目标战车坐标): alt+left\n"
+                "右移: alt+right\n"
+                "上移: alt+up\n"
+                "下移: alt+right\n"
+                "恢复HP: alt+h")
 
     def render_person(self):
         Choice("角色", datasets.PERSONS, self.on_person_change)
