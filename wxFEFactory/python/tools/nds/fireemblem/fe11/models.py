@@ -3,16 +3,17 @@ from ..models import ItemSlot, BaseGlobal
 
 
 class Person(Model):
-    SIZE = 0xA0
+    SIZE = 0xA8
     prof = Field(0x44)
-    level = ByteField(0x5A)
-    exp = ByteField(0x5B)
+    level = ByteField(0x6A)
+    level_limit = ByteField(0x63)
+    exp = ByteField(0x6B)
     no = ByteField(0x41)  # 头像、身份？
-    moved = ByteField(0x94)
-    posx = ByteField(0x5E)
-    posy = ByteField(0x5F)
-    hpmax = ByteField(0x50)
-    hp = ByteField(0x5C)
+    moved = ByteField(0x9C)
+    posx = ByteField(0x6E)
+    posy = ByteField(0x6F)
+    hpmax = ByteField(0x50)  # TODO
+    hp = ByteField(0x6C)
     power = ByteField(0x51)
     magic = ByteField(0x52)
     skill = ByteField(0x53)
@@ -20,24 +21,15 @@ class Person(Model):
     lucky = ByteField(0x55)
     defense = ByteField(0x56)
     magicdef = ByteField(0x57)
-    # physical_add = ByteField(26)
-    # together = ByteField(27)  # 同行人物序号
-    move_add = ByteField(0x5D)
-    items = ArrayField(0x60, 5, ModelField(0, ItemSlot))
-    proficiency = ArrayField(0x74, 6, ByteField(0))  # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
-    # status = ByteField(48)  # 状态种类
-    # status_turn = ByteField(49)  # 状态持续回合数
-    # support = ArrayField(50, 10, ByteField(0))  # 支援等级
+    move_add = ByteField(0x6D)
+    items = ArrayField(0x70, 5, ModelField(0, ItemSlot))
+    proficiency = ArrayField(0x84, 6, ByteField(0))  # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
 
 
 class Config(Model):
-    money = Field(0x0194)
-    difficulty = ByteField(0x01A9)
-    character_gender = ByteField(0x0298)
-    character_hair_style = ByteField(0x029D)
-    character_hair_color = ByteField(0x029E)
-    character_eye = ByteField(0x029F)
-    character_cloth = ByteField(0x02A0)
+    money = Field(0x0190)
+    difficulty = ByteField(0x01A5)
+    character_gender = False
 
 
 class ItemInfo(Model):
@@ -79,28 +71,30 @@ class ItemInfo(Model):
 class Global(BaseGlobal):
     # chapter = ByteField(0x0202BCFA)
     # turns = WordField(0x0202BCFC)
-    person_addr = Field(0x021BED30)
-    curx = ByteField(0x02273BD4)  # 0x02272EA4
-    cury = ByteField(0x02273BD5)  # 0x02272EA5
+    person_addr = Field(0x021986F4)
+    curx = ByteField(0x02273BD4)  # 0x02272EA4  # TODO
+    cury = ByteField(0x02273BD5)  # 0x02272EA5  # TODO
     # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
-    train_items = ArrayField(0x022C7420, 100, ModelField(0, ItemSlot))  # 运输队
-    ourturn = ToggleField(0x021CC278, enable=0xE3A01001, disable=0xE5D01000)
-    control_enemy = ToggleField(0x021D5674, enable=0xE1500000, disable=0xE1510000)
-    upgrade_max = ToggleField(0x02050AC0, enable=0xB1A06004, disable=0xB2866001)
-    upgrade_all = ToggleField(0x02050A98, enable=0xE1A00000, disable=0xAA000009)
+    train_items = ArrayField(0x021986D0, 100, ModelField(0, ItemSlot))  # 运输队
+    ourturn = ToggleField(0x021A9674, enable=0xE2812000, disable=0xE2812001)
+    control_enemy = ToggleField(0x021B1830, enable=0xE1500000, disable=0xE1510000)
+    upgrade_max = ToggleField(0x0203C474, enable=0xE1A09005, disable=0xB2899001)
+    upgrade_all = ToggleField(0x0203C44C, enable=0xE1A00000, disable=0xAA000009)
     lv1_can_transfer = ToggleField(0x02049EE0, enable=0x00000001, disable=0xE350000A)
-    can_train = ToggleField(0x021EBE08, enable=0xE3A00002, disable=0xEBF98E8F)
-    can_visit = ToggleField(0x021ECB14, enable=0xE3A00002, disable=0xEBF98B4C)
-    can_holddown = ToggleField(0x021EBBD8, enable=0xE3A00002, disable=0xEBF98F1B)
+    can_train = ToggleField(0x021C6F7C, enable=0xE3A00002, disable=0xEBF9D152)
+    can_visit = ToggleField(0x021ECB14, enable=0xE3A00002, disable=0xEBF98B4C)  # TODO
+    can_holddown = ToggleField(0x021C6E0C, enable=0xEBF9A61E, disable=0xEBF9D1AE)
     use_enemy_prof = ToggleField(0x021D4CEC, enable=0xEA000022, disable=0x1A000022)
-    infinite_refine = ToggleField(0x02069683, size=1, enable=0, disable=0xE3)
-    item_consume = ToggleField(0x02051650, size=2, enable=0x0000, disable=0x0001)
-    enemy_item_drop = ToggleField(0x021F8CE0, size=8, enable=0xE3500000E1D006B0, disable=0xE3100020E5D00063)
-    exp_rate = Field(0x021F4DA8)
-    pro_rate = Field(0x021F4F5C)
-    config = ModelPtrField(0x021BD44C, Config, 4)
-    # iteminfo_base = Field(0x0227A748)
-    _iteminfos = ArrayField(0x022AA97C, 0xff, ModelField(0, ItemInfo))
+    infinite_refine = ToggleField(0x02052618, size=2, enable=0, disable=0x0A01)
+    item_consume = ToggleField(0x0203CDD0, size=2, enable=0x0000, disable=0x0001)
+    enemy_item_drop = ToggleField(0x021D3114, size=8, enable=0xE3500000E1D006B0, disable=0xE3500020E5D10003)
+    exp_rate = Field(0x021CFACC)
+    pro_rate = Field(0x021CFC78)
+    config = ModelPtrField(0x02198120, Config, 4)
+    _iteminfos = ArrayField(0x022494E0, 0xff, ModelField(0, ItemInfo))
+
+    difficulty = ByteField(0x0227E6E5)  # 0201FF8C E3A00000
+    always_level_up = ToggleField(0x021CFAC4, enable=0xE3A02064, disable=0xE5D1206B)
 
     @property
     def _offset(self):

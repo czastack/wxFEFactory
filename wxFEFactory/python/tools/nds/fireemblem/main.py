@@ -1,5 +1,5 @@
 from ..base import BaseNdsHack
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, Label
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice, Label
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from fefactory_api import ui
@@ -51,11 +51,12 @@ class FeHack(BaseNdsHack):
     def render_config(self):
         datasets = self.datasets
         ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
-        ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
-        ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
-        ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
-        ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
-        ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
+        if self.models.Config.character_gender:
+            ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
+            ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
+            ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
+            ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
+            ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
 
     def render_person(self):
         datasets = self.datasets
@@ -76,7 +77,6 @@ class FeHack(BaseNdsHack):
         ModelInput("defense", "守备+")
         ModelInput("magicdef", "魔防+")
         ModelInput("lucky", "幸运+")
-        ModelInput("physical_add", "体格+")
         ModelInput("move_add", "移动+")
         # ModelSelect("status", "状态种类", choices=datasets.STATUS)
         # ModelInput("status_turn", "状态持续")
