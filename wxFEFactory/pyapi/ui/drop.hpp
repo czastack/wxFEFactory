@@ -11,7 +11,7 @@ public:
 	{
 		if (m_ondrop)
 		{
-			pycref ret = pyCall(m_ondrop, filenames);
+			pycref ret = PyCall(m_ondrop, filenames);
 			if (ret.ptr() == Py_False)
 			{
 				return false;
@@ -33,7 +33,7 @@ public:
 	{
 		if (m_ondrop)
 		{
-			pycref ret = pyCall(m_ondrop, text);
+			pycref ret = PyCall(m_ondrop, text);
 			if (ret.ptr() == Py_False)
 			{
 				return false;

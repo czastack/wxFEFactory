@@ -89,6 +89,6 @@ void destroyPyEnv()
 {
 	if (onAppExit)
 	{
-		pyCall(onAppExit);
+		PyCall(onAppExit);
 	}
 }

@@ -66,10 +66,10 @@ public:
 
 	void onClick(wxCommandEvent &event)
 	{
-		pycref onclick = pyDictGet(m_listeners, py::cast(event.GetId()));
+		pycref onclick = PyDictGet(m_listeners, py::cast(event.GetId()));
 		if (!onclick.is_none())
 		{
-			pyCall(onclick, py::cast(this), event.GetId());
+			PyCall(onclick, py::cast(this), event.GetId());
 		}
 	}
 
@@ -140,7 +140,7 @@ public:
 	StatusBar& setFieldsCount(pycref list)
 	{
 		int n;
-		auto ptr = asArray<int>(list, n);
+		auto ptr = PyToArray<int>(list, n);
 		ctrl().SetFieldsCount(n, ptr.get());
 		return *this;
 	}
@@ -148,7 +148,7 @@ public:
 	StatusBar& setItemWidths(pycref list)
 	{
 		int n;
-		auto ptr = asArray<int>(list, n);
+		auto ptr = PyToArray<int>(list, n);
 		ctrl().SetStatusWidths(n, ptr.get());
 		return *this;
 	}

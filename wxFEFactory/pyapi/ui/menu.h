@@ -41,7 +41,7 @@ public:
 
 	pyobj getMenu(int id)
 	{
-		return pyDictGet(*getHandlers(), py::cast(id));
+		return PyDictGet(*getHandlers(), py::cast(id));
 	}
 
 	void setMenu(int id, pycref item)

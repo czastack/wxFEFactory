@@ -59,12 +59,12 @@ namespace pybind11 {
 		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<hasAdd<ArrayType>::value>> {
 		public:
 			bool load(handle src, bool) {
-				addAll(value, py::reinterpret_borrow<py::object>(src));
+				wxArrayAddAll(value, py::reinterpret_borrow<py::object>(src));
 				return true;
 			}
 
 			static handle cast(const ArrayType &src, return_value_policy /* policy */, handle /* parent */) {
-				return asPyList(src);
+				return PyListFromArray(src);
 			}
 
 			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArray"));

@@ -46,7 +46,7 @@ public:
 
 	void handleEvent(pycref fn, wxPropertyGridEvent &event)
 	{
-		pycref ret = pyCall(fn, this, event.GetPropertyName());
+		pycref ret = PyCall(fn, this, event.GetPropertyName());
 		if (!PyObject_IsTrue(ret.ptr()))
 		{
 			event.Skip();
@@ -122,7 +122,7 @@ public:
 
 	void addArrayStringProperty(wxcstr title, wxcstr name, pycref help, const py::iterable &py_values) {
 		wxArrayString values;
-		addAll(values, py_values);
+		wxArrayAddAll(values, py_values);
 		Append(new wxArrayStringProperty(title, name, values), help);
 	}
 

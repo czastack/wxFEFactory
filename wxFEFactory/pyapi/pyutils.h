@@ -15,32 +15,32 @@ class wxArrayString;
 extern const py::none None;
 
 
+inline auto PyBytesGetBuff(const py::bytes &b)
+{
+	return PyBytes_AsString(b.ptr());
+}
+
 inline wxString pywxstr(const py::object & str, wxcstr def = wxNoneString)
 {
 	return str.is_none() ? def : str.cast<wxString>();
 }
 
-inline auto bytesGetBuff(const py::bytes &b)
-{
-	return PyBytes_AsString(b.ptr());
-}
-
 wxString& pystrcpy(wxString &text, const py::handle &h);
 
 
-void addAll(wxArrayString &array, py::iterable &items);
+void wxArrayAddAll(wxArrayString &array, py::iterable &items);
 
 /**
  * Dict getitem
  */
-py::object pyDictGet(pycref di, pycref key);
+py::object PyDictGet(pycref di, pycref key);
 
-inline py::object pyDictGet(pycref di, wxcstr key) {
-	return pyDictGet(di, py::str(key));
+inline py::object PyDictGet(pycref di, wxcstr key) {
+	return PyDictGet(di, py::str(key));
 }
 
 template<class T>
-T pyDictGet(pycref di, pycref key, T defval)
+T PyDictGet(pycref di, pycref key, T defval)
 {
 	if (!di.is_none())
 	{
@@ -55,14 +55,14 @@ T pyDictGet(pycref di, pycref key, T defval)
 }
 
 template<class T>
-T pyDictGet(pycref di, wxcstr key, T defval)
+T PyDictGet(pycref di, wxcstr key, T defval)
 {
-	return pyDictGet(di, py::str(key), defval);
+	return PyDictGet(di, py::str(key), defval);
 }
 
 
 template<class T>
-void addAll(T &array, pycref items)
+void wxArrayAddAll(T &array, pycref items)
 {
 	if (!items.is_none())
 	{
@@ -75,7 +75,7 @@ void addAll(T &array, pycref items)
 template<class T> class wxSharedPtr;
 
 template<class T>
-wxSharedPtr<T> asArray(pycref list, int &n)
+wxSharedPtr<T> PyToArray(pycref list, int &n)
 {
 	n = py::len(list);
 	T *data = new T[n];
@@ -88,7 +88,7 @@ wxSharedPtr<T> asArray(pycref list, int &n)
 }
 
 template<class T>
-pyobj asPyList(T &array)
+pyobj PyListFromArray(T &array)
 {
 	py::list list;
 	for (const auto &i : array)
@@ -99,7 +99,7 @@ pyobj asPyList(T &array)
 }
 
 template <typename... Args>
-py::object pyCall(const py::object & obj, Args &&...args) {
+py::object PyCall(const py::object & obj, Args &&...args) {
 	try {
 		return obj(std::forward<Args>(args)...);
 	}
@@ -121,7 +121,7 @@ inline py::handle getSelf(const T *ptr)
 /**
  * 在交互解释器中运行，保留结果
  */
-void py_interpreter_run(wxcstr line);
+void PyInterpreterRun(wxcstr line);
 
 
 #define ATTR_INT(obj, name, pre) PyObject_SetAttrString(obj, #name, PyLong_FromLong(pre##name))

@@ -114,7 +114,7 @@ pyobj CheckListBox::getCheckedItems()
 {
 	wxArrayInt items;
 	ctrl().GetCheckedItems(items);
-	return asPyList(items);
+	return PyListFromArray(items);
 }
 
 void CheckListBox::setCheckedItems(pyobj list)
@@ -302,8 +302,8 @@ void init_controls(py::module & m)
 	py::class_t<RearrangeList, CheckListBox>(m, "RearrangeList")
 		.def(py::init<pyobj, pyobj, pyobj, pyobj, pyobj>(),
 			choices, "order"_a = py::list(), onselect, className, style)
-		.def("moveUp", &RearrangeList::moveUp)
-		.def("moveDown", &RearrangeList::moveDown);
+		.def("MoveCurrentUp", [](RearrangeList *self) { self->ctrl().MoveCurrentUp(); })
+		.def("MoveCurrentDown", [](RearrangeList *self) { self->ctrl().MoveCurrentDown(); });
 
 	py::class_t<Choice, ControlWithItems>(m, "Choice")
 		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),

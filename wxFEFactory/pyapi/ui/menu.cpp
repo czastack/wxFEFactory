@@ -42,7 +42,7 @@ bool ContextMenu::onSelect(pycref view, int id)
 	else if (!m_onselect.is_none())
 	{
 		pycref item = getMenu(id);
-		pyCall(m_onselect, view, item);
+		PyCall(m_onselect, view, item);
 		return true;
 	}
 	return false;
@@ -68,7 +68,7 @@ bool MenuBar::onSelect(int id)
 	else if (!m_onselect.is_none())
 	{
 		pycref item = getMenu(id);
-		pyCall(m_onselect, item);
+		PyCall(m_onselect, item);
 		return true;
 	}
 	return false;
@@ -98,11 +98,11 @@ bool MenuItem::onSelect(pycref owner)
 	{
 		if (owner.is_none())
 		{
-			pyCall(m_onselect, py::cast(this));
+			PyCall(m_onselect, py::cast(this));
 		}
 		else
 		{
-			pyCall(m_onselect, owner, py::cast(this));
+			PyCall(m_onselect, owner, py::cast(this));
 		}
 		return true;
 	}

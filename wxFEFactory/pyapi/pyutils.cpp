@@ -17,7 +17,7 @@ wxString& pystrcpy(wxString &text, const py::handle &h) {
 	return text;
 }
 
-void addAll(wxArrayString &array, py::iterable &items)
+void wxArrayAddAll(wxArrayString &array, py::iterable &items)
 {
 	wxString text;
 	if (!items.is_none())
@@ -28,7 +28,7 @@ void addAll(wxArrayString &array, py::iterable &items)
 	}
 }
 
-py::object pyDictGet(pycref di, pycref key)
+py::object PyDictGet(pycref di, pycref key)
 {
 	if (!di.is_none())
 	{
@@ -43,7 +43,7 @@ py::object pyDictGet(pycref di, pycref key)
 }
 
 
-void py_interpreter_run(wxcstr line) {
+void PyInterpreterRun(wxcstr line) {
 	static PyObject *m = PyImport_AddModule("__main__");
 	static PyObject *d = PyModule_GetDict(m);
 

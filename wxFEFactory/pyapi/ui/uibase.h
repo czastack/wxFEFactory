@@ -160,7 +160,7 @@ public:
 
 	void handleEvent(pycref fn, wxEvent &event)
 	{
-		pycref ret = pyCall(fn, this);
+		pycref ret = PyCall(fn, this);
 		if (!PyObject_IsTrue(ret.ptr()))
 		{
 			event.Skip();
@@ -174,7 +174,7 @@ public:
 	template <typename EventTag>
 	void removeEvt(const EventTag& eventType, pycref fn)
 	{
-		py::object event_list = pyDictGet(m_event_table, py::int_((int)eventType));
+		py::object event_list = PyDictGet(m_event_table, py::int_((int)eventType));
 
 		if (!event_list.is_none())
 		{
@@ -254,7 +254,7 @@ public:
 		}
 		else
 		{
-			return pyDictGet(m_style, key, defval);
+			return PyDictGet(m_style, key, defval);
 		}
 	}
 

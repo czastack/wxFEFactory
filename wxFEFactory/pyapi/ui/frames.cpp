@@ -202,7 +202,7 @@ void HotkeyWindow::stopHotkey()
 void HotkeyWindow::onHotkey(wxKeyEvent & event)
 {
 	pycref hotkeyId = py::cast(event.GetId());
-	pycref ret = pyCall(m_hotkey_map[hotkeyId]);
+	pycref ret = PyCall(m_hotkey_map[hotkeyId]);
 	if (!PyObject_IsTrue(ret.ptr()))
 	{
 		event.Skip();
@@ -299,7 +299,7 @@ void KeyHookWindow::onKeyMsg(const ParamEvent &event)
 	py::int_ key(modifiers << 16 | event.wParam);
 	if (m_hotkey_map.contains(key))
 	{
-		pyCall(m_hotkey_map[key]);
+		PyCall(m_hotkey_map[key]);
 	}
 }
 

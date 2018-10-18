@@ -88,7 +88,7 @@ class Module(BaseListBoxModuel):
 
     def onListSelect(self, _):
         self._lastpos = self.listbox.index
-        item =self.data_list[self._lastpos]
+        item = self.data_list[self._lastpos]
         self.textarea.value = item['text']
         addr = item.get('addr', '')
         if addr:
@@ -99,14 +99,14 @@ class Module(BaseListBoxModuel):
             code = code
         self.code_view.value = code
 
-    def moveUp(self):
+    def move_up(self):
         """上移一项"""
         index = self.listbox.index
         if index != 0:
             self.data_list[index - 1], self.data_list[index] = self.data_list[index], self.data_list[index - 1]
             self.listbox.index = index - 1
 
-    def moveDown(self):
+    def move_down(self):
         """下移一项"""
         index = self.listbox.index
         if index != self.listbox.count - 1:

@@ -70,7 +70,7 @@ void View::startTextDrag(wxcstr text, pycref callback)
 	dragSource.SetData(data);
 	wxDragResult result = dragSource.DoDragDrop(wxDrag_AllowMove);
 	if (!callback.is_none()) {
-		pyCall(callback, this, (int)result);
+		PyCall(callback, this, (int)result);
 	}
 }
 
@@ -149,7 +149,7 @@ pyobj View::getStyle(wxcstr key)
 		}
 		return None;
 	}
-	return pyDictGet(m_style, key);
+	return PyDictGet(m_style, key);
 }
 
 bool View::hasStyle(pyobj & key)
@@ -175,10 +175,10 @@ bool View::hasStyle(pyobj & key)
 
 void View::testStyles(pycref styles)
 {
-	pycref typecase = pyDictGet(styles, wxT("type"), None);
-	pycref classcase = pyDictGet(styles, wxT("class"), None);
+	pycref typecase = PyDictGet(styles, wxT("type"), None);
+	pycref classcase = PyDictGet(styles, wxT("class"), None);
 
-	pyobj style = pyDictGet(typecase, getTypeName());
+	pyobj style = PyDictGet(typecase, getTypeName());
 	if (!style.is_none())
 	{
 		addStyle(style);
@@ -187,7 +187,7 @@ void View::testStyles(pycref styles)
 	{
 		for (auto &e : m_class)
 		{
-			style = pyDictGet(classcase, py::reinterpret_borrow<py::object>(e));
+			style = PyDictGet(classcase, py::reinterpret_borrow<py::object>(e));
 			if (!style.is_none())
 			{
 				addStyle(style);
@@ -196,7 +196,7 @@ void View::testStyles(pycref styles)
 	}
 	else
 	{
-		style = pyDictGet(classcase, m_class);
+		style = PyDictGet(classcase, m_class);
 		if (!style.is_none())
 		{
 			addStyle(style);
@@ -246,7 +246,7 @@ void View::applyStyle()
 		wxFont font = m_elem->GetFont();
 
 		// 字重
-		wxcstr weightStr = pyDictGet(style, wxT("weight"), wxNoneString);
+		wxcstr weightStr = PyDictGet(style, wxT("weight"), wxNoneString);
 		if (weightStr != wxNoneString)
 		{
 			font.SetWeight(
@@ -258,7 +258,7 @@ void View::applyStyle()
 		}
 
 		// 字体样式
-		wxcstr styleStr = pyDictGet(style, wxT("style"), wxNoneString);
+		wxcstr styleStr = PyDictGet(style, wxT("style"), wxNoneString);
 		if (styleStr != wxNoneString)
 		{
 			font.SetStyle(
@@ -269,8 +269,8 @@ void View::applyStyle()
 			);
 		}
 
-		font.SetUnderlined(pyDictGet(style, wxT("underline"), false));
-		font.SetFaceName(pyDictGet(style, wxT("face"), wxNoneString));
+		font.SetUnderlined(PyDictGet(style, wxT("underline"), false));
+		font.SetFaceName(PyDictGet(style, wxT("face"), wxNoneString));
 
 		m_elem->SetFont(font);
 	}
@@ -376,7 +376,7 @@ bool View::_bindEvt(int eventType, pycref fn, bool reset, bool pass_event)
 
 bool View::handleEvent(wxEvent & event)
 {
-	py::object event_list = pyDictGet(m_event_table, py::int_(event.GetEventType()));
+	py::object event_list = PyDictGet(m_event_table, py::int_(event.GetEventType()));
 
 	py::object callback;
 	py::object ret;
@@ -388,13 +388,13 @@ bool View::handleEvent(wxEvent & event)
 			callback = py::reinterpret_borrow<py::object>(e);
 			if (isPyDict(callback))
 			{
-				if (pyDictGet(callback, "arg_event", false))
+				if (PyDictGet(callback, "arg_event", false))
 				{
-					ret = pyCall(callback["callback"], this, &event);
+					ret = PyCall(callback["callback"], this, &event);
 				}
 			}
 			else {
-				ret = pyCall(callback, this);
+				ret = PyCall(callback, this);
 			}
 			if (!PyObject_IsTrue(ret.ptr()))
 			{

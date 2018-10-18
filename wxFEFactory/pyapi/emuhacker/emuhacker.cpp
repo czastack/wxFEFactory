@@ -60,7 +60,7 @@ namespace emuhacker {
 		{
 			if (size == 0)
 				size = PyBytes_Size(data.ptr());
-			return self.write(addr, bytesGetBuff(data), size);
+			return self.write(addr, PyBytesGetBuff(data), size);
 		}
 		else if (PyByteArray_Check(data.ptr()))
 		{
@@ -152,7 +152,7 @@ namespace emuhacker {
 		wxChar* prefix = std::get<1>(pArgs);
 		if (!prefix || wcsncmp(szWindowName, prefix, std::get<2>(pArgs)) == 0)
 		{
-			py::object ret = pyCall(std::get<0>(pArgs), (LPARAM)hWnd, szWindowName);
+			py::object ret = PyCall(std::get<0>(pArgs), (LPARAM)hWnd, szWindowName);
 			return PyObject_IsTrue(ret.ptr());
 		}
 		return TRUE;

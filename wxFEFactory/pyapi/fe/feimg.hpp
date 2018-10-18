@@ -22,10 +22,10 @@ public:
 		OffsetTilesData tilesData;
 		tilesData.tileStride = tileStride;
 
-		Palette24 palette = *(Palette16*)bytesGetBuff(pal);
+		Palette24 palette = *(Palette16*)PyBytesGetBuff(pal);
 		SetPalette(palette.toWxPalette());
 
-		tilesData.data = (Tile*)bytesGetBuff(tiles);
+		tilesData.data = (Tile*)PyBytesGetBuff(tiles);
 		for (auto &item : moveArgs)
 		{
 			const py::tuple &arg = item.cast<py::tuple>();
@@ -44,7 +44,7 @@ public:
 		py::bytes buff(nullptr, size);
 
 		tilesData.tileStride = tileStride;
-		tilesData.data = (Tile*)bytesGetBuff(buff);
+		tilesData.data = (Tile*)PyBytesGetBuff(buff);
 		reduceColor(*this, palette);
 
 		for (auto &item : moveArgs)

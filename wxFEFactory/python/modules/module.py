@@ -162,13 +162,13 @@ class BaseListBoxModuel(BaseModule):
                 return pos, text
         return -1, None
 
-    def moveUp(self):
+    def move_up(self):
         """上移一项"""
-        self.listbox.moveUp()
+        self.listbox.MoveCurrentUp()
 
-    def moveDown(self):
+    def move_down(self):
         """下移一项"""
-        self.listbox.moveDown()
+        self.listbox.MoveCurrentDown()
 
     def onListBoxKey(self, lb, event):
         """按键监听"""
@@ -176,9 +176,9 @@ class BaseListBoxModuel(BaseModule):
         if mod == WXK.MOD_CONTROL:
             code = event.GetKeyCode()
             if code == WXK.UP:
-                self.moveUp()
+                self.move_up()
             elif code == WXK.DOWN:
-                self.moveDown()
+                self.move_down()
         event.Skip()
 
     def doAdd(self, text):

@@ -16,7 +16,7 @@ void Console__bind_elem(ConsoleHandler* self, View *input, View *output)
 
 auto Console__get_history(ConsoleHandler* self)
 {
-	return asPyList(*(wxArrayString*)self->getHistory());
+	return PyListFromArray(*(wxArrayString*)self->getHistory());
 }
 
 

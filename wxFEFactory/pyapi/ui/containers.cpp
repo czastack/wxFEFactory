@@ -126,7 +126,7 @@ void BookCtrlBase::doAdd(View & child)
 		// 替换回原指针
 		child.ptr()->SetClientData(&child);
 
-		wxcstr caption = pyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
+		wxcstr caption = PyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
 		ctrl().AddPage(child, caption);
 
 		py::cast(item).dec_ref();

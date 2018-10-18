@@ -477,7 +477,7 @@ public:
 
 	void append(wxcstr text)
 	{
-		insert(text, getCount());
+		ctrl().Append(text);
 	}
 
 	void insertItems(pycref choices, int pos)
@@ -487,7 +487,7 @@ public:
 
 	void appendItems(pycref choices)
 	{
-		insertItems(choices, getCount());
+		ctrl().Append(py::cast<wxArrayString>(choices));
 	}
 
 	void pop(int pos)
@@ -496,8 +496,7 @@ public:
 	}
 
 	void setItems(pycref choices) {
-		clear();
-		insertItems(choices, 0);
+		ctrl().Set(py::cast<wxArrayString>(choices));
 	}
 
 	void clear()
@@ -574,16 +573,6 @@ public:
 	wxRearrangeList& ctrl() const
 	{
 		return *(wxRearrangeList*)m_elem;
-	}
-
-	void moveUp()
-	{
-		ctrl().MoveCurrentUp();
-	}
-
-	void moveDown()
-	{
-		ctrl().MoveCurrentDown();
 	}
 };
 

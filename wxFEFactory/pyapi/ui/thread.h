@@ -19,7 +19,7 @@ public:
 		{
 			wxMilliSleep(m_delay);
 		}
-		pyCall(m_fn);
+		PyCall(m_fn);
 		return 0;
 	}
 };

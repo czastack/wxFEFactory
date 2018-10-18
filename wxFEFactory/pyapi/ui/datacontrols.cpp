@@ -11,7 +11,7 @@ void PropertyGrid::OnChange(wxPropertyGridEvent & event)
 		pycref value = getValue(event.GetValue());
 		if (!m_onchange.is(None))
 		{
-			pycref ret = pyCall(m_onchange, this, name, value);
+			pycref ret = PyCall(m_onchange, this, name, value);
 			if (ret.ptr() == Py_False)
 			{
 				// 返回False忽略当前改动
@@ -33,10 +33,10 @@ void PropertyGrid::OnChange(wxPropertyGridEvent & event)
 void PropertyGrid::addFlagsProperty(wxcstr title, wxcstr name, pycref help, pycref py_items, pycref py_values, int value) {
 	wxArrayString labels;
 	wxArrayInt values;
-	addAll(labels, py_items);
+	wxArrayAddAll(labels, py_items);
 	if (!py_values.is_none())
 	{
-		addAll(values, py::iterable(py_values));
+		wxArrayAddAll(values, py::iterable(py_values));
 	}
 	else
 	{
@@ -160,7 +160,7 @@ void PropertyGrid::setValues(pycref data, bool all)
 		for (; !it.AtEnd(); ++it)
 		{
 			wxPGProperty* p = *it;
-			_setValue(p, pyDictGet(data, p->GetName()));
+			_setValue(p, PyDictGet(data, p->GetName()));
 		}
 	}
 	else

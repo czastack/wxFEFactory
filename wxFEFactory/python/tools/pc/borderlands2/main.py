@@ -257,6 +257,7 @@ class Main(AssemblyHacktool):
         ui.Text("H: 回复护甲+血量\n"
             "P: 回复推进+血量\n"
             "B: 前进\n"
+            "N: 向上\n"
             ";: 弹药全满\n"
             ".: 升级\n"
             "/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
@@ -271,6 +272,7 @@ class Main(AssemblyHacktool):
             (0, VK.H, this.pull_through),
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
+            (0, VK.N, this.go_up),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
             (0, VK.getCode('/'), this.sync_weapon_level),
@@ -328,6 +330,11 @@ class Main(AssemblyHacktool):
             vector = player_config.move_vector.values()
             coord = player_config.coord
             coord += (vector[0] * 5, vector[1] * 5, abs(vector[2] * 3))
+
+    def go_up(self):
+        player_config = self._player_config()
+        if player_config:
+            player_config.coord.z += 500
 
     def vehicle_full(self):
         vehicle_mgrs = self._global.mgr.vehicle_mgrs

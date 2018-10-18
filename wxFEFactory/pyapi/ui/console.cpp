@@ -150,6 +150,6 @@ void ConsoleHandler::input(wxcstr line)
 		m_history->Add(line);
 		m_input->Clear();
 
-		py_interpreter_run(line);
+		PyInterpreterRun(line);
 	}
 }
