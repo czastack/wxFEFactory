@@ -40,5 +40,6 @@ class Main(MetalMaxHack):
 
     def render_wanted(self):
         datasets = self.datasets
-        for i, name in enumerate(datasets.WANTED_LIST):
-            ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS)
+        with ModelSelect.choices_cache:
+            for i, name in enumerate(datasets.WANTED_LIST):
+                ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS)

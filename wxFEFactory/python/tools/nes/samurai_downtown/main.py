@@ -31,8 +31,9 @@ class Main(BaseNesHack):
             dialog_style = {'width': 1200, 'height': 900}
             with DialogGroup("items", "道具", self.itemholder, cols=4, dialog_style=dialog_style) as dialog_group:
                 indexs = (0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15)
-                for i in indexs:
-                    ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
+                with ModelSelect.choices_cache:
+                    for i in indexs:
+                        ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
             with DialogGroup("skills", "技能", self.skillholder, dialog_style=dialog_style):
                 values = [1 << i for i in range(7, -1, -1)]
                 for i, labels in enumerate(datasets.SKILL_ITEMS):

@@ -18,8 +18,9 @@ class Main(BaseGbaHack):
             ModelInput("kill_slot", "必杀槽").set_help("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
             ModelInput("rage", "RAGE")
             ModelInput("member_num", "队伍人数")
-            for i in range(5):
-                ModelSelect("members.%d" % i, "第%d位队员" % (i + 1), choices=datasets.PERSONS)
+            with ModelSelect.choices_cache:
+                for i in range(5):
+                    ModelSelect("members.%d" % i, "第%d位队员" % (i + 1), choices=datasets.PERSONS)
             ModelInput("item_num", "道具数量")
 
         with Group("favors", "好感度", self._global):
@@ -32,9 +33,10 @@ class Main(BaseGbaHack):
                 i += 1
 
         with Group("items", "道具", self._global, cols=4):
-            for i in range(16):
-                ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
-                ModelInput("items.%d.count" % i, "数量")
+            with ModelSelect.choices_cache:
+                for i in range(16):
+                    ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
+                    ModelInput("items.%d.count" % i, "数量")
 
         with Group("event_items", "事件道具", self._global):
             for i, labels in enumerate(datasets.EVENT_ITEMS):

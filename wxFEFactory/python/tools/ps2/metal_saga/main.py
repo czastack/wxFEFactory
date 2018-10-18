@@ -68,9 +68,10 @@ class Main(BasePs2Hack):
         ModelInput("title")
         ModelSelect("prof", choices=datasets.PROFS)
         # ModelInput("status")
-        for i in range(self.person.skills.length):
-            ModelSelect("skills.%d" % i, "技能%d" % (i + 1),
-                choices=datasets.SPECIAL_SKILLS.choices, values=datasets.SPECIAL_SKILLS.values)
+        with ModelSelect.choices_cache:
+            for i in range(self.person.skills.length):
+                ModelSelect("skills.%d" % i, "技能%d" % (i + 1),
+                    choices=datasets.SPECIAL_SKILLS.choices, values=datasets.SPECIAL_SKILLS.values)
 
     def render_person_grow(self):
         ModelInput("hp_init")
@@ -114,9 +115,10 @@ class Main(BasePs2Hack):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp")
 
-        # for i in range(self.chariot.hole_type.length):
-        #     ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1),
-        #         choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
+        # with ModelSelect.choices_cache:
+        #     for i in range(self.chariot.hole_type.length):
+        #         ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1),
+        #             choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
 
         # ModelInput("position", hex=True)
 
@@ -142,9 +144,10 @@ class Main(BasePs2Hack):
                     instance=self.chariot, prop=prop))
 
     def render_wanted(self):
-        for i, name in enumerate(datasets.WANTED_LIST):
-            ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
-                values=datasets.WANTED_STATUS_VALUES)
+        with ModelSelect.choices_cache:
+            for i, name in enumerate(datasets.WANTED_LIST):
+                ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
+                    values=datasets.WANTED_STATUS_VALUES)
 
     def render_functions(self):
         super().render_functions(('fake_down',))

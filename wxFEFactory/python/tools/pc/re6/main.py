@@ -58,8 +58,9 @@ class Main(NativeHacktool):
                 r += 1
 
     def render_person_skills(self):
-        for i in range(3):
-            ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
+        with ModelSelect.choices_cache:
+            for i in range(3):
+                ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
 
     def render_assembly_functions(self):
         # NOP_7 = b'\x90' * 7

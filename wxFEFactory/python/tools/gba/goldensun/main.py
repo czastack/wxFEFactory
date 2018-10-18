@@ -50,15 +50,17 @@ class GSHack(BaseGbaHack):
             ModelInput("%s_defense" % tname, "%s抗性" % tlabel)
 
     def render_skills(self):
-        for i in range(5):
-            ModelSelect("skills.%d+skills_offset.value" % i, "精神力", choices=self.datasets.SKILLS)
+        with ModelSelect.choices_cache:
+            for i in range(5):
+                ModelSelect("skills.%d+skills_offset.value" % i, "精神力", choices=self.datasets.SKILLS)
         with self.skills_group.footer:
             Pagination(self.on_skills_page, self.SKILLS_PAGE_TOTAL)
 
     def render_items(self):
-        for i in range(15):
-            ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=self.datasets.ITEMS)
-            ModelInput("items.%d.count" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(15):
+                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=self.datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
 
     def render_djinnis(self):
         for (tlable, tname), (labels, helps) in zip(self.datasets.ELEMENT_TYPES, self.datasets.DJINNIS):

@@ -70,9 +70,10 @@ class MetalMaxHack(BaseNdsHack):
         ModelInput("spirit")
         ModelInput("scar")
         ModelInput("level_max")
-        ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
-        ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
-        ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+        with ModelSelect.choices_cache:
+            ModelSelect("weapon_1", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+            ModelSelect("weapon_2", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
+            ModelSelect("weapon_3", choices=datasets.EQUIP_WEAPON.choices, values=datasets.EQUIP_WEAPON.values)
         ModelSelect("equip_head", choices=datasets.EQUIP_HEAD.choices, values=datasets.EQUIP_HEAD.values)
         ModelSelect("equip_body", choices=datasets.EQUIP_BODY.choices, values=datasets.EQUIP_BODY.values)
         ModelSelect("equip_hand", choices=datasets.EQUIP_HAND.choices, values=datasets.EQUIP_HAND.values)
@@ -181,10 +182,11 @@ class MetalMaxHack(BaseNdsHack):
             item['group'].read()
 
         def render_items(self, item=None):
-            for i in range(self.IREM_PAGE_LENGTH):
-                ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "",
-                    choices=item['source'].choices, values=item['source'].values)
-                ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
+            with ModelSelect.choices_cache:
+                for i in range(self.IREM_PAGE_LENGTH):
+                    ModelSelect("{0}.{1}+{0}_offset.item".format(item['key'], i), "",
+                        choices=item['source'].choices, values=item['source'].values)
+                    ModelInput("{0}.{1}+{0}_offset.count".format(item['key'], i), "数量")
             with Group.active_group().footer:
                 Pagination(partial(on_page_change, self.weak, item=item), item['page_count'])
 
@@ -218,9 +220,11 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, min=-100, max=100).set_help(
                 "○<=-50, -50<●<=-20, 20<空<30, 30<=△<80, 80<=×")
 
-        for i in range(4):
-            ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1), instance=self._global, choices=datasets.MONSTERS)
-            ModelInput("enemy_case.%d.count" % i, "数量", instance=self._global)
+        with ModelSelect.choices_cache:
+            for i in range(4):
+                ModelSelect("enemy_case.%d.race" % i, "种类%d" % (i + 1),
+                    instance=self._global, choices=datasets.MONSTERS)
+                ModelInput("enemy_case.%d.count" % i, "数量", instance=self._global)
 
     def render_ext(self):
         pass

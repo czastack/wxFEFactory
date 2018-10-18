@@ -703,6 +703,16 @@ class BaseSelect(TwoWayWidget):
                 else:
                     print("数据源不一致")
 
+    class CacheContex:
+        def __enter__(self):
+            ui.Choice.start_cache()
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            ui.Choice.end_cache()
+
+    choices_cache = CacheContex()
+
 
 class Select(BaseSelect, OffsetsWidget):
     def __init__(self, *args, type=int, size=4, **kwargs):

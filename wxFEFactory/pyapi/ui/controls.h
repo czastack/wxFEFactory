@@ -9,6 +9,7 @@
 #include <wx/filepicker.h>
 #include <wx/clrpicker.h>
 #include <wx/treectrl.h>
+#include <unordered_map>
 #include "wxpatch.h"
 
 
@@ -583,7 +584,7 @@ public:
 	Choice(pycref choices, pycref onselect, Args ...args) :
 		ControlWithItems(args...)
 	{
-		bindElem(new wxChoice(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
+		bindElem(new wxChoice(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), getChoices(choices)));
 		bindEvt(wxEVT_CHOICE, onselect);
 	}
 
@@ -591,6 +592,23 @@ public:
 	{
 		addPendingEvent(wxEVT_CHOICE);
 	}
+
+	wxArrayString getChoices(pycref choices);
+
+	static void start_cache()
+	{
+		m_choices_cache_on = true;
+	}
+
+	static void end_cache()
+	{
+		m_choices_cache_on = false;
+		m_choices_cache.clear();
+	}
+
+protected:
+	static std::unordered_map<PyObject*, wxArrayString> m_choices_cache;
+	static bool m_choices_cache_on;
 };
 
 

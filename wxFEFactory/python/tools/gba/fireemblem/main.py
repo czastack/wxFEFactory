@@ -67,9 +67,10 @@ class FeHack(BaseGbaHack):
 
     def render_char_items(self):
         datasets = self.datasets
-        for i in range(5):
-            ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
-            ModelInput("items.%d.count" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(5):
+                ModelSelect("items.%d.item" % i, "物品%d" % (i + 1), choices=datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
 
     def render_char_support(self):
         for i in range(self._personins.support.length):
@@ -77,9 +78,10 @@ class FeHack(BaseGbaHack):
 
     def render_train_items(self):
         datasets = self.datasets
-        for i in range(10):
-            ModelSelect("train_items.%d+train_items_offset.item" % i, "", choices=datasets.ITEMS)
-            ModelInput("train_items.%d+train_items_offset.count" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(10):
+                ModelSelect("train_items.%d+train_items_offset.item" % i, "", choices=datasets.ITEMS)
+                ModelInput("train_items.%d+train_items_offset.count" % i, "数量")
         with Group.active_group().footer:
             Pagination(self.on_train_items_page, self.TRAIN_ITEMS_PAGE_TOTAL)
 

@@ -63,12 +63,11 @@ class Main(BaseSfcHack):
                 "恢复HP: alt+h")
 
     def render_human_items(self):
-        for i in range(self.person.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1),
-                choices=datasets.HUMAN_EQUIPS)
-        for i in range(self.person.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
-                choices=datasets.HUMAN_ITEMS)
+        with ModelSelect.choices_cache:
+            for i in range(self.person.equips.length):
+                ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
+            for i in range(self.person.items.length):
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
         with Group.active_group().footer:
             ui.Button("装备全部", className="btn_md", onclick=self.equip_all)
 
@@ -79,16 +78,18 @@ class Main(BaseSfcHack):
         ModelInput("weight")
         ModelInput("bullet")
 
-        for i in range(self.chariot.hole_type.length):
-            ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1),
-                choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
+        with ModelSelect.choices_cache:
+            for i in range(self.chariot.hole_type.length):
+                ModelSelect("hole_type.%d" % i, "炮穴%d类型" % (i + 1),
+                    choices=datasets.HOLE_TYPES, values=datasets.HOLE_TYPE_VALUES)
 
         ModelInput("position", hex=True)
 
     def render_chariot_items(self):
-        for i in range(self.chariot.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
-                choices=datasets.CHARIOT_ITEMS)
+        with ModelSelect.choices_cache:
+            for i in range(self.chariot.items.length):
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1),
+                    choices=datasets.CHARIOT_ITEMS)
 
         for i in range(self.chariot.equips.length):
             with ModelChoiceDisplay("equips.0.equip", "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS).container:
@@ -100,9 +101,10 @@ class Main(BaseSfcHack):
                     key="equips.%d" % i))
 
     def render_wanted(self):
-        for i, name in enumerate(datasets.WANTED_LIST):
-            ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
-                values=datasets.WANTED_STATUS_VALUES)
+        with ModelSelect.choices_cache:
+            for i, name in enumerate(datasets.WANTED_LIST):
+                ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
+                    values=datasets.WANTED_STATUS_VALUES)
 
     def get_hotkeys(self):
         this = self.weak

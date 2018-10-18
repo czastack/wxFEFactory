@@ -110,6 +110,28 @@ void ItemContainer::next(bool handle)
 }
 
 
+std::unordered_map<PyObject*, wxArrayString> Choice::m_choices_cache;
+bool Choice::m_choices_cache_on = false;
+
+wxArrayString Choice::getChoices(pycref choices)
+{
+	if (m_choices_cache_on) {
+		auto it = m_choices_cache.find(choices.ptr());
+		if (it != m_choices_cache.end())
+		{
+			return it->second;
+		}
+		wxArrayString &array = m_choices_cache.emplace(std::pair<PyObject*, wxArrayString>(choices.ptr(), {})).first->second;
+		wxArrayAddAll(array, choices);
+		return array;
+	}
+	else
+	{
+		return py::cast<wxArrayString>(choices);
+	}
+}
+
+
 pyobj CheckListBox::getCheckedItems()
 {
 	wxArrayInt items;
@@ -307,7 +329,9 @@ void init_controls(py::module & m)
 
 	py::class_t<Choice, ControlWithItems>(m, "Choice")
 		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),
-			choices, onselect, className, style);
+			choices, onselect, className, style)
+		.def_static("start_cache", &Choice::start_cache)
+		.def_static("end_cache", &Choice::end_cache);
 
 	py::class_t<ComboBox, ControlWithItems>(m, "ComboBox")
 		.def(py::init<long, pyobj, pyobj, pyobj, pyobj>(),

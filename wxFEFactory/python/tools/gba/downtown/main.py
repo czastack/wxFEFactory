@@ -41,8 +41,9 @@ class ExTool(BaseGbaHack):
                     ("skills", "技能", datasets.SKILLS, datasets.SKILL_VALUES),
                     ("skillkeys", "技能按键", datasets.SKILLKEYS, None)):
                 with DialogGroup(name, label, person, cols=4, dialog_style=dialog_style) as dialog_group:
-                    for i in indexs:
-                        ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)
+                    with ModelSelect.choices_cache:
+                        for i in indexs:
+                            ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)
 
     def on_person_change(self, lb):
         self.person.addr = self.PERSON_ADDR_START + lb.index * 0x9c

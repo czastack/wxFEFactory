@@ -29,8 +29,9 @@ class Main(BaseNesHack):
         with group.footer:
             dialog_style = {'width': 1200, 'height': 900}
             with DialogGroup("items", "道具", self.itemholder, dialog_style=dialog_style) as dialog_group:
-                for i in range(8):
-                    ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
+                with ModelSelect.choices_cache:
+                    for i in range(8):
+                        ModelSelect("items.%d" % i, "道具%02d" % (i + 1), choices=datasets.ITEMS)
 
         with StaticGroup("快捷键"):
             ui.Text("恢复HP: alt+h")

@@ -50,12 +50,13 @@ class Main(BaseNesHack):
                 "恢复HP: alt+h")
 
     def render_human_items(self):
-        for i in range(self.person.equips.length):
-            ModelSelect("equips.%d" % i, "装备%d" % (i + 1),
-                choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
-        for i in range(self.person.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
-                choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
+        with ModelSelect.choices_cache:
+            for i in range(self.person.equips.length):
+                ModelSelect("equips.%d" % i, "装备%d" % (i + 1),
+                    choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
+            for i in range(self.person.items.length):
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1),
+                    choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -66,12 +67,13 @@ class Main(BaseNesHack):
         ModelInput("weight", "底盘重量")
 
     def render_chariot_items(self):
-        for i in range(self.chariot.equips.length):
-            ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1),
-                choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
-        for i in range(self.chariot.items.length):
-            ModelSelect("items.%d" % i, "物品%d" % (i + 1),
-                choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
+        with ModelSelect.choices_cache:
+            for i in range(self.chariot.equips.length):
+                ModelSelect("equips.%d.type" % i, "装备%d" % (i + 1),
+                    choices=datasets.CHARIOT_EQUIPS, values=datasets.CHARIOT_EQUIP_VALUES)
+            for i in range(self.chariot.items.length):
+                ModelSelect("items.%d" % i, "物品%d" % (i + 1),
+                    choices=datasets.CHARIOT_ITEMS, values=datasets.CHARIOT_ITEM_VALUES)
 
     def get_hotkeys(self):
         this = self.weak

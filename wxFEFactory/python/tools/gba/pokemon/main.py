@@ -44,8 +44,9 @@ class PMHack(BaseGbaHack):
 
     def render_shop(self):
         datasets = self.datasets
-        for i in range(8):
-            ModelSelect("store.%d.item" % i, "商品%d" % (i + 1), choices=datasets.ITEMS)
+        with ModelSelect.choices_cache:
+            for i in range(8):
+                ModelSelect("store.%d.item" % i, "商品%d" % (i + 1), choices=datasets.ITEMS)
 
     def render_backpack(self):
         datasets = self.datasets
