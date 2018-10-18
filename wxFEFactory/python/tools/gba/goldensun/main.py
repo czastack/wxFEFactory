@@ -5,7 +5,7 @@ from lib.exui.components import Pagination
 from fefactory_api import ui
 
 
-class BaseGSTool(BaseGbaHack):
+class GSHack(BaseGbaHack):
     SKILLS_PAGE_LENGTH = 5
     SKILLS_PAGE_TOTAL = 7
 

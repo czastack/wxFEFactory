@@ -36,7 +36,6 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("team", "团队", team_config), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
-        self.lazy_group(StaticGroup("功能"), self.render_functions)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
@@ -160,9 +159,6 @@ class Main(AssemblyHacktool):
         for i, item in enumerate(datasets.SKILL_NAMES):
             self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
 
-    def render_functions(self):
-        super().render_functions(('sync_weapon_level',))
-
     def render_assembly_functions(self):
         functions = (
             # AssemblyItems('子弹不减+精准+无后坐',
@@ -262,6 +258,7 @@ class Main(AssemblyHacktool):
             "P: 回复推进+血量\n"
             "B: 前进\n"
             ";: 弹药全满\n"
+            ".: 升级\n"
             "/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
 
     def onattach(self):
@@ -275,6 +272,7 @@ class Main(AssemblyHacktool):
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
             (0, VK.getCode(';'), this.all_ammo_full),
+            (0, VK.getCode('.'), this.level_up),
             (0, VK.getCode('/'), this.sync_weapon_level),
         )
 
@@ -345,7 +343,13 @@ class Main(AssemblyHacktool):
         for ammo in self._global.mgr.weapon_ammos:
             ammo.value_max()
 
-    def sync_weapon_level(self, _=None):
+    def level_up(self):
+        """升级"""
+        character = self._character()
+        if character:
+            character.experience.value = character.exp_next_level
+
+    def sync_weapon_level(self):
         """同步武器等级"""
         character = self._character()
         level = character and character.level

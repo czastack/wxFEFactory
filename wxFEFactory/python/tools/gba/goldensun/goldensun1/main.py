@@ -1,6 +1,6 @@
-from ..main import BaseGSTool
+from ..main import GSHack
 
 
-class Main(BaseGSTool):
+class Main(GSHack):
     from . import models, datasets, coords
     PERSON_ADDR_START = 0x02000500

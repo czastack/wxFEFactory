@@ -405,7 +405,8 @@ class Groups(BaseGroup):
     def render(self):
         with ui.Vertical(className="fill") as root:
             self.view = ui.Notebook(className="fill")
-        ui.Item(root, caption=self.label)
+        if self.label:
+            ui.Item(root, caption=self.label)
         self.root = root
         if self.onPageChange:
             self.view.setOnPageChange(self.onPageChange)

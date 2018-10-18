@@ -218,12 +218,12 @@ class PokemonStruct(LocalModel):
     def GetIsShiny(self):
         if self.bEncoded:
             return
-        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        dwChar, dwID = self.Header['dwChar', 'dwID']
         wShiny = loword(dwChar) ^ hiword(dwChar) ^ loword(dwID) ^ hiword(dwID)
         return wShiny <= 0x07
 
     def GenShinyID(self):
-        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        dwChar, dwID = self.Header['dwChar', 'dwID']
         dwShinyId = loword(dwID) ^ loword(dwChar) ^ hiword(dwChar) ^ random.randint(0, 7)
         dwShinyId = (dwShinyId << 16) | loword(dwID)
         return dwShinyId
@@ -232,7 +232,7 @@ class PokemonStruct(LocalModel):
         wNoShinyRand = random.randint(0, 0xFFFF) & 0xFFF8
         if wNoShinyRand == 0:
             wNoShinyRand = 8
-        dwChar, dwID = self.Header[('dwChar', 'dwID')]
+        dwChar, dwID = self.Header['dwChar', 'dwID']
         dwNoShinyId = loword(dwID) ^ loword(dwChar) ^ hiword(dwChar)
         dwNoShinyId = ((dwNoShinyId ^ wNoShinyRand) << 16) | loword(dwID)
         return dwNoShinyId
