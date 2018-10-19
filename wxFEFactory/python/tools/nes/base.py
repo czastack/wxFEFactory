@@ -21,7 +21,7 @@ class SimpleNesHack(BaseNesHack):
         if not hasattr(cls, 'fields'):
             raise ValueError('missing class variable "fields"')
 
-        if hasattr(cls, 'pull_through'):
+        if not hasattr(cls, 'get_hotkeys') and hasattr(cls, 'pull_through'):
             cls.get_hotkeys = cls._get_hotkeys
 
         class Global(Model):
@@ -39,10 +39,14 @@ class SimpleNesHack(BaseNesHack):
 
         cls.Global = Global
 
+    def set_value(self, name, value):
+        setattr(self._global, name, value)
+
     def set_max(self, name):
         item = self.fields_map[name]
-        if item.max:
-            setattr(self._global, name, item.max)
+        if item.max is None:
+            item.max = ((1 << (item.size << 3)) - 1)
+        self.set_value(name, item.max or item.max)
 
     def render_main(self):
         self._global = self.Global(0, self.handler)
