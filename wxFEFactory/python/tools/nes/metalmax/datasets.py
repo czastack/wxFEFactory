@@ -251,6 +251,7 @@ def split_items(start, end):
         (0,) + tuple(range(start, end))
     )
 
+
 HUMAN_EQUIPS, HUMAN_EQUIP_VALUES = split_items(0x01, 0x41)
 HUMAN_ITEMS, HUMAN_ITEM_VALUES = split_items(0x99, 0xCB)
 

@@ -63,7 +63,6 @@ class Global(Model):
         self._money_2p = int(str(value), 16)
 
 
-
 class Person(Model):
     _locals = locals()
 
@@ -88,7 +87,6 @@ class SkillHolder(Model):
     have_2 = ByteField(0x7C67)
     have_3 = ByteField(0x7C69)
     have_4 = ByteField(0x7C6B)
-
 
     # 技能激活flag 0x7AEB 0x7AEF 0x7B01 0x7B03
     # 技能拥有flag 0x7C65 0x7C67 0x7C69 0x7C6B
