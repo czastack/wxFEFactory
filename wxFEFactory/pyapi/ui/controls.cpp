@@ -110,10 +110,10 @@ void ItemContainer::next(bool handle)
 }
 
 
-std::unordered_map<PyObject*, wxArrayString> Choice::m_choices_cache;
-bool Choice::m_choices_cache_on = false;
+std::unordered_map<PyObject*, wxArrayString> ItemContainer::m_choices_cache;
+bool ItemContainer::m_choices_cache_on = false;
 
-wxArrayString Choice::getChoices(pycref choices)
+wxArrayString ItemContainer::getChoices(pycref choices)
 {
 	if (m_choices_cache_on) {
 		auto it = m_choices_cache.find(choices.ptr());
@@ -295,6 +295,8 @@ void init_controls(py::module & m)
 		.def("__len__", &ItemContainer::getCount)
 		.def("prev", &ItemContainer::prev, "handle"_a = true)
 		.def("next", &ItemContainer::next, "handle"_a = true)
+		.def_static("start_cache", &Choice::start_cache)
+		.def_static("end_cache", &Choice::end_cache)
 		.def_property("text", &ItemContainer::getText1, &ItemContainer::setText1)
 		.def_property("index", &ItemContainer::getSelection, &ItemContainer::doSetSelection)
 		.def_property_readonly("count", &ItemContainer::getCount);
@@ -329,9 +331,7 @@ void init_controls(py::module & m)
 
 	py::class_t<Choice, ControlWithItems>(m, "Choice")
 		.def(py::init<pyobj, pyobj, pyobj, pyobj>(),
-			choices, onselect, className, style)
-		.def_static("start_cache", &Choice::start_cache)
-		.def_static("end_cache", &Choice::end_cache);
+			choices, onselect, className, style);
 
 	py::class_t<ComboBox, ControlWithItems>(m, "ComboBox")
 		.def(py::init<long, pyobj, pyobj, pyobj, pyobj>(),

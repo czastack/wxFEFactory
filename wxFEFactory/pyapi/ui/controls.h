@@ -453,6 +453,23 @@ public:
 	void prev(bool handle = true);
 
 	void next(bool handle = true);
+
+	static wxArrayString getChoices(pycref choices);
+
+	static void start_cache()
+	{
+		m_choices_cache_on = true;
+	}
+
+	static void end_cache()
+	{
+		m_choices_cache_on = false;
+		m_choices_cache.clear();
+	}
+
+protected:
+	static std::unordered_map<PyObject*, wxArrayString> m_choices_cache;
+	static bool m_choices_cache_on;
 };
 
 
@@ -516,7 +533,7 @@ public:
 	ListBox(pycref choices, pycref onselect, Args ...args) :
 		ControlWithItems(args...)
 	{
-		bindElem(new wxListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
+		bindElem(new wxListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), getChoices(choices)));
 		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
@@ -540,7 +557,7 @@ public:
 	CheckListBox(pycref choices, pycref onselect, Args ...args) :
 		ListBox(args...)
 	{
-		bindElem(new wxCheckListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
+		bindElem(new wxCheckListBox(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(), getChoices(choices)));
 		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
@@ -567,7 +584,7 @@ public:
 		CheckListBox(args...)
 	{
 		bindElem(new wxRearrangeListPatched(*getActiveLayout(), wxID_ANY, wxDefaultPosition, getStyleSize(),
-			py::cast<wxArrayInt>(order), py::cast<wxArrayString>(choices)));
+			py::cast<wxArrayInt>(order), getChoices(choices)));
 		bindEvt(wxEVT_LISTBOX, onselect);
 	}
 
@@ -592,23 +609,6 @@ public:
 	{
 		addPendingEvent(wxEVT_CHOICE);
 	}
-
-	wxArrayString getChoices(pycref choices);
-
-	static void start_cache()
-	{
-		m_choices_cache_on = true;
-	}
-
-	static void end_cache()
-	{
-		m_choices_cache_on = false;
-		m_choices_cache.clear();
-	}
-
-protected:
-	static std::unordered_map<PyObject*, wxArrayString> m_choices_cache;
-	static bool m_choices_cache_on;
 };
 
 
@@ -619,7 +619,7 @@ public:
 	ComboBox(long wxstyle, pycref choices, pycref onselect, Args ...args) :
 		ControlWithItems(args...)
 	{
-		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices), wxstyle));
+		bindElem(new wxComboBox(*getActiveLayout(), wxID_ANY, wxNoneString, wxDefaultPosition, getStyleSize(), getChoices(choices), wxstyle));
 		bindEvt(wxEVT_COMBOBOX, onselect);
 	}
 
@@ -671,7 +671,7 @@ public:
 	RadioBox(wxcstr label, pycref choices, pycref onselect, Args ...args) :
 		ItemContainer(args...)
 	{
-		bindElem(new wxRadioBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), py::cast<wxArrayString>(choices)));
+		bindElem(new wxRadioBox(*getActiveLayout(), wxID_ANY, label, wxDefaultPosition, getStyleSize(), getChoices(choices)));
 		bindEvt(wxEVT_RADIOBOX, onselect);
 	}
 
