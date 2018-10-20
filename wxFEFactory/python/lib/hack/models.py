@@ -772,6 +772,10 @@ class FieldPrep:
     def type(self):
         return self.field.type
 
+    @property
+    def label(self):
+        return self.field.label
+
 
 class AddFieldPrep(FieldPrep):
     """加预处理"""

@@ -9,7 +9,7 @@ class Global(Model):
     money = ByteField(0x018E, label="金钱")
     bomb_count = ByteField(0x018F, label="炸弹数量")
     bomb_type = ByteField(0x0190, label="炸弹种类")
-    armor = ToggleField(0x0032, enable=0xC0, disable=0, label="护甲")
+    armor = ToggleField(0x0032, size=1, enable=0xC0, disable=0, label="护甲")
     power = ByteField(0x0033, label="子弹威力")
     bullet_type = ByteField(0x0034, label="子弹种类")
     bomb_power = ByteField(0x003B, label="炸弹威力")
@@ -38,11 +38,19 @@ class Main(BaseNesHack):
     def get_hotkeys(self):
         return (
             (0, VK.B, self.bomb_time),
+            (VK.MOD_SHIFT, VK.B, self.bomb_stop),
             (0, VK.N, self.invincible),
+            (0, VK.M, self.add_armor),
         )
 
     def bomb_time(self):
         self._global.bomb_time = 0xFF
 
+    def bomb_stop(self):
+        self._global.bomb_time = 5
+
     def invincible(self):
-        self._global.invincible = 0xFF
+        self._global.invincible = 20
+
+    def add_armor(self):
+        self._global.armor = 0xC0
