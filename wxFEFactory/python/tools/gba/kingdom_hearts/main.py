@@ -125,6 +125,7 @@ ENEMY_CARDS = (
     '【马尔夏】无视储卡副作用，储卡技一次后立马重复一次。卡片生效期间火系、冰系、雷系、特殊伤害减少，物理伤害增加。3E',
     '【雷克萨斯】终结技命中前的瞬间有高概率是敌人消失，效果同【次元裂缝】。卡片生效期间冰系伤害无效，物理伤害减少，特殊伤害增加。50A',
     '【安塞姆】隐藏储卡。炎、冰、雷属性耐性增大。10次储卡技',
+    '【黑暗侧影】变成对手用的敌人卡片',
 )
 
 
@@ -146,12 +147,3 @@ class Main(BaseGbaHack):
             ModelInput("battle_hp")
             ModelInput("battle_hpmax")
             ModelCheckBox("riku_enable")
-
-    def get_hotkeys(self):
-        this = self.weak
-        return (
-            (VK.MOD_ALT, VK.P, this.card_add),
-        )
-
-    def card_add(self):
-        self._global.battle_cards[0] += 1

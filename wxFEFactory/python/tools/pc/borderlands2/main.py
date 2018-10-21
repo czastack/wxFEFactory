@@ -245,6 +245,9 @@ class Main(AssemblyHacktool):
                 0x00DA0000, 0x00DB0000, b'',
                 b'\x8B\x14\x99\x83\xC2\x05\x3B\x56\x44\x7E\x03\x8B\x56\x44\x89\x14\x99',
                 inserted=True, replace_len=6),
+            AssemblyItem('enemy_fast_evolution', '敌人快速升级', b'\x8B\x49\x4C\x8B\xC6\x3B\xC8',
+                0x00290000, 0x002A0000, b'', b'\x83\xFA\x0B\x75\x04\x8B\xCA\xEB\x03\x8B\x49\x4C\x8B\xC6',
+                inserted=True, replace_len=5),
         )
         super().render_assembly_functions(functions)
 
@@ -273,6 +276,7 @@ class Main(AssemblyHacktool):
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
+            (VK.MOD_SHIFT, VK.N, this.go_down),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
             (0, VK.getCode('/'), this.sync_weapon_level),
@@ -329,12 +333,17 @@ class Main(AssemblyHacktool):
         if player_config:
             vector = player_config.move_vector.values()
             coord = player_config.coord
-            coord += (vector[0] * 5, vector[1] * 5, abs(vector[2] * 3))
+            coord += (vector[0] * 5, vector[1] * 5, max(abs(vector[2] * 3), 500))
 
     def go_up(self):
         player_config = self._player_config()
         if player_config:
             player_config.coord.z += 500
+
+    def go_down(self):
+        player_config = self._player_config()
+        if player_config:
+            player_config.coord.z -= 500
 
     def vehicle_full(self):
         vehicle_mgrs = self._global.mgr.vehicle_mgrs

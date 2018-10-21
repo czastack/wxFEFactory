@@ -74,6 +74,8 @@ class CoordWidget(TwoWayWidget):
             self.views = tuple(views)
         self.view = self.views[0]
         self.container = container
+        for view in self.views:
+            view.setOnKeyDown(self.onKey)
 
     @property
     def mem_value(self):
