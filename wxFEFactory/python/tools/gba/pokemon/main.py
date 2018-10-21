@@ -6,6 +6,9 @@ from fefactory_api import ui
 from . import models, datasets
 
 
+BREED_COUNT = 412
+
+
 class PMHack(BaseGbaHack):
     BACKPACK_PAGE_LENGTH = 10
 
@@ -133,6 +136,21 @@ class PMHack(BaseGbaHack):
 
     def _active_pokemon(self):
         return self.active_pokemon_ins or self.read_active_pokemon()
+
+    def _active_pokemon_breed(self):
+        """选中的宝可梦的种族数据"""
+        pokemon = self._active_pokemon()
+        if pokemon:
+            breed = pokemon.breedInfo.wBreed
+            if breed < BREED_COUNT:
+                return self._globalins.breed_list[breed]
+
+    def _active_pokemon_exp_list(self):
+        """选中的宝可梦的种族EXP列表"""
+        breed_entry = self._active_pokemon_breed()
+        if breed_entry:
+            exptype = breed_entry.bExpType
+            return self._globalins.exp_list[exptype]
 
     # pokemon = property(_pokemon)
     # active_pokemons = property(_active_pokemons)
