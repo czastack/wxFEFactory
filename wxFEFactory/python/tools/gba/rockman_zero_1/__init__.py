@@ -1,1 +1,1 @@
-name="洛克人Zero1"
+name = "洛克人Zero1"

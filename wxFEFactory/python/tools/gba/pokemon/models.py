@@ -463,6 +463,8 @@ class RubyJp(RubySapphireJp):
     # rom
     breed_list = ArrayField(0x081D09CC, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x00000000)
+    # ^
+    exp_list = Field(0x001CFD2C)
     item_list = Field(0x0039A648)
     skill_list = Field(0x001CCEE0)
 
@@ -472,6 +474,8 @@ class SapphireJp(RubySapphireJp):
     # rom
     breed_list = ArrayField(0x081D095C, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x00000000)
+    # ^
+    exp_list = Field(0x001CFCBC)
     item_list = Field(0x0039A62C)
     skill_list = Field(0x001CCE70)
 
@@ -513,6 +517,8 @@ class RubyEn(RubySapphireEn):
     # rom
     breed_list = ArrayField(0x081FEC18, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x00000000)
+    # ^
+    exp_list = Field(0x001FDF78)
     item_list = Field(0x003C5564)
     skill_list = Field(0x001FB12C)
 
@@ -522,6 +528,8 @@ class SapphireEn(RubySapphireEn):
     # rom
     breed_list = ArrayField(0x081FEBA8, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x00000000)
+    # ^
+    exp_list = Field(0x001FDF08)
     item_list = Field(0x003C55BC)
     skill_list = Field(0x001FB0BC)
 
@@ -567,6 +575,8 @@ class FireJp(FireLeafJp):
     # rom
     breed_list = ArrayField(0x0821118C, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x0021AA2E)
+    # ^
+    exp_list = Field(0x002104EC)
     item_list = Field(0x003A06F8)
     skill_list = Field(0x0020D60C)
 
@@ -576,6 +586,8 @@ class LeafJp(FireLeafJp):
     # rom
     breed_list = ArrayField(0x08211168, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x0021AA0E)
+    # ^
+    exp_list = Field(0x002104C8)
     item_list = Field(0x003A0568)
     skill_list = Field(0x0020D5E8)
 
@@ -601,6 +613,8 @@ class FireEn(FireLeafEn):
     # rom
     breed_list = ArrayField(0x08254784, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x0025E026)
+    # ^
+    exp_list = Field(0x00253AE4)
     item_list = Field(0x003DB028)
     skill_list = Field(0x00250C04)
 
@@ -610,6 +624,8 @@ class LeafEn(FireLeafEn):
     # rom
     breed_list = ArrayField(0x08254760, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x0025E006)
+    # ^
+    exp_list = Field(0x00253AC0)
     item_list = Field(0x003DAE64)
     skill_list = Field(0x00250BE0)
 
@@ -656,6 +672,8 @@ class EmeraldJp(PointerGlobal):
     # rom
     breed_list = ArrayField(0x082F0D54, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x002FA6D6)
+    # ^
+    exp_list = Field(0x002F00B4)
     item_list = Field(0x0055CEE8)
     skill_list = Field(0x002ED220)
 
@@ -682,6 +700,8 @@ class EmeraldEn(PointerGlobal):
     # rom
     breed_list = ArrayField(0x083203CC, 412, ModelField(0, BreedListEntry))
     deoxys_breed_abilities = Field(0x00329D48)
+    # ^
+    exp_list = Field(0x0031F72C)
     item_list = Field(0x005839A0)
     skill_list = Field(0x0031C898)
 

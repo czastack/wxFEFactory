@@ -1019,3 +1019,5 @@ POKEMONS = (
     "迪奥西斯",
     "风铃子",
 )
+
+BREED_NAMES = POKEMONS[:252] + ('?',) * 25 + POKEMONS[252:]

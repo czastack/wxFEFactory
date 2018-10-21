@@ -590,7 +590,6 @@ class BaseSelect(TwoWayWidget):
             self.view.setOnLeftDown(self.weak.onLeftDown)
             self.view.setOnTextDrop(self.weak.onTextDrop)
         self.search_map[id(self.view)] = self
-        del self.onselect, self.dragable
 
     def setItems(self, choices, values=0):
         self.choices = choices
@@ -616,6 +615,8 @@ class BaseSelect(TwoWayWidget):
         except ValueError:
             self.view.index = -1
             # print(hex(value), "不在%s的可选值中" % self.label)
+        if self.onselect:
+            self.onselect(self.view)
 
     @lazy.ClassLazy
     def contextmenu(cls):

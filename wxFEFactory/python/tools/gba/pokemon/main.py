@@ -66,15 +66,17 @@ class PMHack(BaseGbaHack):
             onselect=self.on_active_pokemo_swith)
 
         with Groups(None, self.weak.onNotePageChange):
-            with Group("basic", "基本", active_pokemon, cols=4):
+            with Group("basic", "基本", active_pokemon):
                 ModelInput("breedInfo.bIntimate", "亲密度", spin=True, max=255)
-                ModelSelect("breedInfo.wBreed", "种族", choices=self.datasets.POKEMONS)
+                ModelSelect("breedInfo.wBreed", "种族", choices=self.datasets.BREED_NAMES)
                 ModelInput("Header.dwChar", "性格值", hex=True)
                 ModelInput("Header.dwID", "ID", hex=True)
                 ModelSelect("personality", "性格", choices=self.datasets.PERSONALITYS,
                     onselect=self.on_personality_select)
                 ui.Text("性格描述", className="vcenter")
                 self.personality_desc = ui.Text("", className="vcenter")
+                ModelSelect("breedInfo.wItem", "手持道具", choices=self.datasets.ITEMS)
+                ModelInput("breedInfo.dwExp", "经验值")
             with Group("basic", "能力", active_pokemon):
                 pass
             with Group("basic", "技能", active_pokemon):

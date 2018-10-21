@@ -1,1 +1,1 @@
-name="重装机兵2 Reload"
+name = "重装机兵2 Reload"
