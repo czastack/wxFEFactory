@@ -1,6 +1,6 @@
 from functools import partial
 from lib.hack.forms import (
-    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Title
+    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Input, Title
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -11,6 +11,7 @@ from fefactory_api import ui
 from styles import styles
 from . import models, datasets
 import fefactory_api
+import types
 
 
 class Main(AssemblyHacktool):
@@ -36,6 +37,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("team", "团队", team_config), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
+        self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
@@ -158,6 +160,40 @@ class Main(AssemblyHacktool):
 
         for i, item in enumerate(datasets.SKILL_NAMES):
             self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
+
+    def render_drop_rates(self):
+        self._drop_rates_scan_data = (b'\x00\x00\x00????????????????????\x00\x00\x00\x00\x01\x00\x00\x00????'
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3F\x00\x00\x80\x3F')
+
+        self._drop_rates_table = (
+            (b'\x2C', 'very_common', '药'),
+            (b'\x2E', 'common', '白'),
+            (b'\x30', 'uncommon', '绿'),
+            (b'\x31', 'very_uncommon', '粉'),
+            (b'\x32', 'rare', '蓝'),
+            (b'\x33', 'very_rare', '紫'),
+            (b'\x34', 'legendary', '橙/珠光')
+        )
+
+        self._drop_rates_preset = (
+            ('原始', (200, 100, 10, 5, 1, 0.1, 0.01)),
+            ('仅橙', (0.001, 0.001, 0.001, 0.001, 0.001, 100, 10000)),
+            ('仅紫', (0.001, 0.001, 0.001, 0.001, 0.001, 1000, 0.001)),
+            ('仅蓝', (0.001, 0.001, 0.001, 0.001, 1000, 0.001, 0.001)),
+            ('10x橙', (200, 100, 10, 5, 1, 0.1, 0.1)),
+            ('100x橙', (200, 100, 10, 5, 1, 0.1, 1)),
+            ('1000x橙', (200, 100, 10, 5, 1, 0.1, 10)),
+        )
+
+        self._drop_rates = types.SimpleNamespace()
+
+        ui.Hr()
+        with ui.Horizontal(className='expand'):
+            ui.Button('读取地址', onclick=self.read_drop_rates)
+            for i, item in enumerate(self._drop_rates_preset):
+                ui.Button(item[0], className='btn_md', onclick=partial(self.set_drop_rates_preset, index=i))
+        self._drop_rates_views = [Input(key, label, addr=partial(__class__.get_drop_rates_item, self.weak, key=key),
+            type=float) for _id, key, label in self._drop_rates_table]
 
     def render_assembly_functions(self):
         functions = (
@@ -373,3 +409,20 @@ class Main(AssemblyHacktool):
             weapon = self._current_weapon()
             if weapon and weapon.addr:
                 weapon.set_level(level)
+
+    def read_drop_rates(self, _):
+        for _id, key, label in self._drop_rates_table:
+            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x14E00000, 0x18000000, fuzzy=True)
+            if addr is -1:
+                raise ValueError('找不到地址, ' + label)
+            setattr(self._drop_rates, key, addr + 0x20)
+
+    def get_drop_rates_item(self, key):
+        addr = getattr(self._drop_rates, key, 0)
+        if addr is 0:
+            print('未读取地址')
+        return addr
+
+    def set_drop_rates_preset(self, _, index):
+        for view, value in zip(self._drop_rates_views, self._drop_rates_preset[index][1]):
+            view.input_value = value

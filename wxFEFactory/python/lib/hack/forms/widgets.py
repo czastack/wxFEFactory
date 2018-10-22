@@ -176,16 +176,19 @@ class ModelWidget:
 
 
 class OffsetsWidget:
+    def get_addr(self):
+        return self.addr() if callable(self.addr) else self.addr
+
     @property
     def mem_value(self):
-        ret = self.handler.ptrs_read(self.addr, self.offsets, self.type, self.size)
+        ret = self.handler.ptrs_read(self.get_addr(), self.offsets, self.type, self.size)
         if self.type is float:
             ret = utils.float32(ret)
         return ret
 
     @mem_value.setter
     def mem_value(self, value):
-        self.handler.ptrs_write(self.addr, self.offsets, self.type(value), self.size)
+        self.handler.ptrs_write(self.get_addr(), self.offsets, self.type(value), self.size)
 
 
 class BaseGroup(Widget):
@@ -462,7 +465,7 @@ class BaseInput(TwoWayWidget):
         self.view.value = value
 
 
-class Input(BaseInput, OffsetsWidget):
+class Input(OffsetsWidget, BaseInput):
     def __init__(self, *args, type=int, **kwargs):
         self.type = type
         super().__init__(*args, **kwargs)
@@ -545,7 +548,7 @@ class BaseCheckBox(TwoWayWidget):
             self.view.checked = False
 
 
-class CheckBox(BaseCheckBox, OffsetsWidget):
+class CheckBox(OffsetsWidget, BaseCheckBox):
     pass
 
 
@@ -715,7 +718,7 @@ class BaseSelect(TwoWayWidget):
     choices_cache = CacheContex()
 
 
-class Select(BaseSelect, OffsetsWidget):
+class Select(OffsetsWidget, BaseSelect):
     def __init__(self, *args, type=int, size=4, **kwargs):
         self.type = type
         self.size = size
@@ -762,7 +765,7 @@ class BaseChoiceDisplay(Widget):
         self.view.value = self.choices[index] if index is not -1 else ''
 
 
-class ChoiceDisplay(BaseChoiceDisplay, OffsetsWidget):
+class ChoiceDisplay(OffsetsWidget, BaseChoiceDisplay):
     def __init__(self, *args, type=int, size=4, **kwargs):
         self.type = type
         self.size = size
@@ -838,7 +841,7 @@ class BaseFlagWidget(TwoWayWidget):
             view.checked = False
 
 
-class FlagWidget(BaseFlagWidget, OffsetsWidget):
+class FlagWidget(OffsetsWidget, BaseFlagWidget):
     def __init__(self, *args, type=int, size=4, **kwargs):
         self.type = type
         self.size = size
