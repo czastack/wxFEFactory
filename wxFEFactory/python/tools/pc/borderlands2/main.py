@@ -107,8 +107,10 @@ class Main(AssemblyHacktool):
     def render_vehicle(self):
         ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
         ModelInput('mgr.vehicle_mgrs.0.boost.value', '载具1推进')
+        ModelInput('mgr.vehicle_mgrs.0.boost.scaled_maximum', '载具1推进最大值')
         ModelInput('mgr.vehicle_mgrs.1.health.value', '载具2血量')
         ModelInput('mgr.vehicle_mgrs.1.boost.value', '载具2推进')
+        ModelInput('mgr.vehicle_mgrs.1.boost.scaled_maximum', '载具2推进最大值')
 
     def render_ammo(self):
         for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹')):
@@ -130,7 +132,7 @@ class Main(AssemblyHacktool):
         ModelInput('base_reload_speed')
         ModelInput('base_burst_length')
         ModelInput('base_projectiles_per_shot')
-        ModelInput('base_bullets_used')
+        ModelInput('calculated_bullets_used')
         ModelInput('base_extra_shot_chance')
         ModelInput('magazine_size')
         ModelInput('current_bullets')
@@ -169,7 +171,7 @@ class Main(AssemblyHacktool):
             (b'\x2C', 'very_common', '药'),
             (b'\x2E', 'common', '白'),
             (b'\x30', 'uncommon', '绿'),
-            (b'\x31', 'very_uncommon', '粉'),
+            (b'\x31', 'very_uncommon', '镒'),
             (b'\x32', 'rare', '蓝'),
             (b'\x33', 'very_rare', '紫'),
             (b'\x34', 'legendary', '橙/珠光')
@@ -297,8 +299,11 @@ class Main(AssemblyHacktool):
             "P: 回复推进+血量\n"
             "B: 前进\n"
             "N: 向上\n"
+            "Shift+N: 向下\n"
+            "F3: 切换2倍移动速度\n"
             ";: 弹药全满\n"
             ".: 升级\n"
+            "': 当前武器高精准，高射速\n"
             "/: 武器等级与人物等级同步(装备中的武器需切到背包再装备)")
 
     def onattach(self):
@@ -313,8 +318,10 @@ class Main(AssemblyHacktool):
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
             (VK.MOD_SHIFT, VK.N, this.go_down),
+            (0, VK.F3, this.move_quickly),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
+            (0, VK.getCode("'"), this.make_weapon_useful),
             (0, VK.getCode('/'), this.sync_weapon_level),
         )
 
@@ -409,6 +416,17 @@ class Main(AssemblyHacktool):
             weapon = self._current_weapon()
             if weapon and weapon.addr:
                 weapon.set_level(level)
+
+    def make_weapon_useful(self):
+        weapon = self._current_weapon()
+        if weapon and weapon.addr:
+            weapon.base_accuracy = 0.1
+            weapon.base_fire_rate = 0.1
+
+    def move_quickly(self):
+        config = self._player_config()
+        if config and config.addr:
+            config.move_speed_mult = 2 if config.move_speed_mult == 1 else 1
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:
