@@ -421,7 +421,7 @@ class Main(AssemblyHacktool):
         weapon = self._current_weapon()
         if weapon and weapon.addr:
             weapon.base_accuracy = 0.1
-            weapon.base_fire_rate = 0.1
+            weapon.base_fire_rate = 0.1 if weapon.base_fire_rate < 0.2 else 0.2
 
     def move_quickly(self):
         config = self._player_config()

@@ -313,27 +313,29 @@ addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, ad
 
 
 	while (cur_addr < end) {
-		read(cur_addr, page, PAGE_SIZE);
-		for (page_cursor = page; page_cursor < page_end; ++page_cursor)
+		if (read(cur_addr, page, PAGE_SIZE))
 		{
-			for (i = 0; i < data_size; ++i) {
-				if (page_cursor[i] != data[i] && (!fuzzy || data[i] != '?'))
-				{
-					break;
-				}
-			}
-			if (i == data_size)
+			for (page_cursor = page; page_cursor < page_end; ++page_cursor)
 			{
-				++ord;
-				if (ord == ordinal)
+				for (i = 0; i < data_size; ++i) {
+					if (page_cursor[i] != data[i] && (!fuzzy || data[i] != '?'))
+					{
+						break;
+					}
+				}
+				if (i == data_size)
 				{
-					finded = true;
-					break;
+					++ord;
+					if (ord == ordinal)
+					{
+						finded = true;
+						break;
+					}
 				}
 			}
-		}
-		if (finded) {
-			break;
+			if (finded) {
+				break;
+			}
 		}
 		cur_addr += PAGE_SIZE;
 	}
