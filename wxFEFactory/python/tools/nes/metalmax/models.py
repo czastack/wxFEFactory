@@ -2,19 +2,11 @@ from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Mode
 
 
 class PersonChariot(Model):
-    @classmethod
-    def _init_fields(cls):
-        fields = []
-        for key, value in cls.__dict__.items():
-            if isinstance(value, Field):
-                fields.append(value)
-                value.origin_offset = value.offset
-        cls.fields = fields
+    def __init_subclass__(cls):
+        for field in cls.fields:
+            field.origin_offset = field.offset
 
     def set_index(self, i):
-        if not hasattr(self, 'fields'):
-            self._init_fields()
-
         for field in self.fields:
             field.offset = field.origin_offset + field.size * i
             if isinstance(field, ArrayField):
@@ -56,7 +48,8 @@ class Chariot(PersonChariot):
     bullet = ByteField(0x651F)
     special_bullets = ArrayField(0x03003DE1, 8, ByteField(0))  # 特殊炮弹
     special_bullets_count = ArrayField(0x03003E39, 8, ByteField(0))  # 特殊炮弹
-    main_bullets_count = ByteField(0x6535)  # 主炮数量
+    main_bullets_count = ByteField(0x6535)  # 主炮弹药
+    se_bullets_count = ByteField(0x654B)  # SE弹药
 
     def set_index(self, i):
         super().set_index(i)

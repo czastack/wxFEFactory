@@ -62,6 +62,7 @@ class Main(BaseNesHack):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
         ModelInput("sp", "装甲片")
         ModelInput("main_bullets_count", "主炮炮弹")
+        ModelInput("se_bullets_count", "S-E炮弹")
         ModelInput("bullet", "弹仓容量")
         ModelInput("defense", "守备力")
         ModelInput("weight", "底盘重量")
@@ -82,7 +83,7 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.RIGHT, this.move_right),
             (VK.MOD_ALT, VK.UP, this.move_up),
             (VK.MOD_ALT, VK.DOWN, this.move_down),
-            (VK.MOD_ALT, VK.H, this.pull_through),
+            (0, VK.H, this.pull_through),
         )
 
     def on_person_change(self, lb):
