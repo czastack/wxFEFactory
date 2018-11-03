@@ -14,8 +14,8 @@ class VirtuaNesHandler(MemHandler):
     # CRAM = 0x5612EC  # size=0x8000
     # VRAM = 0x57B360  # size=0x1000
     # SPRAM = 0x5A0424  # size=0x100
-    # PROM = 0x57C364  # ptr
-    # VROM = 0x5A0420  # ptr
+    PROM = 0x5A0420  # ptr
+    VROM = 0x57C364  # ptr
     CPU_MEM_BANKS = 0x57B340
     PPU_MEM_BANKS = 0x5732EC
 
@@ -39,6 +39,9 @@ class VirtuaNesHandler(MemHandler):
 
     def ppu_mem_bank_addr(self, i):
         return self.raw_read(self.PPU_MEM_BANKS + (i << 2), int, 4)
+
+    def rom_addr(self, addr):
+        return self.raw_read(self.PROM) + addr - 0x10
 
 
 class NestopiaHandler(MemHandler):
