@@ -614,7 +614,7 @@ class BaseSelect(TwoWayWidget):
     def input_value(self, value):
         try:
             self.view.index = self.values.index(value) if self.values else (
-                value if value and value < len(self.choices) else -1)
+                value if value is not None and value < len(self.choices) else -1)
         except ValueError:
             self.view.index = -1
             # print(hex(value), "不在%s的可选值中" % self.label)

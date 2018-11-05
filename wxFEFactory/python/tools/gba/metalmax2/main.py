@@ -23,20 +23,7 @@ class Main(BaseGbaHack):
             ModelInput("battlein")
 
         with Group("player", "角色", self.person, cols=4):
-            Choice("角色", datasets.PERSONS, self.on_person_change)
-            ModelInput("level")
-            ModelInput("hp")
-            ModelInput("hpmax")
-            ModelInput("atk")
-            ModelInput("defense")
-            ModelInput("power")
-            ModelInput("intelli")
-            ModelInput("stamina")
-            ModelInput("speed")
-            ModelInput("battle")
-            ModelInput("drive")
-            ModelInput("fix")
-            ModelInput("exp")
+            self.render_player()
 
         self.lazy_group(Group("human_items", "角色装备/物品", self.person), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
@@ -45,6 +32,22 @@ class Main(BaseGbaHack):
         self.storage_group = Group("storage", "保管物品", self._global)
         self.lazy_group(self.storage_group, self.render_storage)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
+
+    def render_player(self):
+        Choice("角色", datasets.PERSONS, self.on_person_change)
+        ModelInput("level")
+        ModelInput("hp")
+        ModelInput("hpmax")
+        ModelInput("atk")
+        ModelInput("defense")
+        ModelInput("power")
+        ModelInput("intelli")
+        ModelInput("stamina")
+        ModelInput("speed")
+        ModelInput("battle")
+        ModelInput("drive")
+        ModelInput("fix")
+        ModelInput("exp")
 
     def render_human_items(self):
         with ModelSelect.choices_cache:
@@ -81,7 +84,7 @@ class Main(BaseGbaHack):
             + tuple((0x0300 | i) for i in range(len(datasets.CHARIOT_EQUIPS))))
 
         with ModelSelect.choices_cache:
-            for i in range(10):
+            for i in range(self.STORAGE_PAGE_LENGTH):
                 ModelSelect("storage.%d+storage_offset" % i, "", choices=choices, values=values, dragable=True)
         with Group.active_group().footer:
             Pagination(self.on_storage_page, self.STORAGE_PAGE_TOTAL)
