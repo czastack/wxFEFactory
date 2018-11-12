@@ -39,8 +39,8 @@ class Main(AssemblyHacktool):
         ModelInput('move_speed', instance=another_mgr)
 
     def render_character(self):
-        health = (self._character_health, models.Value)
-        shield = (self._character_shield, models.Value)
+        health = (self._character_health, models.ShieldHealth)
+        shield = (self._character_shield, models.ShieldHealth)
         experience = (self._experience, models.Value)
         ability_cooldown = (self._ability_cooldown, models.Value)
         character_config = (lambda: self._global.mgr.play_mgr.character_config, models.CharacterConfig)
@@ -49,17 +49,17 @@ class Main(AssemblyHacktool):
         ModelInput('value', instance=health)
         ModelInput('scaled_maximum', instance=health)
         ModelInput('base_maximum', instance=health)
-        # ModelInput('regen_rate', instance=health)
-        # ModelSelect('status', instance=health,
-        #     choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
+        ModelInput('regen_rate', instance=health)
+        ModelSelect('status', instance=health,
+            choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
 
         Title('护甲')
         ModelInput('value', instance=shield)
         ModelInput('scaled_maximum', instance=shield)
         ModelInput('base_maximum', instance=shield)
-        # ModelInput('regen_rate', instance=shield)
-        # ModelSelect('status', instance=shield,
-        #     choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
+        ModelInput('regen_rate', instance=shield)
+        ModelSelect('status', instance=shield,
+            choices=datasets.SHIELD_HEALTH_STATUS_CHOICES, values=datasets.SHIELD_HEALTH_STATUS_VALUES)
 
         Title('经验值')
         ModelInput('value', instance=experience)
@@ -77,7 +77,7 @@ class Main(AssemblyHacktool):
         ModelInput('skill_points', instance=character_config)
 
     def render_ammo(self):
-        for i, label in enumerate(('狙击枪', '连发枪', '手雷', '左轮手枪', '冲锋枪', '霰弹枪', '战斗步枪', '火箭筒')):
+        for i, label in enumerate(('狙击枪', '手枪', '手雷', '左轮手枪', '冲锋枪', '霰弹枪', '战斗步枪', '火箭筒')):
             with ModelInput('mgr.play_mgr.character.weapon_ammos.%d.value' % i, label).container:
                 ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
             ModelInput('mgr.play_mgr.character.weapon_ammos.%d.regen_rate' % i, '恢复速度')

@@ -30,11 +30,17 @@ class AnotherManager(Model):
     move_speed = FloatField((0x70, 0x2CC), label='移动速度')
 
 
+class ShieldHealth(Value):
+    """护甲和生命"""
+    regen_rate = FloatField(0x94, label='回复速度')
+    status = Field(0x100, label='切换')  # Normal: 5, God: 6
+
+
 class Character(Model):
     experience = ModelPtrField(0x1E4, Value, label='经验')
     ability_cooldown = ModelPtrField(0x1E8, Value, label='能力冷却')
-    health = ModelPtrField(0x1F0, Value, label='生命')
-    shield = ModelPtrField(0x1F4, Value, label='护盾')
+    health = ModelPtrField(0x1F0, ShieldHealth, label='生命')
+    shield = ModelPtrField(0x1F4, ShieldHealth, label='护盾')
     weapon_ammos = ArrayField(0x1F8, 8, ModelPtrField(0, WeaponAmmo), cachable=True)
 
 
