@@ -499,10 +499,7 @@ class ManagedModelField(ModelField):
 
 
 class CoordField(Cachable, FieldType):
-    field_size = 4
-    length = 3
-
-    def __init__(self, offset, type=float, length=length, field_size=field_size, label=None):
+    def __init__(self, offset, type=float, length=3, field_size=4, label=None):
         self.offset = offset
         self.type = type
         self.field_size = field_size

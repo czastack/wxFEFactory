@@ -280,4 +280,4 @@ VEHICLE_LIST = (
     )),
 )
 
-EXPLOTION_TYPE = ('GRENADE', 'MOLOTOV', 'ROCKET', 'HI_OCTANE', 'CAR', 'PLANE')
+EXPLOTION_TYPE = ('手榴弹', '燃烧瓶', '火箭弹', '摩托车', '汽车', '飞机')

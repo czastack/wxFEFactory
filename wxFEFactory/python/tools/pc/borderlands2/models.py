@@ -14,7 +14,7 @@ class Value(Model):
 
 
 class WeaponAmmo(Value):
-    """武器管理器"""
+    """弹药"""
     regen_rate = FloatField(0x84, label='回复速度')
 
 
