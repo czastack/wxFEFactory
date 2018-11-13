@@ -19,6 +19,17 @@ class WeaponAmmo(Value):
     regen_rate = FloatField(0x80, label='回复速度')
 
 
+class Weapon(Model):
+    magazine_size = FloatField(0x3B0, label='弹药库容量')
+    current_ammo = FloatField(0x3CC, label='当前弹药')
+    total_ammo = FloatField(0x390, label='总弹药数')
+    damage = FloatField(0x2BC, label='伤害')
+    base_accuracy = FloatField(0x2A8, label='基本偏移率')
+    calculated_accuracy = FloatField(0x2AC, label='计算偏移率')
+    base_fire_rate = FloatField(0x294, label='基本射击延迟')
+    calculated_fire_rate = FloatField(0x298, label='射击延迟')
+
+
 class WeaponProf(Model):
     SIZE = 0x2C
     level = Field(0, label='等级')
@@ -38,7 +49,7 @@ class ShieldHealth(Value):
 
 class Character(Model):
     experience = ModelPtrField(0x1E4, Value, label='经验')
-    ability_cooldown = ModelPtrField(0x1E8, Value, label='能力冷却')
+    ability_cooldown = ModelPtrField(0x1E8, Value, label='技能冷却')
     health = ModelPtrField(0x1F0, ShieldHealth, label='生命')
     shield = ModelPtrField(0x1F4, ShieldHealth, label='护盾')
     weapon_ammos = ArrayField(0x1F8, 8, ModelPtrField(0, WeaponAmmo), cachable=True)
@@ -46,6 +57,7 @@ class Character(Model):
 
 class CharacterConfig(Model):
     level = Field(0x284, label='等级')
+    exp_next_level = Field(0x288, label='下级所需经验')
     skill_points = Field(0x29C, label='技能点数')
     money = Field(0x2A4, label='金钱')
 

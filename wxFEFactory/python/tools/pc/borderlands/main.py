@@ -22,16 +22,18 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
+        self._weapon = models.Weapon(0, self.handler)
 
     def render_main(self):
         character = (self._character, models.Character)
-        # weapon = (self._current_weapon, models.Weapon)
+        weapon = (self._current_weapon, models.Weapon)
 
         with Group("global", "全局", self._global):
             self.render_global()
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
         self.lazy_group(Group("ammo", "弹药", character, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
+        self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
@@ -69,7 +71,7 @@ class Main(AssemblyHacktool):
         ModelInput('base_maximum', instance=experience)
         # ModelInput('multiplier', instance=experience)
 
-        Title('能力冷却')
+        Title('技能冷却')
         ModelInput('value', instance=ability_cooldown)
         ModelInput('scaled_maximum', instance=ability_cooldown)
         ModelInput('base_maximum', instance=ability_cooldown)
@@ -89,10 +91,22 @@ class Main(AssemblyHacktool):
             ModelInput('another_mgr.weapon_profs.%d.level' % i, '%s等级' % label)
             ModelInput('another_mgr.weapon_profs.%d.exp' % i, '经验')
 
+    def render_weapon(self):
+        ModelInput('addr_hex', '地址', readonly=True)
+        # ModelInput('display_level')
+        # ModelInput('actual_level')
+        # ModelInput('item_actual_level')
+        # ModelInput('specification_level')
+        ModelInput('damage')
+        ModelInput('base_accuracy')
+        ModelInput('calculated_accuracy')
+        ModelInput('base_fire_rate')
+        ModelInput('calculated_fire_rate')
+
     def render_assembly_functions(self):
         functions = (
-            AssemblyItem('accuracy_keep', '精准度不减', b'\xF3\x0F\x10\x40\x68\xF3\x0F\x11\x44\x24\x08',
-                0x008D0000, 0x008F0000, b'\x0F\x57\xC0\x90\x90'),
+            # AssemblyItem('accuracy_keep', '精准度不减', b'\xF3\x0F\x10\x40\x68\xF3\x0F\x11\x44\x24\x08',
+            #     0x008D0000, 0x008F0000, b'\x0F\x57\xC0\x90\x90'),
             AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x10\x81\x94\x02\x00\x00\x0F\x2F',
                 0x00330000, 0x00340000, b'\x0F\x57\xC0\x90\x90\x90\x90\x90'),
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8B\xD8\x0B\x00\x00\xF3\x0F\x10\x83\xD4\x0B\x00\x00',
@@ -101,12 +115,17 @@ class Main(AssemblyHacktool):
                 0x01130000, 0x01140000, b'',
                 b'\xC7\x86\xCC\x03\x00\x00\x63\x00\x00\x00',
                 inserted=True, replace_len=6),
+            AssemblyItem('cur_weapon', '当前武器', b'\x8B\x86\xCC\x03\x00\x00\x33\xC9',
+                0x01070000, 0x01080000, b'',
+                AssemblyGroup(b'\x89\x35', assembly_code.Variable('selected_item_addr'), b'\x8B\x86\xCC\x03\x00\x00'),
+                inserted=True, replace_len=6, args=('selected_item_addr',)),
         )
         super().render_assembly_functions(functions)
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"
-            ";: 弹药全满\n")
+            ";: 弹药全满\n"
+            ".: 升级\n")
 
     def onattach(self):
         super().onattach()
@@ -116,7 +135,9 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (0, VK.H, this.pull_through),
+            (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.getCode(';'), this.all_ammo_full),
+            (0, VK.getCode('.'), this.level_up),
         )
 
     def _character(self):
@@ -142,6 +163,15 @@ class Main(AssemblyHacktool):
         character = self._character()
         return character and character.weapon_ammos
 
+    def _current_weapon(self):
+        # player_config = self._player_config()
+        # weapon = player_config and player_config.current_weapon
+        # if weapon:
+        #     if not weapon.addr:
+        #         weapon.addr = self.get_variable_value('selected_item_addr', 0)
+        self._weapon.addr = self.get_variable_value('selected_item_addr', 0)
+        return self._weapon
+
     def weapon_ammo_max(self, _=None, i=0):
         ammos = self._weapon_ammos()
         if ammos:
@@ -160,3 +190,15 @@ class Main(AssemblyHacktool):
         if ammos:
             for ammo in ammos:
                 ammo.value_max()
+
+    def level_up(self):
+        """升级"""
+        character = self._character()
+        if character:
+            character.experience.value = self._global.mgr.play_mgr.character_config.exp_next_level
+
+    def ability_cooldown(self):
+        """技能冷却"""
+        character = self._character()
+        if character:
+            character.ability_cooldown.value = 0
