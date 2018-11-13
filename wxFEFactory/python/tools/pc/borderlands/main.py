@@ -32,6 +32,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
         self.lazy_group(Group("ammo", "弹药", character, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
@@ -87,6 +88,21 @@ class Main(AssemblyHacktool):
         for i, label in enumerate(('手枪', '冲锋枪', '霰弹枪', '战斗步枪', '狙击枪', '火箭筒', '外星枪')):
             ModelInput('another_mgr.weapon_profs.%d.level' % i, '%s等级' % label)
             ModelInput('another_mgr.weapon_profs.%d.exp' % i, '经验')
+
+    def render_assembly_functions(self):
+        functions = (
+            AssemblyItem('accuracy_keep', '精准度不减', b'\xF3\x0F\x10\x40\x68\xF3\x0F\x11\x44\x24\x08',
+                0x008D0000, 0x008F0000, b'\x0F\x57\xC0\x90\x90'),
+            AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x10\x81\x94\x02\x00\x00\x0F\x2F',
+                0x00330000, 0x00340000, b'\x0F\x57\xC0\x90\x90\x90\x90\x90'),
+            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8B\xD8\x0B\x00\x00\xF3\x0F\x10\x83\xD4\x0B\x00\x00',
+                0x010C0000, 0x010D0000, b'\x0F\x57\xC0\x0F\x57\xC9' + b'\x90' * 10),
+            AssemblyItem('no_reload', '无需换弹', b'\x2B\x86\xCC\x03\x00\x00\x39\x86\x90\x03\x00\x00',
+                0x01130000, 0x01140000, b'',
+                b'\xC7\x86\xCC\x03\x00\x00\x63\x00\x00\x00',
+                inserted=True, replace_len=6),
+        )
+        super().render_assembly_functions(functions)
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"
