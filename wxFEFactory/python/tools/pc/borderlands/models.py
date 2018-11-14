@@ -83,6 +83,16 @@ class CharacterConfig(Model):
     money = Field(0x2A4, label='金钱')
 
 
+class Vehicle(Model):
+    boost = ModelPtrField((0x390, 0x1DC), Value, label='推进剂')
+    health = ModelPtrField(0x398, Value, label='血量')
+
+
+# class VehicleManager(Model):
+#     vehicle_1 = ModelPtrField(0, Vehicle)
+#     vehicle_2 = ModelPtrField(0x18, Vehicle)
+
+
 class PlayerManager(Model):
     character_config = ModelPtrField((0xA8, 0x14), CharacterConfig)
     character = ModelPtrField(0x2AC, Character)
@@ -96,4 +106,5 @@ class Global(Model):
     mgr = ModelPtrField(0x01BF3C90, Manager)
     another_mgr = ModelPtrField((0x01C2AF2C, 8), AnotherManager)
     physics_mgr = ModelPtrField(0x01BF3C9C, PhysicsManager)
+    vehicle_mgr = ModelPtrField((0x01BF0164, 0), Vehicle)
     current_weapon_ammo = ModelPtrField((0x01BF3CCC, 0, 0x28, 0x38C), Value, label='当前武器子弹总数')

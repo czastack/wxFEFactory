@@ -296,7 +296,7 @@ class Main(AssemblyHacktool):
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"
-            "P: 回复推进+血量\n"
+            "P: 回复载具推进+血量\n"
             "B: 前进\n"
             "N: 向上\n"
             "Shift+N: 向下\n"
@@ -371,6 +371,16 @@ class Main(AssemblyHacktool):
         if shield:
             shield.value_max()
 
+    def vehicle_full(self):
+        vehicle_mgrs = self._global.mgr.vehicle_mgrs
+        if vehicle_mgrs.addr:
+            if vehicle_mgrs[0].addr:
+                vehicle_mgrs[0].boost.value_max()
+                vehicle_mgrs[0].health.value_max()
+            if vehicle_mgrs[1].addr:
+                vehicle_mgrs[1].boost.value_max()
+                vehicle_mgrs[1].health.value_max()
+
     def go_forward(self):
         player_config = self._player_config()
         if player_config:
@@ -387,16 +397,6 @@ class Main(AssemblyHacktool):
         player_config = self._player_config()
         if player_config:
             player_config.coord.z -= 500
-
-    def vehicle_full(self):
-        vehicle_mgrs = self._global.mgr.vehicle_mgrs
-        if vehicle_mgrs.addr:
-            if vehicle_mgrs[0].addr:
-                vehicle_mgrs[0].boost.value_max()
-                vehicle_mgrs[0].health.value_max()
-            if vehicle_mgrs[1].addr:
-                vehicle_mgrs[1].boost.value_max()
-                vehicle_mgrs[1].health.value_max()
 
     def all_ammo_full(self):
         for ammo in self._global.mgr.weapon_ammos:

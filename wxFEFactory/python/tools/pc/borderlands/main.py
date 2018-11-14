@@ -32,6 +32,7 @@ class Main(AssemblyHacktool):
             self.render_global()
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
         self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
+        self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", character, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
@@ -88,6 +89,14 @@ class Main(AssemblyHacktool):
 
         ModelCoordWidget('coord', instance=movement_mgr, savable=True)
 
+    def render_vehicle(self):
+        ModelInput('vehicle_mgr.health.value', '载具血量')
+        ModelInput('vehicle_mgr.boost.value', '载具推进')
+        ModelInput('vehicle_mgr.boost.scaled_maximum', '载具推进最大值')
+        # ModelInput('vehicle_mgr.vehicle_2.health.value', '载具2血量')
+        # ModelInput('vehicle_mgr.vehicle_2.boost.value', '载具2推进')
+        # ModelInput('vehicle_mgr.vehicle_2.boost.scaled_maximum', '载具2推进最大值')
+
     def render_ammo(self):
         for i, label in enumerate(('狙击枪', '手枪', '手雷', '左轮手枪', '冲锋枪', '霰弹枪', '战斗步枪', '火箭筒')):
             with ModelInput('weapon_ammos.%d.value' % i, label).container:
@@ -107,11 +116,8 @@ class Main(AssemblyHacktool):
         # ModelInput('item_actual_level')
         # ModelInput('specification_level')
         ModelInput('base_damage')
-        ModelInput('calculated_damage')
         ModelInput('base_accuracy')
-        ModelInput('calculated_accuracy')
         ModelInput('base_fire_rate')
-        ModelInput('calculated_fire_rate')
         ModelInput('calculated_bullets_used')
 
     def render_assembly_functions(self):
@@ -135,6 +141,7 @@ class Main(AssemblyHacktool):
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"
+            "P: 回复载具推进+血量\n"
             "B: 前进\n"
             "N: 向上\n"
             "Shift+N: 向下\n"
@@ -149,6 +156,7 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (0, VK.H, this.pull_through),
+            (0, VK.U, this.vehicle_full),
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
             (VK.MOD_SHIFT, VK.N, this.go_down),
@@ -204,6 +212,18 @@ class Main(AssemblyHacktool):
         shield = self._character_shield()
         if shield:
             shield.value_max()
+
+    def vehicle_full(self):
+        vehicle_mgr = self._global.vehicle_mgr
+        if vehicle_mgr.addr > 0x100000:
+            vehicle_mgr.boost.value_max()
+            vehicle_mgr.health.value_max()
+            # if vehicle_mgr.vehicle_1.addr > 0x100000:
+            #     vehicle_mgr.vehicle_1.boost.value_max()
+            #     vehicle_mgr.vehicle_1.health.value_max()
+            # if vehicle_mgr.vehicle_2.addr > 0x100000:
+            #     vehicle_mgr.vehicle_2.boost.value_max()
+            #     vehicle_mgr.vehicle_2.health.value_max()
 
     def go_forward(self):
         movement_mgr = self._movement_mgr()
