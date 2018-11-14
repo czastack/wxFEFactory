@@ -107,7 +107,7 @@ class PlayerConfig(Model):
     miss_ricochet_chance = FloatField(0x9AC, label='避开击飞')
     ignore_fatal_damage_chance = FloatField(0x9E8, label='免受致命伤')
     coord = CoordField(0x60, label='坐标')
-    move_vector = CoordField(0x104, label='坐标')
+    move_vector = CoordField(0x104, label='移动向量')
 
 
 class SkillItem(Model):

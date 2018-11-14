@@ -20,14 +20,20 @@ class WeaponAmmo(Value):
 
 
 class Weapon(Model):
-    magazine_size = FloatField(0x3B0, label='弹药库容量')
+    real_magazine_size = FloatField(0x3B0, label='计算弹夹容量')
+    base_magazine_size = FloatField(0x3B4, label='基本弹夹容量')
     current_ammo = FloatField(0x3CC, label='当前弹药')
     total_ammo = FloatField(0x390, label='总弹药数')
-    damage = FloatField(0x2BC, label='伤害')
-    base_accuracy = FloatField(0x2A8, label='基本偏移率')
-    calculated_accuracy = FloatField(0x2AC, label='计算偏移率')
-    base_fire_rate = FloatField(0x294, label='基本射击延迟')
-    calculated_fire_rate = FloatField(0x298, label='射击延迟')
+    # all_ammo = ModelPtrField(0x3BC, Value, label='包含弹夹的总弹药数')
+    calculated_damage = FloatField(0x2BC, label='计算伤害')
+    base_damage = FloatField(0x2C0, label='基本伤害')
+    calculated_accuracy = FloatField(0x2A8, label='计算偏移率')
+    base_accuracy = FloatField(0x2AC, label='基本偏移率')
+    calculated_fire_rate = FloatField(0x294, label='计算射击延迟')
+    base_fire_rate = FloatField(0x298, label='基本射击延迟')
+    calculated_bullets_used = Field(0x398, label='计算使用子弹')
+    base_bullets_used = Field(0x39C, label='基本使用子弹')
+    item_price = Field(0x21C, label='物品价格')
 
 
 class WeaponProf(Model):
@@ -36,9 +42,24 @@ class WeaponProf(Model):
     exp = Field(4, label='经验')
 
 
+class MovementManager(Model):
+    base_move_speed = FloatField(0x2D0, label='基本移动速度')
+    current_move_speed = FloatField(0x2CC, label='当前移动速度')
+    current_jump_height = FloatField(0x300, label='当前跳跃高度')
+    base_jump_height = FloatField(0x304, label='基本跳跃高度')
+    rriction = FloatField(0x2FC, label='摩擦力')
+    coord = CoordField(0x5C, label='坐标')
+    move_vector = CoordField(0x124, label='移动向量')
+
+
 class AnotherManager(Model):
     weapon_profs = ArrayField((0xF0, 0x508), 7, ModelField(0, WeaponProf))
-    move_speed = FloatField((0x70, 0x2CC), label='移动速度')
+    movement_mgr = ModelPtrField(0x70, MovementManager)
+
+
+class PhysicsManager(Model):
+    movement_mgr = ModelPtrField((0, 0x28, 0x5A0), MovementManager)
+    view_height = FloatField((0x10, 0x28, 0x360), label='可视高度')
 
 
 class ShieldHealth(Value):
@@ -74,4 +95,5 @@ class Manager(Model):
 class Global(Model):
     mgr = ModelPtrField(0x01BF3C90, Manager)
     another_mgr = ModelPtrField((0x01C2AF2C, 8), AnotherManager)
+    physics_mgr = ModelPtrField(0x01BF3C9C, PhysicsManager)
     current_weapon_ammo = ModelPtrField((0x01BF3CCC, 0, 0x28, 0x38C), Value, label='当前武器子弹总数')

@@ -31,6 +31,7 @@ class Main(AssemblyHacktool):
         with Group("global", "全局", self._global):
             self.render_global()
         self.lazy_group(Group("character", "角色", character, cols=4), self.render_character)
+        self.lazy_group(Group("character_ext", "角色额外", character), self.render_character_ext)
         self.lazy_group(Group("ammo", "弹药", character, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
@@ -38,9 +39,11 @@ class Main(AssemblyHacktool):
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
-        another_mgr = (lambda: self._global.another_mgr, models.AnotherManager)
+        movement_mgr = (self._movement_mgr, models.MovementManager)
 
-        ModelInput('move_speed', instance=another_mgr)
+        ModelInput('base_move_speed', instance=movement_mgr)
+        ModelInput('current_move_speed', instance=movement_mgr)
+        ModelInput('current_jump_height', instance=movement_mgr)
 
     def render_character(self):
         health = (self._character_health, models.ShieldHealth)
@@ -80,6 +83,11 @@ class Main(AssemblyHacktool):
         ModelInput('money', instance=character_config)
         ModelInput('skill_points', instance=character_config)
 
+    def render_character_ext(self):
+        movement_mgr = (self._movement_mgr, models.MovementManager)
+
+        ModelCoordWidget('coord', instance=movement_mgr, savable=True)
+
     def render_ammo(self):
         for i, label in enumerate(('狙击枪', '手枪', '手雷', '左轮手枪', '冲锋枪', '霰弹枪', '战斗步枪', '火箭筒')):
             with ModelInput('weapon_ammos.%d.value' % i, label).container:
@@ -93,15 +101,18 @@ class Main(AssemblyHacktool):
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)
+        ModelInput('item_price')
         # ModelInput('display_level')
         # ModelInput('actual_level')
         # ModelInput('item_actual_level')
         # ModelInput('specification_level')
-        ModelInput('damage')
+        ModelInput('base_damage')
+        ModelInput('calculated_damage')
         ModelInput('base_accuracy')
         ModelInput('calculated_accuracy')
         ModelInput('base_fire_rate')
         ModelInput('calculated_fire_rate')
+        ModelInput('calculated_bullets_used')
 
     def render_assembly_functions(self):
         functions = (
@@ -124,6 +135,9 @@ class Main(AssemblyHacktool):
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"
+            "B: 前进\n"
+            "N: 向上\n"
+            "Shift+N: 向下\n"
             ";: 弹药全满\n"
             ".: 升级\n")
 
@@ -135,6 +149,9 @@ class Main(AssemblyHacktool):
         this = self.weak
         return (
             (0, VK.H, this.pull_through),
+            (0, VK.B, this.go_forward),
+            (0, VK.N, this.go_up),
+            (VK.MOD_SHIFT, VK.N, this.go_down),
             (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
@@ -172,6 +189,9 @@ class Main(AssemblyHacktool):
         self._weapon.addr = self.get_variable_value('selected_item_addr', 0)
         return self._weapon
 
+    def _movement_mgr(self):
+        return self._global.physics_mgr.movement_mgr
+
     def weapon_ammo_max(self, _=None, i=0):
         ammos = self._weapon_ammos()
         if ammos:
@@ -184,6 +204,23 @@ class Main(AssemblyHacktool):
         shield = self._character_shield()
         if shield:
             shield.value_max()
+
+    def go_forward(self):
+        movement_mgr = self._movement_mgr()
+        if movement_mgr:
+            vector = movement_mgr.move_vector.values()
+            coord = movement_mgr.coord
+            coord += (vector[0] * 5, vector[1] * 5, max(abs(vector[2] * 3), 500))
+
+    def go_up(self):
+        movement_mgr = self._movement_mgr()
+        if movement_mgr:
+            movement_mgr.coord.z += 500
+
+    def go_down(self):
+        movement_mgr = self._movement_mgr()
+        if movement_mgr:
+            movement_mgr.coord.z -= 500
 
     def all_ammo_full(self):
         ammos = self._weapon_ammos()

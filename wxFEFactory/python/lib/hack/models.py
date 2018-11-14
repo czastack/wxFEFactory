@@ -532,7 +532,7 @@ class CoordData:
 
     @property
     def addr(self):
-        return self.instance.addr + self.owner.offset
+        return self.owner.get_addr(self.instance)
 
     def values(self):
         addr = self.addr
