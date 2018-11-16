@@ -15,7 +15,6 @@ def lazy(func, type_=property, indict=False):
 
 lazymethod = partial(lazy, type_=None)
 lazyclassmethod = partial(lazy, type_=classmethod)
-lazyclassmethod_indict = partial(lazy, type_=classmethod, indict=True)
 
 
 class ClassLazy:

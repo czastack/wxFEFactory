@@ -145,6 +145,7 @@ class Main(AssemblyHacktool):
             "B: 前进\n"
             "N: 向上\n"
             "Shift+N: 向下\n"
+            "Alt+F: 技能冷却\n"
             ";: 弹药全满\n"
             ".: 升级\n")
 
@@ -230,7 +231,8 @@ class Main(AssemblyHacktool):
         if movement_mgr:
             vector = movement_mgr.move_vector.values()
             coord = movement_mgr.coord
-            coord += (vector[0] * 5, vector[1] * 5, max(abs(vector[2] * 3), 500))
+            delta_z = max(abs(vector[2] * 3), 500) if coord.z < 1000 else 0
+            coord += (vector[0] * 5, vector[1] * 5, delta_z)
 
     def go_up(self):
         movement_mgr = self._movement_mgr()

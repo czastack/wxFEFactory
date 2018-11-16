@@ -71,4 +71,3 @@ class Config(Configurable):
             self.setConfig(name, value)
         else:
             object.__setattr__(self, name, value)
-

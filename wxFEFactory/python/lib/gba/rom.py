@@ -1,6 +1,6 @@
 from .file import FileRW
 
-ROM_MASK = ~(1<<27)
+ROM_MASK = ~(1 << 27)
 
 
 class RomHandler:
@@ -14,7 +14,6 @@ class RomHandler:
 
 
 class BaseRomRW(FileRW):
-
     def __init__(self, path, addrmask=ROM_MASK, mode=None):
         FileRW.__init__(self, path, addrmask, mode)
 

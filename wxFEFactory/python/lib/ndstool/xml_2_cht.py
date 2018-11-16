@@ -1,4 +1,6 @@
 import xml.etree.ElementTree as ET
+import re
+
 
 text = """
 <game>
@@ -72,11 +74,10 @@ text = """
 </game>
 """
 
-import re
-
 root = ET.fromstring(text)
 INDENT = '\t'
-codrbr = re.compile('(\w{8} \w{8}) ')
+codrbr = re.compile('(\\w{8} \\w{8}) ')
+
 
 class BufferedPrinter:
     def __init__(self):
@@ -111,6 +112,7 @@ def parse(node, lv=0):
         print("%s[%s]" % (indent, node.find('name').text))
         print("%s%s\n" % (indent, code))
 
+
 printer = BufferedPrinter()
 printer.start()
 
@@ -118,4 +120,3 @@ for child in root:
     parse(child)
 
 printer.end()
-

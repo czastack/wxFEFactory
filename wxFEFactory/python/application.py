@@ -7,9 +7,9 @@ import fefactory_api
 CONFIG_FILE = 'config.json'
 HISTORY_SIZE = 10
 
+
 class Application(Configurable):
     """保存一些全局数据"""
-    
     def __init__(self):
         Configurable.__init__(self, CONFIG_FILE)
         config = self.config
@@ -38,7 +38,8 @@ class Application(Configurable):
         self.writeConfig()
         if self.project:
             self.project.writeConfig()
-        import __main__, application
+        import __main__
+        import application
         del __main__.app
         del __main__.win
         del application.app

@@ -1,10 +1,12 @@
-from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields, MinuendFieldPrep
+from lib.hack.models import (
+    Model, Field, ByteField, WordField, ArrayField, ModelField, ToggleField, ToggleFields, MinuendFieldPrep
+)
 from ..models import ItemInfo, ItemInfo2, BaseGlobal
 
 
 class Person(Model):
     SIZE = 0xC4
-    
+
     prof = ByteField(0x02195DC8, label="职业")
     figure = ByteField(0x02195DC9, label="形象")
     level = WordField(0x02195DCE, label="等级")

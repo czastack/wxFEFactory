@@ -1,13 +1,9 @@
 class ProxyMetaclass(type):
 
     def __new__(class_, name, bases, attrs):
-        magic = attrs.get('__magic__', None)
+        magic = attrs.pop('__magic__', None)
 
         if magic:
-            if 'item' in magic:
-                magic.remove('item')
-                magic.extend(('getitem', 'setitem', 'delitem'))
-
             for key in magic:
                 key = "__%s__" % key
                 fn = getattr(Magic, key, None)
@@ -25,6 +21,7 @@ class ProxyMetaclass(type):
 class Proxy(metaclass=ProxyMetaclass):
     """
     classfield __proxy__: name of proxy member
+    classfield __magic__: list of magic function name without under line
     """
     def __init__(self, obj=None):
         object.__setattr__(self, self.__proxy__, obj)

@@ -119,3 +119,8 @@ def prepare_option(choices, values):
                 fn = split_label_value if isinstance(choices[0][0], str) else split_value_label
                 choices, values = fn(choices)
     return choices, values
+
+
+def dirfind(obj, text):
+    """dir属性中查找"""
+    return list(filter(lambda x: text in x, dir(obj)))

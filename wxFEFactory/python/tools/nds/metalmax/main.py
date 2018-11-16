@@ -156,7 +156,8 @@ class MetalMaxHack(BaseNdsHack):
                 ui.Button("预设", className="btn_sm", onclick=preset_click(key))
         for i in range(self.chariot.items.length):
             key = "items.%d" % i
-            with ModelChoiceDisplay(key + '.item', "物品%d" % (i + 1), choices=item_choices, values=item_values).container:
+            with ModelChoiceDisplay(key + '.item', "物品%d" % (i + 1),
+                    choices=item_choices, values=item_values).container:
                 ui.Button("上次", className="btn_sm", onclick=detail_keep_click(key))
                 ui.Button("详情", className="btn_sm", onclick=detail_click(key))
                 ui.Button("C装置/引擎", onclick=preset_ci_click(key))
@@ -284,7 +285,8 @@ class MetalMaxHack(BaseNdsHack):
                         listview.insertItems([part_name + item[1:]])
                         dialog.data_list.append(item)
                         dialog.name_list.append(item_name)
-                listview.setOnItemActivated(partial(__class__.on_chariot_item_preset_selected, self.weak, dialog=dialog))
+                listview.setOnItemActivated(partial(__class__.on_chariot_item_preset_selected,
+                    self.weak, dialog=dialog))
             setattr(self, name, dialog)
         return dialog
 
