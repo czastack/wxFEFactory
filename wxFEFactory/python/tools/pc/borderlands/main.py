@@ -36,6 +36,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("ammo", "弹药", character, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
+        self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
@@ -119,6 +120,47 @@ class Main(AssemblyHacktool):
         ModelInput('base_accuracy')
         ModelInput('base_fire_rate')
         ModelInput('calculated_bullets_used')
+
+    def render_drop_rates(self):
+        self._drop_rates_scan_data = (b'\xFF\xFF\xFF\xFF', b'\x00\x00\x00????????????????????'
+            b'\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+
+        self._drop_rates_table = (
+            (b'\x4C', 'chest_awesome_ini', 'ChestAwesomeIni'),
+            (b'\x53', 'verycommon', '遍地'),
+            (b'\x54', 'verycommon_lower', '遍地 lower'),
+            (b'\x55', 'common', '普通'),
+            (b'\x57', 'uncommon', '罕见'),
+            (b'\x58', 'uncommoner', '更罕见'),
+            (b'\x59', 'rare', '稀有'),
+            (b'\x5A', 'veryrare', '非常稀有'),
+            (b'\x5B', 'awesome_verycommon', '特殊遍地'),
+            (b'\x5C', 'awesome_common', '特殊普通'),
+            (b'\x5D', 'awesome_uncommon', '特殊罕见'),
+            (b'\x5E', 'awesome_uncommoner', '特殊更罕见'),
+            (b'\x5F', 'awesome_rare', '特殊稀有'),
+            (b'\x60', 'awesome_veryrare', '特殊非常稀有'),
+            (b'\x61', 'awesome_legendary', '特殊传说'),
+        )
+
+        self._drop_rates_preset = (
+            ('原始', (1, 200, 100, 10, 5, 1, 0.1, 0.05, 1, 1, 1, 1, 1, 0.1, 0.01)),
+            ('更好', (10, 40, 20, 5, 2.5, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 0.5)),
+            ('最好', (1, 0.01, 0.01, 0.01, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1, 25, 50, 100)),
+            ('5x橙', (1, 200, 100, 10, 5, 1, 0.1, 0.05, 1, 1, 1, 1, 1, 0.1, 0.05)),
+            ('10x橙', (1, 200, 100, 10, 5, 1, 0.2, 0.1, 1, 1, 1, 1, 1, 0.2, 0.1)),
+            ('50x橙', (1, 200, 100, 10, 5, 1, 1, 0.5, 1, 1, 1, 1, 1, 1, 0.5)),
+        )
+
+        self._drop_rates = types.SimpleNamespace()
+
+        ui.Hr()
+        with ui.Horizontal(className='expand'):
+            ui.Button('读取地址', onclick=self.read_drop_rates)
+            for i, item in enumerate(self._drop_rates_preset):
+                ui.Button(item[0], className='btn_md', onclick=partial(self.set_drop_rates_preset, index=i))
+        self._drop_rates_views = [Input(key, label, addr=partial(__class__.get_drop_rates_item, self.weak, key=key),
+            type=float) for _id, key, label in self._drop_rates_table]
 
     def render_assembly_functions(self):
         functions = (
@@ -231,7 +273,7 @@ class Main(AssemblyHacktool):
         if movement_mgr:
             vector = movement_mgr.move_vector.values()
             coord = movement_mgr.coord
-            delta_z = max(abs(vector[2] * 3), 500) if coord.z < 1000 else 0
+            delta_z = max(abs(vector[2] * 3), 500) if coord.z < 1500 else 0
             coord += (vector[0] * 5, vector[1] * 5, delta_z)
 
     def go_up(self):
@@ -261,3 +303,28 @@ class Main(AssemblyHacktool):
         character = self._character()
         if character:
             character.ability_cooldown.value = 0
+
+    def read_drop_rates(self, _):
+        start = 0x1E000000
+        end = 0x1F000000
+        for _id, key, label in self._drop_rates_table:
+            find_data = _id.join(self._drop_rates_scan_data)
+            addr = self.handler.find_bytes(find_data, start, end, fuzzy=True)
+            if addr is -1:
+                addr = self.handler.find_bytes(find_data, start - 0x10000, end - 0x10000, fuzzy=True)
+                if addr is -1:
+                    raise ValueError('找不到地址, ' + label)
+            if start == 0x1E000000:
+                start = addr & 0xFFFF0000
+                end = start + 0x10000
+            setattr(self._drop_rates, key, addr + 0x30)
+
+    def get_drop_rates_item(self, key):
+        addr = getattr(self._drop_rates, key, 0)
+        if addr is 0:
+            print('未读取地址')
+        return addr
+
+    def set_drop_rates_preset(self, _, index):
+        for view, value in zip(self._drop_rates_views, self._drop_rates_preset[index][1]):
+            view.input_value = value
