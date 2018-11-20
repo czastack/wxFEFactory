@@ -111,6 +111,7 @@ class Main(AssemblyHacktool):
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)
+        ModelInput('level')
         ModelInput('item_price')
         # ModelInput('display_level')
         # ModelInput('actual_level')

@@ -20,6 +20,7 @@ class WeaponAmmo(Value):
 
 
 class Weapon(Model):
+    level = Field(0x230, label='需求等级')
     real_magazine_size = FloatField(0x3B0, label='计算弹夹容量')
     base_magazine_size = FloatField(0x3B4, label='基本弹夹容量')
     current_ammo = FloatField(0x3CC, label='当前弹药')
