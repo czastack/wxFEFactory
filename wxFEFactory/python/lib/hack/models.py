@@ -2,6 +2,7 @@ from lib.utils import float32, Accumulator
 from lib.extypes import DataClass, classproperty
 from functools import partialmethod
 from types import SimpleNamespace
+from . import utils
 
 
 class Model:
@@ -43,7 +44,6 @@ class Model:
         return self.handler.read(self.addr, bytes, self.SIZE)
 
     def to_hex_str(self):
-        from . import utils
         return utils.bytes_beautify(self.to_bytes())
 
     def hex(self):

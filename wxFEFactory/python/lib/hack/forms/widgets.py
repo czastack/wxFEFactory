@@ -1,11 +1,12 @@
 from lib import exui, utils, lazy, wxconst
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
-from styles import btn_xs_style
+from styles import btn_xs_style, styles, dialog_style
 from ..utils import strhex
 import json
 import fefactory
 import fefactory_api
+import __main__
 ui = fefactory_api.ui
 Label = exui.Label
 
@@ -356,14 +357,11 @@ class DialogGroup(Group):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        from __main__ import win as main_win
-        from styles import styles, dialog_style
-
         if self.button:
             ui.Button(label=self.label, onclick=self.weak.show)
 
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
-        with main_win:
+        with __main__.win:
             with exui.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
                 self.render_root()
 

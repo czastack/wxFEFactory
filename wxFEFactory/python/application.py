@@ -3,6 +3,7 @@ from lib.config import Configurable
 from project import Project
 import json
 import fefactory_api
+import __main__
 
 CONFIG_FILE = 'config.json'
 HISTORY_SIZE = 10
@@ -38,11 +39,9 @@ class Application(Configurable):
         self.writeConfig()
         if self.project:
             self.project.writeConfig()
-        import __main__
-        import application
+        globals().pop('app')
         del __main__.app
         del __main__.win
-        del application.app
 
 
 app = Application()

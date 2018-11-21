@@ -62,7 +62,6 @@ class MainFrame:
                 ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_consol_input_multi)
             with ui.Menu("工具"):
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.open_tool)
-                ui.MenuItem("模拟器接入\tCtrl+Shift+E", onselect=self.attach_emu, kind="check")
             with ui.Menu("窗口"):
                 ui.MenuItem("保存窗口位置和大小", onselect=self.save_win_option)
 
@@ -320,29 +319,6 @@ class MainFrame:
         self.book.index = self.book.count - 1
 
         __main__.tool = tool
-
-    def attach_emu(self, m):
-        if m.checked:
-            from lib.hack.handlers.gbahandler import VbaHandler, NogbaHandler
-            from fe.ferom import FeEmuRW
-
-            attached = False
-            for Emu in VbaHandler, NogbaHandler:
-                emu = Emu()
-                if emu.attach():
-                    attached = True
-                    break
-            if attached:
-                __main__.emu = emu
-                __main__.femu = FeEmuRW(emu)
-                print("现在可以在控制台用emu对象操作模拟器了")
-            else:
-                print("未检查到正在运行的模拟器，现在支持VBA, NO$GBA等模拟器")
-                m.checked = False
-        else:
-            if __main__.emu:
-                __main__.emu.close()
-                __main__.emu = None
 
     def save_win_option(self, m):
         app.setConfig('start_option', {

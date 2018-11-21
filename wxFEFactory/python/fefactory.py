@@ -6,6 +6,7 @@ import json
 import os
 import sys
 import traceback
+import application
 import __main__
 
 
@@ -33,8 +34,7 @@ def reload(start_option=None, callback=None):
         pass
 
     if start_option:
-        from application import app
-        app.start_option = start_option
+        application.app.start_option = start_option
 
     __import__(__name__)
 

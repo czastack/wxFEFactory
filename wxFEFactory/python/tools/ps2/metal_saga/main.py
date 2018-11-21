@@ -9,6 +9,8 @@ from tools.utils import PresetDialog
 from functools import partial
 from . import models, datasets
 from fefactory_api import ui
+from lib.gba.dictionary import Dictionary
+import os
 
 
 class Main(BasePs2Hack):
@@ -164,8 +166,6 @@ class Main(BasePs2Hack):
 
     @ClassLazy
     def dictionary(self):
-        from lib.gba.dictionary import Dictionary
-        import os
         return Dictionary(os.path.join(os.path.dirname(__file__), 'dict.txt'), low_range=(0x81, 0x98), use_ascii=True)
 
     def get_item_info_dialog(self):

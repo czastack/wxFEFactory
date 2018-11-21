@@ -7,6 +7,7 @@ from fefactory_api import ui
 import traceback
 import base64
 import fefactory
+import __main__
 
 
 class BaseHackTool(NestedTool):
@@ -123,10 +124,7 @@ class BaseHackTool(NestedTool):
         self.config.cancel_change()
 
     def swith_keeptop(self, cb):
-        if self.nested:
-            from __main__ import win
-        else:
-            win = self.win
+        win = __main__.win if self.nested else self.win
         win.keeptop = cb.checked
 
     def read_vector(self, addr):
