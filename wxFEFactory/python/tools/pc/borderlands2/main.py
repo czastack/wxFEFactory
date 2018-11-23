@@ -139,11 +139,11 @@ class Main(AssemblyHacktool):
         ModelInput('badass_tokens')
 
     def render_skill(self):
-        with Group('main_skill', "主技能"):
-            ModelInput('skill_mgr.main_skill', '主技能状态')
-            ModelInput('skill_mgr.main_skill_duration', '主技能持续时间')
-            ModelInput('main_skill_cooldown_timer')
-            ModelInput('main_skill_cooldown_mult')
+        with Group('ability', "主技能"):
+            ModelInput('skill_mgr.ability_status', '主技能状态')
+            ModelInput('skill_mgr.ability_duration', '主技能持续时间')
+            ModelInput('ability_cooldown_timer')
+            ModelInput('ability_cooldown_mult')
 
         def render_sub_skill(data):
             i = 0
@@ -253,7 +253,7 @@ class Main(AssemblyHacktool):
                     VariableType('super_jump_mult', type=float, value=0x3FA00000),
                     VariableType('super_jump_store', type=float, value=0x441D8000),
                 )),
-            AssemblyItem('instant_main_skill_timer', '主动技能冷却时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
+            AssemblyItem('instant_ability_timer', '主动技能冷却时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
                 0x002B0000, 0x002C0000, b'',
                 b'\x8B\x84\x90\x88\x01\x00\x00\x85\xC0\x74\x0C\x83\xFA\x09\x75\x07\xC7\x40\x6C\x00\x00\x00\x00',
                 inserted=True, replace_len=7),

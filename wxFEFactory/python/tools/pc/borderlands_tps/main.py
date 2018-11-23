@@ -79,9 +79,8 @@ class Main(AssemblyHacktool):
         ModelInput('exp_next_level')
         ModelInput('level')
         ModelInput('money')
-        ModelInput('eridium')
-        ModelInput('seraph_crystals')
-        ModelInput('torgue_tokens')
+        ModelInput('moon_shards')
+        ModelInput('shift_coins')
         ModelInput('skill_points')
 
         ModelInput('bank_size', instance=player_mgr)
@@ -95,8 +94,8 @@ class Main(AssemblyHacktool):
         ModelCoordWidget('coord', instance=player_config, savable=True)
         ModelInput('player_visibility', instance=player_config).set_help('216: 对敌人不可见')
         ModelInput('move_speed_mult', instance=player_config)
-        ModelInput('second_wind.multiplier', '原地复活生命倍数', instance=player_config)
-        ModelInput('second_wind.fight_time_multiplier', '原地复活时间倍数', instance=player_config)
+        ModelInput('ffyl_time_mult', '原地复活生命倍数', instance=player_config)
+        ModelInput('ffyl_Health_mult', '原地复活时间倍数', instance=player_config)
 
     def render_vehicle(self):
         ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
@@ -140,13 +139,13 @@ class Main(AssemblyHacktool):
     def render_team(self):
         ModelInput('team_ammo_regen')
         ModelInput('badass_tokens')
+        ModelInput('ability_cooldown.value', '能力冷却时间')
+        ModelInput('ability_cooldown.mult', '能力冷却倍数')
 
     def render_skill(self):
-        with Group('main_skill', "主技能"):
-            ModelInput('skill_mgr.main_skill', '主技能状态')
-            ModelInput('skill_mgr.main_skill_duration', '主技能持续时间')
-            ModelInput('main_skill_cooldown_timer')
-            ModelInput('main_skill_cooldown_mult')
+        with Group('ability', "主技能"):
+            ModelInput('skill_mgr.ability_status', '主技能状态')
+            ModelInput('skill_mgr.ability_duration', '主技能持续时间')
 
         def render_sub_skill(data):
             i = 0
@@ -292,6 +291,7 @@ class Main(AssemblyHacktool):
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
             (VK.MOD_SHIFT, VK.N, this.go_down),
+            (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.F3, this.move_quickly),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
@@ -406,9 +406,15 @@ class Main(AssemblyHacktool):
         if config and config.addr:
             config.move_speed_mult = 2 if config.move_speed_mult == 1 else 1
 
+    def ability_cooldown(self):
+        """技能冷却"""
+        team_config = self._team_config()
+        if team_config:
+            team_config.ability_cooldown.value = 0
+
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:
-            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x1C450000, 0x1E000000, fuzzy=True)
+            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x1C000000, 0x1E000000, fuzzy=True)
             if addr is -1:
                 raise ValueError('找不到地址, ' + label)
             setattr(self._drop_rates, key, addr + 0x20)

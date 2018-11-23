@@ -138,17 +138,20 @@ class SkillItem(Model):
 
 
 class SkillManager(Model):
-    main_skill_status = Field(0x1C, label='主技能状态')
-    main_skill_duration = FloatField((0, 0x74), label='主技能持续时间')
+    ability_status = Field(0x1C, label='主技能状态')
+    ability_duration = FloatField((0, 0x74), label='主技能持续时间')
     skills = ArrayField(0x40, 33, ModelField(0, SkillItem))
+
+
+class AbilityCooldown(Value):
+    mult = FloatField(0x70, label='冷却倍数')
 
 
 class TeamConfig(Model):
     """团队属性"""
     moxxi_drink_duration = FloatField(0x10BC, label='莫西饮酒时长')
     skill_mgr = ModelPtrField((0xC98, 0x58), SkillManager, label='技能')
-    main_skill_cooldown_timer = FloatField((0xC58, 0x6C), label='主技能冷却时间')
-    main_skill_cooldown_mult = FloatField((0xC58, 0x70), label='主技能冷却倍数')
+    ability_cooldown = ModelPtrField(0xC58, AbilityCooldown, label='主技能冷却')
     damage_heals_self = FloatField(0xD54)
     team_ammo_regen = FloatField(0xFE0, label='团队弹药回复')
     explosives_heal_allies = FloatField(0x114C)
