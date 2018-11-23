@@ -2,6 +2,23 @@
 STATUS_CHOICES = ('普通', '不减')
 STATUS_VALUES = (5, 6)
 
+BADASS_BONUSES = (
+    "Maximum Health",
+    "Shield Capacity",
+    "Shield Recharge Rate",
+    "Shield Recharge Delay",
+    "Melee Damage",
+    "Grenade Damage",
+    "Gun Accuracy",
+    "Gun Damage",
+    "Fire Rate",
+    "Recoil Reduction",
+    "Elemental Effect Chance",
+    "Reload Speed",
+    "Elemental Effect Damage",
+    "Critical Hit Damage",
+)
+
 
 SKILL_NAMES = (
     ('突击手', '军刀枪塔', (

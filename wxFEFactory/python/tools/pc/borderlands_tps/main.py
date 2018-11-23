@@ -16,7 +16,7 @@ import types
 
 class Main(AssemblyHacktool):
     CLASS_NAME = 'LaunchUnrealUWindowsClient'
-    WINDOW_NAME = 'Borderlands 2 (32-bit, DX9)'
+    WINDOW_NAME = 'Borderlands: The Pre-Sequel (32-bit, DX9)'
 
     def __init__(self):
         super().__init__()
@@ -43,11 +43,11 @@ class Main(AssemblyHacktool):
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
-        system_config = (lambda: self._global.mgr.system_config, models.SystemConfig)
+        player_config = (self._player_config, models.PlayerConfig)
         physics_config = (lambda: self._global.mgr.player_mgr.physics_config, models.PhysicsConfig)
 
-        ModelInput('time_scale_multiplier', instance=system_config)
-        ModelInput('gravity', instance=system_config)
+        ModelInput('time_scale_multiplier', instance=player_config)
+        ModelInput('gravity', instance=player_config)
 
         ModelInput('move_speed', instance=physics_config)
         ModelInput('jump_height', instance=physics_config)
@@ -57,10 +57,11 @@ class Main(AssemblyHacktool):
     def render_character(self):
         health = (self._character_health, models.ShieldHealth)
         shield = (self._character_shield, models.ShieldHealth)
+        oxygen = (self._character_oxygen, models.ShieldHealth)
         experience = (self._experience, models.Experience)
         player_mgr = (self._player_mgr, models.PlayerManager)
 
-        for label, instance in (('生命', health), ('护甲', shield)):
+        for label, instance in (('生命', health), ('护甲', shield), ('氧气', oxygen)):
             Title(label)
             ModelInput('value', instance=instance)
             ModelInput('scaled_maximum', instance=instance)
@@ -106,10 +107,12 @@ class Main(AssemblyHacktool):
         ModelInput('mgr.vehicle_mgrs.1.boost.scaled_maximum', '载具2推进最大值')
 
     def render_ammo(self):
-        for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹')):
+        for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹', '激光子弹')):
             with ModelInput('mgr.weapon_ammos.%d.value' % i, label).container:
                 ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
             ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度')
+            ModelSelect('mgr.weapon_ammos.%d.status' % i, '不减',
+                choices=datasets.STATUS_CHOICES, values=datasets.STATUS_VALUES)
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)
@@ -161,13 +164,13 @@ class Main(AssemblyHacktool):
             b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3F\x00\x00\x80\x3F')
 
         self._drop_rates_table = (
-            (b'\x2C', 'very_common', '药'),
-            (b'\x2E', 'common', '白'),
-            (b'\x30', 'uncommon', '绿'),
-            (b'\x31', 'very_uncommon', '镒'),
-            (b'\x32', 'rare', '蓝'),
-            (b'\x33', 'very_rare', '紫'),
-            (b'\x34', 'legendary', '橙/珠光')
+            (b'\x2D', 'very_common', '药'),
+            (b'\x2F', 'common', '白'),
+            (b'\x32', 'uncommon', '绿'),
+            (b'\x33', 'very_uncommon', '镒'),
+            (b'\x34', 'rare', '蓝'),
+            (b'\x35', 'very_rare', '紫'),
+            (b'\x36', 'legendary', '橙/珠光')
         )
 
         self._drop_rates_preset = (
@@ -192,23 +195,8 @@ class Main(AssemblyHacktool):
 
     def render_assembly_functions(self):
         functions = (
-            # AssemblyItems('子弹不减+精准+无后坐',
-            #     AssemblyItem('ammo_keep', None, b'\x88\x5D\xFC\x8B\x86',
-            #         0x00DE0000, 0x00EF0000, b'',
-            #         b'\x9C\x60\xA1\x04\x09\xB7\x03\x8B\x80\x70\x04\x00\x00\x39\xF0\x0F\x85\x5E\x00\x00\x00'
-            #         b'\xC7\x86\xDC\x09\x00\x00\x00\x00\x00\x00\x8B\x80\xD0\x09\x00\x00\xC7\x80\x04\x01\x00\x00'
-            #         b'\x02\x00\x00\x00\xC7\x86\xEC\x08\x00\x00\x00\x7C\x12\x48\xC7\x86\xD8\x08\x00\x00\xCD\xCC\x4C\x3D'
-            #         b'\xC7\x86\xC4\x08\x00\x00\xCD\xCC\x4C\x3D\x31\xC9\x8B\x3D\x08\x09\xB7\x03\x89\x8F\x0C\x0E\x00\x00'
-            #         b'\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00'
-            #         b'\x61\x9D\x8B\x86\x28\x0A\x00\x00',
-            #         inserted=True, replace_len=6, replace_offset=3),
-            #     AssemblyItem('ammo_keep2', None, b'\x89\x7D?\x89\x7D?\x89\x7D?\x8B\x06\x8B\x55',
-            #         0x008A0000, 0x008B0000, b'',
-            #         b'\x9C\x60\x8B\x0D\x04\x09\xB7\x03\x8B\x89\x70\x04\x00\x00\x39\xC8\x0F\x85\x08\x00\x00\x00'
-            #         b'\xC7\x44\x24\x2C\x00\x00\x00\x00\x61\x9D\x55\x8B\xEC\x6A\xFF',
-            #         inserted=True, replace_len=5, replace_offset=-0x2F, fuzzy=True)),
             AssemblyItem('ammo_inf', '子弹不减+精准不减', b'\xF3\x0F\x58\x45\x08\x51',
-                0x007F0000, 0x00810000, b'',
+                0x005C0000, 0x005D0000, b'',
                 AssemblyGroup(
                     b'\x83\x79\x48\x00\x75\x24\x83\x79\x4C\x00\x75\x1E\x0F\xAE\x05',
                     assembly_code.Variable('fxbuff'),
@@ -221,44 +209,23 @@ class Main(AssemblyHacktool):
                 inserted=True, replace_len=5,
                 args=(VariableType('fxbuff', size=512, align=16), VariableType('minus_one', value=0xBF800000))),
             AssemblyItem('ammo_inf2', '无需换弹', b'\x3B\xC1\x7C\x0B\x8B\x55\x0C\x89\x02\x8B\xE5\x5D\xC2\x08\x00',
-                0x002A0000, 0x002B0000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
+                0x00460000, 0x00470000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
                 inserted=True, replace_len=5, replace_offset=7),
-            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
-                0x001A0000, 0x001B0000, b'',
-                b'\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00'
-                    b'\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00',
-                inserted=True, replace_len=8),
+            # AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
+            #     0x001A0000, 0x001B0000, b'',
+            #     b'\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00'
+            #         b'\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00',
+            #     inserted=True, replace_len=8),
             AssemblyItem('without_golden_keys', '无需金钥匙', b'\x74\x1D\x8A\x54',
                 0x00500000, 0x00510000, b'\xEB\x1D\x8A\x54'),
-            AssemblyItem('raid_boss_before', '无限刷BOSS（杀怪前）', b'\x89\x44\xF7\x04\x5E\x5F',
-                0x00080000, 0x00090000, b'\x90\x90\x90\x90'),
-            AssemblyItem('raid_boss_after', '无限刷BOSS（杀怪后）', b'\x8B\x44\xF7\x04\x53\x50\xe8',
-                0x00850000, 0x00860000, b'', b'\xC7\x44\xF7\x04\x00\x00\x00\x00\x8B\x44\xF7\x04\x53',
-                replace_len=5, inserted=True),
             AssemblyItem('ammo_upgrade_mod', '弹药上限升级', b'\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00',
-                0x003B0000, 0x003C0000, b'',
+                0x009FF000, 0x00110000, b'',
                 AssemblyGroup(b'\x83\xFE\x07\x0F\x84\x14\x00\x00\x00\x83\xFE\x08\x0F\x84\x0B\x00\x00\x00\x8B\x0D',
                     assembly_code.Variable('ammo_upgrade_level'),
                     b'\x01\x0C\xB0\xEB\x03\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00'),
                 inserted=True, args=(VariableType('ammo_upgrade_level', value=100),)),
-            AssemblyItem('super_speed_jump', '超级速度和跳跃', b'\xF3\x0F\x11\x44\x24\x04\xF3\x0F\x10\x43\x08\x8D\x95',
-                0x00DF0000, 0x00E00000, b'',
-                AssemblyGroup(b'\xF3\x0F\x10\x05', assembly_code.Variable('super_jump_mult'),
-                    b'\xF3\x0F\x59\x05', assembly_code.Variable('super_jump_store'),
-                    b'\xF3\x0F\x11\x86\xEC\x02\x00\x00\xF3\x0F\x10\x86\xA8\x02\x00\x00',
-                    b'\xF3\x0F\x59\x05', assembly_code.Variable('super_speed_mult'),
-                    b'\xF3\x0F\x11\x44\x24\x04',),
-                inserted=True, replace_len=6, args=(
-                    VariableType('super_speed_mult', type=float, value=0x40000000),
-                    VariableType('super_jump_mult', type=float, value=0x3FA00000),
-                    VariableType('super_jump_store', type=float, value=0x441D8000),
-                )),
-            AssemblyItem('instant_main_skill_timer', '主动技能冷却时间', b'\x8B\x84\x90\x88\x01\x00\x00\x89\x43\x08',
-                0x002B0000, 0x002C0000, b'',
-                b'\x8B\x84\x90\x88\x01\x00\x00\x85\xC0\x74\x0C\x83\xFA\x09\x75\x07\xC7\x40\x6C\x00\x00\x00\x00',
-                inserted=True, replace_len=7),
             AssemblyItem('mission_timer_freeze', '任务时间锁定', b'\xF3\x0F\x2C\x54\x03\x04\x89\x11',
-                0x00EF0000, 0x00F00000, b'',
+                0x00DE0000, 0x00DF0000, b'',
                 AssemblyGroup(b'\xF3\x0F\x2C\x54\x18\x04\x80\x7C\x18\x08\x00\x74\x2E\x83\x3D',
                     assembly_code.Variable('mission_timer_loaded'),
                     b'\x01\x74\x10\x89\x15', assembly_code.Variable('mission_timer_temp'),
@@ -268,19 +235,31 @@ class Main(AssemblyHacktool):
                     b'\xE9\x0A\x00\x00\x00\xC7\x05', assembly_code.Variable('mission_timer_loaded'),
                     b'\x00\x00\x00\x00',),
                 inserted=True, replace_len=6, args=('mission_timer_loaded', 'mission_timer_temp')),
-            AssemblyItem('selected_item', '选中的物品', b'\x8B\x81\xD0\x01\x00\x00\xC3\xCC\xCC',
-                0x00EA0000, 0x00EB0000, b'',
-                AssemblyGroup(b'\x89\x0D', assembly_code.Variable('selected_item_addr'), b'\x8B\x81\xD0\x01\x00\x00'),
-                inserted=True, replace_len=6, args=('selected_item_addr',)),
-            AssemblyItem('faster_collecting', '快速收集任务物品', b'\xFF\x04\x99\x8B\x14\x99\x8D\x1C\x99\x89\x55\xFC',
-                0x00DA0000, 0x00DB0000, b'',
-                b'\x8B\x14\x99\x83\xC2\x05\x3B\x56\x44\x7E\x03\x8B\x56\x44\x89\x14\x99',
+            AssemblyItems('选中的物品',
+                AssemblyItem('selected_gun', None, b'\x8B\x8F\x78\x0E\x00\x00\x33',
+                    0x00B8F000, 0x00BA0000, b'',
+                    AssemblyGroup(b'\x8B\x8F\x78\x0E\x00\x00\x89\x3D', assembly_code.Variable('selected_item_addr')),
+                    inserted=True, replace_len=6, args=('selected_item_addr',)),
+                AssemblyItem('selected_item', None, b'\x8B\x81\xA4\x08\x00\x00\x85\xC0\x74\x14',
+                    0x00A40000, 0x00A50000, b'',
+                    AssemblyGroup(b'\x8B\x81\xA4\x08\x00\x00\x89\x0D', assembly_code.Variable('selected_item_addr')),
+                    inserted=True, replace_len=6, args=('selected_item_addr',))),
+            # AssemblyItem('no_equip_level_limit', '解除装备等级限制', b'\x8B\x80\x58\x02\x00\x00\x5F\x5E\xC3',
+            #     0x00830000, 0x00840000, b'\x90\x90\x90\x90\x90\x90', replace_len=6),
+            AssemblyItem('no_unique_weapon_spreadfire_patterns', '无扩散', b'\x99\xF7\xFE\x8B\xC1\x89\x17',
+                0x00D00000, 0x00D10000, b'', b'\x99\xF7\xFE\x8B\xC1\xC7\x07\x00\x00\x00\x00',
+                inserted=True, replace_len=8),
+            AssemblyItem('free_world_usage', '免费世界使用', b'\x8B\x44\x81\x60\x8B\x4D\x14',
+                0x00440000, 0x00450000, b'', b'\xB8\x00\x00\x00\x00\x8B\x4D\x14', inserted=True),
+            AssemblyItem('free_moxi_drinks', '免费喝酒', b'\x8B\x81\xDC\x00\x00\x00\x8B\x4D\x10',
+                0x00680000, 0x00690000, b'\xB8\x00\x00\x00\x00\x90', replace_len=6),
+            AssemblyItem('unlimited_moxi_drink_duration', '无限喝酒时长', b'\xF3\x0F\x11\x8E\xBC\x10\x00\x00',
+                0x00090000, 0x000A0000, b'\x90\x90\x90\x90\x90\x90\x90\x90'),
+            AssemblyItem('infinite_double_jump', '无限二段跳', b'\x8B\x8B\x98\x0B\x00\x00\xC1\xE9\x09',
+                0x00EC0000, 0x00ED0000, b'', b'\x8B\x8B\x98\x0B\x00\x00\xC6\x83\x99\x0B\x00\x00\x10',
                 inserted=True, replace_len=6),
-            AssemblyItem('enemy_fast_evolution', '敌人快速升级', b'\x8B\x49\x4C\x8B\xC6\x3B\xC8',
-                0x00290000, 0x002A0000, b'', b'\x83\xFA\x0B\x75\x04\x8B\xCA\xEB\x03\x8B\x49\x4C\x8B\xC6',
-                inserted=True, replace_len=5),
-            AssemblyItem('no_equip_level_limit', '解除装备等级限制', b'\x8B\x80\x58\x02\x00\x00\x5F\x5E\xC3',
-                0x00830000, 0x00840000, b'\x90\x90\x90\x90\x90\x90', replace_len=6),
+            AssemblyItem('no_backpack_pickup_limit', '解除背包限制', b'\x8B\x81\x00\x02\x00\x00\xC3\xCC\xCC',
+                0x00790000, 0x007A0000, b'\xB8\x00\x00\x00\x00\x90', replace_len=6),
         )
         super().render_assembly_functions(functions)
 
@@ -330,6 +309,10 @@ class Main(AssemblyHacktool):
     def _character_shield(self):
         character = self._character()
         return character and character.shield
+
+    def _character_oxygen(self):
+        character = self._character()
+        return character and character.oxygen
 
     def _experience(self):
         character = self._character()
@@ -425,7 +408,7 @@ class Main(AssemblyHacktool):
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:
-            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x14E00000, 0x18000000, fuzzy=True)
+            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x1C450000, 0x1E000000, fuzzy=True)
             if addr is -1:
                 raise ValueError('找不到地址, ' + label)
             setattr(self._drop_rates, key, addr + 0x20)
