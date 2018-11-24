@@ -35,7 +35,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
-        self.lazy_group(Group("team", "团队", team_config), self.render_team)
+        self.lazy_group(Group("team", "团队", team_config, cols=4), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
         self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
@@ -101,9 +101,11 @@ class Main(AssemblyHacktool):
         ModelInput('mgr.vehicle_mgrs.0.health.value', '载具1血量')
         ModelInput('mgr.vehicle_mgrs.0.boost.value', '载具1推进')
         ModelInput('mgr.vehicle_mgrs.0.boost.scaled_maximum', '载具1推进最大值')
+        ModelCoordWidget('mgr.vehicle_mgrs.0.coord', '载具1坐标', savable=True)
         ModelInput('mgr.vehicle_mgrs.1.health.value', '载具2血量')
         ModelInput('mgr.vehicle_mgrs.1.boost.value', '载具2推进')
         ModelInput('mgr.vehicle_mgrs.1.boost.scaled_maximum', '载具2推进最大值')
+        ModelCoordWidget('mgr.vehicle_mgrs.1.coord', '载具1坐标', savable=True)
 
     def render_ammo(self):
         for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹', '激光子弹')):
@@ -141,6 +143,9 @@ class Main(AssemblyHacktool):
         ModelInput('badass_tokens')
         ModelInput('ability_cooldown.value', '能力冷却时间')
         ModelInput('ability_cooldown.mult', '能力冷却倍数')
+
+        for i, label in enumerate(datasets.BADASS_BONUSES):
+            ModelInput('badass_bonuses.%d' % i, label)
 
     def render_skill(self):
         with Group('ability', "主技能"):
@@ -216,7 +221,7 @@ class Main(AssemblyHacktool):
             #         b'\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00',
             #     inserted=True, replace_len=8),
             AssemblyItem('without_golden_keys', '无需金钥匙', b'\x74\x1D\x8A\x54',
-                0x00500000, 0x00510000, b'\xEB\x1D\x8A\x54'),
+                0x00440000, 0x00450000, b'\xEB\x1D\x8A\x54'),
             AssemblyItem('ammo_upgrade_mod', '弹药上限升级', b'\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00',
                 0x009FF000, 0x00110000, b'',
                 AssemblyGroup(b'\x83\xFE\x07\x0F\x84\x14\x00\x00\x00\x83\xFE\x08\x0F\x84\x0B\x00\x00\x00\x8B\x0D',

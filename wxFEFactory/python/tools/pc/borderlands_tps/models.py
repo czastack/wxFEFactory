@@ -120,7 +120,7 @@ class PlayerConfig(Model):
     hit_ricochet_chance = FloatField(0xA1C, label='击飞')
     miss_ricochet_chance = FloatField(0xA80, label='避开击飞')
     ignore_fatal_damage_chance = FloatField(0xABC, label='免受致命伤')
-    bullet_reflect_chance = FloatField(0xA44, label='子弹反弹次数')
+    bullet_reflect_chance = FloatField(0xA44, label='子弹反弹几率')
     coord = CoordField(0x60, label='坐标')
     move_vector = CoordField(0x104, label='移动向量')
 
