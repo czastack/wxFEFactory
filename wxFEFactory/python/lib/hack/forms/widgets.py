@@ -83,7 +83,8 @@ class Widget:
                 # 逻辑地址
                 print(strhex(self.get_addr()))
                 return True
-            elif code == WXK.getCode('-'):
+        elif mod == WXK.MOD_SHIFT:
+            if code == WXK._7:
                 # 进程中的地址
                 print(strhex(self.handler.address_map(self.get_addr())))
                 return True
@@ -514,20 +515,26 @@ class SimpleCheckBox(Widget):
 
 
 class BaseCheckBox(TwoWayWidget):
-    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None):
+    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, alone=False):
         """
         :param enable: 激活时写入的数据
         :param disable: 关闭时写入的数据
         """
-        super().__init__(name, label, addr, offsets)
+        self.alone = alone
         self.enable = enable
         self.disable = disable
         self.type = type(enable)
+        super().__init__(name, label, addr, offsets)
 
     def render(self):
+        label = self.label
+        if self.alone:
+            self.label = ''
         super().render()
+        if self.alone:
+            self.label = label
         with ui.Horizontal(className="fill") as container:
-            self.view = ui.CheckBox("", className="fill")
+            self.view = ui.CheckBox("" if not self.alone else label, className="fill")
             self.render_btn()
         self.container = container
 

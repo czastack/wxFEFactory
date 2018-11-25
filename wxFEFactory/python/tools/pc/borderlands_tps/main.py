@@ -111,9 +111,8 @@ class Main(AssemblyHacktool):
         for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹', '激光子弹')):
             with ModelInput('mgr.weapon_ammos.%d.value' % i, label).container:
                 ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
-            ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度')
-            ModelSelect('mgr.weapon_ammos.%d.status' % i, '不减',
-                choices=datasets.STATUS_CHOICES, values=datasets.STATUS_VALUES)
+            with ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度').container:
+                ModelCheckBox('mgr.weapon_ammos.%d.infinite' % i, '不减', alone=True)
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)
@@ -171,7 +170,7 @@ class Main(AssemblyHacktool):
             (b'\x2D', 'very_common', '药'),
             (b'\x2F', 'common', '白'),
             (b'\x32', 'uncommon', '绿'),
-            (b'\x33', 'very_uncommon', '镒'),
+            (b'\x33', 'very_uncommon', '月'),
             (b'\x34', 'rare', '蓝'),
             (b'\x35', 'very_rare', '紫'),
             (b'\x36', 'legendary', '橙/珠光')
@@ -215,11 +214,11 @@ class Main(AssemblyHacktool):
             AssemblyItem('ammo_inf2', '无需换弹', b'\x3B\xC1\x7C\x0B\x8B\x55\x0C\x89\x02\x8B\xE5\x5D\xC2\x08\x00',
                 0x00460000, 0x00470000, b'', b'\x8B\x02\x89\x02\x8B\xE5\x5D',
                 inserted=True, replace_len=5, replace_offset=7),
-            # AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x10\x0E\x00\x00',
-            #     0x001A0000, 0x001B0000, b'',
-            #     b'\x31\xC9\x89\x8F\x0C\x0E\x00\x00\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00'
-            #         b'\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00',
-            #     inserted=True, replace_len=8),
+            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x2C\x8F\x98\x0F\x00\x00\x01\x0E',
+                0x009D0000, 0x009E0000, b'',
+                b'\x31\xC9\x89\x8F\x94\x0F\x00\x00\x89\x8F\x98\x0F\x00\x00\x89\x8F\x9C\x0F\x00\x00'
+                    b'\x89\x8F\xA0\x0F\x00\x00\x89\x8F\xA4\x0F\x00\x00\x89\x8F\xA8\x0F\x00\x00',
+                inserted=True, replace_len=8),
             AssemblyItem('without_golden_keys', '无需金钥匙', b'\x74\x1D\x8A\x54',
                 0x00440000, 0x00450000, b'\xEB\x1D\x8A\x54'),
             AssemblyItem('ammo_upgrade_mod', '弹药上限升级', b'\xFF\x04\xB0\x8B\x8F\xE0\x00\x00\x00',
@@ -295,6 +294,7 @@ class Main(AssemblyHacktool):
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
+            (0, VK.X, this.current_ammo_full),
             (VK.MOD_SHIFT, VK.N, this.go_down),
             (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.F3, this.move_quickly),
@@ -353,6 +353,9 @@ class Main(AssemblyHacktool):
         shield = self._character_shield()
         if shield:
             shield.value_max()
+        oxygen = self._character_oxygen()
+        if oxygen:
+            oxygen.value_max()
 
     def vehicle_full(self):
         vehicle_mgrs = self._global.mgr.vehicle_mgrs
@@ -380,6 +383,11 @@ class Main(AssemblyHacktool):
         player_config = self._player_config()
         if player_config:
             player_config.coord.z -= 500
+
+    def current_ammo_full(self):
+        weapon = self._current_weapon()
+        if weapon.addr:
+            weapon.ammo.value_max()
 
     def all_ammo_full(self):
         for ammo in self._global.mgr.weapon_ammos:
@@ -419,7 +427,7 @@ class Main(AssemblyHacktool):
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:
-            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x1C000000, 0x1E000000, fuzzy=True)
+            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x1B000000, 0x1E000000, fuzzy=True)
             if addr is -1:
                 raise ValueError('找不到地址, ' + label)
             setattr(self._drop_rates, key, addr + 0x20)
