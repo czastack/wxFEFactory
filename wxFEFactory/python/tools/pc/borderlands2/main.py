@@ -109,7 +109,8 @@ class Main(AssemblyHacktool):
         for i, label in enumerate(('突击步枪子弹', '霰弹枪子弹', '手雷', '冲锋枪子弹', '手枪子弹', '火箭炮弹药', '狙击步枪子弹')):
             with ModelInput('mgr.weapon_ammos.%d.value' % i, label).container:
                 ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
-            ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度')
+            with ModelInput('mgr.weapon_ammos.%d.regen_rate' % i, '恢复速度').container:
+                ModelCheckBox('mgr.weapon_ammos.%d.infinite' % i, '不减', alone=True)
 
     def render_weapon(self):
         ModelInput('addr_hex', '地址', readonly=True)

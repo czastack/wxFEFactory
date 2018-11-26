@@ -1,5 +1,5 @@
 from lib.hack.models import (
-    Model, Field, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField, CoordField
+    Model, Field, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField, CoordField, ToggleField
 )
 
 
@@ -16,6 +16,8 @@ class Value(Model):
 class WeaponAmmo(Value):
     """弹药"""
     regen_rate = FloatField(0x84, label='回复速度')
+    status = Field(0x104, label='切换')  # Normal: 5, Infinite: 6
+    infinite = ToggleField(0x104, enable=6, disable=5, label='不减')
 
 
 class Weapon(Model):
