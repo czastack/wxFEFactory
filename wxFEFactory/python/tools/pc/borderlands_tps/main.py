@@ -128,6 +128,7 @@ class Main(AssemblyHacktool):
         ModelInput('base_reload_speed')
         ModelInput('base_burst_length')
         ModelInput('base_projectiles_per_shot')
+        ModelInput('calculated_projectiles_per_shot')
         ModelInput('calculated_bullets_used')
         ModelInput('base_extra_shot_chance')
         ModelInput('magazine_size')

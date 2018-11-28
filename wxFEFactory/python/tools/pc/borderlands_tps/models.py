@@ -53,8 +53,8 @@ class Weapon(Model):
     item_quantity = Field(0x1D4, label='物品数量')
     item_state = Field(0x21C, label='物品状态')  # Favorited, Crossed, Equipped, ect
 
-    # type_definition = Field(0xE78, label='类别')
-    # balance_definition = Field(0xE7C, label='平衡')
+    # type = Field(0xE78, label='类别')
+    # balance = Field(0xE7C, label='平衡')
     # manufacturer = Field(0xE80, label='制造商')
     # body = Field(0xE88, label='枪身')
     # grip = Field(0xE8C, label='握把')
