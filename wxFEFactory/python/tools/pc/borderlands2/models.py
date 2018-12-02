@@ -45,6 +45,7 @@ class Weapon(Model):
     base_extra_shot_chance = Field(0xD2C, label='基本额外射击机会')
     magazine_size = Field(0xA0C, label='弹药库容量')
     current_bullets = Field(0xA28, label='当前子弹')
+    ammo = ModelPtrField(0x9D0, WeaponAmmo, label='弹药')
     clip_ammo = Field(0x9D4, label='弹夹子弹')
     item_price = Field(0x1D0, label='物品价格')
     item_quantity = Field(0x1D8, label='物品数量')

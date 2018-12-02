@@ -317,6 +317,7 @@ class Main(AssemblyHacktool):
             (0, VK.P, this.vehicle_full),
             (0, VK.B, this.go_forward),
             (0, VK.N, this.go_up),
+            (0, VK.X, this.current_ammo_full),
             (VK.MOD_SHIFT, VK.N, this.go_down),
             (0, VK.F3, this.move_quickly),
             (0, VK.getCode(';'), this.all_ammo_full),
@@ -397,6 +398,11 @@ class Main(AssemblyHacktool):
         player_config = self._player_config()
         if player_config:
             player_config.coord.z -= 500
+
+    def current_ammo_full(self):
+        weapon = self._current_weapon()
+        if weapon.addr:
+            weapon.ammo.value_max()
 
     def all_ammo_full(self):
         for ammo in self._global.mgr.weapon_ammos:
