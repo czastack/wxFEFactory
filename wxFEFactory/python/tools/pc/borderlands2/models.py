@@ -133,6 +133,7 @@ class TeamConfig(Model):
     explosives_heal_allies = FloatField(0xF90)
     bullets_heal_allies = FloatField(0xF54)
     badass_tokens = FloatField(0x1664, label='坏小子徽章')
+    badass_bonuses = ArrayField((0x1678, 0), 14, Field(0))  # 坏小子加成效果
     team_kill_skill_timer_mult = FloatField(0x18A4)
 
     bullets_resistance = FloatField(0x4A0, label='普通抗性')

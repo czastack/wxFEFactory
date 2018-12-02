@@ -145,7 +145,7 @@ class Main(AssemblyHacktool):
         ModelInput('ability_cooldown.mult', '能力冷却倍数')
 
         for i, label in enumerate(datasets.BADASS_BONUSES):
-            ModelInput('badass_bonuses.%d' % i, label)
+            ModelInput('badass_bonuses.%d' % i, label).set_help('100% = 464, 200% = 1169, Max = 8388607')
 
     def render_skill(self):
         with Group('ability', "主技能"):

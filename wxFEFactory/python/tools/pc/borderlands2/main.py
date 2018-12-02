@@ -35,7 +35,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("vehicle", "载具", self._global), self.render_vehicle)
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
-        self.lazy_group(Group("team", "团队", team_config), self.render_team)
+        self.lazy_group(Group("team", "团队", team_config, cols=4), self.render_team)
         self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
         self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
@@ -126,6 +126,7 @@ class Main(AssemblyHacktool):
         ModelInput('base_reload_speed')
         ModelInput('base_burst_length')
         ModelInput('base_projectiles_per_shot')
+        ModelInput('calculated_projectiles_per_shot')
         ModelInput('calculated_bullets_used')
         ModelInput('base_extra_shot_chance')
         ModelInput('magazine_size')
@@ -138,6 +139,9 @@ class Main(AssemblyHacktool):
     def render_team(self):
         ModelInput('team_ammo_regen')
         ModelInput('badass_tokens')
+
+        for i, label in enumerate(datasets.BADASS_BONUSES):
+            ModelInput('badass_bonuses.%d' % i, label).set_help('100% = 464, 200% = 1169, Max = 8388607')
 
     def render_skill(self):
         with Group('ability', "主技能"):
@@ -426,7 +430,7 @@ class Main(AssemblyHacktool):
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:
-            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x14E00000, 0x18000000, fuzzy=True)
+            addr = self.handler.find_bytes(_id + self._drop_rates_scan_data, 0x14000000, 0x1E000000, fuzzy=True)
             if addr is -1:
                 raise ValueError('找不到地址, ' + label)
             setattr(self._drop_rates, key, addr + 0x20)
