@@ -319,6 +319,7 @@ class Main(AssemblyHacktool):
             (0, VK.N, this.go_up),
             (0, VK.X, this.current_ammo_full),
             (VK.MOD_SHIFT, VK.N, this.go_down),
+            (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.F3, this.move_quickly),
             (0, VK.getCode(';'), this.all_ammo_full),
             (0, VK.getCode('.'), this.level_up),
@@ -433,6 +434,12 @@ class Main(AssemblyHacktool):
         config = self._player_config()
         if config and config.addr:
             config.move_speed_mult = 2 if config.move_speed_mult == 1 else 1
+
+    def ability_cooldown(self):
+        """技能冷却"""
+        team_config = self._team_config()
+        if team_config:
+            team_config.ability_cooldown_timer = 0
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:

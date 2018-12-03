@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 import re
 
 
@@ -74,7 +74,7 @@ text = """
 </game>
 """
 
-root = ET.fromstring(text)
+root = ElementTree.fromstring(text)
 INDENT = '\t'
 codrbr = re.compile('(\\w{8} \\w{8}) ')
 
