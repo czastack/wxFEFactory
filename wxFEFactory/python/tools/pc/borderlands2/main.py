@@ -144,11 +144,11 @@ class Main(AssemblyHacktool):
             ModelInput('badass_bonuses.%d' % i, label).set_help('100% = 464, 200% = 1169, Max = 8388607')
 
     def render_skill(self):
-        with Group('ability', "主技能"):
-            ModelInput('skill_mgr.ability_status', '主技能状态')
-            ModelInput('skill_mgr.ability_duration', '主技能持续时间')
-            ModelInput('ability_cooldown_timer')
-            ModelInput('ability_cooldown_mult')
+        with Group('ability', "能力"):
+            ModelInput('skill_mgr.ability_status', '能力状态')
+            ModelInput('skill_mgr.ability_duration', '能力持续时间')
+            ModelInput('ability_cooldown.value', '能力冷却时间')
+            ModelInput('ability_cooldown.mult', '能力冷却倍数')
 
         def render_sub_skill(data):
             i = 0
@@ -439,7 +439,7 @@ class Main(AssemblyHacktool):
         """技能冷却"""
         team_config = self._team_config()
         if team_config:
-            team_config.ability_cooldown_timer = 0
+            team_config.ability_cooldown.value = 0
 
     def read_drop_rates(self, _):
         for _id, key, label in self._drop_rates_table:

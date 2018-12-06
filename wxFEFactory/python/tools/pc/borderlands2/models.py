@@ -124,11 +124,14 @@ class SkillManager(Model):
     skills = ArrayField(0x40, 33, ModelField(0, SkillItem))
 
 
+class AbilityCooldown(Value):
+    mult = FloatField(0x70, label='冷却倍数')
+
+
 class TeamConfig(Model):
     """团队属性"""
     skill_mgr = ModelPtrField((0xB74, 0x58), SkillManager, label='技能')
-    ability_cooldown_timer = FloatField((0xB64, 0x6C), label='主技能冷却时间')
-    ability_cooldown_mult = FloatField((0xB64, 0x60), label='主技能冷却倍数')
+    ability_cooldown = ModelPtrField(0xB64, AbilityCooldown, label='主技能冷却')
     damage_heals_self = FloatField(0xBF4)
     team_ammo_regen = FloatField(0xE58, label='团队弹药回复')
     explosives_heal_allies = FloatField(0xF90)
