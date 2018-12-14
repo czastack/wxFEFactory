@@ -4,7 +4,7 @@ from lib.hack.forms import (
 )
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
-from lib.lazy import ClassLazy
+from lib.lazy import classlazy
 from tools.utils import PresetDialog
 from functools import partial
 from . import models, datasets
@@ -164,7 +164,7 @@ class Main(BasePs2Hack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    @ClassLazy
+    @classlazy
     def dictionary(self):
         return Dictionary(os.path.join(os.path.dirname(__file__), 'dict.txt'), low_range=(0x81, 0x98), use_ascii=True)
 

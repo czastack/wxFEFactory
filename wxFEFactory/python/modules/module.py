@@ -1,6 +1,5 @@
 from application import app
-from lib import wxconst
-from lib.lazy import ClassLazy
+from lib import wxconst, lazy
 from lib.scene import BaseScene
 from styles import styles
 from fefactory_api import ui
@@ -52,7 +51,7 @@ class BaseModule(BaseScene):
         """
         pass
 
-    @ClassLazy
+    @lazy.classlazy
     def title(cls):
         """获取原始标题，显示在标签页标题和菜单栏"""
         name = cls.module_name
@@ -61,7 +60,7 @@ class BaseModule(BaseScene):
                 return item[0]
         return name
 
-    @ClassLazy
+    @lazy.classlazy
     def module_name(cls):
         """模块名称，即模块文件夹名"""
         return cls.__module__.split('.')[1]

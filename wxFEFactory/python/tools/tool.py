@@ -1,6 +1,5 @@
-from lib import wxconst
+from lib import wxconst, lazy
 from lib.scene import BaseScene
-from lib.lazy import ClassLazy
 from styles import styles, dialog_style
 from fefactory_api import ui, alert
 import traceback
@@ -59,13 +58,13 @@ class BaseTool(BaseScene):
             close_callbacks = self._close_callbacks = []
         close_callbacks.append(callback)
 
-    @ClassLazy
+    @lazy.classlazy
     def title(cls):
         """获取原始标题，显示在标签页标题和菜单栏"""
         module = cls.__module__
         return __import__(module[:module.rfind('.')], fromlist='__init__').name
 
-    @ClassLazy
+    @lazy.classlazy
     def module_name(cls):
         """模块名称，即模块文件夹名"""
         module = cls.__module__

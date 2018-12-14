@@ -626,14 +626,14 @@ class BaseSelect(TwoWayWidget):
         if self.onselect:
             self.onselect(self.view)
 
-    @lazy.ClassLazy
+    @lazy.classlazy
     def contextmenu(cls):
         with ui.ContextMenu() as contextmenu:
             ui.MenuItem("搜索(&S)", onselect=cls.menu_search)
             ui.MenuItem("拖拽帮助", onselect=cls.move_about)
         return contextmenu
 
-    @lazy.ClassLazy
+    @lazy.classlazy
     def search_dialog(cls):
         return exui.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
 
