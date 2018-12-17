@@ -13,7 +13,7 @@ import __main__
 class BaseHackTool(NestedTool):
     def __init__(self):
         super().__init__()
-        self.config = Config(self.module_name + '_config.json')
+        self.config = Config("config/%s_config.json" % self.module_name + '')
 
     def attach(self, frame):
         super().attach(frame)

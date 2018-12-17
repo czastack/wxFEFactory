@@ -14,7 +14,7 @@ class Project(Configurable):
         Configurable.__init__(self, Path.join(self.path, 'project.json'))
 
     def exists(self):
-        return Path.exists(self.getConfigFile())
+        return Path.exists(self.getconfigFile())
 
     @property
     def title(self):
@@ -23,4 +23,4 @@ class Project(Configurable):
     @title.setter
     def title(self, title):
         if title:
-            self.setConfig('title', title)
+            self.setconfig('title', title)

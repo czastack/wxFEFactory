@@ -9,7 +9,7 @@ import json
 import types
 import __main__
 
-DUMP_INDENT = app.getConfig('json_indent', 4)
+DUMP_INDENT = app.getconfig('json_indent', 4)
 
 
 class BaseModule(BaseScene):

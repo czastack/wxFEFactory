@@ -321,7 +321,7 @@ class MainFrame:
         __main__.tool = tool
 
     def save_win_option(self, m):
-        app.setConfig('start_option', {
+        app.setconfig('start_option', {
             'position': self.win.position,
             'size': self.win.size,
         })

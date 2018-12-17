@@ -24,8 +24,8 @@ class ConfigCtrl(ABC):
         self.default = default
         parent.append_child(self)
         self.owner = parent.owner
-        self.owner.setDefault(name, default)
-        self.owner.registerObserver(name, self.weak._onConfigChange)
+        self.owner.setdefault(name, default)
+        self.owner.register_observer(name, self.weak._onConfigChange)
 
     def _onConfigChange(self, config, name, value):
         self.read()
@@ -37,10 +37,10 @@ class ConfigCtrl(ABC):
         self.set_config_value(value)
 
     def get_config_value(self):
-        return self.owner.getConfig(self.name, self.default)
+        return self.owner.getconfig(self.name, self.default)
 
     def set_config_value(self, value, notity=True):
-        return self.owner.setConfig(self.name, value, notity)
+        return self.owner.setconfig(self.name, value, notity)
 
     @abstractmethod
     def get_input_value(self):

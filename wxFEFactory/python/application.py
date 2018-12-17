@@ -5,8 +5,7 @@ import json
 import fefactory_api
 import __main__
 
-CONFIG_FILE = 'config.json'
-HISTORY_SIZE = 10
+CONFIG_FILE = 'config/config.json'
 
 
 class Application(Configurable):
@@ -14,15 +13,16 @@ class Application(Configurable):
     def __init__(self):
         Configurable.__init__(self, CONFIG_FILE)
         config = self.config
-        recent_project = self.getConfig('recent_project')
+        recent_project = self.getconfig('recent_project')
+        history_size = self.getconfig('history_size', 10)
         if recent_project:
-            config['recent_project'] = HistoryList(recent_project, HISTORY_SIZE)
+            config['recent_project'] = HistoryList(recent_project, history_size)
             self.project = Project(config['recent_project'][-1])
         else:
-            config['recent_project'] = HistoryList(maxsize=HISTORY_SIZE)
+            config['recent_project'] = HistoryList(maxsize=history_size)
             self.project = None
 
-        self.start_option = self.getConfig('start_option')
+        self.start_option = self.getconfig('start_option')
 
     def project_confirm(self):
         if not self.project:
@@ -36,9 +36,9 @@ class Application(Configurable):
         self.project = project
 
     def onExit(self):
-        self.writeConfig()
+        self.writeconfig()
         if self.project:
-            self.project.writeConfig()
+            self.project.writeconfig()
         globals().pop('app')
         del __main__.app
         del __main__.win

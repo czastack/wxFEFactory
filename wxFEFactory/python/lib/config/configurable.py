@@ -10,19 +10,19 @@ class Configurable(ABC):
         self.config_file = config_file
         self.config_changed = False
         self.observers = {}
-        self.loadConfig()
+        self.loadconfig()
 
     def __del__(self):
-        self.writeConfig()
+        self.writeconfig()
 
     def __str__(self):
         return '{}("{}")'.format(self.__class__.__name__, self.config_file)
 
-    def getConfig(self, name, defval=None):
+    def getconfig(self, name, defval=None):
         return self.config.get(name, defval)
 
-    def setConfig(self, name, value, notify=True):
-        if self.getConfig(name) != value:
+    def setconfig(self, name, value, notify=True):
+        if self.getconfig(name) != value:
             self.config[name] = value
             self.config_changed = True
             if notify:
@@ -30,13 +30,13 @@ class Configurable(ABC):
                 if handler:
                     handler(self, name, value)
 
-    def setDefault(self, name, default):
+    def setdefault(self, name, default):
         if name not in self.config:
-            self.setConfig(name, default)
+            self.setconfig(name, default)
 
-    def registerObserver(self, name, handler):
+    def register_observer(self, name, handler):
         """ 注册变化观察者
-        :param handler: fn(config, name, value) 
+        :param handler: fn(config, name, value)
         """
         self.observers[name] = handler
 
@@ -44,14 +44,14 @@ class Configurable(ABC):
         """放弃之前的所以修改"""
         self.config_changed = False
 
-    def loadConfig(self):
+    def loadconfig(self):
         try:
             with open(self.config_file) as file:
                 self.config = json.load(file)
         except Exception:
             self.config = {}
 
-    def writeConfig(self):
+    def writeconfig(self):
         if self.config_changed:
             with open(self.config_file, 'w') as file:
                 self.config = json.dump(self.config, file)
@@ -59,15 +59,15 @@ class Configurable(ABC):
 
 
 class Config(Configurable):
-    load = Configurable.loadConfig
-    write = Configurable.writeConfig
+    load = Configurable.loadconfig
+    write = Configurable.writeconfig
 
     def __getattr__(self, name):
         if name in self.observers:
-            return self.getConfig(name)
+            return self.getconfig(name)
 
     def __setattr__(self, name, value):
         if name not in self.__slots__ and name in self.observers:
-            self.setConfig(name, value)
+            self.setconfig(name, value)
         else:
             object.__setattr__(self, name, value)

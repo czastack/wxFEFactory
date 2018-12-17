@@ -124,3 +124,12 @@ def prepare_option(choices, values):
 def dirfind(obj, text):
     """dir属性中查找"""
     return list(filter(lambda x: text in x, dir(obj)))
+
+
+def compose(*funs):
+    """合并装饰器"""
+    def _deco(self):
+        for func in reversed(funs):
+            f = fun(f)
+        return f
+    return _deco
