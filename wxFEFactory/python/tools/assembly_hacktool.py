@@ -59,6 +59,8 @@ class AssemblyHacktool(BaseHackTool):
                     self.unregister_assembly(item.key)
         elif isinstance(item, AssemblySwitch):
             self.set_variable_value(item.key, int(checked))
+        elif isinstance(item, SimpleButton):
+            item.onclick(checked)
 
     def toggle_assembly_button(self, key):
         self.assembly_buttons[key].toggle()
@@ -293,6 +295,7 @@ AssemblyItem = DataClass(
 
 
 AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
+SimpleButton = DataClass('SimpleButton', ('key', 'label', 'onclick'))
 
 VariableType = DataClass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
     defaults={'size': 4, 'type': int, 'value': 0})
