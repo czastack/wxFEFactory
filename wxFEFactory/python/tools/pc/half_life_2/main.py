@@ -1,0 +1,72 @@
+from functools import partial
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.handlers import MemHandler
+from lib.win32.keys import VK
+from tools.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
+from tools.assembly_code import AssemblyGroup, Variable
+from tools import assembly_code
+from fefactory_api import ui
+from styles import styles
+# from . import models
+import fefactory_api
+
+
+class Main(AssemblyHacktool):
+    CLASS_NAME = 'Valve001'
+    WINDOW_NAME = 'HALF-LIFE 2'
+
+    def __init__(self):
+        super().__init__()
+        self.handler = MemHandler()
+        # self._global = models.Global(0, self.handler)
+
+    def render_main(self):
+        # with Group("global", "全局", self._global):
+        #     pass
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+
+    def onattach(self):
+        super().onattach()
+        self._server_base = self.handler.get_module('server.dll')
+
+    def server_base(self):
+        return self._server_base
+
+    def render_assembly_functions(self):
+        server_base = self.server_base
+        functions = (
+            # AssemblyItems('无限生命',
+            #     AssemblyItem('health_inf', None, b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
+            #         0x3A00000, 0x3B00000, b'',
+            #         b'\x66\x8B\x82\xB0\x01\x00\x00\x66\x89\x82\x32\x02\x00\x00'
+            #             b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
+            #         inserted=True),
+            #     AssemblyItem('health_inf2', None, b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00',
+            #         0x3A00000, 0x3B00000, b'',
+            #         b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00\x66\xC7\x81\x32\x02\x00\x00\x0F\x27',
+            #         inserted=True)),
+            AssemblyItem('ammo_999', '弹药999', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
+                0x21A000, 0x220000, b'',
+                b'\xC7\x84\xBE\x30\x06\x00\x00\xE7\x03\x00\x00',
+                inserted=True, replace_len=7, find_base=server_base),
+            AssemblyItem('no_reload_pistol', '手枪不用换弹', b'\x89\x9E\xC4\x04\x00\x00\xEB\x39',
+                0x218000, 0x228000, b'\x90' * 6, find_base=server_base),
+            AssemblyItem('no_reload_slot3', 'Slot3不用换弹', b'\x89\xAE\xC4\x04\x00\x00\x33\xED',
+                0x37000, 0x38000, b'\x90' * 6, find_base=server_base),
+            AssemblyItem('no_reload_shotgun', '单管霰弹枪不用换弹', b'\x89\x9F\xC4\x04\x00\x00\x8B\x06',
+                0x173000, 0x173200, b'\x90' * 6, find_base=server_base),
+            AssemblyItem('no_reload_shotgun2', '双管霰弹枪不用换弹', b'\x89\x9F\xC4\x04\x00\x00\x8B\x06',
+                0x173200, 0x173300, b'\x90' * 6, find_base=server_base),
+            AssemblyItem('no_reload_crossbow', '十字弩不用换弹', b'\x89\x9E\xC4\x04\x00\x00\x8D\x54\x24\x24',
+                0x15E000, 0x160000, b'\x90' * 6, find_base=server_base),
+        )
+        super().render_assembly_functions(functions)
+
+    # def get_hotkeys(self):
+    #     this = self.weak
+    #     return (
+    #         (0, VK.H, this.pull_through),
+    #     )
+
+    def pull_through(self):
+        self.toggle_assembly_button('health_inf')

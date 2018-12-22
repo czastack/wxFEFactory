@@ -7,7 +7,7 @@ from tools.assembly_code import AssemblyGroup, Variable
 from tools import assembly_code
 from fefactory_api import ui
 from styles import styles
-from . import models
+# from . import models
 import fefactory_api
 
 
@@ -18,7 +18,7 @@ class Main(AssemblyHacktool):
     def __init__(self):
         super().__init__()
         self.handler = MemHandler()
-        self._global = models.Global(0, self.handler)
+        # self._global = models.Global(0, self.handler)
 
     def render_main(self):
         # with Group("global", "全局", self._global):

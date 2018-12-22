@@ -68,11 +68,11 @@ class NativeHacktool(AssemblyHacktool):
                 return self.handler.read_double(self.native_context.m_pReturn + 16)
             return self.handler.read_float(self.native_context.m_pReturn + 8)
 
-    def get_cached_address(self, key, original, find_start, find_end, find_range_from_base=True):
+    def get_cached_address(self, key, original, find_start, find_end, find_base=True):
         cached_address = getattr(self, '_cached_address', None)
         if cached_address is None:
             cached_address = self._cached_address = {}
         addr = cached_address.get(key, None)
         if addr is None:
-            addr = self.find_address(original, find_start, find_end, find_range_from_base)
+            addr = self.find_address(original, find_start, find_end, find_base)
         return addr

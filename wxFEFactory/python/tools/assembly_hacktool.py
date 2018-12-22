@@ -91,7 +91,7 @@ class AssemblyHacktool(BaseHackTool):
             replace_len = item.replace_len
             replace_offset = item.replace_offset
 
-            addr = self.find_address(original, item.find_start, item.find_end, item.find_range_from_base, item.fuzzy)
+            addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.fuzzy)
             if addr is -1:
                 return
 
@@ -196,11 +196,10 @@ class AssemblyHacktool(BaseHackTool):
         self.handler.write(item['addr'], item['original'])
         item['active'] = False
 
-    def find_address(self, original, find_start, find_end, find_range_from_base=True, fuzzy=False):
-        base_addr = self.handler.base_addr
-        if find_start and find_range_from_base:
+    def find_address(self, original, find_start, find_end, find_base=True, fuzzy=False):
+        base_addr = find_base is True and self.handler.base_addr or callable(find_base) and find_base() or find_base
+        if base_addr:
             find_start += base_addr
-        if find_end and find_range_from_base:
             find_end += base_addr
         return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
 
@@ -273,17 +272,17 @@ class AssemblyItems:
     :param find_end: 原始数据查找结束
     :param replace: 原始数据替换为的内容
     :param assembly: 写到新内存的内容
-    :param find_range_from_base: 是否将find_start和find_end加上模块起始地址
+    :param find_base: 是否将find_start和find_end加上模块起始地址
     :param inserted: 是否自动加入jmp代码
     :param replace_len: 只记录original前n个字节
 """
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly',
-        'find_range_from_base', 'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help'),
+        'find_base', 'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help'),
     defaults={
         'assembly': None,
-        'find_range_from_base': True,
+        'find_base': True,
         'inserted': False,
         'fuzzy': False,
         'replace_len': 0,
