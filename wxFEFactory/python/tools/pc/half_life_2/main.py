@@ -37,23 +37,16 @@ class Main(AssemblyHacktool):
     def render_assembly_functions(self):
         server_base = self.server_base
         NOP_6 = b'\x90' * 6
+        NOP_7 = b'\x90' * 7
         functions = (
-            # AssemblyItems('无限生命',
-            #     AssemblyItem('health_inf', None, b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
-            #         0x3A00000, 0x3B00000, b'',
-            #         b'\x66\x8B\x82\xB0\x01\x00\x00\x66\x89\x82\x32\x02\x00\x00'
-            #             b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
-            #         inserted=True),
-            #     AssemblyItem('health_inf2', None, b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00',
-            #         0x3A00000, 0x3B00000, b'',
-            #         b'\x4C\x8D\x44\x24\x70\x0F\x28\xCE\x48\x8B\x8B\xD0\x01\x00\x00\x66\xC7\x81\x32\x02\x00\x00\x0F\x27',
-            #         inserted=True)),
             AssemblyItem('invincible', '不扣血', b'\x89\xBE\x9C\x00\x00\x00\x5F\x5E\x5D\xB8',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
             AssemblyItem('ammo_999', '装填弹药999', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
                 0x21A000, 0x220000, b'', b'\xC7\x84\xBE\x30\x06\x00\x00\xE7\x03\x00\x00',
                 inserted=True, replace_len=7, find_base=server_base),
             SimpleButton('no_reload_all', '不用换弹', onclick=self.no_reload_all),
+            AssemblyItem('no_reload_grenade', '炮弹不用换弹', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
+                0x21A000, 0x220000, NOP_7, find_base=server_base),
             AssemblyItem('no_reload_pistol', '手枪不用换弹', b'\x89\x9E\xC4\x04\x00\x00\xEB\x39',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
             AssemblyItem('no_reload_revolver', '左轮不用换弹', b'\x83\x09\x01\x8B\x12\x89\x10',
@@ -79,7 +72,7 @@ class Main(AssemblyHacktool):
         self.toggle_assembly_button('health_inf')
 
     def no_reload_all(self, checked):
-        keys = ('no_reload_pistol', 'no_reload_revolver', 'no_reload_slot3',
+        keys = ('no_reload_grenade', 'no_reload_pistol', 'no_reload_revolver', 'no_reload_slot3',
             'no_reload_shotgun', 'no_reload_shotgun2', 'no_reload_crossbow')
         for key in keys:
             self.toggle_assembly_button(key)
