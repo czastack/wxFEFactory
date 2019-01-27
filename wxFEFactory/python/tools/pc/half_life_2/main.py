@@ -37,16 +37,17 @@ class Main(AssemblyHacktool):
     def render_assembly_functions(self):
         server_base = self.server_base
         NOP_6 = b'\x90' * 6
-        NOP_7 = b'\x90' * 7
         functions = (
-            AssemblyItem('invincible', '不扣血', b'\x89\xBE\x9C\x00\x00\x00\x5F\x5E\x5D\xB8',
+            AssemblyItem('invincible', '血量不减', b'\x89\xBE\x9C\x00\x00\x00\x5F\x5E\x5D\xB8',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
+            AssemblyItem('suit_keep', '护甲不减', b'\x2B\xE8\x39\xAE\xB4\x0B\x00\x00',
+                0x33A000, 0x33B000, b'\x90\x90', replace_len=2, find_base=server_base),
             AssemblyItem('ammo_999', '装填弹药999', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
                 0x21A000, 0x220000, b'', b'\xC7\x84\xBE\x30\x06\x00\x00\xE7\x03\x00\x00',
                 inserted=True, replace_len=7, find_base=server_base),
             SimpleButton('no_reload_all', '不用换弹', onclick=self.no_reload_all),
             AssemblyItem('no_reload_grenade', '炮弹不用换弹', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
-                0x21A000, 0x220000, NOP_7, find_base=server_base),
+                0x21A000, 0x220000, b'\x90' * 7, find_base=server_base),
             AssemblyItem('no_reload_pistol', '手枪不用换弹', b'\x89\x9E\xC4\x04\x00\x00\xEB\x39',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
             AssemblyItem('no_reload_revolver', '左轮不用换弹', b'\x83\x09\x01\x8B\x12\x89\x10',
@@ -68,8 +69,8 @@ class Main(AssemblyHacktool):
     #         (0, VK.H, this.pull_through),
     #     )
 
-    def pull_through(self):
-        self.toggle_assembly_button('health_inf')
+    # def pull_through(self):
+    #     self.toggle_assembly_button('health_inf')
 
     def no_reload_all(self, checked):
         keys = ('no_reload_grenade', 'no_reload_pistol', 'no_reload_revolver', 'no_reload_slot3',

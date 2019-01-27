@@ -227,7 +227,7 @@ class AssemblyHacktool(BaseHackTool):
         return variable
 
     def get_variable(self, name):
-        """获取变量地址"""
+        """获取变量对象"""
         if self.allocated_memory:
             return self.registed_variable.get(name, None)
 
