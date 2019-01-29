@@ -252,11 +252,11 @@ class Main(BaseGTATool):
         # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
         # if player_addr is 0:
         #     return None
-        player = getattr(self, '_playerins', None)
+        player = getattr(self, '_player_ins', None)
         player_index = self.get_player_index()
 
         if not player:
-            player = self._playerins = self.Player(player_index, self.get_ped_handle(player_index), self)
+            player = self._player_ins = self.Player(player_index, self.get_ped_handle(player_index), self)
         else:
             player.index = player_index
             player.handle = self.get_ped_handle(player_index)

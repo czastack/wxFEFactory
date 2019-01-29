@@ -13,7 +13,7 @@ class FeHack(BaseGbaHack):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
-        self._personins = self.models.Person(0, self.handler)
+        self._person_ins = self.models.Person(0, self.handler)
 
     def render_main(self):
         with Group("global", "全局", self._global):
@@ -73,7 +73,7 @@ class FeHack(BaseGbaHack):
                 ModelInput("items.%d.count" % i, "数量")
 
     def render_char_support(self):
-        for i in range(self._personins.support.length):
+        for i in range(self._person_ins.support.length):
             ModelInput("support.%d" % i, "好感度%d" % (i + 1)).set_help('80~160: C, 160~240: B, 240~255: A')
 
     def render_train_items(self):
@@ -104,9 +104,9 @@ class FeHack(BaseGbaHack):
     def _person(self):
         person_addr = self._global.person_addr
         if person_addr and (person_addr & 0xFFFF0000 == 0x02020000):
-            self._personins.addr = person_addr
-        if self._personins.addr:
-            return self._personins
+            self._person_ins.addr = person_addr
+        if self._person_ins.addr:
+            return self._person_ins
 
     person = property(_person)
 

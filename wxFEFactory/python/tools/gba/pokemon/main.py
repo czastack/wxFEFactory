@@ -14,8 +14,8 @@ class PMHack(BaseGbaHack):
 
     def __init__(self):
         super().__init__()
-        self._globalins = None
-        self._pokemonins = models.Pokemon(0, self.handler)
+        self._global_ins = None
+        self._pokemon_ins = models.Pokemon(0, self.handler)
         self.active_pokemon_index = 0
         self.active_pokemon_ins = None
 
@@ -103,24 +103,24 @@ class PMHack(BaseGbaHack):
             item = models.GAME_ENCRYPTED.get(szGameVersion, None)
 
         if item:
-            self._globalins = item[0](0, self.handler)
+            self._global_ins = item[0](0, self.handler)
             self.pm_version = item[1]
             self.lang = item[2]
             # 初始化一些背包参数
-            self._globalins.backpack_offset = 0
+            self._global_ins.backpack_offset = 0
 
     def _global(self):
-        return self._globalins
+        return self._global_ins
 
     def read_active_pokemons(self):
-        pokemons = self._globalins.active_pokemon.tolocal()
+        pokemons = self._global_ins.active_pokemon.tolocal()
         for pokemon in pokemons.content:
             pokemon.pmStruct.attach()
             pokemon.pmStruct.Decode()
         return pokemons
 
     def read_active_pokemon(self, _=None):
-        active_pokemon = self._globalins.active_pokemon.content[self.active_pokemon_index]
+        active_pokemon = self._global_ins.active_pokemon.content[self.active_pokemon_index]
         self.active_pokemon_ins = pokemon = active_pokemon.pmStruct.tolocal()
         pokemon.attach()
         pokemon.Decode()
@@ -132,7 +132,7 @@ class PMHack(BaseGbaHack):
             temp = pokemon.tolocal()
             temp.bEncoded = False
             temp.Encode()
-            self._globalins.active_pokemon.content[self.active_pokemon_index].pmStruct = temp
+            self._global_ins.active_pokemon.content[self.active_pokemon_index].pmStruct = temp
 
     def _active_pokemon(self):
         return self.active_pokemon_ins or self.read_active_pokemon()
@@ -143,26 +143,26 @@ class PMHack(BaseGbaHack):
         if pokemon:
             breed = pokemon.breedInfo.wBreed
             if breed < BREED_COUNT:
-                return self._globalins.breed_list[breed]
+                return self._global_ins.breed_list[breed]
 
     def _active_pokemon_exp_list(self):
         """选中的宝可梦的种族EXP列表"""
         breed_entry = self._active_pokemon_breed()
         if breed_entry:
             exptype = breed_entry.bExpType
-            return self._globalins.exp_list[exptype]
+            return self._global_ins.exp_list[exptype]
 
     # pokemon = property(_pokemon)
     # active_pokemons = property(_active_pokemons)
 
     def on_backpack_page(self, page):
         """背包物品切换页"""
-        self._globalins.backpack_offset = (page - 1) * self.BACKPACK_PAGE_LENGTH
+        self._global_ins.backpack_offset = (page - 1) * self.BACKPACK_PAGE_LENGTH
         self.backpack_group.read()
 
     def on_backpack_swith(self, view):
-        self._globalins.backpack_type = self.datasets.BACKPACK_KEYS[view.index]
-        self.backpack_pageview.asset_total(self._globalins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
+        self._global_ins.backpack_type = self.datasets.BACKPACK_KEYS[view.index]
+        self.backpack_pageview.asset_total(self._global_ins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
         self.backpack_group.read()
 
     def on_active_pokemo_swith(self, view):

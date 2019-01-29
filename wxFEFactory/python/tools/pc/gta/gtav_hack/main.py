@@ -448,11 +448,11 @@ class Main(BaseGTATool):
 
     def _player(self):
         """获取当前角色"""
-        player = getattr(self, '_playerins', None)
+        player = getattr(self, '_player_ins', None)
         player_index = self.player_id
 
         if not player:
-            player = self._playerins = self.Player(player_index, self.ped_id, self)
+            player = self._player_ins = self.Player(player_index, self.ped_id, self)
         else:
             player.index = player_index
             player.handle = self.ped_id

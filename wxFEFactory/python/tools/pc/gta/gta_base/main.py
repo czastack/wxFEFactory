@@ -33,9 +33,9 @@ class BaseGTATool(NativeHacktool):
         player_addr = self.handler.read32(self.address.PLAYER_PTR)
         if player_addr is 0:
             return None
-        player = getattr(self, '_playerins', None)
+        player = getattr(self, '_player_ins', None)
         if not player:
-            player = self._playerins = self.Player(player_addr, self)
+            player = self._player_ins = self.Player(player_addr, self)
         elif player.addr != player_addr:
             player.addr = player_addr
         return player

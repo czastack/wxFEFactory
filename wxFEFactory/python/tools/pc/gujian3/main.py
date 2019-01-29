@@ -19,7 +19,7 @@ class Main(AssemblyHacktool):
     def __init__(self):
         super().__init__()
         self.handler = MemHandler()
-        self._globalins = models.Global(0, self.handler)
+        self._global_ins = models.Global(0, self.handler)
         self._movement_ins = models.Movement(0, self.handler)
 
     def render_main(self):
@@ -122,8 +122,8 @@ class Main(AssemblyHacktool):
         super().render_assembly_functions(functions)
 
     def _global(self):
-        self._globalins.addr = self.get_variable_value('base1')
-        return self._globalins
+        self._global_ins.addr = self.get_variable_value('base1')
+        return self._global_ins
 
     def _movement(self):
         self._movement_ins.addr = self.get_variable_value('base_move')

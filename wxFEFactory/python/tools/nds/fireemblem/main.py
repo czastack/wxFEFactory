@@ -13,7 +13,7 @@ class FeHack(BaseNdsHack):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
-        self._personins = self.models.Person(0, self.handler)
+        self._person_ins = self.models.Person(0, self.handler)
         self.item_index = 1
 
     def render_main(self):
@@ -148,8 +148,8 @@ class FeHack(BaseNdsHack):
     def _person(self):
         person_addr = self._global.person_addr
         if person_addr:
-            self._personins.addr = person_addr
-            return self._personins
+            self._person_ins.addr = person_addr
+            return self._person_ins
 
     person = property(_person)
 
