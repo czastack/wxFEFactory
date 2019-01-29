@@ -5,16 +5,16 @@ class AssemblyGroup:
     def __init__(self, *nodes):
         self.nodes = nodes
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         buff = bytearray()
         for node in self.nodes:
             if isinstance(node, bytes):
                 buff.extend(node)
-                addr += len(node)
+                context.addr += len(node)
             elif isinstance(node, AssemblyNode):
-                data = node.generate(owner, addr)
+                data = node.generate(owner, context)
                 buff.extend(data)
-                addr += len(data)
+                context.addr += len(data)
         return bytes(buff)
 
 
@@ -34,13 +34,16 @@ class AssemblyNode:
             target = owner.get_variable(target).addr
         return target
 
+    def generate(self, owner, context):
+        return b''
+
 
 class Variable(AssemblyNode):
     def __init__(self, key, size=4):
         self.key = key
         self.size = size
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         addr = owner.get_variable(self.key).addr
         if addr >= (1 << (self.size << 3)):
             raise ValueError('变量%s长度超过%d字节' % (self.key, self.size))
@@ -54,9 +57,9 @@ class Cmp(AssemblyNode):
         self.target = target
         self.value = value
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         target = self.get_target(owner)
-        offset = self.offset(target, addr, 7)
+        offset = self.offset(target, context.addr, 7)
         if offset:
             return b'\x83\x3D' + offset + self.value.to_bytes(1, 'little')
         else:
@@ -69,9 +72,9 @@ class Dec(AssemblyNode):
     def __init__(self, target):
         self.target = target
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         target = self.get_target(owner)
-        offset = self.offset(target, addr, 6)
+        offset = self.offset(target, context.addr, 6)
         if offset:
             return b'\xFF\x0D' + offset
         else:
@@ -86,19 +89,24 @@ class IfInt64(AssemblyNode):
         self.true_node = true_node
         self.false_node = false_node
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         target = self.get_target(owner)
-        if target > 0xFFFFFFFF:
-            return self.true_node.generate(owner, addr)
-        else:
-            return self.false_node.generate(owner, addr)
+        return (self.true_node if target > 0xFFFFFFFF else self.false_node).generate(owner, context)
 
 
 class Offset(AssemblyNode):
-    def __init__(self, target, size):
+    def __init__(self, target, size=4):
         self.target = target
         self.size = size
 
-    def generate(self, owner, addr):
+    def generate(self, owner, context):
         target = self.get_target(owner)
-        return self.offset(target, addr, self.size)
+        return self.offset(target, context.addr, self.size)
+
+
+class Origin(AssemblyNode):
+    def generate(self, owner, context):
+        return context.original
+
+
+ORIGIN = Origin()

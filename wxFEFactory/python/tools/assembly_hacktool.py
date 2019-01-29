@@ -4,6 +4,7 @@ from lib.hack import utils
 from fefactory_api import ui
 from .hacktool import BaseHackTool
 from .assembly_code import AssemblyGroup
+import types
 
 
 class AssemblyHacktool(BaseHackTool):
@@ -141,7 +142,9 @@ class AssemblyHacktool(BaseHackTool):
 
                 # 动态生成机器码
                 if isinstance(assembly, AssemblyGroup):
-                    assembly = assembly.generate(self, memory)
+                    assembly = assembly.generate(self, types.SimpleNamespace(
+                        item=item, original_addr=addr, original=original, addr=memory,
+                    ))
 
                 jmp_offset = memory - (addr + 5)
                 if abs(jmp_offset) < 0x7FFFFFFF or self.is32process:
@@ -280,8 +283,8 @@ class AssemblyItems:
 """
 AssemblyItem = DataClass(
     'AssemblyItem',
-    ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly',
-        'find_base', 'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help'),
+    ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
+        'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help', 'ext'),
     defaults={
         'assembly': None,
         'find_base': True,

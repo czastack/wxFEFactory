@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, Fields, ByteField, WordField, FloatField
+from lib.hack.models import Model, Field, Fields, ByteField, WordField, FloatField, CoordField
 
 
 class Global(Model):
@@ -17,3 +17,10 @@ class Global(Model):
     attr_water = Field(0xC90, label="水属性")
     # Field(0x6D0, label="防守移动 防守0 正常1")
     # Field(0x8A8, label="攻击方式 普通攻击 10001")
+
+
+class Movement(Model):
+    coord = CoordField(0, label='坐标')
+    air_time = FloatField(-0x14, label='空中滞留时间')  # 初始30, 减慢为15
+    jump_height = FloatField(-0x18, label='跳跃高度')
+    move_speed_mult = FloatField(-0x38, label='移动速度倍数')

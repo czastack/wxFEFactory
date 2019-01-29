@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.assembly_hacktool import (
@@ -20,6 +20,7 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self._globalins = models.Global(0, self.handler)
+        self._movement_ins = models.Movement(0, self.handler)
 
     def render_main(self):
         with Group("global", "全局", (self._global, models.Global)):
@@ -38,16 +39,22 @@ class Main(AssemblyHacktool):
             ModelInput("attr_water")
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
+        with Group("movement", "移动", (self._movement, models.Movement)):
+            ModelInput("air_time")
+            ModelInput("jump_height")
+            ModelInput("move_speed_mult")
+            ModelCoordWidget('coord', savable=True)
+
     def render_assembly_functions(self):
         functions = (
-            AssemblyItem('invincible', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
+            AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
                 0x137500, 0x137800, b'',
                 AssemblyGroup(
                     b'\x41\x81\xFC\xFF\xFF\xFF\xFF'
                     b'\x0F\x85\x02\x01\x00\x00'
                     b'\x3D\xE0\x0A\x00\x00'
                     b'\x0F\x85\xF7\x00\x00\x00'
-                    b'\x48\x89\x0D', assembly_code.Offset('base1', 4),
+                    b'\x48\x89\x0D', assembly_code.Offset('base1'),
                     assembly_code.Cmp('s_inf_energy', 1),
                     b'\x75\x0A'
                     b'\xC7\x81\xE4\x0A\x00\x00\x00\x00\xC6\x42',
@@ -93,13 +100,15 @@ class Main(AssemblyHacktool):
                 args=(('base1', 8), 's_inf_energy', 's_inf_vigour', 's_inf_health', 's_inf_skill', 's_inf_hit',
                     's_add_atk', 's_add_def', 's_add_critical_buff', 's_add_critical'),
                 inserted=True, replace_offset=8, replace_len=14, fuzzy=True),
-            # AssemblyItem('suit_keep', '护甲不减', b'\x2B\xE8\x39\xAE\xB4\x0B\x00\x00',
-            #     0x33A000, 0x33B000, b'\x90\x90', replace_len=2),
-            # AssemblyItem('ammo_999', '装填弹药999', b'\x89\x9C\xBE\x30\x06\x00\x00\x5F\x5E\x5B',
-            #     0x21A000, 0x220000, b'', b'\xC7\x84\xBE\x30\x06\x00\x00\xE7\x03\x00\x00',
-            #     inserted=True, replace_len=7),
-            # AssemblyItem('no_reload_crossbow', '十字弩不用换弹', b'\x89\x9E\xC4\x04\x00\x00\x8D\x54\x24\x24',
-            #     0x15E000, 0x160000, NOP_6),
+
+            AssemblyItem('base_move', '开启移动相关', b'\x48\x8B\xFA\x48\x8B\xD9\x66\x0F\x6E\xC0\x0F\x5B\xC0\x0F\x2E\xC6',
+                0x1E0D00, 0x1E1000, b'',
+                AssemblyGroup(
+                    assembly_code.ORIGIN,
+                    b'\x48\x89\x3D', assembly_code.Offset('base_move'),
+                ),
+                args=(('base_move', 8),),
+                inserted=True, replace_len=16),
             AssemblySwitch('s_inf_energy', '无限体力'),
             AssemblySwitch('s_inf_vigour', '无限元气'),
             AssemblySwitch('s_inf_health', '无限元精'),
@@ -115,6 +124,10 @@ class Main(AssemblyHacktool):
     def _global(self):
         self._globalins.addr = self.get_variable_value('base1')
         return self._globalins
+
+    def _movement(self):
+        self._movement_ins.addr = self.get_variable_value('base_move')
+        return self._movement_ins
 
     # def get_hotkeys(self):
     #     this = self.weak
