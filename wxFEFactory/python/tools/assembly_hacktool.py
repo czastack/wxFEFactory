@@ -208,7 +208,7 @@ class AssemblyHacktool(BaseHackTool):
             find_end += base_addr
         return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
 
-    def register_variable(self, variable, value=0):
+    def register_variable(self, variable):
         """注册变量"""
         self.insure_memory()
         if isinstance(variable, str):
@@ -225,8 +225,8 @@ class AssemblyHacktool(BaseHackTool):
             self.next_usable_memory += utils.align_size(variable.size, align)
         else:
             variable = temp
-        if value is not 0:
-            self.handler.write(variable.addr, value, size)
+        if variable.value is not 0:
+            self.handler.write(variable.addr, variable.value, variable.size)
         return variable
 
     def get_variable(self, name):
@@ -258,6 +258,10 @@ class VariableModel:
 
     def __setattr__(self, name, value):
         return self.owner.set_variable_value(name, value)
+
+    def __and__(self, field):
+        variable = self.owner.get_variable(field)
+        return variable and variable.addr or 0
 
 
 class AssemblyItems:

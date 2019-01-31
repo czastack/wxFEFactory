@@ -39,15 +39,16 @@ class AssemblyNode:
 
 
 class Variable(AssemblyNode):
-    def __init__(self, key, size=4):
+    """写入变量地址"""
+    def __init__(self, key):
         self.key = key
-        self.size = size
 
     def generate(self, owner, context):
+        size = 4 if owner.is32process else 8
         addr = owner.get_variable(self.key).addr
-        if addr >= (1 << (self.size << 3)):
-            raise ValueError('变量%s长度超过%d字节' % (self.key, self.size))
-        return addr.to_bytes(self.size, 'little')
+        if addr >= (1 << (size << 3)):
+            raise ValueError('变量%s长度超过%d字节' % (self.key, size))
+        return addr.to_bytes(size, 'little')
 
 
 class Cmp(AssemblyNode):

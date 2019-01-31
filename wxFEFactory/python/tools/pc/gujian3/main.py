@@ -39,11 +39,14 @@ class Main(AssemblyHacktool):
             ModelInput("attr_water")
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
-        with Group("movement", "移动", (self._movement, models.Movement)):
-            ModelInput("air_time")
-            ModelInput("jump_height")
-            ModelInput("move_speed_mult")
-            ModelCoordWidget('coord', savable=True)
+        # with Group("movement", "移动", (self._movement, models.Movement)):
+        #     ModelInput("air_time")
+        #     ModelInput("jump_height")
+        #     ModelInput("move_speed_mult")
+        #     ModelCoordWidget('coord', savable=True)
+
+        with Group("movement", "变量", self.variable_model):
+            ModelInput("jump_height", "跳跃高度")
 
     def render_assembly_functions(self):
         functions = (
@@ -109,6 +112,13 @@ class Main(AssemblyHacktool):
                 ),
                 args=(('base_move', 8),),
                 inserted=True, replace_len=16),
+            AssemblyItem('base_move', '超级跳跃', b'\x48\x85\xC0\x74\x0B\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3',
+                0x1B4C00, 0x1B4E00, b'',
+                AssemblyGroup(
+                    b'\x48\x85\xC0\x74\x1A\x50\xA1', assembly_code.Variable('jump_height'),
+                    b'\x66\x0F\x6E\xC8\x58\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3'
+                ),
+                args=(VariableType('jump_height', type=float, value=1000.0),), inserted=True),
             AssemblySwitch('s_inf_energy', '无限体力'),
             AssemblySwitch('s_inf_vigour', '无限元气'),
             AssemblySwitch('s_inf_health', '无限元精'),
