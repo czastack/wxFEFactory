@@ -39,41 +39,41 @@ btn_md_style = {'width': btn_md_width}
 styles = {
     'class': {
         'fill': {
-            'flex': 1,
+            'weight': 1,
             'expand': True,
         },
-        'grow': {'flex': 1},
+        'grow': {'weight': 1},
         'expand': {'expand': True},
         'vcenter': {'vertical-align': 'middle'},
         'right': {'align': 'right'},
         'button': {
-            'flex': 1,
+            'weight': 1,
             'width': btn_width,
         },
         'padding': {
             'padding': 10,
-            'padding-flag': '1',
+            'padding-flag': 1,
         },
         'padding_label': {
             'padding': 8,
-            'padding-flag': '1 1 0 1',
+            'padding-flag': 0b1101,
         },
-        'padding_top': {'padding': 10, 'padding-flag': '1 0 0 0'},
-        'padding_right': {'padding': 8, 'padding-flag': '1 1 1 0'},
-        'padding_bottom': {'padding': 10, 'padding-flag': '0 0 1 0'},
-        'padding_left': {'padding': 10, 'padding-flag': '0 0 0 1'},
+        'padding_top': {'padding': 10, 'padding-flag': 0b1000},
+        'padding_right': {'padding': 8, 'padding-flag': 0b1110},
+        'padding_bottom': {'padding': 10, 'padding-flag': 0b0010},
+        'padding_left': {'padding': 10, 'padding-flag': 0b0001},
         'input_label': {
             'padding': 8,
-            'padding-flag': '1 1 0 1',
+            'padding-flag': 0b1101,
             'text-align': 'right',
         },
         'input_label_vertical': {
             'padding': 5,
-            'padding-flag': '0 0 1 0',
+            'padding-flag': 0b0010,
         },
         'form_label': {
             'padding': 8,
-            'padding-flag': '0 1 0 1',
+            'padding-flag': 0b0101,
             'text-align': 'right',
         },
         'btn_xs': btn_xs_style,

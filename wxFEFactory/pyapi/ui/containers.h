@@ -15,7 +15,7 @@ public:
 	/**
 	* 获取布局参数
 	*/
-	void getBoxArg(View &child, int *pFlex, int *pFlag, int *pPadding);
+	void getBoxArg(View &child, int *pWeight, int *pFlag, int *pPadding);
 
 	void doAdd(View &child) override;
 

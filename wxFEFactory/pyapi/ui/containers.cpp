@@ -6,7 +6,7 @@
  * 获取布局参数
  */
 
-void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPadding)
+void SizerLayout::getBoxArg(View & child, int * pWeight, int * pFlag, int * pPadding)
 {
 	int flag = 0;
 	if (child.getStyle(STYLE_EXPAND, false))
@@ -14,28 +14,24 @@ void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPaddi
 		flag |= wxEXPAND;
 	}
 
-	wxcstr padding_flag = child.getStyle(STYLE_SHOWPADDING, wxNoneString);
+	int padding_flag = child.getStyle(STYLE_SHOWPADDING, 0);
 
-	if (padding_flag != wxNoneString)
+	if (padding_flag != 0)
 	{
-		if (padding_flag.size() == 1)
+		if (padding_flag == 1)
 		{
-			if (padding_flag[0] != '0')
-				flag |= wxALL;
+			flag |= wxALL;
 		}
-		else if (padding_flag.size() == 7)
+		else
 		{
-			if (padding_flag[0] != '0')
+			if (padding_flag & 0b1000)
 				flag |= wxTOP;
-			if (padding_flag[2] != '0')
+			if (padding_flag & 0b0100)
 				flag |= wxRIGHT;
-			if (padding_flag[4] != '0')
+			if (padding_flag & 0b0010)
 				flag |= wxBOTTOM;
-			if (padding_flag[6] != '0')
+			if (padding_flag & 0b0001)
 				flag |= wxLEFT;
-		}
-		else {
-			log_message(wxString::Format(wxT("%s: %s not available"), STYLE_SHOWPADDING, padding_flag));
 		}
 	}
 
@@ -81,15 +77,15 @@ void SizerLayout::getBoxArg(View & child, int * pFlex, int * pFlag, int * pPaddi
 		}
 	}
 	*pFlag = flag;
-	*pFlex = child.getStyle(STYLE_FLEX, 0);
+	*pWeight = child.getStyle(STYLE_WEIGHT, 0);
 	*pPadding = child.getStyle(STYLE_PADDING, 5);
 }
 
 void SizerLayout::doAdd(View & child)
 {
-	int flex, flag, padding;
-	getBoxArg(child, &flex, &flag, &padding);
-	m_elem->GetSizer()->Add(child, flex, flag, padding);
+	int weight, flag, padding;
+	getBoxArg(child, &weight, &flag, &padding);
+	m_elem->GetSizer()->Add(child, weight, flag, padding);
 }
 
 void SplitterWindow::__exit__(py::args & args)
@@ -172,9 +168,9 @@ void init_containers(py::module & m)
 		.def(py::init<int, int, int, int, pyobj, pyobj, pyobj>(),
 			"rows"_a = 0, "cols"_a = 2, "vgap"_a = 0, "hgap"_a = 0,
 			styles, className, style)
-		.def("AddGrowableRow", &FlexGridLayout::AddGrowableRow, "index"_a, "flex"_a = 0)
+		.def("AddGrowableRow", &FlexGridLayout::AddGrowableRow, "index"_a, "weight"_a = 0)
 		.def("RemoveGrowableRow", &FlexGridLayout::RemoveGrowableRow, "index"_a)
-		.def("AddGrowableCol", &FlexGridLayout::AddGrowableCol, "index"_a, "flex"_a = 0)
+		.def("AddGrowableCol", &FlexGridLayout::AddGrowableCol, "index"_a, "weight"_a = 0)
 		.def("RemoveGrowableCol", &FlexGridLayout::RemoveGrowableCol, "index"_a)
 		.def_property("flexDirection", &FlexGridLayout::GetFlexibleDirection, &FlexGridLayout::SetFlexibleDirection);
 

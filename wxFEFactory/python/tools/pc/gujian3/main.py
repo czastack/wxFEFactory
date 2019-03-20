@@ -139,11 +139,11 @@ class Main(AssemblyHacktool):
         self._movement_ins.addr = self.get_variable_value('base_move')
         return self._movement_ins
 
-    # def get_hotkeys(self):
-    #     this = self.weak
-    #     return (
-    #         (0, VK.H, this.pull_through),
-    #     )
+    def get_hotkeys(self):
+        this = self.weak
+        return (
+            (0, VK.U, this.pull_through),
+        )
 
-    # def pull_through(self):
-    #     self.toggle_assembly_button('health_inf')
+    def pull_through(self):
+        self._global_ins.health = 2346

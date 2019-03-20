@@ -46,7 +46,7 @@ class CoordWidget(TwoWayWidget):
             views = []
             with ui.Vertical(className="fill") as root:
                 with ui.Horizontal(className="fill"):
-                    with ui.Vertical(style={'flex': 2}):
+                    with ui.Vertical(style={'weight': 2}):
                         with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
                             grid.AddGrowableCol(1)
                             for label in self.labels or ('X坐标', 'Y坐标', 'Z坐标'):

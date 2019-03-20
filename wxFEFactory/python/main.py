@@ -341,12 +341,12 @@ window_style = {'width': window_size[0], 'height': window_size[1]}
 
 styles = {
     'class': {
-        'fill': {'flex': 1},
+        'fill': {'weight': 1},
         'expand': {'expand': True},
         'console-bar': {'height': 160},
-        'console-output': {'expand': True, 'flex': 1},
-        'console-input': {'expand': True, 'flex': 1},
-        'console-input-bar': {'show-padding': '1 0 0 0'},
+        'console-output': {'expand': True, 'weight': 1},
+        'console-input': {'expand': True, 'weight': 1},
+        'console-input-bar': {'padding-flag': 0b1000},
         'console-input-multi': {'height': 100},
         'btn-sm': {'width': 34},
     }

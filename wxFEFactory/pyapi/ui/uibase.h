@@ -22,7 +22,7 @@
 #define STYLE_BOTTOM         wxT("bottom")
 #define STYLE_TOP            wxT("top")
 #define STYLE_EXPAND         wxT("expand")
-#define STYLE_FLEX           wxT("flex")
+#define STYLE_WEIGHT         wxT("weight")
 #define STYLE_PADDING        wxT("padding")
 #define STYLE_SHOWPADDING    wxT("padding-flag")
 #define STYLE_ALIGN          wxT("align")
