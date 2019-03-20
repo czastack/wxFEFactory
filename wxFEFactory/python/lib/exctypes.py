@@ -69,12 +69,12 @@ class cint:
             if other.MAX > self.MAX:
                 type_ = other.__class__
             other = other.value
-        return type_(self.value.__add__(other))
+        return type_(getattr(self.value, name)(other))
 
     local = locals()
     for name in ('__add__', '__sub__', '__mul__', '__floordiv__', '__mod__', '__pow__', '__lshift__', '__rshift__',
-            '__and__', '__or__', '__xor__', '__rsub__', '__rmul__', '__rmul__', '__rfloordiv__', '__rmod__',
-            '__rdivmod__', '__rpow__', '__rlshift__', '__rrshift__', '__ror__', '__rxor__'):
+            '__and__', '__or__', '__xor__', '__radd__', '__rsub__', '__rmul__', '__rmul__', '__rfloordiv__',
+            '__rmod__', '__rdivmod__', '__rpow__', '__rlshift__', '__rrshift__', '__rand__', '__ror__', '__rxor__'):
         local[name] = partialmethod(_newfn, name)
     local['__truediv__'] = local['__floordiv__']
     local['__rtruediv__'] = local['__rfloordiv__']
@@ -115,28 +115,34 @@ class cint:
     def __ixor__(self, other):
         self.value ^= ival(other)
 
+    def __str__(self):
+        return str(self.value)
 
-class int8(ctypes.c_int8, cint):
+    def __repr__(self):
+        return '%s(%d)' % (self.__class__.__name__, self.value)
+
+
+class int8(cint, ctypes.c_int8):
     MAX = 127
 
 
-class int16(ctypes.c_int16, cint):
+class int16(cint, ctypes.c_int16):
     MAX = 32767
 
 
-class int32(ctypes.c_int32, cint):
+class int32(cint, ctypes.c_int32):
     MAX = 2147483647
 
 
-class int64(ctypes.c_int64, cint):
+class int64(cint, ctypes.c_int64):
     MAX = 9223372036854775807
 
 
-class u8(ctypes.c_uint8, cint):
+class u8(cint, ctypes.c_uint8):
     MAX = 255
 
 
-class u16(ctypes.c_uint16, cint):
+class u16(cint, ctypes.c_uint16):
     MAX = 65535
 
 
