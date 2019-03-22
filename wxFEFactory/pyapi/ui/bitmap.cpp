@@ -3,10 +3,10 @@
 #include "bitmap.h"
 
 
-void wxBitmap__setSize(wxBitmap &self, py::tuple &size)
+/*void wxBitmap__setSize(wxBitmap &self, py::tuple &size)
 {
-	self.SetSize({ size[0].cast<int>(), size[1].cast<int>() });
-}
+	self.SetSize(size[0].cast<int>(), size[1].cast<int>());
+}*/
 
 pyobj wxBitmap__getSize(wxBitmap &self)
 {
@@ -35,6 +35,7 @@ void init_bitmap(py::module & m)
 		.def("save", &wxBitmap::SaveFile, "path"_a, bptype, "palette"_a=NULL)
 		.def("load", &wxBitmap::LoadFile, "path"_a, bptype)
 		.def("loadIcon", wxBitmap__LoadIcon)
-		.def_property("size", wxBitmap__getSize, wxBitmap__setSize)
+		// .def_property("size", wxBitmap__getSize, wxBitmap__setSize)
+		.def_property_readonly("size", wxBitmap__getSize)
 		.ptr();
 }
