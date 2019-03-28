@@ -146,9 +146,9 @@ class u16(cint, ctypes.c_uint16):
     MAX = 65535
 
 
-class u32(ctypes.c_uint32, cint):
+class u32(cint, ctypes.c_uint32):
     MAX = 4294967295
 
 
-class u64(ctypes.c_uint64, cint):
+class u64(cint, ctypes.c_uint64):
     MAX = 18446744073709551615
