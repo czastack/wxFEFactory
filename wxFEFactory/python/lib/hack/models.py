@@ -36,6 +36,10 @@ class Model:
     def addr_hex(self):
         return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
 
+    def prev(self):
+        self.addr -= self.SIZE
+        return self
+
     def next(self):
         self.addr += self.SIZE
         return self

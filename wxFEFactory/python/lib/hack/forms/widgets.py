@@ -136,9 +136,7 @@ class ModelWidget:
     def render(self):
         if self.label is self.name:
             # 从Field读取label
-            field = None
-            if self.instance_type:
-                field = getattr(self.instance_type, self.offsets, None)
+            field = self.field
             if field and field.label:
                 self.label = field.label
         super().render()
@@ -146,7 +144,20 @@ class ModelWidget:
 
     @property
     def instance(self):
+        """模型实例"""
         return self.addr() if callable(self.addr) else self.addr
+
+    @property
+    def field(self):
+        # 尝试获取对应的模型字段
+        field = None
+        if self.instance_type:
+            field = getattr(self.instance_type, self.offsets, None)
+        else:
+            instance = self.instance
+            if instance and hasattr(instance, 'field'):
+                field = instance.field(self.offsets)
+        return field
 
     @property
     def mem_value(self):
@@ -165,13 +176,6 @@ class ModelWidget:
         instance = self.instance
         if instance:
             delattr(instance, self.offsets)
-
-    @property
-    def field(self):
-        # 尝试获取对应的模型字段
-        instance = self.instance
-        if instance and hasattr(instance, 'field'):
-            return instance.field(self.offsets)
 
     def get_addr(self):
         return self.instance & self.offsets
@@ -855,6 +859,39 @@ class FlagWidget(OffsetsWidget, BaseFlagWidget):
 
 class ModelFlagWidget(ModelWidget, BaseFlagWidget):
     pass
+
+
+class ModelArrayWidget(ModelWidget, Widget):
+    def get_labels(self):
+        field = self.field
+
+        if self.label is self.name:
+            if field and field.label:
+                self.label = field.label
+
+        if isinstance(self.label, str):
+            labels = ["%s%d" % (self.label, i + 1) for i in range(field.length)]
+        else:
+            labels = self.label
+        return field, labels
+
+
+class ModelArrayInput(ModelArrayWidget):
+    def render(self):
+        field, labels = self.get_labels()
+        self.children = [ModelInput('%s.%d' % (self.name, i), label=labels[i])
+            for i in range(field.length)]
+
+
+class ModelArraySelect(ModelArrayWidget):
+    def __init__(self, *args, choices=None, **kwargs):
+        self.choices = choices
+        super().__init__(*args, **kwargs)
+
+    def render(self):
+        field, labels = self.get_labels()
+        self.children = [ModelSelect('%s.%d' % (self.name, i), label=labels[i], choices=self.choices)
+            for i in range(field.length)]
 
 
 def render_tab_list(data):
