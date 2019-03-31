@@ -28,9 +28,15 @@ class Pilot(Model):
     exp = WordField(2, label="经验")  # 决定等级 max:0xC000
     sp = WordField(4, label="精神点数")  # 03E7
     killed = WordField(6, label="击坠")  # 03E7
+    skill_1 = ByteField(8, label="特技1")
+    skill_2 = ByteField(9, label="特技2")
+    skill_1_status = ByteField(10, label="特技1状态")
+    skill_2_status = ByteField(11, label="特技2状态")
+    enable = ByteField(12, label="状态开关")
     help_atk = ByteField(13, label="援攻")  # 09
     help_def = ByteField(14, label="援防")  # 09
     energy = ByteField(15, label="气力")  # 96
+    # group = ByteField(16, label="敌我状态")  # 0: 我方(蓝), 1: 第三方(黄), 2: 不可控我方(蓝), 3: 敌方(红)
     points = ByteField(17, label="奖励点数")  # FF
     # 养成能力
     develop = ArrayField(18, 6, ByteField(0),
@@ -52,6 +58,9 @@ class Global(Model):
 # 全员无限移动
 # 4203424E 0103
 # 0000003C 0084
+
+
+# 男主移动状态  02034e2b
 
 # 全机体已探查
 # 4203423E 1001

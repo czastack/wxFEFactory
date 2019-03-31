@@ -115,13 +115,10 @@ class BaseTool(BaseScene):
         close_callbacks = getattr(self, '_close_callbacks', None)
         if close_callbacks:
             for callback in close_callbacks:
-                callback()
+                callback(self)
             close_callbacks.clear()
 
         super().onClose()
-
-        if getattr(__main__, 'tool', None) == self:
-            del __main__.tool
 
         callback = getattr(self, 'close_callback', None)
         if callback:

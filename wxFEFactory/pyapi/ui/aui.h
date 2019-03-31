@@ -130,6 +130,11 @@ public:
 	bool closePage(int n = -1);
 
 	bool closeAllPage();
+
+	void setOnPageChanged(pyobj &fn, bool reset = true)
+	{
+		bindEvt(wxEVT_AUINOTEBOOK_PAGE_CHANGED, fn, reset);
+	}
 };
 
 

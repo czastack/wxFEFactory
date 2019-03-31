@@ -238,6 +238,8 @@ void init_aui(py::module & m)
 	auto styles = "styles"_a = None;
 	auto label = "label"_a;
 	auto base_frame_wxstyle_a = "wxstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	auto evt_fn = "fn"_a;
+	auto evt_reset = "reset"_a = true;
 
 	py::class_t<AuiMDIParentFrame, BaseFrame>(m, "AuiMDIParentFrame")
 		.def(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(), label, "menubar"_a = nullptr, base_frame_wxstyle_a, styles, className, style);
@@ -262,6 +264,7 @@ void init_aui(py::module & m)
 		.def("getPage", &AuiNotebook::getPage, "n"_a = -1)
 		.def("closePage", &AuiNotebook::closePage, "n"_a = -1)
 		.def("closeAllPage", &AuiNotebook::closeAllPage)
+		.def("setOnPageChanged", &AuiNotebook::setOnPageChanged, evt_fn, evt_reset)
 		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
 		.def_property_readonly("count", &AuiNotebook::getPageCount);
 }

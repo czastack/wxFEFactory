@@ -28,6 +28,8 @@ ToolTreeItem = extypes.DataClass("ToolTreeItem", ("module", "label", "package", 
 class MainFrame:
     def __init__(self, start_option=None):
         self.weak = extypes.WeakBinder(self)
+        self.opened_tools = []
+        self.opened_tools_map = {}
         self.render()
 
         if start_option:
@@ -94,6 +96,7 @@ class MainFrame:
                 win.setIcon(icon_name)
 
         win.setOnClose(self.onClose)
+        self.book.setOnPageChanged(self.on_tool_change)
 
         self.win = win
         self.aui = aui
@@ -137,6 +140,8 @@ class MainFrame:
     def onClose(self, _=None):
         if self.book.closeAllPage():
             del self.book
+            self.opened_tools.clear()
+            self.opened_tools_map.clear()
             return True
         return False
 
@@ -285,7 +290,7 @@ class MainFrame:
                 for item in self.root_tools:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
-                tree.setOnItemActivated(self.weak.on_tool_sel)
+                tree.setOnItemActivated(self.weak.on_tool_select)
             self.tool_dialog = dialog
         dialog.showModal()
 
@@ -301,7 +306,18 @@ class MainFrame:
                     result.append(ToolTreeItem(m, m.name, getattr(m, 'package', False), None, None))
         return result
 
-    def on_tool_sel(self, tree, event):
+    def open_tool_by_name(self, name):
+        Tool = self.get_tool(name)
+        tool = Tool()
+        tool.attach(self)
+        self.opened_tools.append(tool)
+        self.opened_tools_map[id(tool.win)] = tool
+        self.book.index = self.book.count - 1
+
+        __main__.tool = tool
+
+    def on_tool_select(self, tree, event):
+        """打开工具选项框项选中"""
         item = tree.GetItemData(event.item)
         if item.package:
             if not item.children:
@@ -312,13 +328,14 @@ class MainFrame:
             self.open_tool_by_name(item.module)
             self.tool_dialog.endModal()
 
-    def open_tool_by_name(self, name):
-        Tool = self.get_tool(name)
-        tool = Tool()
-        tool.attach(self)
-        self.book.index = self.book.count - 1
+    def on_tool_change(self, book):
+        __main__.tool = self.opened_tools_map.get(id(book.getPage()), None)
 
-        __main__.tool = tool
+    def on_tool_close(self, tool):
+        self.opened_tools.remove(tool)
+
+        if getattr(__main__, 'tool', None) == self:
+            del __main__.tool
 
     def save_win_option(self, m):
         app.setconfig('start_option', {

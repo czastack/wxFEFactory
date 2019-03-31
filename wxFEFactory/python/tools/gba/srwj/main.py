@@ -1,6 +1,7 @@
 from ..base import BaseGbaHack
 from lib.hack.forms import (
-    Group, StaticGroup, ModelInput, ModelArrayInput, ModelSelect, ModelArraySelect, ModelFlagWidget, Choice
+    Group, StaticGroup, ModelInput, ModelArrayInput, ModelSelect, ModelArraySelect,
+    ModelFlagWidget, ModelCheckBox, Choice
 )
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
@@ -31,7 +32,7 @@ class Main(BaseGbaHack):
             self.render_pilot()
 
         with StaticGroup("功能"):
-            self.render_functions(('all_intensified_parts', 'all_mini_games', 'all_skill_chip'))
+            self.render_functions(('all_intensified_parts', 'all_mini_games', 'all_skill_chip', 'all_move_10'))
 
     def render_robot(self):
         Choice("机体", datasets.ROBOT_CHOICES, self.on_robot_change)
@@ -49,14 +50,24 @@ class Main(BaseGbaHack):
         ModelInput("exp")
         ModelInput("sp")
         ModelInput("killed")
+        ui.Hr()
+        ui.Hr()
+        ModelFlagWidget("skill_1", labels=datasets.SKILLS_1, cols=2)
+        ModelFlagWidget("skill_2", labels=datasets.SKILLS_2, cols=2)
+        ModelCheckBox("skill_1_status")
+        ModelCheckBox("skill_2_status")
         ModelInput("help_atk")
         ModelInput("help_def")
         ModelInput("energy")
         ModelInput("points")
-        ui.Hr()
-        ui.Hr()
         ModelArrayInput("develop")
         ModelArraySelect("skill_chip", choices=datasets.SHILL_CHIPS)
+
+    def get_hotkeys(self):
+        this = self.weak
+        return (
+            (VK.MOD_ALT, VK.R, this.move_again),
+        )
 
     def on_robot_change(self, lb):
         self.robot.addr = models.Robot.START + models.Robot.SIZE * lb.index
@@ -75,3 +86,13 @@ class Main(BaseGbaHack):
     def all_skill_chip(self, _):
         """全技能芯片"""
         self._global.skill_chip.fill(99)
+
+    def all_move_10(self, _):
+        """全员十次移动次数"""
+        addr = 0x0203424F
+        for i in range(60):
+            self.handler.write8(addr, 10)
+            addr += 0x84
+
+    def move_again(self):
+        self.handler.write32(0x02034E2B, 10)
