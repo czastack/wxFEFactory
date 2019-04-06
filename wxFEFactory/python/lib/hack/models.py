@@ -367,7 +367,7 @@ class SignedField(Field):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        return instance.handler.read_int(self.get_addr(instance), self.type, self.size)
+        return instance.handler.read_int(self.get_addr(instance), self.size)
 
     def __set__(self, instance, value):
         if not isinstance(value, self.type):

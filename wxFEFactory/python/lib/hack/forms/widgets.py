@@ -890,8 +890,9 @@ class ModelArraySelect(ModelArrayWidget):
 
     def render(self):
         field, labels = self.get_labels()
-        self.children = [ModelSelect('%s.%d' % (self.name, i), label=labels[i], choices=self.choices)
-            for i in range(field.length)]
+        with ModelSelect.choices_cache:
+            self.children = [ModelSelect('%s.%d' % (self.name, i), label=labels[i], choices=self.choices)
+                for i in range(field.length)]
 
 
 def render_tab_list(data):

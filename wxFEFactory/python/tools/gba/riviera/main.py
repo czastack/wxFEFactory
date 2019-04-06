@@ -1,5 +1,7 @@
 from ..base import BaseGbaHack
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Choice
+from lib.hack.forms import (
+    Group, StaticGroup, ModelInput, ModelArrayInput, ModelSelect, ModelArraySelect, ModelFlagWidget, Choice
+)
 from lib.win32.keys import VK
 from fefactory_api import ui
 from . import models, datasets
@@ -12,62 +14,70 @@ class Main(BaseGbaHack):
         self.person = models.Person(0, self.handler)
 
     def render_main(self):
-        person = self.person
         with Group("global", "全局", self._global):
-            ModelInput("tp", "TP")
-            ModelInput("kill_slot", "必杀槽").set_help("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
-            ModelInput("rage", "RAGE")
-            ModelInput("member_num", "队伍人数")
-            with ModelSelect.choices_cache:
-                for i in range(5):
-                    ModelSelect("members.%d" % i, "第%d位队员" % (i + 1), choices=datasets.PERSONS)
-            ModelInput("item_num", "道具数量")
-
-        with Group("favors", "好感度", self._global):
-            i = 0
-            for item in datasets.GIRLS:
-                ModelInput("favors.%d" % i, "%s累计好感度" % item)
-                i += 1
-            for item in datasets.GIRLS:
-                ModelInput("favors.%d" % i, "%s本章好感度" % item)
-                i += 1
-
-        with Group("items", "道具", self._global, cols=4):
-            with ModelSelect.choices_cache:
-                for i in range(16):
-                    ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
-                    ModelInput("items.%d.count" % i, "数量")
-
-        with Group("event_items", "事件道具", self._global):
-            for i, labels in enumerate(datasets.EVENT_ITEMS):
-                ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
-                    checkbtn=True)
-
-        with Group("person_battles", "战斗中", self._global, cols=4):
-            for i in range(3):
-                ModelInput("person_battles.%d.hp" % i, "我方单位%dHP" % (i + 1))
-            for i in range(3):
-                ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
-
-        with Group("player", "角色", person, cols=4) as person_group:
-            Choice("角色", datasets.PERSONS, self.on_person_change)
-            ModelInput("hpmax", "HP上限")
-            ModelInput("resist", "RESIST")
-            ModelInput("str", "STR")
-            ModelInput("mgc", "MGC")
-            ModelInput("agl", "AGL")
-            ModelInput("vit", "VIT")
-            ModelInput("_resist", "抗性")
-
-            with person_group.footer:
-                ui.Button("全技能", onclick=self.weak.all_skills)
-
-        with StaticGroup("功能"):
-            self.render_functions(('enable_addition', 'all_cg', 'all_item_book', 'all_music',
-                'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc'))
+            self.render_global()
+        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
+        self.lazy_group(Group("favors", "好感度", self._global), self.render_favors)
+        self.lazy_group(Group("items", "道具", self._global, cols=4), self.render_items)
+        self.lazy_group(Group("event_items", "事件道具", self._global), self.render_event_items)
+        self.lazy_group(Group("person_battles", "战斗中", self._global, cols=4), self.render_person_battles)
+        self.lazy_group(StaticGroup("功能"), self.render_functions)
 
         with StaticGroup("快捷键"):
             ui.Text("恢复HP: alt+h")
+
+    def render_global(self):
+        ModelInput("tp")
+        ModelInput("kill_slot").set_help("Lv1: 128, Lv2: 256, Lv3: 384, break: 389+")
+        ModelInput("rage")
+        ModelInput("member_num")
+        ModelArraySelect("members", choices=datasets.PERSONS)
+        ModelInput("item_num")
+
+    def render_person(self):
+        Choice("角色", datasets.PERSONS, self.on_person_change)
+        ModelInput("hp_max")
+        ModelInput("resist")
+        ModelInput("str")
+        ModelInput("mgc")
+        ModelInput("agl")
+        ModelInput("vit")
+        ModelInput("hp_heal")
+        ModelArrayInput("resistance", label=["%s抗性" % item for item in datasets.ATTRIBUTE])
+        ModelFlagWidget("adaptive", cols=3, labels=datasets.ATTRIBUTE)
+
+        with Group.active_group().footer:
+            ui.Button("全技能", onclick=self.weak.all_skills)
+
+    def render_favors(self):
+        i = 0
+        for item in datasets.GIRLS:
+            ModelInput("favors.%d" % i, "%s累计好感度" % item)
+            i += 1
+        for item in datasets.GIRLS:
+            ModelInput("favors.%d" % i, "%s本章好感度" % item)
+            i += 1
+
+    def render_items(self):
+        with ModelSelect.choices_cache:
+            for i in range(16):
+                ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
+                ModelInput("items.%d.count" % i, "数量")
+
+    def render_event_items(self):
+        for i, labels in enumerate(datasets.EVENT_ITEMS):
+            ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
+                checkbtn=True, cols=4)
+
+    def render_person_battles(self):
+        for i in range(3):
+            ModelInput("person_battles.%d.hp" % i, "我方单位%dHP" % (i + 1))
+        for i in range(3):
+            ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
+
+    def render_functions(self):
+        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music',
+            'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc', 'over_drive'))
 
     def get_hotkeys(self):
         return (
@@ -75,7 +85,7 @@ class Main(BaseGbaHack):
         )
 
     def on_person_change(self, lb):
-        self.person.addr = self.person_index * lb.index
+        self.person.addr = models.Person.SIZE * lb.index
 
     def persons(self):
         person = models.Person(0, self.handler)
@@ -85,9 +95,9 @@ class Main(BaseGbaHack):
 
     def pull_through(self):
         for person in self.persons():
-            person.hp = person.hpmax
+            person.hp = person.hp_max
 
-    def enable_addition(self, btn):
+    def enable_extra(self, btn):
         """附加项开启"""
         self.handler.write16(0x0200AFDA, 0xFFFF)
 
@@ -120,5 +130,10 @@ class Main(BaseGbaHack):
         """全道具说明"""
         self.handler.write(0x020086F0, b'\xff' * 0x78)
 
+    def over_drive(self, btn):
+        """必杀槽最大"""
+        self._global.kill_slot = 0x180
+
     def all_skills(self, btn):
+        """当前角色全技能"""
         self.person.skills = b'\xff' * 0x48
