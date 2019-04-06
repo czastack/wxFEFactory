@@ -11,9 +11,13 @@ import __main__
 
 
 class BaseHackTool(NestedTool):
+    handler_class = None
+
     def __init__(self):
         super().__init__()
         self.config = Config("config/%s_config.json" % self.module_name + '')
+        if callable(self.handler_class):
+            self.handler = self.handler_class()
 
     def attach(self, frame):
         super().attach(frame)
@@ -235,7 +239,7 @@ class BaseHackTool(NestedTool):
 
 class ProxyHackTool(BaseHackTool):
     """ 使用代理Handler
-    abs field: handlers: iterable
+    abs field: handler_class: iterable
     """
     def __init__(self):
         super().__init__()
@@ -245,7 +249,7 @@ class ProxyHackTool(BaseHackTool):
         if self.handler.active:
             self.ondetach()
 
-        for Handler in self.handlers:
+        for Handler in self.handler_class:
             handler = Handler()
             if handler.attach():
                 self.handler.set(handler)

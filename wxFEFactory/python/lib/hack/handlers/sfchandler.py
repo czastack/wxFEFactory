@@ -1,6 +1,5 @@
 from .handler import MemHandler
 from ..models import Model, Field, ByteField, QWordField, StringField
-import struct
 
 
 class Memory64(Model):

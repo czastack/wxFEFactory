@@ -8,7 +8,7 @@ from ..hacktool import ProxyHackTool
 
 
 class BaseNesHack(ProxyHackTool):
-    handlers = VirtuaNesHandler, NestopiaHandler
+    handler_class = VirtuaNesHandler, NestopiaHandler
 
 
 FieldItem = DataClass('FieldItem', ('addr', 'name', 'size', 'max'))

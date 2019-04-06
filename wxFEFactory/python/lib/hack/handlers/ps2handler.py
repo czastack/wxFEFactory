@@ -1,6 +1,4 @@
 from .handler import MemHandler
-from ..models import Model, Field, ByteField, QWordField, StringField
-import struct
 
 
 class Pcsx2Handler(MemHandler):

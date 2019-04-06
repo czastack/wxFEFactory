@@ -17,6 +17,7 @@ class Robot(Model):
     weapon_remould = ByteField(31, label="武器改造")
     # 弹药 63636363
     ammo = ArrayField(32, 4, ByteField(0), label="弹药")
+    intensified_parts = ArrayField(41, 4, ByteField(0), label="强化部件")
 
 
 class Pilot(Model):

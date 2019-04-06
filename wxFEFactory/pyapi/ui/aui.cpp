@@ -141,7 +141,7 @@ bool AuiNotebook::canPageClose(int n)
 		ret = PyObject_IsTrue(PyCall(onclose).ptr()) != 0;
 		if (ret)
 		{
-			m_close_listeners.attr("pop")(page);
+			m_close_listeners.attr("pop").call(page);
 		}
 	}
 
@@ -170,7 +170,7 @@ void AuiNotebook::_removePage(int n)
 {
 	auto page = py::cast(getPage(n));
 	if (m_children.contains(page)) {
-		PyCall(m_children.attr("remove"), page);
+		m_children.attr("remove").call(page);
 	}
 }
 

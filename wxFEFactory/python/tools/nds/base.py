@@ -4,4 +4,4 @@ from ..hacktool import ProxyHackTool
 
 
 class BaseNdsHack(ProxyHackTool):
-    handlers = DeSmuMEHandler, NogbaHandler
+    handler_class = DeSmuMEHandler, NogbaHandler

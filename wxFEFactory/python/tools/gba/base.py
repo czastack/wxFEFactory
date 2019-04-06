@@ -4,4 +4,4 @@ from ..hacktool import ProxyHackTool
 
 
 class BaseGbaHack(ProxyHackTool):
-    handlers = VbaHandler, NogbaHandler
+    handler_class = VbaHandler, NogbaHandler
