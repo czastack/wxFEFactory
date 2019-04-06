@@ -174,6 +174,19 @@ namespace emuhacker {
 	{
 		return self.attach_handle((HWND)hWnd);
 	}
+
+	wxString getWindowText(ProcessHandler& self) {
+		HWND hWnd = self.getHWnd();
+		if (hWnd)
+		{
+			wxChar buff[128];
+			int result = ::GetWindowText(hWnd, buff, 128);
+			if (result) {
+				return wxString(buff, result);
+			}
+		}
+		return wxNoneString;
+	}
 };
 
 
@@ -195,11 +208,9 @@ public:
 			addr_t,              /* Return type */
 			ProcessHandler,      /* Parent class */
 			address_map,         /* Name of function in C++ (must match Python name) */
-			addr                /* Argument(s) */
+			addr                 /* Argument(s) */
 		);
 	};
-
-
 };
 
 
@@ -248,6 +259,7 @@ void init_emuhacker(pybind11::module & m)
 		.def_property_readonly("active", &ProcessHandler::isValid)
 		.def_property_readonly("base_addr", &ProcessHandler::getProcessBaseAddress)
 		.def_property_readonly("ptr_size", &ProcessHandler::getPtrSize)
+		.def_property_readonly("window_text", &emuhacker::getWindowText)
 		.def_readonly_static("is64os", &PyProcessHandler::m_is64os)
 		.def_readonly("is32process", &PyProcessHandler::m_is32process)
 		.def_readonly("thread_id", &PyProcessHandler::m_thread_id)

@@ -16,6 +16,12 @@ class PPSSPPHandler(MemHandler):
         'default': 0x00DC8FB0,
     }
 
+    # 0x00010000, "Scratchpad"
+    # 0x04000000, "VRAM"
+    # 0x08800000, "User memory"
+    # 0x08804000, "Default load address"
+    # 0x88000000, "Kernel memory"
+
     def attach(self):
         succeed = self.attach_window(self.CLASS_NAME, self.WINDOW_NAME)
         if succeed:
@@ -24,6 +30,8 @@ class PPSSPPHandler(MemHandler):
             match = re.match(r'^PPSSPP v(\d(\.\d)+)', window_text)
             version = match.group(1) if match else 'default'
             self.base = self.raw_read(BASE[version] + self.base_addr, size=self.ptr_size)
+            # for cheats
+            self.user_memory = self.base + 0x08800000
 
         return succeed
 
@@ -31,4 +39,4 @@ class PPSSPPHandler(MemHandler):
         if self._raw_addr:
             return addr
 
-        return self.base + addr
+        return self.user_memory + addr

@@ -12,6 +12,7 @@ class ProcessHandler
 protected:
 	HANDLE		m_process;
 	DWORD       m_thread_id;
+	HWND        m_hwnd;
 	static bool m_is64os;
 	bool        m_is32process; // target is 32bit process
 	bool        m_raw_addr;
@@ -50,6 +51,7 @@ public:
 	bool is32Process();
 	auto getProcess() { return m_process; }
 	DWORD getProcessId() { return ::GetProcessId(m_process); }
+	auto getHWnd() { return m_hwnd; }
 
 	int getPtrSize() { return m_is32process ? 4 : 8; }
 
@@ -98,7 +100,7 @@ public:
 		return data;
 	}
 
-	bool write_int(addr_t addr, INT64 data, size_t size)
+	bool write_int(addr_t addr, size_t data, size_t size)
 	{
 		return write_uint(addr, data & ((1 << (size << 3)) - 1), size);
 	}
