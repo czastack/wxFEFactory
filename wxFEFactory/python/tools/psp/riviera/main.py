@@ -19,7 +19,7 @@ class Main(BasePspHack):
         self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
         self.lazy_group(Group("favors", "好感度", self._global), self.render_favors)
         self.lazy_group(Group("items", "道具", self._global, cols=4), self.render_items)
-        self.lazy_group(Group("event_items", "事件道具", self._global), self.render_event_items)
+        # self.lazy_group(Group("event_items", "事件道具", self._global), self.render_event_items)
         # self.lazy_group(Group("person_battles", "战斗中", self._global, cols=4), self.render_person_battles)
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
@@ -64,10 +64,10 @@ class Main(BasePspHack):
                 ModelSelect("items.%d.item" % i, "道具%d" % (i + 1), choices=datasets.ITEMS)
                 ModelInput("items.%d.count" % i, "数量")
 
-    def render_event_items(self):
-        for i, labels in enumerate(datasets.EVENT_ITEMS):
-            ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
-                checkbtn=True, cols=4)
+    # def render_event_items(self):
+    #     for i, labels in enumerate(datasets.EVENT_ITEMS):
+    #         ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
+    #             checkbtn=True, cols=4)
 
     # def render_person_battles(self):
     #     for i in range(3):
@@ -76,8 +76,8 @@ class Main(BasePspHack):
     #         ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
     def render_functions(self):
-        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music',
-            'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc', 'over_drive'))
+        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music', 'all_face', 'all_dubbing',
+            'enable_chapter8', 'all_item_desc', 'over_drive', 'rage_clear', 's_ranking', 'tool_keep'))
 
     def get_hotkeys(self):
         return (
@@ -143,6 +143,14 @@ class Main(BasePspHack):
         """必杀槽最大"""
         self._global.kill_slot = 0x180
 
+    def rage_clear(self, btn):
+        """rage槽清空"""
+        self._global.rage = 0
+
+    def s_ranking(self, btn):
+        """获得S评价"""
+        self._global.battle_time = 0
+
     def tool_keep(self, btn):
-        """战斗中道具使用次数不减"""
+        """道具耐久不减"""
         self.handler.write32(0x000458FC, 0x00601023)

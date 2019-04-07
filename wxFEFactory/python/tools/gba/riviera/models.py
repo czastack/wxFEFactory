@@ -37,5 +37,6 @@ class Global(Model):
     items = ArrayField(0x02006DBC, 16, ModelField(0, ItemSlot))
     kill_slot = WordField(0x020028E2, label="必杀槽")
     rage = WordField(0x020028EC, label="RAGE")
+    battle_time = ByteField(0x020028F6, label="战斗时间")
     person_battles = ArrayField(0, 6, ModelField(0, PersonBattle))  # 战斗中人物信息
     event_items = ArrayField(0x02008170, 10, WordField(0))  # 事件道具

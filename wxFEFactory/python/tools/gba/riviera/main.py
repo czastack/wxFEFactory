@@ -76,8 +76,8 @@ class Main(BaseGbaHack):
             ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
     def render_functions(self):
-        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music',
-            'all_face', 'all_dubbing', 'enable_chapter8', 'all_item_desc', 'over_drive'))
+        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music', 'all_face', 'all_dubbing',
+            'enable_chapter8', 'all_item_desc', 'over_drive', 'rage_clear', 's_ranking'))
 
     def get_hotkeys(self):
         return (
@@ -134,6 +134,14 @@ class Main(BaseGbaHack):
         """必杀槽最大"""
         self._global.kill_slot = 0x180
 
+    def rage_clear(self, btn):
+        """rage槽清空"""
+        self._global.rage = 0
+
     def all_skills(self, btn):
         """当前角色全技能"""
         self.person.skills = b'\xff' * 0x48
+
+    def s_ranking(self, btn):
+        """获得S评价"""
+        self._global.battle_time = 0
