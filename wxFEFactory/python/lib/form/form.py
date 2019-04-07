@@ -2,7 +2,7 @@ from .fields import Field, Group
 import ctypes
 
 
-class FormMetaclass(type):
+class FormMeta(type):
     SLOTS = ()
 
     def __new__(class_, name, bases, attrs):
@@ -42,7 +42,7 @@ class FormMetaclass(type):
         return super().__new__(class_, name, bases, attrs)
 
 
-class BaseForm(metaclass=FormMetaclass):
+class BaseForm(metaclass=FormMeta):
     """
     表单基类
     """

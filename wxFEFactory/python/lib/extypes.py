@@ -148,14 +148,19 @@ class classproperty:
 
 class _DataClass:
     __slots__ = ()
+    default = None
 
     def __init__(self, *args, **kwargs):
+        self._set_data(args, kwargs)
+
+    def set_data(self, *args, **kwargs):
+        self._set_data(args, kwargs)
+
+    def _set_data(self, args, kwargs):
         for field, arg in zip(self.__slots__, args):
             setattr(self, field, arg)
         for field in kwargs:
             setattr(self, field, kwargs[field])
-
-    set_data = __init__
 
     def to_dict(self):
         return {field: getattr(self, field) for field in self.__slots__}
@@ -187,5 +192,45 @@ class _DataClass:
         return self.default
 
 
-def DataClass(name, fields, default=None, defaults=None):
-    return type(name, (_DataClass,), {'__slots__': tuple(fields), 'default': default, 'defaults': defaults})
+def DataClass(name, fields, default=None, defaults=None, attrs=None, bases=None):
+    """ 直接构造数据类
+    :param bases: 父类元组或None"""
+    the_attrs = {'fields': fields, 'default': default, 'defaults': defaults}
+    if attrs:
+        attrs.update(the_attrs)
+        the_attrs = attrs
+    return DataClassMeta.__new__(DataClassMeta, name, bases, the_attrs)
+
+
+class DataClassMeta(type):
+    def __new__(class_, name, bases, attrs):
+        fields = attrs.pop('fields')
+
+        the_bases = (_DataClass,)
+        if bases:
+            # 处理继承
+            dataclass_base = False
+            base_slots = []
+            base_defaults = {}
+            defaults = attrs.pop('defaults', None)
+            for base in bases:
+                if issubclass(base, _DataClass):
+                    dataclass_base = True
+                    base_slots.extend(base.__slots__)
+                    if base.defaults:
+                        base_defaults.update(base.defaults)
+            if defaults:
+                base_defaults.update(defaults)
+            attrs['defaults'] = base_defaults
+            base_slots.extend(fields)
+            slots = base_slots
+
+            if dataclass_base:
+                if dataclass_base:
+                    the_bases = bases
+                else:
+                    the_bases = bases + the_bases
+        else:
+            slots = tuple(fields)
+        attrs['__slots__'] = slots
+        return super().__new__(class_, name, the_bases, attrs)
