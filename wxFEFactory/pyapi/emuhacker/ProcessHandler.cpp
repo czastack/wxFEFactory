@@ -12,7 +12,12 @@ bool Is64Bit_OS()
 	typedef void (WINAPI *LPFN_PGNSI)(LPSYSTEM_INFO);
 
 	SYSTEM_INFO si = { 0 };
-	LPFN_PGNSI pGNSI = (LPFN_PGNSI)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "GetNativeSystemInfo");
+	HMODULE module = GetModuleHandle(_T("kernel32.dll"));
+	if (module == NULL)
+	{
+		return FALSE;
+	}
+	LPFN_PGNSI pGNSI = (LPFN_PGNSI)GetProcAddress(module, "GetNativeSystemInfo");
 	if (pGNSI == NULL)
 	{
 		return FALSE;
@@ -104,8 +109,13 @@ bool ProcessHandler::is32Process()
 	}
 
 	typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
-	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandleW(L"kernel32"), "IsWow64Process");
-	if (NULL != fnIsWow64Process)
+	HMODULE module = GetModuleHandleW(L"kernel32");
+	if (module == NULL)
+	{
+		return FALSE;
+	}
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(module, "IsWow64Process");
+	if (fnIsWow64Process != NULL)
 	{
 		BOOL bIsWow64 = FALSE;
 		fnIsWow64Process(m_process, &bIsWow64);
@@ -214,8 +224,8 @@ addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
 	{
 		for (int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
 		{
-			TCHAR szModName[64];
-			if (GetModuleBaseName(m_process, hMods[i], szModName, sizeof(szModName)))
+			TCHAR szModName[128];
+			if (GetModuleBaseName(m_process, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
 			{
 				if (wcscmp(name, szModName) == 0)
 				{
@@ -370,6 +380,12 @@ addr_t ProcAddressHelper::getProcAddress(LPCSTR funcname)
 {
 	size_t namesize = strlen(funcname);
 	char *namebuf = (char*)malloc(namesize + 1);
+
+	if (namebuf == NULL)
+	{
+		return NULL;
+	}
+
 	namebuf[namesize] = NULL;
 
 	// 按函数名查找函数地址

@@ -11,7 +11,7 @@ class NativeContext(NativeContext):
     SIZE = 160
 
     m_nDataCount = Field(0x0C)                                          # unsigned int m_nDataCount;     // 0C-10
-    m_pOriginalData = ArrayField(0x10, 4, ModelPtrField(0, _Vector3))  # CVector3 * m_pOriginalData[4]; // 10-20
+    m_pOriginalData = ArrayField(0x10, 4, ModelPtrField(0, _Vector3))   # CVector3 * m_pOriginalData[4]; // 10-20
     m_TemporaryData = ArrayField(0x20, 4, CoordField(0, length=4))      # Vector4 m_TemporaryData[4];    // 20-60
     m_TempStack = ArrayField(0x60, 16, Field(0))                        # int m_TempStack[16];           // 60-A0
 

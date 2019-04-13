@@ -1,3 +1,4 @@
+import math
 import os
 import struct
 
@@ -65,6 +66,11 @@ class Accumulator:
 def float32(f):
     """浮点数保留6位小数"""
     return round(f, 6)
+
+
+def round_s(number, ndigits=0):
+    rate = 10 ** ndigits
+    return math.floor(number * rate + 0.5) / rate
 
 
 def tuple2rgb(rgbtuple):

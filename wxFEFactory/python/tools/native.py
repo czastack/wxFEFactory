@@ -90,6 +90,8 @@ class NativeContext(Model):
 
     def get_result(self, type, size=0):
         """获取调用结果"""
+        if type is str:
+            return self.get_string_result(size)
         return self.handler.read(self.m_pReturn, type, size)
 
     def get_vector_result(self, size=4, fixed=-1):
@@ -100,6 +102,13 @@ class NativeContext(Model):
                 return round(self.handler.read_float(addr), fixed)
         addr = self.m_pReturn
         return (r(addr), r(addr + size), r(addr + size + size))
+
+    def get_string_result(self, size):
+        data = self.handler.read(self.handler.read_ptr(self.m_pReturn), bytes, size)
+        n = data.find(0)
+        if n is not -1:
+            data = data[:n]
+        return data
 
     def reset(self):
         self.m_nArgCount = 0

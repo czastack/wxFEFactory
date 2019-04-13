@@ -24,6 +24,8 @@ namespace emuhacker {
 		}
 		else if (type.ptr() == (PyObject*)&PyFloat_Type)
 		{
+			if (size == 8)
+				return py::cast(self.read<double>(addr));
 			return py::cast(self.read<float>(addr));
 		}
 		else if (type.ptr() == (PyObject*)&PyBool_Type)
@@ -35,7 +37,7 @@ namespace emuhacker {
 			char *buf = new char[size];
 			self.read(addr, buf, size);
 			py::bytes ret(buf, size);
-			delete buf;
+			delete[] buf;
 			return ret;
 		}
 		return None;
@@ -46,10 +48,12 @@ namespace emuhacker {
 	{
 		if (PyLong_Check(data.ptr()))
 		{
-			self.write_uint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
+			return self.write_uint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
 		}
 		else if (PyFloat_Check(data.ptr()))
 		{
+			if (size == 8)
+				return self.write(addr, data.cast<double>());
 			return self.write(addr, data.cast<float>());
 		}
 		else if (PyBool_Check(data.ptr()))

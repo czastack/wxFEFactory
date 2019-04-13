@@ -14,7 +14,6 @@ from ..gta_base.native import SafeScriptEnv
 from ..gta_base.widgets import ColorWidget
 from . import address, models, datasets, coords
 from .models import Player, Vehicle
-from .native import NativeContext
 from .widgets import WeaponWidget, CustomColorWidget
 from fefactory_api import ui
 import math
@@ -31,7 +30,6 @@ class Main(BaseGTATool):
     models = models
     Player = Player
     Vehicle = Vehicle
-    NativeContext = NativeContext
 
     RAISE_UP_SPEED = 12
     SAFE_SPEED_RATE = 30
@@ -42,9 +40,6 @@ class Main(BaseGTATool):
     SLING_COORD_UP = 3
     SLING_SPEED_RATE = 70
     EXPLODE_DISTANCE_VEHICLE = 10
-
-    # use x64 native_call
-    FUNCTION_NATIVE_CALL = BaseGTATool.FUNCTION_NATIVE_CALL_64
 
     def __init__(self):
         super().__init__()
