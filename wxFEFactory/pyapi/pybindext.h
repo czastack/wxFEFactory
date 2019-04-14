@@ -54,6 +54,31 @@ namespace pybind11 {
 		};
 #endif
 
+
+		template<typename T>
+		struct IsArray {
+			template <typename C> static typename C::wxBaseArray test(int);
+			template <typename C> static std::false_type test(...);
+			static constexpr bool value = !std::is_same<decltype(test<T>(0)), std::false_type>::value;
+		};
+
+		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<IsArray<ArrayType>::value>> {
+		public:
+			bool load(handle src, bool) {
+				wxArrayAddAll(value, py::reinterpret_borrow<py::object>(src));
+				return true;
+			}
+
+			static handle cast(const ArrayType& src, return_value_policy /* policy */, handle /* parent */) {
+				return PyListFromArray(src);
+			}
+
+			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArray"));
+		protected:
+			bool success = false;
+		};
+
+
 		HAS_MEM_FUNC(Add, hasAdd);
 
 		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<hasAdd<ArrayType>::value>> {
@@ -67,7 +92,7 @@ namespace pybind11 {
 				return PyListFromArray(src);
 			}
 
-			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArray"));
+			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArrayLike"));
 		protected:
 			bool success = false;
 		};
