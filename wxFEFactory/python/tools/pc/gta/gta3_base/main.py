@@ -1,7 +1,7 @@
 from functools import partial
+from fefactory_api import ui
 from ..gta_base.main import BaseGTATool
 from . import opcodes
-from fefactory_api import ui
 
 
 class BaseGTA3_VC_SA_Tool(BaseGTATool):

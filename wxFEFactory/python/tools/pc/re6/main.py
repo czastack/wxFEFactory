@@ -5,7 +5,7 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.native_hacktool import NativeHacktool, AssemblyItem
+from tools.base.native_hacktool import NativeHacktool, AssemblyItem
 from fefactory_api import ui
 from . import models, datasets
 import fefactory_api

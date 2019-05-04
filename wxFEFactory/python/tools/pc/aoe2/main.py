@@ -3,7 +3,7 @@ from lib.exui.controls import SearchListBox
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.native_hacktool import NativeHacktool
+from tools.base.native_hacktool import NativeHacktool
 from fefactory_api import ui
 from . import models, datasets
 import base64

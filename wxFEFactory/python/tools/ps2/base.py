@@ -1,5 +1,5 @@
 from lib.hack.handlers.ps2handler import Pcsx2Handler
-from ..hacktool import BaseHackTool
+from tools.base.hacktool import BaseHackTool
 
 
 class BasePs2Hack(BaseHackTool):

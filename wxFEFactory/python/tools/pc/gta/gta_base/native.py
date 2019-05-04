@@ -1,4 +1,4 @@
-from tools.native import NativeContext, NativeContext64
+from tools.base.native import NativeContext, NativeContext64
 
 
 class SafeScriptEnv:

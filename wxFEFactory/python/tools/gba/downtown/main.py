@@ -1,6 +1,6 @@
-from ..base import BaseGbaHack
 from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect, Choice
 from fefactory_api import ui
+from ..base import BaseGbaHack
 
 
 class ExTool(BaseGbaHack):

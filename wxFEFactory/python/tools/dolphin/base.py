@@ -1,5 +1,5 @@
 from lib.hack.handlers.wiihandler import DolphinHandler
-from ..hacktool import BaseHackTool
+from tools.base.hacktool import BaseHackTool
 
 
 class BaseDolphinHack(BaseHackTool):

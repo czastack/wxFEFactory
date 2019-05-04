@@ -1,5 +1,5 @@
-from ..main import MetalMaxHack
 from lib.hack.forms import ModelCheckBox, ModelInput, ModelSelect
+from ..main import MetalMaxHack
 
 
 class Main(MetalMaxHack):

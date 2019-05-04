@@ -1,8 +1,8 @@
-from ..base import BaseGbaHack
 from lib.hack.forms import Group, Groups, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from fefactory_api import ui
+from ..base import BaseGbaHack
 from . import models, datasets
 
 

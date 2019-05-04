@@ -1,4 +1,3 @@
-from ..base import BaseGbaHack
 from lib.hack.forms import (
     Group, StaticGroup, ModelInput, ModelArrayInput, ModelSelect, ModelArraySelect,
     ModelFlagWidget, ModelCheckBox, Choice
@@ -6,6 +5,7 @@ from lib.hack.forms import (
 from lib.win32.keys import VK
 from lib.exui.components import Pagination
 from fefactory_api import ui
+from ..base import BaseGbaHack
 from . import models, datasets
 
 

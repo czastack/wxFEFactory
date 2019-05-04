@@ -1,4 +1,3 @@
-from ..base import BaseSfcHack
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect,
     ModelChoiceDisplay, Choice
@@ -8,6 +7,7 @@ from lib import exui, wxconst
 from lib.exui.components import Pagination
 from functools import partial
 from fefactory_api import ui
+from ..base import BaseSfcHack
 from . import models, datasets
 
 

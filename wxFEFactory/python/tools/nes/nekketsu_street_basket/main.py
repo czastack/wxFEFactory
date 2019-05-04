@@ -1,7 +1,7 @@
-from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, Choice
 from lib.win32.keys import VK
 from fefactory_api import ui
+from ..base import BaseNesHack
 from . import models, datasets
 
 

@@ -1,6 +1,6 @@
 from lib.win32.keys import VK
 from fefactory_api import auto, ui
-from tools.tool import BaseTool
+from tools.base.basetool import BaseTool
 import json
 import time
 import fefactory_api

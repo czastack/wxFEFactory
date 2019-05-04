@@ -2,13 +2,13 @@ from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, ModelInput, ModelCoordWidget
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles
+from fefactory_api import ui
+from ..gta_base.widgets import WeaponWidget
+from ..gta3_base.main import BaseGTA3Tool
 from . import address, models, coords
 from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
-from ..gta_base.widgets import WeaponWidget
-from ..gta3_base.main import BaseGTA3Tool
-from fefactory_api import ui
 import math
 import os
 import json

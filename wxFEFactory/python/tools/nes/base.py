@@ -4,7 +4,7 @@ from lib.hack.forms import Group, StaticGroup, ModelInput
 from lib.hack.models import Model, Field, ByteField, WordField
 from lib.win32.keys import VK
 from lib.extypes import DataClass
-from ..hacktool import ProxyHackTool
+from tools.base.hacktool import ProxyHackTool
 
 
 class BaseNesHack(ProxyHackTool):

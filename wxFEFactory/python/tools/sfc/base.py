@@ -1,5 +1,5 @@
 from lib.hack.handlers.sfchandler import Snes9xHandler
-from ..hacktool import BaseHackTool
+from tools.base.hacktool import BaseHackTool
 
 
 class BaseSfcHack(BaseHackTool):

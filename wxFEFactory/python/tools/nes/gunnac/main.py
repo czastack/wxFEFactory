@@ -1,7 +1,7 @@
-from ..base import BaseNesHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelCheckBox, ModelSelect
 from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField
+from ..base import BaseNesHack
 
 
 class Global(Model):

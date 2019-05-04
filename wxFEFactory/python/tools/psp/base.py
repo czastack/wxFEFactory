@@ -1,5 +1,5 @@
 from lib.hack.handlers.psphandler import PPSSPPHandler
-from ..hacktool import BaseHackTool
+from tools.base.hacktool import BaseHackTool
 
 
 class BasePspHack(BaseHackTool):

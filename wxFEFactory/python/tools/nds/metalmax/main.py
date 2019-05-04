@@ -1,4 +1,3 @@
-from ..base import BaseNdsHack
 from lib.hack.forms import (
     Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
 )
@@ -7,6 +6,7 @@ from lib import exui, wxconst
 from lib.exui.components import Pagination
 from fefactory_api import ui
 from functools import partial
+from ..base import BaseNdsHack
 
 
 class MetalMaxHack(BaseNdsHack):

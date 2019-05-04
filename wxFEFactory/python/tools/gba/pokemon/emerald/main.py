@@ -1,5 +1,5 @@
-from ..main import PMHack
 from fefactory_api import ui
+from ..main import PMHack
 
 
 class Main(PMHack):

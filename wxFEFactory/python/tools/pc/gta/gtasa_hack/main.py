@@ -6,13 +6,13 @@ from lib.hack.forms import (
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles, btn_md_style
+from fefactory_api import ui
+from ..gta3_base.main import BaseGTA3_VC_SA_Tool
+from ..gta_base.widgets import WeaponWidget, ColorWidget
 from . import cheat, address, models, datasets, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
-from ..gta3_base.main import BaseGTA3_VC_SA_Tool
-from ..gta_base.widgets import WeaponWidget, ColorWidget
-from fefactory_api import ui
 import math
 import os
 import json

@@ -1,3 +1,4 @@
+from functools import partial
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem
 from .native import NativeContext, NativeContext64, NativeContextArray
 import base64
@@ -7,6 +8,7 @@ class NativeHacktool(AssemblyHacktool):
     NativeContext = None
     enable_native_call_n = False
 
+    # x86 native_call
     FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GD/'
         b'wF2A4tN+P9V9IlFCIX/dQyLRgTB4AKJRfQDZfSLDotFCF9eiQGL5V3DuAAQFADD')
 
@@ -18,6 +20,7 @@ class NativeHacktool(AssemblyHacktool):
         b'QVhDrBEyLRhCD+wR8HkGKQ9s8AHQSPAF0B/IPEF4Y6wvzDxBeGOsETItOGP/VSYsOSIkB8w8RQQjyDxFBEEiF/3QDSAPnSIPEMEFeX17D'
     )
 
+    # x86 native_call_n
     FUNCTION_NATIVE_CALL_N = base64.b64decode(
         b'VYvsUcdF/AAAAADrCYtF/IPAAYlF/ItN/DtNEH0TaVX8jAAAAANVDFL/VQiDxATr3IvlXcM=')
 
@@ -85,21 +88,24 @@ class NativeHacktool(AssemblyHacktool):
         else:
             return self.native_call_auto(*args, **kwargs)
 
-    def native_call_n(self, call_list):
+    def native_call_n(self, call_list, context_array=None):
         """一次调用多个函数"""
-        context_array = NativeContextArray(self.handler, len(call_list), self.NativeContext)
+        context_reuse = context_array is not None
+        if not context_reuse:
+            context_array = NativeContextArray(self.handler, len(call_list), self.NativeContext)
         for i, item in enumerate(call_list):
             context = context_array[i]
-            if item['arg_sign']:
-                if issubclass(self.NativeContext, NativeContext64):
-                    context.push('p2Q' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
-                        context.fflag, item['addr'], item['this'], *item['args'])
-                else:
-                    context.push('2L' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
-                        item['addr'], item['this'], *item['args'])
+            if context_reuse:
+                context.reset()
+            if issubclass(self.NativeContext, NativeContext64):
+                context.push('p2Q' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
+                    context.fflag, item['addr'], item['this'], *item['args'])
+            else:
+                context.push('2L' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
+                    item['addr'], item['this'], *item['args'])
 
         self.native_call_sys(self.native_call_n_addr, '2Pi',
-            self.native_call_addr, context_array.addr, context_array.size)
+            self.native_call_addr, context_array.addr, len(call_list))
 
         result = [
             context_array[i].get_result(item['ret_type'], item['ret_size']) if item['ret_type'] else None
@@ -120,3 +126,7 @@ class NativeHacktool(AssemblyHacktool):
 def call_arg(addr, arg_sign, *args, this=0, ret_type=None, ret_size=4):
     return {'addr': addr, 'arg_sign': arg_sign, 'args': args,
         'this': this, 'ret_type': ret_type, 'ret_size': ret_size}
+
+
+call_arg_int32 = partial(call_arg, ret_type=int, ret_size=4)
+call_arg_int64 = partial(call_arg, ret_type=int, ret_size=8)

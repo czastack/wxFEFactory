@@ -1,5 +1,5 @@
 from lib import wxconst
-from tools.tool import BaseTool
+from tools.base.basetool import BaseTool
 from fe.ferom import FeRomRW
 from fefactory_api import ui
 

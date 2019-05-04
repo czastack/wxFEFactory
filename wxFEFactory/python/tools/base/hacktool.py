@@ -1,4 +1,4 @@
-from .tool import NestedTool
+from .basetool import NestedTool
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler

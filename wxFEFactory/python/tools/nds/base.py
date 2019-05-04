@@ -1,6 +1,6 @@
 from lib.hack.handlers import ProxyHandler
 from lib.hack.handlers.ndshandler import DeSmuMEHandler, NogbaHandler
-from ..hacktool import ProxyHackTool
+from tools.base.hacktool import ProxyHackTool
 
 
 class BaseNdsHack(ProxyHackTool):
