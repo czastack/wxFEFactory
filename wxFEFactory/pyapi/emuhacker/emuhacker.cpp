@@ -83,18 +83,19 @@ namespace emuhacker {
 		return self.read_last_addr(addr, offsets);
 	}
 
-	auto write_function(ProcessHandler &self, py::bytes buf, size_t start) {
-		char *buff;
-		ssize_t size;
-		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
-		return self.write_function(buff, size, start);
-	}
-
 	auto alloc_data(ProcessHandler &self, py::bytes buf, size_t start) {
 		char *buff;
 		ssize_t size;
 		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
 		return self.alloc_data(buff, size, start);
+	}
+
+	auto write_function(ProcessHandler &self, py::bytes buf, size_t start) {
+		// 申请的内存可执行
+		char *buff;
+		ssize_t size;
+		PyBytes_AsStringAndSize(buf.ptr(), &buff, &size);
+		return self.write_function(buff, size, start);
 	}
 
 	pyobj find_bytes(ProcessHandler &self, py::bytes buf, addr_t start, addr_t end, int ordinal, bool fuzzy)

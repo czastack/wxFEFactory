@@ -117,7 +117,6 @@ class NativeContext(Model):
         return self.m_TempStack[index]
 
     def __setitem__(self, index, value):
-        print(index, value)
         self.m_TempStack[index] = value
 
     def __enter__(self):
@@ -130,7 +129,7 @@ class NativeContext(Model):
 
 class NativeContext64(NativeContext):
     """x64原生函数调用环境 (GTAV)"""
-    SIZE = 144
+    SIZE = 160
     ARG_MAX = 16
 
     m_pReturn = Field(0x00, size=8)                                    # void * m_pReturn;              // 00-04
@@ -157,7 +156,7 @@ class NativeContext64(NativeContext):
         """压入参数"""
         # 除去fflag, dwFunc, this，剩余参数的序号
         arg_count = self.m_nArgCount
-        # 调用NativeCall 汇编函数时用到
+        # 调用 native_call 汇编函数时用到
         if arg_count + self.str_arg_block >= 16:
             raise ValueError('参数缓冲区容量不足')
 
@@ -229,3 +228,33 @@ class NativeContext64(NativeContext):
         addr = self.m_TempStack.addr_at(self.m_nArgCount)
         self.handler.write(addr, buff)
         self.m_nArgCount = arg_count
+
+    def get_result(self, type, size=0):
+        """获取调用结果"""
+        if type is not float:
+            return super().get_result(type, size)
+        else:
+            if size is 8:
+                return self.handler.read_double(self.m_pReturn + 16)
+            return self.handler.read_float(self.m_pReturn + 8)
+
+
+class NativeContextArray:
+    def __init__(self, handler, size, NativeContext=NativeContext):
+        self.handler = handler
+        self.size = size
+        self.NativeContext = NativeContext
+        self.addr = handler.alloc_memory(NativeContext.SIZE * size)
+        self.contexts = [NativeContext(self.addr + NativeContext.SIZE * i, handler) for i in range(size)]
+
+    def __del__(self):
+        self.release()
+
+    def release(self):
+        if self.addr:
+            self.handler.free_memory(self.addr)
+            self.addr = 0
+        self.contexts = None
+
+    def __getitem__(self, index):
+        return self.contexts[index] if self.contexts else None

@@ -33,7 +33,7 @@ native_call PROC
     test        rdx,rdx
     je          LABEL_1
     ; {
-        ; dwThis ´æÔÚrcx, µÚÒ»¸ö²ÎÊı´æÔÚrdx»òxmm1£¬ÒÀ´ÎÀàÍÆ£¬µÚËÄ¸ö¼°Ö®ºóµÄ²ÎÊıÍ¨¹ıÕ»´«µİ
+        ; dwThis å­˜åœ¨rcx, ç¬¬ä¸€ä¸ªå‚æ•°å­˜åœ¨rdxæˆ–xmm1ï¼Œä¾æ¬¡ç±»æ¨ï¼Œç¬¬å››ä¸ªåŠä¹‹åçš„å‚æ•°é€šè¿‡æ ˆä¼ é€’
         ; ++count;
         inc         ebx
         ;   fflag <<= 1;
@@ -43,29 +43,29 @@ native_call PROC
     ;else
     jmp         LABEL_2
     ; {
-        ; Ö¸ÏòµÚÒ»¸ö²ÎÊı
+        ; æŒ‡å‘ç¬¬ä¸€ä¸ªå‚æ•°
         ; ++args;
         LABEL_1:
         add         rsi,8
     ; }
-    ; ´ËÊ±argsÖ¸ÏòdwThis»òµÚÒ»¸ö²ÎÊı
+    ; æ­¤æ—¶argsæŒ‡å‘dwThisæˆ–ç¬¬ä¸€ä¸ªå‚æ•°
 
 LABEL_2:
     ; DWORD stack_diff = 0;
     xor rdi, rdi
-    ; Ê£ÓàµÄ²ÎÊı
+    ; å‰©ä½™çš„å‚æ•°
     ; if (count >= 5)
     cmp         ebx,5
     jl          LABEL_4
     ; {
-        ; args Ö¸ÏòµÚËÄ¸ö²ÎÊı
+        ; args æŒ‡å‘ç¬¬å››ä¸ªå‚æ•°
         ; args += 4;
-        ; À´Ô´
+        ; æ¥æº
         add rsi, 20h
         ; count -= 4
         sub rbx, 4
         ; stack_diff = (count << 3) + 0x20;
-        ; Õ»ÒªÔ¤Áô20h¸ö×Ö½Ú
+        ; æ ˆè¦é¢„ç•™20hä¸ªå­—èŠ‚
         lea         r10,[rbx*8+20h]
         mov rax, r10
         and rax, 0Fh
@@ -74,24 +74,24 @@ LABEL_2:
         add r10, 8h
 LABEL_3:
         sub rsp, r10
-        ; Ä¿±ê
+        ; ç›®æ ‡
         mov rdi, rsp
-        ; Ô¤Áô32×Ö½Ú
+        ; é¢„ç•™32å­—èŠ‚
         add rdi, 20h
-        ; Ñ­»·´ÎÊı
+        ; å¾ªç¯æ¬¡æ•°
         xor rcx, rcx
         mov ecx, ebx
         rep movsq
 
-        ; Ö®ºóÄÃrdiÀ´´æstack_diff
+        ; ä¹‹åæ‹¿rdiæ¥å­˜stack_diff
         mov rdi, r10
         ; count += 4
         add ebx, 4
-        ; ÔÙ´ÎÖ¸ÏòµÚÒ»¸ö²ÎÊı
+        ; å†æ¬¡æŒ‡å‘ç¬¬ä¸€ä¸ªå‚æ•°
         sub rsi, r10
         test rax, rax
         je LABEL_4
-        ; ÒòÎªÕ»Òª¶ÔÆë16×Ö½Ú£¬Èç¹û¸Õ²ÅÎªÁË¶ÔÆë¶à¼ÓÁË8£¬ÏÖÔÚ¼õ»ØÈ¥
+        ; å› ä¸ºæ ˆè¦å¯¹é½16å­—èŠ‚ï¼Œå¦‚æœåˆšæ‰ä¸ºäº†å¯¹é½å¤šåŠ äº†8ï¼Œç°åœ¨å‡å›å»
         add rsi, 8h
     ; }
 
