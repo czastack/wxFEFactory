@@ -95,6 +95,7 @@ class AssemblyHacktool(BaseHackTool):
             replace_offset = item.replace_offset
 
             addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.fuzzy)
+            print(addr)
             if addr is -1:
                 return
 
