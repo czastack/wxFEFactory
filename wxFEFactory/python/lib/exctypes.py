@@ -1,7 +1,6 @@
 from .lazy import lazy
 from functools import partialmethod
 import ctypes
-_SimpleCData = ctypes._SimpleCData
 
 
 class CArray:
@@ -48,7 +47,7 @@ class Uint64Array(CArray):
 
 
 def ival(value):
-    if isinstance(value, _SimpleCData):
+    if isinstance(value, ctypes._SimpleCData):
         value = value.value
     return value
 
