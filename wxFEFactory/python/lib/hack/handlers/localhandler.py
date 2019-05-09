@@ -9,6 +9,7 @@ _LocalHandler__instance = None
 
 class LocalHandler:
     ptr_size = ctypes.sizeof(ctypes.c_char_p)
+    memory_map = {}  # 申请的buffer {addr: array}
 
     def read(self, addr, type, size=0):
         if type is int:
@@ -30,6 +31,8 @@ class LocalHandler:
         elif _type is bool:
             return self.write8(addr, data)
         else:
+            if _type is bytearray:
+                data = bytes(data)
             return mem_write(addr, data, size)
 
     def read_uint(self, addr, size=4, signed=False):
@@ -108,6 +111,26 @@ class LocalHandler:
         if addr:
             return self.write(addr, data, size)
         return False
+
+    def alloc_memory(self, init, size=None):
+        """ 申请内存
+        (aBytes)
+        (anInteger)
+        (aBytes, anInteger)
+        """
+        if self.memory_map is None:
+            self.memory_map = {}
+        buff = ctypes.create_string_buffer(init, size)
+        addr = ctypes.addressof(buff)
+        self.memory_map[addr] = buff
+        return addr
+
+    def alloc_data(self, data):
+        return self.alloc_memory(data)
+
+    def free_memory(self, addr):
+        if self.memory_map:
+            return self.memory_map.pop(addr, None)
 
     @classmethod
     def get_instance(cls):

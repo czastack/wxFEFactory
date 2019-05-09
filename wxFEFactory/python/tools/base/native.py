@@ -6,21 +6,29 @@ import struct
 
 class NativeContext(Model):
     """原生函数调用的环境
-    GTAIV中的实现拿来用
+    借鉴GTAIV中的实现
     """
     SIZE = 140
+    ARG_MAX = 32
+    ITEM_SIZE = 4
 
     m_pReturn = Field(0)                                               # void * m_pReturn;              // 00-04
     m_nArgCount = Field(4)                                             # unsigned int m_nArgCount;      // 04-08
     m_pArgs = Field(8)                                                 # void * m_pArgs;                // 08-0C
-    m_TempStack = ArrayField(0x0C, 32, Field(0))                       # int m_TempStack[20];           // 0C-8C
+    m_TempStack = ArrayField(0x0C, ARG_MAX, Field(0))                  # int m_TempStack[20];           // 0C-8C
 
     def __init__(self, addr, handler):
         super().__init__(addr, handler)
         self.m_pArgs = self.m_pReturn = self.m_TempStack.addr
+        # 字符串、数组等临时参数占的块数，每块8字节
+        self.temp_index = 0
+
+    def reset(self):
+        self.m_nArgCount = 0
+        self.temp_index = 0
 
     def push(self, signature, *args):
-        """压入参数，m_nArgCount增大"""
+        """压入参数"""
         # signature
         # x: pad byte
         # c: char
@@ -41,7 +49,10 @@ class NativeContext(Model):
         # p: char[]
         # P: void *
         # 写入栈的地址
-        addr = self.m_TempStack.addr_at(self.m_nArgCount)
+        arg_count = self.m_nArgCount
+        if arg_count + self.temp_index >= self.ARG_MAX:
+            raise ValueError('参数缓冲区容量不足')
+        addr = self.m_TempStack.addr_at(arg_count)
         try:
             self.handler.write(addr, struct.pack(signature, *args))
         except Exception as e:
@@ -88,6 +99,89 @@ class NativeContext(Model):
             result = map(mapfn, result)
         return result
 
+    def put_temp_string(self, data, arg_count=None):
+        """存放临时字符串
+        :return: 字符串地址"""
+        length = len(data) + 1
+        if isinstance(data, str):
+            data = data.encode()
+        if arg_count is None:
+            arg_count = self.m_nArgCount
+        block_count = math.ceil(length / self.ITEM_SIZE)
+
+        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+            raise ValueError('字符串长度过长，参数缓冲区容量不足')
+
+        self.temp_index += block_count
+        addr = self.get_temp_addr(self.temp_index)
+        self.handler.write(addr, struct.pack('%ds' % (length + 1), data))
+        return addr
+
+    def put_temp_array(self, signature, *args, itemsize=None, arg_count=None):
+        """存放临时数组
+        :return: 数组地址"""
+        if itemsize is None:
+            itemsize = self.ITEM_SIZE
+        block_count = math.ceil(itemsize * len(args) / self.ITEM_SIZE)
+        if arg_count is None:
+            arg_count = self.m_nArgCount
+
+        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+            raise ValueError('数据过长，参数缓冲区容量不足')
+
+        buff = bytearray()
+        # 重复次数，例如2L中为2，L中为1
+        repeat = 0
+        arg_it = iter(args)
+
+        if isinstance(signature, str):
+            signature = signature.encode()
+
+        for ch in signature:
+            if 0x30 <= ch <= 0x39:
+                repeat = repeat * 10 + (ch - 0x30)
+                continue
+            else:
+                fmt = chr(ch)
+
+            if repeat is 0:
+                repeat = 1
+
+            for i in range(repeat):
+                arg = next(arg_it)
+                try:
+                    data = struct.pack(fmt, arg)
+                except Exception:
+                    print(fmt, arg)
+                    raise
+                datasize = len(data)
+                buff.extend(data)
+                if datasize < itemsize:
+                    # 对齐8个字节
+                    buff.extend(bytes(itemsize - datasize))
+                elif datasize > itemsize:
+                    raise ValueError('datasize must <= itemsize')
+            repeat = 0
+
+        self.temp_index += block_count
+        addr = self.get_temp_addr(self.temp_index)
+        self.handler.write(addr, buff)
+        return addr
+
+    def put_temp_simple_array(self, signature, *args, arg_count=None):
+        """存放临时简单数组
+        :return: 数组地址"""
+        data = struct.pack(signature, *args)
+        block_count = math.ceil(len(data) / self.ITEM_SIZE)
+        if arg_count is None:
+            arg_count = self.m_nArgCount
+        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+            raise ValueError('数据过长，参数缓冲区容量不足')
+        self.temp_index += block_count
+        addr = self.get_temp_addr(self.temp_index)
+        self.handler.write(addr, data)
+        return addr
+
     def get_result(self, type, size=0):
         """获取调用结果"""
         if type is str:
@@ -110,9 +204,6 @@ class NativeContext(Model):
             data = data[:n]
         return data
 
-    def reset(self):
-        self.m_nArgCount = 0
-
     def __getitem__(self, index):
         return self.m_TempStack[index]
 
@@ -131,6 +222,7 @@ class NativeContext64(NativeContext):
     """x64原生函数调用环境 (GTAV)"""
     SIZE = 160
     ARG_MAX = 16
+    ITEM_SIZE = 8
 
     m_pReturn = Field(0x00, size=8)                                    # void * m_pReturn;              // 00-04
     m_nArgCount = Field(0x08)                                          # unsigned int m_nArgCount;      // 04-08
@@ -142,13 +234,10 @@ class NativeContext64(NativeContext):
         super().__init__(addr, handler)
         # 前四个参数是否是float, double的标记, 0: 非浮点型, 1: float, 2: double
         self.fflag = bytearray(8)
-        # 字符串参数占的块数，每块8字节
-        self.str_arg_block = 0
 
     def reset(self):
-        self.m_nArgCount = 0
+        super().reset()
         self.m_nDataCount = 0
-        self.str_arg_block = 0
         for i in range(4):
             self.fflag[i] = 0
 
@@ -157,7 +246,7 @@ class NativeContext64(NativeContext):
         # 除去fflag, dwFunc, this，剩余参数的序号
         arg_count = self.m_nArgCount
         # 调用 native_call 汇编函数时用到
-        if arg_count + self.str_arg_block >= 16:
+        if arg_count + self.temp_index >= self.ARG_MAX:
             raise ValueError('参数缓冲区容量不足')
 
         buff = bytearray()
@@ -193,19 +282,7 @@ class NativeContext64(NativeContext):
                         # 字符串(s是c style, p是pascal style)
                         if repeat is not 1:
                             raise ValueError('对于字符串参数, s和p前暂不支持加数字')
-
-                        length = len(arg) + 1
-                        if isinstance(arg, str):
-                            arg = arg.encode()
-                        block_count = math.ceil(length / 8)
-
-                        if arg_count + self.str_arg_block + block_count > self.ARG_MAX:
-                            raise ValueError('字符串长度过长，参数缓冲区容量不足')
-
-                        self.str_arg_block += block_count
-                        temp_addr = self.get_temp_addr(self.str_arg_block)
-                        self.handler.write(temp_addr, struct.pack('%ds' % (length + 1), arg))
-                        arg = temp_addr
+                        arg = self.put_temp_string(arg, arg_count)
                         fmt = 'Q'
 
                     try:
@@ -213,11 +290,11 @@ class NativeContext64(NativeContext):
                     except Exception:
                         print(fmt, arg)
                         raise
-                    data_size = len(data)
+                    datasize = len(data)
                     buff.extend(data)
-                    if data_size < 8:
+                    if datasize < 8:
                         # 对齐8个字节
-                        buff.extend(bytes(8 - data_size))
+                        buff.extend(bytes(8 - datasize))
 
                     arg_count += 1
                 repeat = 0
