@@ -10,7 +10,7 @@
 #include <wx/clrpicker.h>
 #include <wx/treectrl.h>
 #include <unordered_map>
-#include "wxpatch.h"
+#include "wx/wxpatch.h"
 
 
 class Button : public Control

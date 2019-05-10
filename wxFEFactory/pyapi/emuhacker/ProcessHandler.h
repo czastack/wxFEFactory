@@ -102,7 +102,7 @@ public:
 
 	bool write_int(addr_t addr, size_t data, size_t size)
 	{
-		return write_uint(addr, data & ((1 << (size << 3)) - 1), size);
+		return write_uint(addr, data & ((1ull << (size << 3ull)) - 1ull), size);
 	}
 
 	/**
@@ -239,5 +239,5 @@ private:
 public:
 	ProcAddressHelper(ProcessHandler *handler, LPVOID pides, addr_t module);
 	~ProcAddressHelper();
-	addr_t getProcAddress(LPCSTR funcname);
+	void getProcAddress(class wxArrayString &name_list, class wxArraySizeT& addr_list);
 };

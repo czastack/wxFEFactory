@@ -2,9 +2,11 @@
 
 #include "ProcessHandler.h"
 #include "types.h"
+#include "wx/wxtypes.h"
 #include <tchar.h>
 #include <psapi.h>
 #include <iostream>
+#include <wx/arrstr.h>
 
 
 bool Is64Bit_OS()
@@ -376,41 +378,43 @@ ProcAddressHelper::~ProcAddressHelper()
 	}
 }
 
-addr_t ProcAddressHelper::getProcAddress(LPCSTR funcname)
+void ProcAddressHelper::getProcAddress(wxArrayString& name_list, wxArraySizeT& addr_list)
 {
-	size_t namesize = strlen(funcname);
-	char *namebuf = (char*)malloc(namesize + 1);
-
-	if (namebuf == NULL)
-	{
-		return NULL;
-	}
-
-	namebuf[namesize] = NULL;
+	char namebuf[128];
 
 	// 按函数名查找函数地址
 	IMAGE_EXPORT_DIRECTORY &ides = *(PIMAGE_EXPORT_DIRECTORY)m_pides;
 	addr_t namePtrAddr = m_module + ides.AddressOfNames;
-	DWORD nameAddr;
 	addr_t result = NULL;
-	for (unsigned i = 0; i < ides.NumberOfNames; i++)
+	size_t count = 0; // 已找到数量
+	DWORD nameAddr, func;
+	WORD origin;
+	for (DWORD i = 0; i < ides.NumberOfNames; ++i)
 	{
 		m_handler->raw_read(namePtrAddr, &nameAddr, sizeof(DWORD));
-		m_handler->raw_read(m_module + nameAddr, namebuf, namesize);
-
-		if (strcmp(namebuf, funcname) == 0)
+		m_handler->raw_read(m_module + nameAddr, namebuf, sizeof(namebuf));
+		
+		for (int j = 0; j < name_list.size(); ++j)
 		{
-			WORD origin;
-			DWORD func;
-			m_handler->raw_read(m_module + ides.AddressOfNameOrdinals + i * sizeof(WORD), &origin, sizeof(WORD));
-			m_handler->raw_read(m_module + ides.AddressOfFunctions + origin * sizeof(DWORD), &func, sizeof(DWORD));
-			result = m_module + func;
+			if (addr_list[j] == 0)
+			{
+				if (name_list[j] == namebuf) {
+					m_handler->raw_read(m_module + ides.AddressOfNameOrdinals + i * sizeof(WORD), &origin, sizeof(WORD));
+					m_handler->raw_read(m_module + ides.AddressOfFunctions + origin * sizeof(DWORD), &func, sizeof(DWORD));
+					addr_list[j] = m_module + func;
+					++count;
+					break;
+				}
+			}
+		}
+
+		if (count == name_list.size())
+		{
 			break;
 		}
+
 		namePtrAddr += sizeof(DWORD);
 	}
-	free(namebuf);
-	return result;
 }
 
 #endif

@@ -3,7 +3,7 @@
 #include "../fefactory_api.h"
 #include "../functions.h"
 #include "utils/color.h"
-#include "myapp.h"
+#include "wx/myapp.h"
 #include "menu.h"
 
 

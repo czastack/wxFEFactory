@@ -145,7 +145,7 @@
     <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp" />
-    <ClCompile Include="myapp.cpp" />
+    <ClCompile Include="wx\myapp.cpp" />
     <ClCompile Include="pyapi\fe\fe.cpp" />
     <ClCompile Include="pyapi\fe\graph.cpp" />
     <ClCompile Include="pyapi\ui\aui.cpp" />
@@ -165,13 +165,13 @@
     <ClCompile Include="pyapi\ui\menu.cpp" />
     <ClCompile Include="pyapi\ui\screen.cpp" />
     <ClCompile Include="pyapi\pyutils.cpp" />
-    <ClCompile Include="wxpatch.cpp" />
+    <ClCompile Include="wx\wxpatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pyapi\auto\auto.h" />
     <ClInclude Include="pyapi\emuhacker\emuhacker.h" />
     <ClInclude Include="pyapi\emuhacker\ProcessHandler.h" />
-    <ClInclude Include="myapp.h" />
+    <ClInclude Include="wx\myapp.h" />
     <ClInclude Include="pyapi\fe\fe.h" />
     <ClInclude Include="pyapi\fe\feimg.hpp" />
     <ClInclude Include="pyapi\fe\graph.h" />
@@ -200,7 +200,8 @@
     <ClInclude Include="utils\color.h" />
     <ClInclude Include="utils\HistorySet.hpp" />
     <ClInclude Include="utils\utils.h" />
-    <ClInclude Include="wxpatch.h" />
+    <ClInclude Include="wx\wxpatch.h" />
+    <ClInclude Include="wx\wxtypes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

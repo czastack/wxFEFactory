@@ -126,6 +126,11 @@ void PyInterpreterRun(wxcstr line);
 
 #define ATTR_INT(obj, name, pre) PyObject_SetAttrString(obj, #name, PyLong_FromLong(pre##name))
 
+
+#define PyIterable_Check(obj) \
+    ((obj)->ob_type->tp_iter != NULL && \
+     (obj)->ob_type->tp_iter != &_PyObject_NextNotImplemented)
+
 /**
  * ºÏ≤È¿‡–Õ
  */

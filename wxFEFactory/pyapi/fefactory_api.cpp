@@ -2,7 +2,7 @@
 #include <wx/wx.h>
 #include "pyutils.h"
 #include "fefactory_api.h"
-#include "myapp.h"
+#include "wx/myapp.h"
 #include "functions.h"
 #include "ui/console.h"
 #include "ui/ui.h"

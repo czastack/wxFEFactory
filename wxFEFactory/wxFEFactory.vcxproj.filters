@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="myapp.cpp" />
     <ClCompile Include="pyapi\fefactory_api.cpp">
       <Filter>pyapi</Filter>
     </ClCompile>
@@ -23,7 +22,7 @@
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp">
       <Filter>pyapi\emuhacker</Filter>
     </ClCompile>
-    <ClCompile Include="wxpatch.cpp">
+    <ClCompile Include="wx\wxpatch.cpp">
       <Filter>wx</Filter>
     </ClCompile>
     <ClCompile Include="pyapi\ui\ui.cpp">
@@ -71,9 +70,11 @@
     <ClCompile Include="pyapi\ui\uibase.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
+    <ClCompile Include="wx\myapp.cpp">
+      <Filter>wx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="myapp.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="utils\ArrayRef.h">
       <Filter>utils</Filter>
@@ -114,7 +115,7 @@
     <ClInclude Include="pyapi\ui\ui.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="wxpatch.h">
+    <ClInclude Include="wx\wxpatch.h">
       <Filter>wx</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\fe\graph.h">
@@ -167,6 +168,12 @@
     </ClInclude>
     <ClInclude Include="pyapi\ui\drop.hpp">
       <Filter>pyapi\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="wx\myapp.h">
+      <Filter>wx</Filter>
+    </ClInclude>
+    <ClInclude Include="wx\wxtypes.h">
+      <Filter>wx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

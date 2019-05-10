@@ -2,7 +2,7 @@
 #include "../pyutils.h"
 #include "../fefactory_api.h"
 #include "../functions.h"
-#include "myapp.h"
+#include "wx/myapp.h"
 
 
 class BaseMenu

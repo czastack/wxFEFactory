@@ -1,6 +1,7 @@
 #ifdef _WIN32
 
 #include <wx/wx.h>
+#include "wx/wxtypes.h"
 #include "../pyutils.h"
 #include "../functions.h"
 #include "emuhacker.h"
@@ -192,6 +193,34 @@ namespace emuhacker {
 		}
 		return wxNoneString;
 	}
+
+	pyobj getProcAddress(ProcAddressHelper& self, pycref data)
+	{
+		if (PyUnicode_Check(data.ptr()))
+		{
+			// 直接返回函数地址
+			wxArrayString name_list;
+			name_list.Add(data.cast<wxString>());
+			wxArraySizeT addr_list(1);
+			self.getProcAddress(name_list, addr_list);
+			return py::int_(addr_list[0]);
+		}
+		else if (PyIterable_Check(data.ptr()))
+		{
+			// 返回一个字典
+			wxArrayString name_list;
+			wxArrayAddAll(name_list, data);
+			wxArraySizeT addr_list(name_list.size());
+			self.getProcAddress(name_list, addr_list);
+			py::dict result;
+			for (size_t i = 0; i < name_list.size(); i++)
+			{
+				result[name_list[i]] = addr_list[i];
+			}
+			return result;
+		}
+		return None;
+	}
 };
 
 
@@ -271,7 +300,7 @@ void init_emuhacker(pybind11::module & m)
 		.def_readwrite("raw_addr", &PyProcessHandler::m_raw_addr);
 
 	py::class_<ProcAddressHelper>(emuhacker, "ProcAddressHelper")
-		.def("get_proc_address", &ProcAddressHelper::getProcAddress);
+		.def("get_proc_address", &emuhacker::getProcAddress);
 }
 
 #endif

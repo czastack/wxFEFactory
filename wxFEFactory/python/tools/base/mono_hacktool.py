@@ -25,8 +25,9 @@ class MonoHacktool(NativeHacktool):
         if mono is 0:
             return
         helper = self.handler.get_proc_helper(mono)
+        address_map = helper.get_proc_address(self.MONO_FUNC.keys())
         for name, sign in self.MONO_FUNC.items():
-            setattr(self, name, (helper.get_proc_address(name), sign))
+            setattr(self, name, (address_map[name], sign))
 
         self.context_array = (NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
             if self.context_array_reuse else None)

@@ -1,7 +1,7 @@
 #include <pybind11/embed.h>
 #include <wx/imagpng.h>
-#include "myapp.h"
 #include "types.h"
+#include "wx/myapp.h"
 #include "pyapi/fefactory_api.h"
 
 const wxString wxNoneString = wxEmptyString;
