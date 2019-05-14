@@ -2,7 +2,7 @@ from lib import exui, utils, lazy, wxconst
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from styles import btn_xs_style, styles, dialog_style
-from ..utils import strhex
+from ..utils import uint_hex
 import json
 import fefactory
 import fefactory_api
@@ -81,12 +81,12 @@ class Widget:
                 return True
             elif code == WXK.getCode('='):
                 # 逻辑地址
-                print(strhex(self.get_addr()))
+                print(uint_hex(self.get_addr()))
                 return True
         elif mod == WXK.MOD_SHIFT:
             if code == WXK._7:
                 # 进程中的地址
-                print(strhex(self.handler.address_map(self.get_addr())))
+                print(uint_hex(self.handler.address_map(self.get_addr())))
                 return True
         event.Skip()
 

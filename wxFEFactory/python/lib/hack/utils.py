@@ -77,16 +77,6 @@ class OptionProvider(BaseItemProvider):
         self._choices, self._values = split_label_value(self.datas)
 
 
-def u32(n):
-    """截取32位整型"""
-    return n & 0xFFFFFFFF
-
-
-def qword(n):
-    """截取64位整型"""
-    return n & 0xFFFFFFFFFFFFFFFF
-
-
 def loword(n):
     """低字"""
     return n & 0xFFFF
@@ -97,27 +87,17 @@ def hiword(n):
     return (n >> 16) & 0xFFFF
 
 
-def u32bytes(n):
-    """32位整型转bytes"""
-    try:
-        return n.to_bytes(4, 'little')
-    except Exception:
-        return struct.pack('L', n)
+def u32(n):
+    """截取32位整型"""
+    return n & 0xFFFFFFFF
 
 
-def strhex(n, size=0):
-    """把整型转成对齐的hex字符串
-    :param size: 字节数
-    """
-    if size is 0:
-        for x in (0x8, 0x10, 0x20, 0x40, 0x80):
-            if n < (1 << x):
-                break
-        size = x >> 3
-    return "%0*X" % ((size << 1), n)
+def qword(n):
+    """截取64位整型"""
+    return n & 0xFFFFFFFFFFFFFFFF
 
 
-def table_size_for(c):
+def ceil_exp(c):
     """求大于c的最小2次幂"""
     n = c - 1
     n |= n >> 1
@@ -137,14 +117,38 @@ def align4(n):
 
 
 def align_size(n, p):
-    """对齐8字节"""
+    """对齐p字节"""
     tail = n & (p - 1)
     if tail:
         n += p - tail
     return n
 
 
+def u32_bytes(n):
+    """32位整型转bytes"""
+    try:
+        return n.to_bytes(4, 'little')
+    except Exception:
+        return struct.pack('L', n)
+
+
+def uint_bytes(n, size=0, byteorder='little'):
+    if size is 0:
+        size = ceil_exp(n.bit_length()) >> 3
+    return n.to_bytes(size, byteorder)
+
+
+def uint_hex(n, size=0):
+    """把整型转成长度对齐2的幂的hex字符串
+    :param size: 字节数
+    """
+    if size is 0:
+        size = ceil_exp(n.bit_length()) >> 3
+    return "%0*X" % ((size << 1), n)
+
+
 def bytes_hex(data, sep=''):
+    """bytes转16进制字符串"""
     return sep.join(("%02X" % b for b in data))
 
 

@@ -1,4 +1,5 @@
-from lib import exui, fileutils, utils
+from pathlib import Path
+from lib import exui, utils
 from lib.win32.keys import WXK
 from .widgets import ModelWidget, TwoWayWidget
 import json
@@ -174,8 +175,8 @@ class CoordWidget(TwoWayWidget):
         self.dialog.endModal()
         del self.dialog
         coords = self.preset.coords
-        path = fileutils.brother(self.preset.__file__, coords[lb.index][1]) + '.json'
-        with open(path, encoding="utf-8") as file:
+        path = Path(self.preset.__file__).with_name(coords[lb.index][1] + '.json')
+        with path.open(encoding="utf-8") as file:
             data = json.load(file)
             if data and isinstance(data, list):
                 if isinstance(data[0], list):

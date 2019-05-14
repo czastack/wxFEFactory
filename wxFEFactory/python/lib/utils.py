@@ -63,9 +63,9 @@ class Accumulator:
     __index__ = __int__
 
 
-def float32(f):
+def float32(number):
     """浮点数保留6位小数"""
-    return round(f, 6)
+    return round(number, 6)
 
 
 def round_s(number, ndigits=0):
