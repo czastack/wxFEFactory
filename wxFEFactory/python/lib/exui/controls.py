@@ -1,5 +1,5 @@
 from fefactory_api import ui
-from lib import wxconst
+from lib import extypes, wxconst
 from lib.win32.keys import WXK
 
 
@@ -30,7 +30,7 @@ class HotkeyCtrl(ui.TextInput):
 class SearchListBox(ui.Vertical):
     """带搜索功能列表框"""
     def __init__(self, choices, onselect, *args, **kwargs):
-        if not isinstance(choices, (list, tuple)):
+        if not extypes.is_list_tuple(choices):
             choices = tuple(choices)
         self.choices = choices
         super().__init__(*args, **kwargs)

@@ -2,6 +2,13 @@ import types
 import weakref
 
 
+list_tuple = (list, tuple)
+
+
+def is_list_tuple(obj):
+    return isinstance(obj, list_tuple)
+
+
 def astr(text):
     """确保是字符串类型"""
     return text if isinstance(text, str) else str(text)
@@ -54,8 +61,8 @@ class Dict:
         return self._data[key]
 
     def __setitem__(self, key, value):
-        if isinstance(key, (list, tuple)):
-            if isinstance(value, (list, tuple)):
+        if is_list_tuple(key):
+            if is_list_tuple(value):
                 val = iter(value).__next__
             else:
                 def val():
@@ -72,7 +79,7 @@ class Dict:
         return __class__.__name__ + '(' + self.__str__() + ')'
 
     def __and__(self, keys):
-        if isinstance(key, (list, tuple)):
+        if is_list_tuple(key):
             return __class__({key: self.__getattr__(key) for key in keys})
 
 
@@ -86,7 +93,7 @@ class Dicts:
     __slots__ = ('_ref', 'data')
 
     def __init__(self, array):
-        if isinstance(array, (list, tuple)):
+        if is_list_tuple(array):
             self._ref = None
             self.data = array
         else:

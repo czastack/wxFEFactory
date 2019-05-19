@@ -15,30 +15,20 @@ class Main(MonoHacktool):
     def onattach(self):
         super().onattach()
 
-        context_array = self.context_array
-        PlayerAttribute, UIDataBind = self.native_call_n((
-            call_arg_int64(*self.mono_class_from_name, self.image, "", "PlayerAttribute"),
-            call_arg_int64(*self.mono_class_from_name, self.image, "", "UIDataBind"),
-        ), context_array)
-
-        set_currentEnergy, set_currentHP, UpdateCharInfo = self.native_call_n((
-            call_arg_int64(*self.mono_class_get_method_from_name, PlayerAttribute, "set_currentEnergy", 1),
-            call_arg_int64(*self.mono_class_get_method_from_name, PlayerAttribute, "set_currentHP", 1),
-            call_arg_int64(*self.mono_class_get_method_from_name, UIDataBind, "UpdateCharInfo", 0),
-        ), context_array)
+        PlayerAttribute, UIDataBind = self.get_global_mono_classes((
+            "PlayerAttribute",
+            "UIDataBind",
+        ))
 
         (
-            _, _,
             self.set_currentEnergy_native,
             self.set_currentHP_native,
             self.UpdateCharInfo_native,
-        ) = self.native_call_n((
-            call_arg(*self.mono_thread_attach, self.root_domain),
-            call_arg(*self.mono_security_set_mode, 0),
-            call_arg_int64(*self.mono_compile_method, set_currentEnergy),
-            call_arg_int64(*self.mono_compile_method, set_currentHP),
-            call_arg_int64(*self.mono_compile_method, UpdateCharInfo),
-        ), context_array)
+        ) = self.get_mono_compile_methods(self.get_mono_methods((
+            (PlayerAttribute, "set_currentEnergy", 1),
+            (PlayerAttribute, "set_currentHP", 1),
+            (UIDataBind, "UpdateCharInfo", 0),
+        )))
 
     def render_main(self):
         Group("player", "全局", None)

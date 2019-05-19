@@ -1,4 +1,5 @@
 from functools import partial
+from lib import extypes
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem
 from .native import NativeContext, NativeContext64, NativeContextArray
 import base64
@@ -31,14 +32,13 @@ class NativeHacktool(AssemblyHacktool):
     def onattach(self):
         """初始化远程函数"""
         super().onattach()
-        is32process = self.handler.is32process
-        self.native_call_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL if is32process
+        self.native_call_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL if self.is32process
             else self.FUNCTION_NATIVE_CALL_64)
         if self.enable_native_call_n:
-            self.native_call_n_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL_N if is32process
+            self.native_call_n_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL_N if self.is32process
                 else self.FUNCTION_NATIVE_CALL_N_64)
         if self.NativeContext is None:
-            self.NativeContext = NativeContext if is32process else NativeContext64
+            self.NativeContext = NativeContext if self.is32process else NativeContext64
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(self.NativeContext.SIZE)
         self.native_context = self.NativeContext(context_addr, self.handler)
@@ -90,6 +90,8 @@ class NativeHacktool(AssemblyHacktool):
 
     def native_call_n(self, call_list, context_array=None):
         """一次调用多个函数"""
+        if not extypes.is_list_tuple(call_list):
+            call_list = tuple(call_list)
         context_reuse = context_array is not None
         if not context_reuse:
             context_array = NativeContextArray(self.handler, len(call_list), self.NativeContext)

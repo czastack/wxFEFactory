@@ -1,5 +1,5 @@
 from application import app
-from lib import wxconst, lazy
+from lib import extypes, lazy, wxconst
 from lib.scene import BaseScene
 from styles import styles
 from fefactory_api import ui
@@ -184,6 +184,6 @@ class BaseListBoxModuel(BaseModule):
         """添加列表项"""
         if isinstance(text, types.GeneratorType):
             text = tuple(text)
-        elif not isinstance(text, (list, tuple)):
+        elif not extypes.is_list_tuple(text):
             text = (text,)
         self.listbox.appendItems(text)

@@ -1,5 +1,7 @@
 from lib.hack.handlers import MemHandler
-from tools.base.native_hacktool import NativeHacktool, NativeContextArray, call_arg, call_arg_int64
+from tools.base.native_hacktool import (
+    NativeHacktool, NativeContextArray, call_arg, call_arg_int32, call_arg_int64
+)
 
 
 class MonoHacktool(NativeHacktool):
@@ -32,9 +34,11 @@ class MonoHacktool(NativeHacktool):
         self.context_array = (NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
             if self.context_array_reuse else None)
 
+        self.call_arg_int = call_arg_int32 if self.is32process else call_arg_int64
+
         self.root_domain, self.image = self.native_call_n((
-            call_arg_int64(*self.mono_get_root_domain),
-            call_arg_int64(*self.mono_image_loaded, "Assembly-CSharp"),
+            self.call_arg_int(*self.mono_get_root_domain),
+            self.call_arg_int(*self.mono_image_loaded, "Assembly-CSharp"),
         ), self.context_array)
         # print(hex(self.image))
 
@@ -42,3 +46,31 @@ class MonoHacktool(NativeHacktool):
         super().ondetach()
         if self.context_array:
             self.context_array = None
+
+    def get_mono_classes(self, items):
+        """根据mono class和mothod name获取mono class
+        :param items: ((namespace, name),)
+        """
+        return self.native_call_n((
+            self.call_arg_int(*self.mono_class_from_name, self.image, *item) for item in items
+        ), self.context_array)
+
+    def get_global_mono_classes(self, names):
+        """获取全局命名空间中的mono class"""
+        return self.get_mono_classes((("", name) for name in names))
+
+    def get_mono_methods(self, items):
+        """根据mono class和mothod name获取mono class
+        :param items: ((class, name, arg_count),)
+        """
+        return self.native_call_n((
+            self.call_arg_int(*self.mono_class_get_method_from_name, *item) for item in items
+        ), self.context_array)
+
+    def get_mono_compile_methods(self, methods):
+        _, _, *result = self.native_call_n((
+            call_arg(*self.mono_thread_attach, self.root_domain),
+            call_arg(*self.mono_security_set_mode, 0),
+            *(self.call_arg_int(*self.mono_compile_method, method) for method in methods)
+        ), self.context_array)
+        return result

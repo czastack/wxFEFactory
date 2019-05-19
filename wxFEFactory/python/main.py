@@ -1,4 +1,3 @@
-from collections import namedtuple
 from application import app
 from project import Project
 from modules import modules

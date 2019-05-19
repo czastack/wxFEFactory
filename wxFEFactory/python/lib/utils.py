@@ -1,3 +1,4 @@
+from lib import extypes
 import math
 import os
 import struct
@@ -118,10 +119,9 @@ def prepare_option(choices, values):
     """预处理选项"""
     if values is None:
         if choices is not None:
-            list_tuple = (list, tuple)
-            if not isinstance(choices, list_tuple):
+            if not extypes.is_list_tuple(choices):
                 choices = tuple(choices)
-            if choices and isinstance(choices[0], list_tuple):
+            if choices and extypes.is_list_tuple(choices[0]):
                 fn = split_label_value if isinstance(choices[0][0], str) else split_value_label
                 choices, values = fn(choices)
     return choices, values
