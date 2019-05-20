@@ -137,13 +137,13 @@ class BaseListBoxModuel(BaseModule):
             ui.MenuItem("清空", onselect=self.weak.onClear)
         return menu
 
-    def onClear(self, m):
+    def onClear(self, menu):
         """清空列表"""
         if self.confirm('提示', '确认清空所有列表项？', wxconst.NO) is wxconst.YES:
             self.listbox.clear()
             return True
 
-    def onRename(self, v, m):
+    def onRename(self, view, menu):
         """重命名列表项"""
         name = self.listbox.text
         if name:

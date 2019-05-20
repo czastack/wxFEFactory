@@ -168,3 +168,24 @@ def bytes_beautify(data, offset=0, step=1):
             i += 1
         result.append(fmt % data)
     return " ".join(result)
+
+
+def iter_signature(signature):
+    """迭代参数签名"""
+    if isinstance(signature, str):
+        signature = signature.encode()
+    # 重复次数，例如2L中为2，L中为1
+    repeat = 0
+    for ch in signature:
+        if 0x30 <= ch <= 0x39:
+            repeat = repeat * 10 + (ch - 0x30)
+            continue
+        else:
+            fmt = chr(ch)
+
+        if repeat is 0:
+            repeat = 1
+
+        for i in range(repeat):
+            yield fmt
+        repeat = 0

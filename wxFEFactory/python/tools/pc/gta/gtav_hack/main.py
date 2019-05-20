@@ -1042,8 +1042,8 @@ class Main(BaseGTATool):
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
-        m = models.VModel(model_id, self)
-        m.request()
+        model = models.VModel(model_id, self)
+        model.request()
         handle = self.script_call('CREATE_VEHICLE', 'Q4f2Q', model_id, *(coord or self.get_front_coord()),
             self.player.heading, 0, 1)
         return Vehicle(handle, self)
@@ -1060,21 +1060,21 @@ class Main(BaseGTATool):
         if vehicle:
             self.player.into_vehicle(vehicle)
 
-    def create_ped(self, model, coord=None, pedType=21):
+    def create_ped(self, model_id, coord=None, pedType=21):
         """生成角色"""
-        m = models.VModel(model, self)
-        m.request()
-        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model, *(coord or self.get_front_coord()),
+        model = models.VModel(model_id, self)
+        model.request()
+        handle = self.script_call('CREATE_PED', '2Q4f2Q', pedType, model_id, *(coord or self.get_front_coord()),
             self.player.heading, 0, 1)
         return Player(0, handle, self)
 
-    def create_object(self, model, coord=None, on_ground=True):
+    def create_object(self, model_id, coord=None, on_ground=True):
         """生成物体"""
-        if isinstance(model, str):
-            model = self.get_hash_key(model)
-        m = models.VModel(model, self)
-        m.request()
-        handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model, *(coord or self.get_front_coord()), 0, 1, 1)
+        if isinstance(model_id, str):
+            model_id = self.get_hash_key(model_id)
+        model = model_ids.VModel(model_id, self)
+        model.request()
+        handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model_id, *(coord or self.get_front_coord()), 0, 1, 1)
         if handle:
             obj = models.Object(handle, self)
             if on_ground:

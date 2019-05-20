@@ -1,5 +1,8 @@
+from abc import ABC, abstractmethod
 from lib.hack.models import Model, Field, ArrayField, CoordField, CoordData
+from lib.hack.utils import iter_signature
 from lib.lazy import lazy
+from lib.extypes import DataClassMeta
 import math
 import struct
 
@@ -99,6 +102,12 @@ class NativeContext(Model):
             result = map(mapfn, result)
         return result
 
+    def put_temp_value(self, value, size=0, index=None):
+        if index is None:
+            index = self.temp_index
+            self.temp_index += 1
+        self.handler.write(self.get_temp_addr(index), value, size)
+
     def put_temp_string(self, data, arg_count=None):
         """存放临时字符串
         :return: 字符串地址"""
@@ -130,38 +139,22 @@ class NativeContext(Model):
             raise ValueError('数据过长，参数缓冲区容量不足')
 
         buff = bytearray()
-        # 重复次数，例如2L中为2，L中为1
-        repeat = 0
         arg_it = iter(args)
 
-        if isinstance(signature, str):
-            signature = signature.encode()
-
-        for ch in signature:
-            if 0x30 <= ch <= 0x39:
-                repeat = repeat * 10 + (ch - 0x30)
-                continue
-            else:
-                fmt = chr(ch)
-
-            if repeat is 0:
-                repeat = 1
-
-            for i in range(repeat):
-                arg = next(arg_it)
-                try:
-                    data = struct.pack(fmt, arg)
-                except Exception:
-                    print(fmt, arg)
-                    raise
-                datasize = len(data)
-                buff.extend(data)
-                if datasize < itemsize:
-                    # 对齐8个字节
-                    buff.extend(bytes(itemsize - datasize))
-                elif datasize > itemsize:
-                    raise ValueError('datasize must <= itemsize')
-            repeat = 0
+        for fmt in iter_signature(signature):
+            arg = next(arg_it)
+            try:
+                data = struct.pack(fmt, arg)
+            except Exception:
+                print(fmt, arg)
+                raise
+            datasize = len(data)
+            buff.extend(data)
+            if datasize < itemsize:
+                # 对齐字节
+                buff.extend(bytes(itemsize - datasize))
+            elif datasize > itemsize:
+                raise ValueError('datasize must <= itemsize')
 
         self.temp_index += block_count
         addr = self.get_temp_addr(self.temp_index)
@@ -182,6 +175,26 @@ class NativeContext(Model):
         self.handler.write(addr, data)
         return addr
 
+    def put_temp_simple_array_ptr(self, signature, addr):
+        """存放临时简单指针数组
+        :return: 指针数组地址"""
+        addr_list = []
+        for fmt in iter_signature(signature):
+            addr_list.append(addr)
+            addr += struct.calcsize(fmt)
+
+        block_count = len(addr_list)
+        if arg_count is None:
+            arg_count = self.m_nArgCount
+        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+            raise ValueError('数据过长，参数缓冲区容量不足')
+        self.temp_index += block_count
+
+        data = struct.pack('%d%s' % (block_count, 'L' if self.ITEM_SIZE == 4 else 'Q'), *addr_list)
+        addr = self.get_temp_addr(self.temp_index)
+        self.handler.write(addr, data)
+        return addr
+
     def get_result(self, type, size=0):
         """获取调用结果"""
         if type is str:
@@ -189,6 +202,7 @@ class NativeContext(Model):
         return self.handler.read(self.m_pReturn, type, size)
 
     def get_vector_result(self, size=4, fixed=-1):
+        """获取三个浮点数结果"""
         if fixed is -1:
             r = self.handler.read_float
         else:
@@ -198,6 +212,7 @@ class NativeContext(Model):
         return (r(addr), r(addr + size), r(addr + size + size))
 
     def get_string_result(self, size):
+        """获取字符串结果"""
         data = self.handler.read(self.handler.read_ptr(self.m_pReturn), bytes, size)
         n = data.find(0)
         if n is not -1:
@@ -250,54 +265,42 @@ class NativeContext64(NativeContext):
             raise ValueError('参数缓冲区容量不足')
 
         buff = bytearray()
-        # 重复次数，例如2L中为2，L中为1
-        repeat = 0
         arg_it = iter(args)
 
-        if isinstance(signature, str):
-            signature = signature.encode()
+        for fmt in iter_signature(signature):
+            arg = next(arg_it)
 
-        for ch in signature:
-            if 0x30 <= ch <= 0x39:
-                repeat = repeat * 10 + (ch - 0x30)
-                continue
-            else:
-                fmt = chr(ch)
+            if 3 <= arg_count < 7:
+                if fmt == 'f':
+                    # float
+                    self.fflag[arg_count - 3] = 1
+                elif fmt == 'd':
+                    # double
+                    self.fflag[arg_count - 3] = 2
 
-                if repeat is 0:
-                    repeat = 1
+            if fmt == 'p' or fmt == 's':
+                # 字符串(s是c style, p是pascal style)
+                if repeat is not 1:
+                    raise ValueError('对于字符串参数, s和p前暂不支持加数字')
+                arg = self.put_temp_string(arg, arg_count)
+                fmt = 'P'
 
-                for i in range(repeat):
-                    arg = next(arg_it)
+            # 自定义打包
+            if isinstance(arg, CustomPacker):
+                fmt, arg = arg.pack_for(self, fmt)
 
-                    if 3 <= arg_count < 7:
-                        if fmt == 'f':
-                            # float
-                            self.fflag[arg_count - 3] = 1
-                        elif fmt == 'd':
-                            # double
-                            self.fflag[arg_count - 3] = 2
+            try:
+                data = struct.pack(fmt, arg)
+            except Exception:
+                print(fmt, arg)
+                raise
+            datasize = len(data)
+            buff.extend(data)
+            if datasize < 8:
+                # 对齐8个字节
+                buff.extend(bytes(8 - datasize))
 
-                    if fmt == 'p' or fmt == 's':
-                        # 字符串(s是c style, p是pascal style)
-                        if repeat is not 1:
-                            raise ValueError('对于字符串参数, s和p前暂不支持加数字')
-                        arg = self.put_temp_string(arg, arg_count)
-                        fmt = 'Q'
-
-                    try:
-                        data = struct.pack(fmt, arg)
-                    except Exception:
-                        print(fmt, arg)
-                        raise
-                    datasize = len(data)
-                    buff.extend(data)
-                    if datasize < 8:
-                        # 对齐8个字节
-                        buff.extend(bytes(8 - datasize))
-
-                    arg_count += 1
-                repeat = 0
+            arg_count += 1
 
         if args[0] is self.fflag:
             buff[:8] = self.fflag
@@ -335,3 +338,52 @@ class NativeContextArray:
 
     def __getitem__(self, index):
         return self.contexts[index] if self.contexts else None
+
+
+class CustomPacker(ABC):
+    @abstractmethod
+    def pack_for(self, context, fmt):
+        """打包自定义参数到NativeContext"""
+        pass
+
+
+class ResultResolver(ABC):
+    @abstractmethod
+    def get_result(self, context):
+        """获取自定义结果"""
+        pass
+
+
+class TempPtr(metaclass=DataClassMeta):
+    """临时地址占位符"""
+    fields = ('index', 'type', 'size', 'value')
+    defaults = {'type': int, 'size': 0}
+
+    def pack_for(self, context, fmt):
+        if self.index is None:
+            self.index = context.temp_index
+            context.temp_index += 1
+        if self.value is not None:
+            context.put_temp_value(self.value, self.size, self.index)
+        addr = context.get_temp_addr(self.index)
+        return fmt, addr
+
+    def get_result(self, context):
+        return context.get_temp_value(self.index, self.type, self.size)
+
+
+class TempArrayPtr(metaclass=DataClassMeta):
+    """临时指针数组地址占位符"""
+    fields = ('signature', 'args')
+
+    def pack_for(self, context, fmt):
+        # 把参数压入数组
+        addr = context.put_temp_simple_array(self.signature, *self.args)
+        # 再压入每个参数的地址作为指针数组(void **params)
+        addr = context.put_temp_simple_array_ptr(self.signature, addr)
+        return fmt, addr
+
+
+CustomPacker.register(TempPtr)
+CustomPacker.register(TempArrayPtr)
+ResultResolver.register(TempPtr)

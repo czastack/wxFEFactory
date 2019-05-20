@@ -642,8 +642,8 @@ class BaseSelect(TwoWayWidget):
         return exui.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
 
     @classmethod
-    def menu_search(cls, v, m):
-        cls.active_ins = cls.search_map[id(v)]
+    def menu_search(cls, view, menu):
+        cls.active_ins = cls.search_map[id(view)]
         if getattr(cls, 'search_last_choices', None) is not cls.active_ins.choices:
             cls.search_dialog.listbox.clear()
         else:
@@ -652,7 +652,7 @@ class BaseSelect(TwoWayWidget):
         del cls.active_ins
 
     @classmethod
-    def move_about(cls, v, m):
+    def move_about(cls, view, menu):
         fefactory_api.alert("按住shift，在下拉框上按下鼠标左键，拖拽到同源下拉框上释放，能交换两者的选值；\n"
             "若释放时按着ctrl，则为复制值；若按着alt，则是把值移到目标处，原有区域下移或上移")
 

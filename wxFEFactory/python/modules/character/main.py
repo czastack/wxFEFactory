@@ -81,8 +81,8 @@ class Module(BaseListBoxModuel):
         if text:
             self.data_map.pop(text, None)
 
-    def onRename(self, m):
-        args = super().onRename(m)
+    def onRename(self, menu):
+        args = super().onRename(menu)
         if args:
             name, newname = args
             item = self.data_map[newname] = self.data_map.pop(name)
@@ -118,9 +118,9 @@ class Module(BaseListBoxModuel):
                 return False
             self.listbox[self._lastpos] = value
 
-    def onClear(self, m):
+    def onClear(self, menu):
         """清空列表"""
-        if super().onClear(m):
+        if super().onClear(menu):
             self.data_map = {}
 
     def onSwichAutoSave(self, checkbox):

@@ -109,7 +109,7 @@ class MainFrame:
 
     @property
     def module_names(self):
-        return (m[0] for m in modules)
+        return (module[0] for module in modules)
 
     @property
     def tool_names(self):
@@ -129,9 +129,9 @@ class MainFrame:
         name = modules[listbox.index][1]
         try:
             Module = self.get_module(name)
-            m = Module()
-            m.attach(self)
-            __main__.module = m
+            module = Module()
+            module.attach(self)
+            __main__.module = module
         except Exception:
             print('加载模块%s失败' % name)
             traceback.print_exc()
@@ -163,14 +163,14 @@ class MainFrame:
     def on_toolbar_tool_click(self, toolbar, toolid):
         self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
 
-    def toggle_console(self, m):
+    def toggle_console(self, menu):
         """显示/隐藏控制台"""
         self.aui.togglePane("console")
 
     def onselect(self, *args):
         print(args)
 
-    def new_project(self, m):
+    def new_project(self, menu):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -183,7 +183,7 @@ class MainFrame:
             app.onChangeProject(project)
             self.on_open_project(project)
 
-    def open_project(self, m):
+    def open_project(self, menu):
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -192,8 +192,8 @@ class MainFrame:
             else:
                 fefactory_api.alert("提示", "该目录下没有project.json")
 
-    def do_open_project(self, m):
-        path = m.getText()
+    def do_open_project(self, menu):
+        path = menu.getText()
         print(path)
         if path != app.project.path:
             project = Project(path)
@@ -204,11 +204,11 @@ class MainFrame:
         if project:
             self.win.title = "%s - %s" % (self.win.title, project.title)
 
-    def open_project_dir(self, m):
+    def open_project_dir(self, menu):
         if app.project_confirm():
             os.startfile(app.project.path)
 
-    def clear_recent_project(self, m):
+    def clear_recent_project(self, menu):
         pass
 
     def toggle_consol_input_multi(self, _=None):
@@ -256,7 +256,7 @@ class MainFrame:
                 self.console_output.clear()
                 return True
 
-    def read_from_rom(self, m):
+    def read_from_rom(self, menu):
         rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
         if not rom:
             return
@@ -269,15 +269,15 @@ class MainFrame:
                     name = modules[i][1]
                     try:
                         Module = self.get_module(name)
-                        m = Module()
-                        m.attach()
-                        m.readFrom(reader)
+                        module = Module()
+                        module.attach()
+                        module.readFrom(reader)
 
                     except Exception:
                         print('加载模块%s失败' % name)
                         traceback.print_exc()
 
-    def open_tool(self, m):
+    def open_tool(self, menu):
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
             with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
@@ -299,10 +299,10 @@ class MainFrame:
         result = []
         for file in files:
             if not file.startswith('__') and file.find('.') is -1 and Path.isdir(Path.join(dir_path, file)):
-                m = __import__(parent.__name__ + '.' + file, fromlist=file)
-                name = getattr(m, 'name', None)
+                module = __import__(parent.__name__ + '.' + file, fromlist=file)
+                name = getattr(module, 'name', None)
                 if name is not None:
-                    result.append(ToolTreeItem(m, m.name, getattr(m, 'package', False), None, None))
+                    result.append(ToolTreeItem(module, name, getattr(module, 'package', False), None, None))
         return result
 
     def open_tool_by_name(self, name):
@@ -336,7 +336,7 @@ class MainFrame:
         if getattr(__main__, 'tool', None) == self:
             del __main__.tool
 
-    def save_win_option(self, m):
+    def save_win_option(self, menu):
         app.setconfig('start_option', {
             'position': self.win.position,
             'size': self.win.size,

@@ -719,10 +719,10 @@ class Main(BaseGTATool):
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""
-        m = models.IVModel(model_id, self)
-        if m.is_in_cdimage and m.is_vehicle:
-            m.request()
-            if m.loaded:
+        model = models.IVModel(model_id, self)
+        if model.is_in_cdimage and model.is_vehicle:
+            model.request()
+            if model.loaded:
                 self.script_call('CREATE_CAR', 'L3fLL', model_id, *(coord or self.get_front_coord()),
                     self.native_context.get_temp_addr(), 1)
                 return Vehicle(self.native_context.get_temp_value(), self)

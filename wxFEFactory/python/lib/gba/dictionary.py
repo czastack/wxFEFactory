@@ -139,11 +139,11 @@ class Dictionary:
                 if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False
                     for ctrlcode in self.ctrl_table.values():
-                        m = ctrlcode.encode(text, i)
-                        if m:
-                            bs, i = m
+                        ctrlcode_result = ctrlcode.encode(text, i)
+                        if ctrlcode_result:
+                            ctrlcode_bytes, i = ctrlcode_result
                             i -= 1
-                            result.extend(bs)
+                            result.extend(ctrlcode_bytes)
                             con = True
                             break
                     if con:
@@ -265,6 +265,7 @@ class CtrlCode:
         self.reg = fmt2reg(fmt)
 
     def decode(self, data, i):
+        """解码"""
         if self.argc is 0:
             return self.fmt, i
         if self.argc is 1:
@@ -274,7 +275,7 @@ class CtrlCode:
             return self.fmt % tuple(data[i] for i in range(self.argc)), i + self.argc
 
     def decode_it(self, it):
-        """
+        """解码迭代器
         :param it: 类byte迭代器
         """
         if self.argc is 0:
@@ -285,6 +286,11 @@ class CtrlCode:
             return self.fmt % tuple(next(it) for i in range(self.argc))
 
     def encode(self, text, i):
+        """控制码编码
+        :param text: 要编码的文本
+        :param i: 结束位置
+        :return: 结果无效时返回None，有效时返回(code, end)
+        """
         result = self.encode_args(text, i)
         if result:
             code, args, end = result
@@ -296,7 +302,7 @@ class CtrlCode:
                 return bytes(code_bytes + args), end
 
     def encode_args(self, text, i):
-        """手动encode时，获取所需参数"""
+        """手动编码时，获取所需参数"""
         code = self.code
         if self.argc is 0:
             fmt_len = len(self.fmt)

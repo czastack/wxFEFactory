@@ -219,14 +219,14 @@ class CoordWidget(TwoWayWidget):
             self.listbox.setText(self.data_list[index]['name'], index)
             self.listbox.setText(self.data_list[index + 1]['name'], index + 1)
 
-    def onCopy(self, v, m):
+    def onCopy(self, view, menu):
         fefactory_api.set_clipboard(str(tuple(self.input_value)))
 
-    def onPaste(self, v, m):
+    def onPaste(self, view, menu):
         values = eval(fefactory_api.get_clipboard())
         self.input_value = values
 
-    def onClear(self, v, m):
+    def onClear(self, view, menu):
         self.clear()
 
 

@@ -153,7 +153,7 @@ class classproperty:
         return self.method(owner)
 
 
-class _DataClass:
+class DataClassType:
     __slots__ = ()
     default = None
 
@@ -199,21 +199,11 @@ class _DataClass:
         return self.default
 
 
-def DataClass(name, fields, default=None, defaults=None, attrs=None, bases=None):
-    """ 直接构造数据类
-    :param bases: 父类元组或None"""
-    the_attrs = {'fields': fields, 'default': default, 'defaults': defaults}
-    if attrs:
-        attrs.update(the_attrs)
-        the_attrs = attrs
-    return DataClassMeta.__new__(DataClassMeta, name, bases, the_attrs)
-
-
 class DataClassMeta(type):
     def __new__(class_, name, bases, attrs):
         fields = attrs.pop('fields')
 
-        the_bases = (_DataClass,)
+        the_bases = (DataClassType,)
         if bases:
             # 处理继承
             dataclass_base = False
@@ -221,7 +211,7 @@ class DataClassMeta(type):
             base_defaults = {}
             defaults = attrs.pop('defaults', None)
             for base in bases:
-                if issubclass(base, _DataClass):
+                if issubclass(base, DataClassType):
                     dataclass_base = True
                     base_slots.extend(base.__slots__)
                     if base.defaults:
@@ -241,3 +231,13 @@ class DataClassMeta(type):
             slots = tuple(fields)
         attrs['__slots__'] = slots
         return super().__new__(class_, name, the_bases, attrs)
+
+
+def DataClass(name, fields, default=None, defaults=None, attrs=None, bases=None):
+    """ 直接构造数据类
+    :param bases: 父类元组或None"""
+    the_attrs = {'fields': fields, 'default': default, 'defaults': defaults}
+    if attrs:
+        attrs.update(the_attrs)
+        the_attrs = attrs
+    return DataClassMeta.__new__(DataClassMeta, name, bases, the_attrs)

@@ -1,4 +1,4 @@
-from lib.hack import models
+from lib.hack import models, utils
 from ..gta_base.models import ManagedModel
 import struct
 
@@ -58,51 +58,36 @@ class BaseRunningScript(ManagedModel):
 
     def push(self, signature, *args):
         """压入参数"""
-        if isinstance(signature, str):
-            signature = signature.encode()
-
-        repeat = 0
         arg_it = iter(args)
 
-        for ch in signature:
-            if 0x30 <= ch <= 0x39:
-                repeat = repeat * 10 + (ch - 0x30)
-                continue
+        for fmt in utils.iter_signature(signature):
+            try:
+                arg_type = self.get_arg_type(ch)
+            except IndexError:
+                raise ValueError('unsupported format: ' + fmt)
+            arg = next(arg_it)
+            self.buff.append(arg_type)
+
+            if arg_type is ArgType.LOCAL_I:
+                # 指针参数
+                var_index = len(self.variables)
+                self.buff.append(var_index & 0xFF)
+                self.buff.append((var_index >> 8) & 0xFF)
+                self.variables.append(arg)
+            elif arg_type is ArgType.GLOBAL_I:
+                # 指针参数
+                var_offset = len(self.variables) << 2
+                self.buff.append(var_offset & 0xFF)
+                self.buff.append((var_offset >> 8) & 0xFF)
+                # 把script_space_base对应位置内存设为当前指针中的值
+                # self.handler.write32(self.script_space_base + var_offset, self.handler.read32(arg))
+                self.variables.append(arg)
+            elif arg_type is ArgType.STRING:
+                # 字符串参数
+                self.push_string(arg)
             else:
-                fmt = chr(ch)
-                try:
-                    arg_type = self.get_arg_type(ch)
-                except IndexError:
-                    raise ValueError('unsupported format: ' + fmt)
-
-                if repeat is 0:
-                    repeat = 1
-
-                for i in range(repeat):
-                    arg = next(arg_it)
-                    self.buff.append(arg_type)
-
-                    if arg_type is ArgType.LOCAL_I:
-                        # 指针参数
-                        var_index = len(self.variables)
-                        self.buff.append(var_index & 0xFF)
-                        self.buff.append((var_index >> 8) & 0xFF)
-                        self.variables.append(arg)
-                    elif arg_type is ArgType.GLOBAL_I:
-                        # 指针参数
-                        var_offset = len(self.variables) << 2
-                        self.buff.append(var_offset & 0xFF)
-                        self.buff.append((var_offset >> 8) & 0xFF)
-                        # 把script_space_base对应位置内存设为当前指针中的值
-                        # self.handler.write32(self.script_space_base + var_offset, self.handler.read32(arg))
-                        self.variables.append(arg)
-                    elif arg_type is ArgType.STRING:
-                        # 字符串参数
-                        self.push_string(arg)
-                    else:
-                        # 普通参数
-                        self.push_common_arg(arg_type, fmt, arg)
-                repeat = 0
+                # 普通参数
+                self.push_common_arg(arg_type, fmt, arg)
 
     def push_end(self):
         """写入结束符"""

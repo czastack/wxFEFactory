@@ -172,7 +172,7 @@ class BaseHackTool(NestedTool):
             value = cache[key] = fn(key)
         return value
 
-    def set_cfn(self, btn, m=None):
+    def set_cfn(self, btn, menu=None):
         self.cfn = btn.click
 
     def render_top_button(self):

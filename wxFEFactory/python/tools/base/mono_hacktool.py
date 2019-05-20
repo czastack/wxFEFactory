@@ -1,4 +1,7 @@
+from contextlib import contextmanager
+from lib.extypes import WeakBinder
 from lib.hack.handlers import MemHandler
+from tools.base.native import TempPtr, TempArrayPtr
 from tools.base.native_hacktool import (
     NativeHacktool, NativeContextArray, call_arg, call_arg_int32, call_arg_int64
 )
@@ -14,12 +17,22 @@ class MonoHacktool(NativeHacktool):
         "mono_thread_attach": "P",
         "mono_thread_detach": "P",
         "mono_security_set_mode": "i",
-        "mono_class_from_name": "Pss",
-        "mono_class_get_method_from_name": "Psi",
-        # "mono_class_get_field_from_name": "Ps",
-        # "mono_field_get_value ": "3P",
+        "mono_class_from_name": "Pss",  # (MonoImage *image, const char* name_space, const char *name)
+        "mono_class_get_method_from_name": "Psi",  # (MonoClass *klass, const char *name, int param_count)
+        "mono_class_vtable": "2P",  # (MonoDomain *domain, MonoClass *klass)
+        "mono_class_get_field_from_name": "Ps",  # (MonoClass *klass, const char *name)
+        "mono_field_get_value": "3P",  # (MonoObject *obj, MonoClassField *field, void *value)
+        "mono_field_set_value": "3P",  # idem
+        "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
+        "mono_field_static_set_value": "3P",  # idem
+        "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
         "mono_compile_method": "P",
+        "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
     }
+
+    def __init__(self):
+        super().__init__()
+        self.caching_values = None
 
     def onattach(self):
         super().onattach()
@@ -47,6 +60,14 @@ class MonoHacktool(NativeHacktool):
         if self.context_array:
             self.context_array = None
 
+    def mono_security_call(self, args):
+        _, _, *result = self.native_call_n((
+            call_arg(*self.mono_thread_attach, self.root_domain),
+            call_arg(*self.mono_security_set_mode, 0),
+            *args
+        ), self.context_array)
+        return result
+
     def get_mono_classes(self, items):
         """根据mono class和mothod name获取mono class
         :param items: ((namespace, name),)
@@ -61,16 +82,88 @@ class MonoHacktool(NativeHacktool):
 
     def get_mono_methods(self, items):
         """根据mono class和mothod name获取mono class
-        :param items: ((class, name, arg_count),)
+        :param items: ((class, name, param_count),)
         """
         return self.native_call_n((
             self.call_arg_int(*self.mono_class_get_method_from_name, *item) for item in items
         ), self.context_array)
 
     def get_mono_compile_methods(self, methods):
-        _, _, *result = self.native_call_n((
-            call_arg(*self.mono_thread_attach, self.root_domain),
-            call_arg(*self.mono_security_set_mode, 0),
-            *(self.call_arg_int(*self.mono_compile_method, method) for method in methods)
-        ), self.context_array)
-        return result
+        """获取编译后的native method地址"""
+        return self.mono_security_call(
+            (self.call_arg_int(*self.mono_compile_method, method) for method in methods)
+        )
+
+    def op_mono_field_get_value(self, object, field):
+        """返回获取字段值的call_arg"""
+        temp_ptr = TempPtr()
+        return call_arg(*self.mono_field_get_value, object, field, temp_ptr, ret_type=temp_ptr)
+
+    def op_mono_field_set_value(self, object, field, value):
+        """返回设置字段值的call_arg"""
+        temp_ptr = TempPtr(value)
+        return call_arg(*self.mono_field_get_value, object, field, temp_ptr, ret_type=temp_ptr)
+
+    def op_mono_field_static_get_value(self, vtable, field):
+        """返回获取静态字段值的call_arg"""
+        temp_ptr = TempPtr()
+        return call_arg(*self.mono_field_static_get_value, vtable, field, temp_ptr, ret_type=temp_ptr)
+
+    def op_mono_field_static_set_value(self, vtable, field, value):
+        """返回设置静态字段值的call_arg"""
+        temp_ptr = TempPtr(value)
+        return call_arg(*self.mono_field_static_set_value, vtable, field, temp_ptr, ret_type=temp_ptr)
+
+    def op_mono_runtime_invoke(self, method, object, signature, values):
+        """返回调用mono函数的call_arg"""
+        params = TempArrayPtr(signature, values)
+        return self.call_arg_int(*self.mono_runtime_invoke, method, object, params, 0)
+
+    # def op_mono_class_vtable(self, klass):
+    #     """返回获取类vtable的call_arg"""
+    #     return self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass),
+
+    # def op_mono_class_get_field_from_name(self, klass, name):
+    #     """返回获取类属性的call_arg"""
+    #     return self.call_arg_int(*self.mono_class_get_field_from_name, klass, name)
+
+    def register_classes(self, classes):
+        """注册mono class列表
+        :param classes: [MonoClass]
+        """
+        # 获取class
+        items = (klass.namespace, klass.name for klass in classes)
+        result_iter = iter(self.get_mono_classes(items))
+
+        # 获取vtable, methods和fields
+        call_args = []
+        for klass in classes:
+            klass.mono_class = next(result_iter)
+
+            if klass.need_vtable:
+                call_args.append(self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass))
+
+            for method in klass.methods:
+                call_args.append(self.call_arg_int(*self.mono_class_get_method_from_name,
+                    klass, method.name, method.param_count))
+            for field in klass.fields:
+                call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
+                    klass, field.name))
+        # 绑定结果
+        result_iter = iter(self.native_call_n(call_args, self.context_array))
+        for klass in classes:
+            if klass.need_vtable:
+                klass.mono_vtable = next(result_iter)
+                klass.owner = self.weak
+
+            for method in klass.methods:
+                method.mono_method = next(result_iter)
+            for field in klass.fields:
+                field.mono_field = next(result_iter)
+
+    @contextmanager
+    def cache_values(self, values):
+        self.caching_values = values
+        yield values
+        for value in values:
+            pass

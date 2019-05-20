@@ -1,7 +1,7 @@
 from functools import partial
 from lib import extypes
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem
-from .native import NativeContext, NativeContext64, NativeContextArray
+from .native import NativeContext, NativeContext64, NativeContextArray, ResultResolver
 import base64
 
 
@@ -88,8 +88,27 @@ class NativeHacktool(AssemblyHacktool):
         else:
             return self.native_call_auto(*args, **kwargs)
 
+    def native_call_1(self, item):
+        """ 调用一项
+        :param item: call_arg
+        """
+        self.native_call_sys(item['addr'], item['arg_sign'], *item['args'],
+            this=item['this'], ret_type=item['ret_type'], ret_size=item['ret_size'])
+        # 函数结果
+        ret_type = item['ret_type']
+        if ret_type:
+            if isinstance(ret_type, ResultResolver):
+                result = ret_type.get_result(self.native_context)
+            else:
+                result = self.native_context.get_result(ret_type, item['ret_size'])
+        else:
+            result = None
+        return result
+
     def native_call_n(self, call_list, context_array=None):
-        """一次调用多个函数"""
+        """一次调用多个函数
+        :param call_list: call_arg[]
+        """
         if not extypes.is_list_tuple(call_list):
             call_list = tuple(call_list)
         context_reuse = context_array is not None
@@ -109,13 +128,22 @@ class NativeHacktool(AssemblyHacktool):
         self.native_call_sys(self.native_call_n_addr, '2Pi',
             self.native_call_addr, context_array.addr, len(call_list))
 
-        result = [
-            context_array[i].get_result(item['ret_type'], item['ret_size']) if item['ret_type'] else None
-            for i, item in enumerate(call_list)
-        ]
-        return result
+        # 函数结果列表
+        results = []
+        for i, item in enumerate(call_list):
+            ret_type = item['ret_type']
+            if ret_type:
+                if isinstance(ret_type, ResultResolver):
+                    result = ret_type.get_result(context_array[i])
+                else:
+                    result = context_array[i].get_result(ret_type, item['ret_size'])
+            else:
+                result = None
+            results.append(result)
+        return results
 
     def get_cached_address(self, key, original, find_start, find_end, find_base=True):
+        """缓存的函数"""
         cached_address = getattr(self, '_cached_address', None)
         if cached_address is None:
             cached_address = self._cached_address = {}
