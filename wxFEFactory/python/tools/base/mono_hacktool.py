@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from lib.hack.handlers import MemHandler
 from tools.base.native_hacktool import (
     NativeHacktool, NativeContextArray, call_arg, call_arg_int32, call_arg_int64
@@ -19,11 +20,16 @@ class MonoHacktool(NativeHacktool):
         "mono_class_vtable": "2P",  # (MonoDomain *domain, MonoClass *klass)
         "mono_class_get_field_from_name": "Ps",  # (MonoClass *klass, const char *name)
         "mono_field_get_value": "3P",  # (MonoObject *obj, MonoClassField *field, void *value)
+        "mono_field_set_value": "3P",  # idem
         "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
         "mono_field_static_set_value": "3P",  # idem
         "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
         "mono_compile_method": "P",
     }
+
+    def __init__(self):
+        super().__init__()
+        self.caching_values = None
 
     def onattach(self):
         super().onattach()
@@ -51,6 +57,14 @@ class MonoHacktool(NativeHacktool):
         if self.context_array:
             self.context_array = None
 
+    def mono_security_call(self, args):
+        _, _, *result = self.native_call_n((
+            call_arg(*self.mono_thread_attach, self.root_domain),
+            call_arg(*self.mono_security_set_mode, 0),
+            *args
+        ), self.context_array)
+        return result
+
     def get_mono_classes(self, items):
         """根据mono class和mothod name获取mono class
         :param items: ((namespace, name),)
@@ -73,15 +87,55 @@ class MonoHacktool(NativeHacktool):
 
     def get_mono_compile_methods(self, methods):
         """获取编译后的native method地址"""
-        _, _, *result = self.native_call_n((
-            call_arg(*self.mono_thread_attach, self.root_domain),
-            call_arg(*self.mono_security_set_mode, 0),
-            *(self.call_arg_int(*self.mono_compile_method, method) for method in methods)
-        ), self.context_array)
-        return result
+        return self.mono_security_call(
+            (self.call_arg_int(*self.mono_compile_method, method) for method in methods)
+        )
 
-    # def arg_mono_class_vtable(self, klass):
+    def op_mono_field_get_value(self, object, field):
+        return call_arg(*mono_field_get_value, object, self.native_context.get_temp_addr())
+
+    def register_classes(self, classes):
+        """注册mono class列表
+        :param classes: [MonoClass]
+        """
+        # 获取class
+        items = (klass.namespace, klass.name for klass in classes)
+        result_iter = iter(self.get_mono_classes(items))
+
+        # 获取vtable, methods和fields
+        call_args = []
+        for klass in classes:
+            klass.mono_class = next(result_iter)
+
+            if klass.need_vtable:
+                call_args.append(self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass))
+
+            for method in klass.methods:
+                call_args.append(self.call_arg_int(*self.mono_class_get_method_from_name,
+                    klass, method.name, method.param_count))
+            for field in klass.fields:
+                call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
+                    klass, field.name))
+        # 绑定结果
+        result_iter = iter(self.native_call_n(call_args, self.context_array))
+        for klass in classes:
+            if klass.need_vtable:
+                klass.mono_vtable = next(result_iter)
+
+            for method in klass.methods:
+                method.mono_method = next(result_iter)
+            for field in klass.fields:
+                field.mono_field = next(result_iter)
+
+    @contextmanager
+    def cache_values(self, values):
+        self.caching_values = values
+        yield values
+        for value in values:
+            pass
+
+    # def op_mono_class_vtable(self, klass):
     #     return self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass),
 
-    # def arg_mono_class_get_field_from_name(self, klass, name):
+    # def op_mono_class_get_field_from_name(self, klass, name):
     #     return self.call_arg_int(*self.mono_class_get_field_from_name, klass, name)

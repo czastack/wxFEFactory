@@ -153,17 +153,14 @@ class classproperty:
         return self.method(owner)
 
 
-class _DataClass:
+class DataClassType:
     __slots__ = ()
     default = None
 
     def __init__(self, *args, **kwargs):
-        self._set_data(args, kwargs)
+        self.set_data(args, kwargs)
 
     def set_data(self, *args, **kwargs):
-        self._set_data(args, kwargs)
-
-    def _set_data(self, args, kwargs):
         for field, arg in zip(self.__slots__, args):
             setattr(self, field, arg)
         for field in kwargs:
@@ -213,7 +210,7 @@ class DataClassMeta(type):
     def __new__(class_, name, bases, attrs):
         fields = attrs.pop('fields')
 
-        the_bases = (_DataClass,)
+        the_bases = (DataClassType,)
         if bases:
             # 处理继承
             dataclass_base = False
@@ -221,7 +218,7 @@ class DataClassMeta(type):
             base_defaults = {}
             defaults = attrs.pop('defaults', None)
             for base in bases:
-                if issubclass(base, _DataClass):
+                if issubclass(base, DataClassType):
                     dataclass_base = True
                     base_slots.extend(base.__slots__)
                     if base.defaults:

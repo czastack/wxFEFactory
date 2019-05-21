@@ -29,7 +29,8 @@ class Model:
     def fields(cls):
         fields = getattr(cls, '_fields', None)
         if fields is None:
-            fields = cls._fields = tuple(cls.field(name) for name in cls.field_names)
+            # tuple(cls.field(name) for name in cls.field_names)
+            fields = cls._fields = tuple(value for value in cls.__dict__.values() if isinstance(value, FieldType))
         return fields
 
     @property
