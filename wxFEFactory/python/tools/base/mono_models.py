@@ -75,13 +75,13 @@ class MonoField(MonoMember):
         """获取值"""
         result = instance.owner.native_call_1(self.op_getter(instance))
         # 转为类实例
-        if issubclass(self.type, MonoClass):
+        if self.type is not int and callable(self.type):
             result = self.type(result, instance.owner)
         return result
 
     def set_value(self, instance, value):
-        if self.type and not isinstance(value, self.type):
-            value = self.type(value)
+        # if self.type and not isinstance(value, self.type):
+        #     value = self.type(value)
         instance.owner.native_call_1(self.op_setter(instance, value))
 
 
@@ -108,7 +108,6 @@ class BoundField:
         self.instance = WeakBinder(instance)
         self.field = field
 
-    @property
     def op_getter(self):
         return self.field.op_getter(self.instance)
 
@@ -122,6 +121,7 @@ class BoundField:
 
 
 class MonoMethod(MonoMember):
+    """mono方法"""
     def __init__(self, name, param_count=0, compile=True):
         super().__init__(name)
         self.param_count = param_count
@@ -136,24 +136,64 @@ class MonoMethod(MonoMember):
         return field
 
     def op_runtime_invoke(self, instance, signature, values):
+        """方法调用的call_arg"""
         return instance.owner.op_mono_runtime_invoke(self.mono_method, instance.mono_object, signature, values)
 
 
 class BoundMethod:
+    """绑定的方法"""
     __slots__ = ('instance', 'method')
 
     def __init__(self, instance, method):
         self.instance = WeakBinder(instance)
         self.method = method
 
-    def __call__(self):
+    def __call__(self, signature, values):
+        """方法调用"""
+        return self.instance.owner.native_call_1(
+            self.field.op_runtime_invoke(self.instance, signature, values))
+
+
+class MonoArray(MonoClass):
+    """数组类型属性"""
+    def __init__(self, mono_object, owner, type=int, itemsize=0):
+        super().__init__(mono_object, owner)
+        self.type = type
+        self.itemsize = itemsize
+
+    def op_size(self):
+        return self.owner.call_arg_int(*self.owner.mono_array_length, self.mono_object)
+
+    def op_addr_at(self, index):
+        if index < 0:
+            index += self.size
+        itemsize = self.itemsize or self.owner.handler.ptr_size
+        return self.owner.call_arg_int(*self.owner.mono_array_addr_with_size,
+            self.mono_object, itemsize, index)
+
+    @property
+    def size(self):
+        return self.owner.native_call_1(self.op_size())
+
+    def addr_at(self, index):
+        return self.owner.native_call_1(self.op_addr_at(index))
+
+    def __getitem__(self, index):
+        addr = self.addr_at(index)
+        result = self.owner.handler.read(addr, int, self.itemsize)
+        if self.type is not int and callable(self.type):
+            result = self.type(result, self.owner)
+        return result
+
+    def __setitem__(self, index, value):
         pass
 
 
-class MonoObject(MonoType):
-    """MonoObject类型属性"""
+class MonoArrayT:
+    """主要用于field的type参数，表示这是一个数组"""
+    def __init__(self, type=int, itemsize=0):
+        self.type = type
+        self.itemsize = itemsize
 
-
-class MonoArray(MonoType):
-    """数组类型属性"""
-    pass
+    def __call__(self, mono_object, owner):
+        return MonoArray(mono_object, owner, self.type, self.itemsize)

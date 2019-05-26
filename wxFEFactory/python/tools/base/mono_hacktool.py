@@ -26,6 +26,7 @@ class MonoHacktool(NativeHacktool):
         "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
         "mono_field_static_set_value": "3P",  # idem
         "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
+        # "mono_array_length": "P",  # (MonoArray *array)
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
     }

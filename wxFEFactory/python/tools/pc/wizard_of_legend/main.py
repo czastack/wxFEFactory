@@ -4,7 +4,7 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from tools.base.assembly_hacktool import AssemblyItem
 from tools.base.mono_hacktool import MonoHacktool, call_arg
-from tools.base.mono_models import MonoClass, MonoField, MonoStaticField
+from tools.base.mono_models import MonoClass, MonoField, MonoStaticField, MonoArrayT
 from fefactory_api import ui
 # from . import models, datasets
 
@@ -15,7 +15,7 @@ class Player(MonoClass):
 
 class GameController(MonoClass):
     need_vtable = True
-    activePlayers = MonoStaticField(type=Player)
+    activePlayers = MonoStaticField(type=MonoArrayT(Player))
 
 
 class Main(MonoHacktool):
@@ -27,7 +27,7 @@ class Main(MonoHacktool):
         self.register_classes((GameController, Player))
 
         controller = GameController(None, self)
-        activePlayers = controller.activePlayers.value
+        activePlayers = controller.activePlayers.value[0]
         print('activePlayers', hex(activePlayers.mono_object))
 
     def render_main(self):
