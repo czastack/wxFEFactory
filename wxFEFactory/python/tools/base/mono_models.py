@@ -11,13 +11,11 @@ class MonoClass(MonoType):
     name = None
     vtable = None
     need_vtable = False
-    owner = None
 
     def __init__(self, mono_object, owner):
         self.mono_object = mono_object
         self.owner = owner
         self.bound_member = {}
-        self.cached_value = {}
 
     def __init_subclass__(cls):
         super().__init_subclass__()
