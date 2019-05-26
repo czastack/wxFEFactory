@@ -23,7 +23,7 @@ class MonoClass(MonoType):
         super().__init_subclass__()
         if not getattr(cls, '__abstract__', False):
             if cls.name is None:
-                cls.name == cls.__name__
+                cls.name = cls.__name__
 
             cls.fields = []
             cls.methods = []
@@ -63,19 +63,22 @@ class MonoField(MonoMember):
 
     def op_getter(self, instance):
         """用于获取值的call_arg"""
-        if not instance.mono_object or not self.field.mono_field:
+        if not instance.mono_object or not self.mono_field:
             raise ValueError('mono_object或mono_field未初始化')
-        return instance.owner.op_mono_field_get_value(instance.mono_object, self.field.mono_field)
+        return instance.owner.op_mono_field_get_value(instance.mono_object, self.mono_field)
 
     def op_setter(self, instance, value):
         """用于设置值的call_arg"""
-        if not instance.mono_object or not self.field.mono_field:
+        if not instance.mono_object or not self.mono_field:
             raise ValueError('mono_object或mono_field未初始化')
-        return instance.owner.op_mono_field_set_value(instance.mono_object, self.field.mono_field, value)
+        return instance.owner.op_mono_field_set_value(instance.mono_object, self.mono_field, value)
 
     def get_value(self, instance):
         """获取值"""
-        result, = instance.owner.native_call_1(self.op_getter(instance))
+        result = instance.owner.native_call_1(self.op_getter(instance))
+        # 转为类实例
+        if issubclass(self.type, MonoClass):
+            result = self.type(result, instance.owner)
         return result
 
     def set_value(self, instance, value):
@@ -84,7 +87,23 @@ class MonoField(MonoMember):
         instance.owner.native_call_1(self.op_setter(instance, value))
 
 
+class MonoStaticField(MonoField):
+    """静态属性"""
+    def op_getter(self, instance):
+        """用于获取值的call_arg"""
+        if not self.mono_field:
+            raise ValueError('mono_field未初始化')
+        return instance.owner.op_mono_field_static_get_value(instance.mono_vtable, self.mono_field)
+
+    def op_setter(self, instance, value):
+        """用于设置值的call_arg"""
+        if not self.mono_field:
+            raise ValueError('mono_field未初始化')
+        return instance.owner.op_mono_field_static_set_value(instance.mono_vtable, self.mono_field, value)
+
+
 class BoundField:
+    """绑定(实例)的字段"""
     __slots__ = ('instance', 'field')
 
     def __init__(self, instance, field):
@@ -102,42 +121,6 @@ class BoundField:
     @value.setter
     def value(self, value):
         return self.field.set_value(self.instance, value)
-
-
-class MonoStaticField(MonoMember):
-    """静态属性"""
-    def __init__(self, name=None, type=int):
-        super().__init__(name)
-        self.type = type
-        self.mono_field = None
-
-    def __set_name__(self, owner, name):
-        super().__set_name__(owner, name)
-        self.owner = WeakBinder(owner)
-
-    def op_getter(self):
-        """用于获取值的call_arg"""
-        if not self.field.mono_field:
-            raise ValueError('mono_field未初始化')
-        return self.owner.owner.op_mono_field_static_get_value(self.owner.vtable, self.field.mono_field)
-
-    def op_setter(self, value):
-        """用于设置值的call_arg"""
-        if not self.field.mono_field:
-            raise ValueError('mono_field未初始化')
-        return self.owner.owner.op_mono_field_static_set_value(self.owner.vtable, self.field.mono_field, value)
-
-    def get_value(self):
-        """获取值"""
-        result, = self.owner.owner.native_call_1(self.op_getter(self.owner))
-        return result
-
-    def set_value(self, value):
-        if self.type and not isinstance(value, self.type):
-            value = self.type(value)
-        self.owner.owner.native_call_1(self.op_setter(self.owner, value))
-
-    value = property(get_value, set_value)
 
 
 class MonoMethod(MonoMember):

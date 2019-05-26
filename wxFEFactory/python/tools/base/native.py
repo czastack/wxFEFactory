@@ -280,8 +280,6 @@ class NativeContext64(NativeContext):
 
             if fmt == 'p' or fmt == 's':
                 # 字符串(s是c style, p是pascal style)
-                if repeat is not 1:
-                    raise ValueError('对于字符串参数, s和p前暂不支持加数字')
                 arg = self.put_temp_string(arg, arg_count)
                 fmt = 'P'
 

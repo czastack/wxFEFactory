@@ -132,7 +132,7 @@ class MonoHacktool(NativeHacktool):
         :param classes: [MonoClass]
         """
         # 获取class
-        items = (klass.namespace, klass.name for klass in classes)
+        items = ((klass.namespace, klass.name) for klass in classes)
         result_iter = iter(self.get_mono_classes(items))
 
         # 获取vtable, methods和fields
@@ -141,14 +141,14 @@ class MonoHacktool(NativeHacktool):
             klass.mono_class = next(result_iter)
 
             if klass.need_vtable:
-                call_args.append(self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass))
+                call_args.append(self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass.mono_class))
 
             for method in klass.methods:
                 call_args.append(self.call_arg_int(*self.mono_class_get_method_from_name,
-                    klass, method.name, method.param_count))
+                    klass.mono_class, method.name, method.param_count))
             for field in klass.fields:
                 call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
-                    klass, field.name))
+                    klass.mono_class, field.name))
         # 绑定结果
         result_iter = iter(self.native_call_n(call_args, self.context_array))
         for klass in classes:
