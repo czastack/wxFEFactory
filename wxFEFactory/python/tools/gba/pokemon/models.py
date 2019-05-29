@@ -1,10 +1,10 @@
+import random
 from lib.hack.models import (
     Model, Field, ByteField, WordField, DWordField, BitsField, ArrayField,
     ModelField, ModelPtrField, FieldPrep, SignedField, ManagedModel
 )
 from lib.hack.handlers.localhandler import LocalHandler, LocalModel
 from lib.hack.utils import loword, hiword
-import random
 
 
 class ItemSlot(Model):

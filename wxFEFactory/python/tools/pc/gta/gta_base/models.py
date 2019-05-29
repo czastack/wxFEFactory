@@ -1,6 +1,6 @@
+import math
 from lib.hack.models import Model, ManagedModel, Field
 from . import utils
-import math
 
 
 def distance(p1, p2):

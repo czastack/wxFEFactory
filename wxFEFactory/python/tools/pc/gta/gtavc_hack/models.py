@@ -1,8 +1,8 @@
+import math
 from lib.hack.models import Model, Field, ByteField, WordField, CoordField
 from ..gta_base.models import Physicle, WeaponSet, Pool, NativeModel
 from ..gta3_base.models import BaseBlip, GTA3Player, GTA3Vehicle
 from .datasets import VEHICLE_LIST
-import math
 
 
 class Entity(Physicle):

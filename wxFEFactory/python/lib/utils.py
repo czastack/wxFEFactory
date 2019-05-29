@@ -1,7 +1,7 @@
-from lib import extypes
 import math
 import os
 import struct
+from lib import extypes
 
 
 class HistoryList(list):

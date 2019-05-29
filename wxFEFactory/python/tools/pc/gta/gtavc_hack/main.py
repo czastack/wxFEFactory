@@ -1,3 +1,8 @@
+import math
+import os
+import json
+import time
+import __main__
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, SimpleCheckBox, ModelInput, ModelCoordWidget
 from lib.win32.keys import VK
@@ -10,11 +15,6 @@ from ..gta3_base.script import RunningScript
 from . import address, models, coords
 from .models import Player, Vehicle
 from .datasets import SLOT_NO_AMMO, WEAPON_LIST, VEHICLE_LIST
-import math
-import os
-import json
-import time
-import __main__
 
 
 class Main(BaseGTA3Tool):

@@ -1,13 +1,13 @@
+import os
+import json
+import types
+import __main__
 from application import app
 from lib import extypes, lazy, wxconst
 from lib.scene import BaseScene
 from styles import styles
 from fefactory_api import ui
 from . import modules
-import os
-import json
-import types
-import __main__
 
 DUMP_INDENT = app.getconfig('json_indent', 4)
 

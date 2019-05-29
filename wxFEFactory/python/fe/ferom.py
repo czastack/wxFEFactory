@@ -1,8 +1,8 @@
+import os
 from lib.gba.rom import BaseRomRW, RomProxyRW, RomHandler
 from lib.lazy import lazy
 from . import config
 from .fedict import FeDict, CtrlCode
-import os
 
 # 控制码表
 ctrl_table = (

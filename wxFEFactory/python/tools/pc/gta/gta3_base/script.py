@@ -1,6 +1,6 @@
+import struct
 from lib.hack import models, utils
 from ..gta_base.models import ManagedModel
-import struct
 
 
 class ArgType:

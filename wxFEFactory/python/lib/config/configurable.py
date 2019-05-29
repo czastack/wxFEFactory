@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 import json
+from abc import ABC, abstractmethod
 
 
 class Configurable(ABC):

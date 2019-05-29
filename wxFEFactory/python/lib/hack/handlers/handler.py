@@ -1,5 +1,5 @@
-from fefactory_api.emuhacker import ProcessHandler
 import struct
+from fefactory_api.emuhacker import ProcessHandler
 
 
 class MemHandler(ProcessHandler):

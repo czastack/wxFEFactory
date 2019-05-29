@@ -1,13 +1,13 @@
+import traceback
+import base64
+import fefactory
+import __main__
 from .basetool import NestedTool
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler
 from lib import exui
 from fefactory_api import ui
-import traceback
-import base64
-import fefactory
-import __main__
 
 
 class BaseHackTool(NestedTool):

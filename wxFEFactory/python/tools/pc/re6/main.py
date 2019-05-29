@@ -1,3 +1,4 @@
+import fefactory_api
 from functools import partial
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
@@ -8,7 +9,6 @@ from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool, AssemblyItem
 from fefactory_api import ui
 from . import models, datasets
-import fefactory_api
 
 
 class Main(NativeHacktool):

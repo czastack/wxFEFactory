@@ -1,5 +1,5 @@
-from .utils import is_bytes
 import re
+from .utils import is_bytes
 
 
 class Dictionary:

@@ -1,3 +1,4 @@
+import os
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, Choice
 )
@@ -10,7 +11,6 @@ from fefactory_api import ui
 from lib.gba.dictionary import Dictionary
 from ..base import BasePs2Hack
 from . import models, datasets
-import os
 
 
 class Main(BasePs2Hack):

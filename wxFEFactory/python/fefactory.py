@@ -1,6 +1,3 @@
-from modules import modules
-from functools import partial
-from lib import wxconst
 import fefactory_api
 import json
 import os
@@ -8,6 +5,9 @@ import sys
 import traceback
 import application
 import __main__
+from modules import modules
+from functools import partial
+from lib import wxconst
 
 
 def reload(start_option=None, callback=None):

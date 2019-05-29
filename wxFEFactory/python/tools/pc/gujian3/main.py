@@ -1,3 +1,4 @@
+import fefactory_api
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
 from lib.hack.handlers import MemHandler
@@ -9,7 +10,6 @@ from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
 from fefactory_api import ui
 from . import models
-import fefactory_api
 
 
 class Main(AssemblyHacktool):

@@ -1,7 +1,7 @@
-from fefactory_api import mem_read, mem_write
-from ..models import Model
 import ctypes
 import struct
+from fefactory_api import mem_read, mem_write
+from ..models import Model
 
 
 _LocalHandler__instance = None

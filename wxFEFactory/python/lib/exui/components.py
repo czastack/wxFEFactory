@@ -1,6 +1,6 @@
+import math
 from lib.extypes import WeakBinder
 from fefactory_api import ui
-import math
 
 
 class Pagination(ui.Horizontal):

@@ -1,6 +1,6 @@
+import ctypes
 from .lazy import lazy
 from functools import partialmethod
-import ctypes
 
 
 class CArray:

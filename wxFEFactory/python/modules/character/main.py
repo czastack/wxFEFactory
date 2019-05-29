@@ -1,9 +1,9 @@
+import fefactory_api
 from lib import wxconst
 from ..module import BaseListBoxModuel
 from . import forms
 from . import config
 from fefactory_api import ui
-import fefactory_api
 
 
 class Module(BaseListBoxModuel):

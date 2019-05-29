@@ -1,5 +1,5 @@
-from xml.etree import ElementTree
 import re
+from xml.etree import ElementTree
 
 
 text = """

@@ -1,10 +1,10 @@
+import math
 from lib.hack.models import Model, Field, CoordField
 from lib.lazy import lazy
 from ..gta_base.models import Physicle, WeaponSet, Pool, ManagedModel
 from ..gta3_base.models import GTA3Player, GTA3Vehicle
 from . import address
 from .datasets import VEHICLE_LIST
-import math
 
 
 class Pos(Model):

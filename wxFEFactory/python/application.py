@@ -1,9 +1,9 @@
-from lib.utils import HistoryList
-from lib.config import Configurable
-from project import Project
 import json
 import fefactory_api
 import __main__
+from lib.utils import HistoryList
+from lib.config import Configurable
+from project import Project
 
 CONFIG_FILE = 'config/config.json'
 

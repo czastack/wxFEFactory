@@ -1,5 +1,5 @@
-from functools import reduce
 import math
+from functools import reduce
 PI = math.pi
 
 

@@ -1,10 +1,10 @@
+import math
+import struct
 from abc import ABC, abstractmethod
 from lib.hack.models import Model, Field, ArrayField, CoordField, CoordData
 from lib.hack.utils import iter_signature
 from lib.lazy import lazy
 from lib.extypes import DataClassMeta
-import math
-import struct
 
 
 class NativeContext(Model):

@@ -1,5 +1,5 @@
-from lib.gba.dictionary import Dictionary, CtrlCode
 import ctypes
+from lib.gba.dictionary import Dictionary, CtrlCode
 
 
 class CTreeNode(ctypes.Structure):

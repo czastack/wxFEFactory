@@ -1,6 +1,6 @@
+import struct
 from lib.hack import models
 from ..gta3_base.script import ArgType, RunningScript
-import struct
 
 
 class RunningScript(RunningScript):

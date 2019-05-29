@@ -1,3 +1,8 @@
+import math
+import os
+import json
+import time
+import __main__
 from functools import partial
 from lib import utils
 from lib.hack.forms import (
@@ -13,11 +18,6 @@ from . import cheat, address, models, datasets, coords
 from .datasets import VEHICLE_LIST
 from .models import Player, Vehicle
 from .script import RunningScript
-import math
-import os
-import json
-import time
-import __main__
 
 
 class Main(BaseGTA3_VC_SA_Tool):

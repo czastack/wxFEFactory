@@ -1,6 +1,6 @@
-from lib.config import Configurable
 import json
 import os
+from lib.config import Configurable
 Path = os.path
 
 

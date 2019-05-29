@@ -1,8 +1,8 @@
+import base64
 from functools import partial
 from lib import extypes
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem
 from .native import NativeContext, NativeContext64, NativeContextArray, ResultResolver
-import base64
 
 
 class NativeHacktool(AssemblyHacktool):

@@ -1,9 +1,3 @@
-from application import app
-from project import Project
-from modules import modules
-from fe.ferom import FeRomRW
-from lib import exui, extypes, wxconst
-from lib.win32.keys import WXK
 import os
 import traceback
 import types
@@ -11,6 +5,12 @@ import __main__
 import fefactory_api
 import fefactory
 import tools
+from application import app
+from project import Project
+from modules import modules
+from fe.ferom import FeRomRW
+from lib import exui, extypes, wxconst
+from lib.win32.keys import WXK
 Path = os.path
 ui = fefactory_api.ui
 

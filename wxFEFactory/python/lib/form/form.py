@@ -1,5 +1,5 @@
-from .fields import Field, Group
 import ctypes
+from .fields import Field, Group
 
 
 class FormMeta(type):

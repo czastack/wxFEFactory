@@ -1,8 +1,8 @@
+import struct
 from lib import wxconst
 from lib.hack.utils import bytes_beautify
 from tools.base.basetool import BaseTool
 from fefactory_api import ui
-import struct
 
 
 class Main(BaseTool):

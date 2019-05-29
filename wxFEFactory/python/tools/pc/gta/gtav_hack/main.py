@@ -1,3 +1,8 @@
+import math
+import os
+import json
+import time
+import __main__
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
@@ -16,11 +21,6 @@ from . import address, models, datasets, coords
 from .models import Player, Vehicle
 from .widgets import WeaponWidget, CustomColorWidget
 from fefactory_api import ui
-import math
-import os
-import json
-import time
-import __main__
 
 
 class Main(BaseGTATool):

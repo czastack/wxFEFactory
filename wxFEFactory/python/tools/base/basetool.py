@@ -1,9 +1,9 @@
+import traceback
+import __main__
 from lib import wxconst, lazy
 from lib.scene import BaseScene
 from styles import styles, dialog_style
 from fefactory_api import ui, alert
-import traceback
-import __main__
 
 
 class BaseTool(BaseScene):

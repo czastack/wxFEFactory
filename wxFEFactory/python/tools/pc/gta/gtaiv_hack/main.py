@@ -1,3 +1,8 @@
+import math
+import os
+import json
+import time
+import __main__
 from functools import partial
 from lib import utils
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelCoordWidget
@@ -14,11 +19,6 @@ from . import address, datasets, models, coords
 from .models import Player, Vehicle
 from .native import NativeContext
 from fefactory_api import ui
-import math
-import os
-import json
-import time
-import __main__
 
 
 class Main(BaseGTATool):

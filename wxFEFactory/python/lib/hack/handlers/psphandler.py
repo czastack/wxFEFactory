@@ -1,5 +1,5 @@
-from .handler import MemHandler
 import re
+from .handler import MemHandler
 
 
 class PPSSPPHandler(MemHandler):

@@ -1,10 +1,10 @@
+import json
+import fefactory
+import fefactory_api
 from pathlib import Path
 from lib import exui, utils
 from lib.win32.keys import WXK
 from .widgets import ModelWidget, TwoWayWidget
-import json
-import fefactory
-import fefactory_api
 ui = fefactory_api.ui
 
 

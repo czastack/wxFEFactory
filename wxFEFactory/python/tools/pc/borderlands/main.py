@@ -1,3 +1,5 @@
+import fefactory_api
+import types
 from functools import partial
 from lib.hack.forms import (
     Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Input, Title
@@ -10,8 +12,6 @@ from tools.base import assembly_code
 from fefactory_api import ui
 from styles import styles
 from . import models, datasets
-import fefactory_api
-import types
 
 
 class Main(AssemblyHacktool):

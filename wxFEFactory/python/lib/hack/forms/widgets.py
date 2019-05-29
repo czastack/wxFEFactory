@@ -1,12 +1,12 @@
+import json
+import fefactory
+import fefactory_api
+import __main__
 from lib import exui, utils, lazy, wxconst
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from styles import btn_xs_style, styles, dialog_style
 from ..utils import uint_hex
-import json
-import fefactory
-import fefactory_api
-import __main__
 ui = fefactory_api.ui
 Label = exui.Label
 

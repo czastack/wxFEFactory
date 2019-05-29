@@ -7,8 +7,8 @@ from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
 from fefactory_api import ui
 from styles import styles
-# from . import models
-import fefactory_api
+# import fefactory_api
+from . import models
 
 
 class Main(AssemblyHacktool):

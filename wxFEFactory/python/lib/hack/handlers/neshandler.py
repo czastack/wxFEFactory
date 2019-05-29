@@ -1,5 +1,5 @@
-from .handler import MemHandler
 import struct
+from .handler import MemHandler
 
 
 class VirtuaNesHandler(MemHandler):
