@@ -1,3 +1,4 @@
+import math
 from lib.utils import split_label_value
 
 
@@ -108,7 +109,14 @@ def ceil_exp(c):
     return n + 1
 
 
-def align4(n):
+def int_size(n, exp=True):
+    """整形字节大小
+    :param exp: 长度对齐2的幂
+    """
+    return (ceil_exp(n.bit_length()) >> 3) if exp else math.ceil(n.bit_length() / 8)
+
+
+def align_4(n):
     """对齐4字节"""
     tail = n & 3
     if tail:
@@ -132,23 +140,36 @@ def u32_bytes(n):
         return struct.pack('L', n)
 
 
-def uint_bytes(n, size=0, byteorder='little'):
+def uint_bytes(n, size=0, byteorder='little', exp=True):
+    """把整型转成bytes
+    :param size: 字节数
+    :param exp: 长度对齐2的幂
+    """
+    origin_size = int_size(n, exp)
     if size is 0:
-        size = ceil_exp(n.bit_length()) >> 3
+        size = origin_size
+    elif size < origin_size:
+        n &= (1 << (size << 3)) - 1
     return n.to_bytes(size, byteorder)
 
 
-def uint_hex(n, size=0):
-    """把整型转成长度对齐2的幂的hex字符串
+def uint_hex(n, size=0, exp=True):
+    """把整型转成hex字符串
     :param size: 字节数
+    :param exp: 长度对齐2的幂
     """
+    origin_size = int_size(n, exp)
     if size is 0:
-        size = ceil_exp(n.bit_length()) >> 3
+        size = origin_size
+    elif size < origin_size:
+        n &= (1 << (size << 3)) - 1
     return "%0*X" % ((size << 1), n)
 
 
 def bytes_hex(data, sep=''):
     """bytes转16进制字符串"""
+    if not sep:
+        return data.hex().upper()
     return sep.join(("%02X" % b for b in data))
 
 

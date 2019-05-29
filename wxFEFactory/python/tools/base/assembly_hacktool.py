@@ -181,7 +181,7 @@ class AssemblyHacktool(BaseHackTool):
                     replace += b'\x90' * (available_len - jmp_len)
 
                 if memory == self.next_usable_memory:
-                    self.next_usable_memory += utils.align4(len(assembly))
+                    self.next_usable_memory += utils.align_4(len(assembly))
                 self.handler.write(memory, assembly)
 
             data = self.registed_assembly[item.key] = {'active': True, 'addr': addr, 'original': original,
