@@ -109,11 +109,18 @@ def ceil_exp(c):
     return n + 1
 
 
-def int_size(n, exp=True):
+def int_of_size(n, size=0, exp=True):
     """整形字节大小
+    :param size: 给定的字节长度，若小于原长度，整形只截取该长度部分
     :param exp: 长度对齐2的幂
     """
-    return (ceil_exp(n.bit_length()) >> 3) if exp else math.ceil(n.bit_length() / 8)
+    bitlen = n.bit_length()
+    origin_size = math.ceil(bitlen / 8)
+    if size is 0:
+        size = (ceil_exp(bitlen) >> 3) if exp else origin_size
+    elif size < origin_size:
+        n &= (1 << (size << 3)) - 1
+    return n, size
 
 
 def align_4(n):
@@ -145,11 +152,7 @@ def uint_bytes(n, size=0, byteorder='little', exp=True):
     :param size: 字节数
     :param exp: 长度对齐2的幂
     """
-    origin_size = int_size(n, exp)
-    if size is 0:
-        size = origin_size
-    elif size < origin_size:
-        n &= (1 << (size << 3)) - 1
+    n, size = int_of_size(n, size, exp)
     return n.to_bytes(size, byteorder)
 
 
@@ -158,11 +161,7 @@ def uint_hex(n, size=0, exp=True):
     :param size: 字节数
     :param exp: 长度对齐2的幂
     """
-    origin_size = int_size(n, exp)
-    if size is 0:
-        size = origin_size
-    elif size < origin_size:
-        n &= (1 << (size << 3)) - 1
+    n, size = int_of_size(n, size, exp)
     return "%0*X" % ((size << 1), n)
 
 
