@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from lib.extypes import WeakBinder
 from lib.hack.handlers import MemHandler
 from tools.base.native import TempPtr, TempArrayPtr
@@ -138,6 +137,8 @@ class MonoHacktool(NativeHacktool):
 
         # 获取vtable, methods和fields
         call_args = []
+        # 获取编译的函数
+        compile_call_args = []
         for klass in classes:
             klass.mono_class = next(result_iter)
 
@@ -150,7 +151,8 @@ class MonoHacktool(NativeHacktool):
             for field in klass.fields:
                 call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
                     klass.mono_class, field.name))
-        # 绑定结果
+
+        # 绑定字段和函数
         result_iter = iter(self.native_call_n(call_args, self.context_array))
         for klass in classes:
             if klass.need_vtable:
@@ -159,12 +161,17 @@ class MonoHacktool(NativeHacktool):
 
             for method in klass.methods:
                 method.mono_method = next(result_iter)
+                # 获取编译的函数
+                if method.compile:
+                    compile_call_args.append(self.call_arg_int(*self.mono_compile_method, method.mono_method))
+
             for field in klass.fields:
                 field.mono_field = next(result_iter)
 
-    @contextmanager
-    def cache_values(self, values):
-        self.caching_values = values
-        yield values
-        for value in values:
-            pass
+        # 绑定编译的函数
+        if compile_call_args:
+            result_iter = iter(self.mono_security_call(compile_call_args))
+            for klass in classes:
+                for method in klass.methods:
+                    if method.compile:
+                        method.mono_compile = next(result_iter)

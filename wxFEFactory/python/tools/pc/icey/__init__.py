@@ -1,1 +1,1 @@
-name = "艾希"
+name = "ICEY 艾希"

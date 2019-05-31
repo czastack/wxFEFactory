@@ -98,6 +98,22 @@ def qword(n):
     return n & 0xFFFFFFFFFFFFFFFF
 
 
+def align_4(n):
+    """对齐4字节"""
+    tail = n & 3
+    if tail:
+        n += 4 - tail
+    return n
+
+
+def align_size(n, p):
+    """对齐p字节"""
+    tail = n & (p - 1)
+    if tail:
+        n += p - tail
+    return n
+
+
 def ceil_exp(c):
     """求大于c的最小2次幂"""
     n = c - 1
@@ -121,22 +137,6 @@ def int_of_size(n, size=0, exp=True):
     elif size < origin_size:
         n &= (1 << (size << 3)) - 1
     return n, size
-
-
-def align_4(n):
-    """对齐4字节"""
-    tail = n & 3
-    if tail:
-        n += 4 - tail
-    return n
-
-
-def align_size(n, p):
-    """对齐p字节"""
-    tail = n & (p - 1)
-    if tail:
-        n += p - tail
-    return n
 
 
 def u32_bytes(n):

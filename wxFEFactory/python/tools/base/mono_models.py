@@ -122,10 +122,12 @@ class BoundField:
 
 class MonoMethod(MonoMember):
     """mono方法"""
-    def __init__(self, name, param_count=0, compile=True):
+    def __init__(self, name=None, param_count=0, compile=False):
         super().__init__(name)
         self.param_count = param_count
+        self.compile = compile
         self.mono_method = None
+        self.mono_compile = None
 
     def __get__(self, instance, owner=None):
         if instance is None:

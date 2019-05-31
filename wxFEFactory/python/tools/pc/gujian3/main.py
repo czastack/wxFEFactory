@@ -6,7 +6,6 @@ from lib.win32.keys import VK
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, SimpleButton
 )
-from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
 from fefactory_api import ui
 from . import models
@@ -52,7 +51,7 @@ class Main(AssemblyHacktool):
         functions = (
             AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
                 0x137500, 0x137800, b'',
-                AssemblyGroup(
+                assembly_code.AssemblyGroup(
                     b'\x41\x81\xFC\xFF\xFF\xFF\xFF'
                     b'\x0F\x85\x02\x01\x00\x00'
                     b'\x3D\xE0\x0A\x00\x00'
@@ -106,7 +105,7 @@ class Main(AssemblyHacktool):
 
             AssemblyItem('base_move', '开启移动相关', b'\x48\x8B\xFA\x48\x8B\xD9\x66\x0F\x6E\xC0\x0F\x5B\xC0\x0F\x2E\xC6',
                 0x1E0D00, 0x1E1000, b'',
-                AssemblyGroup(
+                assembly_code.AssemblyGroup(
                     assembly_code.ORIGIN,
                     b'\x48\x89\x3D', assembly_code.Offset('base_move'),
                 ),
@@ -114,7 +113,7 @@ class Main(AssemblyHacktool):
                 inserted=True, replace_len=16),
             AssemblyItem('base_move', '超级跳跃', b'\x48\x85\xC0\x74\x0B\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3',
                 0x1B4C00, 0x1B4E00, b'',
-                AssemblyGroup(
+                assembly_code.AssemblyGroup(
                     b'\x48\x85\xC0\x74\x1A\x50\xA1', assembly_code.Variable('jump_height'),
                     b'\x66\x0F\x6E\xC8\x58\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3'
                 ),
