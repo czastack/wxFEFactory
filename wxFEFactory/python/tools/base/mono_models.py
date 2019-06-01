@@ -1,4 +1,3 @@
-from lib.extypes import WeakBinder
 from lib.utils import float32
 from tools.base.native_hacktool import call_arg
 from tools.base.native import NativeContext, TempPtr, TempArrayPtr
@@ -17,7 +16,6 @@ class MonoClass(MonoType):
     def __init__(self, mono_object, owner):
         self.mono_object = mono_object
         self.owner = owner
-        self.bound_member = {}
 
     def __init_subclass__(cls):
         super().__init_subclass__()
@@ -49,8 +47,10 @@ class MonoMember:
 
 class MonoField(MonoMember):
     """字段"""
-    def __init__(self, name=None, type=int, size=0):
+    def __init__(self, name=None, type=int, size=4):
         super().__init__(name)
+        if issubclass(type, MonoType):
+            size = 0
         self.type = type
         self.size = size
         self.mono_field = None
@@ -58,10 +58,8 @@ class MonoField(MonoMember):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        field = instance.bound_member.get(self.name, None)
-        if field is None:
-            field = instance.bound_member[self.name] = BoundField(instance, self)
-        return field
+        # return BoundField(instance, self)
+        return self.get_value(instance)
 
     def __set__(self, instance, value):
         self.set_value(instance, value)
@@ -150,7 +148,10 @@ class MonoProperty(MonoField):
 
     def get_value(self, instance):
         """获取值"""
-        result, = instance.owner.mono_security_call((self.op_getter(instance),))
+        owner = instance.owner
+        result, = owner.mono_security_call((self.op_getter(instance),))
+        result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
+        result = owner.handler.read(result, self.real_type, self.size)
         return self.prepare_value(result, instance)
 
     def set_value(self, instance, value):
@@ -158,24 +159,24 @@ class MonoProperty(MonoField):
         instance.owner.mono_security_call((self.op_setter(instance, value),))
 
 
-class BoundField:
-    """绑定(实例)的字段"""
-    __slots__ = ('instance', 'field')
+# class BoundField:
+#     """绑定(实例)的字段"""
+#     __slots__ = ('instance', 'field')
 
-    def __init__(self, instance, field):
-        self.instance = WeakBinder(instance)
-        self.field = field
+#     def __init__(self, instance, field):
+#         self.instance = instance
+#         self.field = field
 
-    def op_getter(self):
-        return self.field.op_getter(self.instance)
+#     def op_getter(self):
+#         return self.field.op_getter(self.instance)
 
-    @property
-    def value(self):
-        return self.field.get_value(self.instance)
+#     @property
+#     def value(self):
+#         return self.field.get_value(self.instance)
 
-    @value.setter
-    def value(self, value):
-        return self.field.set_value(self.instance, value)
+#     @value.setter
+#     def value(self, value):
+#         return self.field.set_value(self.instance, value)
 
 
 class MonoMethod(MonoMember):
@@ -190,10 +191,7 @@ class MonoMethod(MonoMember):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        field = instance.bound_member.get(self.name, None)
-        if field is None:
-            field = instance.bound_member[self.name] = BoundMethod(instance, self)
-        return field
+        return BoundMethod(instance, self)
 
     def op_runtime_invoke(self, instance, signature, values):
         """方法调用的call_arg"""
@@ -205,7 +203,7 @@ class BoundMethod:
     __slots__ = ('instance', 'method')
 
     def __init__(self, instance, method):
-        self.instance = WeakBinder(instance)
+        self.instance = instance
         self.method = method
 
     def __call__(self, signature, values):
@@ -228,13 +226,13 @@ class MonoArray(MonoType):
             self.itemsize = itemsize
 
     def op_size(self):
-        return self.owner.call_arg_int(*self.owner.mono_array_length, self.mono_object)
+        return self.owner.call_arg_ptr(*self.owner.mono_array_length, self.mono_object)
 
     def op_addr_at(self, index):
         if index < 0:
             index += self.size
         itemsize = self.itemsize or self.owner.handler.ptr_size
-        return self.owner.call_arg_int(*self.owner.mono_array_addr_with_size,
+        return self.owner.call_arg_ptr(*self.owner.mono_array_addr_with_size,
             self.mono_object, itemsize, index)
 
     @property

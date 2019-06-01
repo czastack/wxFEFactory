@@ -11,8 +11,24 @@ from fefactory_api import ui
 # from . import models, datasets
 
 
+class Health(MonoClass):
+    CurrentHealthValue = MonoProperty()  # 生命
+    CurrentShieldValue = MonoProperty()  # 护盾
+    CurrentGuardCountValue = MonoProperty()  # 防御次数
+
+
+class Wallet(MonoClass):
+    """钱包"""
+    balance = MonoField()
+    maxBalance = MonoField()
+
+
 class Player(MonoClass):
+    need_vtable = True
     OverdriveProgress = MonoProperty(type=float)
+    health = MonoField(type=Health)
+    goldWallet = MonoStaticField(type=Wallet)
+    platWallet = MonoStaticField(type=Wallet)
 
 
 class GameController(MonoClass):
@@ -39,10 +55,10 @@ class Main(MonoHacktool):
 
     def onattach(self):
         super().onattach()
-        self.register_classes((GameController, Player, Cooldown, CooldownEntry))
+        self.register_classes((GameController, Health, Wallet, Player, Cooldown, CooldownEntry))
 
         controller = GameController(None, self)
-        self.activePlayers = controller.activePlayers.value
+        self.activePlayers = controller.activePlayers
         # print(hex(Cooldown.get_IsCharging.mono_compile))
 
     def render_main(self):
@@ -101,6 +117,7 @@ class Main(MonoHacktool):
         return self.activePlayers and self.activePlayers[0]
 
     def overdrive(self):
+        """大招槽满"""
         player = self.activePlayer
         if player:
-            player.OverdriveProgress.value = 100.0
+            player.OverdriveProgress = 100.0

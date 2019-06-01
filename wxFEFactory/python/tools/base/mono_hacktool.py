@@ -31,6 +31,7 @@ class MonoHacktool(NativeHacktool):
         # "mono_array_length": "P",  # (MonoArray *array)
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
+        "mono_object_unbox": "P",  # (MonoObject *obj)
     }
 
     def onattach(self):
@@ -46,11 +47,11 @@ class MonoHacktool(NativeHacktool):
         self.context_array = (NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
             if self.context_array_reuse else None)
 
-        self.call_arg_int = call_arg_int32 if self.is32process else call_arg_int64
+        self.call_arg_ptr = call_arg_int32 if self.is32process else call_arg_int64
 
         self.root_domain, self.image = self.native_call_n((
-            self.call_arg_int(*self.mono_get_root_domain),
-            self.call_arg_int(*self.mono_image_loaded, "Assembly-CSharp"),
+            self.call_arg_ptr(*self.mono_get_root_domain),
+            self.call_arg_ptr(*self.mono_image_loaded, "Assembly-CSharp"),
         ), self.context_array)
         # print(hex(self.image))
 
@@ -72,7 +73,7 @@ class MonoHacktool(NativeHacktool):
         :param items: ((namespace, name),)
         """
         return self.native_call_n((
-            self.call_arg_int(*self.mono_class_from_name, self.image, *item) for item in items
+            self.call_arg_ptr(*self.mono_class_from_name, self.image, *item) for item in items
         ), self.context_array)
 
     def get_global_mono_classes(self, names):
@@ -84,19 +85,19 @@ class MonoHacktool(NativeHacktool):
         :param items: ((class, name, param_count),)
         """
         return self.native_call_n((
-            self.call_arg_int(*self.mono_class_get_method_from_name, *item) for item in items
+            self.call_arg_ptr(*self.mono_class_get_method_from_name, *item) for item in items
         ), self.context_array)
 
     def get_mono_compile_methods(self, methods):
         """获取编译后的native method地址"""
         return self.mono_security_call(
-            (self.call_arg_int(*self.mono_compile_method, method) for method in methods)
+            (self.call_arg_ptr(*self.mono_compile_method, method) for method in methods)
         )
 
     def op_mono_runtime_invoke(self, method, object, signature, values):
         """返回调用mono函数的call_arg"""
         params = TempArrayPtr(signature, values)
-        return self.call_arg_int(*self.mono_runtime_invoke, method, object, params, 0)
+        return self.call_arg_ptr(*self.mono_runtime_invoke, method, object, params, 0)
 
     def register_classes(self, classes):
         """注册mono class列表
@@ -114,16 +115,16 @@ class MonoHacktool(NativeHacktool):
             klass.mono_class = next(result_iter)
 
             if klass.need_vtable:
-                call_args.append(self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass.mono_class))
+                call_args.append(self.call_arg_ptr(*self.mono_class_vtable, self.root_domain, klass.mono_class))
 
             for method in klass.methods:
-                call_args.append(self.call_arg_int(*self.mono_class_get_method_from_name,
+                call_args.append(self.call_arg_ptr(*self.mono_class_get_method_from_name,
                     klass.mono_class, method.name, method.param_count))
             for field in klass.fields:
-                call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
+                call_args.append(self.call_arg_ptr(*self.mono_class_get_field_from_name,
                     klass.mono_class, field.name))
             for prop in klass.properties:
-                call_args.append(self.call_arg_int(*self.mono_class_get_property_from_name,
+                call_args.append(self.call_arg_ptr(*self.mono_class_get_property_from_name,
                     klass.mono_class, prop.name))
 
         # 绑定函数、字段和属性
@@ -137,7 +138,7 @@ class MonoHacktool(NativeHacktool):
                 method.mono_method = next(result_iter)
                 # 获取编译的函数
                 if method.compile:
-                    compile_call_args.append(self.call_arg_int(*self.mono_compile_method, method.mono_method))
+                    compile_call_args.append(self.call_arg_ptr(*self.mono_compile_method, method.mono_method))
 
             for field in klass.fields:
                 field.mono_field = next(result_iter)
