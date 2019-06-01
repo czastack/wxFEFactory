@@ -626,6 +626,9 @@ class ArrayField(Cachable, Field):
             # itemkeys: 元素可缓存时(itemkeys不为None)，itemkeys是元素对应的key
             self.itemkeys = tuple("%s_%d" % (self.key, i) for i in range(self.length))
 
+    def __len__(self):
+        return self.length
+
     def create_cache(self, instance):
         return ArrayData(self, instance)
 

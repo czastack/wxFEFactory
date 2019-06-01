@@ -82,6 +82,7 @@ class BaseHackTool(NestedTool):
         return super().onClose(*args)
 
     def lazy_group(self, group, fn, depend=None):
+        """延迟加载的group"""
         groups = getattr(self, 'lazy_groups', None)
         if groups is None:
             self.lazy_groups = groups = {}
@@ -90,13 +91,15 @@ class BaseHackTool(NestedTool):
         return item
 
     def handle_lazy_group(self, root):
+        """处理延迟加载的group"""
         item = self.lazy_groups.get(root, None)
         if item:
             group, fn, depend = item
             if depend:
                 self.handle_lazy_group(depend)
             with group:
-                fn()
+                if not fn():
+                    return
             group.after_lazy()
             del self.lazy_groups[root]
 
@@ -125,9 +128,11 @@ class BaseHackTool(NestedTool):
             raise ValueError("ConfigGroup Group层级校验失败")
 
     def discard_config(self, _=None):
+        """放弃修改的配置"""
         self.config.cancel_change()
 
     def swith_keeptop(self, cb):
+        """切换置顶"""
         win = __main__.win if self.nested else self.win
         win.keeptop = cb.checked
 
@@ -173,6 +178,7 @@ class BaseHackTool(NestedTool):
         return value
 
     def set_cfn(self, btn, menu=None):
+        """绑定alt+c事件"""
         self.cfn = btn.click
 
     def render_top_button(self):

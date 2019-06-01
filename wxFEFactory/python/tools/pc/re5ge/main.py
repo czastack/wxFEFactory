@@ -82,7 +82,7 @@ class Main(NativeHacktool):
         NOP_7 = b'\x90' * 7
         NOP_8 = b'\x90' * 8
         NOP_9 = b'\x90' * 9
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('hp_keep', '生命不减', b'\x66\x29\x8E\x64\x13\x00\x00', 0x700000, 0x800000, NOP_7),
             AssemblyItem('ammo_keep', '弹药不减', b'\x2B\x44\x24\x08\x89\x41\x08', 0x800000, 0x900000, NOP_7),
             AssemblyItem('infinity_ammo', '无限弹药', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
@@ -93,8 +93,7 @@ class Main(NativeHacktool):
                 0x300000, 0x400000, NOP_8),
             AssemblyItem('combo_timer_keep', '连击时间不减', b'\xF3\x0F\x11\x84\x31\xA0\x06\x00\x00\x5F',
                 0x300000, 0x400000, NOP_9),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def get_ingame_item_dialog(self):
         """物品信息对话框"""

@@ -1,6 +1,6 @@
 from lib.extypes import WeakBinder
 from lib.hack.handlers import MemHandler
-from tools.base.native import TempPtr, TempArrayPtr
+from tools.base.native import TempArrayPtr
 from tools.base.native_hacktool import (
     NativeHacktool, NativeContextArray, call_arg, call_arg_int32, call_arg_int64
 )
@@ -20,19 +20,18 @@ class MonoHacktool(NativeHacktool):
         "mono_class_get_method_from_name": "Psi",  # (MonoClass *klass, const char *name, int param_count)
         "mono_class_vtable": "2P",  # (MonoDomain *domain, MonoClass *klass)
         "mono_class_get_field_from_name": "Ps",  # (MonoClass *klass, const char *name)
+        "mono_class_get_property_from_name": "Ps",  # (MonoClass *klass, const char *name)
         "mono_field_get_value": "3P",  # (MonoObject *obj, MonoClassField *field, void *value)
         "mono_field_set_value": "3P",  # idem
         "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
         "mono_field_static_set_value": "3P",  # idem
+        "mono_property_set_value": "4P",  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
+        "mono_property_get_value": "4P",  # idem
         "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
         # "mono_array_length": "P",  # (MonoArray *array)
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
     }
-
-    def __init__(self):
-        super().__init__()
-        self.caching_values = None
 
     def onattach(self):
         super().onattach()
@@ -94,38 +93,10 @@ class MonoHacktool(NativeHacktool):
             (self.call_arg_int(*self.mono_compile_method, method) for method in methods)
         )
 
-    def op_mono_field_get_value(self, object, field):
-        """返回获取字段值的call_arg"""
-        temp_ptr = TempPtr()
-        return call_arg(*self.mono_field_get_value, object, field, temp_ptr, ret_type=temp_ptr)
-
-    def op_mono_field_set_value(self, object, field, value):
-        """返回设置字段值的call_arg"""
-        temp_ptr = TempPtr(value)
-        return call_arg(*self.mono_field_get_value, object, field, temp_ptr, ret_type=temp_ptr)
-
-    def op_mono_field_static_get_value(self, vtable, field):
-        """返回获取静态字段值的call_arg"""
-        temp_ptr = TempPtr()
-        return call_arg(*self.mono_field_static_get_value, vtable, field, temp_ptr, ret_type=temp_ptr)
-
-    def op_mono_field_static_set_value(self, vtable, field, value):
-        """返回设置静态字段值的call_arg"""
-        temp_ptr = TempPtr(value)
-        return call_arg(*self.mono_field_static_set_value, vtable, field, temp_ptr, ret_type=temp_ptr)
-
     def op_mono_runtime_invoke(self, method, object, signature, values):
         """返回调用mono函数的call_arg"""
         params = TempArrayPtr(signature, values)
         return self.call_arg_int(*self.mono_runtime_invoke, method, object, params, 0)
-
-    # def op_mono_class_vtable(self, klass):
-    #     """返回获取类vtable的call_arg"""
-    #     return self.call_arg_int(*self.mono_class_vtable, self.root_domain, klass),
-
-    # def op_mono_class_get_field_from_name(self, klass, name):
-    #     """返回获取类属性的call_arg"""
-    #     return self.call_arg_int(*self.mono_class_get_field_from_name, klass, name)
 
     def register_classes(self, classes):
         """注册mono class列表
@@ -151,9 +122,12 @@ class MonoHacktool(NativeHacktool):
             for field in klass.fields:
                 call_args.append(self.call_arg_int(*self.mono_class_get_field_from_name,
                     klass.mono_class, field.name))
+            for prop in klass.properties:
+                call_args.append(self.call_arg_int(*self.mono_class_get_property_from_name,
+                    klass.mono_class, prop.name))
 
-        # 绑定字段和函数
-        result_iter = iter(self.native_call_n(call_args, self.context_array))
+        # 绑定函数、字段和属性
+        result_iter = iter(self.native_call_n_reuse(call_args, self.context_array))
         for klass in classes:
             if klass.need_vtable:
                 klass.mono_vtable = next(result_iter)
@@ -167,6 +141,9 @@ class MonoHacktool(NativeHacktool):
 
             for field in klass.fields:
                 field.mono_field = next(result_iter)
+
+            for prop in klass.properties:
+                prop.mono_field = next(result_iter)
 
         # 绑定编译的函数
         if compile_call_args:

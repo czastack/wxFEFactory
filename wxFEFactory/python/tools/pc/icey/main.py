@@ -35,7 +35,7 @@ class Main(MonoHacktool):
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_assembly_functions(self):
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('unlimited_health', '无限生命', b'\x89\x47\x20\x48\x8B\x7D\xF8',
                 self.set_currentHP_native, self.set_currentHP_native + 0x100,
                 b'', b'\x8B\x47\x1C\x89\x47\x20\x48\x8B\x7D\xF8',
@@ -48,5 +48,4 @@ class Main(MonoHacktool):
                 self.UpdateCharInfo_native + 0x200, self.UpdateCharInfo_native + 0x400,
                 b'', b'\xC7\x41\x10\x9F\x86\x01\x00\x48\x63\x49\x10\x39\xC8',
                 replace_len=6, inserted=True, find_base=False),
-        )
-        super().render_assembly_functions(functions)
+        ))

@@ -2,6 +2,7 @@ from lib.hack import utils
 
 
 class AssemblyGroup:
+    """节点组合"""
     def __init__(self, *nodes):
         self.nodes = nodes
 
@@ -19,8 +20,9 @@ class AssemblyGroup:
 
 
 class AssemblyNode:
+    """汇编节点"""
     @staticmethod
-    def offset(target, addr, size):
+    def offsetof(target, addr, size):
         """计算偏移
         :param size: 指令长度
         """
@@ -29,6 +31,7 @@ class AssemblyNode:
             return utils.u32(diff).to_bytes(4, 'little')
 
     def get_target(self, owner):
+        """获取目标符号(变量地址)"""
         target = self.target
         if isinstance(self.target, str):
             target = owner.get_variable(target).addr
@@ -52,6 +55,7 @@ class Variable(AssemblyNode):
 
 
 class Cmp(AssemblyNode):
+    """比较节点"""
     def __init__(self, target, value):
         if value > 0xFF:
             raise ValueError("暂时只支持8位立即数的值")
@@ -60,7 +64,7 @@ class Cmp(AssemblyNode):
 
     def generate(self, owner, context):
         target = self.get_target(owner)
-        offset = self.offset(target, context.addr, 7)
+        offset = self.offsetof(target, context.addr, 7)
         if offset:
             return b'\x83\x3D' + offset + self.value.to_bytes(1, 'little')
         else:
@@ -70,12 +74,13 @@ class Cmp(AssemblyNode):
 
 
 class Dec(AssemblyNode):
+    """相减节点"""
     def __init__(self, target):
         self.target = target
 
     def generate(self, owner, context):
         target = self.get_target(owner)
-        offset = self.offset(target, context.addr, 6)
+        offset = self.offsetof(target, context.addr, 6)
         if offset:
             return b'\xFF\x0D' + offset
         else:
@@ -85,6 +90,7 @@ class Dec(AssemblyNode):
 
 
 class IfInt64(AssemblyNode):
+    """条件分支节点"""
     def __init__(self, target, true_node, false_node):
         self.target = target
         self.true_node = true_node
@@ -95,17 +101,31 @@ class IfInt64(AssemblyNode):
         return (self.true_node if target > 0xFFFFFFFF else self.false_node).generate(owner, context)
 
 
+class MemRead(AssemblyNode):
+    """从内存读取值"""
+    def __init__(self, addr=0, offset=0, size=4):
+        self.addr = addr
+        self.offset = offset
+        self.size = size
+
+    def generate(self, owner, context):
+        addr = (self.addr or context.original_addr) + self.offset
+        return owner.handler.read(addr, bytes, self.size)
+
+
 class Offset(AssemblyNode):
+    """计算偏移地址"""
     def __init__(self, target, size=4):
         self.target = target
         self.size = size
 
     def generate(self, owner, context):
         target = self.get_target(owner)
-        return self.offset(target, context.addr, self.size)
+        return self.offsetof(target, context.addr, self.size)
 
 
 class Origin(AssemblyNode):
+    """查找的原始值"""
     def generate(self, owner, context):
         return context.original
 

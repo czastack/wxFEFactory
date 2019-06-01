@@ -48,7 +48,7 @@ class Main(AssemblyHacktool):
             ModelInput("jump_height", "跳跃高度")
 
     def render_assembly_functions(self):
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
                 0x137500, 0x137800, b'',
                 assembly_code.AssemblyGroup(
@@ -127,8 +127,7 @@ class Main(AssemblyHacktool):
             AssemblySwitch('s_add_def', '增加防御'),
             AssemblySwitch('s_add_critical_buff', '增强暴击伤害加成'),
             AssemblySwitch('s_add_critical', '增强暴击率'),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def _global(self):
         self._global_ins.addr = self.get_variable_value('base1')

@@ -164,7 +164,7 @@ class Main(AssemblyHacktool):
             type=float) for _id, key, label in self._drop_rates_table]
 
     def render_assembly_functions(self):
-        functions = (
+        super().render_assembly_functions((
             # AssemblyItem('accuracy_keep', '精准度不减', b'\xF3\x0F\x10\x40\x68\xF3\x0F\x11\x44\x24\x08',
             #     0x008D0000, 0x008F0000, b'\x0F\x57\xC0\x90\x90'),
             AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x10\x81\x94\x02\x00\x00\x0F\x2F',
@@ -179,8 +179,7 @@ class Main(AssemblyHacktool):
                 0x01070000, 0x01080000, b'',
                 AssemblyGroup(b'\x89\x35', assembly_code.Variable('selected_item_addr'), b'\x8B\x86\xCC\x03\x00\x00'),
                 inserted=True, replace_len=6, args=('selected_item_addr',)),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def render_hotkeys(self):
         ui.Text("H: 回复护甲+血量\n"

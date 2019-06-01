@@ -26,7 +26,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
 
     def render_assembly_functions(self):
-        functions = (
+        super().render_assembly_functions((
             AssemblyItems('无限生命',
                 AssemblyItem('health_inf', None, b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
                     0x3A00000, 0x3B00000, b'',
@@ -133,8 +133,7 @@ class Main(AssemblyHacktool):
                 b'\xC7\x80\x5C\x03\x00\x00\x00\x00\x00\x00\xC7\x80\x60\x03\x00\x00\x00\x00\x00\x00'
                     b'\x44\x39\xA8\x60\x03\x00\x00',
                 inserted=True),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def get_hotkeys(self):
         this = self.weak

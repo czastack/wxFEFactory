@@ -198,7 +198,7 @@ class Main(AssemblyHacktool):
             type=float) for _id, key, label in self._drop_rates_table]
 
     def render_assembly_functions(self):
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('ammo_inf', '子弹不减+精准不减', b'\xF3\x0F\x58\x45\x08\x51',
                 0x005C0000, 0x005D0000, b'',
                 AssemblyGroup(
@@ -264,8 +264,7 @@ class Main(AssemblyHacktool):
                 inserted=True, replace_len=6),
             AssemblyItem('no_backpack_pickup_limit', '解除背包限制', b'\x8B\x81\x00\x02\x00\x00\xC3\xCC\xCC',
                 0x00790000, 0x007A0000, b'\xB8\x00\x00\x00\x00\x90', replace_len=6),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def render_assembly_variable(self):
         ModelInput('ammo_upgrade_level', '弹药上限等级')

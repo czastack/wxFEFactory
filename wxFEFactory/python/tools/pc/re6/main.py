@@ -66,7 +66,7 @@ class Main(NativeHacktool):
         # NOP_7 = b'\x90' * 7
         NOP_8 = b'\x90' * 8
         # NOP_9 = b'\x90' * 9
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
                 b'\x66\x4A\x90\x90\x90'),
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
@@ -81,8 +81,7 @@ class Main(NativeHacktool):
             AssemblyItem('skill_points', '技能点数', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00',
                 0x580000, 0x640000, b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
                 inserted=True, args=('skill_points_base',)),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     def render_functions(self):
         super().render_functions(('unlock_guns', 'give_rocket_launcher'))

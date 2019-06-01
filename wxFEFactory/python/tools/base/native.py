@@ -175,7 +175,7 @@ class NativeContext(Model):
         self.handler.write(addr, data)
         return addr
 
-    def put_temp_simple_array_ptr(self, signature, addr):
+    def put_temp_simple_array_ptr(self, signature, addr, arg_count=None):
         """存放临时简单指针数组
         :return: 指针数组地址"""
         addr_list = []
@@ -231,6 +231,23 @@ class NativeContext(Model):
 
     def __exit__(self, *args):
         pass
+
+    @staticmethod
+    def type_signature(type, size=4):
+        """type转参数签名"""
+        if type is int:
+            if size is 1:
+                return 'B'
+            elif size is 2:
+                return 'H'
+            elif size is 4:
+                return 'I'
+            elif size is 8:
+                return 'Q'
+        elif type is float:
+            if size is 8:
+                return 'd'
+            return 'f'
 
 
 class NativeContext64(NativeContext):
@@ -327,6 +344,9 @@ class NativeContextArray:
 
     def __del__(self):
         self.release()
+
+    def __len__(self):
+        return self.size
 
     def release(self):
         if self.addr:

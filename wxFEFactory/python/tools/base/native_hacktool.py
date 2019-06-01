@@ -112,7 +112,10 @@ class NativeHacktool(AssemblyHacktool):
         if not extypes.is_list_tuple(call_list):
             call_list = tuple(call_list)
         context_reuse = context_array is not None
-        if not context_reuse:
+        if context_reuse:
+            if context_array.size < len(call_list):
+                raise ValueError('复用的context_array长度不足')
+        else:
             context_array = NativeContextArray(self.handler, len(call_list), self.NativeContext)
         for i, item in enumerate(call_list):
             context = context_array[i]
@@ -141,6 +144,18 @@ class NativeHacktool(AssemblyHacktool):
                 result = None
             results.append(result)
         return results
+
+    def native_call_n_reuse(self, call_list, context_array):
+        """一次调用多个函数(复用)"""
+        len_call_list = len(call_list)
+        len_context_array = len(context_array)
+        if len_call_list <= len_context_array:
+            return self.native_call_n(call_list, context_array)
+        else:
+            results = []
+            for i in range(0, len_call_list, len_context_array):
+                results.extend(self.native_call_n(call_list[i:i + len_context_array], context_array))
+            return results
 
     def get_cached_address(self, key, original, find_start, find_end, find_base=True):
         """缓存的函数"""

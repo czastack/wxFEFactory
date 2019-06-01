@@ -37,7 +37,7 @@ class Main(AssemblyHacktool):
     def render_assembly_functions(self):
         server_base = self.server_base
         NOP_6 = b'\x90' * 6
-        functions = (
+        super().render_assembly_functions((
             AssemblyItem('invincible', '血量不减', b'\x89\xBE\x9C\x00\x00\x00\x5F\x5E\x5D\xB8',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
             AssemblyItem('suit_keep', '护甲不减', b'\x2B\xE8\x39\xAE\xB4\x0B\x00\x00',
@@ -60,8 +60,7 @@ class Main(AssemblyHacktool):
                 0x173200, 0x173300, NOP_6, find_base=server_base),
             AssemblyItem('no_reload_crossbow', '十字弩不用换弹', b'\x89\x9E\xC4\x04\x00\x00\x8D\x54\x24\x24',
                 0x15E000, 0x160000, NOP_6, find_base=server_base),
-        )
-        super().render_assembly_functions(functions)
+        ))
 
     # def get_hotkeys(self):
     #     this = self.weak
