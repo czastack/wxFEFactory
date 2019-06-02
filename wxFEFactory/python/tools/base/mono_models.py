@@ -52,7 +52,7 @@ class MonoMember:
 class MonoTyping:
     """带有类型的数据"""
     def __init__(self, type, size):
-        if issubclass(type, MonoType):
+        if type is None or issubclass(type, MonoType):
             size = 0
         self.type = type
         self.size = size
@@ -60,7 +60,7 @@ class MonoTyping:
     @property
     def real_type(self):
         type = self.type
-        if issubclass(type, MonoType):
+        if type and issubclass(type, MonoType):
             type = int
         return type
 
@@ -165,8 +165,8 @@ class MonoProperty(MonoMember, MonoTyping):
         """用于获取值的call_arg"""
         if not self.mono_property:
             raise ValueError('mono_property未初始化')
-        return call_arg(*instance.owner.mono_property_get_value,
-            self.mono_property, instance.mono_object, 0, 0, ret_type=self.real_type)
+        return instance.owner.call_arg_ptr(*instance.owner.mono_property_get_value,
+            self.mono_property, instance.mono_object, 0, 0)
 
     def op_setter(self, instance, value):
         """用于设置值的call_arg"""
@@ -176,17 +176,15 @@ class MonoProperty(MonoMember, MonoTyping):
         return call_arg(*instance.owner.mono_property_set_value,
             self.mono_property, instance.mono_object, params, 0)
 
-    def get_addr(self, instance):
-        """获取值要先解包，得到地址"""
-        owner = instance.owner
-        result, = owner.mono_security_call((self.op_getter(instance),))
-        result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
-        return result
-
     def get_value(self, instance):
         """获取值"""
-        addr = self.get_addr(instance)
-        result = instance.owner.handler.read(addr, self.real_type, self.size)
+        owner = instance.owner
+        result, = owner.mono_security_call((self.op_getter(instance),))
+        if result and not issubclass(self.type, MonoType):
+            # 获取值要先解包，得到地址
+            result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
+            # TODO 判断类型
+            result = owner.handler.read(result, self.real_type, self.size)
         return self.case_value(result, instance)
 
     def set_value(self, instance, value):
@@ -214,10 +212,11 @@ class MonoProperty(MonoMember, MonoTyping):
 #         return self.field.set_value(self.instance, value)
 
 
-class MonoMethod(MonoMember):
+class MonoMethod(MonoMember, MonoTyping):
     """mono方法"""
-    def __init__(self, name=None, param_count=0, signature=None, compile=False):
-        super().__init__(name)
+    def __init__(self, name=None, param_count=0, signature=None, compile=False, type=None, size=4):
+        MonoMember.__init__(self, name)
+        MonoTyping.__init__(self, type, size)
         self.param_count = param_count
         self.signature = signature
         self.compile = compile
@@ -233,7 +232,22 @@ class MonoMethod(MonoMember):
         """方法调用的call_arg"""
         if signature is None:
             signature = self.signature
-        return instance.owner.op_mono_runtime_invoke(self.mono_method, instance.mono_object, signature, values)
+        params = TempArrayPtr(signature, values)
+        return instance.owner.call_arg_ptr(*instance.owner.mono_runtime_invoke,
+            self.mono_method, instance.mono_object, params, 0)
+
+    def call(self, instance, values):
+        """直接调用"""
+        owner = instance.owner
+        result, = owner.mono_security_call((self.op_runtime_invoke(instance, values=values),))
+        if self.type:
+            if result and not issubclass(self.type, MonoType):
+                print(hex(result))
+                # 获取值要先解包，得到地址
+                result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
+                # TODO 判断类型
+                result = owner.handler.read(result, self.real_type, self.size)
+            return self.case_value(result, instance)
 
 
 class BoundMethod:
@@ -244,10 +258,9 @@ class BoundMethod:
         self.instance = instance
         self.method = method
 
-    def __call__(self, signature=None, values=()):
+    def __call__(self, *values):
         """方法调用"""
-        return self.instance.owner.native_call_1(
-            self.field.op_runtime_invoke(self.instance, signature, values))
+        return self.method.call(self.instance, values)
 
 
 class MonoArray(MonoType):

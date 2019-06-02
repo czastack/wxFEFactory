@@ -12,11 +12,21 @@ from fefactory_api import ui
 # from . import models, datasets
 
 
+class NumVarStat(MonoClass):
+    """数值"""
+    CurrentValue = MonoProperty(type=float)  # 当前值
+    ModifiedValue = MonoProperty(type=float)  # 最大值
+
+
 class Health(MonoClass):
     # 生命值相关
     CurrentHealthValue = MonoProperty()  # 生命
     CurrentShieldValue = MonoProperty()  # 护盾
     CurrentGuardCountValue = MonoProperty()  # 防御次数
+
+    healthStat = MonoField(type=NumVarStat)
+    shieldStat = MonoField(type=NumVarStat)
+    guardCountStat = MonoField(type=NumVarStat)
 
 
 class Wallet(MonoClass):
@@ -36,7 +46,13 @@ class Player(MonoClass):
     platWallet = MonoStaticField(type=Wallet)
 
     # void AssignSkillSlot(int skillSlotNum, string skillID, bool setSignature = false, bool signatureStatus = false)
-    AssignSkillSlot = MonoMethod(param_count=4, signature='is2B')
+    AssignSkillSlot = MonoMethod(param_count=4, signature='iP2B')
+    # Player.SkillState GetSkill(string ID)
+    GetSkill = MonoMethod(param_count=1, signature='P', type=int, size=0)
+    # void PickUpSkill(string givenID, bool isSignature = false, bool isEmpowered = false)
+    PickUpSkill = MonoMethod(param_count=3, signature='P2B')
+    # void GiveDesignatedItem(string givenID = "")
+    GiveDesignatedItem = MonoMethod(param_count=1, signature='P')
 
 
 class GameController(MonoClass):
@@ -65,7 +81,7 @@ class Main(MonoHacktool):
 
     def onattach(self):
         super().onattach()
-        self.register_classes((GameController, Health, Wallet, Player, Cooldown, CooldownEntry))
+        self.register_classes((NumVarStat, Health, Wallet, Player, GameController, Cooldown, CooldownEntry))
 
         controller = GameController(None, self)
         self.activePlayers = controller.activePlayers
@@ -80,10 +96,18 @@ class Main(MonoHacktool):
     def render_global(self):
         ui.Hr()
         ui.Text('游戏版本: v1.1')
-        ProxyInput("CurrentHealthValue", "生命", *Descriptor(lambda: self.activePlayer.health, "CurrentHealthValue"))
-        ProxyInput("CurrentShieldValue", "护盾", *Descriptor(lambda: self.activePlayer.health, "CurrentShieldValue"))
+        ProxyInput("CurrentHealthValue", "生命",
+            *Descriptor(lambda: self.activePlayer.health, "CurrentHealthValue"))
+        ProxyInput("CurrentHealthValue", "生命上限",
+            *Descriptor(lambda: self.activePlayer.health.healthStat, "ModifiedValue"))
+        ProxyInput("CurrentShieldValue", "护盾",
+            *Descriptor(lambda: self.activePlayer.health, "CurrentShieldValue"))
+        ProxyInput("CurrentShieldValue", "护盾上限",
+            *Descriptor(lambda: self.activePlayer.health.shieldStat, "ModifiedValue"))
         ProxyInput("CurrentGuardCountValue", "防御次数",
             *Descriptor(lambda: self.activePlayer.health, "CurrentGuardCountValue"))
+        ProxyInput("CurrentGuardCountValue", "防御次数上限",
+            *Descriptor(lambda: self.activePlayer.health.guardCountStat, "ModifiedValue"))
         ProxyInput("balance", "宝石", *Descriptor(lambda: self.activePlayer.platWallet, "balance"))
         ProxyInput("balance", "金币", *Descriptor(lambda: self.activePlayer.goldWallet, "balance"))
 
@@ -145,10 +169,25 @@ class Main(MonoHacktool):
 
     def recovery(self):
         """恢复健康"""
-        pass
+        player = self.activePlayer
+        if player:
+            health = player.health
+            health.CurrentHealthValue = health.healthStat.ModifiedValue
 
     def overdrive(self):
         """大招槽满"""
         player = self.activePlayer
         if player:
             player.OverdriveProgress = 100.0
+
+    def GetSkill(self, skill):
+        """获取技能"""
+        return self.activePlayer.GetSkill(self.call_mono_string_new(skill))
+
+    def PickUpSkill(self, skill):
+        """给予技能"""
+        self.activePlayer.PickUpSkill(self.call_mono_string_new(skill), True, True)
+
+    def GiveItem(self, item):
+        """给予物品"""
+        self.activePlayer.GiveDesignatedItem(self.call_mono_string_new(item))

@@ -32,6 +32,7 @@ class MonoHacktool(NativeHacktool):
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
         "mono_object_unbox": "P",  # (MonoObject *obj)
+        "mono_string_new": "Ps",  # (MonoDomain *domain, const char *text)
     }
 
     def onattach(self):
@@ -94,10 +95,14 @@ class MonoHacktool(NativeHacktool):
             (self.call_arg_ptr(*self.mono_compile_method, method) for method in methods)
         )
 
-    def op_mono_runtime_invoke(self, method, object, signature, values):
-        """返回调用mono函数的call_arg"""
-        params = TempArrayPtr(signature, values)
-        return self.call_arg_ptr(*self.mono_runtime_invoke, method, object, params, 0)
+    # def op_mono_runtime_invoke(self, method, object, signature, values):
+    #     """返回调用mono函数的call_arg"""
+    #     params = TempArrayPtr(signature, values)
+    #     return self.call_arg_ptr(*self.mono_runtime_invoke, method, object, params, 0)
+
+    def call_mono_string_new(self, text):
+        """创建mono string"""
+        return self.native_call_1(self.call_arg_ptr(*self.mono_string_new, self.root_domain, text))
 
     def register_classes(self, classes):
         """注册mono class列表
