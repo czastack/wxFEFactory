@@ -479,18 +479,19 @@ class ModelInput(ModelWidget, BaseInput):
 
 
 class ProxyInput(BaseInput):
-    def __init__(self, name, label, read, write):
+    """代理输入框"""
+    def __init__(self, name, label, getter, setter):
         super().__init__(name, label, None, None)
-        self.do_read = read
-        self.do_write = write
+        self.getter = getter
+        self.setter = setter
 
     @property
     def mem_value(self):
-        return self.do_read()
+        return self.getter()
 
     @mem_value.setter
     def mem_value(self, value):
-        self.do_write(value)
+        self.setter(value)
 
 
 class SimpleCheckBox(Widget):

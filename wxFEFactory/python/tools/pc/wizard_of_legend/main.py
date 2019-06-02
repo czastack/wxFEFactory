@@ -1,7 +1,8 @@
 from lib.hack.forms import (
-    Group, StaticGroup
+    Group, StaticGroup, ProxyInput
 )
 from lib.hack.handlers import MemHandler
+from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
 from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType
 from tools.base.mono_hacktool import MonoHacktool, call_arg
@@ -12,6 +13,7 @@ from fefactory_api import ui
 
 
 class Health(MonoClass):
+    # 生命值相关
     CurrentHealthValue = MonoProperty()  # 生命
     CurrentShieldValue = MonoProperty()  # 护盾
     CurrentGuardCountValue = MonoProperty()  # 防御次数
@@ -19,11 +21,14 @@ class Health(MonoClass):
 
 class Wallet(MonoClass):
     """钱包"""
-    balance = MonoField()
-    maxBalance = MonoField()
+    balance = MonoField(label="余额")
+    maxBalance = MonoField(label="最大值")
+    # 存入
+    Deposit = MonoMethod(param_count=1, compile=True)
 
 
 class Player(MonoClass):
+    # 玩家
     need_vtable = True
     OverdriveProgress = MonoProperty(type=float)
     health = MonoField(type=Health)
@@ -35,11 +40,13 @@ class Player(MonoClass):
 
 
 class GameController(MonoClass):
+    # 获取玩家实例
     need_vtable = True
     activePlayers = MonoStaticField(type=MonoArrayT(Player))
 
 
 class Cooldown(MonoClass):
+    # 技能冷却相关
     get_ChargesMissing = MonoMethod(compile=True)
     get_IsCharging = MonoMethod(compile=True)
 
@@ -65,9 +72,20 @@ class Main(MonoHacktool):
         # print(hex(Cooldown.get_IsCharging.mono_compile))
 
     def render_main(self):
-        Group("player", "全局", None)
+        with Group("player", "全局", None):
+            self.render_global()
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
+
+    def render_global(self):
+        ui.Hr()
+        ui.Text('游戏版本: v1.1')
+        ProxyInput("CurrentHealthValue", "生命", *Descriptor(lambda: self.activePlayer.health, "CurrentHealthValue"))
+        ProxyInput("CurrentShieldValue", "护盾", *Descriptor(lambda: self.activePlayer.health, "CurrentShieldValue"))
+        ProxyInput("CurrentGuardCountValue", "防御次数",
+            *Descriptor(lambda: self.activePlayer.health, "CurrentGuardCountValue"))
+        ProxyInput("balance", "宝石", *Descriptor(lambda: self.activePlayer.platWallet, "balance"))
+        ProxyInput("balance", "金币", *Descriptor(lambda: self.activePlayer.goldWallet, "balance"))
 
     def render_assembly_functions(self):
         if not Cooldown.get_ChargesMissing.mono_compile:

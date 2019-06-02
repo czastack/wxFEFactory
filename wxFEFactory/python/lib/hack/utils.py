@@ -78,6 +78,23 @@ class OptionProvider(BaseItemProvider):
         self._choices, self._values = split_label_value(self.datas)
 
 
+class Descriptor:
+    """获取getter, setter"""
+    def __init__(self, instance_getter, attr):
+        self.instance_getter = instance_getter
+        self.attr = attr
+
+    def getter(self):
+        return getattr(self.instance_getter(), self.attr)
+
+    def setter(self, value):
+        setattr(self.instance_getter(), self.attr, value)
+
+    def __iter__(self):
+        yield self.getter
+        yield self.setter
+
+
 def loword(n):
     """低字"""
     return n & 0xFFFF

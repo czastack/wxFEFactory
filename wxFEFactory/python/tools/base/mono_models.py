@@ -35,6 +35,10 @@ class MonoClass(MonoType):
                 elif isinstance(value, MonoMethod):
                     cls.methods.append(value)
 
+    def field(self, name):
+        # 兼容lib.hack.models
+        return getattr(self.__class__, name)
+
 
 class MonoMember:
     def __init__(self, name=None):
@@ -72,9 +76,10 @@ class MonoTyping:
 
 class MonoField(MonoMember, MonoTyping):
     """字段"""
-    def __init__(self, name=None, type=int, size=4):
+    def __init__(self, name=None, type=int, size=4, label=None):
         MonoMember.__init__(self, name)
         MonoTyping.__init__(self, type, size)
+        self.label = label
         self.mono_field = None
 
     def __get__(self, instance, owner=None):
@@ -112,8 +117,9 @@ class MonoField(MonoMember, MonoTyping):
 
     def set_value(self, instance, value):
         """设置值"""
-        # if self.type and not isinstance(value, self.type):
-        #     value = self.type(value)
+        type = self.real_type
+        if type and not isinstance(value, type):
+            value = type(value)
         instance.owner.native_call_1(self.op_setter(instance, value))
 
 
@@ -137,9 +143,10 @@ class MonoStaticField(MonoField):
 
 class MonoProperty(MonoMember, MonoTyping):
     """属性"""
-    def __init__(self, name=None, type=int, size=4):
+    def __init__(self, name=None, type=int, size=4, label=None):
         MonoMember.__init__(self, name)
         MonoTyping.__init__(self, type, size)
+        self.label = label
         self.mono_property = None
 
     def __get__(self, instance, owner=None):
@@ -166,16 +173,24 @@ class MonoProperty(MonoMember, MonoTyping):
         return call_arg(*instance.owner.mono_property_set_value,
             self.mono_property, instance.mono_object, params, 0)
 
-    def get_value(self, instance):
-        """获取值"""
+    def get_addr(self, instance):
+        """获取值要先解包，得到地址"""
         owner = instance.owner
         result, = owner.mono_security_call((self.op_getter(instance),))
         result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
-        result = owner.handler.read(result, self.real_type, self.size)
+        return result
+
+    def get_value(self, instance):
+        """获取值"""
+        addr = self.get_addr(instance)
+        result = owner.handler.read(addr, self.real_type, self.size)
         return self.prepare_value(result, instance)
 
     def set_value(self, instance, value):
         """设置值"""
+        type = self.real_type
+        if type and not isinstance(value, type):
+            value = type(value)
         instance.owner.mono_security_call((self.op_setter(instance, value),))
 
 
