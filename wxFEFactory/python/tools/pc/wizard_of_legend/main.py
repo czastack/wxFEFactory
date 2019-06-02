@@ -30,6 +30,9 @@ class Player(MonoClass):
     goldWallet = MonoStaticField(type=Wallet)
     platWallet = MonoStaticField(type=Wallet)
 
+    # void AssignSkillSlot(int skillSlotNum, string skillID, bool setSignature = false, bool signatureStatus = false)
+    AssignSkillSlot = MonoMethod(param_count=4, signature='is2B')
+
 
 class GameController(MonoClass):
     need_vtable = True
@@ -64,6 +67,7 @@ class Main(MonoHacktool):
     def render_main(self):
         Group("player", "全局", None)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_assembly_functions(self):
         if not Cooldown.get_ChargesMissing.mono_compile:
@@ -107,14 +111,23 @@ class Main(MonoHacktool):
                 )),
         ))
 
+    def render_hotkeys(self):
+        ui.Text("Capslock: 大招槽满\n"
+            "alt+h: 血量满\n")
+
     def get_hotkeys(self):
         return (
             (0, VK.CAPSLOCK, self.overdrive),
+            (0, VK.H, self.recovery),
         )
 
     @property
     def activePlayer(self):
         return self.activePlayers and self.activePlayers[0]
+
+    def recovery(self):
+        """恢复健康"""
+        pass
 
     def overdrive(self):
         """大招槽满"""

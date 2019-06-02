@@ -144,7 +144,7 @@ class MonoHacktool(NativeHacktool):
                 field.mono_field = next(result_iter)
 
             for prop in klass.properties:
-                prop.mono_field = next(result_iter)
+                prop.mono_property = next(result_iter)
 
         # 绑定编译的函数
         if compile_call_args:

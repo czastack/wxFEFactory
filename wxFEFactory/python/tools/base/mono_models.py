@@ -28,10 +28,10 @@ class MonoClass(MonoType):
             cls.properties = []
 
             for value in cls.__dict__.values():
-                if isinstance(value, MonoProperty):
-                    cls.properties.append(value)
-                elif isinstance(value, MonoField):
+                if isinstance(value, MonoField):
                     cls.fields.append(value)
+                elif isinstance(value, MonoProperty):
+                    cls.properties.append(value)
                 elif isinstance(value, MonoMethod):
                     cls.methods.append(value)
 
@@ -45,14 +45,36 @@ class MonoMember:
             self.name = name
 
 
-class MonoField(MonoMember):
-    """字段"""
-    def __init__(self, name=None, type=int, size=4):
-        super().__init__(name)
+class MonoTyping:
+    """带有类型的数据"""
+    def __init__(self, type, size):
         if issubclass(type, MonoType):
             size = 0
         self.type = type
         self.size = size
+
+    @property
+    def real_type(self):
+        type = self.type
+        if issubclass(type, MonoType):
+            type = int
+        return type
+
+    def prepare_value(self, result, instance):
+        # 转为类实例
+        if self.type is not int and callable(self.type):
+            if issubclass(self.type, MonoType):
+                result = self.type(result, instance.owner)
+            else:
+                result = self.type(result)
+        return result
+
+
+class MonoField(MonoMember, MonoTyping):
+    """字段"""
+    def __init__(self, name=None, type=int, size=4):
+        MonoMember.__init__(self, name)
+        MonoTyping.__init__(self, type, size)
         self.mono_field = None
 
     def __get__(self, instance, owner=None):
@@ -63,13 +85,6 @@ class MonoField(MonoMember):
 
     def __set__(self, instance, value):
         self.set_value(instance, value)
-
-    @property
-    def real_type(self):
-        type = self.type
-        if issubclass(type, MonoType):
-            type = int
-        return type
 
     def temp_ptr(self, value=None):
         """临时地址"""
@@ -101,15 +116,6 @@ class MonoField(MonoMember):
         #     value = self.type(value)
         instance.owner.native_call_1(self.op_setter(instance, value))
 
-    def prepare_value(self, result, instance):
-        # 转为类实例
-        if self.type is not int and callable(self.type):
-            if issubclass(self.type, MonoType):
-                result = self.type(result, instance.owner)
-            else:
-                result = self.type(result)
-        return result
-
 
 class MonoStaticField(MonoField):
     """静态字段"""
@@ -129,22 +135,36 @@ class MonoStaticField(MonoField):
         return call_arg(*instance.owner.mono_field_static_set_value, instance.mono_vtable, self.mono_field, temp_ptr)
 
 
-class MonoProperty(MonoField):
+class MonoProperty(MonoMember, MonoTyping):
     """属性"""
+    def __init__(self, name=None, type=int, size=4):
+        MonoMember.__init__(self, name)
+        MonoTyping.__init__(self, type, size)
+        self.mono_property = None
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        # return BoundField(instance, self)
+        return self.get_value(instance)
+
+    def __set__(self, instance, value):
+        self.set_value(instance, value)
+
     def op_getter(self, instance):
         """用于获取值的call_arg"""
-        if not self.mono_field:
+        if not self.mono_property:
             raise ValueError('mono_property未初始化')
         return call_arg(*instance.owner.mono_property_get_value,
-            self.mono_field, instance.mono_object, 0, 0, ret_type=self.real_type)
+            self.mono_property, instance.mono_object, 0, 0, ret_type=self.real_type)
 
     def op_setter(self, instance, value):
         """用于设置值的call_arg"""
-        if not self.mono_field:
+        if not self.mono_property:
             raise ValueError('mono_property未初始化')
         params = TempArrayPtr(NativeContext.type_signature(self.real_type, self.size), (value,))
         return call_arg(*instance.owner.mono_property_set_value,
-            self.mono_field, instance.mono_object, params, 0)
+            self.mono_property, instance.mono_object, params, 0)
 
     def get_value(self, instance):
         """获取值"""
@@ -181,9 +201,10 @@ class MonoProperty(MonoField):
 
 class MonoMethod(MonoMember):
     """mono方法"""
-    def __init__(self, name=None, param_count=0, compile=False):
+    def __init__(self, name=None, param_count=0, signature=None, compile=False):
         super().__init__(name)
         self.param_count = param_count
+        self.signature = signature
         self.compile = compile
         self.mono_method = None
         self.mono_compile = None
@@ -193,8 +214,10 @@ class MonoMethod(MonoMember):
             return self
         return BoundMethod(instance, self)
 
-    def op_runtime_invoke(self, instance, signature, values):
+    def op_runtime_invoke(self, instance, signature=None, values=()):
         """方法调用的call_arg"""
+        if signature is None:
+            signature = self.signature
         return instance.owner.op_mono_runtime_invoke(self.mono_method, instance.mono_object, signature, values)
 
 
@@ -206,7 +229,7 @@ class BoundMethod:
         self.instance = instance
         self.method = method
 
-    def __call__(self, signature, values):
+    def __call__(self, signature=None, values=()):
         """方法调用"""
         return self.instance.owner.native_call_1(
             self.field.op_runtime_invoke(self.instance, signature, values))
