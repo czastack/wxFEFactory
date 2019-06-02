@@ -232,7 +232,7 @@ class MonoMethod(MonoMember, MonoTyping):
         """方法调用的call_arg"""
         if signature is None:
             signature = self.signature
-        params = TempArrayPtr(signature, values)
+        params = TempArrayPtr(signature, values) if self.param_count else 0
         return instance.owner.call_arg_ptr(*instance.owner.mono_runtime_invoke,
             self.mono_method, instance.mono_object, params, 0)
 

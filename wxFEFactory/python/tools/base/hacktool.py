@@ -98,7 +98,7 @@ class BaseHackTool(NestedTool):
             if depend:
                 self.handle_lazy_group(depend)
             with group:
-                if not fn():
+                if fn() is False:
                     return
             group.after_lazy()
             del self.lazy_groups[root]

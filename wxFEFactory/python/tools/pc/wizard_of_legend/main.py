@@ -48,11 +48,16 @@ class Player(MonoClass):
     # void AssignSkillSlot(int skillSlotNum, string skillID, bool setSignature = false, bool signatureStatus = false)
     AssignSkillSlot = MonoMethod(param_count=4, signature='iP2B')
     # Player.SkillState GetSkill(string ID)
-    GetSkill = MonoMethod(param_count=1, signature='P', type=int, size=0)
+    GetSkill = MonoMethod(param_count=1, signature='P', type=MonoClass)
     # void PickUpSkill(string givenID, bool isSignature = false, bool isEmpowered = false)
     PickUpSkill = MonoMethod(param_count=3, signature='P2B')
     # void GiveDesignatedItem(string givenID = "")
     GiveDesignatedItem = MonoMethod(param_count=1, signature='P')
+
+    # # void RequestTeleportMoveToLocation(Vector2 givenLocation, bool useCheck = false)
+    # RequestTeleportMoveToLocation = MonoMethod(param_count=2, signature='PB')
+    # # Vector2 GetInputVector(bool faceInputVector = true, bool useAimVector = true, bool ignoreZero = true)
+    # GetInputVector = MonoMethod(param_count=3, signature='3B')
 
 
 class GameController(MonoClass):
@@ -77,14 +82,14 @@ class Main(MonoHacktool):
 
     def __init__(self):
         super().__init__()
-        self.activePlayers = None
+        self.controller = None
 
     def onattach(self):
         super().onattach()
         self.register_classes((NumVarStat, Health, Wallet, Player, GameController, Cooldown, CooldownEntry))
 
-        controller = GameController(None, self)
-        self.activePlayers = controller.activePlayers
+        self.controller = GameController(None, self)
+        # self.activePlayers = controller.activePlayers
         # print(hex(Cooldown.get_IsCharging.mono_compile))
 
     def render_main(self):
@@ -155,7 +160,7 @@ class Main(MonoHacktool):
 
     def render_hotkeys(self):
         ui.Text("Capslock: 大招槽满\n"
-            "alt+h: 血量满\n")
+            "h: 血量满\n")
 
     def get_hotkeys(self):
         return (
@@ -165,7 +170,7 @@ class Main(MonoHacktool):
 
     @property
     def activePlayer(self):
-        return self.activePlayers and self.activePlayers[0]
+        return self.controller and self.controller.activePlayers[0]
 
     def recovery(self):
         """恢复健康"""
@@ -180,8 +185,13 @@ class Main(MonoHacktool):
         if player:
             player.OverdriveProgress = 100.0
 
+    def AssignSkillSlot(self, slot, skill):
+        """设置技能"""
+        return self.activePlayer.AssignSkillSlot(slot, self.call_mono_string_new(skill), False, False)
+
     def GetSkill(self, skill):
         """获取技能"""
+        # 存在BUG
         return self.activePlayer.GetSkill(self.call_mono_string_new(skill))
 
     def PickUpSkill(self, skill):
