@@ -209,4 +209,5 @@ class Manager(Model):
 
 
 class Global(Model):
-    mgr = ModelPtrField(0x01CFA848, Manager)
+    # mgr = ModelPtrField(0x01CFA848, Manager)
+    mgr = ModelPtrField(0x01528F78, Manager)

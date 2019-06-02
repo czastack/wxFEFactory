@@ -96,6 +96,7 @@ class AssemblyHacktool(BaseHackTool):
 
             addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.fuzzy)
             if addr is -1:
+                print('找不到地址: ', item.key)
                 return
 
             memory = self.next_usable_memory
@@ -203,6 +204,10 @@ class AssemblyHacktool(BaseHackTool):
 
     def find_address(self, original, find_start, find_end, find_base=True, fuzzy=False):
         base_addr = find_base is True and self.handler.base_addr or callable(find_base) and find_base() or find_base
+        if callable(find_start):
+            find_start = find_start()
+        if callable(find_end):
+            find_end = find_end()
         if base_addr:
             find_start += base_addr
             find_end += base_addr
