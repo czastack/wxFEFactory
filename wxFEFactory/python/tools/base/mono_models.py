@@ -64,7 +64,7 @@ class MonoTyping:
             type = int
         return type
 
-    def prepare_value(self, result, instance):
+    def case_value(self, result, instance):
         # 转为类实例
         if self.type is not int and callable(self.type):
             if issubclass(self.type, MonoType):
@@ -72,6 +72,12 @@ class MonoTyping:
             else:
                 result = self.type(result)
         return result
+
+    def prepare_value(self, value):
+        type = self.real_type
+        if type and not isinstance(value, type):
+            value = type(value)
+        return value
 
 
 class MonoField(MonoMember, MonoTyping):
@@ -113,14 +119,11 @@ class MonoField(MonoMember, MonoTyping):
     def get_value(self, instance):
         """获取值"""
         result = instance.owner.native_call_1(self.op_getter(instance))
-        return self.prepare_value(result, instance)
+        return self.case_value(result, instance)
 
     def set_value(self, instance, value):
         """设置值"""
-        type = self.real_type
-        if type and not isinstance(value, type):
-            value = type(value)
-        instance.owner.native_call_1(self.op_setter(instance, value))
+        instance.owner.native_call_1(self.op_setter(instance, self.prepare_value(value)))
 
 
 class MonoStaticField(MonoField):
@@ -183,15 +186,12 @@ class MonoProperty(MonoMember, MonoTyping):
     def get_value(self, instance):
         """获取值"""
         addr = self.get_addr(instance)
-        result = owner.handler.read(addr, self.real_type, self.size)
-        return self.prepare_value(result, instance)
+        result = instance.owner.handler.read(addr, self.real_type, self.size)
+        return self.case_value(result, instance)
 
     def set_value(self, instance, value):
         """设置值"""
-        type = self.real_type
-        if type and not isinstance(value, type):
-            value = type(value)
-        instance.owner.mono_security_call((self.op_setter(instance, value),))
+        instance.owner.mono_security_call((self.op_setter(instance, self.prepare_value(value)),))
 
 
 # class BoundField:
