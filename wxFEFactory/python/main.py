@@ -309,6 +309,7 @@ class MainFrame:
         Tool = self.get_tool(name)
         tool = Tool()
         tool.attach(self)
+        tool.add_close_callback(self.weak.on_tool_close)
         self.opened_tools.append(tool)
         self.opened_tools_map[id(tool.win)] = tool
         self.book.index = self.book.count - 1
@@ -332,8 +333,9 @@ class MainFrame:
 
     def on_tool_close(self, tool):
         self.opened_tools.remove(tool)
+        self.opened_tools_map.pop(id(tool.win), None)
 
-        if getattr(__main__, 'tool', None) == self:
+        if getattr(__main__, 'tool', None) == tool:
             del __main__.tool
 
     def save_win_option(self, menu):

@@ -28,30 +28,33 @@ class Main(BaseDolphinHack):
             if group['hascount']:
                 self.count_data[group['name']] = [0] * len(group['items'])
 
-            with StaticGroup(group['caption']):
-                li = ui.ListView(className="fill")
-                li.enableCheckboxes()
-                li.appendColumns(*group['head'])
-                if group['hascount']:
-                    li.appendColumn('数量')
-                li.insertItems(group['items'])
+            self.lazy_group(StaticGroup(group['caption']), partial(self.render_one_list, group))
 
-                with ui.Horizontal(className="expand"):
-                    uncheck_action = ui.CheckBox(label="不选中表示移除该物品", className="vcenter")
-                    if group['hascount']:
-                        ui.Text("数量 ", className="vcenter")
-                        input_num = ui.SpinCtrl(className="vcenter")
-                        ui.Text("  ")
-                        ui.Button(label="修改数量", className="button", onclick=partial(self.set_count, view=li,
-                            group=group, input_num=input_num)).setToolTip('勾选高亮选中的项的数量')
-                    ui.Button(label="勾选选中", className="button",
-                        onclick=partial(self.list_view_check_select, view=li)).setToolTip('勾选高亮选中的项')
-                    ui.Button(label="全选", className="button", onclick=partial(self.list_view_checkall, view=li))
-                    ui.Button(label="全不选", className="button", onclick=partial(self.list_view_uncheckall, view=li))
-                    ui.Button(label="读取", className="button",
-                        onclick=partial(self.list_view_read, view=li, group=group))
-                    ui.Button(label="写入", className="button", onclick=partial(self.list_view_write, view=li,
-                        group=group, uncheck_action=uncheck_action))
+    def render_one_list(self, group):
+        """渲染其中一个列表"""
+        li = ui.ListView(className="fill")
+        li.enableCheckboxes()
+        li.appendColumns(*group['head'])
+        if group['hascount']:
+            li.appendColumn('数量')
+        li.insertItems(group['items'])
+
+        with ui.Horizontal(className="expand"):
+            uncheck_action = ui.CheckBox(label="不选中表示移除该物品", className="vcenter")
+            if group['hascount']:
+                ui.Text("数量 ", className="vcenter")
+                input_num = ui.SpinCtrl(className="vcenter")
+                ui.Text("  ")
+                ui.Button(label="修改数量", className="button", onclick=partial(self.set_count, view=li,
+                    group=group, input_num=input_num)).setToolTip('勾选高亮选中的项的数量')
+            ui.Button(label="勾选选中", className="button",
+                onclick=partial(self.list_view_check_select, view=li)).setToolTip('勾选高亮选中的项')
+            ui.Button(label="全选", className="button", onclick=partial(self.list_view_checkall, view=li))
+            ui.Button(label="全不选", className="button", onclick=partial(self.list_view_uncheckall, view=li))
+            ui.Button(label="读取", className="button",
+                onclick=partial(self.list_view_read, view=li, group=group))
+            ui.Button(label="写入", className="button", onclick=partial(self.list_view_write, view=li,
+                group=group, uncheck_action=uncheck_action))
 
     # def onListSelect(self, view, event):
     #     index = event.index

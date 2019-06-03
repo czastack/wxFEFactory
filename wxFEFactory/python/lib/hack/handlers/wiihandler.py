@@ -2,6 +2,7 @@ from .handler import BigendHandler
 
 
 class DolphinHandler(BigendHandler):
+    CLASS_NAME = 'Dolphin'  # 只用于显示
 
     OFFSET_MAP = {
         '4.0.2': 0x4968938,

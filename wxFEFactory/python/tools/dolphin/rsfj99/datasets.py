@@ -69,7 +69,7 @@ LISTS = (
     {
         "name": "decorator",
         "caption": "装饰1",
-        "head":  COMMON_HEAD,
+        "head": COMMON_HEAD,
         "hascount": False,
         "items": (
             ("忍者笼手", "力＋1　身体能力上升"),
@@ -103,7 +103,7 @@ LISTS = (
     {
         "name": "decorator2",
         "caption": "装饰2",
-        "head":  COMMON_HEAD,
+        "head": COMMON_HEAD,
         "hascount": False,
         "items": (
             ("锁帷子", "铁壁之构：将受到的伤害减轻十分之一"),
@@ -240,7 +240,7 @@ LISTS = (
 
     {
         "name": "blade",
-        "caption": "刀", 
+        "caption": "刀",
         "head": (("名称", "攻击", "奥义", "效果", "带刀条件(力, 体力)"), (300, 100, 200, 300, 300)),
         "hascount": False,
         "items": (
