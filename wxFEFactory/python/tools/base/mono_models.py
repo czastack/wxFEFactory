@@ -179,7 +179,7 @@ class MonoProperty(MonoMember, MonoTyping):
     def get_value(self, instance):
         """获取值"""
         owner = instance.owner
-        result, = owner.mono_security_call((self.op_getter(instance),))
+        result = owner.mono_security_call_1(self.op_getter(instance))
         if result and not issubclass(self.type, MonoType):
             # 获取值要先解包，得到地址
             result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
@@ -189,7 +189,7 @@ class MonoProperty(MonoMember, MonoTyping):
 
     def set_value(self, instance, value):
         """设置值"""
-        instance.owner.mono_security_call((self.op_setter(instance, self.prepare_value(value)),))
+        instance.owner.mono_security_call_1(self.op_setter(instance, self.prepare_value(value)))
 
 
 # class BoundField:
@@ -239,7 +239,7 @@ class MonoMethod(MonoMember, MonoTyping):
     def call(self, instance, values):
         """直接调用"""
         owner = instance.owner
-        result, = owner.mono_security_call((self.op_runtime_invoke(instance, values=values),))
+        result = owner.mono_security_call_1(self.op_runtime_invoke(instance, values=values))
         if self.type:
             if result and not issubclass(self.type, MonoType):
                 print(hex(result))

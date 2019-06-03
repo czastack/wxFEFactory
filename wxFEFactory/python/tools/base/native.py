@@ -126,42 +126,7 @@ class NativeContext(Model):
         self.handler.write(addr, struct.pack('%ds' % (length + 1), data))
         return addr
 
-    def put_temp_array(self, signature, *args, itemsize=None, arg_count=None):
-        """存放临时数组
-        :return: 数组地址"""
-        if itemsize is None:
-            itemsize = self.ITEM_SIZE
-        block_count = math.ceil(itemsize * len(args) / self.ITEM_SIZE)
-        if arg_count is None:
-            arg_count = self.m_nArgCount
-
-        if arg_count + self.temp_index + block_count > self.ARG_MAX:
-            raise ValueError('数据过长，参数缓冲区容量不足')
-
-        buff = bytearray()
-        arg_it = iter(args)
-
-        for fmt in iter_signature(signature):
-            arg = next(arg_it)
-            try:
-                data = struct.pack(fmt, arg)
-            except Exception:
-                print(fmt, arg)
-                raise
-            datasize = len(data)
-            buff.extend(data)
-            if datasize < itemsize:
-                # 对齐字节
-                buff.extend(bytes(itemsize - datasize))
-            elif datasize > itemsize:
-                raise ValueError('datasize must <= itemsize')
-
-        self.temp_index += block_count
-        addr = self.get_temp_addr(self.temp_index)
-        self.handler.write(addr, buff)
-        return addr
-
-    def put_temp_simple_array(self, signature, *args, arg_count=None):
+    def put_temp_simple_array(self, signature, args, arg_count=None):
         """存放临时简单数组
         :return: 数组地址"""
         data = struct.pack(signature, *args)
@@ -171,26 +136,6 @@ class NativeContext(Model):
         if arg_count + self.temp_index + block_count > self.ARG_MAX:
             raise ValueError('数据过长，参数缓冲区容量不足')
         self.temp_index += block_count
-        addr = self.get_temp_addr(self.temp_index)
-        self.handler.write(addr, data)
-        return addr
-
-    def put_temp_simple_array_ptr(self, signature, addr, arg_count=None):
-        """存放临时简单指针数组
-        :return: 指针数组地址"""
-        addr_list = []
-        for fmt in iter_signature(signature):
-            addr_list.append(addr)
-            addr += struct.calcsize(fmt)
-
-        block_count = len(addr_list)
-        if arg_count is None:
-            arg_count = self.m_nArgCount
-        if arg_count + self.temp_index + block_count > self.ARG_MAX:
-            raise ValueError('数据过长，参数缓冲区容量不足')
-        self.temp_index += block_count
-
-        data = struct.pack('%d%s' % (block_count, 'L' if self.ITEM_SIZE == 4 else 'Q'), *addr_list)
         addr = self.get_temp_addr(self.temp_index)
         self.handler.write(addr, data)
         return addr
@@ -391,15 +336,56 @@ class TempPtr(metaclass=DataClassMeta):
 
 
 class TempArrayPtr(metaclass=DataClassMeta):
-    """临时指针数组地址占位符"""
+    """临时指针数组地址占位符 (void **params)"""
     fields = ('signature', 'args')
 
     def pack_for(self, context, fmt):
-        # 把参数压入数组
-        addr = context.put_temp_simple_array(self.signature, *self.args)
-        # 再压入每个参数的地址作为指针数组(void **params)
-        addr = context.put_temp_simple_array_ptr(self.signature, addr)
+        addr = self.pack_array_ptr(context)
         return fmt, addr
+
+    def pack_array_ptr(self, context):
+        # 注意：格式为P的已经是指针，不需要再放到临时数组中
+        addr_list = []
+        buff = bytearray()
+        arg_it = iter(self.args)
+        offset = 0  # 用于计算最终数组中的地址
+
+        for fmt in iter_signature(self.signature):
+            arg = next(arg_it)
+
+            if fmt == 'P':
+                # 已经是指针则直接用
+                addr_list.append(arg)
+            else:
+                addr_list.append(offset)
+                offset += struct.calcsize(fmt)
+
+                try:
+                    data = struct.pack(fmt, arg)
+                except Exception:
+                    print(fmt, arg)
+                    raise
+                buff.extend(data)
+
+        block_count = math.ceil(len(buff) / context.ITEM_SIZE)
+        if context.m_nArgCount + context.temp_index + block_count + len(addr_list) > context.ARG_MAX:
+            raise ValueError('数据过长，参数缓冲区容量不足')
+        context.temp_index += block_count
+        # 数据临时数组地址
+        addr = context.get_temp_addr(context.temp_index)
+        context.handler.write(addr, buff)
+
+        # 把偏移转为地址
+        addr_count = len(addr_list)
+        for i in range(addr_count):
+            if addr_list[i] < offset:
+                addr_list[i] += addr
+
+        buff = struct.pack('%d%s' % (addr_count, 'L' if context.ITEM_SIZE == 4 else 'Q'), *addr_list)
+        context.temp_index += addr_count
+        addr = context.get_temp_addr(context.temp_index)
+        context.handler.write(addr, buff)
+        return addr
 
 
 CustomPacker.register(TempPtr)

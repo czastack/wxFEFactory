@@ -27,7 +27,7 @@ class MonoHacktool(NativeHacktool):
         "mono_field_static_set_value": "3P",  # idem
         "mono_property_set_value": "4P",  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
         "mono_property_get_value": "4P",  # idem
-        "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
+        # "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
         # "mono_array_length": "P",  # (MonoArray *array)
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
@@ -69,6 +69,9 @@ class MonoHacktool(NativeHacktool):
         ), self.context_array)
         return result
 
+    def mono_security_call_1(self, arg):
+        return self.mono_security_call((arg,))[0]
+
     def get_mono_classes(self, items):
         """根据mono class和mothod name获取mono class
         :param items: ((namespace, name),)
@@ -102,7 +105,7 @@ class MonoHacktool(NativeHacktool):
 
     def call_mono_string_new(self, text):
         """创建mono string"""
-        return self.native_call_1(self.call_arg_ptr(*self.mono_string_new, self.root_domain, text))
+        return self.mono_security_call_1(self.call_arg_ptr(*self.mono_string_new, self.root_domain, text))
 
     def register_classes(self, classes):
         """注册mono class列表

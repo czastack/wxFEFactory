@@ -46,7 +46,7 @@ class Player(MonoClass):
     platWallet = MonoStaticField(type=Wallet)
 
     # void AssignSkillSlot(int skillSlotNum, string skillID, bool setSignature = false, bool signatureStatus = false)
-    AssignSkillSlot = MonoMethod(param_count=4, signature='iP2B')
+    # AssignSkillSlot = MonoMethod(param_count=4, signature='iP2B')
     # Player.SkillState GetSkill(string ID)
     GetSkill = MonoMethod(param_count=1, signature='P', type=MonoClass)
     # void PickUpSkill(string givenID, bool isSignature = false, bool isEmpowered = false)
@@ -91,6 +91,9 @@ class Main(MonoHacktool):
         self.controller = GameController(None, self)
         # self.activePlayers = controller.activePlayers
         # print(hex(Cooldown.get_IsCharging.mono_compile))
+        # string = self.call_mono_string_new('ShockTouchBasic')
+        # result = self.mono_security_call_1(call_arg(*self.mono_string_length, string, ret_type=int))
+        # print(hex(string))
 
     def render_main(self):
         with Group("player", "全局", None):
@@ -184,10 +187,6 @@ class Main(MonoHacktool):
         player = self.activePlayer
         if player:
             player.OverdriveProgress = 100.0
-
-    def AssignSkillSlot(self, slot, skill):
-        """设置技能"""
-        return self.activePlayer.AssignSkillSlot(slot, self.call_mono_string_new(skill), False, False)
 
     def GetSkill(self, skill):
         """获取技能"""
