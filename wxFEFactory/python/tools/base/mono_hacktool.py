@@ -27,8 +27,8 @@ class MonoHacktool(NativeHacktool):
         "mono_field_static_set_value": "3P",  # idem
         "mono_property_set_value": "4P",  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
         "mono_property_get_value": "4P",  # idem
-        # "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
-        # "mono_array_length": "P",  # (MonoArray *array)
+        "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
+        "mono_array_length": "P",  # (MonoArray *array)
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
         "mono_object_unbox": "P",  # (MonoObject *obj)
@@ -62,6 +62,7 @@ class MonoHacktool(NativeHacktool):
             self.context_array = None
 
     def mono_security_call(self, args):
+        """安全调用mono api"""
         _, _, *result = self.native_call_n((
             call_arg(*self.mono_thread_attach, self.root_domain),
             call_arg(*self.mono_security_set_mode, 0),
@@ -70,7 +71,15 @@ class MonoHacktool(NativeHacktool):
         return result
 
     def mono_security_call_1(self, arg):
+        """安全调用1个mono api"""
         return self.mono_security_call((arg,))[0]
+
+    def mono_security_call_reuse(self, args):
+        """安全调用多个mono api"""
+        return self.native_call_n_reuse(args, self.context_array, preset=(
+            call_arg(*self.mono_thread_attach, self.root_domain),
+            call_arg(*self.mono_security_set_mode, 0),
+        ))
 
     def get_mono_classes(self, items):
         """根据mono class和mothod name获取mono class

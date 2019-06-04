@@ -145,16 +145,35 @@ class NativeHacktool(AssemblyHacktool):
             results.append(result)
         return results
 
-    def native_call_n_reuse(self, call_list, context_array):
-        """一次调用多个函数(复用)"""
+    def native_call_n_reuse(self, call_list, context_array, preset=None):
+        """一次调用多个函数(复用)
+        :param prest: 前置调用，每次复用前都要先放调用前置条件
+        """
         len_call_list = len(call_list)
-        len_context_array = len(context_array)
-        if len_call_list <= len_context_array:
+        len_buffer = len(context_array)
+        len_preset = len(preset) if preset else 0
+
+        if len_preset:
+            if len_preset > len_buffer:
+                raise ValueError('前置调用数量大于缓冲数量')
+            # 腾出空间给前置调用
+            len_buffer -= len_preset
+
+        if len_call_list <= len_buffer:
+            if preset:
+                call_list = (*preset, *call_list)
             return self.native_call_n(call_list, context_array)
         else:
             results = []
-            for i in range(0, len_call_list, len_context_array):
-                results.extend(self.native_call_n(call_list[i:i + len_context_array], context_array))
+            for i in range(0, len_call_list, len_buffer):
+                temp_list = call_list[i:i + len_buffer]
+                if len_preset:
+                    temp_list = (*preset, *temp_list)
+                temp_results = self.native_call_n(temp_list, context_array)
+                if len_preset:
+                    # 排除掉前置调用的结果
+                    temp_results = temp_results[len_preset:]
+                results.extend(temp_results)
             return results
 
     def get_cached_address(self, key, original, find_start, find_end, find_base=True):

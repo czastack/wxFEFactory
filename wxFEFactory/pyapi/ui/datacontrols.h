@@ -246,6 +246,16 @@ public:
 		ctrl().CheckItem(item, checked);
 	}
 
+	void toggleItem(int item)
+	{
+		ctrl().CheckItem(item, !isItemChecked(item));
+	}
+
+	/**
+	 * 勾选高亮选中的项
+	 */
+	void checkSelection(bool toggle);
+
 	bool isItemSelected(int item)
 	{
 		return ctrl().IsSelected(item);

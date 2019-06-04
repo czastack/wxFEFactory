@@ -65,7 +65,7 @@ class MonoTyping:
         return type
 
     def case_value(self, result, instance):
-        # 转为类实例
+        """传出时转换值，例如转为类实例"""
         if self.type is not int and callable(self.type):
             if issubclass(self.type, MonoType):
                 result = self.type(result, instance.owner)
@@ -73,7 +73,18 @@ class MonoTyping:
                 result = self.type(result)
         return result
 
+    def case_boxed_value(self, result, instance):
+        """转换被装箱的值，通常是mono函数调用或者property"""
+        if result and not issubclass(self.type, MonoType):
+            owner = instance.owner
+            # 获取值要先解包，得到地址
+            result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
+            # TODO 判断类型
+            result = owner.handler.read(result, self.real_type, self.size)
+        return self.case_value(result, instance)
+
     def prepare_value(self, value):
+        """传入前预处理值"""
         type = self.real_type
         if type and not isinstance(value, type):
             value = type(value)
@@ -180,12 +191,7 @@ class MonoProperty(MonoMember, MonoTyping):
         """获取值"""
         owner = instance.owner
         result = owner.mono_security_call_1(self.op_getter(instance))
-        if result and not issubclass(self.type, MonoType):
-            # 获取值要先解包，得到地址
-            result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
-            # TODO 判断类型
-            result = owner.handler.read(result, self.real_type, self.size)
-        return self.case_value(result, instance)
+        return self.case_boxed_value(result, instance)
 
     def set_value(self, instance, value):
         """设置值"""
@@ -228,11 +234,9 @@ class MonoMethod(MonoMember, MonoTyping):
             return self
         return BoundMethod(instance, self)
 
-    def op_runtime_invoke(self, instance, signature=None, values=()):
+    def op_runtime_invoke(self, instance, values=()):
         """方法调用的call_arg"""
-        if signature is None:
-            signature = self.signature
-        params = TempArrayPtr(signature, values) if self.param_count else 0
+        params = TempArrayPtr(self.signature, values) if self.param_count else 0
         return instance.owner.call_arg_ptr(*instance.owner.mono_runtime_invoke,
             self.mono_method, instance.mono_object, params, 0)
 
@@ -241,13 +245,7 @@ class MonoMethod(MonoMember, MonoTyping):
         owner = instance.owner
         result = owner.mono_security_call_1(self.op_runtime_invoke(instance, values=values))
         if self.type:
-            if result and not issubclass(self.type, MonoType):
-                print(hex(result))
-                # 获取值要先解包，得到地址
-                result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
-                # TODO 判断类型
-                result = owner.handler.read(result, self.real_type, self.size)
-            return self.case_value(result, instance)
+            return self.case_boxed_value(result, instance)
 
 
 class BoundMethod:

@@ -218,6 +218,19 @@ void ListView::insertItems(const py::iterable & rows, int pos, bool create)
 	}
 }
 
+
+/**
+* 勾选高亮选中的项
+*/
+
+void ListView::checkSelection(bool toggle)
+{
+	for (int i = ctrl().GetFirstSelected(); i != -1; i = ctrl().GetNextSelected(i))
+	{
+		checkItem(i, toggle ? !isItemChecked(i) : true);
+	}
+}
+
 py::list ListView::getCheckedList()
 {
 	py::list result;
@@ -304,8 +317,10 @@ void init_datacontrols(py::module &m)
 		.def("enableCheckboxes", &ListView::enableCheckboxes, "enabled"_a=true)
 		.def("isItemChecked", &ListView::isItemChecked, "item"_a)
 		.def("checkItem", &ListView::checkItem, "item"_a, "checked"_a=true)
+		.def("toggleItem", &ListView::toggleItem, "item"_a)
+		.def("checkSelection", &ListView::checkSelection, "toggle"_a=true)
 		.def("isItemSelected", &ListView::isItemSelected, "item"_a)
-		.def("selectItem", &ListView::selectItem, "item"_a, "selected"_a = true)
+		.def("selectItem", &ListView::selectItem, "item"_a, "selected"_a=true)
 		.def("getCheckedList", &ListView::getCheckedList)
 		.def("getSelectedList", &ListView::getSelectedList)
 		.def("clearSelected", &ListView::clearSelected)

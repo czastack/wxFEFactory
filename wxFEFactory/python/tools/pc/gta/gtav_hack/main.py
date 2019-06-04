@@ -6,8 +6,7 @@ import __main__
 from functools import partial
 from lib import utils
 from lib.lazy import lazy
-from lib.hack.forms import (Group, StaticGroup, ModelInput, ModelCoordWidget,
-    render_tab_list)
+from lib.hack.forms import (Group, StaticGroup, ModelInput, ModelCoordWidget, TabList)
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
@@ -162,7 +161,7 @@ class Main(BaseGTATool):
     def render_ped_model(self):
         from .datasets.player_models import PLAYER_MODELS
         with ui.Horizontal(className="fill padding"):
-            self.player_model_book = render_tab_list(PLAYER_MODELS)
+            self.player_model_book = TabList(PLAYER_MODELS)
             with ui.ScrollView(className="fill padding"):
                 ui.Text("1. 切换模型会失去武器")
                 ui.Text("2. 切换动物模型容易引发bug，请慎用")
@@ -172,11 +171,11 @@ class Main(BaseGTATool):
 
     def render_vehicle_model(self):
         from .datasets.vehicle_models import VEHICLE_MODELS
-        self.vehicle_model_book = render_tab_list(VEHICLE_MODELS)
+        self.vehicle_model_book = TabList(VEHICLE_MODELS)
 
     def render_object_model(self):
         from .datasets.object_models import OBJECT_MODELS
-        self.object_model_book = render_tab_list(OBJECT_MODELS)
+        self.object_model_book = TabList(OBJECT_MODELS)
 
     def render_weapon_components(self):
         from .datasets.weapon_components import WEAPON_COMPONENTS
@@ -192,7 +191,7 @@ class Main(BaseGTATool):
             weapon_components.append((weapon[1], item[1], weapon[2]))
 
         with ui.Vertical(className="fill padding"):
-            self.weapon_component_book = render_tab_list(weapon_components)
+            self.weapon_component_book = TabList(weapon_components)
             # self.weapon_component_book.setToolTip("选中后回车键给与配件")
             with ui.Horizontal():
                 ui.Button("给予", onclick=self.give_weapon_component)

@@ -13,7 +13,7 @@ Label = exui.Label
 
 __ALL__ = ('Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox',
     'Groups', 'Input', 'ModelInput', 'ProxyInput', 'SimpleCheckBox', 'CheckBox', 'ModelCheckBox', 'Select',
-    'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'render_tab_list', 'Label')
+    'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'TabList', 'Label')
 
 
 class Widget:
@@ -920,10 +920,17 @@ class ModelArraySelect(ModelArrayWidget):
                 for i in range(field.length)]
 
 
-def render_tab_list(data):
+def TabList(data):
     """多个tab的列表框"""
     book = ui.Notebook(className="fill", wxstyle=0x0200)
     with book:
         for category in data:
             ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
     return book
+
+
+def ListFooterButtons(li):
+    """渲染带复选框列表的底部按钮"""
+    ui.Button(label="全选", className="button", onclick=lambda btn: li.checkAll())
+    ui.Button(label="全不选", className="button", onclick=lambda btn: li.checkAll(False))
+    ui.Button(label="勾选高亮", className="button", onclick=lambda btn: li.checkSelection())
