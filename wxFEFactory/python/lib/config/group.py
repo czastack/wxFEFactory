@@ -2,6 +2,7 @@ from .configurable import Configurable
 
 
 class ConfigGroup:
+    """配置父容器"""
     GROUPS = []
 
     def __init__(self, owner):

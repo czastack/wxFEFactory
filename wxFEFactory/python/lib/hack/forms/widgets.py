@@ -104,6 +104,7 @@ class Widget:
 
 
 class TwoWayWidget(Widget):
+    """双向控件"""
     def read(self):
         value = self.mem_value
         if value is not None:
@@ -118,6 +119,7 @@ class TwoWayWidget(Widget):
 
 
 class ModelWidget:
+    """模型绑定控件"""
     def __init__(self, name, label=None, instance=None, prop=None, **kwargs):
         """
         :param instance: Model实例，或者返回Model实例的函数，在Widget中用addr占位
@@ -182,6 +184,7 @@ class ModelWidget:
 
 
 class OffsetsWidget:
+    """多级偏移控件"""
     def get_addr(self):
         return self.addr() if callable(self.addr) else self.addr
 
@@ -198,6 +201,7 @@ class OffsetsWidget:
 
 
 class BaseGroup(Widget):
+    """基本控件容器"""
     cachable = True
 
     def __init__(self, name, label, addr=None, handler=None, cachable=True):
@@ -226,6 +230,7 @@ class BaseGroup(Widget):
 
         super().__init__(name, label, origin_addr)
 
+        # 处理缓存
         if cachable:
             self.addr = self.weak.cached_ins_getter
             if isinstance(origin_addr, tuple):
@@ -275,6 +280,7 @@ class BaseGroup(Widget):
         self.end_ins_cache()
 
     def load(self):
+        """从文件中加载数据"""
         data = fefactory.json_load_file(self)
         if data:
             for field in self.children:
@@ -286,6 +292,7 @@ class BaseGroup(Widget):
                     print("加载字段%s出错" % field.name, e.args)
 
     def export(self):
+        """导出数据到文件"""
         data = {field.name: field.input_value for field in self.children if field.input_value is not None}
         fefactory.json_dump_file(self, data)
 
@@ -295,6 +302,7 @@ class BaseGroup(Widget):
 
 
 class Group(BaseGroup):
+    """通用控件容器，会生成NoteBook的一个tab"""
     cols = 2
     horizontal = True
 
@@ -318,6 +326,7 @@ class Group(BaseGroup):
         self.root = root
 
     def render_root(self):
+        """渲染外层框架"""
         this = self.weak
         with ui.Vertical(className="fill") as root:
             if self.hasheader:
@@ -337,6 +346,7 @@ class Group(BaseGroup):
         return root
 
     def render_main(self):
+        """渲染主要内容"""
         with ui.ScrollView(className="fill padding") as content:
             if self.flexgrid:
                 self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
@@ -350,6 +360,7 @@ class Group(BaseGroup):
                 self.view = content
 
     def after_lazy(self):
+        """延迟加载后的操作"""
         if isinstance(self.view, ui.FlexGridLayout):
             self.view.parent.relayout()
 
@@ -381,11 +392,13 @@ class DialogGroup(Group):
 
 
 class StaticGroup(Group):
+    """静态容器，不绑定目标"""
     def __init__(self, caption):
         return Group.__init__(self, None, caption, 0, flexgrid=False, hasfooter=False)
 
 
 class GroupBox(BaseGroup):
+    """StaticBox外观的容器"""
     def render(self):
         with ui.StaticBox(self.label, className="fill") as root:
             self.view = ui.ScrollView(className="fill padding")
@@ -429,6 +442,7 @@ class Groups(BaseGroup):
 
 
 class BaseInput(TwoWayWidget):
+    """基类输入框"""
     def __init__(self, *args, hex=False, spin=False, size=4, min=0, max=None, **kwargs):
         """size: hex为True时有用"""
         self.hex = hex and not spin
@@ -578,6 +592,7 @@ class ModelCheckBox(ModelWidget, BaseCheckBox):
 
 
 class BaseSelect(TwoWayWidget):
+    """基类下拉框"""
     search_map = {}
 
     def __init__(self, *args, choices=None, values=None, onselect=None, dragable=False, **kwargs):
@@ -633,6 +648,7 @@ class BaseSelect(TwoWayWidget):
 
     @lazy.classlazy
     def contextmenu(cls):
+        """右键菜单"""
         with ui.ContextMenu() as contextmenu:
             ui.MenuItem("搜索(&S)", onselect=cls.menu_search)
             ui.MenuItem("拖拽帮助", onselect=cls.move_about)
@@ -686,6 +702,7 @@ class BaseSelect(TwoWayWidget):
             return False
 
     def onTextDrop(self, i):
+        """拖动事件"""
         if i.isdigit():
             instance = self.search_map.get(int(i), None)
             if instance and self != instance:
@@ -718,6 +735,7 @@ class BaseSelect(TwoWayWidget):
                     print("数据源不一致")
 
     class CacheContex:
+        """选项数组缓存，避免重复C++类型转换"""
         def __enter__(self):
             ui.Choice.start_cache()
             return self
@@ -740,6 +758,7 @@ class ModelSelect(ModelWidget, BaseSelect):
 
 
 class BaseChoiceDisplay(Widget):
+    """静态选项(只显示)"""
     def __init__(self, *args, choices=None, values=None, **kwargs):
         # 预处理choices, values
         self.choices, self.values = utils.prepare_option(choices, values)
@@ -787,16 +806,19 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
 
 
 def Choice(laebl, choices, onselect):
+    """选项框"""
     exui.Label(laebl)
     return ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
 
 
 def Title(label):
+    """标题"""
     ui.Hr()
     return ui.Text(label)
 
 
 class BaseFlagWidget(TwoWayWidget):
+    """参数组合"""
     def __init__(self, *args, labels=None, helps=None, values=None, checkbtn=False, cols=None, **kwargs):
         """size: hex为True时有用"""
         self.labels = labels
@@ -878,6 +900,7 @@ class ModelArrayWidget(ModelWidget, Widget):
 
 
 class ModelArrayInput(ModelArrayWidget):
+    """输入框数组"""
     def render(self):
         field, labels = self.get_labels()
         self.children = [ModelInput('%s.%d' % (self.name, i), label=labels[i])
@@ -885,6 +908,7 @@ class ModelArrayInput(ModelArrayWidget):
 
 
 class ModelArraySelect(ModelArrayWidget):
+    """下拉框数组"""
     def __init__(self, *args, choices=None, **kwargs):
         self.choices = choices
         super().__init__(*args, **kwargs)
@@ -897,6 +921,7 @@ class ModelArraySelect(ModelArrayWidget):
 
 
 def render_tab_list(data):
+    """多个tab的列表框"""
     book = ui.Notebook(className="fill", wxstyle=0x0200)
     with book:
         for category in data:

@@ -12,17 +12,18 @@ __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
 
 
 class ConfigCtrl(ABC):
+    """配置项控件"""
     def __init__(self, name, label, default):
         parent = ConfigGroup.active_group()
 
         if not parent:
             raise TypeError('Config Widget must be within ConfigGroup')
 
+        parent.append_child(self)
         self.weak = WeakBinder(self)
         self.name = name
         self.label = label
         self.default = default
-        parent.append_child(self)
         self.owner = parent.owner
         self.owner.setdefault(name, default)
         self.owner.register_observer(name, self.weak._onConfigChange)
@@ -44,13 +45,16 @@ class ConfigCtrl(ABC):
 
     @abstractmethod
     def get_input_value(self):
+        """获取控件的输入值"""
         pass
 
     @abstractmethod
     def set_input_value(self, value):
+        """设置控件的输入值"""
         pass
 
     def render_lable(self):
+        """渲染标签文本"""
         return exui.Label(self.label)
 
     def read(self, _=None):
@@ -60,11 +64,13 @@ class ConfigCtrl(ABC):
         self.set_config_value(self.get_input_value(), False)
 
     def render_btn(self):
+        """渲染按钮"""
         this = self.weak
         ui.Button(label="r", style=btn_xs_style, onclick=this.read)
         ui.Button(label="w", style=btn_xs_style, onclick=this.write)
 
     def set_help(self, text=None):
+        """设置帮助内容"""
         if text is None:
             text = self.help
         try:
@@ -75,6 +81,7 @@ class ConfigCtrl(ABC):
 
 
 class BoolConfig(ConfigCtrl):
+    """布尔值控件"""
     def __init__(self, name, label, default=False):
         super().__init__(name, label, default)
 
@@ -90,6 +97,7 @@ class BoolConfig(ConfigCtrl):
 
 
 class InputConfig(ConfigCtrl):
+    """输入控件"""
     def __init__(self, name, label, default, type):
         super().__init__(name, label, default)
         self.type = type
@@ -121,16 +129,19 @@ class InputConfig(ConfigCtrl):
 
 
 class IntConfig(InputConfig):
+    """整型输入控件"""
     def __init__(self, name, label, default=0):
         return super().__init__(name, label, default, int)
 
 
 class FloatConfig(InputConfig):
+    """浮点型输入控件"""
     def __init__(self, name, label, default=0.0):
         return super().__init__(name, label, default, float)
 
 
 class SelectConfig(ConfigCtrl):
+    """下拉框控件"""
     def __init__(self, name, label, choices, values=None, default=None):
         self.choices, self.values = utils.prepare_option(choices, values)
         if default is None:

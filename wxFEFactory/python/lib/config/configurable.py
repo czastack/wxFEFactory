@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 
 class Configurable(ABC):
+    """可配置项"""
     __slots__ = ('config_file', 'config_changed', 'observers')
 
     def __init__(self, config_file, *args, **kwargs):
@@ -59,6 +60,7 @@ class Configurable(ABC):
 
 
 class Config(Configurable):
+    """配置"""
     load = Configurable.loadconfig
     write = Configurable.writeconfig
 

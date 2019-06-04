@@ -12,6 +12,7 @@ class Model:
 
     @classmethod
     def field(cls, name):
+        # 获取字段实例
         for base in cls.__mro__:
             field = base.__dict__.get(name, None)
             if field:
@@ -19,6 +20,7 @@ class Model:
 
     @classproperty
     def field_names(cls):
+        # 字段名元组
         field_names = getattr(cls, '_field_names', None)
         if field_names is None:
             field_names = cls._field_names = tuple(name for name, value in cls.__dict__.items()
@@ -27,6 +29,7 @@ class Model:
 
     @classproperty
     def fields(cls):
+        # 字段实例元组
         fields = getattr(cls, '_fields', None)
         if fields is None:
             # tuple(cls.field(name) for name in cls.field_names)
@@ -35,32 +38,41 @@ class Model:
 
     @property
     def addr_hex(self):
+        # 地址16进制
         return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
 
     def prev(self):
+        # 地址前移一个
         self.addr -= self.SIZE
         return self
 
     def next(self):
+        # 地址后移一个
         self.addr += self.SIZE
         return self
 
     def to_bytes(self):
+        # 从内存中读取bytes数据
         return self.handler.read(self.addr, bytes, self.SIZE)
 
     def to_hex_str(self):
+        # 从内存中读取bytes数据并格式化成可读性强的16进制字符串
         return utils.bytes_beautify(self.to_bytes())
 
     def hex(self):
+        # 从内存中读取bytes数据并转成16进制
         return self.to_bytes().hex()
 
-    def fromhex(self, hexstr):
-        return self.handler.write(self.addr, bytes.fromhex(hexstr), self.SIZE)
+    def fromhex(self, string):
+        # 从16进制字符串读取bytes并写入内存
+        return self.handler.write(self.addr, bytes.fromhex(string), self.SIZE)
 
     def clone(self):
+        # 克隆对象
         return self.__class__(self.addr, self.handler)
 
-    def addrof(self, field):
+    def addressof(self, field):
+        # 获取字段的地址
         if isinstance(field, str):
             temp = self.field(field)
             if temp is None:
@@ -80,6 +92,7 @@ class Model:
             return field.get_addr(self)
 
     def offsetof(self, field):
+        # 获取字段的偏移
         if isinstance(field, str):
             field = self.field(field)
             if field is None:
@@ -91,25 +104,30 @@ class Model:
             raise TypeError('expected a Field object, got ' + str(field))
 
     def set_with(self, nameto, namefrom):
+        # 把一个字段的值赋予另一个字段
         setattr(self, nameto, getattr(self, namefrom))
         return self
 
     def set_addr_by_index(self, i):
+        # 使用序号设置地址
         self.addr = self.SIZE * i
 
     def test_comlex_attr(self, name):
+        # 测试复合属性，例如"foo.bar[0]"
         return test_comlex_attr(name)
 
     def __and__(self, field):
-        return self.addrof(field)
+        return self.addressof(field)
 
     def __getitem__(self, attrs):
+        # 获取一个或多个字段的值
         if isinstance(attrs, str):
             return getattr(self, attr)
         else:
             return (getattr(self, attr) for attr in attrs)
 
     def __setitem__(self, attrs, values):
+        # 设置一个或多项字段的值
         if isinstance(attrs, str):
             setattr(self, attrs, values)
         else:
@@ -118,6 +136,7 @@ class Model:
                 setattr(self, attr, next(valueiter))
 
     def __getattr__(self, name):
+        # 获取其他属性，通常是兼容getattr 复合属性
         def func(item, attr, is_int):
             if is_int:
                 try:
@@ -134,6 +153,7 @@ class Model:
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
+        # 设置其他属性，通常是兼容setattr 复合属性
         def func(item, attr, is_int):
             if is_int:
                 item[attr] = value
@@ -149,7 +169,10 @@ class Model:
             super().__setattr__(name, value)
 
     def handle_comlex_attr(self, name, func, out_range_warn=False):
-        """func(item, attr, is_int) 最后一项的处理"""
+        """ 处理复合属性
+        func(item, attr, is_int) 最后一项的处理
+        :param out_range_warn: 是否警告下标超出范围
+        """
         data = test_comlex_attr(name)
         if data is not None:
             item = self
@@ -191,6 +214,7 @@ class Model:
         return COMLEX_ATTR_NONE
 
     def datasnap(self, fields=None):
+        # 内存快照，返回命名空间
         data = SimpleNamespace()
         for name in (fields if fields else self.field_names):
             setattr(data, name, getattr(self, name))
@@ -198,6 +222,7 @@ class Model:
 
 
 class ManagedModel(Model):
+    """托管的Model"""
     def __init__(self, addr, context):
         super().__init__(addr, context.handler)
         self.context = context
@@ -255,6 +280,7 @@ class FieldType:
 
 
 class Field(FieldType):
+    """通用字段基类"""
     def __init__(self, offset, type=int, size=4, label=None):
         self.offset = offset
         self.type = type
@@ -329,6 +355,7 @@ class Cachable:
 
 
 class PtrField(Field):
+    """指针字段"""
     __init__ = partialmethod(Field.__init__, size=0)
 
     def __get__(self, instance, owner=None):
@@ -504,6 +531,7 @@ class ManagedModelField(ModelField):
 
 
 class CoordField(Cachable, FieldType):
+    """坐标字段(Vector3)"""
     def __init__(self, offset, type=float, length=3, field_size=4, label=None):
         self.offset = offset
         self.type = type
@@ -612,6 +640,7 @@ class CoordData:
 
 
 class ArrayField(Cachable, Field):
+    """数组字段"""
     itemkeys = None
 
     def __init__(self, offset, length, field, cachable=False, label=None):
@@ -652,17 +681,19 @@ class ArrayField(Cachable, Field):
 
 
 class ArrayData:
+    """数组字段__get__返回的绑定数据"""
     def __init__(self, owner, instance):
         self.owner = owner
         self.instance = instance
         if owner.field.size is 0:
-            """传入了延迟设置size的field"""
+            # 传入了延迟设置size的field
             owner.field.__get__(instance)
 
     def __len__(self):
         return self.owner.length
 
     def get_field(self, i):
+        """某项作为字段返回"""
         if i >= self.owner.length:
             raise IndexError("array index out of range")
         field = self.owner.field
@@ -726,6 +757,7 @@ class ArrayData:
 
 
 class StringField(Field):
+    """字符串字段"""
     def __init__(self, offset, size=0, label=None, encoding='gbk'):
         super().__init__(offset, bytes, size or 64, label)
         self.encoding = encoding
@@ -745,6 +777,7 @@ class StringField(Field):
 
 
 class FieldPrep:
+    """字段预处理器"""
     def __init__(self, preget, preset=None, field=None):
         self.preget = preget
         self.preset = preset or preget

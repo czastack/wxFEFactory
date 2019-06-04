@@ -3,6 +3,7 @@ from lib.utils import split_label_value
 
 
 class BaseItemProvider:
+    """基础items提供器"""
     def __init__(self):
         self._choices = None
         self._values = None
@@ -190,6 +191,7 @@ def bytes_hex(data, sep=''):
 
 
 def bytes_beautify(data, offset=0, step=1):
+    """bytes转可读性强的16进制字符串"""
     if offset == 0 and step == 1:
         return bytes_hex(data, " ")
 
