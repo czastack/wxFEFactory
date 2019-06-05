@@ -54,14 +54,14 @@ class Module(BaseListBoxModuel):
         else:
             self.addr_view.value = ""
 
-    def onClose(self, _=None):
+    def onclose(self, _=None):
         if self.pg.changed:
             choice = self.confirm('保存修改', '有修改，是否保存？', wxconst.CANCEL)
             if choice is wxconst.CANCEL:
                 return False
             elif choice is wxconst.YES:
                 self.onSave(None)
-        return super().onClose()
+        return super().onclose()
 
     def onAdd(self, btn):
         name = input("角色名称")

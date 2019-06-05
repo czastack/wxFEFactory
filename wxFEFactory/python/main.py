@@ -57,7 +57,7 @@ class MainFrame:
                 ui.MenuItem("打开工程所在文件夹", onselect=self.open_project_dir)
                 # ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
-                ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
+                ui.MenuItem("退出\tCtrl+Q", onselect=self.close_window)
             with ui.Menu("视图"):
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggle_console)
                 ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_console_input_multi)
@@ -70,7 +70,7 @@ class MainFrame:
             with ui.AuiManager() as aui:
                 toolbar = self.render_toolbar()
                 ui.AuiItem(toolbar, direction="top", captionVisible=False)
-                # ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.onNav), captionVisible=False)
+                # ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.on_nav), captionVisible=False)
                 self.book = ui.AuiNotebook()
                 ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)
                 with ui.Vertical(className="console-bar") as console:
@@ -94,7 +94,7 @@ class MainFrame:
             if Path.exists(icon_name):
                 win.setIcon(icon_name)
 
-        win.setOnClose(self.onClose)
+        win.setOnClose(self.onclose)
         self.book.setOnPageChanged(self.on_tool_change)
 
         self.win = win
@@ -103,9 +103,6 @@ class MainFrame:
         fefactory_api.console.bind_elem(self.console_input, self.console_output)
         self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
-
-    def on_enter(self, _):
-        print(_)
 
     @property
     def module_names(self):
@@ -124,7 +121,7 @@ class MainFrame:
         module = __import__(name, fromlist=['main']).main
         return module.Main
 
-    def onNav(self, listbox):
+    def on_nav(self, listbox):
         """左边导航切换模块"""
         name = modules[listbox.index][1]
         try:
@@ -136,7 +133,7 @@ class MainFrame:
             print('加载模块%s失败' % name)
             traceback.print_exc()
 
-    def onClose(self, _=None):
+    def onclose(self, _=None):
         if self.book.closeAllPage():
             del self.book
             self.opened_tools.clear()
@@ -144,12 +141,12 @@ class MainFrame:
             return True
         return False
 
-    def closeWindow(self, _=None):
+    def close_window(self, _=None):
         self.win.close()
 
     def restart(self, _=None, callback=None):
         """重启"""
-        self.closeWindow()
+        self.close_window()
         fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
 
     def render_toolbar(self):
@@ -300,6 +297,8 @@ class MainFrame:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
                 tree.setOnItemActivated(self.weak.on_tool_select)
+            with dialog.footer:
+                ui.Button(label="收藏")
             self.tool_dialog = dialog
         dialog.showModal()
 

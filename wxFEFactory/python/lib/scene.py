@@ -23,7 +23,7 @@ class BaseScene:
             ins.append(self)
         self.weak = WeakBinder(self)
 
-    def onClose(self, _=None):
+    def onclose(self, _=None):
         ins = self.__class__.INS
         ins[ins.index(self)] = None
 

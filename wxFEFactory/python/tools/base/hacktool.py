@@ -75,11 +75,11 @@ class BaseHackTool(NestedTool):
     def WINDOW_NAME(self):
         return getattr(self.handler, 'WINDOW_NAME', None) or self.CLASS_NAME
 
-    def onClose(self, *args):
+    def onclose(self, *args):
         if self.handler.active:
             self.ondetach()
         self.config.write()
-        return super().onClose(*args)
+        return super().onclose(*args)
 
     def lazy_group(self, group, fn, depend=None):
         """延迟加载的group"""

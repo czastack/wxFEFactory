@@ -25,7 +25,7 @@ class BaseModule(BaseScene):
         with frame.win.menubar:
             self.menu = self.get_menu()
 
-    def onClose(self, _=None):
+    def onclose(self, _=None):
         """标签页关闭回调，返回False会取消关闭"""
         if self.menu:
             __main__.win.menubar.remove(self.menu)
@@ -33,7 +33,7 @@ class BaseModule(BaseScene):
         if getattr(__main__, 'module', None) == self:
             del __main__.module
 
-        super().onClose()
+        super().onclose()
 
         return True
 
@@ -112,7 +112,7 @@ class BaseListBoxModuel(BaseModule):
                     ui.Button(label="删除", className="button", onclick=this.onDel)
             with ui.Vertical():
                 self.render_main()
-        ui.AuiItem(panel, caption=self.unique_title, onclose=self.onClose)
+        ui.AuiItem(panel, caption=self.unique_title, onclose=self.onclose)
 
         self.listbox.setOnKeyDown(this.onListBoxKey)
 

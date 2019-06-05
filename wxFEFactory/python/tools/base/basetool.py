@@ -24,7 +24,7 @@ class BaseTool(BaseScene):
                 with frame.win:
                     win = self.render()
             if win:
-                win.setOnClose({'callback': self.onClose, 'arg_event': True})
+                win.setOnClose({'callback': self.onclose, 'arg_event': True})
                 self.win = win
         except Exception:
             traceback.print_exc()
@@ -46,7 +46,7 @@ class BaseTool(BaseScene):
         """
         with ui.MenuBar() as menubar:
             with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.closeWindow)
+                ui.MenuItem("关闭\tCtrl+W", onselect=self.close_window)
                 ui.MenuItem("重载\tCtrl+R", onselect=self.reload)
                 ui.MenuItem("切换置顶", onselect=self.swith_keeptop)
 
@@ -79,29 +79,29 @@ class BaseTool(BaseScene):
             __main__.frame.restart(callback=callback)
 
         if self.nested:
-            # 现在改成了主窗口的onClose里会先关闭所有未关闭子窗口
+            # 现在改成了主窗口的onclose里会先关闭所有未关闭子窗口
             close_callback()
         else:
-            self.closeWindow()
+            self.close_window()
             close_callback()
 
-    def closeWindow(self, _=None):
+    def close_window(self, _=None):
         if self.nested:
             try:
-                # closePage会自动调用onClose
+                # closePage会自动调用onclose
                 self.win.parent.closePage()
             except Exception:
                 traceback.print_exc()
                 self.win.close()
         else:
-            # win应该设置close回调为self.onClose
+            # win应该设置close回调为self.onclose
             self.win.close()
 
-    def onClose(self, view=None, event=None):
+    def onclose(self, view=None, event=None):
         """
         有三种情况进入这里
         1. nested且有关闭按钮，点关闭按钮触发
-        2. 手动调用self.closeWindow(菜单)，由parent.closePage内调用window的onClose触发
+        2. 手动调用self.close_window(菜单)，由parent.closePage内调用window的onclose触发
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
         if self.nested:
@@ -118,7 +118,7 @@ class BaseTool(BaseScene):
                 callback(self)
             close_callbacks.clear()
 
-        super().onClose()
+        super().onclose()
 
         callback = getattr(self, 'close_callback', None)
         if callback:
