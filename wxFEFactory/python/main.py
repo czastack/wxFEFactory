@@ -8,7 +8,7 @@ import tools
 from application import app
 from project import Project
 from modules import modules
-from fe.ferom import FeRomRW
+# from fe.ferom import FeRomRW
 from lib import exui, extypes, wxconst
 from lib.win32.keys import WXK
 Path = os.path
@@ -55,12 +55,12 @@ class MainFrame:
                     if app.config['recent_project']:
                         ui.MenuItem("清除列表", onselect=self.clear_recent_project, sep=True)
                 ui.MenuItem("打开工程所在文件夹", onselect=self.open_project_dir)
-                ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
+                # ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
                 ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=self.closeWindow)
             with ui.Menu("视图"):
                 ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggle_console)
-                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_consol_input_multi)
+                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_console_input_multi)
             with ui.Menu("工具"):
                 ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.open_tool)
             with ui.Menu("窗口"):
@@ -78,12 +78,12 @@ class MainFrame:
                     with ui.Horizontal(className="expand console-input-bar"):
                         self.console_input = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
                             className="expand console-input")
-                        ui.Button("∧", className="btn-sm", onclick=self.toggle_consol_input_multi)
+                        ui.Button("∧", className="btn-sm", onclick=self.toggle_console_input_multi)
                 with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
                     self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
                     with ui.Vertical(className="expand"):
-                        ui.Button("∨", className="btn-sm", onclick=self.toggle_consol_input_multi)
-                        ui.Button(">>", className="btn-sm fill", onclick=self.consol_input_multi_run).setToolTip(
+                        ui.Button("∨", className="btn-sm", onclick=self.toggle_console_input_multi)
+                        ui.Button(">>", className="btn-sm fill", onclick=self.console_input_multi_run).setToolTip(
                             "执行输入框中代码 Ctrl+Enter")
                 ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
                 ui.AuiItem(multiline_console, name="multiline_console", direction="bottom",
@@ -148,29 +148,30 @@ class MainFrame:
         self.win.close()
 
     def restart(self, _=None, callback=None):
+        """重启"""
         self.closeWindow()
         fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
 
     def render_toolbar(self):
+        """渲染快捷工具栏"""
         bitmap = ui.Bitmap()
         toolbar = ui.AuiToolBar()
-        for item in tools.toolbar_tools:
-            bitmap.loadIcon('python/tools/%s/icon.ico' % item[1].replace('.', '/'))
-            toolbar.addTool(item[0], "", bitmap, self.on_toolbar_tool_click)
+        for name, module in tools.toolbar_tools:
+            bitmap.loadIcon('python/tools/%s/icon.ico' % module.replace('.', '/'))
+            toolbar.addTool(name, "", bitmap, self.on_toolbar_tool_click)
 
         return toolbar.realize()
 
     def on_toolbar_tool_click(self, toolbar, toolid):
+        """快捷工具栏点击处理"""
         self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
 
     def toggle_console(self, menu):
         """显示/隐藏控制台"""
         self.aui.togglePane("console")
 
-    def onselect(self, *args):
-        print(args)
-
     def new_project(self, menu):
+        """新建工程"""
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -184,6 +185,7 @@ class MainFrame:
             self.on_open_project(project)
 
     def open_project(self, menu):
+        """打开工程"""
         path = fefactory_api.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
@@ -193,6 +195,7 @@ class MainFrame:
                 fefactory_api.alert("提示", "该目录下没有project.json")
 
     def do_open_project(self, menu):
+        """处理打开工程"""
         path = menu.getText()
         print(path)
         if path != app.project.path:
@@ -201,24 +204,29 @@ class MainFrame:
             self.on_open_project(project)
 
     def on_open_project(self, project):
+        """打开工程回调"""
         if project:
             self.win.title = "%s - %s" % (self.win.title, project.title)
 
     def open_project_dir(self, menu):
+        """打开工程目录"""
         if app.project_confirm():
             os.startfile(app.project.path)
 
     def clear_recent_project(self, menu):
+        # 清除最近的工程
         pass
 
-    def toggle_consol_input_multi(self, _=None):
+    def toggle_console_input_multi(self, _=None):
+        """触发控制台多行输入框"""
         p1 = self.console_input.parent
         isShow = not p1.isShow()
         p1.show(isShow)
         self.aui.showPane("multiline_console", not isShow)
         self.console.relayout()
 
-    def consol_input_multi_run(self, _=None):
+    def console_input_multi_run(self, _=None):
+        """控制台多行输入框执行"""
         try:
             exec(self.console_input_multi.value, vars(__main__))
         except Exception as e:
@@ -228,6 +236,7 @@ class MainFrame:
                 traceback.print_exc()
 
     def onConsoleFileDrop(self, files):
+        """控制台文件拖动事件"""
         # scope = __main__.__dict__
         scope = {'__builtins__': __main__.__builtins__}
         for file in files:
@@ -247,7 +256,7 @@ class MainFrame:
             return True
         if mod == WXK.MOD_CONTROL:
             if code == WXK.RETURN:
-                self.consol_input_multi_run()
+                self.console_input_multi_run()
                 return True
             elif code == WXK.A:
                 text_input.selectAll()
@@ -256,28 +265,29 @@ class MainFrame:
                 self.console_output.clear()
                 return True
 
-    def read_from_rom(self, menu):
-        rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
-        if not rom:
-            return
-        reader = FeRomRW(rom)
-        if not reader.closed:
-            print(reader.getRomTitle())
-            dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
-            if dialog.showModal():
-                for i in dialog.listbox.getCheckedItems():
-                    name = modules[i][1]
-                    try:
-                        Module = self.get_module(name)
-                        module = Module()
-                        module.attach()
-                        module.readFrom(reader)
+    # def read_from_rom(self, menu):
+    #     rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
+    #     if not rom:
+    #         return
+    #     reader = FeRomRW(rom)
+    #     if not reader.closed:
+    #         print(reader.getRomTitle())
+    #         dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
+    #         if dialog.showModal():
+    #             for i in dialog.listbox.getCheckedItems():
+    #                 name = modules[i][1]
+    #                 try:
+    #                     Module = self.get_module(name)
+    #                     module = Module()
+    #                     module.attach()
+    #                     module.readFrom(reader)
 
-                    except Exception:
-                        print('加载模块%s失败' % name)
-                        traceback.print_exc()
+    #                 except Exception:
+    #                     print('加载模块%s失败' % name)
+    #                     traceback.print_exc()
 
     def open_tool(self, menu):
+        """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
             with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
@@ -294,6 +304,7 @@ class MainFrame:
         dialog.showModal()
 
     def get_sub_tools(self, parent):
+        """获取子目录工具"""
         dir_path = Path.dirname(parent.__file__)
         files = os.listdir(dir_path)
         result = []
@@ -306,6 +317,7 @@ class MainFrame:
         return result
 
     def open_tool_by_name(self, name):
+        """根据名称打开工具"""
         Tool = self.get_tool(name)
         tool = Tool()
         tool.attach(self)
@@ -329,9 +341,11 @@ class MainFrame:
             self.tool_dialog.endModal()
 
     def on_tool_change(self, book):
+        """切换工具"""
         __main__.tool = self.opened_tools_map.get(id(book.getPage()), None)
 
     def on_tool_close(self, tool):
+        """工具窗口关闭回调，移除引用"""
         self.opened_tools.remove(tool)
         self.opened_tools_map.pop(id(tool.win), None)
 
@@ -339,12 +353,14 @@ class MainFrame:
             del __main__.tool
 
     def save_win_option(self, menu):
+        """保存窗口参数(大小和位置等)"""
         app.setconfig('start_option', {
             'position': self.win.position,
             'size': self.win.size,
         })
 
 
+# 自适应默认窗口大小
 screen_width = fefactory.Screen.width
 if screen_width <= 1366:
     window_size = (900, 1200)

@@ -1,6 +1,6 @@
 from lib import wxconst
 from tools.base.basetool import BaseTool
-from fe.ferom import FeRomRW
+from tools.gba.fireemblem.fe.ferom import FeRomRW
 from fefactory_api import ui
 
 
