@@ -70,6 +70,7 @@ class Main(MonoHacktool):
         with ui.Horizontal(className="expand padding_top"):
             ListFooterButtons(li)
             ui.Button(label="解锁所选", className="button", onclick=self.unlock_checked_skills)
+            ui.Button(label="捡起当前", className="button", onclick=self.pickup_selected_skill)
 
     def render_items(self):
         """渲染符文列表"""
@@ -173,7 +174,7 @@ class Main(MonoHacktool):
         self.mono_security_call_reuse(args)
 
     def PickUpSkill(self, skill):
-        """给予技能，原有技能会掉出"""
+        """捡起技能，原有技能会掉出"""
         self.activePlayer.PickUpSkill(self.call_mono_string_new(skill), True, True)
 
     def GiveItem(self, item):
@@ -193,6 +194,15 @@ class Main(MonoHacktool):
         """解锁所选技能"""
         skills = (datasets.skills_info[i][0] for i in self.skill_listview.getCheckedList())
         self.HandleSkillsUnlock(skills)
+
+    def pickup_selected_skill(self, _):
+        """捡起当前第一个高亮选中的技能"""
+        indexs = self.skill_listview.getSelectedList()
+        if indexs:
+            index = indexs[0]
+            self.PickUpSkill(datasets.skills_info[index][0])
+            if len(indexs) > 1:
+                print('选中了多个技能，但只生效第一个')
 
     def give_checked_items(self, _):
         """给予所选物品"""

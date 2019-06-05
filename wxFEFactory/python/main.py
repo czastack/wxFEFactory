@@ -297,8 +297,8 @@ class MainFrame:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
                 tree.setOnItemActivated(self.weak.on_tool_select)
-            with dialog.footer:
-                ui.Button(label="收藏")
+            # with dialog.footer:
+            #     ui.Button(label="收藏")
             self.tool_dialog = dialog
         dialog.showModal()
 
