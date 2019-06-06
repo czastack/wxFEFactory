@@ -929,8 +929,20 @@ def TabList(data):
     return book
 
 
-def ListFooterButtons(li):
+class ListFooterButtons:
     """渲染带复选框列表的底部按钮"""
-    ui.Button(label="全选", className="button", onclick=lambda btn: li.checkAll())
-    ui.Button(label="全不选", className="button", onclick=lambda btn: li.checkAll(False))
-    ui.Button(label="勾选高亮", className="button", onclick=lambda btn: li.checkSelection())
+    def __init__(self, li):
+        self.li = li
+        ui.Button(label="全选", className="button", onclick=lambda btn: li.checkAll())
+        ui.Button(label="全不选", className="button", onclick=lambda btn: li.checkAll(False))
+        ui.Button(label="勾选高亮", className="button", onclick=lambda btn: li.checkSelection())
+        ui.Button(label="导出勾选", className="button", onclick=self.dump_checked)
+        ui.Button(label="导入勾选", className="button", onclick=self.load_checked)
+
+    def dump_checked(self, _):
+        """导出勾选"""
+        fefactory.json_dump_file(self, self.li.getCheckedList())
+
+    def load_checked(self, _):
+        """导入勾选"""
+        self.li.setCheckedList(fefactory.json_load_file(self))

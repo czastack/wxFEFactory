@@ -65,3 +65,8 @@ class Cooldown(MonoClass):
 
 class CooldownEntry(MonoClass):
     EntryUpdate = MonoMethod(compile=True)
+
+
+class Item(MonoClass):
+    # static bool IsUnlocked(string givenID, bool setUnlocked = false)
+    IsUnlocked = MonoMethod(param_count=2, signature='PB', type=int)

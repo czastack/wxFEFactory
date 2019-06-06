@@ -241,7 +241,7 @@ public:
 		return ctrl().IsItemChecked(item);
 	}
 
-	void checkItem(int item, bool checked)
+	void checkItem(int item, bool checked=true)
 	{
 		ctrl().CheckItem(item, checked);
 	}
@@ -261,7 +261,7 @@ public:
 		return ctrl().IsSelected(item);
 	}
 
-	void selectItem(int item, bool selected)
+	void selectItem(int item, bool selected=true)
 	{
 		ctrl().Select(item, selected);
 	}
@@ -284,6 +284,11 @@ public:
 
 	py::list getCheckedList();
 	py::list getSelectedList();
+	// 设置勾选的列表
+	void setCheckedList(py::sequence& selection);
+	// 设置选中的列表
+	void setSelectedList(py::sequence& selection);
+	// 清除选中
 	void clearSelected();
 
 	void setOnItemSelected(pyobj &fn, bool reset = true)

@@ -18,7 +18,7 @@ class Main(MonoHacktool):
 
     def __init__(self):
         super().__init__()
-        self.controller = None
+        self.GameController = None
 
     def onattach(self):
         super().onattach()
@@ -30,9 +30,11 @@ class Main(MonoHacktool):
             models.GameController,
             models.Cooldown,
             models.CooldownEntry,
+            models.Item,
         ))
 
-        self.controller = models.GameController(None, self)
+        self.GameController = models.GameController(0, self)
+        self.Item = models.Item(0, self)
 
     def render_main(self):
         with Group("player", "全局", None):
@@ -141,7 +143,7 @@ class Main(MonoHacktool):
 
     @property
     def activePlayer(self):
-        return self.controller and self.controller.activePlayers[0]
+        return self.GameController and self.GameController.activePlayers[0]
 
     def recovery(self):
         """恢复健康"""
@@ -189,6 +191,10 @@ class Main(MonoHacktool):
             for item in items
         )
         self.mono_security_call_reuse(args)
+
+    def ItemIsUnlocked(self, item, set=True):
+        """设置或查询符文解锁情况"""
+        return self.Item.IsUnlocked(self.call_mono_string_new(item), set)
 
     def unlock_checked_skills(self, _):
         """解锁所选技能"""

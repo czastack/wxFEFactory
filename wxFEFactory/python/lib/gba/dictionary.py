@@ -23,7 +23,7 @@ class Dictionary:
         self.use_ascii = use_ascii
 
         if isinstance(code_table, str):
-            with open(code_table, 'r', encoding='utf8') as f:
+            with open(code_table, encoding='utf8') as f:
                 for line in f.readlines():
                     line = line.rstrip('\n')
                     if line:

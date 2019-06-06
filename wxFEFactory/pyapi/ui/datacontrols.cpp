@@ -254,6 +254,24 @@ py::list ListView::getSelectedList()
 	return result;
 }
 
+void ListView::setCheckedList(py::sequence& selection)
+{
+	checkAll(false);
+	for (auto &i: selection)
+	{
+		checkItem(i.cast<int>());
+	}
+}
+
+void ListView::setSelectedList(py::sequence& selection)
+{
+	clearSelected();
+	for (auto& i : selection)
+	{
+		selectItem(i.cast<int>());
+	}
+}
+
 void ListView::clearSelected()
 {
 	for (int i = ctrl().GetFirstSelected(); i != -1; i = ctrl().GetNextSelected(i))
@@ -323,6 +341,8 @@ void init_datacontrols(py::module &m)
 		.def("selectItem", &ListView::selectItem, "item"_a, "selected"_a=true)
 		.def("getCheckedList", &ListView::getCheckedList)
 		.def("getSelectedList", &ListView::getSelectedList)
+		.def("setCheckedList", &ListView::setCheckedList, "selection"_a)
+		.def("setSelectedList", &ListView::setSelectedList, "selection"_a)
 		.def("clearSelected", &ListView::clearSelected)
 		.def("setOnItemSelected", &ListView::setOnItemSelected, "onselect"_a, evt_reset)
 		.def("setOnItemDeselected", &ListView::setOnItemDeselected, "ondeselect"_a, evt_reset)

@@ -58,10 +58,11 @@ def execfile(path, encoding="utf-8"):
 
 def json_dump_file(owner, data, dumper=None):
     """选择json文件导出"""
-    path = fefactory_api.choose_file("选择保存文件", file=getattr(owner, 'lastfile', None), wildcard='*.json')
+    lastfile = owner and getattr(owner, 'lastfile', None)
+    path = fefactory_api.choose_file("选择保存文件", file=lastfile, wildcard='*.json')
     if path:
-        owner.lastfile = path
-
+        if owner:
+            owner.lastfile = path
         with open(path, 'w', encoding="utf-8") as file:
             if dumper is None:
                 json.dump(data, file)
@@ -71,9 +72,11 @@ def json_dump_file(owner, data, dumper=None):
 
 def json_load_file(owner):
     """选择json文件导入"""
-    path = fefactory_api.choose_file("选择要读取的文件", file=getattr(owner, 'lastfile', None), wildcard='*.json')
+    lastfile = owner and getattr(owner, 'lastfile', None)
+    path = fefactory_api.choose_file("选择要读取的文件", file=lastfile, wildcard='*.json')
     if path:
-        owner.lastfile = path
+        if owner:
+            owner.lastfile = path
         with open(path, encoding="utf-8") as file:
             return json.load(file)
 
