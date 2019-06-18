@@ -149,6 +149,8 @@ class NativeHacktool(AssemblyHacktool):
         """一次调用多个函数(复用)
         :param prest: 前置调用，每次复用前都要先放调用前置条件
         """
+        if not extypes.is_list_tuple(call_list):
+            call_list = tuple(call_list)
         len_call_list = len(call_list)
         len_buffer = len(context_array)
         len_preset = len(preset) if preset else 0

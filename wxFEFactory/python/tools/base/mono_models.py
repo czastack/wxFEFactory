@@ -10,6 +10,7 @@ class MonoType:
 class MonoClass(MonoType):
     namespace = ''
     name = None
+    namepath = None  # 内部类前缀 /分隔
     vtable = None
     need_vtable = False
 
@@ -22,6 +23,8 @@ class MonoClass(MonoType):
         if not getattr(cls, '__abstract__', False):
             if cls.name is None:
                 cls.name = cls.__name__
+                if cls.namepath is not None:
+                    cls.name = cls.namepath + cls.name
 
             cls.methods = []
             cls.fields = []

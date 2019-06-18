@@ -85,7 +85,7 @@ class MonoHacktool(NativeHacktool):
         """根据mono class和mothod name获取mono class
         :param items: ((namespace, name),)
         """
-        return self.native_call_n((
+        return self.native_call_n_reuse((
             self.call_arg_ptr(*self.mono_class_from_name, self.image, *item) for item in items
         ), self.context_array)
 

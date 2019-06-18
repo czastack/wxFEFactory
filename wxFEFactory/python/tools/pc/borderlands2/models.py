@@ -200,5 +200,7 @@ class Manager(Model):
 
 
 class Global(Model):
-    mgr = ModelPtrField(0x01EEE798, Manager)
+    # old
+    # mgr = ModelPtrField(0x01EEE798, Manager)
+    mgr = ModelPtrField(0x01648458, Manager)
     # player_mgr = ModelPtrField(0x01EEF510, PlayerManager)

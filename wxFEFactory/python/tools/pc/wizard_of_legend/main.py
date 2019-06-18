@@ -5,7 +5,7 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta
 from tools.base.mono_hacktool import MonoHacktool, call_arg
 from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, ORIGIN
 from fefactory_api import ui
@@ -26,11 +26,15 @@ class Main(MonoHacktool):
             models.NumVarStat,
             models.Health,
             models.Wallet,
+            models.PlatWallet,
+            models.GoldWallet,
             models.Player,
             models.GameController,
             models.Cooldown,
             models.CooldownEntry,
             models.Item,
+            models.SkillState,
+            models.MeleeAttackState,
         ))
 
         self.GameController = models.GameController(0, self)
@@ -61,18 +65,23 @@ class Main(MonoHacktool):
             *Descriptor(lambda: self.activePlayer.health.guardCountStat, "ModifiedValue"))
         ProxyInput("balance", "宝石", *Descriptor(lambda: self.activePlayer.platWallet, "balance"))
         ProxyInput("balance", "金币", *Descriptor(lambda: self.activePlayer.goldWallet, "balance"))
+        ProxyInput("overdriveMinValue", "必杀槽最小值", *Descriptor(lambda: self.activePlayer, "overdriveMinValue"))
+        ProxyInput("overdriveBuildDecayRate", "必杀槽未满衰减",
+            *Descriptor(lambda: self.activePlayer.overdriveBuildDecayRate, "ModifiedValue"))
+        ProxyInput("overdriveActiveDecayRate", "必杀槽满后衰减",
+            *Descriptor(lambda: self.activePlayer.overdriveActiveDecayRate, "ModifiedValue"))
 
     def render_skills(self):
         """渲染技能列表"""
         li = self.skill_listview = ui.ListView(className="fill")
         li.enableCheckboxes()
-        li.appendColumns(("名称", "授权", "描述"), (260, 400, 800))
+        li.appendColumns(("名称", "加强", "描述"), (260, 400, 800))
         li.insertItems((item[1:] for item in datasets.skills_info))
 
         with ui.Horizontal(className="expand padding_top"):
             ListFooterButtons(li)
             ui.Button(label="解锁所选", className="button", onclick=self.unlock_checked_skills)
-            ui.Button(label="捡起当前", className="button", onclick=self.pickup_selected_skill)
+            ui.Button(label="捡起高亮", className="button", onclick=self.pickup_selected_skill)
 
     def render_items(self):
         """渲染符文列表"""
@@ -84,6 +93,7 @@ class Main(MonoHacktool):
         with ui.Horizontal(className="expand padding_top"):
             ListFooterButtons(li)
             ui.Button(label="给予所选", className="button", onclick=self.give_checked_items)
+            ui.Button(label="给予高亮", className="button", onclick=self.give_selected_items)
 
     def render_assembly_functions(self):
         Cooldown = models.Cooldown
@@ -94,45 +104,30 @@ class Main(MonoHacktool):
         super().render_assembly_functions((
             AssemblyItems('无冷却',
                 AssemblyItem('no_cooldown', None, b'\x48???\x2B\xC1',
-                    Cooldown.get_ChargesMissing.mono_compile,
-                    Cooldown.get_ChargesMissing.mono_compile + 0x2d,
-                    b'', AssemblyGroup(b'\x89\x46', MemRead(offset=3, size=1), ORIGIN),
+                    Cooldown.get_ChargesMissing.mono_compile, Delta(0x2d), b'',
+                    AssemblyGroup(b'\x89\x46', MemRead(offset=3, size=1), ORIGIN),
                     inserted=True, find_base=False, fuzzy=True),
                 AssemblyItem('no_cooldown2', None, b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
-                    Cooldown.get_IsCharging.mono_compile,
-                    Cooldown.get_IsCharging.mono_compile + 0x58,
+                    Cooldown.get_IsCharging.mono_compile, Delta(0x58),
                     b'\x90\x90\x30', find_base=False, replace_len=3)),
-            AssemblyItem('enhanced_magic_4', '技能连发', b'\x48\x83\xEC\x20\x48\x8B??????????\x48\x83\xC4\x20\x4C\x8B\xC0',
-                models.CooldownEntry.EntryUpdate.mono_compile,
-                models.CooldownEntry.EntryUpdate.mono_compile + 0x141,
-                b'', AssemblyGroup(
-                    b'\x53\x50',
-                    MemRead(offset=4, size=3),
-                    b'\x48\x8B\x80',
-                    MemRead(offset=0xC, size=4),
-                    b'\x48\xBB',
-                    Variable('cSkillStateGetIsEmpowered'),
-                    b'\x48\x8B\x1B\x48\x85\xDB\x75\x39\x80\x38\xE8\x74\x65\x80\x38\x55\x75\x60\x48\xBB',
-                    Variable('cSkillStateGetIsEmpowered'),
-                    b'\x48\x89\x03\xFF\x30\x8F\x43\x08\xFF\x70\x08\x8F\x43\x10\x48\xBB\x48\xB8\x01\x00\x00\x00\x00\x00'
-                    b'\x48\x89\x18\xBB\x00\x00\xC3\x90\x89\x58\x08\xEB\x31\x48\xBB',
-                    Variable('bEnhancedMagicScriptState'),
-                    b'\x80\x3B\x01\x7C\x22\x48\xBB',
-                    Variable('cSkillStateGetIsEmpowered'),
-                    b'\xFF\x73\x08\x8F\x00\xFF\x73\x10\x8F\x40\x08\x48\xBB',
-                    Variable('bEnhancedMagicScriptState'),
-                    b'\xC6\x03\x02\x58\x5B',
-                    ORIGIN,
-                ),
-                inserted=True, find_base=False, fuzzy=True, replace_len=7,
-                args=(
-                    VariableType('cSkillStateGetIsEmpowered', size=0x28),
-                    VariableType('bEnhancedMagicScriptState', size=8),
-                )),
+            AssemblyItem('basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
+                models.MeleeAttackState.HandleSelfTransition.mono_compile, Delta(0xf0),
+                b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
+            AssemblyItem('double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00',
+                models.PlatWallet.Deposit.mono_compile, Delta(0x5d), b'',
+                AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
+                inserted=True, find_base=False),
+            AssemblyItem('double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00',
+                models.GoldWallet.Deposit.mono_compile, Delta(0x5d), b'',
+                AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
+                inserted=True, find_base=False),
+            AssemblyItem('skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00',
+                models.SkillState.get_IsEmpowered.mono_compile, Delta(0x2b),
+                b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
         ))
 
     def render_hotkeys(self):
-        ui.Text("Capslock: 大招槽满\n"
+        ui.Text("Capslock: 必杀槽满\n"
             "h: 血量满\n")
 
     def get_hotkeys(self):
@@ -143,6 +138,7 @@ class Main(MonoHacktool):
 
     @property
     def activePlayer(self):
+        """当前玩家"""
         return self.GameController and self.GameController.activePlayers[0]
 
     def recovery(self):
@@ -153,7 +149,7 @@ class Main(MonoHacktool):
             health.CurrentHealthValue = health.healthStat.ModifiedValue
 
     def overdrive(self):
-        """大招槽满"""
+        """必杀槽满"""
         player = self.activePlayer
         if player:
             player.OverdriveProgress = 100.0
@@ -213,4 +209,9 @@ class Main(MonoHacktool):
     def give_checked_items(self, _):
         """给予所选物品"""
         items = (datasets.items_info[i][0] for i in self.item_listview.getCheckedList())
+        self.GiveItems(items)
+
+    def give_selected_items(self, _):
+        """给予高亮选中物品"""
+        items = (datasets.items_info[i][0] for i in self.item_listview.getSelectedList())
         self.GiveItems(items)

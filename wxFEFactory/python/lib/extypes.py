@@ -15,97 +15,56 @@ def astr(text):
 
 
 class Map(dict):
-    __slots__ = ()
+    __slots__ = ('__dict__',)
 
-    def __getattr__(self, name):
-        return self.get(name, None)
-
-    def __setattr__(self, name, value):
-        self[name] = value
-
-    def __delattr__(self, name):
-        del self[name]
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        self.__dict__ = self
 
 
-class Dict:
+class Dict(Map):
     """
     usage:
         data = Dict({'a': 1})
         print(data.a)  # get 1
     """
-    __slots__ = ('_data',)
+    __slots__ = ('dafault_value',)
 
-    def __init__(self, obj=None):
-        self._attr('_data', obj)
+    def __init__(self, *args, dafault_value=None, **kwargs):
+        Map.__init__(self, *args, **kwargs)
+        self.dafault_value = dafault_value
 
-    def _attr(self, name, value):
-        object.__setattr__(self, name, value)
+    def __missing__(self, name):
+        return self.dafault_value
 
     def __getattr__(self, name):
-        return self._data.get(name, getattr(self._data, name, None))
-
-    def __setattr__(self, name, value):
-        self._data[name] = value
-
-    def __str__(self):
-        return self._data.__str__()
-
-    def __iter__(self):
-        return self._data.__iter__()
+        return self.dafault_value
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
-            return (self._data[k] for k in key)
+            return (Map.__getitem__(self, k) for k in key)
         elif isinstance(key, list):
-            return [self._data[k] for k in key]
-        return self._data[key]
+            return [Map.__getitem__(self, k) for k in key]
+        return Map.__getitem__(self, key)
 
     def __setitem__(self, key, value):
         if is_list_tuple(key):
             if is_list_tuple(value):
-                val = iter(value).__next__
+                get = iter(value).__next__
             else:
-                def val():
+                def get():
                     return value
             for k in key:
-                self._data[k] = val()
+                Map.__setitem__(self, k, get())
         else:
-            self._data[key] = value
-
-    def __delattr__(self, name):
-        del self._data[name]
+            Map.__setitem__(self, key, value)
 
     def __repr__(self):
-        return __class__.__name__ + '(' + self.__str__() + ')'
+        return '%s(%s)' % (__class__.__name__, Map.__repr__(self))
 
     def __and__(self, keys):
-        if is_list_tuple(key):
-            return __class__({key: self.__getattr__(key) for key in keys})
-
-
-class Dicts:
-    """
-    接收字典列表
-    datas = Dict([{'a': 1}, {'a': 2}])
-    for data in datas:
-        print(data.a)
-    """
-    __slots__ = ('_ref', 'data')
-
-    def __init__(self, array):
-        if is_list_tuple(array):
-            self._ref = None
-            self.data = array
-        else:
-            raise TypeError('array must be a list or tuple')
-
-    def __iter__(self):
-        if not self._ref:
-            self._ref = Dict()
-
-        for item in self.data:
-            self._ref.__init__(item)
-            yield self._ref
+        if is_list_tuple(keys):
+            return __class__({key: Map.__getitem__(self, key) for key in keys})
 
 
 class INum:

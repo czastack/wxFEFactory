@@ -22,7 +22,16 @@ class Wallet(MonoClass):
     """钱包"""
     balance = MonoField(label="余额")
     maxBalance = MonoField(label="最大值")
+
+
+class PlatWallet(MonoClass):
+    """混沌宝石钱包"""
     # 存入
+    Deposit = MonoMethod(param_count=1, compile=True)
+
+
+class GoldWallet(MonoClass):
+    """金币钱包"""
     Deposit = MonoMethod(param_count=1, compile=True)
 
 
@@ -33,6 +42,11 @@ class Player(MonoClass):
     health = MonoField(type=Health)
     goldWallet = MonoStaticField(type=Wallet)
     platWallet = MonoStaticField(type=Wallet)
+    overdriveMinValue = MonoField(type=float)  # 必杀槽最小值
+    # 必杀槽未满衰减速度
+    overdriveBuildDecayRate = MonoField(type=NumVarStat)
+    # 必杀槽满后衰减速度
+    overdriveActiveDecayRate = MonoField(type=NumVarStat)
 
     # void AssignSkillSlot(int skillSlotNum, string skillID, bool setSignature = false, bool signatureStatus = false)
     # AssignSkillSlot = MonoMethod(param_count=4, signature='iP2B')
@@ -70,3 +84,20 @@ class CooldownEntry(MonoClass):
 class Item(MonoClass):
     # static bool IsUnlocked(string givenID, bool setUnlocked = false)
     IsUnlocked = MonoMethod(param_count=2, signature='PB', type=int)
+
+
+class SkillState(MonoClass):
+    """基础技能状态"""
+    namepath = 'Player/'
+    get_IsEmpowered = MonoMethod(compile=True)
+
+
+class MeleeAttackState(MonoClass):
+    """基础技能状态"""
+    namepath = 'Player/'
+    # 主要是这个字段要低: minAnimSpeedForSelfTransition
+    HandleSelfTransition = MonoMethod(param_count=1, compile=True)
+
+
+class ItemStoreItem(MonoClass):
+    BuyWithPlat = MonoMethod(compile=True)

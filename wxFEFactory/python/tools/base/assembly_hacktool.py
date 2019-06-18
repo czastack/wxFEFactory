@@ -208,6 +208,8 @@ class AssemblyHacktool(BaseHackTool):
             find_start = find_start()
         if callable(find_end):
             find_end = find_end()
+        elif isinstance(find_end, Delta):
+            find_end = find_start + find_end
         if base_addr:
             find_start += base_addr
             find_end += base_addr
@@ -278,6 +280,11 @@ class AssemblyItems:
     @property
     def key(self):
         return self.children[0].key
+
+
+class Delta(int):
+    """差值"""
+    pass
 
 
 """ register_assembly 的参数类型
