@@ -75,7 +75,7 @@ struct Color32: Color24
 {
 	u8 alpha;
 
-	Color32 &operator=(Color c) 
+	Color32 &operator=(Color c)
 	{
 		(void)Color24::operator=(c);
 		alpha = 0xFFu;
@@ -134,7 +134,7 @@ struct CPalette
 			data[i] = pal[i];
 		}
 	}
-	
+
 	CPalette(const wxPalette &pal)
 	{
 		(void)operator=(pal);

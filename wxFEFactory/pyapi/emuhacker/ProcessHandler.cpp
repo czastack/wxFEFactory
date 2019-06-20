@@ -305,7 +305,7 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
 			+ offsetof(IMAGE_DATA_DIRECTORY, VirtualAddress);
 	raw_read(module + e_lfanew + offsetVirtualAddress, &VirtualAddress, sizeof(DWORD));
 	raw_read(module + VirtualAddress, &ides, sizeof(IMAGE_EXPORT_DIRECTORY));
-	
+
 	return new ProcAddressHelper(this, &ides, module);
 }
 
@@ -353,7 +353,7 @@ addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, ad
 		}
 		cur_addr += PAGE_SIZE;
 	}
-	
+
 	if (finded)
 	{
 		return cur_addr + (page_cursor - page);
@@ -393,7 +393,7 @@ void ProcAddressHelper::getProcAddress(wxArrayString& name_list, wxArraySizeT& a
 	{
 		m_handler->raw_read(namePtrAddr, &nameAddr, sizeof(DWORD));
 		m_handler->raw_read(m_module + nameAddr, namebuf, sizeof(namebuf));
-		
+
 		for (int j = 0; j < name_list.size(); ++j)
 		{
 			if (addr_list[j] == 0)

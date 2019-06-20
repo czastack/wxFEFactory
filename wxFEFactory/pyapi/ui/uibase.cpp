@@ -423,7 +423,7 @@ pyobj Layout::__enter__() {
 	{
 		tmp_styles_list = new wxVector<PyObject*>;
 	}
-	
+
 	Layout *parent = getParent();
 
 	if (!parent)

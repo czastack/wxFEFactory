@@ -4,7 +4,7 @@
 #include "utils/utils.h"
 
 namespace pybind11 {
-	
+
 	namespace detail {
 #if wxUSE_UNICODE_WCHAR && wxUSE_STL_BASED_WXSTRING
 		template <> class type_caster<wxString> {
@@ -116,7 +116,7 @@ namespace pybind11 {
 		};
 	}
 
-	
+
 	template <typename type_, typename... options>
 	class class_t : public class_<type_, options...>
 	{

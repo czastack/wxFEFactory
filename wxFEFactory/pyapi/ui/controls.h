@@ -148,7 +148,7 @@ public:
 };
 
 
-class Img : public Control 
+class Img : public Control
 {
 public:
 	template <class... Args>
@@ -283,7 +283,7 @@ public:
 	SearchCtrl(wxcstr value, bool search_button, bool cancel_button, long wxstyle, Args ...args) : Control(args...)
 	{
 		bindElem(new wxSearchCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), wxstyle));
-		
+
 		if (!search_button)
 		{
 			ctrl().ShowSearchButton(false);
@@ -327,7 +327,7 @@ public:
 	template <class... Args>
 	SpinCtrl(wxcstr value, int min, int max, int initial, long wxstyle, Args ...args) : Control(args...)
 	{
-		bindElem(new wxSpinCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(), 
+		bindElem(new wxSpinCtrl(*getActiveLayout(), wxID_ANY, value, wxDefaultPosition, getStyleSize(),
 			wxstyle ? wxstyle: (wxSP_ARROW_KEYS | wxALIGN_RIGHT), min, max, initial));
 	}
 
@@ -708,7 +708,7 @@ public:
 };
 
 
-class FilePickerCtrl : public Control 
+class FilePickerCtrl : public Control
 {
 public:
 	template <class... Args>
@@ -739,7 +739,7 @@ public:
 };
 
 
-class DirPickerCtrl : public Control 
+class DirPickerCtrl : public Control
 {
 public:
 	template <class... Args>

@@ -265,7 +265,7 @@ void init_controls(py::module & m)
 			"value"_a = wxEmptyString, "min"_a=0, "max"_a=100, "initial"_a=0, wxstyle, className, style)
 		.def("setOnChange", &SpinCtrl::setOnChange, evt_fn, evt_reset)
 		.def("setOnEnter", &SpinCtrl::setOnEnter, evt_fn, evt_reset)
-		.def_property("value", 
+		.def_property("value",
 			[](SpinCtrl *self) { return self->ctrl().GetValue(); },
 			[](SpinCtrl *self, int value) { return self->ctrl().SetValue(value); })
 		.def_property("min",
@@ -384,7 +384,7 @@ void init_controls(py::module & m)
 			return self->ctrl().InsertItem(parent, pos, text, image, selectedImage, data.is_none() ? NULL : new PyTreeItemData(data));
 		}, "parent"_a, text, image, selectedImage, data, pos)
 
-		.def("GetItemData", [](TreeCtrl *self, const wxTreeItemId& item) { 
+		.def("GetItemData", [](TreeCtrl *self, const wxTreeItemId& item) {
 			PyTreeItemData *data = (PyTreeItemData*)self->ctrl().GetItemData(item);
 			return data ? data->GetData(): None;
 		})
@@ -414,9 +414,9 @@ void init_controls(py::module & m)
 		.def("SetIndent", [](TreeCtrl *self, unsigned int indent) { self->ctrl().SetIndent(indent); })
 		.def("GetSpacing", [](TreeCtrl *self) { return self->ctrl().GetSpacing(); })
 		.def("SetSpacing", [](TreeCtrl *self, unsigned int spacing) { self->ctrl().SetSpacing(spacing); })*/
-		
+
 		.def_property_readonly("count", [](TreeCtrl *self) { return self->ctrl().GetCount(); })
-		.def_property("indent", 
+		.def_property("indent",
 			[](TreeCtrl *self) { return self->ctrl().GetIndent(); },
 			[](TreeCtrl *self, unsigned int indent) { self->ctrl().SetIndent(indent); }
 		)

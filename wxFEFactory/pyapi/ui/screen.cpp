@@ -15,7 +15,7 @@ py::tuple Screen::getScreenSize()
 py::tuple Screen::getDpi()
 {
 	auto size = py::tuple(2);
-	// 获取DPI  
+	// 获取DPI
 	HDC hdc = GetDC(NULL);
 	if (hdc != NULL) {
 		size[0] = GetDeviceCaps(hdc, LOGPIXELSX);

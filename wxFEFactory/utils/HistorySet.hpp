@@ -8,7 +8,7 @@ class HistorySet: public wxArrayString
 public:
 	HistorySet(int maxsize=-1): m_maxsize(maxsize)
 	{
-		
+
 	}
 
 	wxcstr prev() {

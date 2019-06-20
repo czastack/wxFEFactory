@@ -21,7 +21,7 @@ void reloadFefactory()
 	if (fefactory)
 	{
 		fefactory.reload();
-	} 
+	}
 	else
 	{
 		try

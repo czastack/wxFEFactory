@@ -16,7 +16,7 @@ namespace FEF {
 		Tile* srcTile = src.data;
 		u32 tileRow;
 		// int emptyOffset = bpData.GetRowStride() - (src.colspan << 3) * decltype(dst)::PixelFormat::SizePixel;
-		
+
 		for (dstTileY = 0; dstTileY < src.rowspan; ++dstTileY)
 		{
 			for (int i = 0; i < 8; ++i)
@@ -92,7 +92,7 @@ namespace FEF {
 		}
 	}
 
-	void reduceColor(wxImage &image, Palette24 &palette) 
+	void reduceColor(wxImage &image, Palette24 &palette)
 	{
 		if ((image.HasPalette() ? image.GetPalette().GetColoursCount() : image.CountColours()) > GBA_COLOR_MAX)
 		{
@@ -106,7 +106,7 @@ namespace FEF {
 		{
 			palette = image.GetPalette();
 		}
-		else 
+		else
 		{
 			const int iHeight = image.GetHeight();
 			const int iWidth = image.GetWidth();
@@ -176,7 +176,7 @@ namespace FEF {
 		}
 
 		for (auto &arg : empty) {
-			bp.SetRGB({ arg.x << 3, arg.y << 3, arg.width << 3, arg.height << 3 }, 
+			bp.SetRGB({ arg.x << 3, arg.y << 3, arg.width << 3, arg.height << 3 },
 				palette24[0].red, palette24[0].green, palette24[0].blue);
 		}
 

@@ -80,8 +80,8 @@ CTreadable* CBuilding::GetIsATreadable(void) 0x0
 /*thiscall*/ void CBuilding::CBuilding(void) 0x407E40
 /*cdecl*/ void CBulletTraces::AddTrace(CVector * start,CVector * end,float radius,uint time,uchar transparency) 0x573910
 /*cdecl*/ void CBulletTraces::AddTrace(CVector * start,CVector * end,int weaponType,CEntity * entity) 0x573D40
-/*cdecl*/ void CBulletTraces::Init(void) 0x573E80 
-/*cdecl*/ void CBulletTraces::Render(void) 0x5729F0 
+/*cdecl*/ void CBulletTraces::Init(void) 0x573E80
+/*cdecl*/ void CBulletTraces::Render(void) 0x5729F0
 /*cdecl*/ int CCarCtrl::AddToLoadedVehicleArray(int, int, int) 0x4267D0
 /*cdecl*/ int CCarCtrl::AddToVehicleArray(int, int) 0x426820
 /*cdecl*/ int CCarCtrl::ChooseCarModel(int) 0x426AA0
@@ -137,23 +137,23 @@ CTreadable* CBuilding::GetIsATreadable(void) 0x0
 /*cdecl*/ void CCarCtrl::WeaveThroughCarsSectorList(CPtrList &ptrlist, CVehicle *vehicle, CPhysical *, float, float, float, float, float *, float *) 0x423490
 /*cdecl*/ void CCarCtrl::WeaveThroughObjectsSectorList(CPtrList &ptrlist, CVehicle *vehicle, float, float, float, float, float *, float *) 0x422B00
 /*cdecl*/ void CCarCtrl::WeaveThroughPedsSectorList(CPtrList &ptrlist, CVehicle *vehicle, CPhysical *, float, float, float, float, float *, float *) 0x4230F0
-/*thiscall*/ bool CCarGenerator::CheckForBlockage(int modelId) 0x5A6FC0 
-/*thiscall*/ bool CCarGenerator::CheckIfWithinRangeOfAnyPlayers(void) 0x5A6D00 
-/*thiscall*/ void CCarGenerator::DoInternalProcessing(void) 0x5A71C0 
-/*thiscall*/ void CCarGenerator::Process(void) 0x5A7130 
-/*thiscall*/ unsigned int CCarGenerator::Setup(float x,float y,float z,float angle,int modelId,short primaryColor,short secondaryColor,uchar forceSpawn,uchar 
-/*thiscall*/ void CCarGenerator::SwitchOff(void) 0x5A7670 
-/*thiscall*/ void CCarGenerator::SwitchOn(void) 0x5A7650 
+/*thiscall*/ bool CCarGenerator::CheckForBlockage(int modelId) 0x5A6FC0
+/*thiscall*/ bool CCarGenerator::CheckIfWithinRangeOfAnyPlayers(void) 0x5A6D00
+/*thiscall*/ void CCarGenerator::DoInternalProcessing(void) 0x5A71C0
+/*thiscall*/ void CCarGenerator::Process(void) 0x5A7130
+/*thiscall*/ unsigned int CCarGenerator::Setup(float x,float y,float z,float angle,int modelId,short primaryColor,short secondaryColor,uchar forceSpawn,uchar
+/*thiscall*/ void CCarGenerator::SwitchOff(void) 0x5A7670
+/*thiscall*/ void CCarGenerator::SwitchOn(void) 0x5A7650
 /*thiscall*/ void CCivilianPed::CCivilianPed(ePedType pedType,uint modelIndex) 0x4EAE00
-/*thiscall*/ void CCivilianPed::CivilianAI(void) 0x4E8E20 
-/*thiscall*/ void CCivilianPed::EnterVacantNearbyCars(void) 0x4E99C0 
-/*thiscall*/ void CCivilianPed::UseNearbyAttractors(void) 0x4E9E90 
+/*thiscall*/ void CCivilianPed::CivilianAI(void) 0x4E8E20
+/*thiscall*/ void CCivilianPed::EnterVacantNearbyCars(void) 0x4E99C0
+/*thiscall*/ void CCivilianPed::UseNearbyAttractors(void) 0x4E9E90
 /*cdecl*/ WORD CClock::GetGameClockMinutesUntil(BYTE hours, BYTE minutes) 0x487130
 /*cdecl*/ bool CClock::GetIsTimeInRange(BYTE hourA, BYTE hourB) 0x4870F0
 /*cdecl*/ void CClock::Initialise(DWORD milisecondsPerGameMinute) 0x4871B0
-/*cdecl*/ void CClock::RestoreClock(void) 0x486FB0 
+/*cdecl*/ void CClock::RestoreClock(void) 0x486FB0
 /*cdecl*/ void CClock::SetGameClock(BYTE hours, BYTE minutes) 0x487160
-/*cdecl*/ void CClock::StoreClock(void) 0x486FE0 
+/*cdecl*/ void CClock::StoreClock(void) 0x486FE0
 /*cdecl*/ void CClouds::Init(void) 0x540FB0
 /*cdecl*/ void CClouds::Render(void) 0x53FC50
 /*cdecl*/ void CClouds::RenderBackground(short,short,short,short,short,short,short) 0x53F650
@@ -166,7 +166,7 @@ void CClumpModelInfo::SetClump(RpClump *) 0x6980B8
 /*cdecl*/ RwFrame* CClumpModelInfo::FindFrameFromNameCB(RwFrame *frame, void *searchData) 0x5411E0
 /*cdecl*/ RwFrame* CClumpModelInfo::FindFrameFromNameWithoutIdCB(RwFrame *frame, void *searchData) 0x541190
 /*cdecl*/ RwFrame* CClumpModelInfo::GetFrameFromId(RpClump *clump, int id) 0x541120
-/*cdecl*/ void CClumpModelInfo::SetAtomicRendererCB(RpAtomic *atomic, void *renderFunc) 0x5412A0 
+/*cdecl*/ void CClumpModelInfo::SetAtomicRendererCB(RpAtomic *atomic, void *renderFunc) 0x5412A0
 /*thiscall*/ void CClumpModelInfo::SetFrameIds(RwObjectNameIdAssocation *data) 0x541090
 /*thiscall*/ void CColBox::Set(CVector const& sup, CVector const& inf, uchar material, uchar flags) 0x4108D0
 /*thiscall*/ void CColBox::operator=(CColBox const& right) 0x410890
@@ -195,15 +195,15 @@ void CClumpModelInfo::SetClump(RpClump *) 0x6980B8
 /*thiscall*/ void CCutsceneObject::CCutsceneObject(void) 0x4E04D0
 /*thiscall*/ void CCutsceneObject::CreateShadow(void) 0x4E03E0
 /*thiscall*/ bool CDamageManager::ApplyDamage(tComponent component, float intensity, float) 0x5A9650
-/*thiscall*/ void CDamageManager::FuckCarCompletely(void) 0x5A9600 
-/*thiscall*/ bool CDamageManager::GetComponentGroup(tComponent component, tComponentGroup* group, uchar *damageCompId) 0x5A98D0 
+/*thiscall*/ void CDamageManager::FuckCarCompletely(void) 0x5A9600
+/*thiscall*/ bool CDamageManager::GetComponentGroup(tComponent component, tComponentGroup* group, uchar *damageCompId) 0x5A98D0
 /*thiscall*/ uint CDamageManager::GetDoorStatus(eDoors door) 0x5A9810
 /*thiscall*/ uint CDamageManager::GetEngineStatus(void) 0x5A97E0
 /*thiscall*/ uint CDamageManager::GetLightStatus(eLights light) 0x5A9870
-/*thiscall*/ uint CDamageManager::GetPanelStatus(ePanels panel) 0x5A9850 
+/*thiscall*/ uint CDamageManager::GetPanelStatus(ePanels panel) 0x5A9850
 /*thiscall*/ uint CDamageManager::GetWheelStatus(int wheel) 0x5A9830
 /*thiscall*/ bool CDamageManager::ProgressPanelDamage(uchar panel) 0x5A9790
-/*thiscall*/ void CDamageManager::ResetDamageStatus(void) 0x5A9890 
+/*thiscall*/ void CDamageManager::ResetDamageStatus(void) 0x5A9890
 /*thiscall*/ void CDamageManager::SetDoorStatus(eDoors door, uint status) 0x5A9820
 /*thiscall*/ void CDamageManager::SetEngineStatus(uint status) 0x5A97F0
 /*thiscall*/ void CDamageManager::SetWheelStatus(int wheel, uint status) 0x5A9840
@@ -236,9 +236,9 @@ unsigned char CDraw::FadeValue 0xA10B16
 /*thiscall*/ void CDummy::CDummy(void) 0x4877E0
 /*thiscall*/ void CDummyObject::CDummyObject(CObject *object) 0x4E05D0
 /*thiscall*/ void CDummyObject::CDummyObject(void) 0x4E0640
-/*thiscall*/ void CEmergencyPed::CEmergencyPed(uint) 0x4EEB40 
-/*thiscall*/ void CEmergencyPed::FiremanAI(void) 0x4EDA80 
-/*thiscall*/ void CEmergencyPed::MedicAI(void) 0x4EDC90 
+/*thiscall*/ void CEmergencyPed::CEmergencyPed(uint) 0x4EEB40
+/*thiscall*/ void CEmergencyPed::FiremanAI(void) 0x4EDA80
+/*thiscall*/ void CEmergencyPed::MedicAI(void) 0x4EDC90
 void CEntity::Add(void) 0x0
 void CEntity::Remove(void) 0x0
 void CEntity::SetModelIndex(uint modelIndex) 0x0
@@ -282,8 +282,8 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 /*cdecl*/ void* CEntryInfoNode::operator new(uint size) 0x489BD0
 /*thiscall*/ void CEntryInfoList::Flush(void) 0x489B60
 /*thiscall*/ void CEscalators::AddOne(CVector const&,CVector const&,CVector const&,CVector const&,bool) 0x54B0A0
-/*cdecl*/ void CEscalators::Init(void) 0x54B460 
-/*cdecl*/ void CEscalators::Shutdown(void) 0x54B3A0 
+/*cdecl*/ void CEscalators::Init(void) 0x54B460
+/*cdecl*/ void CEscalators::Shutdown(void) 0x54B3A0
 /*thiscall*/ void CEscalators::Update(void) 0x54A9B0
 /*cdecl*/ int CFileMgr::GetErrorReadWrite(int fileHandle) 0x48DE90
 /*cdecl*/ int CFileMgr::CloseFile(int fileHandle) 0x48DEA0
@@ -342,12 +342,12 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 /*cdecl*/ void UnicodeMakeUpperCase(ushort *str_out,ushort const*str_in) 0x552470
 /*cdecl*/ int UnicodeStrlen(ushort const*str) 0x5524B0
 /*cdecl*/ void AsciiToUnicode(char const*str_ascii,ushort *str_unicode) 0x552500
-/*cdecl*/ bool CGeneral::SolveQuadratic(float a,float b,float c,float &x1,float &x2) 0x4A53D0 
-/*cdecl*/ int CGeneral::GetNodeHeadingFromVector(float x,float y) 0x4A5450 
-/*cdecl*/ float CGeneral::GetATanOfXY(float x,float y) 0x4A55E0 
-/*cdecl*/ float CGeneral::LimitRadianAngle(float angle) 0x4A57F0 
-/*cdecl*/ float CGeneral::LimitAngle(float angle) 0x4A5890 
-/*cdecl*/ float CGeneral::GetRadianAngleBetweenPoints(float x1,float y1,float x2,float y2) 0x4A58E0 
+/*cdecl*/ bool CGeneral::SolveQuadratic(float a,float b,float c,float &x1,float &x2) 0x4A53D0
+/*cdecl*/ int CGeneral::GetNodeHeadingFromVector(float x,float y) 0x4A5450
+/*cdecl*/ float CGeneral::GetATanOfXY(float x,float y) 0x4A55E0
+/*cdecl*/ float CGeneral::LimitRadianAngle(float angle) 0x4A57F0
+/*cdecl*/ float CGeneral::LimitAngle(float angle) 0x4A5890
+/*cdecl*/ float CGeneral::GetRadianAngleBetweenPoints(float x1,float y1,float x2,float y2) 0x4A58E0
 /*cdecl*/ float CGeneral::GetAngleBetweenPoints(float x1,float y1,float x2,float y2) 0x4A59D0
 /*thiscall*/ void cHandlingDataMgr::cHandlingDataMgr(void) 0x5ABDC0
 /*thiscall*/ void cHandlingDataMgr::ConvertDataToGameUnits(tHandlingData *handling) 0x5ABAA0
@@ -355,8 +355,8 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 /*thiscall*/ tBoatHandlingData* cHandlingDataMgr::GetBoatPointer(uchar handlingId) 0x5ABA40
 /*thiscall*/ tFlyingHandlingData* cHandlingDataMgr::GetFlyingPointer(uchar handlingId) 0x5ABA70
 /*thiscall*/ int cHandlingDataMgr::GetHandlingId(char const* name) 0x5ABCC0
-/*thiscall*/ void cHandlingDataMgr::Initialise(void) 0x5ABA10 
-/*thiscall*/ void cHandlingDataMgr::LoadHandlingData(void) 0x5AAE20 
+/*thiscall*/ void cHandlingDataMgr::Initialise(void) 0x5ABA10
+/*thiscall*/ void cHandlingDataMgr::LoadHandlingData(void) 0x5AAE20
 /*thiscall*/ void CHeli::CHeli(int modelIndex, uchar createdBy) 0x5AF7F0
 /*cdecl*/ void CHeli::InitHelis(void) 0x5AD4A0
 /*thiscall*/ void CHeli::PreRenderAlways(void) 0x5AF2E0
@@ -370,21 +370,21 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 /*cdecl*/ void GenerateHeli(bool enable) 0x5ACB30
 /*cdecl*/ void StartCatalinaFlyBy(void) 0x5ACAF0
 /*cdecl*/ RwObject* GetHeliAtomicObjectCB(RwObject* object, void* data) 0x5AC4E0
-/*cdecl*/ void CHud::Draw(void) 0x557320 
-/*cdecl*/ void CHud::DrawAfterFade(void) 0x5566E0 
+/*cdecl*/ void CHud::Draw(void) 0x557320
+/*cdecl*/ void CHud::DrawAfterFade(void) 0x5566E0
 /*cdecl*/ float CHud::DrawFadeState(DRAW_FADE_STATE fadeState,int) 0x55BD20
-/*cdecl*/ void CHud::GetRidOfAllHudMessages(void) 0x55C200 
-/*cdecl*/ void CHud::Initialise(void) 0x55C8A0 
-/*cdecl*/ bool CHud::IsHelpMessageBeingDisplayed(void) 0x55BFB0 
-/*cdecl*/ void CHud::ReInitialise(void) 0x55C440 
-/*cdecl*/ void CHud::ResetWastedText(void) 0x556570 
+/*cdecl*/ void CHud::GetRidOfAllHudMessages(void) 0x55C200
+/*cdecl*/ void CHud::Initialise(void) 0x55C8A0
+/*cdecl*/ bool CHud::IsHelpMessageBeingDisplayed(void) 0x55BFB0
+/*cdecl*/ void CHud::ReInitialise(void) 0x55C440
+/*cdecl*/ void CHud::ResetWastedText(void) 0x556570
 /*cdecl*/ void CHud::SetBigMessage(ushort *text,ushort style) 0x5565B0
 /*cdecl*/ void CHud::SetHelpMessage(ushort *text, bool quickMessage, bool permanent, bool addToBrief) 0x55BFC0
 /*cdecl*/ void CHud::SetMessage(ushort *text) 0x5566A0
 /*cdecl*/ void CHud::SetPagerMessage(ushort *text) 0x5565A0
 /*cdecl*/ void CHud::SetVehicleName(ushort *text) 0x55BFA0
 /*cdecl*/ void CHud::SetZoneName(ushort *text) 0x55C1F0
-/*cdecl*/ void CHud::Shutdown(void) 0x55C7F0 
+/*cdecl*/ void CHud::Shutdown(void) 0x55C7F0
 /*cdecl*/ void CIniFile::LoadIniFile(void) 0x56D070
 /*cdecl*/ CMatrix operator*(CMatrix const&a,CMatrix const&b) 0x4DE6C0
 /*cdecl*/ void Invert(CMatrix const&in,CMatrix&out) 0x4DE870
@@ -426,22 +426,22 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 /*cdecl*/ CTimeModelInfo* CModelInfo::AddTimeModel(int index) 0x55F6E0
 /*cdecl*/ CVehicleModelInfo* CModelInfo::AddVehicleModel(int index) 0x55F5D0
 /*cdecl*/ CWeaponModelInfo* CModelInfo::AddWeaponModel(int index) 0x55F690
-/*cdecl*/ void* CModelInfo::Get2dEffectStore(void) 0x55F570 
+/*cdecl*/ void* CModelInfo::Get2dEffectStore(void) 0x55F570
 /*cdecl*/ CBaseModelInfo* CModelInfo::GetModelInfo(char const* name,int * index) 0x55F7D0
 /*cdecl*/ CBaseModelInfo* CModelInfo::GetModelInfo(char const* name,int minIndex,int maxInedx) 0x55F780
-/*cdecl*/ void CModelInfo::Initialise(void) 0x55FA40 
+/*cdecl*/ void CModelInfo::Initialise(void) 0x55FA40
 /*cdecl*/ bool CModelInfo::IsBikeModel(int index) 0x55F4E0
 /*cdecl*/ bool CModelInfo::IsBoatModel(int index) 0x55F540
 /*cdecl*/ bool CModelInfo::IsCarModel(int index) 0x55F510
-/*cdecl*/ void CModelInfo::ShutDown(void) 0x55F820 
-/*thiscall*/ void CObject::CObject(CDummyObject * dummyObject) 0x4E40F0 
-/*thiscall*/ void CObject::CObject(int,bool) 0x4E41B0 
-/*thiscall*/ void CObject::CObject(void) 0x4E4220 
-/*thiscall*/ bool CObject::CanBeDeleted(void) 0x4E3E20 
+/*cdecl*/ void CModelInfo::ShutDown(void) 0x55F820
+/*thiscall*/ void CObject::CObject(CDummyObject * dummyObject) 0x4E40F0
+/*thiscall*/ void CObject::CObject(int,bool) 0x4E41B0
+/*thiscall*/ void CObject::CObject(void) 0x4E4220
+/*thiscall*/ bool CObject::CanBeDeleted(void) 0x4E3E20
 /*cdecl*/ void CObject::DeleteAllMissionObjects(void) 0x4E0820
 /*cdecl*/ void CObject::DeleteAllTempObjects(void) 0x4E08A0
 /*cdecl*/ void CObject::DeleteAllTempObjectsInArea(CVector point, float radius) 0x4E0720
-/*thiscall*/ void CObject::Init(void) 0x4E3E50 
+/*thiscall*/ void CObject::Init(void) 0x4E3E50
 /*thiscall*/ void CObject::ObjectDamage(float damage) 0x4E0990
 /*thiscall*/ void CObject::RefModelInfo(int modelIndex) 0x4E0970
 /*cdecl*/ void CObject::operator delete(void * data) 0x4E4030
@@ -486,158 +486,158 @@ void CEntity::FlagToDestroyWhenNextProcessed(void) 0x0
 void CPed::SetMoveAnim(void) 0x50CD50
 /*thiscall*/ int CPed::AddInCarAnims(CVehicle *vehicle,bool) 0x512520
 /*thiscall*/ void CPed::AddWeaponModel(int modelIndex) 0x4FFE40
-/*thiscall*/ char CPed::AimGun(void) 0x50B2C0 
-/*thiscall*/ void CPed::AnswerMobile(void) 0x4F5710 
+/*thiscall*/ char CPed::AimGun(void) 0x50B2C0
+/*thiscall*/ void CPed::AnswerMobile(void) 0x4F5710
 /*thiscall*/ CEntity* CPed::AttachPedToEntity(CEntity *entity,CVector offset,ushort position,float angle,eWeaponType weaponType) 0x4EF490
-/*thiscall*/ uint CPed::Attack(void) 0x52B070 
-/*thiscall*/ void CPed::Avoid(void) 0x4FA2E0 
-/*thiscall*/ int CPed::BeingDraggedFromCar(void) 0x518250 
-/*thiscall*/ void CPed::BuildPedLists(void) 0x50D4B0 
-/*thiscall*/ void CPed::BuyIceCream(void) 0x4F10D0 
-/*thiscall*/ void CPed::CalculateNewOrientation(void) 0x509F80 
-/*thiscall*/ void CPed::CalculateNewVelocity(void) 0x50A640 
-/*thiscall*/ bool CPed::CanBeDamagedByThisGangMember(CPed* ped) 0x50F130 
-/*thiscall*/ bool CPed::CanBeDeleted(void) 0x4FFEF0 
-/*thiscall*/ bool CPed::CanBeDeletedEvenInVehicle(void) 0x4FFEC0 
-/*thiscall*/ bool CPed::CanPedDriveOff(void) 0x4EFC90 
+/*thiscall*/ uint CPed::Attack(void) 0x52B070
+/*thiscall*/ void CPed::Avoid(void) 0x4FA2E0
+/*thiscall*/ int CPed::BeingDraggedFromCar(void) 0x518250
+/*thiscall*/ void CPed::BuildPedLists(void) 0x50D4B0
+/*thiscall*/ void CPed::BuyIceCream(void) 0x4F10D0
+/*thiscall*/ void CPed::CalculateNewOrientation(void) 0x509F80
+/*thiscall*/ void CPed::CalculateNewVelocity(void) 0x50A640
+/*thiscall*/ bool CPed::CanBeDamagedByThisGangMember(CPed* ped) 0x50F130
+/*thiscall*/ bool CPed::CanBeDeleted(void) 0x4FFEF0
+/*thiscall*/ bool CPed::CanBeDeletedEvenInVehicle(void) 0x4FFEC0
+/*thiscall*/ bool CPed::CanPedDriveOff(void) 0x4EFC90
 /*thiscall*/ bool CPed::CanPedJumpThis(CEntity *entity,CVector *) 0x4F0590
 /*thiscall*/ bool CPed::CanSeeEntity(CEntity *entity,float limitAngle) 0x51C870
-/*thiscall*/ bool CPed::CanSetPedState(void) 0x5018D0 
-/*thiscall*/ bool CPed::CanStrafeOrMouseControl(void) 0x501890 
-/*thiscall*/ bool CPed::CanWeRunAndFireWithWeapon(void) 0x50B220 
-/*thiscall*/ uint CPed::Chat(void) 0x4F6050 
-/*thiscall*/ bool CPed::CheckForExplosions(CVector2D &) 0x4F4950 
-/*thiscall*/ char CPed::CheckForPointBlankPeds(CPed* ped) 0x52C670 
-/*thiscall*/ bool CPed::CheckIfInTheAir(void) 0x4FD680 
-/*thiscall*/ int CPed::CheckThreatValidity(void) 0x50BD00 
-/*thiscall*/ int CPed::ChooseAttackAI(uchar,bool) 0x529460 
-/*thiscall*/ int CPed::ChooseAttackPlayer(uchar,bool) 0x528AA0 
-/*thiscall*/ void CPed::ClearAimFlag(void) 0x50B4A0 
-/*thiscall*/ void CPed::ClearAll(void) 0x509DF0 
-/*thiscall*/ void CPed::ClearAnswerMobile(void) 0x4F58C0 
-/*thiscall*/ void CPed::ClearAttack(void) 0x52D120 
-/*thiscall*/ void CPed::ClearAttackByRemovingAnim(void) 0x52CF70 
-/*thiscall*/ void CPed::ClearChat(void) 0x4F5FA0 
-/*thiscall*/ void CPed::ClearDuck(bool) 0x512A20 
-/*thiscall*/ void CPed::ClearFollowPath(void) 0x4F7920 
-/*thiscall*/ void CPed::ClearInvestigateEvent(void) 0x526BA0 
-/*thiscall*/ void CPed::ClearLeader(void) 0x521670 
-/*thiscall*/ void CPed::ClearLookFlag(void) 0x50B9C0 
-/*thiscall*/ void CPed::ClearObjective(void) 0x521720 
-/*thiscall*/ void CPed::ClearPointGunAt(void) 0x52DBE0 
-/*thiscall*/ void CPed::ClearSeek(void) 0x4FC450 
-/*thiscall*/ void CPed::ClearWaitState(void) 0x4F3130 
-/*thiscall*/ void CPed::ClearWeapons(void) 0x4FF740 
-/*thiscall*/ void CPed::CollideWithPed(CPed* ped) 0x524920 
-/*thiscall*/ void CPed::CreateDeadPedMoney(void) 0x43E2C0 
+/*thiscall*/ bool CPed::CanSetPedState(void) 0x5018D0
+/*thiscall*/ bool CPed::CanStrafeOrMouseControl(void) 0x501890
+/*thiscall*/ bool CPed::CanWeRunAndFireWithWeapon(void) 0x50B220
+/*thiscall*/ uint CPed::Chat(void) 0x4F6050
+/*thiscall*/ bool CPed::CheckForExplosions(CVector2D &) 0x4F4950
+/*thiscall*/ char CPed::CheckForPointBlankPeds(CPed* ped) 0x52C670
+/*thiscall*/ bool CPed::CheckIfInTheAir(void) 0x4FD680
+/*thiscall*/ int CPed::CheckThreatValidity(void) 0x50BD00
+/*thiscall*/ int CPed::ChooseAttackAI(uchar,bool) 0x529460
+/*thiscall*/ int CPed::ChooseAttackPlayer(uchar,bool) 0x528AA0
+/*thiscall*/ void CPed::ClearAimFlag(void) 0x50B4A0
+/*thiscall*/ void CPed::ClearAll(void) 0x509DF0
+/*thiscall*/ void CPed::ClearAnswerMobile(void) 0x4F58C0
+/*thiscall*/ void CPed::ClearAttack(void) 0x52D120
+/*thiscall*/ void CPed::ClearAttackByRemovingAnim(void) 0x52CF70
+/*thiscall*/ void CPed::ClearChat(void) 0x4F5FA0
+/*thiscall*/ void CPed::ClearDuck(bool) 0x512A20
+/*thiscall*/ void CPed::ClearFollowPath(void) 0x4F7920
+/*thiscall*/ void CPed::ClearInvestigateEvent(void) 0x526BA0
+/*thiscall*/ void CPed::ClearLeader(void) 0x521670
+/*thiscall*/ void CPed::ClearLookFlag(void) 0x50B9C0
+/*thiscall*/ void CPed::ClearObjective(void) 0x521720
+/*thiscall*/ void CPed::ClearPointGunAt(void) 0x52DBE0
+/*thiscall*/ void CPed::ClearSeek(void) 0x4FC450
+/*thiscall*/ void CPed::ClearWaitState(void) 0x4F3130
+/*thiscall*/ void CPed::ClearWeapons(void) 0x4FF740
+/*thiscall*/ void CPed::CollideWithPed(CPed* ped) 0x524920
+/*thiscall*/ void CPed::CreateDeadPedMoney(void) 0x43E2C0
 /*thiscall*/ void CPed::CreateDeadPedPickupCoors(float *pX,float *pY,float *pZ) 0x43DAC0
-/*thiscall*/ void CPed::CreateDeadPedWeaponPickups(void) 0x43DF30 
-/*thiscall*/ void CPed::DeadPedMakesTyresBloody(void) 0x587700 
-/*thiscall*/ void CPed::DettachPedFromEntity(void) 0x4EF370 
-/*thiscall*/ void CPed::Dress(void) 0x4EEFD0 
-/*thiscall*/ void CPed::DriveVehicle(void) 0x522AA0 
-/*thiscall*/ void CPed::Duck(void) 0x512A90 
-/*thiscall*/ void CPed::DuckAndCover(void) 0x513340 
-/*thiscall*/ void CPed::EndFight(uchar) 0x5289A0 
-/*thiscall*/ void CPed::EnterCar(void) 0x517BA0 
-/*thiscall*/ void CPed::ExitCar(void) 0x516960 
-/*thiscall*/ bool CPed::FacePhone(void) 0x4F5CA0 
-/*thiscall*/ void CPed::Fall(void) 0x4FD740 
-/*thiscall*/ void CPed::Fight(void) 0x529A00 
-/*thiscall*/ void CPed::FightHitPed(CPed* ped,CVector &,CVector &,short) 0x527800 
-/*thiscall*/ void CPed::FightStrike(CVector &,bool) 0x5282E0 
-/*thiscall*/ bool CPed::FindBestCoordsFromNodes(CVector,CVector*) 0x513DF0 
-/*thiscall*/ void CPed::Flee(void) 0x4FB130 
+/*thiscall*/ void CPed::CreateDeadPedWeaponPickups(void) 0x43DF30
+/*thiscall*/ void CPed::DeadPedMakesTyresBloody(void) 0x587700
+/*thiscall*/ void CPed::DettachPedFromEntity(void) 0x4EF370
+/*thiscall*/ void CPed::Dress(void) 0x4EEFD0
+/*thiscall*/ void CPed::DriveVehicle(void) 0x522AA0
+/*thiscall*/ void CPed::Duck(void) 0x512A90
+/*thiscall*/ void CPed::DuckAndCover(void) 0x513340
+/*thiscall*/ void CPed::EndFight(uchar) 0x5289A0
+/*thiscall*/ void CPed::EnterCar(void) 0x517BA0
+/*thiscall*/ void CPed::ExitCar(void) 0x516960
+/*thiscall*/ bool CPed::FacePhone(void) 0x4F5CA0
+/*thiscall*/ void CPed::Fall(void) 0x4FD740
+/*thiscall*/ void CPed::Fight(void) 0x529A00
+/*thiscall*/ void CPed::FightHitPed(CPed* ped,CVector &,CVector &,short) 0x527800
+/*thiscall*/ void CPed::FightStrike(CVector &,bool) 0x5282E0
+/*thiscall*/ bool CPed::FindBestCoordsFromNodes(CVector,CVector*) 0x513DF0
+/*thiscall*/ void CPed::Flee(void) 0x4FB130
 /*thiscall*/ __int16 CPed::FollowPath(void) 0x4F76C0
-/*thiscall*/ int CPed::GetFormationPosition(void) 0x519E30 
-/*thiscall*/ int CPed::GetLocalDirection(CVector2D const&) 0x5035F0 
+/*thiscall*/ int CPed::GetFormationPosition(void) 0x519E30
+/*thiscall*/ int CPed::GetLocalDirection(CVector2D const&) 0x5035F0
 /*cdecl*/ int CPed::GetLocalPositionToOpenCarDoor(CVehicle *vehicle,uint,float) 0x512D10
 /*thiscall*/ int CPed::GetNearestDoor(CVehicle *vehicle,CVector &position) 0x5160E0
 /*thiscall*/ bool CPed::GetNearestPassengerDoor(CVehicle *vehicle,CVector &position) 0x515CE0
 /*thiscall*/ bool CPed::GetNearestTrainDoor(CVehicle *vehicle,CVector &position) 0x514A70
 /*thiscall*/ bool CPed::GetNearestTrainPedPosition(CVehicle *vehicle,CVector &position) 0x514650
-/*thiscall*/ int CPed::GetNextPointOnRoute(void) 0x51C9E0 
+/*thiscall*/ int CPed::GetNextPointOnRoute(void) 0x51C9E0
 /*cdecl*/ int CPed::GetPositionToOpenCarDoor(CVehicle *vehicle,uint) 0x5164D0
 /*cdecl*/ int CPed::GetPositionToOpenCarDoor(CVehicle *vehicle,uint,float) 0x513080
 /*thiscall*/ int CPed::GetWeaponSlot(eWeaponType weaponType) 0x4FFA10
 /*thiscall*/ void CPed::GiveDelayedWeapon(eWeaponType weaponType,uint ammo) 0x4FFC30
 /*thiscall*/ void CPed::GiveWeapon(eWeaponType weaponType,uint ammo,bool likeUnused) 0x4FFA30
 /*thiscall*/ void CPed::GrantAmmo(eWeaponType weaponType,uint ammo) 0x4FF840
-/*thiscall*/ bool CPed::HasAttractor(void) 0x4EF8A0 
-/*thiscall*/ bool CPed::HaveReachedNextPointOnRoute(float) 0x51C970 
-/*thiscall*/ void CPed::Idle(void) 0x4FDEB0 
-/*thiscall*/ void CPed::InTheAir(void) 0x4FD4D0 
+/*thiscall*/ bool CPed::HasAttractor(void) 0x4EF8A0
+/*thiscall*/ bool CPed::HaveReachedNextPointOnRoute(float) 0x51C970
+/*thiscall*/ void CPed::Idle(void) 0x4FDEB0
+/*thiscall*/ void CPed::InTheAir(void) 0x4FD4D0
 /*thiscall*/ void CPed::InflictDamage(void *,eWeaponType weaponType,float,ePedPieceTypes,uchar) 0x525B20
 /*thiscall*/ void CPed::InformMyGangOfAttack(CEntity *entity) 0x512950
 /*cdecl*/ void CPed::Initialise(void) 0x50D9F0
-/*thiscall*/ void CPed::InvestigateEvent(void) 0x526C60 
-/*thiscall*/ bool CPed::IsGangMember(void) 0x4F4910 
-/*thiscall*/ bool CPed::IsPedDoingDriveByShooting(void) 0x5C84D0 
+/*thiscall*/ void CPed::InvestigateEvent(void) 0x526C60
+/*thiscall*/ bool CPed::IsGangMember(void) 0x4F4910
+/*thiscall*/ bool CPed::IsPedDoingDriveByShooting(void) 0x5C84D0
 /*thiscall*/ bool CPed::IsPedHeadAbovePos(float zPos) 0x525960
-/*thiscall*/ bool CPed::IsPedInControl(void) 0x501950 
-/*thiscall*/ bool CPed::IsPedShootable(void) 0x501930 
-/*thiscall*/ bool CPed::IsPlayer(void) 0x4F4930 
-/*thiscall*/ bool CPed::IsPointerValid(void) 0x4F4860 
-/*thiscall*/ bool CPed::IsRoomToBeCarJacked(void) 0x512670 
-/*thiscall*/ void CPed::KillCharOnFootArmed(CVector &,CVector &,CVector &) 0x50FFC0 
-/*thiscall*/ void CPed::KillCharOnFootMelee(CVector &,CVector &,CVector &) 0x50F170 
+/*thiscall*/ bool CPed::IsPedInControl(void) 0x501950
+/*thiscall*/ bool CPed::IsPedShootable(void) 0x501930
+/*thiscall*/ bool CPed::IsPlayer(void) 0x4F4930
+/*thiscall*/ bool CPed::IsPointerValid(void) 0x4F4860
+/*thiscall*/ bool CPed::IsRoomToBeCarJacked(void) 0x512670
+/*thiscall*/ void CPed::KillCharOnFootArmed(CVector &,CVector &,CVector &) 0x50FFC0
+/*thiscall*/ void CPed::KillCharOnFootMelee(CVector &,CVector &,CVector &) 0x50F170
 /*thiscall*/ void CPed::KillPedWithCar(CVehicle *vehicle,float) 0x523CD0
-/*thiscall*/ void CPed::LineUpPedWithCar(uint) 0x518AD0 
+/*thiscall*/ void CPed::LineUpPedWithCar(uint) 0x518AD0
 /*cdecl*/ void CPed::LoadFightData(void) 0x527570
-/*thiscall*/ void CPed::LookForInterestingNodes(void) 0x4F3540 
-/*thiscall*/ void CPed::LookForSexyCars(void) 0x4F3EB0 
-/*thiscall*/ void CPed::LookForSexyPeds(void) 0x4F4090 
-/*thiscall*/ bool CPed::MakePhonecall(void) 0x4F5B40 
+/*thiscall*/ void CPed::LookForInterestingNodes(void) 0x4F3540
+/*thiscall*/ void CPed::LookForSexyCars(void) 0x4F3EB0
+/*thiscall*/ void CPed::LookForSexyPeds(void) 0x4F4090
+/*thiscall*/ bool CPed::MakePhonecall(void) 0x4F5B40
 /*thiscall*/ void CPed::MakeTyresMuddySectorList(CPtrList &ptrList) 0x5870D0
-/*thiscall*/ void CPed::MoveHeadToLook(void) 0x50B700 
-/*thiscall*/ void CPed::Mug(void) 0x4FCD30 
+/*thiscall*/ void CPed::MoveHeadToLook(void) 0x50B700
+/*thiscall*/ void CPed::Mug(void) 0x4FCD30
 /*thiscall*/ bool CPed::OurPedCanSeeThisOne(CEntity *entity,bool) 0x50D360
-/*thiscall*/ void CPed::Pause(void) 0x4FDE80 
-/*thiscall*/ void CPed::PedShuffle(void) 0x51A2F0 
-/*thiscall*/ bool CPed::PlacePedOnDryLand(void) 0x5256A0 
-/*thiscall*/ void CPed::PlayFootSteps(void) 0x503680 
-/*thiscall*/ void CPed::PlayHitSound(CPed* ped) 0x528850 
+/*thiscall*/ void CPed::Pause(void) 0x4FDE80
+/*thiscall*/ void CPed::PedShuffle(void) 0x51A2F0
+/*thiscall*/ bool CPed::PlacePedOnDryLand(void) 0x5256A0
+/*thiscall*/ void CPed::PlayFootSteps(void) 0x503680
+/*thiscall*/ void CPed::PlayHitSound(CPed* ped) 0x528850
 /*thiscall*/ __int16 CPed::PointGunAt(void) 0x52DCD0
-/*thiscall*/ bool CPed::PositionAnyPedOutOfCollision(void) 0x511840 
-/*thiscall*/ void CPed::PositionAttachedPed(void) 0x4EF0A0 
-/*thiscall*/ bool CPed::PositionPedOutOfCollision(void) 0x511B10 
+/*thiscall*/ bool CPed::PositionAnyPedOutOfCollision(void) 0x511840
+/*thiscall*/ void CPed::PositionAttachedPed(void) 0x4EF0A0
+/*thiscall*/ bool CPed::PositionPedOutOfCollision(void) 0x511B10
 /*thiscall*/ bool CPed::PossiblyFindBetterPosToSeekCar(CVector *,CVehicle *vehicle) 0x4F0810
-/*thiscall*/ void CPed::ProcessBuoyancy(void) 0x509460 
-/*thiscall*/ void CPed::ProcessObjective(void) 0x51CA70 
-/*thiscall*/ void CPed::QuitEnteringCar(void) 0x5179D0 
+/*thiscall*/ void CPed::ProcessBuoyancy(void) 0x509460
+/*thiscall*/ void CPed::ProcessObjective(void) 0x51CA70
+/*thiscall*/ void CPed::QuitEnteringCar(void) 0x5179D0
 /*thiscall*/ void CPed::ReactToAttack(CEntity *entity) 0x51BDA0
 /*thiscall*/ void CPed::ReactToPointGun(CEntity *entity) 0x51C1E0
 /*thiscall*/ void CPed::RegisterThreatWithGangPeds(CEntity *entity) 0x514360
-/*thiscall*/ void CPed::RemoveDrivebyAnims(void) 0x512480 
-/*thiscall*/ void CPed::RemoveInCarAnims(bool) 0x512440 
+/*thiscall*/ void CPed::RemoveDrivebyAnims(void) 0x512480
+/*thiscall*/ void CPed::RemoveInCarAnims(bool) 0x512440
 /*thiscall*/ void CPed::RemoveWeaponAnims(int likeUnused, float blendDelta) 0x5229B0
 /*thiscall*/ void CPed::RemoveWeaponModel(int modelIndex) 0x4FFD80
-/*thiscall*/ void CPed::RemoveWeaponWhenEnteringVehicle(void) 0x4FF6A0 
-/*thiscall*/ void CPed::ReplaceWeaponWhenExitingVehicle(void) 0x4FF5A0 
-/*thiscall*/ void CPed::RequestDelayedWeapon(void) 0x4FFCE0 
-/*thiscall*/ void CPed::RestartNonPartialAnims(void) 0x50CCF0 
-/*thiscall*/ void CPed::RestoreGunPosition(void) 0x50B250 
-/*thiscall*/ void CPed::RestoreHeadPosition(void) 0x50B650 
-/*thiscall*/ void CPed::RestoreHeadingRate(void) 0x4F17D0 
-/*thiscall*/ void CPed::RestorePreviousObjective(void) 0x520FE0 
-/*thiscall*/ void CPed::RestorePreviousState(void) 0x50C600 
-/*thiscall*/ void CPed::Say(ushort) 0x5226B0 
-/*thiscall*/ void CPed::Say(ushort,int) 0x4EEFA0 
-/*thiscall*/ void CPed::ScanForDelayedResponseThreats(void) 0x50BD80 
-/*thiscall*/ void CPed::ScanForInterestingStuff(void) 0x50AD50 
-/*thiscall*/ void CPed::ScanForThreats(void) 0x50BE00 
-/*thiscall*/ bool CPed::Seek(void) 0x4FBD00 
-/*thiscall*/ void CPed::SeekBoatPosition(void) 0x512740 
-/*thiscall*/ void CPed::SeekCar(void) 0x4F4AD0 
-/*thiscall*/ void CPed::SeekFollowingPath(void) 0x4FA1C0 
-/*thiscall*/ bool CPed::SelectGunIfArmed(void) 0x51C800 
-/*thiscall*/ void CPed::ServiceTalking(void) 0x522850 
-/*thiscall*/ bool CPed::ServiceTalkingWhenDead(void) 0x522990 
+/*thiscall*/ void CPed::RemoveWeaponWhenEnteringVehicle(void) 0x4FF6A0
+/*thiscall*/ void CPed::ReplaceWeaponWhenExitingVehicle(void) 0x4FF5A0
+/*thiscall*/ void CPed::RequestDelayedWeapon(void) 0x4FFCE0
+/*thiscall*/ void CPed::RestartNonPartialAnims(void) 0x50CCF0
+/*thiscall*/ void CPed::RestoreGunPosition(void) 0x50B250
+/*thiscall*/ void CPed::RestoreHeadPosition(void) 0x50B650
+/*thiscall*/ void CPed::RestoreHeadingRate(void) 0x4F17D0
+/*thiscall*/ void CPed::RestorePreviousObjective(void) 0x520FE0
+/*thiscall*/ void CPed::RestorePreviousState(void) 0x50C600
+/*thiscall*/ void CPed::Say(ushort) 0x5226B0
+/*thiscall*/ void CPed::Say(ushort,int) 0x4EEFA0
+/*thiscall*/ void CPed::ScanForDelayedResponseThreats(void) 0x50BD80
+/*thiscall*/ void CPed::ScanForInterestingStuff(void) 0x50AD50
+/*thiscall*/ void CPed::ScanForThreats(void) 0x50BE00
+/*thiscall*/ bool CPed::Seek(void) 0x4FBD00
+/*thiscall*/ void CPed::SeekBoatPosition(void) 0x512740
+/*thiscall*/ void CPed::SeekCar(void) 0x4F4AD0
+/*thiscall*/ void CPed::SeekFollowingPath(void) 0x4FA1C0
+/*thiscall*/ bool CPed::SelectGunIfArmed(void) 0x51C800
+/*thiscall*/ void CPed::ServiceTalking(void) 0x522850
+/*thiscall*/ bool CPed::ServiceTalkingWhenDead(void) 0x522990
 /*thiscall*/ void CPed::SetAimFlag(CEntity *aimingTo) 0x50B510
 /*thiscall*/ void CPed::SetAimFlag(float heading) 0x50B5B0
 /*thiscall*/ void CPed::SetAmmo(eWeaponType weaponType, uint ammo) 0x4FF780
 /*cdecl*/ void CPed::SetAnimOffsetForEnterOrExitVehicle(void) 0x5155E0
-/*thiscall*/ void CPed::SetAnswerMobile(void) 0x4F59C0 
+/*thiscall*/ void CPed::SetAnswerMobile(void) 0x4F59C0
 /*thiscall*/ void CPed::SetAttack(CEntity *entity) 0x52D1C0
 /*thiscall*/ void CPed::SetAttackTimer(uint time) 0x4FCAB0
 /*thiscall*/ void CPed::SetBeingDraggedFromCar(CVehicle *vehicle,uint,bool) 0x518430
@@ -646,74 +646,74 @@ void CPed::SetMoveAnim(void) 0x50CD50
 /*thiscall*/ void CPed::SetChat(CEntity *entity,uint) 0x4F6220
 /*thiscall*/ void CPed::SetCurrentWeapon(eWeaponType weaponType) 0x4FF8E0
 /*thiscall*/ void CPed::SetCurrentWeapon(int slot) 0x4FF900
-/*thiscall*/ void CPed::SetDead(void) 0x4F6430 
-/*thiscall*/ void CPed::SetDie(AnimationId,float,float) 0x4F65C0 
+/*thiscall*/ void CPed::SetDead(void) 0x4F6430
+/*thiscall*/ void CPed::SetDie(AnimationId,float,float) 0x4F65C0
 /*thiscall*/ void CPed::SetDirectionToWalkAroundObject(CEntity *entity) 0x5019A0
 /*thiscall*/ void CPed::SetDirectionToWalkAroundVehicle(CVehicle *vehicle) 0x5035B0
-/*thiscall*/ void CPed::SetDuck(uint,bool) 0x512C10 
+/*thiscall*/ void CPed::SetDuck(uint,bool) 0x512C10
 /*thiscall*/ void CPed::SetEnterCar(CVehicle *vehicle,uint) 0x518080
 /*thiscall*/ void CPed::SetEnterCar_AllClear(CVehicle *vehicle,uint,uint) 0x517DE0
-/*thiscall*/ void CPed::SetEvasiveDive(CPhysical *,uchar) 0x4F6A20 
-/*thiscall*/ void CPed::SetEvasiveStep(CPhysical *,uchar) 0x4F7170 
-/*thiscall*/ void CPed::SetExitBoat(CVehicle *boat) 0x517670 
+/*thiscall*/ void CPed::SetEvasiveDive(CPhysical *,uchar) 0x4F6A20
+/*thiscall*/ void CPed::SetEvasiveStep(CPhysical *,uchar) 0x4F7170
+/*thiscall*/ void CPed::SetExitBoat(CVehicle *boat) 0x517670
 /*thiscall*/ void CPed::SetExitCar(CVehicle *vehicle,uint) 0x516C60
-/*thiscall*/ void CPed::SetFall(int,AnimationId,uchar) 0x4FD9F0 
-/*thiscall*/ void CPed::SetFlee(CEntity *,int) 0x4FB820 
-/*thiscall*/ void CPed::SetFlee(CVector2D const&,int) 0x4FBA90 
-/*thiscall*/ void CPed::SetFollowPath(CVector const&,float,eMoveState,CEntity *,CEntity *,int) 0x4F9F60 
-/*thiscall*/ bool CPed::SetFollowPathDynamic(void) 0x4F7990 
-/*thiscall*/ bool CPed::SetFollowPathStatic(void) 0x4F99F0 
-/*thiscall*/ void CPed::SetFormation(eFormation) 0x51A020 
-/*thiscall*/ void CPed::SetGetUp(void) 0x4FCF60 
-/*thiscall*/ void CPed::SetIdle(void) 0x4FDFD0 
-/*thiscall*/ void CPed::SetInTheAir(void) 0x4FD610 
+/*thiscall*/ void CPed::SetFall(int,AnimationId,uchar) 0x4FD9F0
+/*thiscall*/ void CPed::SetFlee(CEntity *,int) 0x4FB820
+/*thiscall*/ void CPed::SetFlee(CVector2D const&,int) 0x4FBA90
+/*thiscall*/ void CPed::SetFollowPath(CVector const&,float,eMoveState,CEntity *,CEntity *,int) 0x4F9F60
+/*thiscall*/ bool CPed::SetFollowPathDynamic(void) 0x4F7990
+/*thiscall*/ bool CPed::SetFollowPathStatic(void) 0x4F99F0
+/*thiscall*/ void CPed::SetFormation(eFormation) 0x51A020
+/*thiscall*/ void CPed::SetGetUp(void) 0x4FCF60
+/*thiscall*/ void CPed::SetIdle(void) 0x4FDFD0
+/*thiscall*/ void CPed::SetInTheAir(void) 0x4FD610
 /*thiscall*/ void CPed::SetInvestigateEvent(eEventType eventType,CVector2D,float,ushort,float) 0x527490
-/*thiscall*/ void CPed::SetJump(void) 0x4F03C0 
-/*thiscall*/ void CPed::SetLanding(void) 0x4FD3A0 
-/*thiscall*/ void CPed::SetLeader(CPed* ped) 0x4F07D0 
+/*thiscall*/ void CPed::SetJump(void) 0x4F03C0
+/*thiscall*/ void CPed::SetLanding(void) 0x4FD3A0
+/*thiscall*/ void CPed::SetLeader(CPed* ped) 0x4F07D0
 /*thiscall*/ void CPed::SetLook(CEntity *entity) 0x4FCB10
 /*thiscall*/ void CPed::SetLookFlag(CEntity *lookingTo,bool likeUnused,bool) 0x50BB70
 /*thiscall*/ void CPed::SetLookFlag(float lookHeading,bool likeUnused,bool) 0x50BC40
 /*thiscall*/ void CPed::SetLookTimer(uint time) 0x4FCAF0
 /*thiscall*/ void CPed::SetMoveState(eMoveState moveState) 0x50D110
-/*thiscall*/ void CPed::SetNewAttraction(CPedAttractor *,CVector const&,float,float,int) 0x4EF7C0 
+/*thiscall*/ void CPed::SetNewAttraction(CPedAttractor *,CVector const&,float,float,int) 0x4EF7C0
 /*thiscall*/ void CPed::SetObjective(eObjective objective) 0x5224B0
 /*thiscall*/ void CPed::SetObjective(eObjective objective,CVector) 0x521840
 /*thiscall*/ void CPed::SetObjective(eObjective objective,float,CVector const&) 0x5217E0
 /*thiscall*/ void CPed::SetObjective(eObjective objective,short,short) 0x521D10
 /*thiscall*/ void CPed::SetObjective(eObjective objective,void *) 0x521F10
 /*thiscall*/ void CPed::SetObjectiveTimer(uint time) 0x522660
-/*thiscall*/ void CPed::SetPedPositionInCar(void) 0x4F42F0 
+/*thiscall*/ void CPed::SetPedPositionInCar(void) 0x4F42F0
 /*thiscall*/ void CPed::SetPedStats(ePedStats statsType) 0x50D8E0
 /*thiscall*/ void CPed::SetPointGunAt(CEntity *entity) 0x52DDF0
-/*thiscall*/ void CPed::SetRadioStation(void) 0x4EFBD0 
-/*thiscall*/ void CPed::SetSeek(CEntity *,float) 0x4FC570 
-/*thiscall*/ void CPed::SetSeek(CVector,float) 0x4FC740 
-/*thiscall*/ void CPed::SetSeekBoatPosition(CVehicle *boat) 0x512850 
-/*thiscall*/ void CPed::SetSeekCar(CVehicle *car,uint) 0x4F54D0 
+/*thiscall*/ void CPed::SetRadioStation(void) 0x4EFBD0
+/*thiscall*/ void CPed::SetSeek(CEntity *,float) 0x4FC570
+/*thiscall*/ void CPed::SetSeek(CVector,float) 0x4FC740
+/*thiscall*/ void CPed::SetSeekBoatPosition(CVehicle *boat) 0x512850
+/*thiscall*/ void CPed::SetSeekCar(CVehicle *car,uint) 0x4F54D0
 /*thiscall*/ void CPed::SetShootTimer(uint time) 0x4FCA90
-/*thiscall*/ void CPed::SetSolicit(uint) 0x4F1400 
-/*thiscall*/ void CPed::SetStoredObjective(void) 0x522620 
-/*thiscall*/ void CPed::SetStoredState(void) 0x50CC40 
+/*thiscall*/ void CPed::SetSolicit(uint) 0x4F1400
+/*thiscall*/ void CPed::SetStoredObjective(void) 0x522620
+/*thiscall*/ void CPed::SetStoredState(void) 0x50CC40
 /*thiscall*/ void CPed::SetWaitState(eWaitState waitState,void *) 0x4F28A0
-/*thiscall*/ void CPed::SetWanderPath(char arg0) 0x4FACC0 
-/*thiscall*/ void CPed::Solicit(void) 0x4F11D0 
+/*thiscall*/ void CPed::SetWanderPath(char arg0) 0x4FACC0
+/*thiscall*/ void CPed::Solicit(void) 0x4F11D0
 /*thiscall*/ void CPed::SortPeds(CPed** pedList,int,int) 0x50D120
-/*thiscall*/ void CPed::SpawnFlyingComponent(int,char arg1) 0x5259F0 
-/*thiscall*/ void CPed::StartFightAttack(uchar) 0x52AD70 
-/*thiscall*/ void CPed::StartFightDefend(uchar,uchar,uchar) 0x52A340 
-/*thiscall*/ void CPed::StopNonPartialAnims(void) 0x50CD20 
-/*thiscall*/ bool CPed::TurnBody(void) 0x4FC970 
+/*thiscall*/ void CPed::SpawnFlyingComponent(int,char arg1) 0x5259F0
+/*thiscall*/ void CPed::StartFightAttack(uchar) 0x52AD70
+/*thiscall*/ void CPed::StartFightDefend(uchar,uchar,uchar) 0x52A340
+/*thiscall*/ void CPed::StopNonPartialAnims(void) 0x50CD20
+/*thiscall*/ bool CPed::TurnBody(void) 0x4FC970
 /*thiscall*/ void CPed::Undress(char const* modelName) 0x4EF030
-/*thiscall*/ void CPed::UpdateFromLeader(void) 0x521070 
-/*thiscall*/ void CPed::UpdatePosition(void) 0x50A040 
-/*thiscall*/ bool CPed::UseGroundColModel(void) 0x501900 
-/*thiscall*/ void CPed::Wait(void) 0x4F18A0 
-/*thiscall*/ void CPed::WanderPath(void) 0x4FA680 
+/*thiscall*/ void CPed::UpdateFromLeader(void) 0x521070
+/*thiscall*/ void CPed::UpdatePosition(void) 0x50A040
+/*thiscall*/ bool CPed::UseGroundColModel(void) 0x501900
+/*thiscall*/ void CPed::Wait(void) 0x4F18A0
+/*thiscall*/ void CPed::WanderPath(void) 0x4FA680
 /*thiscall*/ void CPed::WarpPedIntoCar(CVehicle *vehicle) 0x4EF8B0
 /*thiscall*/ void CPed::WarpPedToNearEntityOffScreen(CEntity *entity) 0x5110C0
-/*thiscall*/ void CPed::WarpPedToNearLeaderOffScreen(void) 0x511480 
-/*thiscall*/ bool CPed::WillChat(CPed* ped) 0x50AC70 
+/*thiscall*/ void CPed::WarpPedToNearLeaderOffScreen(void) 0x511480
+/*thiscall*/ bool CPed::WillChat(CPed* ped) 0x50AC70
 /*thiscall*/ float CPed::WorkOutHeadingForMovingFirstPerson(float heading) 0x50A530
 /*cdecl*/ void CPed::operator delete(void *data) 0x50DA20
 /*cdecl*/ void* CPed::operator new(uint size) 0x50DA60
@@ -776,7 +776,7 @@ int CPickups::aPickUpsCollected[20] 0x94AF48
 short CPickups::NumMessages 0xA10A5A
 tPickupMessage CPickups::aMessages[16] 0x7E9B08
 CPickup CPickups::aPickUps[336] 0x945D30
-/*thiscall*/ int CPickup::GiveUsAPickUpObject(CObject **,CObject **,int,int) 0x43D3B0 
+/*thiscall*/ int CPickup::GiveUsAPickUpObject(CObject **,CObject **,int,int) 0x43D3B0
 /*thiscall*/ void CPickup::Update(CPlayerPed *,CVehicle *vehicle,int) 0x440030
 /*thiscall*/ void CPickup::CPickup(void) 0x441F30
 /*cdecl*/ void CPickups::CreateSomeMoney(CVector posn,int) 0x43E180
@@ -787,17 +787,17 @@ CPickup CPickups::aPickUps[336] 0x945D30
 /*cdecl*/ int CPickups::GenerateNewOne(CVector posn,uint,uchar ,uint,uint,bool,char *msg) 0x4418C0
 /*cdecl*/ int CPickups::GetActualPickupIndex(int handle) 0x43D360
 /*cdecl*/ bool CPickups::GivePlayerGoodiesWithPickUpMI(ushort model,int plrIndex) 0x43D910
-/*cdecl*/ void CPickups::Init(void) 0x441D30 
+/*cdecl*/ void CPickups::Init(void) 0x441D30
 /*cdecl*/ bool CPickups::IsPickUpPickedUp(int handle) 0x441880
-/*cdecl*/ void CPickups::Load(uchar *,uint) 0x43CF40 
+/*cdecl*/ void CPickups::Load(uchar *,uint) 0x43CF40
 /*cdecl*/ int CPickups::ModelForWeapon(eWeaponType weaponType) 0x4418B0
 /*cdecl*/ void CPickups::PassTime(uint time) 0x43D8C0
 /*cdecl*/ void CPickups::RemoveAllPickupsOfACertainWeaponGroupWithNoAmmo(eWeaponType weaponType) 0x43D240
 /*cdecl*/ void CPickups::RemovePickUp(int handle) 0x4417D0
 /*cdecl*/ void CPickups::RemoveUnnecessaryPickups(CVector const& posn,float radius) 0x43E4C0
-/*cdecl*/ void CPickups::RenderPickUpText(void) 0x43E5E0 
-/*cdecl*/ void CPickups::Save(uchar *,uint *) 0x43D0D0 
-/*cdecl*/ void CPickups::Update(void) 0x441BB0 
+/*cdecl*/ void CPickups::RenderPickUpText(void) 0x43E5E0
+/*cdecl*/ void CPickups::Save(uchar *,uint *) 0x43D0D0
+/*cdecl*/ void CPickups::Update(void) 0x441BB0
 /*thiscall*/ void CPlaceable::CPlaceable(void) 0x4BBAD0
 /*thiscall*/ bool CPlaceable::IsWithinArea(float x1,float y1,float z1,float x2,float y2,float z2) 0x4BB900
 /*thiscall*/ bool CPlaceable::IsWithinArea(float x1,float y1,float x2,float y2) 0x4BB9E0
@@ -815,7 +815,7 @@ void __thiscall CPlayerInfo::Process(void) 0x4BCA90
 bool __thiscall CPlayerInfo::IsPlayerInRemoteMode(void) 0x4BCA60
 void __thiscall CPlayerInfo::SavePlayerInfo(unsigned char *bufferPointer, unsigned int *structSize) 0x4BC800
 void __thiscall CPlayerInfo::LoadPlayerInfo(unsigned char *bufferPointer, unsigned int structSize) 0x4BC5B0
-void __thiscall CPlayerInfo::FindClosestCarSectorList(CPtrList &ptrList, CPed *ped, float conrerAX, float cornerAY, float cornerBX, float cornerBY, float 
+void __thiscall CPlayerInfo::FindClosestCarSectorList(CPtrList &ptrList, CPed *ped, float conrerAX, float cornerAY, float cornerBX, float cornerBY, float
 CVector __thiscall CPlayerInfo::GetPos(void) 0x4BC2A0
 bool __thiscall CPlayerInfo::IsRestartingAfterDeath(void) 0x4BBF50
 bool __thiscall CPlayerInfo::IsRestartingAfterArrest(void) 0x4BBF30
@@ -827,44 +827,44 @@ void __thiscall CPlayerInfo::BlowUpRCBuggy(bool blowUp) 0x4BBBC0
 void __thiscall CPlayerInfo::SetPlayerSkin(char const *skinName) 0x4BBB70
 void __thiscall CPlayerInfo::LoadPlayerSkin(void) 0x4BBB30
 void __thiscall CPlayerInfo::DeletePlayerSkin(void) 0x4BBB10
-/*thiscall*/ void CPlayerPed::AnnoyPlayerPed(bool) 0x531CF0 
-/*thiscall*/ void CPlayerPed::CPlayerPed(void) 0x5384B0 
-/*thiscall*/ void CPlayerPed::ClearAdrenaline(void) 0x531CC0 
-/*thiscall*/ void CPlayerPed::ClearWeaponTarget(void) 0x533B30 
+/*thiscall*/ void CPlayerPed::AnnoyPlayerPed(bool) 0x531CF0
+/*thiscall*/ void CPlayerPed::CPlayerPed(void) 0x5384B0
+/*thiscall*/ void CPlayerPed::ClearAdrenaline(void) 0x531CC0
+/*thiscall*/ void CPlayerPed::ClearWeaponTarget(void) 0x533B30
 /*cdecl*/ void CPlayerPed::DeactivatePlayerPed(int playerId) 0x5383C0
-/*thiscall*/ void CPlayerPed::DoStuffToGoOnFire(void) 0x531D20 
-/*thiscall*/ float CPlayerPed::DoWeaponSmoothSpray(void) 0x536410 
+/*thiscall*/ void CPlayerPed::DoStuffToGoOnFire(void) 0x531D20
+/*thiscall*/ float CPlayerPed::DoWeaponSmoothSpray(void) 0x536410
 /*thiscall*/ bool CPlayerPed::DoesPlayerWantNewWeapon(eWeaponType weaponType,bool enable) 0x535240
-/*thiscall*/ void CPlayerPed::EvaluateNeighbouringTarget(CEntity *target,CEntity **outTarget,float *outTargetPriority,float maxDistance,float,bool,bool,bool) 
+/*thiscall*/ void CPlayerPed::EvaluateNeighbouringTarget(CEntity *target,CEntity **outTarget,float *outTargetPriority,float maxDistance,float,bool,bool,bool)
 /*thiscall*/ void CPlayerPed::EvaluateTarget(CEntity *target,CEntity **outTarget,float *outTargetPriority,float maxDistance,float,bool,bool) 0x532360
-/*thiscall*/ int CPlayerPed::FindMeleeAttackPoint(CPed *,CVector &,uint &) 0x531390 
+/*thiscall*/ int CPlayerPed::FindMeleeAttackPoint(CPed *,CVector &,uint &) 0x531390
 /*thiscall*/ __int16 CPlayerPed::FindNewAttackPoints(void) 0x531810
 /*thiscall*/ bool CPlayerPed::FindNextWeaponLockOnTarget(CEntity *target,bool) 0x532590
-/*thiscall*/ bool CPlayerPed::FindWeaponLockOnTarget(void) 0x533030 
+/*thiscall*/ bool CPlayerPed::FindWeaponLockOnTarget(void) 0x533030
 /*thiscall*/ CPlayerInfo* CPlayerPed::GetPlayerInfoForThisPlayerPed(void) 0x531D40
-/*thiscall*/ void CPlayerPed::KeepAreaAroundPlayerClear(void) 0x531D60 
+/*thiscall*/ void CPlayerPed::KeepAreaAroundPlayerClear(void) 0x531D60
 /*thiscall*/ void CPlayerPed::MakeChangesForNewWeapon(eWeaponType weaponType) 0x534450
 /*thiscall*/ void CPlayerPed::MakeChangesForNewWeapon(int weaponSlot) 0x534580
-/*thiscall*/ void CPlayerPed::MakeObjectTargettable(int,bool) 0x531FD0 
-/*thiscall*/ void CPlayerPed::PlayIdleAnimations(CPad *pad) 0x535D10 
-/*thiscall*/ void CPlayerPed::PlayerControl1stPersonRunAround(CPad *pad) 0x5357D0 
+/*thiscall*/ void CPlayerPed::MakeObjectTargettable(int,bool) 0x531FD0
+/*thiscall*/ void CPlayerPed::PlayIdleAnimations(CPad *pad) 0x535D10
+/*thiscall*/ void CPlayerPed::PlayerControl1stPersonRunAround(CPad *pad) 0x5357D0
 /*thiscall*/ void CPlayerPed::PlayerControlFighter(CPad *pad) 0x535BB0
 /*thiscall*/ void CPlayerPed::PlayerControlM16(CPad *pad) 0x5352B0
 /*thiscall*/ void CPlayerPed::PlayerControlSniper(CPad *pad) 0x535550
 /*thiscall*/ void CPlayerPed::PlayerControlZelda(CPad *pad) 0x535F40
-/*thiscall*/ void CPlayerPed::ProcessAnimGroups(void) 0x533B80 
+/*thiscall*/ void CPlayerPed::ProcessAnimGroups(void) 0x533B80
 /*thiscall*/ void CPlayerPed::ProcessPlayerWeapon(CPad *pad) 0x534890
 /*thiscall*/ void CPlayerPed::ProcessWeaponSwitch(CPad *pad) 0x5345A0
-/*thiscall*/ void CPlayerPed::ReApplyMoveAnims(void) 0x5371B0 
+/*thiscall*/ void CPlayerPed::ReApplyMoveAnims(void) 0x5371B0
 /*cdecl*/ void CPlayerPed::ReactivatePlayerPed(int playerId) 0x5383A0
 /*thiscall*/ void CPlayerPed::RemovePedFromMeleeList(CPed *ped) 0x5312A0
-/*thiscall*/ void CPlayerPed::SetInitialState(void) 0x5381F0 
-/*thiscall*/ void CPlayerPed::SetNearbyPedsToInteractWithPlayer(void) 0x530FB0 
-/*thiscall*/ void CPlayerPed::SetRealMoveAnim(void) 0x536620 
+/*thiscall*/ void CPlayerPed::SetInitialState(void) 0x5381F0
+/*thiscall*/ void CPlayerPed::SetNearbyPedsToInteractWithPlayer(void) 0x530FB0
+/*thiscall*/ void CPlayerPed::SetRealMoveAnim(void) 0x536620
 /*thiscall*/ void CPlayerPed::SetWantedLevel(int level) 0x532090
 /*thiscall*/ void CPlayerPed::SetWantedLevelNoDrop(int level) 0x532070
 /*cdecl*/ void CPlayerPed::SetupPlayerPed(int playerId) 0x5383E0
-/*thiscall*/ void CPlayerPed::UpdateMeleeAttackers(void) 0x531600 
+/*thiscall*/ void CPlayerPed::UpdateMeleeAttackers(void) 0x531600
 /*thiscall*/ int CPlayerPed::GetWantedLevel(void) 0x599B20
 /*cdecl*/ void CPlayerSkin::BeginFrontendSkinEdit(void) 0x627D10
 /*cdecl*/ void CPlayerSkin::EndFrontendSkinEdit(void) 0x627CE0
@@ -891,30 +891,30 @@ void __thiscall CPlayerInfo::DeletePlayerSkin(void) 0x4BBB10
 /*cdecl*/ CPed* CPopulation::AddDeadPedInFrontOfCar(CVector const& posn,CVehicle * vehicle) 0x53B180
 /*cdecl*/ CPed* CPopulation::AddPed(ePedType pedType,uint modelIndex,CVector const& posn,int) 0x53B600
 /*cdecl*/ CPed* CPopulation::AddPedInCar(CVehicle * vehicle,bool driver) 0x53A8A0
-/*cdecl*/ void CPopulation::AddToPopulation(float,float,float,float) 0x53BA80 
+/*cdecl*/ void CPopulation::AddToPopulation(float,float,float,float) 0x53BA80
 /*cdecl*/ bool CPopulation::CanJeerAtStripper(int modelIndex) 0x53A670
 /*cdecl*/ bool CPopulation::CanSolicitPlayerInCar(int modelIndex) 0x53A6A0
 /*cdecl*/ bool CPopulation::CanSolicitPlayerOnFoot(int modelIndex) 0x53A6C0
-/*cdecl*/ void CPopulation::ChooseCivilianCoupleOccupations(int,int &,int &) 0x53AE90 
-/*cdecl*/ int CPopulation::ChooseCivilianOccupation(int) 0x53B070 
-/*cdecl*/ int CPopulation::ChooseNextCivilianOccupation(int) 0x53AFD0 
-/*cdecl*/ void CPopulation::ConvertAllObjectsToDummyObjects(void) 0x53D430 
+/*cdecl*/ void CPopulation::ChooseCivilianCoupleOccupations(int,int &,int &) 0x53AE90
+/*cdecl*/ int CPopulation::ChooseCivilianOccupation(int) 0x53B070
+/*cdecl*/ int CPopulation::ChooseNextCivilianOccupation(int) 0x53AFD0
+/*cdecl*/ void CPopulation::ConvertAllObjectsToDummyObjects(void) 0x53D430
 /*cdecl*/ void CPopulation::ConvertToDummyObject(CObject * object) 0x53D290
 /*cdecl*/ void CPopulation::ConvertToRealObject(CDummyObject * dummyObject) 0x53D340
-/*cdecl*/ void CPopulation::GeneratePedsAtStartOfGame(void) 0x53E3E0 
-/*cdecl*/ void CPopulation::Initialise(void) 0x53EAF0 
+/*cdecl*/ void CPopulation::GeneratePedsAtStartOfGame(void) 0x53E3E0
+/*cdecl*/ void CPopulation::Initialise(void) 0x53EAF0
 /*cdecl*/ bool CPopulation::IsFemale(int modelIndex) 0x53AD50
 /*cdecl*/ bool CPopulation::IsMale(int modelIndex) 0x53ADF0
 /*cdecl*/ bool CPopulation::IsSkateable(CVector const& point) 0x53ACA0
 /*cdecl*/ bool CPopulation::IsSunbather(int modelIndex) 0x53A6F0
-/*cdecl*/ void CPopulation::LoadPedGroups(void) 0x53E9C0 
-/*cdecl*/ void CPopulation::ManagePopulation(void) 0x53D690 
+/*cdecl*/ void CPopulation::LoadPedGroups(void) 0x53E9C0
+/*cdecl*/ void CPopulation::ManagePopulation(void) 0x53D690
 /*cdecl*/ void CPopulation::PlaceCouple(ePedType pedType1,int modelIndex1,ePedType pedType2,int modelIndex2,CVector posn) 0x5388F0
 /*cdecl*/ void CPopulation::PlaceGangMembersInCircle(ePedType pedType,int modelIndex,CVector const& posn) 0x5397F0
 /*cdecl*/ void CPopulation::PlaceGangMembersInFormation(ePedType pedType,int modelIndex,CVector const& posn) 0x539FC0
 /*cdecl*/ void CPopulation::PlaceMallPedsAsStationaryGroup(CVector const& posn,int modelIndex) 0x538E90
 /*cdecl*/ void CPopulation::RemovePed(CPed * ped) 0x53B160
-/*cdecl*/ void CPopulation::RemovePedsIfThePoolGetsFull(void) 0x53D560 
+/*cdecl*/ void CPopulation::RemovePedsIfThePoolGetsFull(void) 0x53D560
 /*cdecl*/ bool CPopulation::TestSafeForRealObject(CDummyObject * dummyObject) 0x53CF80
 /*cdecl*/ void CPopulation::Update(bool generatePeds) 0x53E5F0
 /*cdecl*/ void CPopulation::UpdatePedCount(ePedType pedType,uchar updateState) 0x53A720
@@ -936,15 +936,15 @@ void CSimpleModelInfo::SetAtomic(int atomicIndex, RpAtomic *atomic) 0x56F790
 /*thiscall*/ void CSimpleModelInfo::Init(void) 0x56F770
 /*thiscall*/ void CSimpleModelInfo::SetLodDistances(float *distances) 0x56F600
 /*thiscall*/ void CSimpleModelInfo::SetupBigBuilding(int minLineIndex,int maxLineIndex) 0x56F420
-/*cdecl*/ void CSprite2d::DrawAnyRect(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const& color1,CRGBA const& color2,CRGBA 
+/*cdecl*/ void CSprite2d::DrawAnyRect(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const& color1,CRGBA const& color2,CRGBA
 /*cdecl*/ void CSprite2d::DrawRect(CRect const&rect,CRGBA const&color1,CRGBA const&color2,CRGBA const&color3,CRGBA const&color4) 0x577A80
 /*cdecl*/ void CSprite2d::DrawRect(CRect const&rect,CRGBA const&color) 0x577B00
 /*thiscall*/ void CSprite2d::SetRenderState(void) 0x577B90
-/*cdecl*/ void CSprite2d::SetVertices(RwIm2DVertex *vertices,CRect const&rect,CRGBA const&color1,CRGBA const&color2,CRGBA const&color3,CRGBA const&color4,float 
+/*cdecl*/ void CSprite2d::SetVertices(RwIm2DVertex *vertices,CRect const&rect,CRGBA const&color1,CRGBA const&color2,CRGBA const&color3,CRGBA const&color4,float
 /*cdecl*/ void CSprite2d::SetMaskVertices(int numVerts,float *posn) 0x577D10
 /*cdecl*/ void CSprite2d::SetVertices(int numVerts,float *posn,float *texCoors,CRGBA const&color) 0x577F70
 /*cdecl*/ void CSprite2d::SetVertices(CRect const&,CRGBA const&,CRGBA const&,CRGBA const&,CRGBA const&,float,float,float,float,float,float,float,float) 0x578010
-/*cdecl*/ void CSprite2d::SetVertices(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const&color1,CRGBA const&color2,CRGBA 
+/*cdecl*/ void CSprite2d::SetVertices(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const&color1,CRGBA const&color2,CRGBA
 /*cdecl*/ void CSprite2d::SetVertices(CRect const&rect,CRGBA const&color1,CRGBA const&color2,CRGBA const&color3,CRGBA const&color4) 0x578370
 /*cdecl*/ void CSprite2d::Draw2DPolygon(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const&color) 0x578520
 /*thiscall*/ void CSprite2d::Draw(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4,CRGBA const&color) 0x5785D0
@@ -1087,30 +1087,30 @@ static void __cdecl CStats::BuildStatLine(char *a1,void *a2,int a3,void *a4,int 
 static void __cdecl CStats::SaveStats(unsigned char * bufferPointer,unsigned int *structSize) 0x4CA9F7
 static void __cdecl CStats::LoadStats(unsigned char * bufferPointer,unsigned int structSize) 0x4CA5BB
 static void __cdecl CStats::ConstructStatLine(int a1) 0x4CB085
-/*cdecl*/ void CTheZones::CreateZone(char *name,eZoneType type,float posX1,float posY1,float posZ1,float posX2,float posY2, float posZ2,eLevelName island) 
+/*cdecl*/ void CTheZones::CreateZone(char *name,eZoneType type,float posX1,float posY1,float posZ1,float posX2,float posY2, float posZ2,eLevelName island)
 /*cdecl*/ CZone* CTheZones::FindAudioZone(CVector *point) 0x4DC370
 /*cdecl*/ int CTheZones::FindInformationZoneForPosition(CVector const* pPoint) 0x4DD160
 /*cdecl*/ short CTheZones::FindNextZoneByLabelAndReturnIndex(char *name,eZoneType type) 0x4DD4A0
 /*cdecl*/ int CTheZones::FindSmallestNavigationZoneForPosition(CVector const* pPoint,bool,bool) 0x4DD060
 /*cdecl*/ short CTheZones::FindZoneByLabelAndReturnIndex(char *name,eZoneType type) 0x4DD5F0
 /*cdecl*/ eLevelName CTheZones::GetLevelFromPosition(CVector const* pPoint) 0x4DD300
-/*cdecl*/ int CTheZones::GetNavigationZone(ushort) 0x4DCC20 
+/*cdecl*/ int CTheZones::GetNavigationZone(ushort) 0x4DCC20
 /*cdecl*/ CZone* CTheZones::GetZoneInfo(CVector const* pPoint,uchar) 0x4DCEA0
 /*cdecl*/ __int16 CTheZones::GetZoneInfoForTimeOfDay(CVector const* pPoint,CZoneInfo *zoneInfo) 0x4DC500
-/*cdecl*/ void CTheZones::Init(void) 0x4DDFA0 
-/*cdecl*/ void CTheZones::InitialiseAudioZoneArray(void) 0x4DC430 
+/*cdecl*/ void CTheZones::Init(void) 0x4DDFA0
+/*cdecl*/ void CTheZones::InitialiseAudioZoneArray(void) 0x4DC430
 /*cdecl*/ bool CTheZones::InsertZoneIntoZoneHierRecursive(CZone *currentZona, CZone *otherZone) 0x4DD9D0
-/*cdecl*/ void CTheZones::LoadAllZones(uchar *,uint) 0x4DBCB0 
+/*cdecl*/ void CTheZones::LoadAllZones(uchar *,uint) 0x4DBCB0
 /*cdecl*/ void CTheZones::LoadOneZone(CZone *pZone,uchar **,uint *,eZoneType type) 0x4DBB80
 /*cdecl*/ bool CTheZones::PointLiesWithinZone(CVector const* pPoint,CZone *pZone) 0x4DD750
-/*cdecl*/ char CTheZones::PostZoneCreation(void) 0x4DDA90 
-/*cdecl*/ void CTheZones::SaveAllZones(uchar *,uint *) 0x4DC090 
+/*cdecl*/ char CTheZones::PostZoneCreation(void) 0x4DDA90
+/*cdecl*/ void CTheZones::SaveAllZones(uchar *,uint *) 0x4DC090
 /*cdecl*/ void CTheZones::SaveOneZone(CZone *pZone,uchar **,uint *,eZoneType type) 0x4DBF30
-/*cdecl*/ void CTheZones::SetPedGroup(ushort,uchar,ushort) 0x4DCC30 
-/*cdecl*/ void CTheZones::SetZoneCarInfo(int,uchar,short,short,short const*) 0x4DCDF0 
-/*cdecl*/ void CTheZones::SetZoneCivilianCarInfo(int,uchar,short const*,short const*) 0x4DCD40 
-/*cdecl*/ void CTheZones::SetZonePedInfo(int,uchar,short,short,short,short,short,short,short,short,short,short,short) 0x4DCC70 
-/*cdecl*/ void CTheZones::Update(void) 0x4DDDF0 
+/*cdecl*/ void CTheZones::SetPedGroup(ushort,uchar,ushort) 0x4DCC30
+/*cdecl*/ void CTheZones::SetZoneCarInfo(int,uchar,short,short,short const*) 0x4DCDF0
+/*cdecl*/ void CTheZones::SetZoneCivilianCarInfo(int,uchar,short const*,short const*) 0x4DCD40
+/*cdecl*/ void CTheZones::SetZonePedInfo(int,uchar,short,short,short,short,short,short,short,short,short,short,short) 0x4DCC70
+/*cdecl*/ void CTheZones::Update(void) 0x4DDDF0
 /*cdecl*/ bool CTheZones::ZoneIsEntirelyContainedWithinOtherZone(CZone *currentZona,CZone *otherZone) 0x4DD7D0
 /*thiscall*/ void CTimeModelInfo::FindOtherTimeModel(void) 0x56F330
 /*cdecl*/ void CTimer::EndUserPause(void) 0x4D0D90
@@ -1124,15 +1124,15 @@ static void __cdecl CStats::ConstructStatLine(int a1) 0x4CB085
 /*cdecl*/ void CTimer::Update(void) 0x4D0F30
 /*cdecl*/ void CTimer::Shutdown(void) 0x4D12F0
 /*cdecl*/ void CTimer::Initialise(void) 0x4D1300
-/*thiscall*/ void CTrain::AddPassenger(CPed * ped) 0x5B2C60 
+/*thiscall*/ void CTrain::AddPassenger(CPed * ped) 0x5B2C60
 /*thiscall*/ void CTrain::CTrain(int modelIndex, uchar createdBy) 0x5B2D00
 /*cdecl*/ void CTrain::InitTrains(void) 0x5B2CA0
 /*cdecl*/ void CTrain::Shutdown(void) 0x5B2C90
 /*cdecl*/ void CTrain::UpdateTrains(void) 0x5B2C80
 /*thiscall*/ float cTransmission::CalculateDriveAcceleration(float const& gasPedal,uchar & currrentGear,float &,float const&,bool) 0x5B2E20
 /*thiscall*/ void cTransmission::CalculateGearForSimpleCar(float velocity,uchar & currrentGear) 0x5B2DC0
-/*thiscall*/ void cTransmission::InitGearRatios(void) 0x5B3120 
-/*thiscall*/ void cTransmission::cTransmission(void) 0x5B3240 
+/*thiscall*/ void cTransmission::InitGearRatios(void) 0x5B3120
+/*thiscall*/ void cTransmission::cTransmission(void) 0x5B3240
 /*cdecl*/ void* CTreadable::operator new(uint size) 0x407FF0
 /*thiscall*/ void CTreadable::CTreadable(void) 0x408020
 /*cdecl*/ TxdDef* CTxdStore::AddRef(int index) 0x580A60
@@ -1140,21 +1140,21 @@ static void __cdecl CStats::ConstructStatLine(int a1) 0x4CB085
 /*cdecl*/ void CTxdStore::Create(int index) 0x580B60
 /*cdecl*/ int CTxdStore::FindTxdSlot(char const* name) 0x580D70
 /*cdecl*/ bool CTxdStore::FinishLoadTxd(int index,RwStream *stream) 0x580BA0
-/*cdecl*/ void CTxdStore::GameShutdown(void) 0x580F40 
+/*cdecl*/ void CTxdStore::GameShutdown(void) 0x580F40
 /*cdecl*/ int CTxdStore::GetNumRefs(int index) 0x580990
 /*cdecl*/ int CTxdStore::GetTxdName(int index) 0x580E50
 /*cdecl*/ bool CTxdStore::LoadTxd(int index, RwStream *stream) 0x580C60
 /*cdecl*/ bool CTxdStore::LoadTxd(int index, char const* filename) 0x580CD0
-/*cdecl*/ void CTxdStore::PopCurrentTxd(void) 0x580AA0 
-/*cdecl*/ void CTxdStore::PushCurrentTxd(void) 0x580AC0 
+/*cdecl*/ void CTxdStore::PopCurrentTxd(void) 0x580AA0
+/*cdecl*/ void CTxdStore::PushCurrentTxd(void) 0x580AC0
 /*cdecl*/ void CTxdStore::RemoveRef(int index) 0x580A10
 /*cdecl*/ TxdDef* CTxdStore::RemoveRefWithoutDelete(int index) 0x5809D0
 /*cdecl*/ void CTxdStore::RemoveTxd(int index) 0x580B10
 /*cdecl*/ void CTxdStore::RemoveTxdSlot(int index) 0x580E90
 /*cdecl*/ void CTxdStore::SetCurrentTxd(int index) 0x580AD0
-/*cdecl*/ void CTxdStore::Shutdown(void) 0x580FF0 
+/*cdecl*/ void CTxdStore::Shutdown(void) 0x580FF0
 /*cdecl*/ bool CTxdStore::StartLoadTxd(int index,RwStream *stream) 0x580BF0
-/*cdecl*/ void CTxdStore::Initialise(void) 0x581010 
+/*cdecl*/ void CTxdStore::Initialise(void) 0x581010
 /*cdecl*/ void CUserDisplay::Init(void) 0x4D1490
 /*cdecl*/ void CUserDisplay::Process(void) 0x4D1400
 void CVehicle::ProcessControlInputs(uchar playerNum) 0x69CA3C
@@ -1213,7 +1213,7 @@ void CVehicle::PlayCarHorn(void) 0x69CA8C
 /*thiscall*/ bool CVehicle::IsVehicleNormal(void) 0x5B7DF0
 /*thiscall*/ void CVehicle::KillPedsInVehicle(void) 0x5B8560
 /*thiscall*/ void CVehicle::MakeNonDraggedPedsLeaveVehicle(CPed *, CPed *, CPlayerPed *&, CCopPed *&) 0x5B3A30
-/*thiscall*/ void CVehicle::ProcessBikeWheel(CVector &, CVector &, CVector &, CVector &, int, float, float, float, float, char, float *, tWheelState *, 
+/*thiscall*/ void CVehicle::ProcessBikeWheel(CVector &, CVector &, CVector &, CVector &, int, float, float, float, float, char, float *, tWheelState *,
 /*thiscall*/ void CVehicle::ProcessCarAlarm(void) 0x5B8040
 /*thiscall*/ void CVehicle::ProcessDelayedExplosion(void) 0x5B8F50
 /*thiscall*/ void CVehicle::ProcessWheel(CVector &, CVector &, CVector &, CVector &, int, float, float, float, char, float *, tWheelState *, ushort) 0x5BA070
@@ -1260,9 +1260,9 @@ void CVehicle::PlayCarHorn(void) 0x69CA8C
 /*cdecl*/ void CVehicleModelInfo::ShutdownEnvironmentMaps(void) 0x578BD0
 /*thiscall*/ bool CWanted::AddCrimeToQ(eCrimeType crimeType,int,CVector const&,bool,bool) 0x4D1990
 /*thiscall*/ bool CWanted::AreArmyRequired(void) 0x4D1E20
-/*thiscall*/ bool CWanted::AreFbiRequired(void) 0x4D1E40 
-/*thiscall*/ bool CWanted::AreMiamiViceRequired(void) 0x4D1E80 
-/*thiscall*/ bool CWanted::AreSwatRequired(void) 0x4D1E60 
+/*thiscall*/ bool CWanted::AreFbiRequired(void) 0x4D1E40
+/*thiscall*/ bool CWanted::AreMiamiViceRequired(void) 0x4D1E80
+/*thiscall*/ bool CWanted::AreSwatRequired(void) 0x4D1E60
 /*thiscall*/ void CWanted::CheatWantedLevel(int) 0x4D1F80
 /*thiscall*/ void CWanted::ClearQdCrimes(void) 0x4D1A50
 /*thiscall*/ void CWanted::Initialise(void) 0x4D2440
@@ -1270,14 +1270,14 @@ void CVehicle::PlayCarHorn(void) 0x69CA8C
 /*thiscall*/ void CWanted::RegisterCrime(eCrimeType crimeType,CVector const&,uint,bool) 0x4D20F0
 /*thiscall*/ void CWanted::RegisterCrime_Immediately(eCrimeType crimeType,CVector const&,uint,bool) 0x4D20B0
 /*thiscall*/ void CWanted::ReportCrimeNow(eCrimeType crimeType,CVector const&,bool) 0x4D1610
-/*thiscall*/ void CWanted::Reset(void) 0x4D2420 
-/*thiscall*/ void CWanted::ResetPolicePursuit(void) 0x4D1D20 
+/*thiscall*/ void CWanted::Reset(void) 0x4D2420
+/*thiscall*/ void CWanted::ResetPolicePursuit(void) 0x4D1D20
 /*cdecl*/ void CWanted::SetMaximumWantedLevel(int level) 0x4D1E90
 /*thiscall*/ void CWanted::SetWantedLevel(int level) 0x4D1FA0
 /*thiscall*/ void CWanted::SetWantedLevelNoDrop(int) 0x4D1F50
-/*thiscall*/ void CWanted::Update(void) 0x4D2260 
-/*thiscall*/ void CWanted::UpdateWantedLevel(void) 0x4D2110 
-/*cdecl*/ void CWanted::WorkOutPolicePresence(CVector,float) 0x4D1B00 
+/*thiscall*/ void CWanted::Update(void) 0x4D2260
+/*thiscall*/ void CWanted::UpdateWantedLevel(void) 0x4D2110
+/*cdecl*/ void CWanted::WorkOutPolicePresence(CVector,float) 0x4D1B00
 Bool CWeapon::bPhotographHasBeenTaken 0xA10AF4
 void __thiscall CWeapon::CWeapon(eWeaponType type, int nAmmoTotal) 0x5D4E20
 static void __cdecl CWeapon::InitialiseWeapons(void) 0x5D4DF0
@@ -1291,7 +1291,7 @@ bool __thiscall CWeapon::FireMelee(CEntity *pFiringEntity, CVector &veSourcePos)
 bool __thiscall CWeapon::FireInstantHit(CEntity *pFiringEntity, CVector *veSourcePos) 0x5D1140
 static void __cdecl CWeapon::AddGunFlashBigGuns(CVector vecStart,CVector vecEnd) 0x5D0740
 void __thiscall CWeapon::AddGunshell(CEntity *pFiringEntity, CVector const& veSourcePos, CVector2D const& vecDirection, float fSize) 0x5D0560
-void __thiscall CWeapon::DoBulletImpact(CEntity *pFiringEntity, CEntity *pCollideEntity, CVector *vecStart, CVector *vecEnd, CColPoint *pColPoint, CVector2D 
+void __thiscall CWeapon::DoBulletImpact(CEntity *pFiringEntity, CEntity *pCollideEntity, CVector *vecStart, CVector *vecEnd, CColPoint *pColPoint, CVector2D
 bool __thiscall CWeapon::FireShotgun(CEntity *pFiringEntity, CVector *vecSourcePos) 0x5CD340
 bool __thiscall CWeapon::FireProjectile(CEntity *pFiringEntity, CVector *vecSourcePos, float fForce) 0x5CCF90
 bool __thiscall CWeapon::FireAreaEffect(CEntity *pFiringEntity, CVector *vecSourcePos) 0x5CCBB0
@@ -1310,7 +1310,7 @@ bool __thiscall CWeapon::IsType2Handed(void) 0x5C9B50
 static void __cdecl CWeapon::MakePedsJumpAtShot(CPhysical *pFiringEntity, CVector *vecStart, CVector *vecEnd) 0x5C8C30
 static void __cdecl CWeapon::BlowUpExplosiveThings(CEntity *Thing) 0x5C8AE0
 bool __thiscall CWeapon::HasWeaponAmmoToBeUsed(void) 0x5C8AB0
-static void __cdecl CWeapon::CheckForShootingVehicleOccupant(CEntity **pCollideEntity, CColPoint *pColPoint, eWeaponType type, CVector const& vecStart, 
+static void __cdecl CWeapon::CheckForShootingVehicleOccupant(CEntity **pCollideEntity, CColPoint *pColPoint, eWeaponType type, CVector const& vecStart,
 static void __cdecl FireOneInstantHitRound(CVector *vecStart, CVector *vecEnd, int nDamage) 0x5C9BB0
 /RwTexture* gpCrossHairTex 0xA0FD40
 /CWeaponEffects gCrossHair 0x9786EC
@@ -1358,40 +1358,40 @@ CWeaponInfo aWeaponInfo[37] 0x782A14
 /*cdecl*/ float CWorld::FindGroundZFor3DCoord(float x,float y,float z,bool *) 0x4D53A0
 /*cdecl*/ float CWorld::FindGroundZForCoord(float x,float y) 0x4D5540
 /*cdecl*/ int CWorld::FindMissionEntitiesIntersectingCube(CVector const&,CVector const&,short *,short,CEntity **,bool,bool,bool) 0x4D5800
-/*cdecl*/ void CWorld::FindMissionEntitiesIntersectingCubeSectorList(CPtrList &ptrlist,CVector const&,CVector const&,short *,short,CEntity **,bool,bool,bool) 
+/*cdecl*/ void CWorld::FindMissionEntitiesIntersectingCubeSectorList(CPtrList &ptrlist,CVector const&,CVector const&,short *,short,CEntity **,bool,bool,bool)
 /*cdecl*/ int CWorld::FindObjectsInRange(CVector const&,float,bool,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D6B90
 /*cdecl*/ void CWorld::FindObjectsInRangeSectorList(CPtrList &ptrlist,CVector const&,float,bool,short *,short,CEntity **) 0x4D6AD0
-/*cdecl*/ int CWorld::FindObjectsIntersectingAngledCollisionBox(CBox const&,CMatrix const&,CVector const&,float,float,float,float,short *,short,CEntity 
-/*cdecl*/ void CWorld::FindObjectsIntersectingAngledCollisionBoxSectorList(CPtrList &ptrlist,CBox const&,CMatrix const&,CVector const&,short *,short,CEntity **) 
-/*cdecl*/ int CWorld::FindObjectsIntersectingCube(CVector const&,CVector const&,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D5FB0 
+/*cdecl*/ int CWorld::FindObjectsIntersectingAngledCollisionBox(CBox const&,CMatrix const&,CVector const&,float,float,float,float,short *,short,CEntity
+/*cdecl*/ void CWorld::FindObjectsIntersectingAngledCollisionBoxSectorList(CPtrList &ptrlist,CBox const&,CMatrix const&,CVector const&,short *,short,CEntity **)
+/*cdecl*/ int CWorld::FindObjectsIntersectingCube(CVector const&,CVector const&,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D5FB0
 /*cdecl*/ void CWorld::FindObjectsIntersectingCubeSectorList(CPtrList &ptrlist,CVector const&,CVector const&,short *,short,CEntity **) 0x4D5EA0
-/*cdecl*/ int CWorld::FindObjectsKindaColliding(CVector const&,float,bool,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D6370 
+/*cdecl*/ int CWorld::FindObjectsKindaColliding(CVector const&,float,bool,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D6370
 /*cdecl*/ void CWorld::FindObjectsKindaCollidingSectorList(CPtrList &ptrlist,CVector const&,float,bool,short *,short,CEntity **) 0x4D6280
-/*cdecl*/ int CWorld::FindObjectsOfTypeInRange(uint,CVector const&,float,bool,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D6770 
+/*cdecl*/ int CWorld::FindObjectsOfTypeInRange(uint,CVector const&,float,bool,short *,short,CEntity **,bool,bool,bool,bool,bool) 0x4D6770
 /*cdecl*/ void CWorld::FindObjectsOfTypeInRangeSectorList(uint,CPtrList &ptrlist,CVector const&,float,bool,short *,short,CEntity **) 0x4D66A0
-/*cdecl*/ float CWorld::FindRoofZFor3DCoord(float x,float y,float z,bool *) 0x4D51D0 
+/*cdecl*/ float CWorld::FindRoofZFor3DCoord(float x,float y,float z,bool *) 0x4D51D0
 /*cdecl*/ bool CWorld::GetIsLineOfSightClear(CVector const& origin,CVector const& target,bool,bool,bool,bool,bool,bool,bool) 0x4DA560
 /*cdecl*/ bool CWorld::GetIsLineOfSightSectorClear(CSector &,CColLine const& colLine,bool,bool,bool,bool,bool,bool,bool) 0x4D6EC0
-/*cdecl*/ void CWorld::Initialise(void) 0x4DB9A0 
-/*cdecl*/ bool CWorld::IsWanderPathClear(CVector const&,CVector const&,float,int) 0x4D2620 
-/*cdecl*/ void CWorld::Process(void) 0x4D7500 
-/*cdecl*/ bool CWorld::ProcessLineOfSight(CVector const& origin,CVector const& target,CColPoint &colPoint,CEntity *&colEntity,bool buildings,bool vehicles,bool 
-/*cdecl*/ bool CWorld::ProcessLineOfSightSector(CSector &,CColLine const& colLine,CColPoint &colPoint,float &,CEntity *&colEntity,bool buildings,bool 
+/*cdecl*/ void CWorld::Initialise(void) 0x4DB9A0
+/*cdecl*/ bool CWorld::IsWanderPathClear(CVector const&,CVector const&,float,int) 0x4D2620
+/*cdecl*/ void CWorld::Process(void) 0x4D7500
+/*cdecl*/ bool CWorld::ProcessLineOfSight(CVector const& origin,CVector const& target,CColPoint &colPoint,CEntity *&colEntity,bool buildings,bool vehicles,bool
+/*cdecl*/ bool CWorld::ProcessLineOfSightSector(CSector &,CColLine const& colLine,CColPoint &colPoint,float &,CEntity *&colEntity,bool buildings,bool
 /*cdecl*/ bool CWorld::ProcessLineOfSightSectorList(CPtrList &ptrlist,CColLine const&,CColPoint &colPoint,float &,CEntity *&colEntity,bool,bool,bool) 0x4D8C60
-/*cdecl*/ bool CWorld::ProcessVerticalLine(CVector const& origin,float distance,CColPoint &colPoint,CEntity *&colEntity,bool buildings,bool vehicles,bool 
-/*cdecl*/ bool CWorld::ProcessVerticalLineSector(CSector &,CColLine const& colLine,CColPoint &colPoint,CEntity 
+/*cdecl*/ bool CWorld::ProcessVerticalLine(CVector const& origin,float distance,CColPoint &colPoint,CEntity *&colEntity,bool buildings,bool vehicles,bool
+/*cdecl*/ bool CWorld::ProcessVerticalLineSector(CSector &,CColLine const& colLine,CColPoint &colPoint,CEntity
 /*cdecl*/ void CWorld::Remove(CEntity *entity) 0x4DB310
-/*cdecl*/ void CWorld::RemoveFallenCars(void) 0x4D48A0 
-/*cdecl*/ void CWorld::RemoveFallenPeds(void) 0x4D4A40 
+/*cdecl*/ void CWorld::RemoveFallenCars(void) 0x4D48A0
+/*cdecl*/ void CWorld::RemoveFallenPeds(void) 0x4D4A40
 /*cdecl*/ void CWorld::RemoveReferencesToDeletedObject(CEntity *entity) 0x4D5090
 /*cdecl*/ CBaseModelInfo* CWorld::RepositionCertainDynamicObjects(void) 0x4D4850
 /*cdecl*/ CBaseModelInfo* CWorld::RepositionOneObject(CEntity *entity) 0x4D43A0
-/*cdecl*/ void CWorld::SetAllCarsCanBeDamaged(bool) 0x4D3550 
+/*cdecl*/ void CWorld::SetAllCarsCanBeDamaged(bool) 0x4D3550
 /*cdecl*/ void CWorld::SetCarsOnFire(float x,float y,float z,float radius,CEntity *vehicles) 0x4D4C30
 /*cdecl*/ void CWorld::SetPedsChoking(float x,float y,float z,float radius,CEntity *peds) 0x4D4D90
 /*cdecl*/ void CWorld::SetPedsOnFire(float x,float y,float z,float radius,CEntity *peds) 0x4D4F30
-/*cdecl*/ void CWorld::ShutDown(void) 0x4DB590 
-/*cdecl*/ void CWorld::StopAllLawEnforcersInTheirTracks(void) 0x4D25B0 
+/*cdecl*/ void CWorld::ShutDown(void) 0x4DB590
+/*cdecl*/ void CWorld::StopAllLawEnforcersInTheirTracks(void) 0x4D25B0
 /*cdecl*/ void CWorld::TestSphereAgainstSectorList(CPtrList &ptrlist,CVector,float,CEntity *entity,bool) 0x4D3C40
 /*cdecl*/ void CWorld::TestSphereAgainstWorld(CVector,float,CEntity *entity,bool,bool,bool,bool,bool,bool) 0x4D3F40
 /*cdecl*/ void CWorld::TriggerExplosion(CVector const&,float,float,CEntity *entity,bool) 0x4D82D0

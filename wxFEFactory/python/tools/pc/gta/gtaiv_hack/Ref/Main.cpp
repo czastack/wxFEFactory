@@ -10,7 +10,7 @@ BOOL APIENTRY DllMain( HANDLE hModule, DWORD  fdwReason, LPVOID lpReserved)
 {
     switch (fdwReason)
     {
-        case DLL_PROCESS_ATTACH: 
+        case DLL_PROCESS_ATTACH:
         {
 			ScriptHookManager::RegisterThread( &_customThread );
 

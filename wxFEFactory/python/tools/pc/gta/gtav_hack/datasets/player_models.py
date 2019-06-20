@@ -4,17 +4,17 @@ PLAYER_MODELS = (
         ("富兰克林", "player_one"),
         ("崔佛", "player_two"),
     )),
-    
+
     ("动物", (
         ("野猪", "a_c_boar"),
         ("家猪", "a_c_pig"),
-        
+
         ("黑猩猩", "a_c_chimp"),
         ("恒河猴", "a_c_rhesus"),
-        
+
         ("母牛", "a_c_cow"),
         ("鹿", "a_c_deer"),
-        
+
         ("小查", "a_c_chop"),
         ("狼", "a_c_coyote"),
         ("哈士奇", "a_c_husky"),
@@ -24,7 +24,7 @@ PLAYER_MODELS = (
         ("巴哥犬", "a_c_pug"),
         ("罗威那", "a_c_rottweiler"),
         ("西高地白梗", "a_c_westy"),
-        
+
         ("鱼", "a_c_fish"),
         ("海豚", "a_c_dolphin"),
         ("座头鲸", "a_c_humpback"),
@@ -32,13 +32,13 @@ PLAYER_MODELS = (
         ("鎚头鲨", "a_c_sharkhammer"),
         ("虎鲨", "a_c_sharktiger"),
         ("黄貂鱼", "a_c_stingray"),
-        
+
         ("猫", "a_c_cat_01"),
         ("山狮", "a_c_mtlion"),
-        
+
         ("老鼠", "a_c_rat"),
         ("兔子", "a_c_rabbit_01"),
-        
+
         ("鹰", "a_c_chickenhawk"),
         ("鸬鹚", "a_c_cormorant"),
         ("乌鸦", "a_c_crow"),
@@ -46,7 +46,7 @@ PLAYER_MODELS = (
         ("海鸥", "a_c_seagull"),
         ("母鸡", "a_c_hen"),
     )),
-    
+
     ("FIB IAA", (
         ("安德列斯·桑切斯 FIB探员 (CS)", "cs_andreas"),
         ("安德列斯·桑切斯 FIB探员 (IG)", "ig_andreas"),

@@ -1,6 +1,6 @@
 /*
 	THIS FILE IS A PART OF GTA V SCRIPT HOOK SDK
-				http://dev-c.com			
+				http://dev-c.com
 			(C) Alexander Blade 2015
 */
 
@@ -17,6 +17,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_DETACH:
 		scriptUnregister(hInstance);
 		break;
-	}		
+	}
 	return TRUE;
 }

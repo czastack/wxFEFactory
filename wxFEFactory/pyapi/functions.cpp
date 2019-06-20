@@ -28,7 +28,7 @@ int confirm_dialog(wxcstr title, wxcstr msg, int defaultButton)
 		style |= wxNO_DEFAULT;
 	else if (defaultButton == wxCANCEL)
 		style |= wxCANCEL_DEFAULT;
-	
+
 	return wxMessageBox(msg, title, style, nullptr);
 }
 
@@ -53,7 +53,7 @@ pyobj longtext_dialog(wxcstr title, wxcstr defaultValue, bool readonly, bool sm)
 	wxLongTextDialog dialog(title, defaultValue, readonly, sm);
 
 	pyobj ret;
-	
+
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		ret = py::cast(dialog.GetValue());

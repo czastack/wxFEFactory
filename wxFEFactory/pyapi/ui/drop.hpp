@@ -2,7 +2,7 @@
 #include <wx/dnd.h>
 #include "../pyutils.h"
 
-class FileDropListener : public wxFileDropTarget 
+class FileDropListener : public wxFileDropTarget
 {
 public:
 	FileDropListener(pycref ondrop): m_ondrop(ondrop) {}
@@ -25,7 +25,7 @@ private:
 };
 
 
-class TextDropListener : public wxTextDropTarget 
+class TextDropListener : public wxTextDropTarget
 {
 public:
 	TextDropListener(pycref ondrop) : m_ondrop(ondrop) {}

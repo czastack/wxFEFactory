@@ -321,7 +321,7 @@ float teleport[300] = {766.169312, -569.311584, 10.298987, 891.4139, -499.3775, 
 
 // Here is the list of teleported locations. The player can scroll through and select one.
 
-char* TelName[] = {"Shoreline of Algonquin","Broker Safehouse","Bohan Safehouse","Alderney City Safehouse"  
+char* TelName[] = {"Shoreline of Algonquin","Broker Safehouse","Bohan Safehouse","Alderney City Safehouse"
         ,"Comedy Club","Rotterdam tower","Getalife Building","Majestic Hotel","Helitours","Bank of liberty"
         ,"Poopdeck restaurant","Algonquin Northwood","Algonquin Starjunction","Alderney Leftwood","Alderney City" // 0-44
         ,"Industrial Park","Bohan Chase point","Broker outlook","Helipad mansion","Bikeshop","Honkers","Museum"

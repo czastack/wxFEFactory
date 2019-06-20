@@ -112,7 +112,7 @@ class FeDict(Dictionary):
                         result.append(code)
                         break_continue = True
                     break
-                
+
             if not break_continue and (code & 0xFF) is 0:
                 break
 
@@ -197,7 +197,7 @@ class FeDict(Dictionary):
                     if con:
                         continue
                 print("warning: %s不在码表中" % ch)
-                
+
             codes.append(code)
 
         return codes
@@ -213,7 +213,7 @@ class FeDict(Dictionary):
             codes.append(0x00)
 
         return self.encodeHaffumanCode(codes, buf)
-            
+
     def encodeHaffumanCode(self, codes, buf=None):
         """ 文本转哈夫曼字节数组
         :param codes: 字码数组
@@ -278,7 +278,7 @@ class FeDict(Dictionary):
 
 if __name__ == '__main__' or __name__ == 'builtins':
     # workdir = 'E:/GBA/fe8/'
-    # di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt') 
+    # di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt')
     # print(di.encodeHaffuman('铁剑'))
     # print(di.decodeHaffuman(b'\x93\xe4\x93\xbf\x01'))
 

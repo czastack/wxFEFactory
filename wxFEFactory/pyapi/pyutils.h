@@ -145,7 +145,7 @@ GEN_TYPE_CHECK(PyDict)
 GEN_TYPE_CHECK(PyList)
 GEN_TYPE_CHECK(PyUnicode)
 
-/* 
+/*
 PyFilter_Type
 PyMap_Type
 PyZip_Type
