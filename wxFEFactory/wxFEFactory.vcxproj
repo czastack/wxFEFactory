@@ -145,6 +145,7 @@
     <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp" />
+    <ClCompile Include="pyapi\ui\wx.cpp" />
     <ClCompile Include="wx\myapp.cpp" />
     <ClCompile Include="pyapi\fe\fe.cpp" />
     <ClCompile Include="pyapi\fe\graph.cpp" />

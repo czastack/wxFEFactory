@@ -73,6 +73,9 @@
     <ClCompile Include="wx\myapp.cpp">
       <Filter>wx</Filter>
     </ClCompile>
+    <ClCompile Include="pyapi\ui\wx.cpp">
+      <Filter>pyapi\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="types.h" />
