@@ -132,10 +132,10 @@ def dirfind(obj, text):
     return list(filter(lambda x: text in x, dir(obj)))
 
 
-def compose(*funs):
+def compose(*decos):
     """合并装饰器"""
-    def _deco(self):
-        for func in reversed(funs):
-            f = fun(f)
-        return f
+    def _deco(func):
+        for deco in reversed(decos):
+            func = deco(func)
+        return func
     return _deco
