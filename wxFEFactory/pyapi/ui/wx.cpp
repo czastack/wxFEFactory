@@ -7,6 +7,7 @@
 #include <wx/listbase.h>
 #include <wx/listbook.h>
 #include <wx/mdi.h>
+#include <wx/menu.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/rearrangectrl.h>
 #include <wx/spinctrl.h>
@@ -36,7 +37,7 @@ public:
 
 
 /**
- * ѡ��ת��
+ * 选项转换
  */
 class ChoicesCaster
 {
@@ -121,6 +122,26 @@ namespace pybind11 {
 		protected:
 			bool success = false;
 		};
+
+
+		/**
+		 * wxTreeItemId
+		 */
+		template <> class type_caster<wxTreeItemId> {
+		public:
+			bool load(handle src, bool) {
+				value.m_pItem = (void*)(size_t)src.cast<pybind11::int_>();
+				return true;
+			}
+
+			static handle cast(const wxTreeItemId &src, return_value_policy /* policy */, handle /* parent */) {
+				return PyLong_FromUnsignedLongLong((size_t)src.GetID());
+			}
+
+			PYBIND11_TYPE_CASTER(wxTreeItemId, (_)("wxTreeItemId"));
+		protected:
+			bool success = false;
+		};
 	}
 }
 
@@ -167,9 +188,13 @@ void init_ui(py::module& m)
 	py::class_<wxArrayInt>(m, "ArrayInt");
 
 	// wxWindow
+#define PACK(...) __VA_ARGS__
 
-#define WINDOW_INIT_STYLE(style, _name) def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),\
-	parent, id, pos, size, style, name=_name)
+#define _WINDOW_INIT(_ext_t, _ext_a, _ext_t1, _ext_a2, _style, _name) \
+	def(py::init<wxWindow*, wxWindowID, _ext_t const wxPoint&, const wxSize&, long, _ext_t1 const wxString&>(),\
+		parent, id, _ext_a pos, size, _style, _ext_a2 name=_name)
+#define WINDOW_INIT_STYLE(_style, _name) _WINDOW_INIT(, , , , _style, _name)
+#define WINDOW_INIT_EXT(ext_t, ext_a, _style, _name) _WINDOW_INIT(PACK(ext_t,), PACK(ext_a,), , , _style, _name)
 #define WINDOW_INIT(_name) WINDOW_INIT_STYLE(style_0, _name)
 
 	py::class_<wxWindow>(m, "Window")
@@ -187,12 +212,16 @@ void init_ui(py::module& m)
 		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a=true)
 		.def("GetId", &wxWindow::GetId)
 		.def("SetId", &wxWindow::SetId, "winid"_a)
+		.def("Show", &wxWindow::Show)
+		.def("Hide", &wxWindow::Hide)
 		.def("GetClientData", &wxWindow::GetClientData)
 		.def("SetClientData", &wxWindow::SetClientData, "data"_a)
 		.def("Layout", &wxWindow::Layout)
 		.def("Bind", (void (wxWindow::*)(const wxEventType&, const PyFunctor&, int winid, int lastId, wxObject * userData)) &wxWindow::Bind,
 			"eventType"_a, "fn"_a, "winid"_a=wxID_ANY, "lastId"_a=wxID_ANY, "userData"_a=NULL)
 		.def("AddPendingEvent", &wxWindow::AddPendingEvent, "event"_a)
+		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
+		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
 		.def("GetHost", [](wxWindow *self) -> py::object {
 			PyObject *ptr = reinterpret_cast<PyObject*>(self->GetClientData());
 			if (ptr) {
@@ -207,12 +236,11 @@ void init_ui(py::module& m)
 
 	// controls
 
-#define STATIC_CONTROL_INIT(ext_t, ext_a, _name) def(py::init<wxWindow*, wxWindowID, ext_t, const wxPoint&, const wxSize&, long, const wxString&>(),\
-	parent, id, ext_a, pos, size, style_0, name = _name)
-#define CONTROL_INIT(ext_t, ext_a, _name) def(py::init<wxWindow*, wxWindowID, ext_t, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),\
-	parent, id, ext_a, pos, size, style_0, validator, name = _name)
-
-#define GROUP(x) x
+#define STATIC_CONTROL_INIT(ext_t, ext_a, _name) _WINDOW_INIT(PACK(ext_t,), PACK(ext_a,), , , style_0, _name)
+#define CONTROL_INIT_STYLE(ext_t, ext_a, _style, _name) \
+	_WINDOW_INIT(PACK(ext_t,), PACK(ext_a,), PACK(const wxValidator&,), PACK(validator,), _style, _name)
+#define CONTROL_INIT_SIMPLE(_style, _name) _WINDOW_INIT(, , PACK(const wxValidator&,), PACK(validator,), _style, _name)
+#define CONTROL_INIT(ext_t, ext_a, _name) CONTROL_INIT_STYLE(ext_t, ext_a, style_0, _name)
 
 	// py::class_<wxControl, wxWindow>(m, "Control");
 
@@ -308,7 +336,7 @@ void init_ui(py::module& m)
 		;
 
 	py::class_<wxRearrangeList, wxCheckListBox>(m, "RearrangeList")
-		.CONTROL_INIT(GROUP(const wxArrayInt&, const wxArrayString&), GROUP("order"_a, items), wxRearrangeListNameStr)
+		.CONTROL_INIT(PACK(const wxArrayInt&, const wxArrayString&), PACK("order"_a, items), wxRearrangeListNameStr)
 	;
 
 	py::class_<wxChoice, wxControlWithItems>(m, "Choice")
@@ -323,10 +351,55 @@ void init_ui(py::module& m)
 		.def("AutoComplete", (bool (wxComboBox::*)(const wxArrayString &choices)) &wxComboBox::AutoComplete, choices)
 		;
 
-	py::class_<wxRadioBox, wxItemContainerImmutable>(m, "RadioBox")
-		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, const wxArrayString&, int, long, const wxValidator&, const wxString&>(),
-			parent, id, title, pos, size, choices, "majorDim"_a=0, style=wxRA_SPECIFY_COLS, validator, name=wxRadioBoxNameStr)
+
+	py::class_<wxFilePickerCtrl, wxWindow>(m, "FilePickerCtrl")
+		.CONTROL_INIT_STYLE(
+			PACK(const wxString&, const wxString&, const wxString&),
+			PACK(wxEmptyString, wxFileSelectorPromptStr, wxFileSelectorDefaultWildcardStr), wxFLP_DEFAULT_STYLE, wxFilePickerCtrlNameStr)
+		.def("GetPath", &wxFilePickerCtrl::GetPath)
+		.def("SetPath", &wxFilePickerCtrl::SetPath, "path"_a)
 		;
+
+
+	py::class_<wxDirPickerCtrl, wxWindow>(m, "DirPickerCtrl")
+		.CONTROL_INIT_STYLE(
+			PACK(const wxString&, const wxString&),
+			PACK(wxEmptyString, wxFileSelectorPromptStr), wxDIRP_DEFAULT_STYLE, wxDirPickerCtrlNameStr)
+		.def("GetPath", &wxDirPickerCtrl::GetPath)
+		.def("SetPath", &wxDirPickerCtrl::SetPath, "path"_a)
+		;
+
+
+	py::class_<wxTreeCtrl, wxWindow>(m, "TreeCtrl")
+		.CONTROL_INIT_SIMPLE(wxTR_HAS_BUTTONS | wxTR_SINGLE, wxTreeCtrlNameStr)
+		.def("AssignImageList", &wxTreeCtrl::AssignImageList)
+		.def("AddRoot", &wxTreeCtrl::AddRoot, text, "image"_a = -1, "selectedImage"_a = -1, "data"_a = None)
+		.def("InsertItem", (wxTreeItemId (wxTreeCtrl::*)(const wxTreeItemId&, size_t, const wxString&, int, int, wxTreeItemData *))
+			&wxTreeCtrl::InsertItem, parent, text, "image"_a = -1, "selectedImage"_a = -1, "data"_a = None)
+		.def("GetItemData", &wxTreeCtrl::GetItemData, item)
+		.def("Delete", &wxTreeCtrl::Delete, item)
+		.def("DeleteChildren", &wxTreeCtrl::DeleteChildren, item)
+		.def("DeleteAllItems", &wxTreeCtrl::DeleteAllItems)
+		.def("Expand", &wxTreeCtrl::Expand, item)
+		.def("ExpandAllChildren", &wxTreeCtrl::ExpandAllChildren, item)
+		.def("ExpandAll", &wxTreeCtrl::ExpandAll)
+		.def("Collapse", &wxTreeCtrl::Collapse, item)
+		.def("CollapseAllChildren", &wxTreeCtrl::CollapseAllChildren, item)
+		.def("CollapseAll", &wxTreeCtrl::CollapseAll)
+		.def("CollapseAndReset", &wxTreeCtrl::CollapseAndReset, item)
+		.def("Toggle", &wxTreeCtrl::Toggle, item)
+		.def("Unselect", &wxTreeCtrl::Unselect)
+		.def("UnselectAll", &wxTreeCtrl::UnselectAll)
+		.def("SelectItem", &wxTreeCtrl::SelectItem, item, "select"_a=true)
+		.def("SelectChildren", &wxTreeCtrl::SelectChildren, parent)
+		.def("ToggleItemSelection", &wxTreeCtrl::ToggleItemSelection, item)
+		.def("GetCount", &wxTreeCtrl::GetCount)
+		.def("GetIndent", &wxTreeCtrl::GetIndent)
+		.def("SetIndent", &wxTreeCtrl::SetIndent)
+		.def("GetSpacing", &wxTreeCtrl::GetSpacing)
+		.def("SetSpacing", &wxTreeCtrl::SetSpacing)
+		;
+
 
 	// containers
 	py::class_<wxSizer, wxWindow>(m, "Sizer")
@@ -392,11 +465,93 @@ void init_ui(py::module& m)
 	py::class_<wxNotebook, wxWindow>(m, "Notebook")
 		.WINDOW_INIT(wxNotebookNameStr);
 
+	py::class_<wxListbook, wxWindow>(m, "Listbook")
+		.WINDOW_INIT(wxEmptyString);
 
+	// frames
 
+	py::class_<wxTopLevelWindow, wxWindow>(m, "TopLevelWindow")
+		.def("GetTitle", &wxTopLevelWindow::GetTitle)
+		.def("SetTitle", &wxTopLevelWindow::SetTitle, title)
+		.def("SetIcon", &wxTopLevelWindow::SetIcon, "icon"_a)
+		.def("Destroy", &wxFrame::Destroy)
+		;
+
+	py::class_<wxFrame, wxTopLevelWindow>(m, "Frame")
+		.WINDOW_INIT_EXT(const wxString&, title, wxDEFAULT_FRAME_STYLE, wxFrameNameStr)
+		.def("SetMenuBar", &wxFrame::SetMenuBar)
+		.def("GetMenuBar", &wxFrame::GetMenuBar)
+		.def("GetStatusBar", &wxFrame::GetStatusBar)
+		.def("SetStatusBar", &wxFrame::SetStatusBar)
+		.def("SetStatusText", &wxFrame::SetStatusText, text, "number"_a=0)
+		.def("SetStatusWidths", &wxFrame::SetStatusWidths, "n"_a, "widths_field"_a)
+		.def("PushStatusText", &wxFrame::PushStatusText, text, "number"_a=0)
+		.def("PopStatusText", &wxFrame::PopStatusText, "number"_a=0)
+		.def("SetStatusBarPane", &wxFrame::SetStatusBarPane, "n"_a)
+		.def("GetStatusBarPane", &wxFrame::GetStatusBarPane)
+		;
+
+	py::class_<wxMDIParentFrame, wxFrame>(m, "MDIParentFrame")
+		.WINDOW_INIT_EXT(const wxString&, title, wxDEFAULT_FRAME_STYLE | wxVSCROLL | wxHSCROLL, wxFrameNameStr)
+		;
+
+	py::class_<wxMDIChildFrame, wxFrame>(m, "MDIChildFrame")
+		.WINDOW_INIT_EXT(const wxString&, title, wxDEFAULT_FRAME_STYLE, wxFrameNameStr)
+		;
+
+	py::class_<wxDialog, wxFrame>(m, "Dialog")
+		.WINDOW_INIT_EXT(const wxString&, title, wxDEFAULT_DIALOG_STYLE, wxDialogNameStr)
+		.def("IsModal", &wxDialog::IsModal)
+		.def("EndModal", &wxDialog::EndModal, "retCode"_a)
+		;
+	
+	// menu
+	py::class_<wxMenu>(m, "Menu")
+		.def(py::init<int>(), style)
+		.def(py::init<const wxString&, int>(), title, style)
+		.def("AppendSubMenu", &wxMenu::AppendSubMenu)
+		.def("Append", (wxMenuItem* (wxMenu::*)(int, const wxString&, const wxString&, wxItemKind)) &wxMenu::Append)
+		.def("Remove", (wxMenuItem* (wxMenu::*)(wxMenuItem *)) &wxMenu::Remove)
+		.def("AppendSeparator", &wxMenu::AppendSeparator)
+		.def("GetMenuItemCount", &wxMenu::GetMenuItemCount)
+		.def("GetTitle", &wxMenu::GetTitle)
+		;
+	
+	
+	py::class_<wxMenuBar, wxWindow>(m, "MenuBar")
+		.def(py::init<int>(), style)
+		.def(py::init<size_t, wxMenu *[], const wxString[], long>(), "n"_a, "menus"_a, "titles"_a, style_0)
+		.def("Append", &wxMenuBar::Append, "menu"_a, title)
+		.def("Insert", &wxMenuBar::Insert, "pos"_a, "menu"_a, title)
+		.def("Remove", &wxMenuBar::Remove)
+		;
+	
+	
+	py::class_<wxMenuItem>(m, "MenuItem")
+		.def("GetItemLabel", &wxMenuItem::GetItemLabel)
+		.def("SetItemLabel", &wxMenuItem::SetItemLabel)
+		.def("GetId", &wxMenuItem::GetId)
+		.def("IsCheck", &wxMenuItem::IsCheck)
+		.def("Check", &wxMenuItem::Check, "bDoEnable"_a=true)
+		.def("Enable", &wxMenuItem::Enable, "bDoCheck"_a=true)
+		;
 
 
 	// evnents
+    py::class_<wxEvent>(m, "Event")
+        .def("Skip", &wxEvent::Skip, "skip"_a = true)
+        .def_property("id", &wxEvent::GetId, &wxEvent::SetId)
+        .def("ResumePropagation", &wxKeyEvent::ResumePropagation);
+
+	// 按键事件
+    py::class_<wxKeyEvent, wxEvent>(m, "KeyEvent")
+        .def("GetKeyCode", &wxKeyEvent::GetKeyCode)
+        .def("GetModifiers", &wxKeyEvent::GetModifiers);
+
+	// 树控件事件
+	py::class_<wxTreeEvent, wxEvent>(m, "TreeEvent")
+        .def("GetItem", &wxTreeEvent::GetItem);
+
 #define EVENT_TYPE(name) PyObject_SetAttrString(wx, #name, PyLong_FromLong(wx##name.operator const wxEventType& ()))
 	// Command events
 	EVENT_TYPE(EVT_BUTTON);

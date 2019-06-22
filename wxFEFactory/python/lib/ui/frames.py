@@ -5,6 +5,14 @@ from . import wx
 class BaseTopLevelWindow(Layout):
     def onready(self):
         self.Show()
+    
+    @property
+    def keeptop(self):
+        return self.has_wxstyle(wx.STAY_ON_TOP)
+
+    @keeptop.setter
+    def keeptop(self, value):
+        self.toggle_wxstyle(wx.STAY_ON_TOP, value)
 
 
 class BaseFrame(BaseTopLevelWindow):

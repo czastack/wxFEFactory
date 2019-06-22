@@ -58,6 +58,10 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 		.def("mem_read", mem_read, "address"_a, "size"_a)
 		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a)
 		.def("get_bit", get_bit)
+		.def("object_from_id", object_from_id)
+		.def("GlobalAddAtom", GlobalAddAtom)
+		.def("GlobalGetAtomName", GlobalGetAtomName)
+		.def("GlobalDeleteAtom", GlobalDeleteAtom)
 		// .def("getMouseState", []() {return wxGetMouseState(); })
 		.def("getKeyState", [](int key) {return wxGetKeyState((wxKeyCode)key); });
 

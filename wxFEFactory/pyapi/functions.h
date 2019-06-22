@@ -24,3 +24,5 @@ wxItemKind getItemKind(wxcstr kindStr);
 
 long getBitmapTypeByExt(wxcstr path);
 class wxBitmap& castBitmap(pycref path, class wxBitmap &bp);
+
+pyobj object_from_id(size_t id);

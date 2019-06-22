@@ -238,3 +238,8 @@ wxBitmap & castBitmap(pycref bitmap, wxBitmap & bp)
 	}
 	return bp;
 }
+
+
+pyobj object_from_id(size_t id) {
+	return py::reinterpret_borrow<py::object>((PyObject*)id);
+}
