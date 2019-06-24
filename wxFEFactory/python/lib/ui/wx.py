@@ -1,3 +1,6 @@
+from fefactory_api.ui import *
+
+
 # 文本对齐
 ALIGN_NOT = 0x0000
 ALIGN_CENTER_HORIZONTAL = 0x0100

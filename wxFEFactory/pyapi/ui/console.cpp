@@ -1,12 +1,12 @@
 #include <wx/combobox.h>
 #include <wx/textctrl.h>
+#include <iostream>
+#include <memory>
 #include "../pyutils.h"
 #include "../functions.h"
 #include "console.h"
 #include "dialogs.h"
 #include "utils/HistorySet.hpp"
-#include <iostream>
-#include <memory>
 using  namespace std;
 
 constexpr auto PS1 = _T(">>> "), PS2 = _T("... "), HISTORY_FILE = _T("python_history.txt");

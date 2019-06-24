@@ -9,22 +9,22 @@ class ToolBarBase(Layout):
 
     def onready(self):
         super().onready()
-        # Bind(wxEVT_COMMAND_TOOL_CLICKED, &ToolBarBase::onClick, this)
+        # Bind(wx.EVT_COMMAND_TOOL_CLICKED, &ToolBarBase::onClick, this)
 
     def onclick(self, event):
         pass
 
-    def layout_child(child, styles):
+    def layout_child(self, child, styles):
         self.AddControl(child, "", None)
 
 
 class ToolBar(ToolBarBase):
-    wxtype = wxToolBar
+    wxtype = wx.ToolBar
 
 
 class AuiToolBar(ToolBarBase):
-    wxtype = wxAuiToolBar
+    wxtype = wx.AuiToolBar
 
 
 class StatusBar(Control):
-    wxtype = wxStatusBar
+    wxtype = wx.StatusBar

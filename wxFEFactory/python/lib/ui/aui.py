@@ -1,4 +1,4 @@
-from .containers import Layout
+from .containers import Layout, BaseFrame, BaseTopLevelWindow
 from . import wx
 
 
@@ -14,14 +14,14 @@ class AuiManager(Layout):
 
     def render(self, parent):
         self.bind_wx(parent.wxwindow)
-        # Bind(wxEVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this)
+        # Bind(wx.EVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this)
 
     def relayout(self):
         self.mgr.Update()
 
     def layout_child(self, child, style):
         data = child.extra
-        info = wxAuiPaneInfo()
+        info = wx.AuiPaneInfo()
 
         if 'name' in data:
             info.Name(data['name'])
@@ -58,7 +58,7 @@ class AuiManager(Layout):
 
     def show_pane(self, name, show=True):
         """显示面板"""
-        self.mgr->GetPane(name).Show(show)
+        self.GetPane(name).Show(show)
         self.layout()
 
 
@@ -74,7 +74,7 @@ class AuiNotebook(Layout):
         self.close_listeners.clear()
 
     def onready(self):
-        # Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &AuiNotebook::OnPageClose, this)
+        # Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, &AuiNotebook::OnPageClose, this)
         pass
 
     def _remove_page(self, n):
@@ -97,11 +97,11 @@ class AuiNotebook(Layout):
             # 手动调用子窗口的onClose
             if isinstance(page, BaseTopLevelWindow):
                 # TODO
-                page.onClose(wxCloseEvent(wxEVT_CLOSE_WINDOW))
+                page.onClose(wx.CloseEvent(wx.EVT_CLOSE_WINDOW))
 
 
 class AuiMDIParentFrame(BaseFrame):
-    wxtype = wxAuiMDIParentFrame
+    wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, wxstyle=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL, **kwagrs):
         Layout.__init__(self, wxstyle=wxstyle, **kwagrs)
@@ -109,7 +109,7 @@ class AuiMDIParentFrame(BaseFrame):
 
 
 class AuiMDIChildFrame(BaseTopLevelWindow):
-    wxtype = wxAuiMDIParentFrame
+    wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, wxstyle=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL, **kwagrs):
         Layout.__init__(self, wxstyle=wxstyle, **kwagrs)

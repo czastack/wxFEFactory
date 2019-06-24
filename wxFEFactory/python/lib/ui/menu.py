@@ -38,7 +38,7 @@ class Menu(MenuHolder):
     """基本菜单"""
     def __init__(self, handlers=None, text=None, help=None):
         MenuHolder.__init__(handlers)
-        self.wxmenu = wxMenu()
+        self.wxmenu = wx.Menu()
         if text is not None and help is not None:
             parent = self.active_menu()
             if parent:
@@ -64,7 +64,7 @@ class MenuBar(MenuHolder):
     def __init__(self, onselect=None):
         MenuHolder.__init__(self, {})
         self.m_onselect = onselect
-        self.wxwindow = wxMenuBar(0)
+        self.wxwindow = wx.MenuBar(0)
         self.wxwindow.SetClientData(this)
 
     def remove(self, menu):

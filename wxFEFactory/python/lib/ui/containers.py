@@ -66,19 +66,19 @@ class SizerLayout(Layout):
 
 
 class SizerPanel(SizerLayout):
-    wxtype = wxPanel
+    wxtype = wx.Panel
 
 
 class Vertical(SizerPanel):
     """垂直布局"""
     def onready(self):
-        self.SetSizer(wxBoxSizer(wx.VERTICAL))
+        self.SetSizer(wx.BoxSizer(wx.VERTICAL))
 
 
 class Horizontal(SizerPanel):
     """水平布局"""
     def onready(self):
-        self.SetSizer(wxBoxSizer(wx.HORIZONTAL))
+        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
 
 
 class GridLayout(SizerPanel):
@@ -91,7 +91,7 @@ class GridLayout(SizerPanel):
         self.hgap = hgap
 
     def onready(self):
-        self.SetSizer(wxGridSizer(self.rows, self.cols, self.vgap, self.hgap))
+        self.SetSizer(wx.GridSizer(self.rows, self.cols, self.vgap, self.hgap))
 
 
 class FlexGridLayout(SizerPanel):
@@ -104,8 +104,8 @@ class FlexGridLayout(SizerPanel):
         self.hgap = hgap
 
     def onready(self):
-        sizer = wxFlexGridSizer(self.rows, self.cols, self.vgap, self.hgap)
-        sizer.SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED)
+        sizer = wx.FlexGridSizer(self.rows, self.cols, self.vgap, self.hgap)
+        sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
         self.SetSizer(sizer)
 
 
@@ -116,7 +116,7 @@ class ScrollView(SizerLayout):
 
     def onready(self):
         self.SetScrollRate(5, 5)
-        self.SetSizer(wxBoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
+        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
 
     def layout(self):
         self.GetSizer().FitInside(self.wxwindow)
@@ -125,7 +125,7 @@ class ScrollView(SizerLayout):
 
 class SplitterWindow(Layout):
     """分割窗口"""
-    wxtype = wxSplitterWindow
+    wxtype = wx.SplitterWindow
 
     def __init__(self, horizontal=False, sashpos=0, **kwargs):
         Layout.__init__(self, **kwargs)
@@ -150,14 +150,14 @@ class SplitterWindow(Layout):
 
 class StaticBox(SizerLayout):
     """静态框"""
-    wxtype = wxStaticBox
+    wxtype = wx.StaticBox
 
     def __init__(self, label, **kwargs):
         super().__init__(**kwargs)
         self.wxparams['label'] = label
 
     def onready(self):
-        sizer = wxBoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.InsertSpacer(0, 15)
         self.SetSizer(sizer)
 
@@ -184,10 +184,10 @@ class BookCtrlBase(Layout):
 
 
 class Notebook(BookCtrlBase):
-    wxtype = wxNotebook
-    wxevent = wxEVT_NOTEBOOK_PAGE_CHANGED
+    wxtype = wx.Notebook
+    wxevent = wx.EVT_NOTEBOOK_PAGE_CHANGED
 
 
 class Listbook(BookCtrlBase):
-    wxtype = wxListbook
-    wxevent = wxEVT_LISTBOOK_PAGE_CHANGED
+    wxtype = wx.Listbook
+    wxevent = wx.EVT_LISTBOOK_PAGE_CHANGED

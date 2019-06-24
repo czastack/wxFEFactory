@@ -3,7 +3,7 @@ from . import wx
 
 
 class PropertyGrid(Control):
-    wxtype = wxPropertyGrid
+    wxtype = wx.PropertyGrid
 
     def __init__(self, data=None, onchange=onchange, exstyle=wx.PG_EX_HELP_AS_TOOLTIPS, **kwargs):
         self._data = data
@@ -13,7 +13,7 @@ class PropertyGrid(Control):
     def onready(self):
         self.SetCaptionBackgroundColour(0xeeeeee)
         self.SetMarginColour(0xeeeeee)
-        # Bind(wxEVT_PG_CHANGING, &PropertyGrid::OnChange, this);
+        # Bind(wx.EVT_PG_CHANGING, &PropertyGrid::OnChange, this);
 
     def set_onhighlight(self, onhighlight):
         self.bind_event(wx.EVT_PG_HIGHLIGHTED, fn)
@@ -23,7 +23,7 @@ class PropertyGrid(Control):
 
 
 class ListView(Control):
-    wxtype = wxListView
+    wxtype = wx.ListView
 
     def append_columns(self, columns, widths):
         widths_len = len(widths) if widths else 0
@@ -33,7 +33,7 @@ class ListView(Control):
                 widths[i] if i < widths_len else -1)
 
     def insert_items(self, rows, pos=-1, create=False):
-        info = wxListItem()
+        info = wx.ListItem()
         info.m_mask = wx.LIST_MASK_TEXT
         info.m_itemId = pos if pos is not -1 else self.GetItemCount()
         if create and pos is -1:
@@ -96,22 +96,22 @@ class ListView(Control):
             self.SelectItem(i, True)
 
     def set_on_item_selected(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_ITEM_SELECTED, fn, reset)
+        self.bind_event(wx.EVT_LIST_ITEM_SELECTED, fn, reset)
 
     def set_on_item_deselected(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_ITEM_DESELECTED, fn, reset)
+        self.bind_event(wx.EVT_LIST_ITEM_DESELECTED, fn, reset)
 
     def set_on_item_checked(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_ITEM_CHECKED, fn, reset)
+        self.bind_event(wx.EVT_LIST_ITEM_CHECKED, fn, reset)
 
     def set_on_item_unchecked(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_ITEM_UNCHECKED, fn, reset)
+        self.bind_event(wx.EVT_LIST_ITEM_UNCHECKED, fn, reset)
 
     def set_on_item_activated(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_ITEM_ACTIVATED, fn, reset)
+        self.bind_event(wx.EVT_LIST_ITEM_ACTIVATED, fn, reset)
 
     def set_on_col_click(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_COL_CLICK, fn, reset)
+        self.bind_event(wx.EVT_LIST_COL_CLICK, fn, reset)
 
     def set_on_col_right_click(self, fn, reset=True):
-        self.bind_event(wxEVT_LIST_COL_RIGHT_CLICK, fn, reset)
+        self.bind_event(wx.EVT_LIST_COL_RIGHT_CLICK, fn, reset)

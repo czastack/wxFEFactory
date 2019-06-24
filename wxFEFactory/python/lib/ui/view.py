@@ -3,6 +3,7 @@
 class View:
     """视图元素"""
     LAYOUTS = []
+    wxtype = None
 
     def __init__(self, class_name=None, style=None, pos=None, size=None, wxstyle=0, extra=None):
         # style: None | [{}] | {}
@@ -26,21 +27,21 @@ class View:
             styles = parent.get_styles()
             if styles is not None:
                 for style in styles:
-                    self.try_styles()
+                    self.try_styles(style)
 
     @classmethod
     def active_layout(cls):
-        return cls.GROUPS[-1] if __class__.GROUPS else None
+        return cls.LAYOUTS[-1] if __class__.LAYOUTS else None
 
     @classmethod
     def active_wxwindow(cls):
-        layout = self.active_layout()
+        layout = cls.active_layout()
         return layout and layout.wxwindow
 
-    # wxWindow* View::safeActiveWindow()
+    # wx.Window* View::safeActiveWindow()
     # {
     #     Layout *layout = getActiveLayout();
-    #     return layout ? layout->ptr() : wxGetApp().GetTopWindow();
+    #     return layout ? layout->ptr() : wx.GetApp().GetTopWindow();
     # }
 
     def bind_wx(self, wxwindow):
@@ -91,7 +92,7 @@ class View:
     def has_style(self, name):
         """判断是否有该样式"""
         for style in self.iter_style():
-            if name in item:
+            if name in style:
                 return True
         return False
 
@@ -160,11 +161,11 @@ class View:
             # 字重
             weight = fontDict.get('weight', None)
             if weight is not None:
-                # wxFONTWEIGHT_NORMAL: 400 | wxFONTWEIGHT_LIGHT: 300 | wxFONTWEIGHT_BOLD: 700
+                # wx.FONTWEIGHT_NORMAL: 400 | wx.FONTWEIGHT_LIGHT: 300 | wx.FONTWEIGHT_BOLD: 700
                 font.SetWeight(weight)
             font_style = fontDict.get('style', None)
             if font_style is not None:
-                # wxFONTSTYLE_NORMAL: 90 | wxFONTSTYLE_ITALIC: 93 | wxFONTSTYLE_SLANT: 94
+                # wx.FONTSTYLE_NORMAL: 90 | wx.FONTSTYLE_ITALIC: 93 | wx.FONTSTYLE_SLANT: 94
                 font.SetStyle(font_style)
             underline = fontDict.get('underline', None)
             if underline is not None:
@@ -216,8 +217,8 @@ class View:
 
     def set_context_menu(self, contextmenu):
         """设置右键菜单"""
-        # m_elem->Bind(wxEVT_CONTEXT_MENU, &View::onPopMenu, this);
-        # m_elem->Bind(wxEVT_MENU, &View::onContextMenu, this);
+        # m_elem->Bind(wx.EVT_CONTEXT_MENU, &View::onPopMenu, this);
+        # m_elem->Bind(wx.EVT_MENU, &View::onContextMenu, this);
         self.contextmenu = contextmenu
 
     @property
@@ -294,14 +295,14 @@ class View:
 
     def post_event(self, event_type):
         """手动添加事件"""
-        self.AddPendingEvent(wxEvent(event_type, self.GetId()))
+        self.AddPendingEvent(wx.Event(event_type, self.GetId()))
 
     # /**
-    #  * 会传wxKeyEvent实例过去，需要手动Skip
+    #  * 会传wx.KeyEvent实例过去，需要手动Skip
     #  */
     # void setOnKeyDown(pycref fn)
     # {
-    #     bindEvt(wxEVT_KEY_DOWN, fn, false, true);
+    #     bindEvt(wx.EVT_KEY_DOWN, fn, false, true);
     # }
 
     # void setOnFileDrop(pycref ondrop);
@@ -312,7 +313,7 @@ class View:
 
     # void setOnDestroy(pycref fn)
     # {
-    #     bindEvt(wxEVT_DESTROY, fn);
+    #     bindEvt(wx.EVT_DESTROY, fn);
     # }
 
 
@@ -398,7 +399,7 @@ class Layout(View):
 
     def remove_child(self, child):
         """移除子元素"""
-        self.RemoveChild(child.wxWindow)
+        self.RemoveChild(child.wx.Window)
         self.children.remove(child)
 
     def clear_children(self):

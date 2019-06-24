@@ -17,7 +17,7 @@ class BaseTopLevelWindow(Layout):
 
 class BaseFrame(BaseTopLevelWindow):
     def onready(self):
-        # elem->Bind(wxEVT_CLOSE_WINDOW, &BaseTopLevelWindow::_onClose, this)
+        # elem->Bind(wx.EVT_CLOSE_WINDOW, &BaseTopLevelWindow::_onClose, this)
         super().onready()
 
     def set_menu(self, menubar):
@@ -30,7 +30,7 @@ class BaseFrame(BaseTopLevelWindow):
 
 
 class Window(BaseFrame):
-    wxtype = wxFrame
+    wxtype = wx.Frame
 
     def __init__(self, title, menubar=None, **kwargs):
         BaseFrame.__init__(self, **kwargs)
@@ -44,7 +44,7 @@ class Window(BaseFrame):
 
 
 class MDIParentFrame(BaseFrame):
-    wxtype = wxMDIParentFrame
+    wxtype = wx.MDIParentFrame
 
     def __init__(self, title, menubar=None, **kwargs):
         BaseFrame.__init__(self, **kwargs)
@@ -58,7 +58,7 @@ class MDIParentFrame(BaseFrame):
 
 
 class MDIChildFrame(BaseFrame):
-    wxtype = wxMDIChildFrame
+    wxtype = wx.MDIChildFrame
 
     def __init__(self, title, menubar=None, **kwargs):
         BaseFrame.__init__(self, **kwargs)
@@ -92,7 +92,7 @@ class KeyHookWindow(Window):
 
 
 class Dialog(BaseTopLevelWindow):
-    wxtype = wxDialog
+    wxtype = wx.Dialog
     default_style = wx.DEFAULT_DIALOG_STYLE | wx.MINIMIZE_BOX | wx.RESIZE_BORDER | wx.CLIP_CHILDREN
 
     def __init__(self, title, wxstyle=default_style, **kwargs):
