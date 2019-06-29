@@ -9,10 +9,8 @@ from application import app
 from project import Project
 from modules import modules
 # from fe.ferom import FeRomRW
-from lib import exui, extypes, wxconst
+from lib import ui, exui, extypes, wxconst
 from lib.win32.keys import WXK
-Path = os.path
-ui = fefactory_api.ui
 
 
 """
@@ -91,7 +89,7 @@ class MainFrame:
             ui.StatusBar()
             # 尝试加载图标
             icon_name = fefactory.executable_name() + '.ico'
-            if Path.exists(icon_name):
+            if os.path.exists(icon_name):
                 win.setIcon(icon_name)
 
         win.setOnClose(self.onclose)
@@ -177,7 +175,7 @@ class MainFrame:
                 fefactory_api.confirm_yes("此工程已存在，是否覆盖", fefactory_api.NO)
             else:
                 # TODO
-                project.title = input("请输入工程名称", Path.basename(path))
+                project.title = input("请输入工程名称", os.path.basename(path))
             app.onChangeProject(project)
             self.on_open_project(project)
 
@@ -304,11 +302,11 @@ class MainFrame:
 
     def get_sub_tools(self, parent):
         """获取子目录工具"""
-        dir_path = Path.dirname(parent.__file__)
+        dir_path = os.path.dirname(parent.__file__)
         files = os.listdir(dir_path)
         result = []
         for file in files:
-            if not file.startswith('__') and file.find('.') is -1 and Path.isdir(Path.join(dir_path, file)):
+            if not file.startswith('__') and file.find('.') is -1 and os.path.isdir(os.path.join(dir_path, file)):
                 module = __import__(parent.__name__ + '.' + file, fromlist=file)
                 name = getattr(module, 'name', None)
                 if name is not None:

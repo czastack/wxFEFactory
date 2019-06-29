@@ -11,7 +11,7 @@
 
 void log_message(wxcstr text)
 {
-	pyConsole.write(text);
+	console.write(text);
 }
 
 

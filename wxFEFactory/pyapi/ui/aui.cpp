@@ -1,270 +1,85 @@
 #include <wx/wx.h>
-#include "aui.h"
+#include <wx/aui/aui.h>
+#include <wx/aui/tabmdi.h>
+#include "ui.h"
 
 
-void AuiManager::doAdd(View & child)
-{
-	AuiItem *item = (AuiItem*)child.ptr()->GetClientData();
-	if (isPyDict(item->m_kwargs))
-	{
-		wxAuiPaneInfo info;
-
-		// 替换回原指针
-		child.ptr()->SetClientData(&child);
-
-		pyobj data;
-
-		data = PyDictGet(item->m_kwargs, wxT("name"));
-		if (!data.is(None))
-		{
-			info.Name(data.cast<wxString>());
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("direction"));
-		if (!data.is(None))
-		{
-			wxcstr direction = data.cast<wxString>();
-
-			if (direction == wxT("top"))
-				info.Top();
-			else if (direction == wxT("right"))
-				info.Right();
-			else if (direction == wxT("bottom"))
-				info.Bottom();
-			else if (direction == wxT("left"))
-				info.Left();
-			else if (direction == wxT("center"))
-				info.Center();
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("caption"));
-		if (!data.is(None))
-		{
-			info.Caption(data.cast<wxString>());
-		}
-
-		if (!PyDictGet(item->m_kwargs, wxT("closeButton"), false))
-		{
-			info.CloseButton(false);
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("maximizeButton"));
-		if (!data.is(None))
-		{
-			info.MaximizeButton(data.cast<bool>());
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("minimizeButton"));
-		if (!data.is(None))
-		{
-			info.MinimizeButton(data.cast<bool>());
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("captionVisible"));
-		if (!data.is(None))
-		{
-			info.CaptionVisible(data.cast<bool>());
-		}
-
-		data = PyDictGet(item->m_kwargs, wxT("row"));
-		if (!data.is(None))
-		{
-			info.Row(data.cast<int>());
-		}
-
-		if (PyDictGet(item->m_kwargs, wxT("hide"), false))
-		{
-			info.Hide();
-		}
-
-		m_mgr->AddPane(child, info);
-
-		py::cast(item).dec_ref();
-	}
-	/*else
-	{
-		log_message(wxString::Format("Child of %s must be AuiItem.", "AuiManager"));
-	}*/
-}
-
-void AuiManager::__exit__(py::args & args)
-{
-	layout();
-
-	// 引用加一，避免被析构
-	pyobj &self = py::cast(this);
-	self.inc_ref();
-	Layout::__exit__(args);
-}
-
-void AuiNotebook::doAdd(View & child)
-{
-	AuiItem *item = (AuiItem*)child.ptr()->GetClientData();
-	if (isPyDict(item->m_kwargs))
-	{
-		// 替换回原指针
-		child.ptr()->SetClientData(&child);
-
-		wxcstr caption = PyDictGet(item->m_kwargs, wxT("caption"), wxNoneString);
-		child.ptr()->Reparent(NULL);
-		ctrl().AddPage(child, caption);
-
-		pycref onclose = PyDictGet(item->m_kwargs, wxT("onclose"));
-		if (!onclose.is(None))
-		{
-			m_close_listeners[py::cast(&child)] = onclose;
-		}
-
-		py::cast(item).dec_ref();
-	}
-	/*else
-	{
-		log_message(wxString::Format("Child of %s must be AuiItem.", "AuiNotebook"));
-	}*/
-}
-
-bool AuiNotebook::canPageClose(int n)
-{
-	if (ctrl().GetPageCount() == 0)
-		return false;
-
-	bool ret = true;
-
-	if (n == -1)
-		n = ctrl().GetSelection();
-
-	pyobj page = py::cast(getPage(n));
-	pyobj onclose = PyDictGet(m_close_listeners, page);
-
-	if (!onclose.is(None))
-	{
-		ret = PyObject_IsTrue(PyCall(onclose).ptr()) != 0;
-		if (ret)
-		{
-			m_close_listeners.attr("pop").call(page);
-		}
-	}
-
-	if (ret) {
-		// 手动调用子窗口的onClose
-		if (py::isinstance<BaseTopLevelWindow>(page))
-		{
-			ret = page.cast<BaseTopLevelWindow*>()->onClose(wxCloseEvent(wxEVT_CLOSE_WINDOW));
-		}
-	}
-
-	return ret;
-}
-
-View * AuiNotebook::getPage(int n)
-{
-	if (n == -1)
-	{
-		n = getSelection();
-	}
-	return (View*)ctrl().GetPage(n)->GetClientData();
-}
-
-
-void AuiNotebook::_removePage(int n)
-{
-	auto page = py::cast(getPage(n));
-	if (m_children.contains(page)) {
-		m_children.attr("remove").call(page);
-	}
-}
-
-void AuiNotebook::OnPageClose(wxAuiNotebookEvent & event)
-{
-	auto selection = event.GetSelection();
-	if (!canPageClose(selection))
-	{
-		event.Veto();
-	}
-	else {
-		_removePage(selection);
-	}
-}
-
-bool AuiNotebook::closePage(int n)
-{
-	if (n == -1)
-	{
-		n = getSelection();
-	}
-
-	if (canPageClose(n))
-	{
-		_removePage(n);
-		ctrl().DeletePage(n);
-		return true;
-	}
-	return false;
-}
-
-bool AuiNotebook::closeAllPage()
-{
-	for (int i = 0; i < getPageCount(); i++)
-	{
-		if (!closePage(i))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-void AuiMDIParentFrame::onRelease()
-{
-	wxAuiNotebook * notebook = win().GetNotebook();
-	if (notebook)
-	{
-		/// 关闭所有子窗口.
-		notebook->DeleteAllPages();
-	}
-
-	m_mgr->UnInit();
-	delete m_mgr;
-
-	BaseFrame::onRelease();
-}
-
-void init_aui(py::module & m)
+void UiModule::init_aui()
 {
 	using namespace py::literals;
+	py::class_<wxAuiManager>(ui, "AuiManager")
+		.def(py::init<wxWindow*, unsigned int>(),
+			"managedWnd"_a = NULL, "flags"_a = (long)wxAUI_MGR_DEFAULT)
+		.def("UnInit", &wxAuiManager::UnInit)
+		.def("Update", &wxAuiManager::Update)
+		.def("AddPane", (bool (wxAuiManager::*)(wxWindow*, const wxAuiPaneInfo&)) & wxAuiManager::AddPane, window, "paneInfo"_a)
+		.def("AddPane", (bool (wxAuiManager::*)(wxWindow*, int, const wxString&))
+			& wxAuiManager::AddPane, window, "direction"_a = wxLEFT, "caption"_a = wxEmptyString)
+		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(wxWindow*)) & wxAuiManager::GetPane, window)
+		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(const wxString&)) & wxAuiManager::GetPane, name)
+		;
 
-	auto className = "className"_a = None;
-	auto style = "style"_a = None;
-	auto styles = "styles"_a = None;
-	auto label = "label"_a;
-	auto base_frame_wxstyle_a = "wxstyle"_a = (long)(wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
-	auto evt_fn = "fn"_a;
-	auto evt_reset = "reset"_a = true;
-
-	py::class_t<AuiMDIParentFrame, BaseFrame>(m, "AuiMDIParentFrame")
-		.def(py::init<wxcstr, MenuBar*, long, pyobj, pyobj, pyobj>(), label, "menubar"_a = nullptr, base_frame_wxstyle_a, styles, className, style);
-
-	py::class_t<AuiMDIChildFrame, BaseTopLevelWindow>(m, "AuiMDIChildFrame")
-		.def(py::init<wxcstr, long, pyobj, pyobj, pyobj>(), label, base_frame_wxstyle_a, styles, className, style);
-
-	py::class_<AuiManager, Layout>(m, "AuiManager")
+	py::class_<wxAuiPaneInfo>(ui, "AuiPaneInfo")
 		.def(py::init<>())
-		.def("showPane", &AuiManager::showPane, "name"_a, "show"_a = true)
-		.def("hidePane", &AuiManager::hidePane)
-		.def("togglePane", &AuiManager::togglePane);
+		.def("Name", &wxAuiPaneInfo::Name)
+		.def("Top", &wxAuiPaneInfo::Top)
+		.def("Right", &wxAuiPaneInfo::Right)
+		.def("Bottom", &wxAuiPaneInfo::Bottom)
+		.def("Left", &wxAuiPaneInfo::Left)
+		.def("Center", &wxAuiPaneInfo::Center)
+		.def("Caption", &wxAuiPaneInfo::Caption)
+		.def("CloseButton", &wxAuiPaneInfo::CloseButton)
+		.def("MaximizeButton", &wxAuiPaneInfo::MaximizeButton)
+		.def("MinimizeButton", &wxAuiPaneInfo::MinimizeButton)
+		.def("CaptionVisible", &wxAuiPaneInfo::CaptionVisible)
+		.def("Row", &wxAuiPaneInfo::Row)
+		.def("Hide", &wxAuiPaneInfo::Hide)
+		/* .def_readwrite("name", &wxAuiPaneInfo::name)
+		.def_readwrite("caption", &wxAuiPaneInfo::caption)
+		.def_readwrite("icon", &wxAuiPaneInfo::icon)
+		.def_readwrite("state", &wxAuiPaneInfo::state)
+		.def_readwrite("dock_direction", &wxAuiPaneInfo::dock_direction)
+		.def_readwrite("dock_layer", &wxAuiPaneInfo::dock_layer)
+		.def_readwrite("dock_row", &wxAuiPaneInfo::dock_row)
+		.def_readwrite("dock_pos", &wxAuiPaneInfo::dock_pos)
+		.def_readwrite("dock_proportion", &wxAuiPaneInfo::dock_proportion) */
+		;
 
-	auto pyItem = py::class_t<Item>(m, "Item")
-		.def(py::init<View&, py::kwargs>(), "view"_a)
-		.def("getView", &AuiItem::getView);
+	py::class_<wxAuiMDIParentFrame, wxFrame>(ui, "AuiMDIParentFrame")
+		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
+			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE | wxVSCROLL | wxHSCROLL, name = (const char*)wxFrameNameStr)
+		.def("GetNotebook", &wxAuiMDIParentFrame::GetNotebook)
+		;
 
-	setattr(m, "AuiItem", pyItem);
+	py::class_<wxAuiMDIChildFrame, wxFrame>(ui, "AuiMDIChildFrame")
+		.def(py::init<wxAuiMDIParentFrame*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
+			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE, name = (const char*)wxFrameNameStr)
+		;
 
-	py::class_t<AuiNotebook, Layout>(m, "AuiNotebook")
-		.def(py::init<pyobj, pyobj, pyobj>(), styles, className, style)
-		.def("getPage", &AuiNotebook::getPage, "n"_a = -1)
-		.def("closePage", &AuiNotebook::closePage, "n"_a = -1)
-		.def("closeAllPage", &AuiNotebook::closeAllPage)
-		.def("setOnPageChanged", &AuiNotebook::setOnPageChanged, evt_fn, evt_reset)
-		.def_property("index", &AuiNotebook::getSelection, &AuiNotebook::setSelection)
-		.def_property_readonly("count", &AuiNotebook::getPageCount);
+
+	py::class_<wxAuiNotebook, wxControl>(ui, "AuiNotebook")
+		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long>(),
+			parent, id, pos_v, size_v, style = (long)wxAUI_NB_DEFAULT_STYLE)
+		.def("GetSelection", &wxAuiNotebook::GetSelection)
+		.def("SetSelection", &wxAuiNotebook::SetSelection)
+		.def("GetPageCount", &wxAuiNotebook::GetPageCount)
+		.def("GetPage", &wxAuiNotebook::GetPage)
+		.def("DeletePage", &wxAuiNotebook::DeletePage)
+		.def("AddPage", (bool (wxAuiNotebook::*)(wxWindow*, const wxString&, bool, const wxBitmap&)) & wxAuiNotebook::AddPage,
+			"page"_a, "caption"_a, "select"_a = false, "bitmap"_a = wxNullBitmap)
+		;
+
+
+	py::class_<wxAuiToolBar, wxControl>(ui, "AuiToolBar")
+		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long>(),
+			parent, id, pos_v, size_v, style = (long)wxAUI_TB_DEFAULT_STYLE)
+		.def("AddTool", (wxAuiToolBarItem * (wxAuiToolBar::*)(int, const wxString&, const wxBitmap&, const wxString&, wxItemKind))
+			& wxAuiToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL)
+		.def("AddControl", &wxAuiToolBar::AddControl, "control"_a, label_v)
+		.def("AddSeparator", &wxAuiToolBar::AddSeparator)
+		.def("Realize", &wxAuiToolBar::Realize)
+		.def("ClearTools", &wxAuiToolBar::ClearTools)
+		.def("GetToolPos", &wxAuiToolBar::GetToolPos)
+		.def("SetToolBitmapSize", &wxAuiToolBar::SetToolBitmapSize)
+		;
 }

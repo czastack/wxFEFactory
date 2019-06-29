@@ -111,8 +111,8 @@ class Text(Control):
         Control.__init__(self, **kwargs)
         self.wxparams['label'] = label
 
-    def apply_style_own(self, styles):
-        align = styles.get('align', None)
+    def apply_style_own(self, style):
+        align = style.get('align', None)
         if align is not None:
             self.wxstyle |= align
 
@@ -279,8 +279,8 @@ class RadioBox(ControlWithItems):
         self.wxparams['label'] = label
         self.onselect = onselect
 
-    def apply_style_own(self, styles):
-        direction = styles.get('flex-direction', None)
+    def apply_style_own(self, style):
+        direction = style.get('flex-direction', None)
         if direction is not None:
             if direction == 'row':
                 self.wxstyle |= wx.RA_SPECIFY_ROWS
@@ -330,3 +330,7 @@ class TreeCtrl(Control):
 
     def set_on_item_activated(self, fn, reset=True):
         self.bind_event(wx.EVT_TREE_ITEM_ACTIVATED, fn, reset)
+
+
+class StatusBar(Control):
+    wxtype = wx.StatusBar

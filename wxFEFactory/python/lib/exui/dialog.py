@@ -1,7 +1,7 @@
 from styles import styles, dialog_style
 from lib import wxconst
 from lib.extypes import WeakBinder
-from fefactory_api import ui
+from lib import ui
 
 
 __ALL__ = ('StdDialog', 'ListDialog', 'ChoiceDialog', 'CheckChoiceDialog', 'SearchDialog')

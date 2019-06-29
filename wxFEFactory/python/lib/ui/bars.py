@@ -24,7 +24,3 @@ class ToolBar(ToolBarBase):
 
 class AuiToolBar(ToolBarBase):
     wxtype = wx.AuiToolBar
-
-
-class StatusBar(Control):
-    wxtype = wx.StatusBar

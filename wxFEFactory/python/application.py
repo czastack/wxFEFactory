@@ -45,4 +45,4 @@ class Application(Configurable):
 
 
 app = Application()
-fefactory_api.setOnAppExit(app.onExit)
+fefactory_api.set_on_exit(app.onExit)

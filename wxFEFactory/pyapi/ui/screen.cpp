@@ -1,8 +1,8 @@
-#include "screen.h"
 #include <windows.h>
+#include "../pyutils.h"
+#include "screen.h"
 
-
-py::tuple Screen::getScreenSize()
+py::tuple Screen::get_screen_size()
 {
 	auto size = py::tuple(2);
 	int width, height;
@@ -12,7 +12,7 @@ py::tuple Screen::getScreenSize()
 	return size;
 }
 
-py::tuple Screen::getDpi()
+py::tuple Screen::get_dpi()
 {
 	auto size = py::tuple(2);
 	// ªÒ»°DPI

@@ -49,9 +49,6 @@
     <ClCompile Include="pyapi\auto\auto.cpp">
       <Filter>pyapi\auto</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\ui\bitmap.cpp">
-      <Filter>pyapi\ui</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\ui\frames.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
@@ -61,19 +58,13 @@
     <ClCompile Include="pyapi\ui\screen.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\ui\bars.cpp">
-      <Filter>pyapi\ui</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\ui\events.cpp">
-      <Filter>pyapi\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="pyapi\ui\uibase.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="wx\myapp.cpp">
       <Filter>wx</Filter>
     </ClCompile>
-    <ClCompile Include="pyapi\ui\wx.cpp">
+    <ClCompile Include="pyapi\ui\image.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -130,43 +121,13 @@
     <ClInclude Include="pyapi\fe\fe.h">
       <Filter>pyapi\fe</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\ui\menu.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\datacontrols.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\controls.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\aui.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\auto\auto.h">
       <Filter>pyapi\auto</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\bitmap.h">
-      <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\ui\thread.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\ui\frames.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\containers.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\ui\screen.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\bars.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\events.h">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="pyapi\ui\uibase.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
     <ClInclude Include="pyapi\ui\drop.hpp">

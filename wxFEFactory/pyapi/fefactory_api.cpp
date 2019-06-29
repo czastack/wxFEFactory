@@ -7,13 +7,14 @@
 #include "ui/console.h"
 #include "ui/ui.h"
 #include "fe/fe.h"
+
 #ifdef __WXMSW__
-#include "auto/auto.h"
-#include "emuhacker/emuhacker.h"
+	#include "auto/auto.h"
+	#include "emuhacker/emuhacker.h"
 #endif
 
 py::module fefactory;
-ConsoleHandler pyConsole;
+ConsoleHandler console;
 pyobj onAppExit;
 
 void reloadFefactory()
@@ -36,7 +37,7 @@ void reloadFefactory()
 	}
 }
 
-void setOnAppExit(pycref fn)
+void set_on_exit(pycref fn)
 {
 	onAppExit = fn;
 }
@@ -47,11 +48,11 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 	m.def("log_message", log_message)
 		.def("alert", alert, "title"_a, "msg"_a)
 		.def("confirm", confirm_dialog, "title"_a, "msg"_a, "defaultButton"_a=wxOK)
-		.def("input", input_dialog, "title"_a, "msg"_a, "defaultValue"_a = wxEmptyString)
+		.def("input", input_dialog, "title"_a, "msg"_a, "defaultValue"_a=wxEmptyString)
 		.def("longtext_dialog", longtext_dialog, "title"_a, "defaultValue"_a=wxEmptyString, "readonly"_a=false, "small"_a=false)
 		.def("choose_file", choose_file, "msg"_a, "dir"_a=None, "file"_a=None, "wildcard"_a=None, "mustExist"_a=false)
 		.def("choose_dir", choose_dir, "msg"_a, "defaultPath"_a=None, "mustExist"_a=false)
-		.def("setOnAppExit", setOnAppExit)
+		.def("set_on_exit", set_on_exit)
 		.def("exec_file", &exec_file)
 		.def("get_clipboard", get_clipboard)
 		.def("set_clipboard", set_clipboard)
@@ -59,13 +60,12 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a)
 		.def("get_bit", get_bit)
 		.def("object_from_id", object_from_id)
+
 		.def("GlobalAddAtom", GlobalAddAtom)
 		.def("GlobalGetAtomName", GlobalGetAtomName)
-		.def("GlobalDeleteAtom", GlobalDeleteAtom)
-		// .def("getMouseState", []() {return wxGetMouseState(); })
-		.def("getKeyState", [](int key) {return wxGetKeyState((wxKeyCode)key); });
+		.def("GlobalDeleteAtom", GlobalDeleteAtom);
 
-	init_ui(m);
+	UiModule ui(m);
 	init_fe(m);
 #ifdef _WIN32
 	init_auto(m);

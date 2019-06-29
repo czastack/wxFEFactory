@@ -4,10 +4,11 @@ from abc import ABC, abstractmethod
 
 class Configurable(ABC):
     """可配置项"""
-    __slots__ = ('config_file', 'config_changed', 'observers')
+    __slots__ = ('config', 'config_file', 'config_changed', 'observers')
 
     def __init__(self, config_file, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.config = None
         self.config_file = config_file
         self.config_changed = False
         self.observers = {}
@@ -55,7 +56,7 @@ class Configurable(ABC):
     def writeconfig(self):
         if self.config_changed:
             with open(self.config_file, 'w') as file:
-                self.config = json.dump(self.config, file)
+                json.dump(self.config, file)
             self.config_changed = False
 
 

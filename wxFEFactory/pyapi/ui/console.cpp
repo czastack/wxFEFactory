@@ -7,7 +7,7 @@
 #include "console.h"
 #include "dialogs.h"
 #include "utils/HistorySet.hpp"
-using  namespace std;
+using namespace std;
 
 constexpr auto PS1 = _T(">>> "), PS2 = _T("... "), HISTORY_FILE = _T("python_history.txt");
 constexpr int HISTORY_SIZE = 10;

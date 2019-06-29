@@ -1,147 +1,40 @@
 #include <wx/wx.h>
-#include "menu.h"
-
-wxVector<MenuHolder*> BaseMenu::MENUS;
-
-bool MenuHolder::onSelect(int id, pycref owner)
-{
-	pycref item = getMenu(id);
-	if (py::isinstance<MenuItem>(item))
-	{
-		return item.cast<MenuItem*>()->onSelect(owner);
-	}
-	return false;
-}
-
-Menu::Menu(wxcstr text, wxcstr helpStr)
-{
-	MenuHolder* parent = getActiveMenu();
-	if (parent)
-	{
-		m_ptr = new wxMenu;
-		parent->append(m_ptr, text, helpStr);
-		m_handlers_ptr = parent->getHandlers();
-	}
-	else
-	{
-		m_ptr = nullptr;
-	}
-}
-
-void Menu::remove(MenuItem &item)
-{
-	m_ptr->Remove(item.ptr());
-}
-
-bool ContextMenu::onSelect(pycref view, int id)
-{
-	if (MenuHolder::onSelect(id, view))
-	{
-		return true;
-	}
-	else if (!m_onselect.is_none())
-	{
-		pycref item = getMenu(id);
-		PyCall(m_onselect, view, item);
-		return true;
-	}
-	return false;
-}
-
-void MenuBar::remove(Menu & m)
-{
-	for (int i = m_elem->GetMenuCount() - 1; i >= 0; --i)
-	{
-		if (m_elem->GetMenu(i) == m.ptr())
-		{
-			m_elem->Remove(i);
-		}
-	}
-}
-
-bool MenuBar::onSelect(int id)
-{
-	if (MenuHolder::onSelect(id, None))
-	{
-		return true;
-	}
-	else if (!m_onselect.is_none())
-	{
-		pycref item = getMenu(id);
-		PyCall(m_onselect, item);
-		return true;
-	}
-	return false;
-}
-
-MenuItem::MenuItem(wxcstr text, wxcstr helpStr, wxcstr kind, int id, bool sep, pycref onselect)
-	:m_onselect(onselect)
-{
-	MenuHolder* parent = getActiveMenu();
-	if (parent)
-	{
-		if (sep && typeid(*parent) == typeid(Menu))
-		{
-			((Menu*)parent)->appendSeparator();
-		}
-		m_ptr = parent->append(id, text, helpStr, kind);
-	}
-	else
-	{
-		m_ptr = nullptr;
-	}
-}
-
-bool MenuItem::onSelect(pycref owner)
-{
-	if (!m_onselect.is_none())
-	{
-		if (owner.is_none())
-		{
-			PyCall(m_onselect, py::cast(this));
-		}
-		else
-		{
-			PyCall(m_onselect, owner, py::cast(this));
-		}
-		return true;
-	}
-	return false;
-}
+#include <wx/menu.h>
+#include "ui.h"
 
 
-
-void init_menu(py::module &m)
+void UiModule::init_menu()
 {
 	using namespace py::literals;
 
-	py::class_<BaseMenu>(m, "BaseMenu");
-
-	py::class_<MenuHolder, BaseMenu>(m, "MenuHolder")
-		.def("__enter__", &MenuHolder::__enter__)
-		.def("__exit__", &MenuHolder::__exit__)
-		//.def("__getattr__", &MenuHolder::__getattr__)
+	py::class_<wxMenu>(ui, "Menu")
+		.def(py::init<int>(), style)
+		.def(py::init<const wxString&, int>(), title, style)
+		.def("AppendSubMenu", &wxMenu::AppendSubMenu)
+		.def("Append", (wxMenuItem * (wxMenu::*)(int, const wxString&, const wxString&, wxItemKind)) & wxMenu::Append)
+		.def("Remove", (wxMenuItem * (wxMenu::*)(wxMenuItem*)) & wxMenu::Remove)
+		.def("AppendSeparator", &wxMenu::AppendSeparator)
+		.def("GetMenuItemCount", &wxMenu::GetMenuItemCount)
+		.def("GetTitle", &wxMenu::GetTitle)
 		;
 
-	py::class_<MenuBar, MenuHolder>(m, "MenuBar")
-		.def(py::init<pyobj>(), "onselect"_a = None)
-		.def("remove", &MenuBar::remove, "menu"_a)
-		.def_property("background", &MenuBar::getBackground, &MenuBar::setBackground)
-		.def_property("color", &MenuBar::getForeground, &MenuBar::setForeground);
 
-	py::class_<Menu, MenuHolder>(m, "Menu")
-		.def(py::init<wxcstr, wxcstr>(), "text"_a, "helpStr"_a = wxEmptyString)
-		.def("remove", &Menu::remove, "menuitem"_a);
+	py::class_<wxMenuBar, wxWindow>(ui, "MenuBar")
+		.def(py::init<>())
+		.def(py::init<long>(), style)
+		// .def(py::init<size_t, wxMenu *[], const wxString[], long>(), "n"_a, "menus"_a, "titles"_a, style_0)
+		.def("Append", &wxMenuBar::Append, "menu"_a, title)
+		.def("Insert", &wxMenuBar::Insert, "pos"_a, "menu"_a, title)
+		.def("Remove", &wxMenuBar::Remove)
+		;
 
-	py::class_<ContextMenu, MenuHolder>(m, "ContextMenu")
-		.def(py::init<pyobj>(), "onselect"_a = None);
 
-	py::class_t<MenuItem, BaseMenu>(m, "MenuItem")
-		.def(py::init<wxcstr, wxcstr, wxcstr, int, bool, pyobj>(),
-			"text"_a, "helpStr"_a = wxEmptyString, "kind"_a = wxEmptyString,
-			"id"_a = -1, "sep"_a = false, "onselect"_a = None)
-		.def("getId", &MenuItem::getId)
-		.def("getText", &MenuItem::getText)
-		.def_readwrite("onselect", &MenuItem::m_onselect)
-		.def_property("checked", &MenuItem::isChecked, &MenuItem::check);
+	py::class_<wxMenuItem>(ui, "MenuItem")
+		.def("GetItemLabel", &wxMenuItem::GetItemLabel)
+		.def("SetItemLabel", &wxMenuItem::SetItemLabel)
+		.def("GetId", &wxMenuItem::GetId)
+		.def("IsCheck", &wxMenuItem::IsCheck)
+		.def("Check", &wxMenuItem::Check, "bDoEnable"_a = true)
+		.def("Enable", &wxMenuItem::Enable, "bDoCheck"_a = true)
+		;
 }

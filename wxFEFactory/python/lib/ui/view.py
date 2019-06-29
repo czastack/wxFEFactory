@@ -208,10 +208,10 @@ class View:
                 size.SetHeight(max_height)
             self.SetMaxSize(size)
 
-        self.apply_style_own(styles)
-        return styles
+        self.apply_style_own(style)
+        return style
 
-    def apply_style_own(self, styles):
+    def apply_style_own(self, style):
         """应用独有样式"""
         pass
 
@@ -296,6 +296,9 @@ class View:
     def post_event(self, event_type):
         """手动添加事件"""
         self.AddPendingEvent(wx.Event(event_type, self.GetId()))
+
+    def __getattr__(self, name):
+        return getattr(self.wxwindow)
 
     # /**
     #  * 会传wx.KeyEvent实例过去，需要手动Skip

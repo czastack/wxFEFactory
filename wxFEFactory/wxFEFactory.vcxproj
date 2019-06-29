@@ -89,8 +89,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.2\include;E:\VS\wxWidgets-3.1.2\lib\vc_x64_dll\mswu;C:\Users\An\AppData\Local\Programs\Python\Python37\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;_WINDOWS;NOPCH;WXUSINGDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.2\include;E:\VS\wxWidgets-3.1.2\lib\vc_x64_dll\mswud;C:\Users\An\AppData\Local\Programs\Python\Python37\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;_WINDOWS;NOMINMAX;NOPCH;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
@@ -128,7 +128,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.2\include\;E:\VS\wxWidgets-3.1.2\lib\vc_x64_lib\mswu;C:\Users\An\AppData\Local\Programs\Python\Python37\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>wxDEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>wxDEBUG_LEVEL=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -145,13 +145,11 @@
     <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp" />
-    <ClCompile Include="pyapi\ui\wx.cpp" />
     <ClCompile Include="wx\myapp.cpp" />
     <ClCompile Include="pyapi\fe\fe.cpp" />
     <ClCompile Include="pyapi\fe\graph.cpp" />
     <ClCompile Include="pyapi\ui\aui.cpp" />
-    <ClCompile Include="pyapi\ui\bars.cpp" />
-    <ClCompile Include="pyapi\ui\bitmap.cpp" />
+    <ClCompile Include="pyapi\ui\image.cpp" />
     <ClCompile Include="pyapi\ui\console.cpp" />
     <ClCompile Include="pyapi\ui\controls.cpp" />
     <ClCompile Include="pyapi\ui\datacontrols.cpp" />
@@ -161,7 +159,6 @@
     <ClCompile Include="pyapi\ui\events.cpp" />
     <ClCompile Include="pyapi\ui\frames.cpp" />
     <ClCompile Include="pyapi\ui\ui.cpp" />
-    <ClCompile Include="pyapi\ui\uibase.cpp" />
     <ClCompile Include="pyapi\ui\containers.cpp" />
     <ClCompile Include="pyapi\ui\menu.cpp" />
     <ClCompile Include="pyapi\ui\screen.cpp" />
@@ -176,26 +173,16 @@
     <ClInclude Include="pyapi\fe\fe.h" />
     <ClInclude Include="pyapi\fe\feimg.hpp" />
     <ClInclude Include="pyapi\fe\graph.h" />
-    <ClInclude Include="pyapi\ui\aui.h" />
-    <ClInclude Include="pyapi\ui\bitmap.h" />
     <ClInclude Include="pyapi\ui\console.h" />
-    <ClInclude Include="pyapi\ui\controls.h" />
-    <ClInclude Include="pyapi\ui\datacontrols.h" />
     <ClInclude Include="pyapi\ui\dialogs.h" />
     <ClInclude Include="pyapi\fefactory_api.h" />
     <ClInclude Include="pyapi\functions.h" />
     <ClInclude Include="pyapi\ui\drop.hpp" />
-    <ClInclude Include="pyapi\ui\events.h" />
-    <ClInclude Include="pyapi\ui\frames.h" />
-    <ClInclude Include="pyapi\ui\uibase.h" />
-    <ClInclude Include="pyapi\ui\containers.h" />
     <ClInclude Include="pyapi\ui\ui.h" />
-    <ClInclude Include="pyapi\ui\menu.h" />
     <ClInclude Include="pyapi\ui\screen.h" />
     <ClInclude Include="pyapi\ui\thread.h" />
     <ClInclude Include="pyapi\pybindext.h" />
     <ClInclude Include="pyapi\pyutils.h" />
-    <ClInclude Include="pyapi\ui\bars.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="utils\ArrayRef.h" />
     <ClInclude Include="utils\color.h" />
