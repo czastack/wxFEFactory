@@ -5,6 +5,7 @@
 #include <wx/spinctrl.h>
 #include <wx/srchctrl.h>
 #include <wx/statline.h>
+#include <wx/radiobox.h>
 #include <wx/rearrangectrl.h>
 #include <wx/filepicker.h>
 #include <wx/clrpicker.h>
@@ -54,6 +55,12 @@ void UiModule::init_controls()
 			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxCheckBoxNameStr)
 		.def("GetValue", &wxToggleButton::GetValue)
 		.def("SetValue", &wxToggleButton::SetValue, value);
+
+	py::class_<wxCheckBox, wxControl>(ui, "CheckBox")
+		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
+			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxCheckBoxNameStr)
+		.def("GetValue", &wxCheckBox::GetValue)
+		.def("SetValue", &wxCheckBox::SetValue, value);
 
 	py::class_<wxStaticBitmap, wxControl>(ui, "StaticBitmap")
 		.def(py::init<wxWindow*, wxWindowID, const wxGDIImage&, const wxPoint&, const wxSize&, long, const wxString&>(),
@@ -158,6 +165,11 @@ void UiModule::init_controls()
 		.def("GetValue", &wxComboBox::GetValue)
 		.def("SetValue", &wxComboBox::SetValue, value)
 		.def("AutoComplete", (bool (wxComboBox::*)(const wxArrayString & choices)) & wxComboBox::AutoComplete, choices)
+		;
+
+	py::class_<wxRadioBox, wxControl, wxItemContainerImmutable>(ui, "RadioBox")
+		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, const wxArrayString&, int, long, const wxValidator&, const wxString&>(),
+			parent, id, title, pos_v, size_v, choices, "majorDim"_a = 0, style_0, validator_v, name = (const char*)wxRadioBoxNameStr)
 		;
 
 	py::class_<wxFilePickerCtrl, wxControl>(ui, "FilePickerCtrl")

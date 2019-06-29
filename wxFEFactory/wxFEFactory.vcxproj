@@ -161,7 +161,6 @@
     <ClCompile Include="pyapi\ui\ui.cpp" />
     <ClCompile Include="pyapi\ui\containers.cpp" />
     <ClCompile Include="pyapi\ui\menu.cpp" />
-    <ClCompile Include="pyapi\ui\screen.cpp" />
     <ClCompile Include="pyapi\pyutils.cpp" />
     <ClCompile Include="wx\wxpatch.cpp" />
   </ItemGroup>
@@ -179,7 +178,6 @@
     <ClInclude Include="pyapi\functions.h" />
     <ClInclude Include="pyapi\ui\drop.hpp" />
     <ClInclude Include="pyapi\ui\ui.h" />
-    <ClInclude Include="pyapi\ui\screen.h" />
     <ClInclude Include="pyapi\ui\thread.h" />
     <ClInclude Include="pyapi\pybindext.h" />
     <ClInclude Include="pyapi\pyutils.h" />

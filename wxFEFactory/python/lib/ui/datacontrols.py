@@ -5,20 +5,44 @@ from . import wx
 class PropertyGrid(Control):
     wxtype = wx.PropertyGrid
 
-    def __init__(self, data=None, onchange=onchange, exstyle=wx.PG_EX_HELP_AS_TOOLTIPS, **kwargs):
-        self._data = data
-        self.onchange = onchange
+    def __init__(self, data=None, exstyle=wx.PG_EX_HELP_AS_TOOLTIPS, **kwargs):
         Control.__init__(self, **kwargs)
+        self._data = data
+        self._onchange = None
+        self.exstyle = exstyle
+        self.changed = False
 
     def onready(self):
+        self.SetExtraStyle(self.exstyle)
         self.SetCaptionBackgroundColour(0xeeeeee)
         self.SetMarginColour(0xeeeeee)
-        # Bind(wx.EVT_PG_CHANGING, &PropertyGrid::OnChange, this);
+        self.Bind(wx.EVT_PG_CHANGING, self.onchange)
+    
+    def onchange(self, event):
+        self.changed = True
+        if self.autosave:
+            prop = event.GetProperty()
+            name = prop.GetName()
+            value = event.GetValue()
 
-    def set_onhighlight(self, onhighlight):
+            if self._onchange is not None:
+                ret = self._onchange(self, name, value)
+                if ret is False:
+                    event.Veto()
+                    return
+                elif not ret:
+                    event.Skip()
+            self._data[name] = value
+        else:
+            event.Skip()
+
+    def set_onchange(self, fn):
+        self._onchange = fn
+
+    def set_onhighlight(self, fn):
         self.bind_event(wx.EVT_PG_HIGHLIGHTED, fn)
 
-    def set_onselected(self, onhighlight):
+    def set_onselected(self, fn):
         self.bind_event(wx.EVT_PG_SELECTED, fn)
 
 

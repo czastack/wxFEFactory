@@ -1,4 +1,5 @@
-from .containers import Layout, BaseFrame, BaseTopLevelWindow
+from .containers import Layout
+from .frames import BaseFrame, BaseTopLevelWindow
 from . import wx
 
 
@@ -63,11 +64,8 @@ class AuiManager(Layout):
 
 
 class AuiNotebook(Layout):
-    default_style = (wx.AUI_NB_TOP | wx.AUI_NB_TAB_SPLIT | wx.AUI_NB_TAB_MOVE | wx.AUI_NB_SCROLL_BUTTONS
-        | wx.AUI_NB_CLOSE_ON_ACTIVE_TAB | wx.AUI_NB_WINDOWLIST_BUTTON)
-
-    def __init__(self, wxstyle=default_style, **kwagrs):
-        Layout.__init__(self, wxstyle=wxstyle, **kwagrs)
+    def __init__(self, **kwagrs):
+        Layout.__init__(self, **kwagrs)
         self.close_listeners = {}
 
     def __del__(self):
@@ -77,9 +75,16 @@ class AuiNotebook(Layout):
         # Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, &AuiNotebook::OnPageClose, this)
         pass
 
+    def on_page_close(self, event):
+        selection = event.GetSelection()
+        if not self.can_page_close(selection):
+            event.Veto()
+        else:
+            self._remove_page(selection)
+
     def _remove_page(self, n):
         page = self.GetPage(n)
-        self.children.remove(n)
+        self.children.remove(page)
 
     def can_page_close(self, n=None):
         if self.GetPageCount() is 0:
@@ -103,14 +108,14 @@ class AuiNotebook(Layout):
 class AuiMDIParentFrame(BaseFrame):
     wxtype = wx.AuiMDIParentFrame
 
-    def __init__(self, title, wxstyle=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL, **kwagrs):
-        Layout.__init__(self, wxstyle=wxstyle, **kwagrs)
+    def __init__(self, title, **kwagrs):
+        Layout.__init__(self, **kwagrs)
         self.wxparams['title'] = title
 
 
 class AuiMDIChildFrame(BaseTopLevelWindow):
     wxtype = wx.AuiMDIParentFrame
 
-    def __init__(self, title, wxstyle=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL, **kwagrs):
-        Layout.__init__(self, wxstyle=wxstyle, **kwagrs)
+    def __init__(self, title, **kwagrs):
+        Layout.__init__(self, **kwagrs)
         self.wxparams['title'] = title

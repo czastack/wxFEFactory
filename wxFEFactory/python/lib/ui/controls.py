@@ -232,11 +232,11 @@ class CheckListBox(ListBox):
 
 class RearrangeList(CheckListBox):
     """可排序复选列表框"""
-    wxtype = wx.RearrangeListPatched
+    wxtype = wx.RearrangeList
 
     def __init__(self, order=None, **kwargs):
         super().__init__(self, **kwargs)
-        self.wxparams['order'] = choices
+        self.wxparams['order'] = order
 
 
 class Choice(ControlWithItems):

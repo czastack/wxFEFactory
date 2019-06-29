@@ -82,10 +82,9 @@ def json_load_file(owner):
 
 
 class Screen:
-    size = fefactory_api.getScreenSize()
-    width, height = size
-    dpi = fefactory_api.getDpi()
-    dpix, dpiy = dpi
+    size = fefactory_api.ui.GetDisplaySize()
+    width, height = size.x, size.y
+    dpi = fefactory_api.ui.GetDisplaySize()
 
 
 if getattr(fefactory_api, 'fefactory_inited', False) is not True:

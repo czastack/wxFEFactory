@@ -46,6 +46,9 @@ void UiModule::init_events()
 		.def("GetIndex", &wxListEvent::GetIndex)
 		.def("GetColumn", &wxListEvent::GetColumn);
 
+	py::class_<wxCloseEvent, wxEvent>(ui, "CloseEvent")
+		.def(py::init<wxEventType, int>(), "type"_a = wxEVT_NULL, "winid"_a = 0);
+
 	auto wx = ui.ptr();
 #define EVENT_TYPE(name) PyObject_SetAttrString(wx, #name, PyLong_FromLong(wx##name.operator const wxEventType& ()))
 	// Command events

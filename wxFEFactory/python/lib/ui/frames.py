@@ -1,3 +1,4 @@
+import fefactory_api
 from .view import Layout
 from . import wx
 
@@ -78,7 +79,7 @@ class HotkeyWindow(Window):
 
     def prepare_hotkey(self, hotkey):
         if isinstance(hotkey, str):
-            return GlobalAddAtom(hotkey)
+            return fefactory_api.GlobalAddAtom(hotkey)
         else:
             return hotkey
 

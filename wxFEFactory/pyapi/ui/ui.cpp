@@ -1,6 +1,5 @@
 #include <wx/wx.h>
 #include "ui.h"
-#include "screen.h"
 #include "thread.h"
 #include "console.h"
 #include "utils/HistorySet.hpp"
@@ -77,12 +76,6 @@ void UiModule::init_ui()
 		.def(py::init<pyobj, DWORD>(), "fn"_a, "delay"_a = 0)
 		.def("Run", &PyThread::Run);
 
-	ui.def("get_screen_size", &Screen::get_screen_size)
-		.def("get_dpi", &Screen::get_dpi);
-
-
-	// ui.def("getMouseState", []() {return wxGetMouseState(); })
-	ui.def("GetKeyState", wxGetKeyState);
 
 	setattr(module, "console", py::cast(&console));
 
@@ -162,10 +155,30 @@ void UiModule::init_ui()
 		.ENUM_VAL(FONTWEIGHT_MAX)
 		.export_values();
 
+	py::enum_<wxMouseButton>(ui, "MouseButton")
+		.ENUM_VAL(MOUSE_BTN_ANY)
+		.ENUM_VAL(MOUSE_BTN_NONE)
+		.ENUM_VAL(MOUSE_BTN_LEFT)
+		.ENUM_VAL(MOUSE_BTN_MIDDLE)
+		.ENUM_VAL(MOUSE_BTN_RIGHT)
+		.ENUM_VAL(MOUSE_BTN_AUX1)
+		.ENUM_VAL(MOUSE_BTN_AUX2)
+		.ENUM_VAL(MOUSE_BTN_MAX);
+
 	// 延迟赋值特殊类型的默认参数
 	pos_v = pos = wxDefaultPosition;
 	size_v = size = wxDefaultSize;
 	validator_v = validator = wxDefaultValidator;
+
+	py::class_<wxMouseState>(ui, "MouseState")
+		.def("ButtonIsDown", &wxMouseState::ButtonIsDown, "but"_a)
+		.def_readwrite("m_x", &wxMouseState::m_x)
+		.def_readwrite("m_y", &wxMouseState::m_y);
+
+	ui.def("GetDisplaySize", &wxGetDisplaySize)
+		.def("GetDisplayPPI", &wxGetDisplayPPI)
+		.def("GetKeyState", wxGetKeyState)
+		.def("GetMouseState", wxGetMouseState);
 
 	py::class_<wxWindow>(ui, "Window")
 		.def(py::init<>())

@@ -1,3 +1,4 @@
+from . import wx
 
 
 class View:
@@ -257,7 +258,7 @@ class View:
             style &= ~flag
         self.SetWindowStyle(style)
 
-    def bind_event(self, event_type, func, reset, pass_event):
+    def bind_event(self, event_type, func, reset=True, pass_event=False):
         """添加事件监听器"""
         wxbind = False
         if func is not None:
@@ -267,10 +268,14 @@ class View:
                     event_list.clear()
             else:
                 self.event_table[event_type] = event_list = []
+                wxbind = True
 
             if pass_event and isinstance(func, dict):
                 func = {'callback': func, 'arg_event': True}
             event_list.append(func)
+
+        if wxbind:
+            self.Bind(event_type, self.handle_event)
 
     def has_event(self, event):
         """是否已注册该类事件"""
@@ -282,11 +287,11 @@ class View:
         res = None
         if event_list is not None:
             for handler in event_list:
-                if isinstance(hand, dict):
+                if isinstance(handler, dict):
                     if handler.get('arg_event', False):
-                        res = handler['callback'](this, event)
+                        res = handler['callback'](self, event)
                 else:
-                    res = handler(this)
+                    res = handler(self)
                 if res is not True:
                     if res is False:
                         return False
@@ -322,8 +327,8 @@ class View:
 
 class Layout(View):
     """容器元素"""
-    def __init__(self, class_name=None, style=None, styles=None):
-        View.__init__(self, class_name, style)
+    def __init__(self, *args, styles=None, **kwargs):
+        View.__init__(self, *args, **kwargs)
         self.children = []
         self.pendding_children = []
         self.tmp_styles_list = None
@@ -348,7 +353,7 @@ class Layout(View):
         # 父元素的临时列表还没释放，本次只要检查自己的
         if parent and parent.tmp_styles_list is not None:
             tmp_styles_list.extend(parent.tmp_styles_list)
-            only_self = true
+            only_self = True
 
         # 加上父控件的样式列表
         parent = self

@@ -1,5 +1,4 @@
-from fefactory_api import ui
-from lib import extypes, wxconst
+from lib import extypes, wxconst, ui
 from lib.win32.keys import WXK
 
 
