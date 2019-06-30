@@ -5,7 +5,7 @@ from .widgets import BaseGroup, Group, TwoWayWidget, ModelWidget, OffsetsWidget
 
 class PgGroup(Group):
     def render_main(self):
-        self.pg = ui.PropertyGrid(className="fill")
+        self.pg = ui.PropertyGrid(class_="fill")
 
 
 class PgCategory(BaseGroup):

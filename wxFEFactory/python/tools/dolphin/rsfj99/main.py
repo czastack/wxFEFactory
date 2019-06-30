@@ -32,25 +32,25 @@ class Main(BaseDolphinHack):
 
     def render_one_list(self, group):
         """渲染其中一个列表"""
-        li = ui.ListView(className="fill")
+        li = ui.ListView(class_="fill")
         li.enableCheckboxes()
         li.appendColumns(*group['head'])
         if group['hascount']:
             li.appendColumn('数量')
         li.insertItems(group['items'])
 
-        with ui.Horizontal(className="expand padding_top"):
-            uncheck_action = ui.CheckBox(label="不选中表示移除该物品", className="vcenter")
+        with ui.Horizontal(class_="expand padding_top"):
+            uncheck_action = ui.CheckBox(label="不选中表示移除该物品", class_="vcenter")
             if group['hascount']:
-                ui.Text("数量 ", className="vcenter")
-                input_num = ui.SpinCtrl(className="vcenter")
+                ui.Text("数量 ", class_="vcenter")
+                input_num = ui.SpinCtrl(class_="vcenter")
                 ui.Text("  ")
-                ui.Button(label="修改数量", className="button", onclick=partial(self.set_count, view=li,
+                ui.Button(label="修改数量", class_="button", onclick=partial(self.set_count, view=li,
                     group=group, input_num=input_num))
             ListFooterButtons(li)
-            ui.Button(label="读取", className="button",
+            ui.Button(label="读取", class_="button",
                 onclick=partial(self.list_view_read, view=li, group=group))
-            ui.Button(label="写入", className="button", onclick=partial(self.list_view_write, view=li,
+            ui.Button(label="写入", class_="button", onclick=partial(self.list_view_write, view=li,
                 group=group, uncheck_action=uncheck_action))
 
     def list_view_read(self, _, view, group):

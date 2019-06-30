@@ -26,12 +26,12 @@ class BaseHackTool(NestedTool):
     def render(self):
         with self.render_win() as win:
             with ui.Vertical():
-                with ui.Horizontal(className="expand padding"):
-                    ui.Button("检测", className="vcenter", onclick=self.check_attach)
+                with ui.Horizontal(class_="expand padding"):
+                    ui.Button("检测", class_="vcenter", onclick=self.check_attach)
                     self.render_top_button()
-                    self.attach_status_view = ui.Text("", className="vcenter grow padding_left")
-                    ui.CheckBox("保持最前", className="vcenter", onchange=self.swith_keeptop)
-                with ui.Notebook(className="fill") as book:
+                    self.attach_status_view = ui.Text("", class_="vcenter grow padding_left")
+                    ui.CheckBox("保持最前", class_="vcenter", onchange=self.swith_keeptop)
+                with ui.Notebook(class_="fill") as book:
                     book.setOnPageChange(self.onNotePageChange)
                     self.begin_group()
                     try:
@@ -187,7 +187,7 @@ class BaseHackTool(NestedTool):
 
     def render_functions(self, names, cols=4):
         """渲染功能按钮"""
-        with ui.GridLayout(cols=cols, vgap=10, className="expand"):
+        with ui.GridLayout(cols=cols, vgap=10, class_="expand"):
             for name in names:
                 func = getattr(self.weak, name)
                 ui.Button(func.__doc__, onclick=func)

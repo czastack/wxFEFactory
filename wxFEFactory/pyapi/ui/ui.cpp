@@ -2,6 +2,7 @@
 #include "ui.h"
 #include "thread.h"
 #include "console.h"
+#include "wx/myapp.h"
 #include "utils/HistorySet.hpp"
 
 extern class ConsoleHandler console;
@@ -77,7 +78,7 @@ void UiModule::init_ui()
 		.def("Run", &PyThread::Run);
 
 
-	setattr(module, "console", py::cast(&console));
+	py::setattr(module, "console", py::cast(&console));
 
 
 	py::class_<wxSize>(ui, "Size")
@@ -104,9 +105,6 @@ void UiModule::init_ui()
 	py::class_<wxArrayInt>(ui, "ArrayInt");
 
 	py::class_<wxValidator>(ui, "Validator");
-
-	py::class_<PyFunctor>(ui, "PyFunctor")
-		.def(py::init<pycref>(), "fn"_a);
 
 #define ENUM_VAL(name) value(#name, wx##name)
 
@@ -170,45 +168,18 @@ void UiModule::init_ui()
 	size_v = size = wxDefaultSize;
 	validator_v = validator = wxDefaultValidator;
 
+	py::setattr(ui, "DefaultPosition", py::cast(wxDefaultPosition));
+	py::setattr(ui, "DefaultSize", py::cast(wxDefaultSize));
+	py::setattr(ui, "DefaultValidator", py::cast(wxDefaultValidator));
+
 	py::class_<wxMouseState>(ui, "MouseState")
 		.def("ButtonIsDown", &wxMouseState::ButtonIsDown, "but"_a)
 		.def_readwrite("m_x", &wxMouseState::m_x)
 		.def_readwrite("m_y", &wxMouseState::m_y);
 
-	ui.def("GetDisplaySize", &wxGetDisplaySize)
-		.def("GetDisplayPPI", &wxGetDisplayPPI)
-		.def("GetKeyState", wxGetKeyState)
-		.def("GetMouseState", wxGetMouseState);
-
-	py::class_<wxWindow>(ui, "Window")
-		.def(py::init<>())
-		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
-			parent, id, pos_v, size_v, style_0, name = (const char*)wxPanelNameStr)
-		.def("GetForegroundColour", &wxWindow::GetForegroundColour)
-		.def("SetForegroundColour", &wxWindow::SetForegroundColour, colour)
-		.def("GetBackgroundColour", &wxWindow::GetBackgroundColour)
-		.def("SetBackgroundColour", &wxWindow::SetBackgroundColour, colour)
-		.def("GetWindowStyle", &wxWindow::GetWindowStyle)
-		.def("SetWindowStyle", &wxWindow::SetWindowStyle, style)
-		.def("GetSize", (wxSize(wxWindow::*)() const) & wxWindow::GetSize)
-		.def("SetSize", (void (wxWindow::*)(int width, int height)) & wxWindow::SetSize, "width"_a, "height"_a)
-		.def("GetSizer", &wxWindow::GetSizer)
-		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true)
-		.def("GetFont", &wxWindow::GetFont)
-		.def("SetFont", &wxWindow::SetFont, "font"_a)
-		.def("GetId", &wxWindow::GetId)
-		.def("SetId", &wxWindow::SetId, "winid"_a)
-		.def("Show", &wxWindow::Show)
-		.def("Hide", &wxWindow::Hide)
-		.def("Reparent", &wxWindow::Reparent)
-		.def("GetClientData", &wxWindow::GetClientData)
-		.def("SetClientData", &wxWindow::SetClientData, data)
-		.def("Layout", &wxWindow::Layout)
-		.def("AddPendingEvent", &wxWindow::wxEvtHandler::AddPendingEvent, event)
-		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
-		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
-		.def("Bind", (void (wxWindow::*)(const wxEventTypeTag<wxEvent>&, const PyFunctor&, int winid, int lastId, wxObject * userData)) & wxWindow::Bind,
-			"eventType"_a, "fn"_a, "winid"_a=wxID_ANY, "lastId"_a=wxID_ANY, "userData"_a=NULL)
+	py::class_<wxEvtHandler>(ui, "EvtHandler")
+		.def("GetClientData", &wxEvtHandler::GetClientData)
+		.def("SetClientData", &wxEvtHandler::SetClientData, data)
 		.def("GetHost", [](wxWindow* self) -> py::object {
 			PyObject* ptr = reinterpret_cast<PyObject*>(self->GetClientData());
 			if (ptr) {
@@ -218,8 +189,58 @@ void UiModule::init_ui()
 		})
 		.def("SetHost", [](wxWindow* self, pycref host) {
 			self->SetClientData(host.ptr());
-		}, "host"_a)
+		}, "host"_a);
+
+
+	py::class_<wxApp>(ui, "App")
+		.def("GetTopWindow", &wxApp::GetTopWindow);
+
+	py::class_<wxWindow, wxEvtHandler>(ui, "Window")
+		.def(py::init<>())
+		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
+			parent, id, pos_v, size_v, style_0, name = (const char*)wxPanelNameStr)
+		.def("GetForegroundColour", &wxWindow::GetForegroundColour)
+		.def("SetForegroundColour", &wxWindow::SetForegroundColour, colour)
+		.def("GetBackgroundColour", &wxWindow::GetBackgroundColour)
+		.def("SetBackgroundColour", &wxWindow::SetBackgroundColour, colour)
+		.def("GetWindowStyle", &wxWindow::GetWindowStyle)
+		.def("SetWindowStyle", &wxWindow::SetWindowStyle, style)
+		.def("GetSize", py::overload_cast<>(&wxWindow::GetSize, py::const_))
+		.def("SetSize", py::overload_cast<int, int>(&wxWindow::SetSize), "width"_a, "height"_a)
+		.def("GetSizer", &wxWindow::GetSizer)
+		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true)
+		.def("GetFont", &wxWindow::GetFont)
+		.def("SetFont", &wxWindow::SetFont, "font"_a)
+		.def("GetId", &wxWindow::GetId)
+		.def("SetId", &wxWindow::SetId, "winid"_a)
+		.def("IsEnabled", &wxWindow::IsEnabled)
+		.def("Enable", &wxWindow::Enable, "enable"_a=true)
+		.def("GetLabel", &wxWindow::GetLabel)
+		.def("SetLabel", &wxWindow::SetLabel, label)
+		.def("Show", &wxWindow::Show, "show"_a=true)
+		.def("IsShown", &wxWindow::IsShown)
+		.def("Hide", &wxWindow::Hide)
+		.def("Destroy", &wxWindow::Destroy)
+		.def("Refresh", &wxWindow::Refresh)
+		.def("Freeze", &wxWindow::Freeze)
+		.def("Thaw", &wxWindow::Thaw)
+		.def("SetToolTip", py::overload_cast<const wxString&>(&wxWindow::SetToolTip))
+		.def("Reparent", &wxWindow::Reparent)
+		.def("Layout", &wxWindow::Layout)
+		.def("AddPendingEvent", &wxWindow::wxEvtHandler::AddPendingEvent, event)
+		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
+		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
+		.def("Bind", [](wxWindow* self, wxEventType eventType, pycref fn, int winid, int lastId, size_t userData)
+		{
+			self->Bind(wxEventTypeTag<wxEvent>(eventType), PyFunctor(fn), winid, lastId, (wxObject*)userData);
+		}, "eventType"_a, "fn"_a, "winid"_a=(int)wxID_ANY, "lastId"_a=(int)wxID_ANY, "userData"_a=NULL)
 		;
+
+	ui.def("GetDisplaySize", &wxGetDisplaySize)
+		.def("GetDisplayPPI", &wxGetDisplayPPI)
+		.def("GetKeyState", wxGetKeyState)
+		.def("GetMouseState", wxGetMouseState)
+		.def("GetApp", &wxGetApp);
 }
 
 

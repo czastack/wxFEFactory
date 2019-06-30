@@ -34,37 +34,37 @@ class CoordWidget(TwoWayWidget):
         this = self.weak
         super().render()
         if not self.savable:
-            with ui.Horizontal(className="expand") as container:
+            with ui.Horizontal(class_="expand") as container:
                 if self.wrap:
-                    with ui.Vertical(className="fill"):
+                    with ui.Vertical(class_="fill"):
                         style = {'height': 54}
-                        self.views = tuple(ui.TextInput(className="fill padding_bottom", style=style)
+                        self.views = tuple(ui.TextInput(class_="fill padding_bottom", style=style)
                             for i in range(self.length))
                 else:
-                    self.views = tuple(ui.TextInput(className="fill") for i in range(self.length))
+                    self.views = tuple(ui.TextInput(class_="fill") for i in range(self.length))
                 self.render_btn()
         else:
             views = []
-            with ui.Vertical(className="fill") as root:
-                with ui.Horizontal(className="fill"):
+            with ui.Vertical(class_="fill") as root:
+                with ui.Horizontal(class_="fill"):
                     with ui.Vertical(style={'weight': 2}):
-                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill") as grid:
+                        with ui.FlexGridLayout(cols=2, vgap=10, class_="fill") as grid:
                             grid.AddGrowableCol(1)
                             for label in self.labels or ('X坐标', 'Y坐标', 'Z坐标'):
                                 exui.Label(label)
-                                views.append(ui.TextInput(className="fill"))
+                                views.append(ui.TextInput(class_="fill"))
                             exui.Label("名称")
-                            self.name_view = ui.TextInput(className="fill")
-                        with ui.Horizontal(className="expand padding") as container:
+                            self.name_view = ui.TextInput(class_="fill")
+                        with ui.Horizontal(class_="expand padding") as container:
                             self.render_btn()
-                            ui.Button(label="添加", className="button", onclick=this.onAdd)
-                            ui.Button(label="更新", className="button", onclick=this.onUpdate)
-                            ui.Button(label="删除", className="button", onclick=this.onDel)
-                            ui.Button(label="保存", className="button", onclick=this.onSave)
-                            ui.Button(label="载入", className="button", onclick=this.onLoad)
+                            ui.Button(label="添加", class_="button", onclick=this.onAdd)
+                            ui.Button(label="更新", class_="button", onclick=this.onUpdate)
+                            ui.Button(label="删除", class_="button", onclick=this.onDel)
+                            ui.Button(label="保存", class_="button", onclick=this.onSave)
+                            ui.Button(label="载入", class_="button", onclick=this.onLoad)
                             if self.preset:
-                                ui.Button(label="预设", className="button", onclick=this.choosePreset)
-                    self.listbox = ui.ListBox(className="fill padding_left", onselect=this.onListBoxSel)
+                                ui.Button(label="预设", class_="button", onclick=this.choosePreset)
+                    self.listbox = ui.ListBox(class_="fill padding_left", onselect=this.onListBoxSel)
                     self.listbox.setOnKeyDown(this.onListBoxKey)
 
                 with ui.ContextMenu() as contextmenu:

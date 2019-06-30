@@ -54,7 +54,7 @@ class PMHack(BaseGbaHack):
     def render_backpack(self):
         datasets = self.datasets
         with self.backpack_group.header:
-            ui.RadioBox("类型", className="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_swith)
+            ui.RadioBox("类型", class_="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_swith)
         for i in range(self.BACKPACK_PAGE_LENGTH):
             ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
             ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
@@ -65,7 +65,7 @@ class PMHack(BaseGbaHack):
         # pokemon = self.weak._pokemon
         active_pokemon = self._active_pokemon
 
-        ui.RadioBox("带着的宝可梦", className="expand", choices=tuple(str(i) for i in range(1, 7)),
+        ui.RadioBox("带着的宝可梦", class_="expand", choices=tuple(str(i) for i in range(1, 7)),
             onselect=self.on_active_pokemo_swith)
 
         with Groups(None, self.weak.onNotePageChange):
@@ -76,8 +76,8 @@ class PMHack(BaseGbaHack):
                 ModelInput("Header.dwID", "ID", hex=True)
                 ModelSelect("personality", "性格", choices=self.datasets.PERSONALITYS,
                     onselect=self.on_personality_select)
-                ui.Text("性格描述", className="vcenter")
-                self.personality_desc = ui.Text("", className="vcenter")
+                ui.Text("性格描述", class_="vcenter")
+                self.personality_desc = ui.Text("", class_="vcenter")
                 ModelSelect("breedInfo.wItem", "手持道具", choices=self.datasets.ITEMS)
                 ModelInput("breedInfo.dwExp", "经验值")
             with Group("basic", "能力", active_pokemon):
@@ -89,9 +89,9 @@ class PMHack(BaseGbaHack):
             with Group("basic", "其它", active_pokemon):
                 pass
 
-        with ui.Horizontal(className="expand"):
-            ui.Button("读入", className="btn_sm", onclick=self.read_active_pokemon)
-            ui.Button("写回", className="btn_sm", onclick=self.write_active_pokemon)
+        with ui.Horizontal(class_="expand"):
+            ui.Button("读入", class_="btn_sm", onclick=self.read_active_pokemon)
+            ui.Button("写回", class_="btn_sm", onclick=self.write_active_pokemon)
 
     def onattach(self):
         super().onattach()

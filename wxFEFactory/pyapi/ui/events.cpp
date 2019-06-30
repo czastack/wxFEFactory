@@ -22,8 +22,9 @@ void UiModule::init_events()
 	py::class_<wxEvent>(ui, "Event")
 		.def("Skip", &wxEvent::Skip, "skip"_a = true)
 		.def("GetId", &wxEvent::GetId)
-		.def_property("id", &wxEvent::GetId, &wxEvent::SetId)
-		.def("ResumePropagation", &wxKeyEvent::ResumePropagation);
+		.def("SetId", &wxEvent::SetId)
+		.def("GetEventType", &wxEvent::GetEventType)
+		.def("ResumePropagation", &wxEvent::ResumePropagation);
 
 	// °´¼üÊÂ¼þ
 	py::class_<wxKeyEvent, wxEvent>(ui, "KeyEvent")

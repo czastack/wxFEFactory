@@ -75,7 +75,7 @@ class Main(BaseGTATool):
         ModelInput("wanted_level", "通缉等级")
         self.money = ModelInput("money", "金钱")
         ui.Text("")
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
             ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
@@ -92,7 +92,7 @@ class Main(BaseGTATool):
         ModelCoordWidget("speed", "速度")
         ModelInput("weight", "重量")
         ui.Text("")
-        with ui.Horizontal(className="expand"):
+        with ui.Horizontal(class_="expand"):
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
             ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
@@ -111,12 +111,12 @@ class Main(BaseGTATool):
         ModelInput("game_hour", "当前小时")
         ModelInput("game_minute", "当前分钟")
         exui.Label("日期")
-        with ui.Horizontal(className="expand"):
+        with ui.Horizontal(class_="expand"):
             ui.Button("回退一天", onclick=self.day_back)
             ui.Button("前进一天", onclick=self.day_forward)
 
     def render_hotkey(self):
-        with ui.ScrollView(className="fill"):
+        with ui.ScrollView(class_="fill"):
             self.render_common_text()
             ui.Text("大加速: alt+shift+m\n"
                 "生成选中的载具并进入: alt+shift+v\n"
@@ -127,15 +127,15 @@ class Main(BaseGTATool):
                 "爆破最近的车: alt+o")
 
     def render_vehicle_model(self):
-        with ui.Horizontal(className="fill"):
-            self.vehicle_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
+        with ui.Horizontal(class_="fill"):
+            self.vehicle_model_book = ui.Notebook(class_="fill", wxstyle=0x0200)
             with self.vehicle_model_book:
                 for category in datasets.VEHICLE_LIST:
-                    ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])),
+                    ui.Item(ui.ListBox(class_="expand", choices=(item[0] for item in category[1])),
                         caption=category[0])
 
     def render_func(self):
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)
             ui.Button("附近的人着火", onclick=self.near_peds_make_fire)

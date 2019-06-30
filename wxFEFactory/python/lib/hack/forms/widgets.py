@@ -41,7 +41,7 @@ class Widget:
 
         if isinstance(parent, Group) and not parent.horizontal:
             self.horizontal = False
-            with ui.Vertical(className="expand"):
+            with ui.Vertical(class_="expand"):
                 self.render()
             del self.horizontal
         else:
@@ -56,7 +56,7 @@ class Widget:
         pass
 
     def render(self):
-        ui.Text(self.label, className="input_label expand" if self.horizontal else "input_label_vertical")
+        ui.Text(self.label, class_="input_label expand" if self.horizontal else "input_label_vertical")
 
     def render_btn(self):
         this = self.weak
@@ -328,28 +328,28 @@ class Group(BaseGroup):
     def render_root(self):
         """渲染外层框架"""
         this = self.weak
-        with ui.Vertical(className="fill") as root:
+        with ui.Vertical(class_="fill") as root:
             if self.hasheader:
-                self.header = ui.Horizontal(className="expand padding")
+                self.header = ui.Horizontal(class_="expand padding")
 
             self.render_main()
 
             if self.hasfooter:
-                with ui.Horizontal(className="expand padding") as footer:
-                    ui.Button(label="读取", className="btn_sm", onclick=lambda btn: this.read())
-                    ui.Button(label="写入", className="btn_sm", onclick=lambda btn: this.write())
+                with ui.Horizontal(class_="expand padding") as footer:
+                    ui.Button(label="读取", class_="btn_sm", onclick=lambda btn: this.read())
+                    ui.Button(label="写入", class_="btn_sm", onclick=lambda btn: this.write())
                     if self.serializable:
-                        ui.Button(label="导入", className="btn_sm", onclick=lambda btn: this.load())
-                        ui.Button(label="导出", className="btn_sm", onclick=lambda btn: this.export())
+                        ui.Button(label="导入", class_="btn_sm", onclick=lambda btn: this.load())
+                        ui.Button(label="导出", class_="btn_sm", onclick=lambda btn: this.export())
                 self.footer = footer
         del self.flexgrid, self.hasheader, self.hasfooter, self.serializable
         return root
 
     def render_main(self):
         """渲染主要内容"""
-        with ui.ScrollView(className="fill padding") as content:
+        with ui.ScrollView(class_="fill padding") as content:
             if self.flexgrid:
-                self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, className="fill")
+                self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, class_="fill")
                 if self.horizontal:
                     for i in range(self.cols >> 1):
                         self.view.AddGrowableCol((i << 1) + 1)
@@ -400,8 +400,8 @@ class StaticGroup(Group):
 class GroupBox(BaseGroup):
     """StaticBox外观的容器"""
     def render(self):
-        with ui.StaticBox(self.label, className="fill") as root:
-            self.view = ui.ScrollView(className="fill padding")
+        with ui.StaticBox(self.label, class_="fill") as root:
+            self.view = ui.ScrollView(class_="fill padding")
 
         self.root = root
 
@@ -422,8 +422,8 @@ class Groups(BaseGroup):
         return super().__init__(None, caption, **kwargs)
 
     def render(self):
-        with ui.Vertical(className="fill") as root:
-            self.view = ui.Notebook(className="fill")
+        with ui.Vertical(class_="fill") as root:
+            self.view = ui.Notebook(class_="fill")
         if self.label:
             ui.Item(root, caption=self.label)
         self.root = root
@@ -454,12 +454,12 @@ class BaseInput(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill") as container:
+        with ui.Horizontal(class_="fill") as container:
             if self.spin:
-                self.view = ui.SpinCtrl(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER | wxconst.SP_ARROW_KEYS,
+                self.view = ui.SpinCtrl(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER | wxconst.SP_ARROW_KEYS,
                     min=self.min, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
-                self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=self.readonly)
+                self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
@@ -552,8 +552,8 @@ class BaseCheckBox(TwoWayWidget):
         super().render()
         if self.alone:
             self.label = label
-        with ui.Horizontal(className="fill") as container:
-            self.view = ui.CheckBox("" if not self.alone else label, className="fill")
+        with ui.Horizontal(class_="fill") as container:
+            self.view = ui.CheckBox("" if not self.alone else label, class_="fill")
             self.render_btn()
         self.container = container
 
@@ -607,8 +607,8 @@ class BaseSelect(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill") as container:
-            self.view = ui.Choice(className="fill", choices=self.choices, onselect=self.onselect)
+        with ui.Horizontal(class_="fill") as container:
+            self.view = ui.Choice(class_="fill", choices=self.choices, onselect=self.onselect)
             self.view.setContextMenu(self.contextmenu)
             self.view.setOnDestroy(self.weak.onDestroy)
             self.render_btn()
@@ -767,8 +767,8 @@ class BaseChoiceDisplay(Widget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill") as container:
-            self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=True)
+        with ui.Horizontal(class_="fill") as container:
+            self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
@@ -808,7 +808,7 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
 def Choice(laebl, choices, onselect):
     """选项框"""
     exui.Label(laebl)
-    return ui.Choice(className="fill", choices=choices, onselect=onselect).setSelection(0)
+    return ui.Choice(class_="fill", choices=choices, onselect=onselect).setSelection(0)
 
 
 def Title(label):
@@ -829,12 +829,12 @@ class BaseFlagWidget(TwoWayWidget):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        ui.Text(self.label, className="form_label expand")
-        with ui.Horizontal(className="fill") as container:
+        ui.Text(self.label, class_="form_label expand")
+        with ui.Horizontal(class_="fill") as container:
             if self.cols is not None:
-                view = ui.GridLayout(cols=self.cols, vgap=10, className="fill")
+                view = ui.GridLayout(cols=self.cols, vgap=10, class_="fill")
             else:
-                view = ui.Horizontal(className="fill")
+                view = ui.Horizontal(class_="fill")
             with view:
                 self.views = tuple(
                     ui.CheckBox(label) for label in self.labels
@@ -922,10 +922,10 @@ class ModelArraySelect(ModelArrayWidget):
 
 def TabList(data):
     """多个tab的列表框"""
-    book = ui.Notebook(className="fill", wxstyle=0x0200)
+    book = ui.Notebook(class_="fill", wxstyle=0x0200)
     with book:
         for category in data:
-            ui.Item(ui.ListBox(className="expand", choices=(item[0] for item in category[1])), caption=category[0])
+            ui.Item(ui.ListBox(class_="expand", choices=(item[0] for item in category[1])), caption=category[0])
     return book
 
 
@@ -933,11 +933,11 @@ class ListFooterButtons:
     """渲染带复选框列表的底部按钮"""
     def __init__(self, li):
         self.li = li
-        ui.Button(label="全选", className="button", onclick=lambda btn: li.checkAll())
-        ui.Button(label="全不选", className="button", onclick=lambda btn: li.checkAll(False))
-        ui.Button(label="勾选高亮", className="button", onclick=lambda btn: li.checkSelection())
-        ui.Button(label="导出勾选", className="button", onclick=self.dump_checked)
-        ui.Button(label="导入勾选", className="button", onclick=self.load_checked)
+        ui.Button(label="全选", class_="button", onclick=lambda btn: li.checkAll())
+        ui.Button(label="全不选", class_="button", onclick=lambda btn: li.checkAll(False))
+        ui.Button(label="勾选高亮", class_="button", onclick=lambda btn: li.checkSelection())
+        ui.Button(label="导出勾选", class_="button", onclick=self.dump_checked)
+        ui.Button(label="导入勾选", class_="button", onclick=self.load_checked)
 
     def dump_checked(self, _):
         """导出勾选"""

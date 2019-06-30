@@ -19,13 +19,13 @@ class Main(BaseTool):
 
     def render(self):
         with self.render_float_win() as win:
-            with ui.Vertical(className="padding"):
-                with ui.Vertical(className="fill padding"):
-                    self.input = ui.TextInput(className="expand", multiline=True, style={'height': 200})
-                    self.listbox = ui.ListBox(className="expand", onselect=self.onSelectChange, style={'height': 200})
-                    with ui.Horizontal(className="expand padding_top"):
+            with ui.Vertical(class_="padding"):
+                with ui.Vertical(class_="fill padding"):
+                    self.input = ui.TextInput(class_="expand", multiline=True, style={'height': 200})
+                    self.listbox = ui.ListBox(class_="expand", onselect=self.onSelectChange, style={'height': 200})
+                    with ui.Horizontal(class_="expand padding_top"):
                         ui.Button("输入", onclick=self.input_text)
-                    with ui.ScrollView(className="fill padding"):
+                    with ui.ScrollView(class_="fill padding"):
                         ui.Text("切换上一个: alt+[")
                         ui.Text("切换下一个: alt+]")
                         ui.Text("切换并粘贴上一个: alt+shift+[")

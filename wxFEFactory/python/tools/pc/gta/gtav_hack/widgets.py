@@ -14,9 +14,9 @@ class WeaponWidget(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(class_="fill"):
             if self.has_ammo:
-                self.ammo_view = ui.SpinCtrl(className="fill", min=0, max=9999, initial=0)
+                self.ammo_view = ui.SpinCtrl(class_="fill", min=0, max=9999, initial=0)
                 ui.Button("最大", style=btn_sm_style, onclick=self.max_ammo)
             ui.Button("移除", style=btn_sm_style, onclick=self.remove_weapon)
             self.render_btn()
@@ -71,8 +71,8 @@ class WeaponWidget(TwoWayWidget):
 class CustomColorWidget(ModelWidget, TwoWayWidget):
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
-            self.view = ui.ColorPicker(className="expand", onchange=lambda v: self.write())
+        with ui.Horizontal(class_="fill"):
+            self.view = ui.ColorPicker(class_="expand", onchange=lambda v: self.write())
             self.render_btn()
             ui.Button("清除", style=btn_sm_style, onclick=self.clear_color)
 

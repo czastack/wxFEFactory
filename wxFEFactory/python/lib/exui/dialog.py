@@ -15,10 +15,10 @@ class StdDialog(ui.Dialog):
         self.weak = WeakBinder(self)
 
         super().__enter__()
-        with ui.Vertical(className="fill"):
-            self.view = (ui.ScrollView if scrollable else ui.Vertical)(className="fill padding")
+        with ui.Vertical(class_="fill"):
+            self.view = (ui.ScrollView if scrollable else ui.Vertical)(class_="fill padding")
 
-            with ui.Horizontal(className="padding right") as footer:
+            with ui.Horizontal(class_="padding right") as footer:
                 if cancel:
                     ui.Button(label="取消").id = wxconst.ID_CANCEL
                 if ok:
@@ -49,10 +49,10 @@ class ListDialog(StdDialog):
 
         with self:
             with ui.Vertical(styles=styles, style=styles['class']['fill']):
-                self.listbox = ui.CheckListBox(className='fill', **listbox_opt)
-                with ui.Horizontal(className="expand"):
-                    ui.Button(label="全选", className="button", onclick=self.weak.checkAll)
-                    ui.Button(label="反选", className="button", onclick=self.weak.reverseCheck)
+                self.listbox = ui.CheckListBox(class_='fill', **listbox_opt)
+                with ui.Horizontal(class_="expand"):
+                    ui.Button(label="全选", class_="button", onclick=self.weak.checkAll)
+                    ui.Button(label="反选", class_="button", onclick=self.weak.reverseCheck)
 
     def checkAll(self, btn):
         self.listbox.checkAll()
@@ -67,7 +67,7 @@ class ChoiceDialog(StdDialog):
         super().__init__(title, *args, **kwargs)
 
         with self:
-            self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
+            self.listbox = ui.ListBox(class_='fill', choices=choices, onselect=onselect)
 
 
 class CheckChoiceDialog(ListDialog):
@@ -119,10 +119,10 @@ class SearchDialog(StdDialog):
         super().__init__(title, *args, **kwargs)
 
         with self:
-            with ui.Horizontal(className='expand'):
-                self.input = ui.TextInput(className='fill', wxstyle=wxconst.TE_PROCESS_ENTER)
-                ui.Button(label="搜索", className='btn_sm', onclick=self.weak.onenter)
-            self.listbox = ui.ListBox(className='fill', onselect=onselect)
+            with ui.Horizontal(class_='expand'):
+                self.input = ui.TextInput(class_='fill', wxstyle=wxconst.TE_PROCESS_ENTER)
+                ui.Button(label="搜索", class_='btn_sm', onclick=self.weak.onenter)
+            self.listbox = ui.ListBox(class_='fill', onselect=onselect)
             self.input.setOnEnter(self.weak.onenter)
 
     def onenter(self, _):

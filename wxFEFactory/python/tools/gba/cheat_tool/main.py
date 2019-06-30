@@ -11,10 +11,10 @@ class Main(NestedTool):
 
         with self.render_win() as win:
             with ui.Vertical():
-                with ui.Vertical(className="fill padding"):
-                    self.textinput = ui.TextInput(className="expand fill", multiline=True, style=textstyle)
-                    self.textoutput = ui.TextInput(className="expand fill", multiline=True, style=textstyle)
-                with ui.Horizontal(className="padding"):
+                with ui.Vertical(class_="fill padding"):
+                    self.textinput = ui.TextInput(class_="expand fill", multiline=True, style=textstyle)
+                    self.textoutput = ui.TextInput(class_="expand fill", multiline=True, style=textstyle)
+                with ui.Horizontal(class_="padding"):
                     ui.Button("解析", onclick=self.weak.analyse)
         return win
 

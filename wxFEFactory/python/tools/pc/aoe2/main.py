@@ -71,15 +71,15 @@ class Main(NativeHacktool):
         AtkDefItemsMgr(self.weak, '防御', 'def_items').render()
 
     def render_hotkeys(self):
-        with ui.Horizontal(className="fill"):
-            SearchListBox(className="expand",
+        with ui.Horizontal(class_="fill"):
+            SearchListBox(class_="expand",
                 choices=(item[1] for item in datasets.UNITS),
                 onselect=self.on_spawn_unit_type_change)
             ui.Text("选中单位恢复HP: alt+h\n"
                 "选中建筑完成修建: alt+b\n"
                 "选中单位死亡: alt+delete\n"
                 "选中单位投诚: alt+f\n"
-                "生成指定兵种单位: alt+v", className="padding")
+                "生成指定兵种单位: alt+v", class_="padding")
 
     def render_functions(self):
         super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
@@ -227,8 +227,8 @@ class AtkDefItemsMgr:
         self.items_key = items_key
 
     def render(self):
-        with ui.Horizontal(className="fill padding"):
-            self.listbox = ui.ListBox(className="expand", style={'width': 400},
+        with ui.Horizontal(class_="fill padding"):
+            self.listbox = ui.ListBox(class_="expand", style={'width': 400},
                 onselect=self.on_listbox_change)
             with Group(None, None, (self.get_item, models.AtkDefItem),
                     handler=self.owner.handler, hasfooter=False) as group:

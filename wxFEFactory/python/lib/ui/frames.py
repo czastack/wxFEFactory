@@ -5,8 +5,17 @@ from . import wx
 
 class BaseTopLevelWindow(Layout):
     def onready(self):
+        super().onready()
         self.Show()
-    
+
+    def onclose(self, event):
+        if self.has_event:
+            if not self.handle_event():
+                event.Veto()
+                return False
+            event.Skip()
+        return True
+
     @property
     def keeptop(self):
         return self.has_wxstyle(wx.STAY_ON_TOP)
@@ -18,14 +27,18 @@ class BaseTopLevelWindow(Layout):
 
 class BaseFrame(BaseTopLevelWindow):
     def onready(self):
-        # elem->Bind(wx.EVT_CLOSE_WINDOW, &BaseTopLevelWindow::_onClose, this)
+        self.Bind(wx.EVT_CLOSE_WINDOW, self.onclose)
+        if self.menubar:
+            self.SetMenuBar(self.menubar.wxwindow)
+            self.Bind(wx.EVT_MENU, self.on_menu)
+
         super().onready()
 
     def set_menu(self, menubar):
-        self.SetMenuBar(menubar)
-        # TODO
+        self.SetMenuBar(menubar.wxwindow)
+        self.Bind(wx.EVT_MENU, self.on_menu)
 
-    def onmenu(self, event):
+    def on_menu(self, event):
         """菜单选中事件"""
         self.menubar.onselect(event.GetId())
 
@@ -38,11 +51,6 @@ class Window(BaseFrame):
         self.wxparams['title'] = title
         self.menubar = menubar
 
-    def onready(self):
-        if self.menubar:
-            self.set_menu(self.menubar)
-        super().onready()
-
 
 class MDIParentFrame(BaseFrame):
     wxtype = wx.MDIParentFrame
@@ -52,11 +60,6 @@ class MDIParentFrame(BaseFrame):
         self.wxparams['title'] = title
         self.menubar = menubar
 
-    def onready(self):
-        if self.menubar:
-            self.set_menu(self.menubar)
-        super().onready()
-
 
 class MDIChildFrame(BaseFrame):
     wxtype = wx.MDIChildFrame
@@ -65,11 +68,6 @@ class MDIChildFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self.wxparams['title'] = title
         self.menubar = menubar
-
-    def onready(self):
-        if self.menubar:
-            self.set_menu(self.menubar)
-        super().onready()
 
 
 class HotkeyWindow(Window):

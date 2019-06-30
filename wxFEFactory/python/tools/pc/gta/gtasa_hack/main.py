@@ -58,22 +58,22 @@ class Main(BaseGTA3_VC_SA_Tool):
         ModelInput("weight", "重量")
         ProxyInput("wanted_level", "通缉等级", self.get_wanted_level, self.set_wanted_level)
         ui.Hr()
-        with ui.Vertical(className="fill"):
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.Vertical(class_="fill"):
+            with ui.GridLayout(cols=5, vgap=10, class_="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
                 ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
 
             ui.Text("防止主角受到来自以下的伤害")
-            with ui.Horizontal(className="fill"):
+            with ui.Horizontal(class_="fill"):
                 self.player_proof_views = [
-                    ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_player_proof,
+                    ui.CheckBox("爆炸", class_="vcenter", onchange=partial(self.set_player_proof,
                         bitindex=Player.SPECIAL_EP)),
-                    ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_player_proof,
+                    ui.CheckBox("碰撞", class_="vcenter", onchange=partial(self.set_player_proof,
                         bitindex=Player.SPECIAL_DP)),
-                    ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_player_proof,
+                    ui.CheckBox("子弹", class_="vcenter", onchange=partial(self.set_player_proof,
                         bitindex=Player.SPECIAL_BP)),
-                    ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_player_proof,
+                    ui.CheckBox("火焰", class_="vcenter", onchange=partial(self.set_player_proof,
                         bitindex=Player.SPECIAL_FP)),
                 ]
                 ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
@@ -89,8 +89,8 @@ class Main(BaseGTA3_VC_SA_Tool):
         ModelCoordWidget("speed", "速度")
         ModelInput("weight", "重量")
         ui.Text("")
-        with ui.Vertical(className="fill"):
-            with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.Vertical(class_="fill"):
+            with ui.GridLayout(cols=5, vgap=10, class_="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
                 ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
@@ -98,22 +98,22 @@ class Main(BaseGTA3_VC_SA_Tool):
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
             ui.Hr()
             ui.Text("防止当前载具受到来自以下的伤害")
-            with ui.Horizontal(className="fill"):
+            with ui.Horizontal(class_="fill"):
                 self.vehicle_proof_views = [
-                    ui.CheckBox("爆炸", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                    ui.CheckBox("爆炸", class_="vcenter", onchange=partial(self.set_vehicle_proof,
                         bitindex=Vehicle.SPECIAL_EP)),
-                    ui.CheckBox("碰撞", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                    ui.CheckBox("碰撞", class_="vcenter", onchange=partial(self.set_vehicle_proof,
                         bitindex=Vehicle.SPECIAL_DP)),
-                    ui.CheckBox("子弹", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                    ui.CheckBox("子弹", class_="vcenter", onchange=partial(self.set_vehicle_proof,
                         bitindex=Vehicle.SPECIAL_BP)),
-                    ui.CheckBox("火焰", className="vcenter", onchange=partial(self.set_vehicle_proof,
+                    ui.CheckBox("火焰", class_="vcenter", onchange=partial(self.set_vehicle_proof,
                         bitindex=Vehicle.SPECIAL_FP)),
                 ]
                 ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
                 ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip(
                     "切换载具后需要再次应用")
         ui.Text("颜色")
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(class_="fill"):
             self.vehicle_body_color_view = ColorWidget("body_color", "车身1", vehicle, "body_color",
                 datasets.COLOR_LIST)
             self.vehicle_body2_color_view = ColorWidget("body2_color", "车身2", vehicle, "body2_color",
@@ -162,8 +162,8 @@ class Main(BaseGTA3_VC_SA_Tool):
         Input("police_time", "义警回车时间(ms)", address.POLICE_TIME_ADDR)
 
     def render_cheat(self):
-        with ui.Vertical(className="fill padding"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.Vertical(class_="fill padding"):
+            with ui.GridLayout(cols=4, vgap=10, class_="expand"):
                 self.cheat_views = [
                     ui.CheckBox(label, onchange=partial(self.toggle_cheat, index=i)) for i, label in enumerate((
                         '不被通缉', '决不会饿', '无限健康', '无限氧气', '无限弹药', '坦克模式', '超级攻击', '超级跳跃',
@@ -173,7 +173,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                 ]
                 ui.CheckBox("冻结任务计时", onchange=self.freeze_timer)
                 ui.CheckBox("一击必杀", onchange=self.one_hit_kill)
-            with ui.Horizontal(className="padding"):
+            with ui.Horizontal(class_="padding"):
                 ui.Button("同步", onclick=self.cheat_sync)
 
     def render_girl_friend(self):
@@ -182,10 +182,10 @@ class Main(BaseGTA3_VC_SA_Tool):
             Input(label, label, address.GIRL_FRIEND_PROGRESS_ADDR[i])
 
     def render_hotkey(self):
-        with ui.Horizontal(className="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
+        with ui.Horizontal(class_="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(class_="expand", onselect=self.on_spawn_vehicle_id_change,
                 choices=(item[0] for item in VEHICLE_LIST))
-            with ui.ScrollView(className="fill padding"):
+            with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
                 ui.Text("根据左边列表生产载具: alt+V\n"
                     "瞬移到地图指针处: ctrl+alt+g\n"
@@ -195,7 +195,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                     "附近的人大风车: alt+shift+r")
 
     def render_func(self):
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             ui.Button(label="洗衣服", onclick=self.clothes_rebuild)
             ui.Button("敌人爆炸", onclick=self.enemys_explode)
@@ -206,7 +206,7 @@ class Main(BaseGTA3_VC_SA_Tool):
             self.set_buttons_contextmenu()
 
     def render_tool(self):
-        with ui.Vertical(className="fill padding"):
+        with ui.Vertical(class_="fill padding"):
             ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):

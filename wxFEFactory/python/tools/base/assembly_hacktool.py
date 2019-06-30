@@ -36,7 +36,7 @@ class AssemblyHacktool(BaseHackTool):
             self.reset()
 
     def render_assembly_functions(self, functions, cols=4, vgap=10):
-        with ui.GridLayout(cols=cols, vgap=vgap, className="expand"):
+        with ui.GridLayout(cols=cols, vgap=vgap, class_="expand"):
             self.assembly_buttons = {}
             for item in functions:
                 button = ui.ToggleButton(label=item.label,

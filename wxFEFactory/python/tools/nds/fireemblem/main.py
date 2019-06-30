@@ -94,8 +94,8 @@ class FeHack(BaseNdsHack):
         datasets = self.datasets
         Choice("物品", datasets.ITEMS, self.on_item_change)
         Label("复制属性")
-        with ui.Horizontal(className="fill"):
-            self.copy_iteminfo_view = ui.Choice(className="fill", choices=datasets.ITEMS)
+        with ui.Horizontal(class_="fill"):
+            self.copy_iteminfo_view = ui.Choice(class_="fill", choices=datasets.ITEMS)
             ui.Button("复制", onclick=self.copy_iteminfo)
         ModelInput("addr_hex", "地址", readonly=True)
         ModelInput("name_ptr", "名称指针", hex=True)

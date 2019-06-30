@@ -7,12 +7,13 @@ void UiModule::init_menu()
 {
 	using namespace py::literals;
 
-	py::class_<wxMenu>(ui, "Menu")
-		.def(py::init<int>(), style)
-		.def(py::init<const wxString&, int>(), title, style)
-		.def("AppendSubMenu", &wxMenu::AppendSubMenu)
-		.def("Append", (wxMenuItem * (wxMenu::*)(int, const wxString&, const wxString&, wxItemKind)) & wxMenu::Append)
-		.def("Remove", (wxMenuItem * (wxMenu::*)(wxMenuItem*)) & wxMenu::Remove)
+	py::class_<wxMenu, wxEvtHandler>(ui, "Menu")
+		.def(py::init<int>(), style_0)
+		.def(py::init<const wxString&, int>(), title, style_0)
+		.def("AppendSubMenu", &wxMenu::AppendSubMenu, "subemenu"_a, text, "help"_a = wxEmptyString)
+		.def("Append", (wxMenuItem * (wxMenu::*)(int, const wxString&, const wxString&, wxItemKind)) & wxMenu::Append,
+			"itemid"_a, text=wxEmptyString, "help"_a=wxEmptyString, "kind"_a=wxITEM_NORMAL)
+		.def("Remove", (wxMenuItem * (wxMenu::*)(wxMenuItem*)) & wxMenu::Remove, item)
 		.def("AppendSeparator", &wxMenu::AppendSeparator)
 		.def("GetMenuItemCount", &wxMenu::GetMenuItemCount)
 		.def("GetTitle", &wxMenu::GetTitle)
@@ -24,8 +25,10 @@ void UiModule::init_menu()
 		.def(py::init<long>(), style)
 		// .def(py::init<size_t, wxMenu *[], const wxString[], long>(), "n"_a, "menus"_a, "titles"_a, style_0)
 		.def("Append", &wxMenuBar::Append, "menu"_a, title)
-		.def("Insert", &wxMenuBar::Insert, "pos"_a, "menu"_a, title)
+		.def("Insert", &wxMenuBar::Insert, pos, "menu"_a, title)
 		.def("Remove", &wxMenuBar::Remove)
+		.def("GetMenu", &wxMenuBar::GetMenu, pos)
+		.def("GetMenuCount", &wxMenuBar::GetMenuCount)
 		;
 
 
@@ -34,7 +37,7 @@ void UiModule::init_menu()
 		.def("SetItemLabel", &wxMenuItem::SetItemLabel)
 		.def("GetId", &wxMenuItem::GetId)
 		.def("IsCheck", &wxMenuItem::IsCheck)
-		.def("Check", &wxMenuItem::Check, "bDoEnable"_a = true)
-		.def("Enable", &wxMenuItem::Enable, "bDoCheck"_a = true)
+		.def("Check", &wxMenuItem::Check, "bDoCheck"_a = true)
+		.def("Enable", &wxMenuItem::Enable, "bDoEnable"_a = true)
 		;
 }

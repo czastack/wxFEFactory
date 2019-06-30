@@ -133,35 +133,35 @@ class MetalMaxHack(BaseNdsHack):
         item_values = self.datasets.CHARIOT_ALL_ITEM.values
 
         with ModelChoiceDisplay("equips.0.equip", "C装置", choices=item_choices, values=item_values).container:
-            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.0"))
-            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.0"))
-            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.0"))
+            ui.Button("上次", class_="btn_sm", onclick=detail_keep_click("equips.0"))
+            ui.Button("详情", class_="btn_sm", onclick=detail_click("equips.0"))
+            ui.Button("预设", class_="btn_sm", onclick=preset_ci_click("equips.0"))
         with ModelChoiceDisplay("equips.1.equip", "引擎", choices=item_choices, values=item_values).container:
-            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.1"))
-            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.1"))
-            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.1"))
+            ui.Button("上次", class_="btn_sm", onclick=detail_keep_click("equips.1"))
+            ui.Button("详情", class_="btn_sm", onclick=detail_click("equips.1"))
+            ui.Button("预设", class_="btn_sm", onclick=preset_ci_click("equips.1"))
         with ModelChoiceDisplay("equips.2.equip", "C装置2/引擎2", choices=item_choices, values=item_values).container:
-            ui.Button("上次", className="btn_sm", onclick=detail_keep_click("equips.2"))
-            ui.Button("详情", className="btn_sm", onclick=detail_click("equips.2"))
-            ui.Button("预设", className="btn_sm", onclick=preset_ci_click("equips.2"))
+            ui.Button("上次", class_="btn_sm", onclick=detail_keep_click("equips.2"))
+            ui.Button("详情", class_="btn_sm", onclick=detail_click("equips.2"))
+            ui.Button("预设", class_="btn_sm", onclick=preset_ci_click("equips.2"))
         for i in range(5):
             key = "equips.%d" % (i + 3)
             exui.Label("炮穴%d" % (i + 1))
-            with ui.Horizontal(className="fill"):
+            with ui.Horizontal(class_="fill"):
                 if self.has_holes:
                     ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
                 ModelChoiceDisplay(key + '.equip', "", choices=item_choices, values=item_values)
-                ui.Button("上次", className="btn_sm", onclick=detail_keep_click(key))
-                ui.Button("详情", className="btn_sm", onclick=detail_click(key))
-                ui.Button("预设", className="btn_sm", onclick=preset_click(key))
+                ui.Button("上次", class_="btn_sm", onclick=detail_keep_click(key))
+                ui.Button("详情", class_="btn_sm", onclick=detail_click(key))
+                ui.Button("预设", class_="btn_sm", onclick=preset_click(key))
         for i in range(self.chariot.items.length):
             key = "items.%d" % i
             with ModelChoiceDisplay(key + '.item', "物品%d" % (i + 1),
                     choices=item_choices, values=item_values).container:
-                ui.Button("上次", className="btn_sm", onclick=detail_keep_click(key))
-                ui.Button("详情", className="btn_sm", onclick=detail_click(key))
+                ui.Button("上次", class_="btn_sm", onclick=detail_keep_click(key))
+                ui.Button("详情", class_="btn_sm", onclick=detail_click(key))
                 ui.Button("C装置/引擎", onclick=preset_ci_click(key))
-                ui.Button("武器", className="btn_sm", onclick=preset_click(key))
+                ui.Button("武器", class_="btn_sm", onclick=preset_click(key))
         with Group.active_group().footer:
             ui.Button("导入字段", onclick=self.weak.load_chariot_fields)
             ui.Button("导出字段", onclick=self.weak.dump_chariot_fields)
@@ -170,7 +170,7 @@ class MetalMaxHack(BaseNdsHack):
         datasets = self.datasets
         for i in range(self.chariot.special_bullets.length):
             exui.Label("特殊炮弹%d" % (i + 1))
-            with ui.Horizontal(className="fill"):
+            with ui.Horizontal(class_="fill"):
                 ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices,
                     values=datasets.SPECIAL_BULLETS.values)
                 ModelInput("special_bullets.%d.count" % i, "数量")
@@ -258,15 +258,15 @@ class MetalMaxHack(BaseNdsHack):
             chariot_equips = self.chariot_equips
             datasets = self.datasets
             with exui.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
-                with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
+                with ui.Horizontal(class_="expand"):
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, class_="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
-                dialog.listview = listview = ui.ListView(className="fill")
-                with ui.Horizontal(className="expand"):
-                    dialog.use_max = ui.CheckBox(label="最大", className="vcenter", checked=True)
-                    dialog.use_weight = ui.CheckBox(label="重量", className="vcenter", checked=True)
-                    dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", className="vcenter", checked=True)
+                dialog.listview = listview = ui.ListView(class_="fill")
+                with ui.Horizontal(class_="expand"):
+                    dialog.use_max = ui.CheckBox(label="最大", class_="vcenter", checked=True)
+                    dialog.use_weight = ui.CheckBox(label="重量", class_="vcenter", checked=True)
+                    dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", class_="vcenter", checked=True)
                 dialog.listview.appendColumns(*head)
 
                 dialog.data_list = []  # 读取预设数据时的列表

@@ -20,21 +20,21 @@ class Module(BaseListBoxModuel):
             count += 1
 
     def render_main(self):
-        with ui.FlexGridLayout(cols=2, vgap=10, className="expand padding") as infobar:
-            ui.Text("地址", className="vcenter input_label")
-            self.addr_view = ui.TextInput(readonly=True, className="expand")
-            ui.Text("代码", className="vcenter input_label")
-            self.code_view = ui.TextInput(readonly=True, multiline=True, className="expand")
+        with ui.FlexGridLayout(cols=2, vgap=10, class_="expand padding") as infobar:
+            ui.Text("地址", class_="vcenter input_label")
+            self.addr_view = ui.TextInput(readonly=True, class_="expand")
+            ui.Text("代码", class_="vcenter input_label")
+            self.code_view = ui.TextInput(readonly=True, multiline=True, class_="expand")
 
             infobar.AddGrowableCol(1)
             infobar.AddGrowableRow(1)
 
-        self.textarea = ui.TextInput(multiline=True, className="fill")
-        with ui.Horizontal(className="expand"):
-            ui.ComboBox(wxstyle=wxconst.CB_READONLY, className="fill")
-            ui.Button(label="保存该项", className="button", onclick=self.onSaveIt)
-            ui.Button(label="保存文件", className="button", onclick=self.onSave)
-            ui.Button(label="另存为", className="button", onclick=self.onSaveAs)
+        self.textarea = ui.TextInput(multiline=True, class_="fill")
+        with ui.Horizontal(class_="expand"):
+            ui.ComboBox(wxstyle=wxconst.CB_READONLY, class_="fill")
+            ui.Button(label="保存该项", class_="button", onclick=self.onSaveIt)
+            ui.Button(label="保存文件", class_="button", onclick=self.onSave)
+            ui.Button(label="另存为", class_="button", onclick=self.onSaveAs)
 
     def onAdd(self, btn):
         text = self.longtext_dialog("输入内容")

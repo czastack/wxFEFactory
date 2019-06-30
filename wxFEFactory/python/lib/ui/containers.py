@@ -3,6 +3,9 @@ from . import wx
 
 
 class SizerLayout(Layout):
+    def onready(self):
+        super().onready()
+        self.layout()
 
     def layout_child(self, child, style):
         flag = self.get_box_flag(style)
@@ -14,10 +17,6 @@ class SizerLayout(Layout):
         self.GetSizer().Layout()
 
     def relayout(self):
-        self.layout()
-
-    def __exit__(self, *args):
-        Layout.__exit__(self, *args)
         self.layout()
 
     def get_box_flag(self, style):
@@ -73,12 +72,14 @@ class Vertical(SizerPanel):
     """垂直布局"""
     def onready(self):
         self.SetSizer(wx.BoxSizer(wx.VERTICAL))
+        super().onready()
 
 
 class Horizontal(SizerPanel):
     """水平布局"""
     def onready(self):
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
+        super().onready()
 
 
 class GridLayout(SizerPanel):
@@ -92,6 +93,7 @@ class GridLayout(SizerPanel):
 
     def onready(self):
         self.SetSizer(wx.GridSizer(self.rows, self.cols, self.vgap, self.hgap))
+        super().onready()
 
 
 class FlexGridLayout(SizerPanel):
@@ -107,6 +109,7 @@ class FlexGridLayout(SizerPanel):
         sizer = wx.FlexGridSizer(self.rows, self.cols, self.vgap, self.hgap)
         sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
         self.SetSizer(sizer)
+        super().onready()
 
 
 class ScrollView(SizerLayout):
@@ -117,6 +120,7 @@ class ScrollView(SizerLayout):
     def onready(self):
         self.SetScrollRate(5, 5)
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
+        super().onready()
 
     def layout(self):
         self.GetSizer().FitInside(self.wxwindow)
@@ -133,6 +137,7 @@ class SplitterWindow(Layout):
         self.sashpos = sashpos
 
     def onready(self):
+        super().onready()
         length = len(self.children)
         if length > 2:
             print('SplitterWindow不支持大于两个子元素')
@@ -160,6 +165,7 @@ class StaticBox(SizerLayout):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.InsertSpacer(0, 15)
         self.SetSizer(sizer)
+        super().onready()
 
 
 class BookCtrlBase(Layout):

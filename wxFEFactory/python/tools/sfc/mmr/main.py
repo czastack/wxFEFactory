@@ -69,7 +69,7 @@ class Main(BaseSfcHack):
             for i in range(self.person.items.length):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
         with Group.active_group().footer:
-            ui.Button("装备全部", className="btn_md", onclick=self.equip_all)
+            ui.Button("装备全部", class_="btn_md", onclick=self.equip_all)
 
     def render_chariot(self):
         Choice("战车", datasets.CHARIOTS, self.on_chariot_change)
@@ -93,11 +93,11 @@ class Main(BaseSfcHack):
 
         for i in range(self.chariot.equips.length):
             with ModelChoiceDisplay("equips.0.equip", "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS).container:
-                ui.Button("上次", className="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
+                ui.Button("上次", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
                     key="equips.%d" % i, read=False))
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
                     key="equips.%d" % i))
-                ui.Button("预设", className="btn_sm", onclick=partial(__class__.show_chariot_equip_preset, self.weak,
+                ui.Button("预设", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_preset, self.weak,
                     key="equips.%d" % i))
 
     def render_wanted(self):
@@ -139,14 +139,14 @@ class Main(BaseSfcHack):
         dialog = getattr(self, name, None)
         if dialog is None:
             with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
-                with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
+                with ui.Horizontal(class_="expand"):
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, class_="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
-                dialog.listview = listview = ui.ListView(className="fill")
-                with ui.Horizontal(className="expand"):
-                    dialog.use_weight = ui.CheckBox(label="重量", className="vcenter", checked=True)
-                    dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", className="vcenter", checked=True)
+                dialog.listview = listview = ui.ListView(class_="fill")
+                with ui.Horizontal(class_="expand"):
+                    dialog.use_weight = ui.CheckBox(label="重量", class_="vcenter", checked=True)
+                    dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", class_="vcenter", checked=True)
                 dialog.listview.appendColumns(*head)
 
                 listview.insertItems(items)

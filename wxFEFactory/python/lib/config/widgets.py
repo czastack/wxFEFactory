@@ -104,8 +104,8 @@ class InputConfig(ConfigCtrl):
 
     def render(self):
         self.render_lable()
-        with ui.Horizontal(className="fill"):
-            self.view = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
+        with ui.Horizontal(class_="fill"):
+            self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
 
@@ -150,7 +150,7 @@ class SelectConfig(ConfigCtrl):
 
     def render(self):
         self.render_lable()
-        self.view = ui.Choice(self.choices, className="fill", onselect=self.weak.write)
+        self.view = ui.Choice(self.choices, class_="fill", onselect=self.weak.write)
         self.view.setSelection(0, True)
 
     def get_input_value(self):

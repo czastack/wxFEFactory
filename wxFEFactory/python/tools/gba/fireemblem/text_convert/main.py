@@ -8,17 +8,17 @@ class Main(BaseTool):
     def render(self):
         with self.render_float_win() as win:
             with ui.Vertical():
-                with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as container:
-                    ui.Text("Rom", className="vcenter")
-                    self.rom_picker = ui.FilePickerCtrl(wildcard="*.gba|*.gba", className="fill")
-                    ui.Text("码表", className="vcenter")
-                    self.dict_picker = ui.FilePickerCtrl(className="fill")
+                with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as container:
+                    ui.Text("Rom", class_="vcenter")
+                    self.rom_picker = ui.FilePickerCtrl(wildcard="*.gba|*.gba", class_="fill")
+                    ui.Text("码表", class_="vcenter")
+                    self.dict_picker = ui.FilePickerCtrl(class_="fill")
                     ui.Text("文本")
-                    self.text_view = ui.TextInput(className="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
+                    self.text_view = ui.TextInput(class_="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
                     ui.Text("码表编码")
-                    self.code_view = ui.TextInput(className="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
+                    self.code_view = ui.TextInput(class_="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
                     ui.Text("哈夫曼编码  ")
-                    self.haff_view = ui.TextInput(className="fill", multiline=True, readonly=True,
+                    self.haff_view = ui.TextInput(class_="fill", multiline=True, readonly=True,
                         wxstyle=wxconst.TE_PROCESS_ENTER)
                     container.AddGrowableCol(1)
                     for i in (2, 3, 4):

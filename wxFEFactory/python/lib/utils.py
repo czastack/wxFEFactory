@@ -139,3 +139,8 @@ def compose(*decos):
             func = deco(func)
         return func
     return _deco
+
+
+def filter_kwargs(**kwargs):
+    """过滤掉值为None的默认参数"""
+    return {name: value for name, value in kwargs.items() if value is not None}

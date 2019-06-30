@@ -16,14 +16,14 @@ class Main(BaseTool):
         self.text_inputs = []
         with self.render_float_win() as win:
             with ui.Vertical():
-                ui.Text("按回车转换", className="padding")
-                self.int_format = ui.RadioBox("整型格式", className="expand padding",
+                ui.Text("按回车转换", class_="padding")
+                self.int_format = ui.RadioBox("整型格式", class_="expand padding",
                     choices=self.INT_FORMAT_CHOICES).setSelection(1)
-                with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as container:
+                with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as container:
                     on_enter = self.weak.on_enter
                     for label in ('bytes', 'byte(1字节)', 'word(2字节)', 'dword(4字节)', 'float(4字节)', 'double(8字节)'):
                         ui.Text(label)
-                        text_input = ui.TextInput(className="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
+                        text_input = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
                         text_input.setOnEnter(on_enter)
                         self.text_inputs.append(text_input)
                     container.AddGrowableCol(1)

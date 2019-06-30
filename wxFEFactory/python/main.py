@@ -9,7 +9,7 @@ from application import app
 from project import Project
 from modules import modules
 # from fe.ferom import FeRomRW
-from lib import ui, exui, extypes, wxconst
+from lib import ui, exui, extypes
 from lib.win32.keys import WXK
 
 
@@ -66,40 +66,45 @@ class MainFrame:
 
         with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
-                toolbar = self.render_toolbar()
-                ui.AuiItem(toolbar, direction="top", captionVisible=False)
-                # ui.AuiItem(ui.ListBox(choices=self.module_names, onselect=self.on_nav), captionVisible=False)
+                toolbar = ui.AuiToolBar()
+                ui.Item(toolbar, direction="top", captionVisible=False)
+                # ui.Item(ui.ListBox(choices=self.module_names, onselect=self.on_nav), captionVisible=False)
                 self.book = ui.AuiNotebook()
-                ui.AuiItem(self.book, direction="center", maximizeButton=True, captionVisible=False)
-                with ui.Vertical(className="console-bar") as console:
-                    self.console_output = ui.TextInput(readonly=True, multiline=True, className="console-output")
-                    with ui.Horizontal(className="expand console-input-bar"):
-                        self.console_input = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
-                            className="expand console-input")
-                        ui.Button("∧", className="btn-sm", onclick=self.toggle_console_input_multi)
-                with ui.Horizontal(className="console-input-multi").show(False) as multiline_console:
-                    self.console_input_multi = ui.TextInput(className="console-input", multiline=True)
-                    with ui.Vertical(className="expand"):
-                        ui.Button("∨", className="btn-sm", onclick=self.toggle_console_input_multi)
-                        ui.Button(">>", className="btn-sm fill", onclick=self.console_input_multi_run).setToolTip(
-                            "执行输入框中代码 Ctrl+Enter")
-                ui.AuiItem(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
-                ui.AuiItem(multiline_console, name="multiline_console", direction="bottom",
-                    captionVisible=False, hide=True)
+                ui.Item(self.book, direction="center", maximizeButton=True, captionVisible=False)
+                with ui.Vertical(class_="console-bar") as console:
+                    self.console_output = ui.TextInput(readonly=True, multiline=True, class_="console-output")
+                    with ui.Horizontal(class_="expand console-input-bar"):
+                        self.console_input = ui.ComboBox(
+                            wxstyle=ui.wx.CB_DROPDOWN | ui.wx.TE_PROCESS_ENTER, class_="expand console-input")
+                        ui.Button("∧", class_="btn-sm", onclick=self.toggle_console_input_multi)
+                with ui.Horizontal(class_="console-input-multi") as multiline_console:
+                    self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
+                    with ui.Vertical(class_="expand"):
+                        ui.Button("∨", class_="btn-sm", onclick=self.toggle_console_input_multi)
+                        ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run)  # .setToolTip(
+                            # "执行输入框中代码 Ctrl+Enter")
+                ui.Item(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
+                ui.Item(multiline_console, name="multiline_console", direction="bottom",
+                        captionVisible=False, hide=True)
             ui.StatusBar()
-            # 尝试加载图标
-            icon_name = fefactory.executable_name() + '.ico'
-            if os.path.exists(icon_name):
-                win.setIcon(icon_name)
 
+        # 尝试加载图标
+        icon_name = fefactory.executable_name() + '.ico'
+        if os.path.exists(icon_name):
+            icon = ui.wx.Icon()
+            icon.LoadFile(icon_name)
+            win.SetIcon(icon)
+
+        multiline_console.Show(False)
         win.setOnClose(self.onclose)
+        self.render_toolbar(toolbar)
         self.book.setOnPageChanged(self.on_tool_change)
 
         self.win = win
         self.aui = aui
         self.console = console
-        fefactory_api.console.bind_elem(self.console_input, self.console_output)
-        self.console.setOnFileDrop(self.onConsoleFileDrop)
+        fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
+        # self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
     @property
@@ -147,15 +152,16 @@ class MainFrame:
         self.close_window()
         fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
 
-    def render_toolbar(self):
+    def render_toolbar(self, toolbar):
         """渲染快捷工具栏"""
-        bitmap = ui.Bitmap()
-        toolbar = ui.AuiToolBar()
+        bitmap = ui.wx.Bitmap()
+        listener = self.on_toolbar_tool_click
         for name, module in tools.toolbar_tools:
-            bitmap.loadIcon('python/tools/%s/icon.ico' % module.replace('.', '/'))
-            toolbar.addTool(name, "", bitmap, self.on_toolbar_tool_click)
+            bitmap.CopyFromIcon(ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/')))
+            toolitem = toolbar.AddTool(wx.ID_ANY, name, bitmap, "")
+            toolbar.set_onclick(toolitem.GetId(), listener)
 
-        return toolbar.realize()
+        return toolbar.Realize()
 
     def on_toolbar_tool_click(self, toolbar, toolid):
         """快捷工具栏点击处理"""
@@ -216,8 +222,8 @@ class MainFrame:
         """触发控制台多行输入框"""
         p1 = self.console_input.parent
         isShow = not p1.isShow()
-        p1.show(isShow)
-        self.aui.showPane("multiline_console", not isShow)
+        p1.Show(isShow)
+        self.aui.ShowPane("multiline_console", not isShow)
         self.console.relayout()
 
     def console_input_multi_run(self, _=None):
@@ -268,7 +274,7 @@ class MainFrame:
     #     if not reader.closed:
     #         print(reader.getRomTitle())
     #         dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
-    #         if dialog.showModal():
+    #         if dialog.ShowModal():
     #             for i in dialog.listbox.getCheckedItems():
     #                 name = modules[i][1]
     #                 try:
@@ -287,7 +293,7 @@ class MainFrame:
         if dialog is None:
             with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
-                tree = ui.TreeCtrl(className="fill", wxstyle=0x2C05)
+                tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")
                 self.root_tools = self.get_sub_tools(tools)
 
@@ -298,7 +304,7 @@ class MainFrame:
             # with dialog.footer:
             #     ui.Button(label="收藏")
             self.tool_dialog = dialog
-        dialog.showModal()
+        dialog.ShowModal()
 
     def get_sub_tools(self, parent):
         """获取子目录工具"""

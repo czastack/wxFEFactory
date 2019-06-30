@@ -73,27 +73,27 @@ class Main(MonoHacktool):
 
     def render_skills(self):
         """渲染技能列表"""
-        li = self.skill_listview = ui.ListView(className="fill")
+        li = self.skill_listview = ui.ListView(class_="fill")
         li.enableCheckboxes()
         li.appendColumns(("名称", "加强", "描述"), (260, 400, 800))
         li.insertItems((item[1:] for item in datasets.skills_info))
 
-        with ui.Horizontal(className="expand padding_top"):
+        with ui.Horizontal(class_="expand padding_top"):
             ListFooterButtons(li)
-            ui.Button(label="解锁所选", className="button", onclick=self.unlock_checked_skills)
-            ui.Button(label="捡起高亮", className="button", onclick=self.pickup_selected_skill)
+            ui.Button(label="解锁所选", class_="button", onclick=self.unlock_checked_skills)
+            ui.Button(label="捡起高亮", class_="button", onclick=self.pickup_selected_skill)
 
     def render_items(self):
         """渲染符文列表"""
-        li = self.item_listview = ui.ListView(className="fill")
+        li = self.item_listview = ui.ListView(class_="fill")
         li.enableCheckboxes()
         li.appendColumns(("名称", "描述"), (260, 1000))
         li.insertItems((item[1:] for item in datasets.items_info))
 
-        with ui.Horizontal(className="expand padding_top"):
+        with ui.Horizontal(class_="expand padding_top"):
             ListFooterButtons(li)
-            ui.Button(label="给予所选", className="button", onclick=self.give_checked_items)
-            ui.Button(label="给予高亮", className="button", onclick=self.give_selected_items)
+            ui.Button(label="给予所选", class_="button", onclick=self.give_checked_items)
+            ui.Button(label="给予高亮", class_="button", onclick=self.give_selected_items)
 
     def render_assembly_functions(self):
         Cooldown = models.Cooldown

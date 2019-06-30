@@ -5,17 +5,17 @@ from fefactory_api import ui
 
 class Pagination(ui.Horizontal):
     def __init__(self, onpagechange, total, page=1):
-        super().__init__(className="expand center")
+        super().__init__(class_="expand center")
         this = WeakBinder(self)
         self.onpagechange = onpagechange
         self.total = total
         self.page = page
         with self:
-            self.total_view = ui.Text(" 共%d页 " % total, className="vcenter")
-            self.page_input = ui.SpinCtrl(className="expand", min=1, max=total, initial=page, wxstyle=0x4600)
-            ui.Button(label="跳转", className="button", onclick=this.on_page)
-            ui.Button(label="上页", className="button", onclick=this.on_prev)
-            ui.Button(label="下页", className="button", onclick=this.on_next)
+            self.total_view = ui.Text(" 共%d页 " % total, class_="vcenter")
+            self.page_input = ui.SpinCtrl(class_="expand", min=1, max=total, initial=page, wxstyle=0x4600)
+            ui.Button(label="跳转", class_="button", onclick=this.on_page)
+            ui.Button(label="上页", class_="button", onclick=this.on_prev)
+            ui.Button(label="下页", class_="button", onclick=this.on_next)
         self.page_input.setOnEnter(this.on_page)
 
     def set_total(self, total):

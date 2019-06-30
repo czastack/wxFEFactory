@@ -11,23 +11,23 @@ class Main(BaseTool):
     def render(self):
         with self.render_float_win() as win:
             with ui.Vertical():
-                with ui.Horizontal(className="fill padding"):
-                    with ui.Vertical(className="fill"):
-                        with ui.Horizontal(className="expand padding"):
-                            ui.Text('输入进制', className="padding_right")
-                            self.base_in = ui.Choice(className="fill",
+                with ui.Horizontal(class_="fill padding"):
+                    with ui.Vertical(class_="fill"):
+                        with ui.Horizontal(class_="expand padding"):
+                            ui.Text('输入进制', class_="padding_right")
+                            self.base_in = ui.Choice(class_="fill",
                                 choices=self.BASES_CHOICES).setSelection(2)
-                        self.text_input = ui.TextInput(className="fill", multiline=True)
-                    with ui.Vertical(className="expand padding"):
-                        ui.Button('<->', className='btn_sm', onclick=self.reverse_base)
-                        with ui.Horizontal(className="fill"):
-                            ui.Button('转换', className='btn_sm vcenter', onclick=self.convert)
-                    with ui.Vertical(className="fill"):
-                        with ui.Horizontal(className="expand padding"):
-                            ui.Text('输出进制', className="padding_right")
-                            self.base_out = ui.Choice(className="fill",
+                        self.text_input = ui.TextInput(class_="fill", multiline=True)
+                    with ui.Vertical(class_="expand padding"):
+                        ui.Button('<->', class_='btn_sm', onclick=self.reverse_base)
+                        with ui.Horizontal(class_="fill"):
+                            ui.Button('转换', class_='btn_sm vcenter', onclick=self.convert)
+                    with ui.Vertical(class_="fill"):
+                        with ui.Horizontal(class_="expand padding"):
+                            ui.Text('输出进制', class_="padding_right")
+                            self.base_out = ui.Choice(class_="fill",
                                 choices=self.BASES_CHOICES).setSelection(3)
-                        self.text_output = ui.TextInput(className="fill", readonly=True, multiline=True)
+                        self.text_output = ui.TextInput(class_="fill", readonly=True, multiline=True)
         return win
 
     def reverse_base(self, _):

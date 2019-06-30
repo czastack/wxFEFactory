@@ -19,11 +19,11 @@ class PresetDialog:
             weak = WeakBinder(self)
             with exui.StdDialog(self.label, style={'width': 1300, 'height': 900},
                     closable=False, cancel=False) as dialog:
-                with ui.Horizontal(className="expand"):
-                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, className="fill",
+                with ui.Horizontal(class_="expand"):
+                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, class_="fill",
                         onselect=weak.on_search_select)
                     ui.Button("搜索", onclick=weak.on_search)
-                dialog.listview = listview = ui.ListView(className="fill")
+                dialog.listview = listview = ui.ListView(class_="fill")
                 dialog.listview.appendColumns(*self.head)
                 listview.insertItems(self.items)
                 listview.setOnItemActivated(weak.on_item_selected)

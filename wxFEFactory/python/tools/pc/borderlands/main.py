@@ -101,7 +101,7 @@ class Main(AssemblyHacktool):
     def render_ammo(self):
         for i, label in enumerate(('狙击枪', '手枪', '手雷', '左轮手枪', '冲锋枪', '霰弹枪', '战斗步枪', '火箭筒')):
             with ModelInput('weapon_ammos.%d.value' % i, label).container:
-                ui.Button(label="最大", className='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
+                ui.Button(label="最大", class_='btn_sm', onclick=partial(self.weapon_ammo_max, i=i))
             ModelInput('weapon_ammos.%d.regen_rate' % i, '恢复速度')
 
     def render_weapon_prof(self):
@@ -156,10 +156,10 @@ class Main(AssemblyHacktool):
         self._drop_rates = types.SimpleNamespace()
 
         ui.Hr()
-        with ui.Horizontal(className='expand'):
+        with ui.Horizontal(class_='expand'):
             ui.Button('读取地址', onclick=self.read_drop_rates)
             for i, item in enumerate(self._drop_rates_preset):
-                ui.Button(item[0], className='btn_md', onclick=partial(self.set_drop_rates_preset, index=i))
+                ui.Button(item[0], class_='btn_md', onclick=partial(self.set_drop_rates_preset, index=i))
         self._drop_rates_views = [Input(key, label, addr=partial(__class__.get_drop_rates_item, self.weak, key=key),
             type=float) for _id, key, label in self._drop_rates_table]
 

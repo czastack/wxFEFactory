@@ -53,7 +53,7 @@ class Main(BaseGTA3Tool):
         ModelInput("wanted_level", "通缉等级")
         Input("money", "金钱", address.MONEY)
         ui.Hr()
-        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.GridLayout(cols=5, vgap=10, class_="expand"):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
 
@@ -66,7 +66,7 @@ class Main(BaseGTA3Tool):
         ModelCoordWidget("turn", "Turn")
         ModelInput("weight", "重量")
         ui.Hr()
-        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.GridLayout(cols=5, vgap=10, class_="expand"):
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
@@ -82,8 +82,8 @@ class Main(BaseGTA3Tool):
             )
 
     def render_cheat(self):
-        with ui.Vertical(className="fill padding"):
-            with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.Vertical(class_="fill padding"):
+            with ui.GridLayout(cols=4, vgap=10, class_="expand"):
                 SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                 SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
                 SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
@@ -93,21 +93,21 @@ class Main(BaseGTA3Tool):
                 SimpleCheckBox("infinite_ammo2", "无限子弹2", 0x5D4AF5, (), b'\x90\x90\x90', b'\xFF\x4E\x0C')
 
     def render_hotkey(self):
-        with ui.Horizontal(className="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(className="expand",
+        with ui.Horizontal(class_="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(class_="expand",
                 onselect=self.on_spawn_vehicle_id_change,
                 choices=(item[0] for item in VEHICLE_LIST))
-            with ui.ScrollView(className="fill padding"):
+            with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
                 ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")
 
     def render_func(self):
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             self.set_buttons_contextmenu()
 
     def render_tool(self):
-        with ui.Vertical(className="fill padding"):
+        with ui.Vertical(class_="fill padding"):
             ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def get_hotkeys(self):

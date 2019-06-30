@@ -31,20 +31,30 @@ void UiModule::init_image()
 		.ENUM_VAL(BITMAP_TYPE_ANY)
 		.export_values();
 
+	py::enum_<wxBitmapTransparency>(ui, "BitmapTransparency")
+		.ENUM_VAL(BitmapTransparency_Auto)
+		.ENUM_VAL(BitmapTransparency_None)
+		.ENUM_VAL(BitmapTransparency_Always)
+		.export_values();
+
 	auto type = "type"_a;
-	auto type_v = type = wxBITMAP_TYPE_PNG;
+	auto bp_type_v = type = wxBITMAP_TYPE_PNG;
+	auto ico_type_v = type = wxICON_DEFAULT_TYPE;
+	auto desiredWidth = "desiredWidth"_a = -1;
+	auto desiredHeight = "desiredHeight"_a = -1;
 
 	py::class_<wxBitmap>(ui, "Bitmap")
 		.def(py::init<>())
-		.def(py::init<wxcstr, long>(), "src"_a, type_v)
+		.def(py::init<wxcstr, long>(), "src"_a, bp_type_v)
 		.def("GetSize", &wxBitmap::GetSize)
-		.def("CopyFromIcon", &wxBitmap::CopyFromIcon)
-		.def("LoadFile", &wxBitmap::LoadFile, "path"_a, type_v)
-		.def("SaveFile", &wxBitmap::SaveFile, "path"_a, type_v, "palette"_a = NULL);
+		.def("CopyFromIcon", &wxBitmap::CopyFromIcon, "icon"_a, "transp"_a=wxBitmapTransparency_Auto)
+		.def("LoadFile", &wxBitmap::LoadFile, "path"_a, bp_type_v)
+		.def("SaveFile", &wxBitmap::SaveFile, "path"_a, bp_type_v, "palette"_a = NULL);
 
 	py::class_<wxIcon>(ui, "Icon")
 		.def(py::init<>())
 		.def(py::init<const wxString &, wxBitmapType, int, int>(),
-			name, type = wxICON_DEFAULT_TYPE, "desiredWidth"_a = -1, "desiredHeight"_a = -1)
+			name, ico_type_v, desiredWidth, desiredHeight)
+		.def("LoadFile", &wxIcon::LoadFile, "path"_a, ico_type_v, desiredWidth, desiredHeight)
 		;
 }

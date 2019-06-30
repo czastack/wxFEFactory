@@ -220,13 +220,19 @@ void UiModule::init_controls()
 		;
 
 
+	py::class_<wxToolBarToolBase>(ui, "ToolBarToolBase")
+		.def("GetId", &wxToolBarToolBase::GetId)
+		.def("GetControl", &wxToolBarToolBase::GetControl)
+		.def("GetStyle", &wxToolBarToolBase::GetStyle);
+
+
 	py::class_<wxToolBar, wxControl>(ui, "ToolBar")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
 		.def("AddTool", (wxToolBarToolBase* (wxToolBar::*)(int, const wxString&, const wxBitmap&, const wxString&, wxItemKind))
 			& wxToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL)
 		.def("AddControl", &wxToolBar::AddControl, "control"_a, label_v)
-		.def("InsertControl", &wxToolBar::InsertControl, "pos"_a, "control"_a, label_v)
+		.def("InsertControl", &wxToolBar::InsertControl, pos, "control"_a, label_v)
 		.def("AddSeparator", &wxToolBar::AddSeparator)
 		.def("Realize", &wxToolBar::Realize)
 		.def("ClearTools", &wxToolBar::ClearTools)

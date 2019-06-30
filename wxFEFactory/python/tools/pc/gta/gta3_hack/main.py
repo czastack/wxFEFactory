@@ -50,7 +50,7 @@ class Main(BaseGTA3Tool):
         ModelInput("weight", "重量")
         ModelInput("wanted_level", "通缉等级")
         ui.Hr()
-        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.GridLayout(cols=5, vgap=10, class_="expand"):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
 
@@ -62,7 +62,7 @@ class Main(BaseGTA3Tool):
         ModelCoordWidget("speed", "速度")
         ModelInput("weight", "重量")
         ui.Hr()
-        with ui.GridLayout(cols=5, vgap=10, className="expand"):
+        with ui.GridLayout(cols=5, vgap=10, class_="expand"):
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
@@ -82,19 +82,19 @@ class Main(BaseGTA3Tool):
         Input("money", "金钱", address.MONEY)
 
     def render_hotkey(self):
-        with ui.Horizontal(className="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(className="expand", onselect=self.on_spawn_vehicle_id_change,
+        with ui.Horizontal(class_="fill padding"):
+            self.spawn_vehicle_id_view = ui.ListBox(class_="expand", onselect=self.on_spawn_vehicle_id_change,
                 choices=(item[0] for item in VEHICLE_LIST))
-            with ui.ScrollView(className="fill padding"):
+            with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
 
     def render_func(self):
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             self.set_buttons_contextmenu()
 
     def render_tool(self):
-        with ui.Vertical(className="fill padding"):
+        with ui.Vertical(class_="fill padding"):
             ui.Button("g3l坐标转json", onclick=self.g3l2json)
 
     def weapon_max(self, _=None):

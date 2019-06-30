@@ -6,20 +6,23 @@ class View:
     LAYOUTS = []
     wxtype = None
 
-    def __init__(self, class_name=None, style=None, pos=None, size=None, wxstyle=0, extra=None):
+    def __init__(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
+                 class_=None, style=None, extra=None):
         # style: None | [{}] | {}
-        if " " in class_name:
-            class_name = class_name.split()
-        self.class_name = class_name
         self.style = style
         self.wxparams = {
+            'id': id,
             'pos': pos,
             'size': size,
-            'style': wxstyle,
         }
-
+        if wxstyle is not 0:
+            self.wxparams[wxstyle] = wxstyle
+        if class_ is not None and " " in class_:
+            class_ = class_.split()
+        self.class_ = class_
         self.extra = extra
         self.event_table = {}
+        self.wxwindow = None
         self.contextmenu = None
 
         parent = self.active_layout()
@@ -39,14 +42,13 @@ class View:
         layout = cls.active_layout()
         return layout and layout.wxwindow
 
-    # wx.Window* View::safeActiveWindow()
-    # {
-    #     Layout *layout = getActiveLayout();
-    #     return layout ? layout->ptr() : wx.GetApp().GetTopWindow();
-    # }
+    @classmethod
+    def safe_active_wxwindow(cls):
+        return self.active_wxwindow() or wx.GetApp().GetTopWindow()
 
     def bind_wx(self, wxwindow):
         self.wxwindow = wxwindow
+        wxwindow.SetHost(self)
 
     def _render(self, parent):
         self.render(parent)
@@ -116,8 +118,8 @@ class View:
             if style is not None:
                 self.add_style(style)
 
-        if classcase is not None and isinstance(self.class_name, list):
-            for item in self.class_name:
+        if classcase is not None and isinstance(self.class_, list):
+            for item in self.class_:
                 style = classcase.get(item, None)
                 if style is not None:
                     self.add_style(style)
@@ -258,7 +260,7 @@ class View:
             style &= ~flag
         self.SetWindowStyle(style)
 
-    def bind_event(self, event_type, func, reset=True, pass_event=False):
+    def bind_event(self, event_type, func, reset=True, pass_event=False, pass_view=False):
         """添加事件监听器"""
         wxbind = False
         if func is not None:
@@ -270,8 +272,8 @@ class View:
                 self.event_table[event_type] = event_list = []
                 wxbind = True
 
-            if pass_event and isinstance(func, dict):
-                func = {'callback': func, 'arg_event': True}
+            if not isinstance(func, EventFunctor):
+                func = EventFunctor(func, pass_event, pass_view)
             event_list.append(func)
 
         if wxbind:
@@ -287,11 +289,7 @@ class View:
         res = None
         if event_list is not None:
             for handler in event_list:
-                if isinstance(handler, dict):
-                    if handler.get('arg_event', False):
-                        res = handler['callback'](self, event)
-                else:
-                    res = handler(self)
+                res = handler(self, event)
                 if res is not True:
                     if res is False:
                         return False
@@ -303,7 +301,7 @@ class View:
         self.AddPendingEvent(wx.Event(event_type, self.GetId()))
 
     def __getattr__(self, name):
-        return getattr(self.wxwindow)
+        return getattr(self.wxwindow, name)
 
     # /**
     #  * 会传wx.KeyEvent实例过去，需要手动Skip
@@ -329,6 +327,7 @@ class Layout(View):
     """容器元素"""
     def __init__(self, *args, styles=None, **kwargs):
         View.__init__(self, *args, **kwargs)
+        self.styles = styles
         self.children = []
         self.pendding_children = []
         self.tmp_styles_list = None
@@ -338,7 +337,6 @@ class Layout(View):
 
     def __enter__(self):
         self.LAYOUTS.append(self)
-        self.Freeze()
 
         if self.tmp_styles_list is None:
             self.tmp_styles_list = tmp_styles_list = []
@@ -358,11 +356,11 @@ class Layout(View):
         # 加上父控件的样式列表
         parent = self
         while parent is not None:
-            if parent.style is not None:
-                if isinstance(parent.style, list):
-                    tmp_styles_list.extend(parent.style)
+            if parent.styles is not None:
+                if isinstance(parent.styles, list):
+                    tmp_styles_list.extend(parent.styles)
                 else:
-                    tmp_styles_list.append(parent.style)
+                    tmp_styles_list.append(parent.styles)
             if only_self:
                 break
             parent = parent.parent
@@ -370,10 +368,9 @@ class Layout(View):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # 根节点，开始渲染
+        __class__.LAYOUTS.pop()
         if not __class__.LAYOUTS:
             self._render(None)
-        __class__.LAYOUTS.pop()
-        self.Thaw()
         # 释放临时样式表
         self.tmp_styles_list = None
         self.pendding_children.clear()
@@ -382,20 +379,29 @@ class Layout(View):
         self.children.append(child)
         self.pendding_children.append(child)
 
-    def _render(self, parent):
-        View._render(self, parent)
+    def onready(self):
+        self.Freeze()
         for child in self.pendding_children:
             child._render(self)
             styles = child.apply_style()
             self.layout_child(child, styles)
+        self.layout()
+        self.Thaw()
 
     def layout_child(self, child, style):
         """布局子元素"""
         pass
 
+    def layout(self):
+        """可选布局"""
+        pass
+
     def relayout(self):
         """子元素改变后重新布局"""
         pass
+
+    def get_styles(self):
+        return self.tmp_styles_list
 
     def set_styles(self, styles):
         """设置样式表"""
@@ -431,3 +437,18 @@ class Item:
     def __init__(self, view, **kwargs):
         self.view = view
         self.__dict__.update(kwargs)
+
+
+class EventFunctor:
+    def __init__(self, fn, pass_event=False, pass_view=True):
+        self.fn = fn
+        self.pass_event
+        self.pass_view = pass_view
+
+    def __call__(self, view, event):
+        args = []
+        if self.pass_view:
+            args.append(view)
+        if self.pass_event:
+            args.append(event)
+        self.fn(*args)

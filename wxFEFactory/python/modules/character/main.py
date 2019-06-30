@@ -24,19 +24,19 @@ class Module(BaseListBoxModuel):
 
     def render_main(self):
         this = self.weak
-        with ui.Horizontal(className="padding expand") as infobar:
+        with ui.Horizontal(class_="padding expand") as infobar:
             ui.ComboBox(wxstyle=wxconst.CB_READONLY, choices=('地址预览', *(key for key in config.ADDR_MAP)),
                 onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
-            ui.Text("地址", className="vcenter input_label")
+            ui.Text("地址", class_="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True)
-            ui.Text("说明", className="vcenter input_label")
-            self.help_view = ui.TextInput(readonly=True, className="fill")
+            ui.Text("说明", class_="vcenter input_label")
+            self.help_view = ui.TextInput(readonly=True, class_="fill")
 
-        self.pg = ui.PropertyGrid(className="fill")
-        with ui.Horizontal(className="expand"):
-            ui.CheckBox(label="自动保存", checked=True, onchange=this.onSwichAutoSave, className="vcenter")
-            ui.Button(label="保存该项", className="button", onclick=this.onSaveIt)
-            ui.Button(label="保存文件", className="button", onclick=this.onSave)
+        self.pg = ui.PropertyGrid(class_="fill")
+        with ui.Horizontal(class_="expand"):
+            ui.CheckBox(label="自动保存", checked=True, onchange=this.onSwichAutoSave, class_="vcenter")
+            ui.Button(label="保存该项", class_="button", onclick=this.onSaveIt)
+            ui.Button(label="保存文件", class_="button", onclick=this.onSave)
 
         self.pg.autosave = True
         self.pg.setOnChange(this.onPgChange)

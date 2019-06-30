@@ -10,7 +10,9 @@ class MenuHolder:
         self.handlers = handlers
 
     def __del__(self):
-        self.handlers.clear()
+        if self.handlers:
+            self.handlers.clear()
+        self.children.clear()
 
     @classmethod
     def active_menu(cls):
@@ -23,40 +25,47 @@ class MenuHolder:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.MENUS.pop()
 
-    def getmenu(self, menuid):
-        return self.handlers.get(menuid, None)
+    def getmenu(self, itemid):
+        return self.handlers.get(itemid, None)
 
-    def setmenu(self, menuid, menu):
-        self.handlers[menuid] = menu
+    def setmenu(self, itemid, menu):
+        self.handlers[itemid] = menu
 
-    def onselect(self, menuid, owner):
-        menu = self.getmenu(menuid)
+    def onselect(self, itemid, owner):
+        menu = self.getmenu(itemid)
         if menu:
-            menu.onselect(owner)
+            # Call MenuItem.onselect
+            return menu.onselect(owner)
+        return False
 
 
 class Menu(MenuHolder):
     """基本菜单"""
-    def __init__(self, handlers=None, text=None, help=None):
-        MenuHolder.__init__(handlers)
+    def __init__(self, text=None, help="", handlers=None):
+        MenuHolder.__init__(self, handlers)
         self.wxmenu = wx.Menu()
-        if text is not None and help is not None:
+        if text is not None:
             parent = self.active_menu()
             if parent:
-                parent.AppendSubMenu(menu, text, help)
+                self.wxmenuitem = parent.AppendSubMenu(self.wxmenu, text, help)
+                parent.children.append(self)
+                self.handlers = parent.handlers
+
+    def __getattr__(self, name):
+        return getattr(self.wxmenu, name)
 
 
 class ContextMenu(Menu):
     """右键菜单"""
     def __init__(self, onselect=None):
         Menu.__init__(self, {})
-        self.m_onselect = onselect
+        self._onselect = onselect
 
-    def onselect_view(self, view, id):
+    def onselect(self, id, view):
         if Menu.onselect(self, id, view):
             return True
-        elif self.m_onselect is not None:
-            self.m_onselect(view, self.getmenu(id))
+        elif self._onselect is not None:
+            self._onselect(view, self.getmenu(id))
             return True
 
 
@@ -64,26 +73,45 @@ class MenuBar(MenuHolder):
     """菜单栏"""
     def __init__(self, onselect=None):
         MenuHolder.__init__(self, {})
-        self.m_onselect = onselect
+        self._onselect = onselect
         self.wxwindow = wx.MenuBar(0)
-        self.wxwindow.SetClientData(self)
+        self.wxwindow.SetHost(self)
+
+    def AppendSubMenu(self, menu, text, help=None):
+        self.Append(menu, text)
 
     def remove(self, menu):
-        pass
+        for i in range(self.GetMenuCount()):
+            if self.GetMenu(i) == menu.wxmemu:
+                self.Remove(i)
+                break
 
-    def onselect_view(self, view, id):
-        if Menu.onselect(self, id, view):
+    def onselect(self, id):
+        if Menu.onselect(self, id, None):
             return True
-        elif self.m_onselect is not None:
-            self.m_onselect(view, self.getmenu(id))
+        elif self._onselect is not None:
+            self._onselect(self, self.getmenu(id))
             return True
+
+    def __getattr__(self, name):
+        return getattr(self.wxwindow, name)
 
 
 class MenuItem:
     """菜单项"""
-    def __init__(self, text=None, help=None, kind=None, id=-1, separator=False, onselect=None):
+    def __init__(self, text="", help="", kind=wx.ITEM_NORMAL, id=-1, separator=False, onselect=None):
         parent = MenuHolder.active_menu()
         if parent:
             if separator:
                 parent.AppendSeparator()
-            self.ptr = parent.Append(id, text, help, kind)
+            self.wxmenuitem = parent.Append(id, text, help, kind)
+            parent.setmenu(self.GetId(), self)
+        self._onselect = onselect
+
+    def onselect(self, owner):
+        if self._onselect:
+            return self._onselect(owner, self)
+        return False
+
+    def __getattr__(self, name):
+        return getattr(self.wxmenuitem, name)

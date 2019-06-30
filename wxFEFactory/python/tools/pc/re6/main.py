@@ -53,7 +53,7 @@ class Main(NativeHacktool):
                 select = ModelChoiceDisplay(prop + ".type", "%s%d" % (label, r),
                     choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values)
                 with select.container:
-                    ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
+                    ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
                         instance=self._person, prop=prop))
                 r += 1
 
@@ -101,8 +101,8 @@ class Main(NativeHacktool):
                 ModelInput("max_quantity")
                 ModelInput("model", hex=True)
             with dialog.footer:
-                ui.Button("复制", className='btn_sm', onclick=self.weak.ingame_item_copy)
-                ui.Button("粘贴", className='btn_sm', onclick=self.weak.ingame_item_paste)
+                ui.Button("复制", class_='btn_sm', onclick=self.weak.ingame_item_copy)
+                ui.Button("粘贴", class_='btn_sm', onclick=self.weak.ingame_item_paste)
 
             setattr(self, name, dialog)
         return dialog

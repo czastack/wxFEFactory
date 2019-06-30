@@ -17,7 +17,8 @@ class PropertyGrid(Control):
         self.SetCaptionBackgroundColour(0xeeeeee)
         self.SetMarginColour(0xeeeeee)
         self.Bind(wx.EVT_PG_CHANGING, self.onchange)
-    
+        super().onready()
+
     def onchange(self, event):
         self.changed = True
         if self.autosave:

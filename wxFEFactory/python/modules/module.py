@@ -104,12 +104,12 @@ class BaseListBoxModuel(BaseModule):
         this = self.weak
         with ui.SplitterWindow(False, 220, styles=styles) as panel:
             with ui.Vertical():
-                self.listbox = ui.RearrangeList(className="fill", onselect=this.onListSelect)
-                with ui.Horizontal(className="expand"):
+                self.listbox = ui.RearrangeList(class_="fill", onselect=this.onListSelect)
+                with ui.Horizontal(class_="expand"):
                     ui.Text("Ctrl+↑↓ 上移/下移当前项")
-                with ui.Horizontal(className="expand"):
-                    ui.Button(label="添加", className="button", onclick=this.onAdd)
-                    ui.Button(label="删除", className="button", onclick=this.onDel)
+                with ui.Horizontal(class_="expand"):
+                    ui.Button(label="添加", class_="button", onclick=this.onAdd)
+                    ui.Button(label="删除", class_="button", onclick=this.onDel)
             with ui.Vertical():
                 self.render_main()
         ui.AuiItem(panel, caption=self.unique_title, onclose=self.onclose)

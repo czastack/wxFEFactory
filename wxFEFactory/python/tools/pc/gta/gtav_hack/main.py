@@ -69,7 +69,7 @@ class Main(BaseGTATool):
         ModelInput("rotation", "旋转")
         ModelInput("wanted_level", "通缉等级")
         ui.Hr()
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
             ui.Button(label="从标记点读取坐标", onclick=self.player_coord_from_waypoint)
             ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
@@ -93,14 +93,14 @@ class Main(BaseGTATool):
         ModelCoordWidget("speed", "速度")
         ModelInput("weight", "重量")
         ui.Hr()
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
             ui.Button(label="从标记点读取坐标", onclick=self.vehicle_coord_from_waypoint)
             ui.ToggleButton(label="开启无伤", onchange=self.set_vechile_invincible)
             ui.Button(label="锁车", onclick=self.vehicle_lock_door)
             ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
         exui.Label("颜色")
-        with ui.Horizontal(className="fill"):
+        with ui.Horizontal(class_="fill"):
             ColorWidget("vehicle_color", "车身", self._vehicle, "color", datasets.COLOR_LIST)
             ColorWidget("vehicle_specular_color", "条纹", vehicle, "specular_color", datasets.COLOR_LIST)
             ColorWidget("vehicle_feature_color1", "边缘", vehicle, "feature_color1", datasets.COLOR_LIST)
@@ -111,12 +111,12 @@ class Main(BaseGTATool):
     def render_weapon(self):
         self.weapon_views = []
         player = self.weak._player
-        with ui.Vertical(className="fill padding"):
-            self.weapon_model_book = ui.Notebook(className="fill", wxstyle=0x0200)
+        with ui.Vertical(class_="fill padding"):
+            self.weapon_model_book = ui.Notebook(class_="fill", wxstyle=0x0200)
             with self.weapon_model_book:
                 for category in datasets.WEAPON_LIST:
                     with ui.Vertical():
-                        with ui.FlexGridLayout(cols=2, vgap=10, className="fill padding") as view:
+                        with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as view:
                             view.AddGrowableCol(1)
                             for item in category[1]:
                                 self.weapon_views.append(WeaponWidget(player, *item))
@@ -137,14 +137,14 @@ class Main(BaseGTATool):
 
         ModelInput("wind_speed", "风速")
         exui.Label("天气")
-        with ui.Horizontal(className="fill"):
-            self.weather_view = ui.Choice(className="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
+        with ui.Horizontal(class_="fill"):
+            self.weather_view = ui.Choice(class_="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
             ui.Button("短暂", onclick=self.apply_weather)
             ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
             ui.ToggleButton("起风", onchange=self.set_wind)
 
     def render_hotkey(self):
-        with ui.ScrollView(className="fill"):
+        with ui.ScrollView(class_="fill"):
             self.render_common_text()
             ui.Text("大加速: alt+shift+m\n"
                 "生成选中的载具并进入: alt+shift+v\n"
@@ -160,9 +160,9 @@ class Main(BaseGTATool):
 
     def render_ped_model(self):
         from .datasets.player_models import PLAYER_MODELS
-        with ui.Horizontal(className="fill padding"):
+        with ui.Horizontal(class_="fill padding"):
             self.player_model_book = TabList(PLAYER_MODELS)
-            with ui.ScrollView(className="fill padding"):
+            with ui.ScrollView(class_="fill padding"):
                 ui.Text("1. 切换模型会失去武器")
                 ui.Text("2. 切换动物模型容易引发bug，请慎用")
                 ui.Text("3. 在陆地上使用鱼类模型会突然失去梦想，请注意")
@@ -190,7 +190,7 @@ class Main(BaseGTATool):
             weapon = weapon_map[item[0]]
             weapon_components.append((weapon[1], item[1], weapon[2]))
 
-        with ui.Vertical(className="fill padding"):
+        with ui.Vertical(class_="fill padding"):
             self.weapon_component_book = TabList(weapon_components)
             # self.weapon_component_book.setToolTip("选中后回车键给与配件")
             with ui.Horizontal():
@@ -198,7 +198,7 @@ class Main(BaseGTATool):
                 ui.Button("移除", onclick=self.remove_weapon_component)
 
     def render_functions(self):
-        with ui.GridLayout(cols=4, vgap=10, className="expand"):
+        with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)
             ui.Button("附近的人缴械", onclick=self.near_peds_remove_weapon)

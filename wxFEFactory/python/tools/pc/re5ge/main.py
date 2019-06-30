@@ -50,7 +50,7 @@ class Main(NativeHacktool):
             select = ModelChoiceDisplay(prop + ".type", "物品%d" % (i + 1), choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
                     instance=self._person, prop=prop))
 
     def render_saved_items(self):
@@ -60,12 +60,12 @@ class Main(NativeHacktool):
             select = ModelChoiceDisplay(prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices,
                 values=datasets.INVENTORY_ITEMS.values)
             with select.container:
-                ui.Button("详情", className="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
                     instance=self._saved_items, prop=prop))
 
     # def render_inventory_treasure_items(self):
     #     """仓库中的物品"""
-    #     with ui.Notebook(className="fill") as book:
+    #     with ui.Notebook(class_="fill") as book:
     #         for label, key in (('物品箱', 'inventory_items'), ('宝物箱', 'treasure_items')):
     #             with Group(None, label, self._gloabl.character_struct, cols=6):
     #                 for i in range(54):
@@ -74,7 +74,7 @@ class Main(NativeHacktool):
     #                         choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
     #                         values=datasets.INVENTORY_TREASURE_ITEMS.values)
     #                     with select.container:
-    #                         ui.Button("详情", className="btn_sm",
+    #                         ui.Button("详情", class_="btn_sm",
     #                             onclick=partial(__class__.show_inventory_treasure_item, self.weak,
     #                                 instance=self._gloabl.character_struct, prop=prop))
 

@@ -15,10 +15,10 @@ class WeaponWidget(TwoWayWidget):
 
     def render(self):
         super().render()
-        with ui.Horizontal(className="fill"):
-            self.id_view = ui.Choice(className="fill", choices=(item[2] for item in self.weapon_list[self.slot]))
+        with ui.Horizontal(class_="fill"):
+            self.id_view = ui.Choice(class_="fill", choices=(item[2] for item in self.weapon_list[self.slot]))
             if self.has_ammo:
-                self.ammo_view = ui.SpinCtrl(className="fill", min=0, max=9999, initial=0)
+                self.ammo_view = ui.SpinCtrl(class_="fill", min=0, max=9999, initial=0)
             self.render_btn()
 
     @property
@@ -69,7 +69,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
 
     def render(self):
         super().render()
-        self.view = ui.Text("", style=self.view_style, className="input_label")
+        self.view = ui.Text("", style=self.view_style, class_="input_label")
         self.view.background = 0xaabccc
         self.view.setOnDoubleClick(self.onDoubleClick)
         self.view.setOnLeftDown(self.onClick)
@@ -88,7 +88,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
 
         if not dialog:
             with exui.StdDialog("选择颜色", style=dialog_style) as dialog:
-                with ui.GridLayout(cols=13, vgap=10, className="expand"):
+                with ui.GridLayout(cols=13, vgap=10, class_="expand"):
                     for color in self.color_list:
                         view = ui.Text("", style=cls.color_item_style)
                         view.background = color

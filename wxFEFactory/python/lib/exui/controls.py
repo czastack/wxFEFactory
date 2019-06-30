@@ -3,16 +3,19 @@ from lib.win32.keys import WXK
 
 
 def Label(text):
-    return ui.Text(text, className="input_label expand")
+    return ui.Text(text, class_="input_label expand")
 
 
 class HotkeyCtrl(ui.TextInput):
     def __init__(self, *args, **kwargs):
         kwargs['wxstyle'] = wxconst.TE_PROCESS_ENTER
         super().__init__(*args, **kwargs)
+        self.value = None
+        self.code = None
+        self.mode = None
         self.setOnKeyDown(self.onKey)
 
-    def onKey(self, v, event):
+    def onKey(self, _, event):
         code = event.GetKeyCode()
         if WXK.isMod(code):
             return
@@ -34,9 +37,9 @@ class SearchListBox(ui.Vertical):
         self.choices = choices
         super().__init__(*args, **kwargs)
         with self:
-            self.input = ui.ComboBox(className='expand', wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
+            self.input = ui.ComboBox(class_='expand', wxstyle=wxconst.CB_DROPDOWN | wxconst.TE_PROCESS_ENTER,
                 onselect=self.onsearch_select)
-            self.listbox = ui.ListBox(className='fill', choices=choices, onselect=onselect)
+            self.listbox = ui.ListBox(class_='fill', choices=choices, onselect=onselect)
             self.input.setOnEnter(self.onsearch)
 
     def onsearch(self, input):
