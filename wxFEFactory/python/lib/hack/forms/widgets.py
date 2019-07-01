@@ -322,7 +322,7 @@ class Group(BaseGroup):
         root = self.render_root()
         if self.label:
             # 作为Tab标签
-            ui.Item(root, caption=self.label)
+            root.extra = dict(caption=self.label)
         self.root = root
 
     def render_root(self):
@@ -425,7 +425,7 @@ class Groups(BaseGroup):
         with ui.Vertical(class_="fill") as root:
             self.view = ui.Notebook(class_="fill")
         if self.label:
-            ui.Item(root, caption=self.label)
+            root.extra = dict(caption=self.label)
         self.root = root
         if self.onPageChange:
             self.view.setOnPageChange(self.onPageChange)
@@ -925,7 +925,7 @@ def TabList(data):
     book = ui.Notebook(class_="fill", wxstyle=0x0200)
     with book:
         for category in data:
-            ui.Item(ui.ListBox(class_="expand", choices=(item[0] for item in category[1])), caption=category[0])
+            ui.ListBox(class_="expand", choices=(item[0] for item in category[1]), extra=dict(caption=category[0]))
     return book
 
 

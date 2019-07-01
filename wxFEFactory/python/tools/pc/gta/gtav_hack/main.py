@@ -120,7 +120,7 @@ class Main(BaseGTATool):
                             view.AddGrowableCol(1)
                             for item in category[1]:
                                 self.weapon_views.append(WeaponWidget(player, *item))
-                    ui.Item(view.parent, caption=category[0])
+                    view.parent.extra = dict(caption=category[0])
 
             with ui.Horizontal():
                 ui.Button(label="全部武器", onclick=self.give_all_weapon)

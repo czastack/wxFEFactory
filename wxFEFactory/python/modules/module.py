@@ -102,7 +102,8 @@ class BaseListBoxModuel(BaseModule):
     """
     def render(self):
         this = self.weak
-        with ui.SplitterWindow(False, 220, styles=styles) as panel:
+        with ui.SplitterWindow(False, 220, styles=styles, extra=dict(
+                caption=self.unique_title, onclose=self.onclose)) as panel:
             with ui.Vertical():
                 self.listbox = ui.RearrangeList(class_="fill", onselect=this.onListSelect)
                 with ui.Horizontal(class_="expand"):
@@ -112,7 +113,6 @@ class BaseListBoxModuel(BaseModule):
                     ui.Button(label="删除", class_="button", onclick=this.onDel)
             with ui.Vertical():
                 self.render_main()
-        ui.AuiItem(panel, caption=self.unique_title, onclose=self.onclose)
 
         self.listbox.setOnKeyDown(this.onListBoxKey)
 

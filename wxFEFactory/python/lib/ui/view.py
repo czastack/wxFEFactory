@@ -57,7 +57,8 @@ class View:
 
     def render(self, parent):
         """渲染"""
-        self.bind_wx(self.wxtype(parent, **self.wxparams))
+        print(self)
+        self.bind_wx(self.wxtype(parent and parent.wxwindow, **self.wxparams))
 
     def onready(self):
         """渲染后的操作"""
@@ -132,7 +133,7 @@ class View:
             style.update(item)
 
         if not style:
-            return
+            return style
 
         backgroud = style.get('backgroud', None)
         if backgroud is not None:
@@ -228,11 +229,7 @@ class View:
     def parent(self):
         parent = self.GetParent()
         if parent is not None:
-            # TODO
-            parent = parent.GetClientData()
-            if parent:
-                if isinstance(parent, Item):
-                    parent = parent.get_view()
+            parent = parent.GetHost()
         return parent
 
     @property
@@ -336,16 +333,14 @@ class Layout(View):
         self.children.clear()
 
     def __enter__(self):
-        self.LAYOUTS.append(self)
-
         if self.tmp_styles_list is None:
             self.tmp_styles_list = tmp_styles_list = []
 
         parent = self.active_layout()
         if parent is None:
             # 判断是否是AuiManager
-            # GetClientData()
-            pass
+            if type(parent).__name__ == 'AuiManager':
+                parent = parent.GetHost()
 
         only_self = False
         # 父元素的临时列表还没释放，本次只要检查自己的
@@ -353,17 +348,20 @@ class Layout(View):
             tmp_styles_list.extend(parent.tmp_styles_list)
             only_self = True
 
+        self.LAYOUTS.append(self)
+        i = len(self.LAYOUTS) - 1
+
         # 加上父控件的样式列表
-        parent = self
-        while parent is not None:
-            if parent.styles is not None:
-                if isinstance(parent.styles, list):
-                    tmp_styles_list.extend(parent.styles)
+        while i is not -1:
+            styles = self.LAYOUTS[i].styles
+            if styles is not None:
+                if isinstance(styles, list):
+                    tmp_styles_list.extend(styles)
                 else:
-                    tmp_styles_list.append(parent.styles)
+                    tmp_styles_list.append(styles)
             if only_self:
                 break
-            parent = parent.parent
+            i -= 1
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -373,7 +371,6 @@ class Layout(View):
             self._render(None)
         # 释放临时样式表
         self.tmp_styles_list = None
-        self.pendding_children.clear()
 
     def append(self, child):
         self.children.append(child)
@@ -383,8 +380,9 @@ class Layout(View):
         self.Freeze()
         for child in self.pendding_children:
             child._render(self)
-            styles = child.apply_style()
-            self.layout_child(child, styles)
+            style = child.apply_style()
+            self.layout_child(child, style)
+        self.pendding_children.clear()
         self.layout()
         self.Thaw()
 
@@ -433,16 +431,10 @@ class Control(View):
     __slots__ = ()
 
 
-class Item:
-    def __init__(self, view, **kwargs):
-        self.view = view
-        self.__dict__.update(kwargs)
-
-
 class EventFunctor:
     def __init__(self, fn, pass_event=False, pass_view=True):
         self.fn = fn
-        self.pass_event
+        self.pass_event = pass_event
         self.pass_view = pass_view
 
     def __call__(self, view, event):

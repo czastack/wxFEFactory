@@ -66,26 +66,25 @@ class MainFrame:
 
         with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
-                toolbar = ui.AuiToolBar()
-                ui.Item(toolbar, direction="top", captionVisible=False)
-                # ui.Item(ui.ListBox(choices=self.module_names, onselect=self.on_nav), captionVisible=False)
-                self.book = ui.AuiNotebook()
-                ui.Item(self.book, direction="center", maximizeButton=True, captionVisible=False)
+                toolbar = ui.AuiToolBar(extra=dict(direction="top", captionVisible=False))
+                # ui.ListBox(choices=self.module_names, onselect=self.on_nav, extra=dict(captionVisible=False))
+                self.book = ui.AuiNotebook(extra=dict(direction="center", maximizeButton=True, captionVisible=False))
                 with ui.Vertical(class_="console-bar") as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, class_="console-output")
                     with ui.Horizontal(class_="expand console-input-bar"):
                         self.console_input = ui.ComboBox(
                             wxstyle=ui.wx.CB_DROPDOWN | ui.wx.TE_PROCESS_ENTER, class_="expand console-input")
                         ui.Button("∧", class_="btn-sm", onclick=self.toggle_console_input_multi)
-                with ui.Horizontal(class_="console-input-multi") as multiline_console:
-                    self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
+                with ui.Horizontal(class_="console-input-multi", extra=dict(
+                        name="multiline_console", direction="bottom", captionVisible=False, hide=True
+                        )) as multiline_console:
+                    self.console_input_multi = ui.TextInput(class_="console-input", multiline=True, extra=dict(
+                        name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True
+                    ))
                     with ui.Vertical(class_="expand"):
                         ui.Button("∨", class_="btn-sm", onclick=self.toggle_console_input_multi)
                         ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run)  # .setToolTip(
                             # "执行输入框中代码 Ctrl+Enter")
-                ui.Item(console, name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True)
-                ui.Item(multiline_console, name="multiline_console", direction="bottom",
-                        captionVisible=False, hide=True)
             ui.StatusBar()
 
         # 尝试加载图标

@@ -131,8 +131,8 @@ class Main(BaseGTATool):
             self.vehicle_model_book = ui.Notebook(class_="fill", wxstyle=0x0200)
             with self.vehicle_model_book:
                 for category in datasets.VEHICLE_LIST:
-                    ui.Item(ui.ListBox(class_="expand", choices=(item[0] for item in category[1])),
-                        caption=category[0])
+                    ui.ListBox(class_="expand", choices=(item[0] for item in category[1]),
+                        extra=dict(caption=category[0]))
 
     def render_func(self):
         with ui.GridLayout(cols=4, vgap=10, class_="expand"):

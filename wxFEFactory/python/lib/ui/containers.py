@@ -22,7 +22,7 @@ class SizerLayout(Layout):
     def get_box_flag(self, style):
         """获取布局参数"""
         flag = 0
-        if child.get('expand', False):
+        if style.get('expand', False):
             flag |= wx.EXPAND
 
         padding_flag = style.get('padding-flag', 0)

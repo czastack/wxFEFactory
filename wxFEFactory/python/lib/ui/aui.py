@@ -7,6 +7,7 @@ class AuiManager(Layout):
     """自动布局器"""
     def __init__(self, **kwargs):
         Layout.__init__(self, **kwargs)
+        self.mgr = None
         self.close_listeners = {}
 
     def __del__(self):
@@ -14,7 +15,8 @@ class AuiManager(Layout):
         self.close_listeners.clear()
 
     def render(self, parent):
-        self.bind_wx(parent.wxwindow)
+        self.wxwindow = parent.wxwindow
+        self.mgr = wx.AuiManager(parent.wxwindow)
         # Bind(wx.EVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this)
 
     def relayout(self):
@@ -64,6 +66,8 @@ class AuiManager(Layout):
 
 
 class AuiNotebook(Layout):
+    wxtype = wx.AuiNotebook
+
     def __init__(self, **kwagrs):
         Layout.__init__(self, **kwagrs)
         self.close_listeners = {}

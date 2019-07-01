@@ -71,7 +71,7 @@ class CheckBox(Control):
         self.onchange = onchange
 
         if align_right:
-            self.wxparams['style'] |= wx.ALIGN_RIGHT
+            self.wxparams['style'] = kwargs.get('wxstyle', 0) | wx.ALIGN_RIGHT
 
     def render(self, parent):
         self.bind_wx(wx.CheckBox(parent, **self.wxparams))
@@ -123,7 +123,7 @@ class TextInput(Control):
 
     def __init__(self, value="", multiline=False, readonly=False, type=None, **kwargs):
         Control.__init__(self, **kwargs)
-        wxstyle = 0
+        wxstyle = kwargs.get('wxstyle', 0)
         if multiline:
             wxstyle |= wx.TE_MULTILINE
         if readonly:
@@ -131,7 +131,7 @@ class TextInput(Control):
         if type == "password":
             wxstyle |= wx.TE_PASSWORD
         if wxstyle:
-            self.wxparams['style'] |= wxstyle
+            self.wxparams['style'] = wxstyle
         self.wxparams['value'] = value
 
     def set_onenter(self, fn, reset=True):

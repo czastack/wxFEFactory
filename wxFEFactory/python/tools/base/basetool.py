@@ -19,7 +19,7 @@ class BaseTool(BaseScene):
                 with frame.book:
                     win = self.render()
                     if win:
-                        ui.AuiItem(win, caption=self.unique_title)
+                        win.extra = dict(caption=self.unique_title)
             else:
                 with frame.win:
                     win = self.render()
