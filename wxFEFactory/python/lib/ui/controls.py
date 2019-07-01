@@ -334,3 +334,8 @@ class TreeCtrl(Control):
 
 class StatusBar(Control):
     wxtype = wx.StatusBar
+
+    def __init__(self, **kwargs):
+        Control.__init__(self, **kwargs)
+        self.wxparams.pop('pos')
+        self.wxparams.pop('size')

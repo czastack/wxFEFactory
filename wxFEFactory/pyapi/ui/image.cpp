@@ -37,11 +37,11 @@ void UiModule::init_image()
 		.ENUM_VAL(BitmapTransparency_Always)
 		.export_values();
 
-	auto type = "type"_a;
-	auto bp_type_v = type = wxBITMAP_TYPE_PNG;
-	auto ico_type_v = type = wxICON_DEFAULT_TYPE;
-	auto desiredWidth = "desiredWidth"_a = -1;
-	auto desiredHeight = "desiredHeight"_a = -1;
+	py::arg type("type");
+	py::arg_v bp_type_v(type, wxBITMAP_TYPE_PNG),
+		ico_type_v(type, wxICON_DEFAULT_TYPE),
+		desiredWidth("desiredWidth", -1),
+		desiredHeight("desiredHeight", -1);
 
 	py::class_<wxBitmap>(ui, "Bitmap")
 		.def(py::init<>())

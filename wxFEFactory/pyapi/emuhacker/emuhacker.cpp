@@ -254,12 +254,12 @@ void init_emuhacker(pybind11::module & m)
 
 	py::module emuhacker = m.def_submodule("emuhacker");
 
-	auto addr_a = "addr"_a;
-	auto offsets_a = "offsets"_a;
-	auto data_a = "data"_a;
-	auto size_a = "size"_a;
-	auto start_a = "start"_a;
-	auto type_a = "type"_a;
+	py::arg addr_a("addr"),
+		offsets_a("offsets"),
+		data_a("data"),
+		size_a("size"),
+		start_a("start"),
+		type_a("type");
 
 	py::class_<ProcessHandler, PyProcessHandler>(emuhacker, "ProcessHandler")
 		.def(py::init<>())

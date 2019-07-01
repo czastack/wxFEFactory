@@ -129,8 +129,8 @@ void init_auto(py::module & m)
 	using namespace py::literals;
 	py::module auto_ = m.def_submodule("auto");
 
-	auto keycode = "keycode"_a;
-	auto keyup = "keyup"_a = false;
+	py::arg keycode("keycode");
+	py::arg_v keyup("keyup", false);
 
 	auto_.def("sendKey", sendKey, "input_list"_a, "interval"_a=0)
 		.def("VKey", VKey, keycode, keyup)

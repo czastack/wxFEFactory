@@ -16,7 +16,7 @@ class View:
             'size': size,
         }
         if wxstyle is not 0:
-            self.wxparams[wxstyle] = wxstyle
+            self.wxparams['style'] = wxstyle
         if class_ is not None and " " in class_:
             class_ = class_.split()
         self.class_ = class_
@@ -57,7 +57,6 @@ class View:
 
     def render(self, parent):
         """渲染"""
-        print(self)
         self.bind_wx(self.wxtype(parent and parent.wxwindow, **self.wxparams))
 
     def onready(self):
@@ -185,9 +184,9 @@ class View:
         if width or height:
             size = self.GetSize()
             if width:
-                size.SetWidth(width)
+                size.x = width
             if height:
-                size.SetHeight(height)
+                size.y = height
             self.SetSize(size)
 
         # 最大/最小尺寸
@@ -199,17 +198,17 @@ class View:
         if min_width or min_height:
             size = self.GetMinSize()
             if min_width:
-                size.SetWidth(min_width)
+                size.x = min_width
             if min_height:
-                size.SetHeight(min_height)
+                size.y = min_height
             self.SetMinSize(size)
 
         if max_width or max_height:
             size = self.GetMaxSize()
             if max_width:
-                size.SetWidth(max_width)
+                size.x = max_width
             if max_height:
-                size.SetHeight(max_height)
+                size.y = max_height
             self.SetMaxSize(size)
 
         self.apply_style_own(style)

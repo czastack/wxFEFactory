@@ -69,7 +69,9 @@ class MainFrame:
                 toolbar = ui.AuiToolBar(extra=dict(direction="top", captionVisible=False))
                 # ui.ListBox(choices=self.module_names, onselect=self.on_nav, extra=dict(captionVisible=False))
                 self.book = ui.AuiNotebook(extra=dict(direction="center", maximizeButton=True, captionVisible=False))
-                with ui.Vertical(class_="console-bar") as console:
+                with ui.Vertical(class_="console-bar", extra=dict(
+                        name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True
+                        )) as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, class_="console-output")
                     with ui.Horizontal(class_="expand console-input-bar"):
                         self.console_input = ui.ComboBox(
@@ -78,9 +80,7 @@ class MainFrame:
                 with ui.Horizontal(class_="console-input-multi", extra=dict(
                         name="multiline_console", direction="bottom", captionVisible=False, hide=True
                         )) as multiline_console:
-                    self.console_input_multi = ui.TextInput(class_="console-input", multiline=True, extra=dict(
-                        name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True
-                    ))
+                    self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
                     with ui.Vertical(class_="expand"):
                         ui.Button("∨", class_="btn-sm", onclick=self.toggle_console_input_multi)
                         ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run)  # .setToolTip(
@@ -103,7 +103,7 @@ class MainFrame:
         self.aui = aui
         self.console = console
         fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
-        # self.console.setOnFileDrop(self.onConsoleFileDrop)
+        self.console.setOnFileDrop(self.onConsoleFileDrop)
         self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
     @property
@@ -157,7 +157,7 @@ class MainFrame:
         listener = self.on_toolbar_tool_click
         for name, module in tools.toolbar_tools:
             bitmap.CopyFromIcon(ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/')))
-            toolitem = toolbar.AddTool(wx.ID_ANY, name, bitmap, "")
+            toolitem = toolbar.AddTool(ui.wx.ID_ANY, name, bitmap, "")
             toolbar.set_onclick(toolitem.GetId(), listener)
 
         return toolbar.Realize()

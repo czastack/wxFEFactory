@@ -11,25 +11,30 @@ void UiModule::init_containers()
 {
 	using namespace py::literals;
 
+	py::arg_v proportion("proportion", 0),
+		flag("flag", 0),
+		border("border", 0),
+		userData("userData", (wxObject*)nullptr);
+
+	py::class_<wxSizerItem>(ui, "SizerItem")
+		.def(py::init<wxWindow*, int, int, int, wxObject*>(),
+			window, proportion, flag, border, userData)
+		.def(py::init<wxSizer*, int, int, int, wxObject*>(),
+			"sizer"_a, proportion, flag, border, userData)
+		.def(py::init<int, int, int, int, int, wxObject*>(),
+			"width"_a, "height"_a, proportion, flag, border, userData)
+		;
+
 	py::class_<wxSizer>(ui, "Sizer")
 		.def("Add", (wxSizerItem * (wxSizer::*)(wxWindow*, int, int, int, wxObject*)) & wxSizer::Add,
-			window, "proportion"_a = 0, "flag"_a = 0, "border"_a = 0, "userData"_a = NULL)
-		.def("Add", (wxSizerItem * (wxSizer::*)(wxSizerItem*)) & wxSizer::Add, "item"_a)
+			window, proportion, flag, border, userData, py::return_value_policy::reference)
+		.def("Add", (wxSizerItem * (wxSizer::*)(wxSizerItem*)) & wxSizer::Add, "item"_a, py::return_value_policy::reference)
 		.def("InsertSpacer", &wxSizer::InsertSpacer, "index"_a, "size"_a)
 		.def("Layout", &wxSizer::Layout)
 		.def("FitInside", &wxSizer::FitInside, window);
 
-	py::class_<wxSizerItem>(ui, "SizerItem")
-		.def(py::init<wxWindow*, int, int, int, wxObject*>(),
-			window, "proportion"_a = 0, "flag"_a = 0, "border"_a = 0, "userData"_a = NULL)
-		.def(py::init<wxSizer*, int, int, int, wxObject*>(),
-			"sizer"_a, "proportion"_a = 0, "flag"_a = 0, "border"_a = 0, "userData"_a = NULL)
-		.def(py::init<int, int, int, int, int, wxObject*>(),
-			"width"_a, "height"_a, "proportion"_a = 0, "flag"_a = 0, "border"_a = 0, "userData"_a = NULL)
-		;
-
 	py::class_<wxBoxSizer, wxSizer>(ui, "BoxSizer")
-		.def(py::init<int>(), "orient"_a = NULL);
+		.def(py::init<int>(), "orient"_a);
 
 	py::class_<wxGridSizer, wxSizer>(ui, "GridSizer")
 		.def(py::init<int, int, int>(), "cols"_a, "vgap"_a, "hgap"_a)

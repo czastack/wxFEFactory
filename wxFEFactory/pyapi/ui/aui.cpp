@@ -71,11 +71,16 @@ void UiModule::init_aui()
 		;
 
 
+	py::class_<wxAuiToolBarItem>(ui, "AuiToolBarItem")
+		.def("GetId", &wxAuiToolBarItem::GetId)
+		.def("SetId", &wxAuiToolBarItem::SetId);
+
+
 	py::class_<wxAuiToolBar, wxControl>(ui, "AuiToolBar")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long>(),
 			parent, id, pos_v, size_v, style = (long)wxAUI_TB_DEFAULT_STYLE)
 		.def("AddTool", (wxAuiToolBarItem * (wxAuiToolBar::*)(int, const wxString&, const wxBitmap&, const wxString&, wxItemKind))
-			& wxAuiToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL)
+			& wxAuiToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL, py::return_value_policy::reference)
 		.def("AddControl", &wxAuiToolBar::AddControl, "control"_a, label_v)
 		.def("AddSeparator", &wxAuiToolBar::AddSeparator)
 		.def("Realize", &wxAuiToolBar::Realize)

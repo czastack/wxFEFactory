@@ -26,6 +26,9 @@ class AuiManager(Layout):
         data = child.extra
         info = wx.AuiPaneInfo()
 
+        if data is None:
+            print(child)
+
         if 'name' in data:
             info.Name(data['name'])
 

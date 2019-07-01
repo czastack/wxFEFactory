@@ -11,7 +11,7 @@ class SizerLayout(Layout):
         flag = self.get_box_flag(style)
         weight = style.get('weight', 0)
         padding = style.get('padding', 5)
-        self.GetSizer().Add(child, weight, flag, padding)
+        self.GetSizer().Add(child.wxwindow, weight, flag, padding)
 
     def layout(self):
         self.GetSizer().Layout()

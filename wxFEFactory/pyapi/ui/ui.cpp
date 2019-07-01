@@ -106,6 +106,8 @@ void UiModule::init_ui()
 
 	py::class_<wxValidator>(ui, "Validator");
 
+	py::class_<wxObject>(ui, "Object");
+
 #define ENUM_VAL(name) value(#name, wx##name)
 
 	py::enum_<wxItemKind>(ui, "ItemKind")
@@ -117,7 +119,7 @@ void UiModule::init_ui()
 		.ENUM_VAL(ITEM_MAX)
 		.export_values();
 
-	py::enum_<wxDirection>(ui, "Direction")
+	py::enum_<wxDirection>(ui, "Direction", py::arithmetic())
 		.ENUM_VAL(LEFT)
 		.ENUM_VAL(RIGHT)
 		.ENUM_VAL(UP)
@@ -207,8 +209,9 @@ void UiModule::init_ui()
 		.def("SetWindowStyle", &wxWindow::SetWindowStyle, style)
 		.def("GetSize", py::overload_cast<>(&wxWindow::GetSize, py::const_))
 		.def("SetSize", py::overload_cast<int, int>(&wxWindow::SetSize), "width"_a, "height"_a)
+		.def("SetSize", py::overload_cast<const wxSize&>(&wxWindow::SetSize), "size"_a)
 		.def("GetSizer", &wxWindow::GetSizer)
-		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true)
+		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true, py::keep_alive<1, 2>())
 		.def("GetFont", &wxWindow::GetFont)
 		.def("SetFont", &wxWindow::SetFont, "font"_a)
 		.def("GetId", &wxWindow::GetId)
@@ -230,10 +233,10 @@ void UiModule::init_ui()
 		.def("AddPendingEvent", &wxWindow::wxEvtHandler::AddPendingEvent, event)
 		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
 		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
-		.def("Bind", [](wxWindow* self, wxEventType eventType, pycref fn, int winid, int lastId, size_t userData)
+		.def("Bind", [](wxWindow* self, wxEventType eventType, pycref fn, int winid, int lastId, wxObject* userData)
 		{
-			self->Bind(wxEventTypeTag<wxEvent>(eventType), PyFunctor(fn), winid, lastId, (wxObject*)userData);
-		}, "eventType"_a, "fn"_a, "winid"_a=(int)wxID_ANY, "lastId"_a=(int)wxID_ANY, "userData"_a=NULL)
+			self->Bind(wxEventTypeTag<wxEvent>(eventType), PyFunctor(fn), winid, lastId, userData);
+		}, "eventType"_a, "fn"_a, "winid"_a=(int)wxID_ANY, "lastId"_a=(int)wxID_ANY, "userData"_a=(wxObject*)nullptr)
 		;
 
 	ui.def("GetDisplaySize", &wxGetDisplaySize)
