@@ -2,7 +2,7 @@
 #include "ui.h"
 #include "thread.h"
 #include "console.h"
-#include "wx/myapp.h"
+#include "myapp.h"
 #include "utils/HistorySet.hpp"
 
 extern class ConsoleHandler console;
@@ -17,6 +17,40 @@ auto Console__get_history(ConsoleHandler* self)
 namespace pybind11 {
 	namespace detail {
 		ENUM_CASTER(wxStandardID);
+	}
+}
+
+
+std::unordered_map<PyObject*, wxArrayString> UiModule::m_choices_cache;
+bool UiModule::m_choices_cache_on = false;
+
+wxArrayString UiModule::get_choices(pycref choices)
+{
+	if (m_choices_cache_on) {
+		auto it = m_choices_cache.find(choices.ptr());
+		if (it != m_choices_cache.end())
+		{
+			return it->second;
+		}
+		wxArrayString& array = m_choices_cache.emplace(std::pair<PyObject*, wxArrayString>(choices.ptr(), {})).first->second;
+		wxArrayAddAll(array, choices);
+		return array;
+	}
+	else
+	{
+		return py::cast<wxArrayString>(choices);
+	}
+}
+
+void PyFunctor::operator()(wxEvent& event)
+{
+	try
+	{
+		PyCall(fn, py::cast(&event));
+	}
+	catch (const std::exception& e)
+	{
+		printf("%s", e.what());
 	}
 }
 
@@ -207,10 +241,11 @@ void UiModule::init_ui()
 		.def("SetBackgroundColour", &wxWindow::SetBackgroundColour, colour)
 		.def("GetWindowStyle", &wxWindow::GetWindowStyle)
 		.def("SetWindowStyle", &wxWindow::SetWindowStyle, style)
+		.def("GetParent", &wxWindow::GetParent)
 		.def("GetSize", py::overload_cast<>(&wxWindow::GetSize, py::const_))
 		.def("SetSize", py::overload_cast<int, int>(&wxWindow::SetSize), "width"_a, "height"_a)
 		.def("SetSize", py::overload_cast<const wxSize&>(&wxWindow::SetSize), "size"_a)
-		.def("GetSizer", &wxWindow::GetSizer)
+		.def("GetSizer", &wxWindow::GetSizer, py::return_value_policy::reference)
 		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true, py::keep_alive<1, 2>())
 		.def("GetFont", &wxWindow::GetFont)
 		.def("SetFont", &wxWindow::SetFont, "font"_a)
@@ -244,26 +279,4 @@ void UiModule::init_ui()
 		.def("GetKeyState", wxGetKeyState)
 		.def("GetMouseState", wxGetMouseState)
 		.def("GetApp", &wxGetApp);
-}
-
-
-std::unordered_map<PyObject*, wxArrayString> UiModule::m_choices_cache;
-bool UiModule::m_choices_cache_on = false;
-
-wxArrayString UiModule::get_choices(pycref choices)
-{
-	if (m_choices_cache_on) {
-		auto it = m_choices_cache.find(choices.ptr());
-		if (it != m_choices_cache.end())
-		{
-			return it->second;
-		}
-		wxArrayString& array = m_choices_cache.emplace(std::pair<PyObject*, wxArrayString>(choices.ptr(), {})).first->second;
-		wxArrayAddAll(array, choices);
-		return array;
-	}
-	else
-	{
-		return py::cast<wxArrayString>(choices);
-	}
 }

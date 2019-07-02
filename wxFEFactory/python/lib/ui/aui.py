@@ -14,12 +14,17 @@ class AuiManager(Layout):
         self.mgr.UnInit()
         self.close_listeners.clear()
 
+    def on_owner_close(self, event):
+        event.Skip()
+        self.UnInit()
+        del self
+
     def render(self, parent):
         self.wxwindow = parent.wxwindow
         self.mgr = wx.AuiManager(parent.wxwindow)
-        # Bind(wx.EVT_CLOSE_WINDOW, &AuiManager::onOwnerClose, this)
+        self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.on_owner_close)
 
-    def relayout(self):
+    def layout(self):
         self.mgr.Update()
 
     def layout_child(self, child, style):
@@ -60,11 +65,13 @@ class AuiManager(Layout):
             info.Row(row)
 
         if data.get('hide', False):
-            info.Hide()
+            info.Show(False)
+
+        self.mgr.AddPane(child.wxwindow, info)
 
     def show_pane(self, name, show=True):
         """显示面板"""
-        self.GetPane(name).Show(show)
+        self.mgr.GetPane(name).Show(show)
         self.layout()
 
 
@@ -79,21 +86,40 @@ class AuiNotebook(Layout):
         self.close_listeners.clear()
 
     def onready(self):
-        # Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, &AuiNotebook::OnPageClose, this)
-        pass
+        self.Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, self.on_page_close)
 
     def on_page_close(self, event):
+        """页面关闭事件"""
         selection = event.GetSelection()
         if not self.can_page_close(selection):
             event.Veto()
         else:
-            self._remove_page(selection)
+            self.remove_page(selection)
 
-    def _remove_page(self, n):
+    def remove_page(self, n):
+        """移除page引用"""
         page = self.GetPage(n)
-        self.children.remove(page)
+        self.children.remove(page.GetHost())
+
+    def close_page(self, n=None):
+        """关闭指定页面"""
+        if n is None:
+            n = self.SetSelection()
+
+        if self.can_page_close(n):
+            self.remove_page(n)
+            self.DeletePage(n)
+        return False
+
+    def close_all_page(self):
+        """关闭全部页面"""
+        for i in range(self.GetPageCount()):
+            if not self.close_page(i):
+                return False
+        return True
 
     def can_page_close(self, n=None):
+        """检查页面能否删除"""
         if self.GetPageCount() is 0:
             return False
         if n is None:
@@ -109,7 +135,11 @@ class AuiNotebook(Layout):
             # 手动调用子窗口的onClose
             if isinstance(page, BaseTopLevelWindow):
                 # TODO
-                page.onClose(wx.CloseEvent(wx.EVT_CLOSE_WINDOW))
+                page.onclose(wx.CloseEvent(wx.EVT_CLOSE_WINDOW))
+
+    def set_on_page_changed(self, fn):
+        """设置页面切换事件"""
+        self.bind_event(wx.EVT_AUINOTEBOOK_PAGE_CHANGED, fn)
 
 
 class AuiMDIParentFrame(BaseFrame):

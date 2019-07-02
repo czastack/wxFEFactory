@@ -4,17 +4,22 @@ from . import wx
 
 
 class BaseTopLevelWindow(Layout):
+    _onclose = None
+
     def onready(self):
         super().onready()
         self.Show()
 
     def onclose(self, event):
-        if self.has_event:
-            if not self.handle_event():
+        if self._onclose:
+            if self._onclose(event) is False:
                 event.Veto()
                 return False
             event.Skip()
         return True
+
+    def set_onclose(self, fn):
+        self._onclose = fn
 
     @property
     def keeptop(self):
@@ -27,16 +32,17 @@ class BaseTopLevelWindow(Layout):
 
 class BaseFrame(BaseTopLevelWindow):
     def onready(self):
-        self.Bind(wx.EVT_CLOSE_WINDOW, self.onclose)
+        self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.onclose)
         if self.menubar:
-            self.SetMenuBar(self.menubar.wxwindow)
-            self.Bind(wx.EVT_MENU, self.on_menu)
+            self.set_menu(self.menubar)
 
         super().onready()
 
     def set_menu(self, menubar):
+        self.menubar = menubar
         self.SetMenuBar(menubar.wxwindow)
-        self.Bind(wx.EVT_MENU, self.on_menu)
+        if not self.has_event_type(wx.EVT_MENU):
+            self.Bind(wx.EVT_MENU, self.on_menu)
 
     def on_menu(self, event):
         """菜单选中事件"""

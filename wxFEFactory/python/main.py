@@ -95,16 +95,16 @@ class MainFrame:
             win.SetIcon(icon)
 
         multiline_console.Show(False)
-        win.setOnClose(self.onclose)
+        win.set_onclose(self.onclose)
         self.render_toolbar(toolbar)
-        self.book.setOnPageChanged(self.on_tool_change)
+        self.book.set_on_page_changed(self.on_tool_change)
 
         self.win = win
         self.aui = aui
         self.console = console
-        fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
-        self.console.setOnFileDrop(self.onConsoleFileDrop)
-        self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
+        # fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
+        # self.console.setOnFileDrop(self.onConsoleFileDrop)
+        # self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
     @property
     def module_names(self):
@@ -136,7 +136,7 @@ class MainFrame:
             traceback.print_exc()
 
     def onclose(self, _=None):
-        if self.book.closeAllPage():
+        if self.book.close_all_page():
             del self.book
             self.opened_tools.clear()
             self.opened_tools_map.clear()
@@ -220,9 +220,9 @@ class MainFrame:
     def toggle_console_input_multi(self, _=None):
         """触发控制台多行输入框"""
         p1 = self.console_input.parent
-        isShow = not p1.isShow()
-        p1.Show(isShow)
-        self.aui.ShowPane("multiline_console", not isShow)
+        show = not p1.IsShown()
+        p1.Show(show)
+        self.aui.show_pane("multiline_console", not show)
         self.console.relayout()
 
     def console_input_multi_run(self, _=None):

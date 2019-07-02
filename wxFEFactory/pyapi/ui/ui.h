@@ -11,9 +11,7 @@ class PyFunctor
 public:
 	PyFunctor(pycref fn=None) : fn(fn) {};
 
-	void operator()(wxEvent& event) {
-		PyCall(fn, event);
-	}
+	void operator()(wxEvent& event);
 
 	pyobj fn;
 };

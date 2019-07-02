@@ -1,4 +1,5 @@
 #pragma once
+#include <wx/dynarray.h>
 
 typedef unsigned char byte, u8;
 typedef unsigned short int u16;
@@ -7,6 +8,8 @@ typedef unsigned int uint;
 
 typedef const class wxString& wxcstr;
 extern const class wxString wxNoneString;
+
+WX_DEFINE_ARRAY_SIZE_T(size_t, wxArraySizeT);
 
 #ifndef NULL
 #define NULL 0

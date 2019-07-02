@@ -16,9 +16,6 @@ class SizerLayout(Layout):
     def layout(self):
         self.GetSizer().Layout()
 
-    def relayout(self):
-        self.layout()
-
     def get_box_flag(self, style):
         """获取布局参数"""
         flag = 0

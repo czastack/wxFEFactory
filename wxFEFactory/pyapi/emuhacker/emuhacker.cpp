@@ -1,7 +1,6 @@
 #ifdef _WIN32
 
 #include <wx/wx.h>
-#include "wx/wxtypes.h"
 #include "../pyutils.h"
 #include "../functions.h"
 #include "emuhacker.h"

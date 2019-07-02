@@ -22,9 +22,6 @@
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp">
       <Filter>pyapi\emuhacker</Filter>
     </ClCompile>
-    <ClCompile Include="wx\wxpatch.cpp">
-      <Filter>wx</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\ui\ui.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
@@ -58,12 +55,10 @@
     <ClCompile Include="pyapi\ui\events.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
-    <ClCompile Include="wx\myapp.cpp">
-      <Filter>wx</Filter>
-    </ClCompile>
     <ClCompile Include="pyapi\ui\image.cpp">
       <Filter>pyapi\ui</Filter>
     </ClCompile>
+    <ClCompile Include="myapp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="types.h" />
@@ -106,9 +101,6 @@
     <ClInclude Include="pyapi\ui\ui.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="wx\wxpatch.h">
-      <Filter>wx</Filter>
-    </ClInclude>
     <ClInclude Include="pyapi\fe\graph.h">
       <Filter>pyapi\fe</Filter>
     </ClInclude>
@@ -127,12 +119,7 @@
     <ClInclude Include="pyapi\ui\drop.hpp">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="wx\myapp.h">
-      <Filter>wx</Filter>
-    </ClInclude>
-    <ClInclude Include="wx\wxtypes.h">
-      <Filter>wx</Filter>
-    </ClInclude>
+    <ClInclude Include="myapp.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utils">
@@ -140,9 +127,6 @@
     </Filter>
     <Filter Include="pyapi">
       <UniqueIdentifier>{aafbb4f5-a597-43a0-9d6a-19376a3ba782}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="wx">
-      <UniqueIdentifier>{b58b684b-307b-4b12-8dcb-0dab4b9021d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="pyapi\emuhacker">
       <UniqueIdentifier>{45f4df9e-41f6-4daf-a6be-e703d6c859b5}</UniqueIdentifier>

@@ -33,6 +33,9 @@ class View:
                 for style in styles:
                     self.try_styles(style)
 
+    def __del__(self):
+        print('del', self)
+
     @classmethod
     def active_layout(cls):
         return cls.LAYOUTS[-1] if __class__.LAYOUTS else None
@@ -256,7 +259,7 @@ class View:
             style &= ~flag
         self.SetWindowStyle(style)
 
-    def bind_event(self, event_type, func, reset=True, pass_event=False, pass_view=False):
+    def bind_event(self, event_type, func, reset=True, pass_event=False, pass_view=True):
         """添加事件监听器"""
         wxbind = False
         if func is not None:
@@ -275,9 +278,16 @@ class View:
         if wxbind:
             self.Bind(event_type, self.handle_event)
 
+    def bind_event_e(self, event_type, func, reset=True):
+        self.bind_event(event_type, func, reset, pass_event=True, pass_view=False)
+
     def has_event(self, event):
         """是否已注册该类事件"""
         return event.GetEventType() in self.event_table
+
+    def has_event_type(self, event_type):
+        """是否已注册该类事件"""
+        return event_type in self.event_table
 
     def handle_event(self, event):
         """处理事件"""
@@ -299,13 +309,8 @@ class View:
     def __getattr__(self, name):
         return getattr(self.wxwindow, name)
 
-    # /**
-    #  * 会传wx.KeyEvent实例过去，需要手动Skip
-    #  */
-    # void setOnKeyDown(pycref fn)
-    # {
-    #     bindEvt(wx.EVT_KEY_DOWN, fn, false, true);
-    # }
+    def set_on_keydown(fn):
+        self.bind_event(wx.EVT_KEY_DOWN, fn, false, true)
 
     # void setOnFileDrop(pycref ondrop);
 
@@ -313,10 +318,8 @@ class View:
 
     # void startTextDrag(wxcstr text, pycref callback);
 
-    # void setOnDestroy(pycref fn)
-    # {
-    #     bindEvt(wx.EVT_DESTROY, fn);
-    # }
+    def set_on_destroy(fn):
+        bind_event(wx.EVT_DESTROY, fn)
 
 
 class Layout(View):
@@ -368,6 +371,7 @@ class Layout(View):
         __class__.LAYOUTS.pop()
         if not __class__.LAYOUTS:
             self._render(None)
+            self.apply_style()
         # 释放临时样式表
         self.tmp_styles_list = None
 
@@ -395,7 +399,7 @@ class Layout(View):
 
     def relayout(self):
         """子元素改变后重新布局"""
-        pass
+        self.layout()
 
     def get_styles(self):
         return self.tmp_styles_list

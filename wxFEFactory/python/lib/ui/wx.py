@@ -124,10 +124,10 @@ AUI_DOCK_LEFT = 4
 AUI_DOCK_CENTER = 5
 
 AUI_DOCK_MAP = {
-    "left": AUI_DOCK_TOP,
+    "top": AUI_DOCK_TOP,
     "right": AUI_DOCK_RIGHT,
-    "top": AUI_DOCK_BOTTOM,
-    "bottom": AUI_DOCK_LEFT,
+    "bottom": AUI_DOCK_BOTTOM,
+    "left": AUI_DOCK_LEFT,
     "center": AUI_DOCK_CENTER,
 }
 

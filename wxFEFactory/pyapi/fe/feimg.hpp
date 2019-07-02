@@ -1,6 +1,6 @@
 #include "../pyutils.h"
 #include "graph.h"
-#include "wx/myapp.h"
+#include "myapp.h"
 #include <wx/image.h>
 #include <wx/palette.h>
 #include "pyapi/ui/dialogs.h"

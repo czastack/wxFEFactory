@@ -2,7 +2,6 @@
 
 #include "ProcessHandler.h"
 #include "types.h"
-#include "wx/wxtypes.h"
 #include <tchar.h>
 #include <psapi.h>
 #include <iostream>

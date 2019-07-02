@@ -39,7 +39,7 @@ class Application(Configurable):
         self.writeconfig()
         if self.project:
             self.project.writeconfig()
-        globals().pop('app')
+        # globals().pop('app')
         del __main__.app
         del __main__.win
 
