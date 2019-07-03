@@ -8,7 +8,7 @@ void UiModule::init_datacontrols()
 {
 	using namespace py::literals;
 
-	py::class_<wxPropertyGrid, wxControl>(ui, "PropertyGrid")
+	py::class_<NODELETE(wxPropertyGrid), wxControl>(ui, "PropertyGrid")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
 		.def("GetSelection", &wxPropertyGrid::GetSelection)
@@ -84,7 +84,7 @@ void UiModule::init_datacontrols()
 		.def("GetArrayString", &wxVariant::GetArrayString);
 
 	// ListView
-	py::class_<wxListView, wxControl>(ui, "ListView")
+	py::class_<NODELETE(wxListView), wxControl>(ui, "ListView")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, style = wxLC_REPORT, validator_v, name = (const char*)wxListCtrlNameStr)
 		.def("AppendColumn", &wxListView::AppendColumn, "heading"_a, "format"_a, "width"_a = -1)

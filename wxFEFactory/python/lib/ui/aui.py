@@ -11,13 +11,20 @@ class AuiManager(Layout):
         self.close_listeners = {}
 
     def __del__(self):
-        self.mgr.UnInit()
+        if self.mgr:
+            self.mgr.UnInit()
         self.close_listeners.clear()
+
+    def __getattr__(self, name):
+        try:
+            return getattr(self.mgr, name)
+        except AttributeError:
+            return Layout.__getattr__(self, name)
 
     def on_owner_close(self, event):
         event.Skip()
-        self.UnInit()
-        del self
+        self.mgr.UnInit()
+        self.mgr = None
 
     def render(self, parent):
         self.wxwindow = parent.wxwindow

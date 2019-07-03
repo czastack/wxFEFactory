@@ -40,43 +40,43 @@ void UiModule::init_controls()
 {
 	using namespace py::literals;
 
-	py::class_<wxControl, wxWindow>(ui, "Control");
+	py::class_<NODELETE(wxControl), wxWindow>(ui, "Control");
 
-	py::class_<wxButton, wxControl>(ui, "Button")
+	py::class_<NODELETE(wxButton), wxControl>(ui, "Button")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxButtonNameStr);
 
-	py::class_<wxBitmapButton, wxButton>(ui, "BitmapButton")
+	py::class_<NODELETE(wxBitmapButton), wxButton>(ui, "BitmapButton")
 		.def(py::init<wxWindow*, wxWindowID, const wxBitmap&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxButtonNameStr);
 
-	py::class_<wxToggleButton, wxControl>(ui, "ToggleButton")
+	py::class_<NODELETE(wxToggleButton), wxControl>(ui, "ToggleButton")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxCheckBoxNameStr)
 		.def("GetValue", &wxToggleButton::GetValue)
 		.def("SetValue", &wxToggleButton::SetValue, value);
 
-	py::class_<wxCheckBox, wxControl>(ui, "CheckBox")
+	py::class_<NODELETE(wxCheckBox), wxControl>(ui, "CheckBox")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, validator_v, name = (const char*)wxCheckBoxNameStr)
 		.def("GetValue", &wxCheckBox::GetValue)
 		.def("SetValue", &wxCheckBox::SetValue, value);
 
-	py::class_<wxStaticBitmap, wxControl>(ui, "StaticBitmap")
+	py::class_<NODELETE(wxStaticBitmap), wxControl>(ui, "StaticBitmap")
 		.def(py::init<wxWindow*, wxWindowID, const wxGDIImage&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, name = (const char*)wxStaticBitmapNameStr);
 
-	py::class_<wxStaticText, wxControl>(ui, "StaticText")
+	py::class_<NODELETE(wxStaticText), wxControl>(ui, "StaticText")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, label_v, pos_v, size_v, style_0, name = (const char*)wxStaticTextNameStr);
 
-	py::class_<wxStaticLine, wxControl>(ui, "StaticLine")
+	py::class_<NODELETE(wxStaticLine), wxControl>(ui, "StaticLine")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style_0, name = (const char*)wxStaticLineNameStr);
 
 	// py::class_<wxTextEntry>(ui, "TextEntry");
 
-	py::class_<wxTextCtrl, wxControl>(ui, "TextCtrl")
+	py::class_<NODELETE(wxTextCtrl), wxControl>(ui, "TextCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, value = wxEmptyString, pos_v, size_v, style_0, validator_v, name = (const char*)wxTextCtrlNameStr)
 		.def("GetValue", &wxTextCtrl::GetValue)
@@ -96,7 +96,7 @@ void UiModule::init_controls()
 		.def("SetSelection", &wxTextCtrl::SetSelection)
 				;
 
-	py::class_<wxSearchCtrl, wxControl>(ui, "SearchCtrl")
+	py::class_<NODELETE(wxSearchCtrl), wxControl>(ui, "SearchCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, value = wxEmptyString, pos_v, size_v, style_0, validator_v, name = (const char*)wxSearchCtrlNameStr)
 		.def("ShowSearchButton", &wxSearchCtrl::ShowSearchButton, show = true)
@@ -105,19 +105,19 @@ void UiModule::init_controls()
 		.def("SetValue", &wxSearchCtrl::SetValue, value)
 		;
 
-	py::class_<wxSpinCtrl, wxControl>(ui, "SpinCtrl")
+	py::class_<NODELETE(wxSpinCtrl), wxControl>(ui, "SpinCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, int, int, int, const wxString&>(),
 			parent, id_v, value = wxEmptyString, pos_v, size_v, style = wxSP_ARROW_KEYS, "min"_a = 0, "max"_a = 100, "initial"_a = 0, name = wxT("wxSpinCtrl"))
 		;
 
-	py::class_<wxColourPickerCtrl, wxControl>(ui, "ColourPickerCtrl")
+	py::class_<NODELETE(wxColourPickerCtrl), wxControl>(ui, "ColourPickerCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxColour&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, "col"_a = *wxBLACK, pos_v, size_v, style = wxCLRP_DEFAULT_STYLE, validator_v, name = (const char*)wxColourPickerCtrlNameStr)
 		.def("GetColour", &wxColourPickerCtrl::GetColour)
 		.def("SetColour", (void (wxColourPickerCtrl::*)(const wxColour & col)) & wxColourPickerCtrl::SetColour, "col"_a)
 		;
 
-	py::class_<wxItemContainerImmutable>(ui, "ItemContainerImmutable")
+	py::class_<NODELETE(wxItemContainerImmutable)>(ui, "ItemContainerImmutable")
 		.def("GetSelection", &wxItemContainerImmutable::GetSelection)
 		.def("SetSelection", &wxItemContainerImmutable::SetSelection, "n"_a)
 		.def("GetCount", &wxItemContainerImmutable::GetCount)
@@ -125,7 +125,7 @@ void UiModule::init_controls()
 		.def("SetString", &wxItemContainerImmutable::SetString, "n"_a, "s"_a)
 		;
 
-	py::class_<wxItemContainer, wxItemContainerImmutable>(ui, "ItemContainer")
+	py::class_<NODELETE(wxItemContainer), wxItemContainerImmutable>(ui, "ItemContainer")
 		.def("Append", (int (wxItemContainer::*)(const wxString & item)) & wxItemContainer::Append, item)
 		.def("Append", (int (wxItemContainer::*)(const wxArrayString & item)) & wxItemContainer::Append, items)
 		.def("Insert", (int (wxItemContainer::*)(const wxString & item, unsigned int pos)) & wxItemContainer::Insert, item, pos)
@@ -135,7 +135,7 @@ void UiModule::init_controls()
 		.def("Delete", &wxItemContainer::Delete)
 		;
 
-	py::class_<wxControlWithItems, wxControl, wxItemContainer>(ui, "ControlWithItems")
+	py::class_<NODELETE(wxControlWithItems), wxControl, wxItemContainer>(ui, "ControlWithItems")
 		;
 
 	py::class_<wxListBox, wxControlWithItems>(ui, "ListBox")
@@ -143,23 +143,23 @@ void UiModule::init_controls()
 			parent, id, pos_v, size_v, choices, style_0, validator_v, name = (const char*)wxListBoxNameStr)
 		;
 
-	py::class_<wxCheckListBox, wxListBox>(ui, "CheckListBox")
+	py::class_<NODELETE(wxCheckListBox), wxListBox>(ui, "CheckListBox")
 		.def("IsChecked", &wxCheckListBox::IsChecked, item)
 		.def("Check", &wxCheckListBox::Check, item, "check"_a = true)
 		.def("GetCheckedItems", &wxCheckListBox::GetCheckedItems)
 		;
 
-	py::class_<wxRearrangeList, wxCheckListBox>(ui, "RearrangeList")
+	py::class_<NODELETE(wxRearrangeList), wxCheckListBox>(ui, "RearrangeList")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, const wxArrayInt&, const wxArrayString&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, "order"_a, items, style_0, validator_v, name = (const char*)wxRearrangeListNameStr)
 		;
 
-	py::class_<wxChoice, wxControlWithItems>(ui, "Choice")
+	py::class_<NODELETE(wxChoice), wxControlWithItems>(ui, "Choice")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, const wxArrayString&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, choices, style_0, validator_v, name = (const char*)wxChoiceNameStr)
 		;
 
-	py::class_<wxComboBox, wxControlWithItems>(ui, "ComboBox")
+	py::class_<NODELETE(wxComboBox), wxControlWithItems>(ui, "ComboBox")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, const wxArrayString&, long, const wxValidator&, const wxString&>(),
 			parent, id, value, pos_v, size_v, choices=py::tuple(), style_0, validator_v, name = (const char*)wxComboBoxNameStr)
 		.def("GetValue", &wxComboBox::GetValue)
@@ -167,12 +167,12 @@ void UiModule::init_controls()
 		.def("AutoComplete", (bool (wxComboBox::*)(const wxArrayString & choices)) & wxComboBox::AutoComplete, choices)
 		;
 
-	py::class_<wxRadioBox, wxControl, wxItemContainerImmutable>(ui, "RadioBox")
+	py::class_<NODELETE(wxRadioBox), wxControl, wxItemContainerImmutable>(ui, "RadioBox")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, const wxArrayString&, int, long, const wxValidator&, const wxString&>(),
 			parent, id, title, pos_v, size_v, choices, "majorDim"_a = 0, style_0, validator_v, name = (const char*)wxRadioBoxNameStr)
 		;
 
-	py::class_<wxFilePickerCtrl, wxControl>(ui, "FilePickerCtrl")
+	py::class_<NODELETE(wxFilePickerCtrl), wxControl>(ui, "FilePickerCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxString&, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, "path"_a = wxEmptyString, "message"_a = (const char*)wxFileSelectorPromptStr, "wildcard"_a = (const char*)wxFileSelectorDefaultWildcardStr,
 			pos_v, size_v, style = wxFLP_DEFAULT_STYLE, validator_v, name = (const char*)wxFilePickerCtrlNameStr)
@@ -180,7 +180,7 @@ void UiModule::init_controls()
 		.def("SetPath", &wxFilePickerCtrl::SetPath, "path"_a)
 		;
 
-	py::class_<wxDirPickerCtrl, wxControl>(ui, "DirPickerCtrl")
+	py::class_<NODELETE(wxDirPickerCtrl), wxControl>(ui, "DirPickerCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxString&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, "path"_a = wxEmptyString, "message"_a = (const char*)wxFileSelectorPromptStr, pos_v, size_v, style = wxDIRP_DEFAULT_STYLE,
 			validator_v, name = (const char*)wxDirPickerCtrlNameStr)
@@ -188,7 +188,7 @@ void UiModule::init_controls()
 		.def("SetPath", &wxDirPickerCtrl::SetPath, "path"_a)
 		;
 
-	py::class_<wxTreeCtrl, wxControl>(ui, "TreeCtrl")
+	py::class_<NODELETE(wxTreeCtrl), wxControl>(ui, "TreeCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, style = wxTR_DEFAULT_STYLE, validator_v, name = (const char*)wxTreeCtrlNameStr)
 		.def("AssignImageList", &wxTreeCtrl::AssignImageList)
@@ -220,13 +220,13 @@ void UiModule::init_controls()
 		;
 
 
-	py::class_<wxToolBarToolBase>(ui, "ToolBarToolBase")
+	py::class_<NODELETE(wxToolBarToolBase)>(ui, "ToolBarToolBase")
 		.def("GetId", &wxToolBarToolBase::GetId)
 		.def("GetControl", &wxToolBarToolBase::GetControl)
 		.def("GetStyle", &wxToolBarToolBase::GetStyle);
 
 
-	py::class_<wxToolBar, wxControl>(ui, "ToolBar")
+	py::class_<NODELETE(wxToolBar), wxControl>(ui, "ToolBar")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
 		.def("AddTool", (wxToolBarToolBase* (wxToolBar::*)(int, const wxString&, const wxBitmap&, const wxString&, wxItemKind))
@@ -241,7 +241,7 @@ void UiModule::init_controls()
 		.def("SetToolBitmapSize", &wxToolBar::SetToolBitmapSize)
 		;
 
-	py::class_<wxStatusBar, wxControl>(ui, "StatusBar")
+	py::class_<NODELETE(wxStatusBar), wxControl>(ui, "StatusBar")
 		.def(py::init<wxWindow*, wxWindowID, long, const wxString&>(),
 			parent, id, style = wxSTB_DEFAULT_STYLE, name = (const char*)wxStatusBarNameStr)
 		.def("GetStatusText", &wxStatusBar::GetStatusText, "number"_a = 0)

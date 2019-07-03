@@ -89,14 +89,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.2\include;E:\VS\wxWidgets-3.1.2\lib\vc_x64_dll\mswud;C:\Users\An\AppData\Local\Programs\Python\Python37\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;_WINDOWS;NOMINMAX;NOPCH;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.2\include;E:\VS\wxWidgets-3.1.2\lib\vc_x64_lib\mswud;C:\Users\An\AppData\Local\Programs\Python\Python37\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\An\AppData\Local\Programs\Python\Python37\libs;E:\VS\wxWidgets-3.1.2\lib\vc_x64_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxbase31ud.lib;wxmsw31ud_adv.lib;wxmsw31ud_core.lib;wxmsw31ud_aui.lib;wxmsw31ud_propgrid.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wininet.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\An\AppData\Local\Programs\Python\Python37\libs;E:\VS\wxWidgets-3.1.2\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase31ud.lib;wxmsw31ud_adv.lib;wxmsw31ud_core.lib;wxmsw31ud_aui.lib;wxmsw31ud_propgrid.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wininet.lib;Version.lib;python3.lib;python37.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(ProjectDir)app.manifest</AdditionalManifestFiles>

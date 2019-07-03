@@ -102,7 +102,7 @@ class MainFrame:
         self.win = win
         self.aui = aui
         self.console = console
-        # fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
+        fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
         # self.console.setOnFileDrop(self.onConsoleFileDrop)
         # self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
@@ -228,7 +228,7 @@ class MainFrame:
     def console_input_multi_run(self, _=None):
         """控制台多行输入框执行"""
         try:
-            exec(self.console_input_multi.value, vars(__main__))
+            exec(self.console_input_multi.GetValue(), vars(__main__))
         except Exception as e:
             if isinstance(e, SystemExit):
                 raise

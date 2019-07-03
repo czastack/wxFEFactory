@@ -7,7 +7,7 @@ void UiModule::init_menu()
 {
 	using namespace py::literals;
 
-	py::class_<wxMenu, wxEvtHandler>(ui, "Menu")
+	py::class_<NODELETE(wxMenu), wxEvtHandler>(ui, "Menu")
 		.def(py::init<int>(), style_0)
 		.def(py::init<const wxString&, int>(), title, style_0)
 		.def("AppendSubMenu", &wxMenu::AppendSubMenu, "subemenu"_a, text, "help"_a = wxEmptyString, py::return_value_policy::reference)
@@ -20,7 +20,7 @@ void UiModule::init_menu()
 		;
 
 
-	py::class_<wxMenuBar, wxWindow>(ui, "MenuBar")
+	py::class_<NODELETE(wxMenuBar), wxWindow>(ui, "MenuBar")
 		.def(py::init<>())
 		.def(py::init<long>(), style)
 		// .def(py::init<size_t, wxMenu *[], const wxString[], long>(), "n"_a, "menus"_a, "titles"_a, style_0)

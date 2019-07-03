@@ -339,3 +339,7 @@ class StatusBar(Control):
         Control.__init__(self, **kwargs)
         self.wxparams.pop('pos')
         self.wxparams.pop('size')
+
+    def onready(self):
+        super().onready()
+        self.GetParent().SetStatusBar(self.wxwindow)

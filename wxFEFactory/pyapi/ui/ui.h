@@ -91,6 +91,7 @@ namespace pybind11 {
 
 
 #define PACK(...) __VA_ARGS__
+#define NODELETE(type) type, std::unique_ptr<type, py::nodelete>
 
 
 class UiModule

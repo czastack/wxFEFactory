@@ -7,14 +7,14 @@
 void UiModule::init_frames()
 {
 	using namespace py::literals;
-	py::class_<wxTopLevelWindow, wxWindow>(ui, "TopLevelWindow")
+	py::class_<NODELETE(wxTopLevelWindow), wxWindow>(ui, "TopLevelWindow")
 		.def("GetTitle", &wxTopLevelWindow::GetTitle)
 		.def("SetTitle", &wxTopLevelWindow::SetTitle, title)
 		.def("SetIcon", &wxTopLevelWindow::SetIcon, "icon"_a)
 		.def("Destroy", &wxFrame::Destroy)
 		;
 
-	py::class_<wxFrame, wxTopLevelWindow>(ui, "Frame")
+	py::class_<NODELETE(wxFrame), wxTopLevelWindow>(ui, "Frame")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE, name = (const char*)wxFrameNameStr)
 		.def("GetMenuBar", &wxFrame::GetMenuBar, py::return_value_policy::reference)
@@ -29,17 +29,17 @@ void UiModule::init_frames()
 		.def("GetStatusBarPane", &wxFrame::GetStatusBarPane)
 		;
 
-	py::class_<wxMDIParentFrame, wxFrame>(ui, "MDIParentFrame")
+	py::class_<NODELETE(wxMDIParentFrame), wxFrame>(ui, "MDIParentFrame")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE | wxVSCROLL | wxHSCROLL, name = (const char*)wxFrameNameStr)
 		;
 
-	py::class_<wxMDIChildFrame, wxFrame>(ui, "MDIChildFrame")
+	py::class_<NODELETE(wxMDIChildFrame), wxFrame>(ui, "MDIChildFrame")
 		.def(py::init<wxMDIParentFrame*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE, name = (const char*)wxFrameNameStr)
 		;
 
-	py::class_<wxDialog, wxTopLevelWindow>(ui, "Dialog")
+	py::class_<NODELETE(wxDialog), wxTopLevelWindow>(ui, "Dialog")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_DIALOG_STYLE, name = (const char*)wxDialogNameStr)
 		.def("IsModal", &wxDialog::IsModal)

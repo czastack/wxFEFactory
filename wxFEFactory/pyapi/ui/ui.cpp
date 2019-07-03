@@ -231,7 +231,7 @@ void UiModule::init_ui()
 	py::class_<wxApp>(ui, "App")
 		.def("GetTopWindow", &wxApp::GetTopWindow);
 
-	py::class_<wxWindow, wxEvtHandler>(ui, "Window")
+	py::class_<NODELETE(wxWindow), wxEvtHandler>(ui, "Window")
 		.def(py::init<>())
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style_0, name = (const char*)wxPanelNameStr)

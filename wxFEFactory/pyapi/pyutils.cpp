@@ -44,20 +44,22 @@ py::object PyDictGet(pycref di, pycref key)
 
 
 void PyInterpreterRun(wxcstr line) {
-	static PyObject *m = PyImport_AddModule("__main__");
-	static PyObject *d = PyModule_GetDict(m);
+	static PyObject *main = PyImport_AddModule("__main__");
+	static PyObject *scope = PyModule_GetDict(main);
 
-	PyObject *v = PyRun_String(line.mb_str(wxConvUTF8), Py_single_input, d, d);
-	if (v == NULL)
+	PyObject *result = PyRun_String(line.mb_str(wxConvUTF8), Py_single_input, scope, scope);
+	if (result == NULL)
 	{
 		PyErr_Print();
 		return;
 	}
 
-	if (v != Py_None)
-		PyObject_Print(v, stdout, Py_PRINT_RAW);
+	if (result != Py_None)
+	{
+		PyObject_Print(result, stdout, Py_PRINT_RAW);
+	}
 
-	Py_DECREF(v);
+	Py_DECREF(result);
 
 
 	/*

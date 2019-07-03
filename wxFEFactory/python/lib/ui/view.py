@@ -17,7 +17,7 @@ class View:
         }
         if wxstyle is not 0:
             self.wxparams['style'] = wxstyle
-        if class_ is not None and " " in class_:
+        if class_ is not None:
             class_ = class_.split()
         self.class_ = class_
         self.extra = extra
