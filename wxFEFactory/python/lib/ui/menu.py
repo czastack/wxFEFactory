@@ -110,7 +110,7 @@ class MenuItem:
 
     def onselect(self, owner):
         if self._onselect:
-            return self._onselect(owner, self)
+            return self._onselect(self)
         return False
 
     def __getattr__(self, name):

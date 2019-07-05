@@ -6,7 +6,21 @@
 
 const wxString wxNoneString = wxEmptyString;
 
-IMPLEMENT_APP(MyApp)
+// IMPLEMENT_APP(MyApp)
+extern "C" int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, wxCmdLineArgType, int nCmdShow)
+{
+	return wxEntry(hInstance, hPrevInstance, 0, nCmdShow);
+}
+MyApp& wxGetApp() { return *static_cast<MyApp*>(wxApp::GetInstance()); }
+wxAppConsole* wxCreateApp()
+{
+	wxAppConsole::CheckBuildOptions(
+		"3.1.2 (wchar_t,Visual C++ 1900,wx containers,compatible with 3.0)",
+		"your program"
+	);
+	return new MyApp;
+}
+wxAppInitializer wxTheAppInitializer((wxAppInitializerFunction)wxCreateApp);
 
 bool MyApp::OnInit()
 {

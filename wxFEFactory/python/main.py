@@ -70,21 +70,22 @@ class MainFrame:
                 # ui.ListBox(choices=self.module_names, onselect=self.on_nav, extra=dict(captionVisible=False))
                 self.book = ui.AuiNotebook(extra=dict(direction="center", maximizeButton=True, captionVisible=False))
                 with ui.Vertical(class_="console-bar", extra=dict(
-                        name="console", direction="bottom", row=1, caption="控制台", maximizeButton=True
-                        )) as console:
+                        name="console", direction="bottom", row=1, caption="控制台", closeButton=False, maximizeButton=True
+                )) as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, class_="console-output")
                     with ui.Horizontal(class_="expand console-input-bar"):
                         self.console_input = ui.ComboBox(
                             wxstyle=ui.wx.CB_DROPDOWN | ui.wx.TE_PROCESS_ENTER, class_="expand console-input")
                         ui.Button("∧", class_="btn-sm", onclick=self.toggle_console_input_multi)
-                with ui.Horizontal(class_="console-input-multi", extra=dict(
-                        name="multiline_console", direction="bottom", captionVisible=False, hide=True
-                        )) as multiline_console:
+                with ui.Horizontal(
+                    class_="console-input-multi",
+                    extra=dict(name="multiline_console", direction="bottom", captionVisible=False, hide=True)
+                ) as multiline_console:
                     self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
                     with ui.Vertical(class_="expand"):
                         ui.Button("∨", class_="btn-sm", onclick=self.toggle_console_input_multi)
-                        ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run)  # .setToolTip(
-                            # "执行输入框中代码 Ctrl+Enter")
+                        ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run,
+                                  extra={"tooltip": "执行输入框中代码 Ctrl+Enter"})
             ui.StatusBar()
 
         # 尝试加载图标
@@ -94,7 +95,6 @@ class MainFrame:
             icon.LoadFile(icon_name)
             win.SetIcon(icon)
 
-        multiline_console.Show(False)
         win.set_onclose(self.onclose)
         self.render_toolbar(toolbar)
         self.book.set_on_page_changed(self.on_tool_change)
@@ -144,7 +144,7 @@ class MainFrame:
         return False
 
     def close_window(self, _=None):
-        self.win.close()
+        self.win.Close()
 
     def restart(self, _=None, callback=None):
         """重启"""
@@ -290,7 +290,7 @@ class MainFrame:
         """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
-            with exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
+            with ui.View.HEAR, exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
                 tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")
@@ -299,9 +299,9 @@ class MainFrame:
                 for item in self.root_tools:
                     item.id = tree.InsertItem(root, item.label, data=item)
 
-                tree.setOnItemActivated(self.weak.on_tool_select)
-            # with dialog.footer:
-            #     ui.Button(label="收藏")
+                tree.set_on_item_activated(self.weak.on_tool_select)
+                # with dialog.footer:
+                #     ui.Button(label="收藏")
             self.tool_dialog = dialog
         dialog.ShowModal()
 

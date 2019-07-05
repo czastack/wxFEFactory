@@ -24,7 +24,7 @@ class StdDialog(ui.Dialog):
                 if ok:
                     ui.Button(label="确定").id = wxconst.ID_OK
             self.footer = footer
-        super().__exit__()
+        super().__exit__(None, None, None)
 
         if not closable:
             self.setOnClose(self.prevent_close)

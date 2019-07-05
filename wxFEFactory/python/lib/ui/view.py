@@ -5,6 +5,7 @@ class View:
     """视图元素"""
     LAYOUTS = []
     wxtype = None
+    _hear = False
 
     def __init__(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, extra=None):
@@ -32,6 +33,10 @@ class View:
             if styles is not None:
                 for style in styles:
                     self.try_styles(style)
+
+        if View._hear:
+            # 立即渲染
+            self.render(parent)
 
     def __del__(self):
         print('del', self)
@@ -321,6 +326,16 @@ class View:
     def set_on_destroy(fn):
         bind_event(wx.EVT_DESTROY, fn)
 
+    class Hear:
+        """立即渲染"""
+        def __enter__(self):
+            View._hear = True
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            View._hear = False
+
+    HEAR = Hear()
+
 
 class Layout(View):
     """容器元素"""
@@ -364,30 +379,39 @@ class Layout(View):
             if only_self:
                 break
             i -= 1
+
+        if View._hear:
+            self.Freeze()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # 根节点，开始渲染
         __class__.LAYOUTS.pop()
-        if not __class__.LAYOUTS:
-            self._render(None)
+        if View._hear:
+            self.Thaw()
+        elif not __class__.LAYOUTS:
+            # 根节点，开始渲染
+            self.render(None)
+            self.Freeze()
+            self.onready()
             self.apply_style()
+            self.Thaw()
+            del self.wxparams
         # 释放临时样式表
         self.tmp_styles_list = None
 
     def append(self, child):
         self.children.append(child)
-        self.pendding_children.append(child)
+        if not View._hear:
+            self.pendding_children.append(child)
 
     def onready(self):
-        self.Freeze()
-        for child in self.pendding_children:
-            child._render(self)
-            style = child.apply_style()
-            self.layout_child(child, style)
-        self.pendding_children.clear()
+        if not View._hear:
+            for child in self.pendding_children:
+                child._render(self)
+                style = child.apply_style()
+                self.layout_child(child, style)
+            self.pendding_children.clear()
         self.layout()
-        self.Thaw()
 
     def layout_child(self, child, style):
         """布局子元素"""

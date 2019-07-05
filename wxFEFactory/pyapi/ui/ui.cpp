@@ -137,9 +137,7 @@ void UiModule::init_ui()
 		;
 
 	py::class_<wxArrayInt>(ui, "ArrayInt");
-
 	py::class_<wxValidator>(ui, "Validator");
-
 	py::class_<wxObject>(ui, "Object");
 
 #define ENUM_VAL(name) value(#name, wx##name)
@@ -204,9 +202,9 @@ void UiModule::init_ui()
 	size_v = size = wxDefaultSize;
 	validator_v = validator = wxDefaultValidator;
 
-	py::setattr(ui, "DefaultPosition", py::cast(wxDefaultPosition));
-	py::setattr(ui, "DefaultSize", py::cast(wxDefaultSize));
-	py::setattr(ui, "DefaultValidator", py::cast(wxDefaultValidator));
+	py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
+	py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
+	py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
 
 	py::class_<wxMouseState>(ui, "MouseState")
 		.def("ButtonIsDown", &wxMouseState::ButtonIsDown, "but"_a)
@@ -258,6 +256,7 @@ void UiModule::init_ui()
 		.def("Show", &wxWindow::Show, "show"_a=true)
 		.def("IsShown", &wxWindow::IsShown)
 		.def("Hide", &wxWindow::Hide)
+		.def("Close", &wxWindow::Close, "force"_a=false)
 		.def("Destroy", &wxWindow::Destroy)
 		.def("Refresh", &wxWindow::Refresh)
 		.def("Freeze", &wxWindow::Freeze)
@@ -278,5 +277,5 @@ void UiModule::init_ui()
 		.def("GetDisplayPPI", &wxGetDisplayPPI)
 		.def("GetKeyState", wxGetKeyState)
 		.def("GetMouseState", wxGetMouseState)
-		.def("GetApp", &wxGetApp);
+		.def("GetApp", &wxGetApp, py::return_value_policy::reference);
 }

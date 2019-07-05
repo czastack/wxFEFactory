@@ -59,11 +59,10 @@ public:
 	void save(wxcstr fileName)
 	{
 		wxFile file(fileName, wxFile::write);
-		wxString br("\n");
 		for (wxcstr line: *this)
 		{
 			file.Write(line);
-			file.Write(br);
+			file.Write("\n", 1);
 		}
 	}
 

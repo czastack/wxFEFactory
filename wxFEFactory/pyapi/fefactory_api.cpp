@@ -13,29 +13,8 @@
 	#include "emuhacker/emuhacker.h"
 #endif
 
-py::module fefactory;
 ConsoleHandler console;
 pyobj onAppExit;
-
-void reloadFefactory()
-{
-	if (fefactory)
-	{
-		fefactory.reload();
-	}
-	else
-	{
-		try
-		{
-			fefactory = py::module::import("fefactory");
-		}
-		catch (py::error_already_set &e)
-		{
-			e.restore();
-			PyErr_Print();
-		}
-	}
-}
 
 void set_on_exit(pycref fn)
 {
@@ -86,7 +65,15 @@ void initPyEnv()
 	PySys_SetArgv(app.argc, (wchar_t **)argv);
 	delete[] argv;
 
-	reloadFefactory();
+	try
+	{
+		py::module::import("fefactory");
+	}
+	catch (py::error_already_set& e)
+	{
+		e.restore();
+		PyErr_Print();
+	}
 }
 
 void destroyPyEnv()

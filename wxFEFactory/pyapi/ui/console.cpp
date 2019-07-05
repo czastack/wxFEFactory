@@ -21,12 +21,6 @@ ConsoleHandler::~ConsoleHandler() {
 	m_history->save(HISTORY_FILE);
 
 	delete m_history;
-
-	if (m_dialog)
-	{
-		m_dialog->Destroy();
-		delete m_dialog;
-	}
 }
 
 void ConsoleHandler::bindElem(wxComboBox* input, wxTextCtrl* output)
