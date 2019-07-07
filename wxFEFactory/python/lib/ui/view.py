@@ -7,26 +7,26 @@ class View:
     wxtype = None
     _hear = False
 
-    def __init__(self, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
-                 class_=None, style=None, extra=None):
+    def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
+                 class_=None, style=None, wxparams=None, extra=None):
         # style: None | [{}] | {}
         self.style = style
-        self.wxparams = {
-            'id': id,
-            'pos': pos,
-            'size': size,
-        }
+        if wxparams is None:
+            wxparams = {}
+        wxparams.update(id=id, pos=pos, size=size)
         if wxstyle is not 0:
-            self.wxparams['style'] = wxstyle
+            wxparams['style'] = wxstyle
         if class_ is not None:
             class_ = class_.split()
+        self.computed_style = None
         self.class_ = class_
+        self.wxparams = wxparams
         self.extra = extra
         self.event_table = {}
         self.wxwindow = None
         self.contextmenu = None
 
-        parent = self.active_layout()
+        parent = parent or self.active_layout()
         if parent is not None:
             parent.append(self)
             styles = parent.get_styles()
@@ -36,7 +36,7 @@ class View:
 
         if View._hear:
             # 立即渲染
-            self.render(parent)
+            self._render(parent)
 
     def __del__(self):
         print('del', self)
@@ -59,9 +59,13 @@ class View:
         wxwindow.SetHost(self)
 
     def _render(self, parent):
+        self.compute_style()
         self.render(parent)
+        self.apply_style()
         self.onready()
+        parent.layout_child(self, self.computed_style)
         del self.wxparams
+        del self.computed_style
 
     def render(self, parent):
         """渲染"""
@@ -132,42 +136,45 @@ class View:
                 if style is not None:
                     self.add_style(style)
 
-    def apply_style(self):
-        """应用样式"""
-        # computed_style
+    def compute_style(self):
         style = {}
         for item in self.iter_style():
             style.update(item)
+        self.computed_style = style
+        # 尺寸
+        width = style.get('width', -1)
+        height = style.get('height', -1)
+        if width is not -1 or height is not -1:
+            self.wxparams['size'] = wx.Size(width, height)
+        return style
+
+    def apply_style(self):
+        """应用样式"""
+        style = self.computed_style
 
         if not style:
             return style
 
-        backgroud = style.get('backgroud', None)
-        if backgroud is not None:
-            if isinstance(backgroud, str):
-                # parseColor
-                pass
-            else:
-                self.SetBackgroundColour(backgroud)
+        background = style.get('background', None)
+        if background is not None:
+            if isinstance(background, str):
+                background = self.parsecolor(background)
+            self.SetBackgroundColour(background)
 
         color = style.get('color', None)
         if color is not None:
             if isinstance(color, str):
-                # parseColor
-                pass
-            else:
-                self.SetForegroundColour(color)
+                color = self.parsecolor(color)
+            self.SetForegroundColour(color)
 
         fontsize = style.get('font-size', None)
         if fontsize is not None:
-            # TODO
             font = self.GetFont()
             font.SetPointSize(fontsize)
             self.SetFont(font)
 
         fontDict = style.get('font', None)
         if fontDict is not None:
-            # TODO
             font = self.GetFont()
             # 字重
             weight = fontDict.get('weight', None)
@@ -187,15 +194,15 @@ class View:
             self.SetFont(font)
 
         # 尺寸
-        width = style.get('width', None)
-        height = style.get('height', None)
-        if width or height:
-            size = self.GetSize()
-            if width:
-                size.x = width
-            if height:
-                size.y = height
-            self.SetSize(size)
+        # width = style.get('width', None)
+        # height = style.get('height', None)
+        # if width or height:
+        #     size = self.GetSize()
+        #     if width:
+        #         size.x = width
+        #     if height:
+        #         size.y = height
+        #     self.SetSize(size)
 
         # 最大/最小尺寸
         min_width = style.get('min-width', None)
@@ -218,13 +225,6 @@ class View:
             if max_height:
                 size.y = max_height
             self.SetMaxSize(size)
-
-        self.apply_style_own(style)
-        return style
-
-    def apply_style_own(self, style):
-        """应用独有样式"""
-        pass
 
     def set_context_menu(self, contextmenu):
         """设置右键菜单"""
@@ -339,47 +339,43 @@ class View:
 
 class Layout(View):
     """容器元素"""
-    def __init__(self, *args, styles=None, **kwargs):
+    def __init__(self, *args, keep_styles=False, styles=None, **kwargs):
         View.__init__(self, *args, **kwargs)
         self.styles = styles
         self.children = []
         self.pendding_children = []
-        self.tmp_styles_list = None
+        self.keep_styles = keep_styles
+
+        # 合并父元素持有的样式表
+        self.tmp_styles_list = tmp_styles_list = []
+        parent = kwargs.get('parent', None) or self.active_layout()
+        # 父元素的临时列表还没释放，本次只要检查自己的
+        if parent and parent.tmp_styles_list is not None:
+            tmp_styles_list.extend(parent.tmp_styles_list)
+        else:
+            i = len(self.LAYOUTS) - 1
+            # 加上父控件的样式列表
+            while i is not -1:
+                styles = self.LAYOUTS[i].styles
+                if styles is not None:
+                    if isinstance(styles, list):
+                        tmp_styles_list.extend(styles)
+                    else:
+                        tmp_styles_list.append(styles)
+                i -= 1
+
+        styles = self.styles
+        if styles is not None:
+            if isinstance(styles, list):
+                tmp_styles_list.extend(styles)
+            else:
+                tmp_styles_list.append(styles)
 
     def __del__(self):
         self.children.clear()
 
     def __enter__(self):
-        if self.tmp_styles_list is None:
-            self.tmp_styles_list = tmp_styles_list = []
-
-        parent = self.active_layout()
-        if parent is None:
-            # 判断是否是AuiManager
-            if type(parent).__name__ == 'AuiManager':
-                parent = parent.GetHost()
-
-        only_self = False
-        # 父元素的临时列表还没释放，本次只要检查自己的
-        if parent and parent.tmp_styles_list is not None:
-            tmp_styles_list.extend(parent.tmp_styles_list)
-            only_self = True
-
         self.LAYOUTS.append(self)
-        i = len(self.LAYOUTS) - 1
-
-        # 加上父控件的样式列表
-        while i is not -1:
-            styles = self.LAYOUTS[i].styles
-            if styles is not None:
-                if isinstance(styles, list):
-                    tmp_styles_list.extend(styles)
-                else:
-                    tmp_styles_list.append(styles)
-            if only_self:
-                break
-            i -= 1
-
         if View._hear:
             self.Freeze()
         return self
@@ -387,29 +383,35 @@ class Layout(View):
     def __exit__(self, exc_type, exc_val, exc_tb):
         __class__.LAYOUTS.pop()
         if View._hear:
+            self.layout()
             self.Thaw()
-        elif not __class__.LAYOUTS:
+        elif self.wxwindow is None and not __class__.LAYOUTS:
             # 根节点，开始渲染
-            self.render(None)
-            self.Freeze()
-            self.onready()
-            self.apply_style()
-            self.Thaw()
-            del self.wxparams
+            self.render_as_root(None)
         # 释放临时样式表
-        self.tmp_styles_list = None
+        if not self.keep_styles:
+            self.tmp_styles_list = None
 
     def append(self, child):
         self.children.append(child)
         if not View._hear:
             self.pendding_children.append(child)
 
+    def render_as_root(self, parent=None):
+        """作为根节点渲染，通常是另外添加的元素"""
+        self.compute_style()
+        self.render(parent)
+        self.Freeze()
+        self.apply_style()
+        self.onready()
+        self.Thaw()
+        del self.wxparams
+        del self.computed_style
+
     def onready(self):
         if not View._hear:
             for child in self.pendding_children:
                 child._render(self)
-                style = child.apply_style()
-                self.layout_child(child, style)
             self.pendding_children.clear()
         self.layout()
 
@@ -452,6 +454,17 @@ class Layout(View):
         child = self.FindFocus()
         if child is not None:
             return child.GetClientData()
+
+    @staticmethod
+    def parsecolor(color):
+        def shl(n):
+            return (n << 4) | n
+        if color.startswith('#'):
+            color = color[1:]
+        value = int(color, 16)
+        if len(color) == 3:
+            value = (shl(value & 0xF00) << 8) | (shl(value & 0xF0) << 4) | shl(value & 0xF)
+        return value
 
 
 class Control(View):

@@ -59,9 +59,10 @@ public:
 	void save(wxcstr fileName)
 	{
 		wxFile file(fileName, wxFile::write);
+		wxMBConvUTF8 conv;
 		for (wxcstr line: *this)
 		{
-			file.Write(line);
+			file.Write(line, conv);
 			file.Write("\n", 1);
 		}
 	}
@@ -71,13 +72,12 @@ public:
 		wxTextFile file(fileName);
 		if (file.Exists() && file.Open())
 		{
-			for (const wxString* line = &file.GetFirstLine(); ; line = &file.GetNextLine())
+			for (const wxString* line = &file.GetFirstLine(); !file.Eof(); line = &file.GetNextLine())
 			{
 				if (!line->IsEmpty())
+				{
 					wxArrayString::Add(*line);
-
-				if (file.Eof())
-					break;
+				}
 			}
 		}
 	}

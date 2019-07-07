@@ -3,10 +3,6 @@ from . import wx
 
 
 class SizerLayout(Layout):
-    def onready(self):
-        super().onready()
-        self.layout()
-
     def layout_child(self, child, style):
         flag = self.get_box_flag(style)
         weight = style.get('weight', 0)
@@ -155,8 +151,7 @@ class StaticBox(SizerLayout):
     wxtype = wx.StaticBox
 
     def __init__(self, label, **kwargs):
-        super().__init__(**kwargs)
-        self.wxparams['label'] = label
+        super().__init__(wxparams={'label': label}, **kwargs)
 
     def onready(self):
         sizer = wx.BoxSizer(wx.VERTICAL)

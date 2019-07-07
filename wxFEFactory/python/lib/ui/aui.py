@@ -153,13 +153,11 @@ class AuiMDIParentFrame(BaseFrame):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        Layout.__init__(self, **kwagrs)
-        self.wxparams['title'] = title
+        Layout.__init__(self, wxparams={'title': title}, **kwagrs)
 
 
 class AuiMDIChildFrame(BaseTopLevelWindow):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        Layout.__init__(self, **kwagrs)
-        self.wxparams['title'] = title
+        Layout.__init__(self, wxparams={'title': title}, **kwagrs)

@@ -43,6 +43,7 @@ void UiModule::init_frames()
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_DIALOG_STYLE, name = (const char*)wxDialogNameStr)
 		.def("IsModal", &wxDialog::IsModal)
+		.def("ShowModal", &wxDialog::ShowModal)
 		.def("EndModal", &wxDialog::EndModal, "retCode"_a)
 		;
 }

@@ -83,26 +83,27 @@ class MainFrame:
                 ) as multiline_console:
                     self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
                     with ui.Vertical(class_="expand"):
-                        ui.Button("∨", class_="btn-sm", onclick=self.toggle_console_input_multi)
+                        ui.Button("∨", class_="btn-sm fill", onclick=self.toggle_console_input_multi)
                         ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run,
                                   extra={"tooltip": "执行输入框中代码 Ctrl+Enter"})
             ui.StatusBar()
 
-        # 尝试加载图标
-        icon_name = fefactory.executable_name() + '.ico'
-        if os.path.exists(icon_name):
-            icon = ui.wx.Icon()
-            icon.LoadFile(icon_name)
-            win.SetIcon(icon)
-
-        win.set_onclose(self.onclose)
-        self.render_toolbar(toolbar)
-        self.book.set_on_page_changed(self.on_tool_change)
-
         self.win = win
         self.aui = aui
         self.console = console
+
+        # 绑定控制台控件
         fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
+        win.set_onclose(self.onclose)
+        # 尝试加载图标
+        icon_path = fefactory.executable_name() + '.ico'
+        if os.path.exists(icon_path):
+            icon = ui.wx.Icon(icon_path, ui.wx.BITMAP_TYPE_ICO)
+            win.SetIcon(icon)
+        self.render_toolbar(toolbar)
+        self.book.set_on_page_changed(self.on_tool_change)
+
+        win.Show()
         # self.console.setOnFileDrop(self.onConsoleFileDrop)
         # self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
 
@@ -156,7 +157,8 @@ class MainFrame:
         bitmap = ui.wx.Bitmap()
         listener = self.on_toolbar_tool_click
         for name, module in tools.toolbar_tools:
-            bitmap.CopyFromIcon(ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/')))
+            icon = ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/'), ui.wx.BITMAP_TYPE_ICO)
+            bitmap.CopyFromIcon(icon)
             toolitem = toolbar.AddTool(ui.wx.ID_ANY, name, bitmap, "")
             toolbar.set_onclick(toolitem.GetId(), listener)
 
@@ -290,18 +292,19 @@ class MainFrame:
         """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
-            with ui.View.HEAR, exui.StdDialog("选择工具", style={'width': 640, 'height': 900}) as dialog:
+            with ui.View.HEAR, exui.StdDialog("选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
                 tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")
                 self.root_tools = self.get_sub_tools(tools)
 
                 for item in self.root_tools:
-                    item.id = tree.InsertItem(root, item.label, data=item)
+                    item.id = tree.InsertItem(root, text=item.label, data=ui.wx.PyTreeItemData(item))
 
                 tree.set_on_item_activated(self.weak.on_tool_select)
                 # with dialog.footer:
                 #     ui.Button(label="收藏")
+                dialog.view.keep_styles = False
             self.tool_dialog = dialog
         dialog.ShowModal()
 
@@ -332,12 +335,12 @@ class MainFrame:
 
     def on_tool_select(self, tree, event):
         """打开工具选项框项选中"""
-        item = tree.GetItemData(event.item)
+        item = tree.GetItemData(event.GetItem()).data
         if item.package:
             if not item.children:
                 item.children = self.get_sub_tools(item.module)
                 for child in item.children:
-                    child.id = tree.InsertItem(item.id, child.label, data=child)
+                    child.id = tree.InsertItem(item.id, text=child.label, data=ui.wx.PyTreeItemData(child))
         else:
             self.open_tool_by_name(item.module)
             self.tool_dialog.endModal()

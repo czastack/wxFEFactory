@@ -13,28 +13,14 @@
 #include <unordered_map>
 #include "ui.h"
 
-namespace pybind11 {
-	namespace detail {
-		/**
-		 * wxTreeItemId
-		 */
-		template <> class type_caster<wxTreeItemId> {
-		public:
-			bool load(handle src, bool) {
-				value.m_pItem = (void*)(size_t)src.cast<pybind11::int_>();
-				return true;
-			}
 
-			static handle cast(const wxTreeItemId& src, return_value_policy /* policy */, handle /* parent */) {
-				return PyLong_FromUnsignedLongLong((size_t)src.GetID());
-			}
+class PyTreeItemData : public wxTreeItemData
+{
+public:
+	PyTreeItemData(pycref obj) : m_data(obj) {}
+	pyobj m_data;
+};
 
-			PYBIND11_TYPE_CASTER(wxTreeItemId, (_)("wxTreeItemId"));
-		protected:
-			bool success = false;
-		};
-	}
-}
 
 void UiModule::init_controls()
 {
@@ -188,14 +174,30 @@ void UiModule::init_controls()
 		.def("SetPath", &wxDirPickerCtrl::SetPath, "path"_a)
 		;
 
+	py::class_<wxTreeItemId>(ui, "TreeItemId")
+		.def(py::init<>())
+		.def("GetID", &wxTreeItemId::GetID)
+		;
+
+	py::class_<NODELETE(wxTreeItemData)>(ui, "TreeItemData")
+		.def(py::init<>())
+		.def("GetId", &wxTreeItemData::GetId, py::return_value_policy::reference)
+		.def("SetId", &wxTreeItemData::SetId)
+		;
+
+	py::class_<NODELETE(PyTreeItemData), wxTreeItemData>(ui, "PyTreeItemData")
+		.def(py::init<pycref>(), data)
+		.def_readwrite("data", &PyTreeItemData::m_data)
+		;
+
 	py::class_<NODELETE(wxTreeCtrl), wxControl>(ui, "TreeCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, style = wxTR_DEFAULT_STYLE, validator_v, name = (const char*)wxTreeCtrlNameStr)
 		.def("AssignImageList", &wxTreeCtrl::AssignImageList)
-		.def("AddRoot", &wxTreeCtrl::AddRoot, text, "image"_a = -1, "selectedImage"_a = -1, data = None)
+		.def("AddRoot", &wxTreeCtrl::AddRoot, text, "image"_a = -1, "selectedImage"_a = -1, data = (wxTreeItemData*)nullptr)
 		.def("InsertItem", (wxTreeItemId(wxTreeCtrl::*)(const wxTreeItemId&, size_t, const wxString&, int, int, wxTreeItemData*))
-			& wxTreeCtrl::InsertItem, parent, pos, text, "image"_a = -1, "selectedImage"_a = -1, data = None)
-		.def("GetItemData", &wxTreeCtrl::GetItemData, item)
+			& wxTreeCtrl::InsertItem, parent, pos=(size_t)-1, text, "image"_a = -1, "selectedImage"_a = -1, data = (wxTreeItemData*)nullptr)
+		.def("GetItemData", &wxTreeCtrl::GetItemData, item, py::return_value_policy::reference)
 		.def("Delete", &wxTreeCtrl::Delete, item)
 		.def("DeleteChildren", &wxTreeCtrl::DeleteChildren, item)
 		.def("DeleteAllItems", &wxTreeCtrl::DeleteAllItems)

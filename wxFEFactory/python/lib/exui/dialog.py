@@ -1,7 +1,6 @@
 from styles import styles, dialog_style
-from lib import wxconst
-from lib.extypes import WeakBinder
 from lib import ui
+from lib.extypes import WeakBinder
 
 
 __ALL__ = ('StdDialog', 'ListDialog', 'ChoiceDialog', 'CheckChoiceDialog', 'SearchDialog')
@@ -16,18 +15,17 @@ class StdDialog(ui.Dialog):
 
         super().__enter__()
         with ui.Vertical(class_="fill"):
-            self.view = (ui.ScrollView if scrollable else ui.Vertical)(class_="fill padding")
-
+            self.view = (ui.ScrollView if scrollable else ui.Vertical)(class_="fill padding", keep_styles=True)
             with ui.Horizontal(class_="padding right") as footer:
                 if cancel:
-                    ui.Button(label="取消").id = wxconst.ID_CANCEL
+                    ui.Button(label="取消", id=ui.wx.ID_CANCEL)
                 if ok:
-                    ui.Button(label="确定").id = wxconst.ID_OK
+                    ui.Button(label="确定", id=ui.wx.ID_OK)
             self.footer = footer
         super().__exit__(None, None, None)
 
         if not closable:
-            self.setOnClose(self.prevent_close)
+            self.set_onclose(self.prevent_close)
 
     def __enter__(self):
         self.view.__enter__()
@@ -120,7 +118,7 @@ class SearchDialog(StdDialog):
 
         with self:
             with ui.Horizontal(class_='expand'):
-                self.input = ui.TextInput(class_='fill', wxstyle=wxconst.TE_PROCESS_ENTER)
+                self.input = ui.TextInput(class_='fill', wxstyle=ui.wx.TE_PROCESS_ENTER)
                 ui.Button(label="搜索", class_='btn_sm', onclick=self.weak.onenter)
             self.listbox = ui.ListBox(class_='fill', onselect=onselect)
             self.input.setOnEnter(self.weak.onenter)

@@ -6,10 +6,6 @@ from . import wx
 class BaseTopLevelWindow(Layout):
     _onclose = None
 
-    def onready(self):
-        super().onready()
-        self.Show()
-
     def onclose(self, event):
         if self._onclose:
             if self._onclose(event) is False:
@@ -53,8 +49,7 @@ class Window(BaseFrame):
     wxtype = wx.Frame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, **kwargs)
-        self.wxparams['title'] = title
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
 
 
@@ -62,8 +57,7 @@ class MDIParentFrame(BaseFrame):
     wxtype = wx.MDIParentFrame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, **kwargs)
-        self.wxparams['title'] = title
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
 
 
@@ -71,8 +65,7 @@ class MDIChildFrame(BaseFrame):
     wxtype = wx.MDIChildFrame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, **kwargs)
-        self.wxparams['title'] = title
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
 
 
@@ -101,8 +94,7 @@ class Dialog(BaseTopLevelWindow):
     default_style = wx.DEFAULT_DIALOG_STYLE | wx.MINIMIZE_BOX | wx.RESIZE_BORDER | wx.CLIP_CHILDREN
 
     def __init__(self, title, wxstyle=default_style, **kwargs):
-        BaseTopLevelWindow.__init__(self, **kwargs)
-        self.wxparams['title'] = title
+        BaseTopLevelWindow.__init__(self, wxparams={'title': title}, wxstyle=wxstyle, **kwargs)
 
     def dismiss(self, ok=True):
         if self.IsModal():

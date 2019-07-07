@@ -1,4 +1,4 @@
-from .view import View, Control
+from .view import View, Control, EventFunctor
 from . import wx
 
 
@@ -7,9 +7,8 @@ class Button(Control):
     wxtype = wx.Button
 
     def __init__(self, label, onclick=None, **kwargs):
-        super().__init__(**kwargs)
-        self.wxparams['label'] = label
         self.onclick = onclick
+        super().__init__(wxparams={'label': label}, **kwargs)
 
     def onready(self):
         self.set_onclick(self.onclick)
@@ -25,9 +24,9 @@ class Button(Control):
 class BitmapButton(Button):
     """图像按钮"""
     def __init__(self, src, onclick=None, **kwargs):
-        Control.__init__(self, **kwargs)
         self.src = src
         self.onclick = onclick
+        Control.__init__(self, **kwargs)
 
     def render(self, parent):
         bitmap = wx.Bitmap(self.src)
@@ -40,10 +39,9 @@ class ToggleButton(Control):
     wxtype = wx.ToggleButton
 
     def __init__(self, label, checked=False, onchange=None, **kwargs):
-        Control.__init__(self, **kwargs)
-        self.wxparams['label'] = label
         self.checked = checked
         self.onchange = onchange
+        Control.__init__(self, wxparams={'label': label}, **kwargs)
 
     def onready(self):
         if self.checked:
@@ -65,13 +63,12 @@ class CheckBox(Control):
     wxtype = wx.CheckBox
 
     def __init__(self, label="", checked=False, align_right=False, onchange=None, **kwargs):
-        Control.__init__(self, **kwargs)
-        self.wxparams['label'] = label
+        if align_right:
+            kwargs['wxstyle'] = kwargs.get('wxstyle', 0) | wx.ALIGN_RIGHT
+        kwargs['wxparams'] = {'label': label}
         self.checked = checked
         self.onchange = onchange
-
-        if align_right:
-            self.wxparams['style'] = kwargs.get('wxstyle', 0) | wx.ALIGN_RIGHT
+        Control.__init__(self, **kwargs)
 
     def render(self, parent):
         self.bind_wx(wx.CheckBox(parent, **self.wxparams))
@@ -94,8 +91,8 @@ class StaticBitmap(Control):
     wxtype = wx.StaticBitmap
 
     def __init__(self, label, **kwargs):
-        Control.__init__(self, **kwargs)
         self.label = label
+        Control.__init__(self, **kwargs)
 
     def render(self, parent):
         bitmap = wx.Bitmap(self.label)
@@ -108,11 +105,11 @@ class Text(Control):
     wxtype = wx.StaticText
 
     def __init__(self, label, **kwargs):
-        Control.__init__(self, **kwargs)
-        self.wxparams['label'] = label
+        Control.__init__(self, wxparams={'label': label}, **kwargs)
 
-    def apply_style_own(self, style):
-        align = style.get('align', None)
+    def apply_style(self):
+        super().apply_style()
+        align = self.computed_style.get('align', None)
         if align is not None:
             self.wxstyle |= align
 
@@ -122,7 +119,6 @@ class TextInput(Control):
     wxtype = wx.TextCtrl
 
     def __init__(self, value="", multiline=False, readonly=False, type=None, **kwargs):
-        Control.__init__(self, **kwargs)
         wxstyle = kwargs.get('wxstyle', 0)
         if multiline:
             wxstyle |= wx.TE_MULTILINE
@@ -131,8 +127,9 @@ class TextInput(Control):
         if type == "password":
             wxstyle |= wx.TE_PASSWORD
         if wxstyle:
-            self.wxparams['style'] = wxstyle
-        self.wxparams['value'] = value
+            kwargs['wxstyle'] = wxstyle
+        kwargs['wxparams'] = {'value': value}
+        Control.__init__(self, **kwargs)
 
     def set_onenter(self, fn, reset=True):
         self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
@@ -146,10 +143,9 @@ class SearchCtrl(Control):
     wxtype = wx.SearchCtrl
 
     def __init__(self, value="", search_button=True, cancel_button=False, **kwargs):
-        Control.__init__(self, **kwargs)
-        self.wxparams['value'] = value
         self.search_button = search_button
         self.cancel_button = cancel_button
+        Control.__init__(self, wxparams={'value': value}, **kwargs)
 
     def onready(self):
         if not self.search_button:
@@ -170,8 +166,9 @@ class SpinCtrl(Control):
     wxtype = wx.SpinCtrl
 
     def __init__(self, value="", min=0, max=100, initial=0, wxstyle=wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, **kwargs):
+        kwargs['wxparams'] = dict(value=value, min=min, max=max, initial=initial)
+        kwargs['wxstyle'] = wxstyle
         Control.__init__(self, **kwargs)
-        self.wxparams.update(value=value, min=min, max=max, initial=initial)
 
     def set_onchange(self, fn, reset=True):
         self.bind_event(wx.EVT_SPINCTRL, fn, reset)
@@ -185,8 +182,7 @@ class ColorPicker(Control):
     wxtype = wx.ColourPickerCtrl
 
     def __init__(self, color=None, onchange=None, **kwargs):
-        Control.__init__(self, **kwargs)
-        self.wxparams['color'] = color
+        Control.__init__(self, wxparams={'color': color}, **kwargs)
         self.onchange = onchange
 
     def onready(self):
@@ -219,9 +215,9 @@ class ListBox(ControlWithItems):
     wxevent = wx.EVT_LISTBOX
 
     def __init__(self, choices=None, onselect=None, **kwargs):
+        if choices is not None:
+            kwargs['wxparams'] = {'choices': choices}
         Control.__init__(self, **kwargs)
-        if choices:
-            self.wxparams['choices'] = choices
         self.onselect = onselect
 
 
@@ -235,8 +231,7 @@ class RearrangeList(CheckListBox):
     wxtype = wx.RearrangeList
 
     def __init__(self, order=None, **kwargs):
-        super().__init__(self, **kwargs)
-        self.wxparams['order'] = order
+        super().__init__(self, wxparams={'order': order}, **kwargs)
 
 
 class Choice(ControlWithItems):
@@ -245,9 +240,9 @@ class Choice(ControlWithItems):
     wxevent = wx.EVT_CHOICE
 
     def __init__(self, choices=None, onselect=None, **kwargs):
+        if choices is not None:
+            kwargs['wxparams'] = {'choices': choices}
         Control.__init__(self, **kwargs)
-        if choices:
-            self.wxparams['choices'] = choices
         self.onselect = onselect
 
 
@@ -257,10 +252,11 @@ class ComboBox(ControlWithItems):
     wxevent = wx.EVT_COMBOBOX
 
     def __init__(self, choices=None, value="", onselect=None, **kwargs):
+        wxparams = {'value': value}
+        if choices is not None:
+            wxparams['choices'] = choices
+        kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
-        if choices:
-            self.wxparams['choices'] = choices
-        self.wxparams['value'] = value
         self.onselect = onselect
 
     def set_onenter(self, fn, reset=True):
@@ -273,14 +269,16 @@ class RadioBox(ControlWithItems):
     wxevent = wx.EVT_RADIOBOX
 
     def __init__(self, label="", choices=None, onselect=None, **kwargs):
-        Control.__init__(self, **kwargs)
+        wxparams = {'label': label}
         if choices:
-            self.wxparams['choices'] = choices
-        self.wxparams['label'] = label
+            wxparams['choices'] = choices
+        kwargs['wxparams'] = wxparams
+        Control.__init__(self, **kwargs)
         self.onselect = onselect
 
-    def apply_style_own(self, style):
-        direction = style.get('flex-direction', None)
+    def apply_style(self):
+        super().apply_style()
+        direction = self.computed_style.get('flex-direction', None)
         if direction is not None:
             if direction == 'row':
                 self.wxstyle |= wx.RA_SPECIFY_ROWS
@@ -293,8 +291,8 @@ class Hr(Control):
     wxtype = wx.StaticLine
 
     def __init__(self, vertical=False, **kwargs):
+        kwargs['wxstyle'] = wx.VERTICAL if vertical else wx.HORIZONTAL
         Control.__init__(self, **kwargs)
-        self.wxparams['wxstyle'] = wx.VERTICAL if vertical else wx.HORIZONTAL
 
 
 class FilePickerCtrl(Control):
@@ -302,8 +300,8 @@ class FilePickerCtrl(Control):
     wxtype = wx.FilePickerCtrl
 
     def __init__(self, path=None, msg="", wildcard="", **kwargs):
+        kwargs['wxparams'] = dict(path=path, msg=msg, wildcard=wildcard)
         Control.__init__(self, **kwargs)
-        self.wxparams.update(path=path, msg=msg, wildcard=wildcard)
 
     def set_onchange(self, onchange, reset=True):
         self.bind_event(wx.EVT_FILEPICKER_CHANGED, onchange, reset)
@@ -314,8 +312,8 @@ class DirPickerCtrl(Control):
     wxtype = wx.DirPickerCtrl
 
     def __init__(self, path=None, msg="", **kwargs):
+        kwargs['wxparams'] = dict(path=path, msg=msg)
         Control.__init__(self, **kwargs)
-        self.wxparams.update(path=path, msg=msg)
 
     def set_onchange(self, onchange, reset=True):
         self.bind_event(wx.EVT_DIRPICKER_CHANGED, onchange, reset)
@@ -329,7 +327,7 @@ class TreeCtrl(Control):
         Control.__init__(self, wxstyle=wxstyle, **kwargs)
 
     def set_on_item_activated(self, fn, reset=True):
-        self.bind_event(wx.EVT_TREE_ITEM_ACTIVATED, fn, reset)
+        self.bind_event(wx.EVT_TREE_ITEM_ACTIVATED, EventFunctor(fn, pass_event=True), reset)
 
 
 class StatusBar(Control):

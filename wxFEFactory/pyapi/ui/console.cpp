@@ -32,6 +32,7 @@ void ConsoleHandler::bindElem(wxComboBox* input, wxTextCtrl* output)
 	input->Bind(wxEVT_CHAR, &ConsoleHandler::onInputKey, this);
 	input->Bind(wxEVT_TEXT_PASTE, &ConsoleHandler::onInputPaste, this);
 	input->Bind(wxEVT_COMBOBOX_DROPDOWN, &ConsoleHandler::onDropdown, this);
+	output->Bind(wxEVT_DESTROY, &ConsoleHandler::onElemDestroy, this);
 
 	std::cout.rdbuf(output);
 	std::cerr.rdbuf(output);
@@ -60,7 +61,16 @@ void ConsoleHandler::onInputKey(wxKeyEvent & event)
 void ConsoleHandler::onDropdown(wxCommandEvent & event)
 {
 	m_input->Clear();
-	m_input->Insert(*m_history, 0);
+	if (!m_history->IsEmpty())
+	{
+		m_input->Insert(*m_history, 0);
+	}
+}
+
+void ConsoleHandler::onElemDestroy(wxWindowDestroyEvent& event)
+{
+	m_input = nullptr;
+	m_output = nullptr;
 }
 
 void ConsoleHandler::onInputPaste(wxClipboardTextEvent & event)

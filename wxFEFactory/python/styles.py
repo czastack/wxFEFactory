@@ -27,11 +27,8 @@ else:  # elif screen_width <= 3840:
 
 
 dialog_style = {'width': dialog_width, 'height': dialog_height}
-
 btn_xs_style = {'width': btn_xs_width}
-
 btn_sm_style = {'width': btn_sm_width}
-
 btn_md_style = {'width': btn_md_width}
 
 

@@ -17,6 +17,7 @@ public:
 	void onInput(class wxCommandEvent &event) { input(event.GetString()); }
 	void onInputKey(class wxKeyEvent &event);
 	void onDropdown(class wxCommandEvent &event);
+	void onElemDestroy(class wxWindowDestroyEvent&event);
 	void onInputPaste(class wxClipboardTextEvent &event);
 private:
 	wxComboBox *m_input;
