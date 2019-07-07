@@ -7,8 +7,8 @@ from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, SimpleCheckBox, ModelInput, ModelCoordWidget
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
+from lib import ui
 from styles import dialog_style, styles
-from fefactory_api import ui
 from ..gta_base.widgets import WeaponWidget
 from ..gta3_base.main import BaseGTA3Tool
 from ..gta3_base.script import RunningScript

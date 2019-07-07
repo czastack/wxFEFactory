@@ -2,10 +2,10 @@ from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
+from lib import ui
 from tools.base.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
 from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
-from fefactory_api import ui
 from styles import styles
 # import fefactory_api
 from . import models

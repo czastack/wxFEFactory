@@ -1,7 +1,6 @@
-from lib import wxconst
+from lib import ui
 from tools.base.basetool import BaseTool
 from tools.gba.fireemblem.fe.ferom import FeRomRW
-from fefactory_api import ui
 
 
 class Main(BaseTool):
@@ -14,12 +13,12 @@ class Main(BaseTool):
                     ui.Text("码表", class_="vcenter")
                     self.dict_picker = ui.FilePickerCtrl(class_="fill")
                     ui.Text("文本")
-                    self.text_view = ui.TextInput(class_="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
+                    self.text_view = ui.TextInput(class_="fill", multiline=True, wxstyle=ui.wx.TE_PROCESS_ENTER)
                     ui.Text("码表编码")
-                    self.code_view = ui.TextInput(class_="fill", multiline=True, wxstyle=wxconst.TE_PROCESS_ENTER)
+                    self.code_view = ui.TextInput(class_="fill", multiline=True, wxstyle=ui.wx.TE_PROCESS_ENTER)
                     ui.Text("哈夫曼编码  ")
                     self.haff_view = ui.TextInput(class_="fill", multiline=True, readonly=True,
-                        wxstyle=wxconst.TE_PROCESS_ENTER)
+                        wxstyle=ui.wx.TE_PROCESS_ENTER)
                     container.AddGrowableCol(1)
                     for i in (2, 3, 4):
                         container.AddGrowableRow(i)

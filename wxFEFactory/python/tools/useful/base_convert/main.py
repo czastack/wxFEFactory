@@ -1,6 +1,6 @@
 import struct
 from tools.base.basetool import BaseTool
-from fefactory_api import ui
+from lib import ui
 
 
 class Main(BaseTool):

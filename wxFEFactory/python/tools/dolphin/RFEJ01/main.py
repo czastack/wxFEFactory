@@ -1,7 +1,7 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import VK
-from fefactory_api import ui
+from lib import ui
 from ..base import BaseDolphinHack
 from . import models, datasets
 

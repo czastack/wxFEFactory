@@ -7,7 +7,7 @@ import application
 import __main__
 from modules import modules
 from functools import partial
-from lib import wxconst
+from lib.ui import wx
 
 
 def reload(start_option=None, callback=None):
@@ -105,8 +105,8 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
             title = '提示'
         _alert(title, msg)
 
-    def confirm_yes(msg, defdefaultButton=wxconst.YES):
-        return fefactory_api.confirm('确认', msg, defdefaultButton) == wxconst.YES
+    def confirm_yes(msg, defdefaultButton=wx.YES):
+        return fefactory_api.confirm('确认', msg, defdefaultButton) == wx.YES
 
     fefactory_api.alert = alert
     fefactory_api.confirm_yes = confirm_yes

@@ -10,7 +10,7 @@ from lib.hack.utils import u32_bytes
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig, ConfigGroup
-from lib import exui
+from lib import ui
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
@@ -18,7 +18,6 @@ from ..gta_base.utils import degreeToRadian
 from . import address, datasets, models, coords
 from .models import Player, Vehicle
 from .native import NativeContext
-from fefactory_api import ui
 
 
 class Main(BaseGTATool):
@@ -110,7 +109,7 @@ class Main(BaseGTATool):
     def render_global(self):
         ModelInput("game_hour", "当前小时")
         ModelInput("game_minute", "当前分钟")
-        exui.Label("日期")
+        ui.Label("日期")
         with ui.Horizontal(class_="expand"):
             ui.Button("回退一天", onclick=self.day_back)
             ui.Button("前进一天", onclick=self.day_forward)

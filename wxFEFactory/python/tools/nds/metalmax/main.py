@@ -1,10 +1,9 @@
+from lib import ui
+from lib.ui.components import Pagination
 from lib.hack.forms import (
     Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
 )
 from lib.win32.keys import VK
-from lib import exui, wxconst
-from lib.exui.components import Pagination
-from fefactory_api import ui
 from functools import partial
 from ..base import BaseNdsHack
 
@@ -146,7 +145,7 @@ class MetalMaxHack(BaseNdsHack):
             ui.Button("预设", class_="btn_sm", onclick=preset_ci_click("equips.2"))
         for i in range(5):
             key = "equips.%d" % (i + 3)
-            exui.Label("炮穴%d" % (i + 1))
+            ui.Label("炮穴%d" % (i + 1))
             with ui.Horizontal(class_="fill"):
                 if self.has_holes:
                     ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
@@ -169,7 +168,7 @@ class MetalMaxHack(BaseNdsHack):
     def render_chariot_special_bullets(self):
         datasets = self.datasets
         for i in range(self.chariot.special_bullets.length):
-            exui.Label("特殊炮弹%d" % (i + 1))
+            ui.Label("特殊炮弹%d" % (i + 1))
             with ui.Horizontal(class_="fill"):
                 ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices,
                     values=datasets.SPECIAL_BULLETS.values)
@@ -257,9 +256,9 @@ class MetalMaxHack(BaseNdsHack):
         if dialog is None:
             chariot_equips = self.chariot_equips
             datasets = self.datasets
-            with exui.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
+            with ui.dialog.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
                 with ui.Horizontal(class_="expand"):
-                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, class_="fill",
+                    dialog.search = ui.ComboBox(wxstyle=ui.wx.CB_DROPDOWN, class_="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(class_="fill")

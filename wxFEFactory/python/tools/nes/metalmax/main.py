@@ -1,7 +1,7 @@
+from lib import ui
+from lib.ui.components import Pagination
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
-from lib.exui.components import Pagination
-from fefactory_api import ui
 from ..base import BaseNesHack
 from . import models, datasets
 

@@ -1,9 +1,8 @@
+from lib import ui
+from lib.ui.components import Pagination
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
-from lib.exui.components import Pagination
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField, ArrayField, BitsField, ModelField
 from lib.win32.keys import VK
-from lib.exui.components import Pagination
-from fefactory_api import ui
 from ..base import BaseGbaHack
 
 

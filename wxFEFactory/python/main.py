@@ -9,7 +9,7 @@ from application import app
 from project import Project
 from modules import modules
 # from fe.ferom import FeRomRW
-from lib import ui, exui, extypes
+from lib import ui, extypes
 from lib.win32.keys import WXK
 
 
@@ -32,10 +32,10 @@ class MainFrame:
         if start_option:
             size = start_option.get('size', None)
             if size:
-                self.win.size = size
+                self.win.SetSize(*size)
             position = start_option.get('position', None)
             if position:
-                self.win.position = position
+                self.win.Move(*position)
 
         if getattr(app, 'project', None):
             self.on_open_project(app.project)
@@ -66,7 +66,7 @@ class MainFrame:
 
         with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
-                toolbar = ui.AuiToolBar(extra=dict(direction="top", captionVisible=False))
+                toolbar = ui.AuiToolBar(style={'height': 100}, extra=dict(direction="top", captionVisible=False))
                 # ui.ListBox(choices=self.module_names, onselect=self.on_nav, extra=dict(captionVisible=False))
                 self.book = ui.AuiNotebook(extra=dict(direction="center", maximizeButton=True, captionVisible=False))
                 with ui.Vertical(class_="console-bar", extra=dict(
@@ -159,14 +159,14 @@ class MainFrame:
         for name, module in tools.toolbar_tools:
             icon = ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/'), ui.wx.BITMAP_TYPE_ICO)
             bitmap.CopyFromIcon(icon)
-            toolitem = toolbar.AddTool(ui.wx.ID_ANY, name, bitmap, "")
+            toolitem = toolbar.AddTool(ui.wx.ID_ANY, name, bitmap, name)
             toolbar.set_onclick(toolitem.GetId(), listener)
 
         return toolbar.Realize()
 
     def on_toolbar_tool_click(self, toolbar, toolid):
         """快捷工具栏点击处理"""
-        self.open_tool_by_name(tools.toolbar_tools[toolbar.getToolPos(toolid)][1])
+        self.open_tool_by_name(tools.toolbar_tools[toolbar.GetToolPos(toolid)][1])
 
     def toggle_console(self, menu):
         """显示/隐藏控制台"""
@@ -292,7 +292,7 @@ class MainFrame:
         """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
-            with ui.View.HEAR, exui.StdDialog("选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
+            with ui.View.HEAR, ui.dialog.StdDialog("选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
                 tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")

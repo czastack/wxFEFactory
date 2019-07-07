@@ -2,18 +2,16 @@ import json
 import fefactory
 import fefactory_api
 import __main__
-from lib import exui, utils, lazy, wxconst
+from lib import ui, utils, lazy
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from styles import btn_xs_style, styles, dialog_style
 from ..utils import uint_hex
-ui = fefactory_api.ui
-Label = exui.Label
 
 
 __ALL__ = ('Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox',
     'Groups', 'Input', 'ModelInput', 'ProxyInput', 'SimpleCheckBox', 'CheckBox', 'ModelCheckBox', 'Select',
-    'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'TabList', 'Label')
+    'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'TabList')
 
 
 class Widget:
@@ -378,7 +376,7 @@ class DialogGroup(Group):
 
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with __main__.win:
-            with exui.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
+            with ui.dialog.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
                 self.render_root()
 
         self.root = root
@@ -456,10 +454,10 @@ class BaseInput(TwoWayWidget):
         super().render()
         with ui.Horizontal(class_="fill") as container:
             if self.spin:
-                self.view = ui.SpinCtrl(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER | wxconst.SP_ARROW_KEYS,
+                self.view = ui.SpinCtrl(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER | ui.wx.SP_ARROW_KEYS,
                     min=self.min, max=self.max or (1 << (self.size << 3) - 1) - 1)
             else:
-                self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=self.readonly)
+                self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
             self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
@@ -656,7 +654,7 @@ class BaseSelect(TwoWayWidget):
 
     @lazy.classlazy
     def search_dialog(cls):
-        return exui.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
+        return ui.dialog.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
 
     @classmethod
     def menu_search(cls, view, menu):
@@ -768,7 +766,7 @@ class BaseChoiceDisplay(Widget):
     def render(self):
         super().render()
         with ui.Horizontal(class_="fill") as container:
-            self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER, readonly=True)
+            self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
         self.container = container
@@ -807,7 +805,7 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
 
 def Choice(laebl, choices, onselect):
     """选项框"""
-    exui.Label(laebl)
+    ui.Label(laebl)
     return ui.Choice(class_="fill", choices=choices, onselect=onselect).setSelection(0)
 
 

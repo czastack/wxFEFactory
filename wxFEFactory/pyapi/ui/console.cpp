@@ -69,8 +69,11 @@ void ConsoleHandler::onDropdown(wxCommandEvent & event)
 
 void ConsoleHandler::onElemDestroy(wxWindowDestroyEvent& event)
 {
-	m_input = nullptr;
-	m_output = nullptr;
+	if (m_output && m_output->GetId() == event.GetId())
+	{
+		m_input = nullptr;
+		m_output = nullptr;
+	}
 }
 
 void ConsoleHandler::onInputPaste(wxClipboardTextEvent & event)

@@ -9,7 +9,7 @@ class ToolBarBase(Layout):
 
     def onready(self):
         super().onready()
-        self.bind_event(wx.EVT_COMMAND_TOOL_CLICKED, self.onclick)
+        self.Bind(wx.EVT_COMMAND_TOOL_CLICKED, self.onclick)
 
     def set_onclick(self, toolid, listener):
         self.listeners[toolid] = listener
@@ -21,7 +21,7 @@ class ToolBarBase(Layout):
             listener(self, toolid)
 
     def layout_child(self, child, styles):
-        self.AddControl(child, "", None)
+        self.AddControl(child.wxwindow, "", None)
 
 
 class ToolBar(ToolBarBase):

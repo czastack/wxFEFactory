@@ -2,8 +2,8 @@ from functools import partial
 from lib.hack.forms import Group, ModelCheckBox, ModelInput, ModelSelect
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
+from lib import ui
 from tools.base.hacktool import BaseHackTool
-from fefactory_api import ui
 from . import models
 
 

@@ -11,6 +11,7 @@ class Button(Control):
         super().__init__(wxparams={'label': label}, **kwargs)
 
     def onready(self):
+        super().onready()
         self.set_onclick(self.onclick)
         del self.onclick
 
@@ -148,6 +149,7 @@ class SearchCtrl(Control):
         Control.__init__(self, wxparams={'value': value}, **kwargs)
 
     def onready(self):
+        super().onready()
         if not self.search_button:
             self.ShowSearchButton(False)
         if self.cancel_button:
@@ -186,6 +188,7 @@ class ColorPicker(Control):
         self.onchange = onchange
 
     def onready(self):
+        super().onready()
         self.set_onchange(self.onchange)
         del self.onchange
 
@@ -199,6 +202,7 @@ class ItemContainer(Control):
 
 class ControlWithItems(ItemContainer):
     def onready(self):
+        super().onready()
         self.set_onselect(self.onselect)
         del self.onselect
 
@@ -341,3 +345,33 @@ class StatusBar(Control):
     def onready(self):
         super().onready()
         self.GetParent().SetStatusBar(self.wxwindow)
+
+
+# exui
+
+
+def Label(text):
+    return Text(text, class_="input_label expand")
+
+
+class HotkeyCtrl(TextInput):
+    def __init__(self, *args, **kwargs):
+        kwargs['wxstyle'] = wx.TE_PROCESS_ENTER
+        super().__init__(*args, **kwargs)
+        self.value = None
+        self.code = None
+        self.mode = None
+        self.setOnKeyDown(self.onKey)
+
+    def onKey(self, _, event):
+        code = event.GetKeyCode()
+        if WXK.isMod(code):
+            return
+        mod = event.GetModifiers()
+        self.handleKey(code, mod)
+        return True
+
+    def handleKey(self, code, mod):
+        self.value = WXK.getName(code, mod)
+        self.code = code
+        self.mode = mod

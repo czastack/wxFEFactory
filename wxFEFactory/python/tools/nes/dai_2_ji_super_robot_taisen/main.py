@@ -1,7 +1,6 @@
 from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input, Choice
 from lib.win32.keys import VK
-from lib import utils
-from fefactory_api import ui
+from lib import ui, utils
 from ..base import BaseNesHack
 from . import models, datasets
 

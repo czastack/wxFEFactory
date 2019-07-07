@@ -1,12 +1,11 @@
+from lib import ui
+from lib.ui.components import Pagination
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect,
     ModelChoiceDisplay, Choice
 )
 from lib.win32.keys import VK
-from lib import exui, wxconst
-from lib.exui.components import Pagination
 from functools import partial
-from fefactory_api import ui
 from ..base import BaseSfcHack
 from . import models, datasets
 
@@ -138,9 +137,9 @@ class Main(BaseSfcHack):
         """战车物品预设对话框"""
         dialog = getattr(self, name, None)
         if dialog is None:
-            with exui.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
+            with ui.dialog.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(class_="expand"):
-                    dialog.search = ui.ComboBox(wxstyle=wxconst.CB_DROPDOWN, class_="fill",
+                    dialog.search = ui.ComboBox(wxstyle=ui.wx.CB_DROPDOWN, class_="fill",
                         onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
                     ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(class_="fill")

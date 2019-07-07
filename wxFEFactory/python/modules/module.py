@@ -3,10 +3,9 @@ import json
 import types
 import __main__
 from application import app
-from lib import extypes, lazy, wxconst
+from lib import extypes, lazy, ui
 from lib.scene import BaseScene
 from styles import styles
-from fefactory_api import ui
 from . import modules
 
 DUMP_INDENT = app.getconfig('json_indent', 4)
@@ -139,7 +138,7 @@ class BaseListBoxModuel(BaseModule):
 
     def onClear(self, menu):
         """清空列表"""
-        if self.confirm('提示', '确认清空所有列表项？', wxconst.NO) is wxconst.YES:
+        if self.confirm('提示', '确认清空所有列表项？', ui.wx.NO) is ui.wx.YES:
             self.listbox.clear()
             return True
 
@@ -155,7 +154,7 @@ class BaseListBoxModuel(BaseModule):
         """删除一项"""
         pos = self.listbox.index
         if pos is not -1:
-            if self.confirm('提示', '确认删除该项？', wxconst.NO) is wxconst.YES:
+            if self.confirm('提示', '确认删除该项？', ui.wx.NO) is ui.wx.YES:
                 text = self.listbox[pos]
                 self.listbox.pop(pos)
                 return pos, text

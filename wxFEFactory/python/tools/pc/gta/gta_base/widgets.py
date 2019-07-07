@@ -1,17 +1,16 @@
-from fefactory_api import ui
-from lib import exui
+from lib import ui
 from lib.hack.forms import Group, TwoWayWidget, ModelWidget
 from styles import dialog_style
 
 
 class WeaponWidget(TwoWayWidget):
     def __init__(self, ped, name, label, slot, slot_no_ammo, weapon_list, callback=None):
-         self.slot = slot
-         self.has_ammo = self.slot not in slot_no_ammo
-         self.weapon_list = weapon_list
-         self.ped = ped
-         self.callback = callback
-         super().__init__(name, label, None, None)
+        self.slot = slot
+        self.has_ammo = self.slot not in slot_no_ammo
+        self.weapon_list = weapon_list
+        self.ped = ped
+        self.callback = callback
+        super().__init__(name, label, None, None)
 
     def render(self):
         super().render()
@@ -46,7 +45,7 @@ class WeaponWidget(TwoWayWidget):
 
     @input_value.setter
     def input_value(self, value):
-        weapon_id =  value.id
+        weapon_id = value.id
         i = 0
         for item in self.weapon_list[self.slot]:
             if item[0] == weapon_id:
@@ -87,7 +86,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
         dialog = getattr(cls, '_dialog', None)
 
         if not dialog:
-            with exui.StdDialog("选择颜色", style=dialog_style) as dialog:
+            with ui.dialog.StdDialog("选择颜色", style=dialog_style) as dialog:
                 with ui.GridLayout(cols=13, vgap=10, class_="expand"):
                     for color in self.color_list:
                         view = ui.Text("", style=cls.color_item_style)

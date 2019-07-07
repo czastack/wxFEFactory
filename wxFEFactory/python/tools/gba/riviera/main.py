@@ -2,7 +2,7 @@ from lib.hack.forms import (
     Group, StaticGroup, ModelInput, ModelArrayInput, ModelSelect, ModelArraySelect, ModelFlagWidget, Choice
 )
 from lib.win32.keys import VK
-from fefactory_api import ui
+from lib import ui
 from ..base import BaseGbaHack
 from . import models, datasets
 

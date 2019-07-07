@@ -1,5 +1,5 @@
 from lib.hack.forms import Group, DialogGroup, ModelInput, ModelSelect, Choice
-from fefactory_api import ui
+from lib import ui
 from ..base import BaseGbaHack
 
 

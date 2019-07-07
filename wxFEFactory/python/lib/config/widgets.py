@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from lib import extypes, wxconst, utils
+from lib import extypes, utils
 from styles import btn_xs_style
-from lib import exui
+from lib import ui
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
 from .group import ConfigGroup
-from fefactory_api import ui
 
 
 __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
@@ -55,7 +54,7 @@ class ConfigCtrl(ABC):
 
     def render_lable(self):
         """渲染标签文本"""
-        return exui.Label(self.label)
+        return ui.Label(self.label)
 
     def read(self, _=None):
         self.set_input_value(self.get_config_value())
@@ -105,7 +104,7 @@ class InputConfig(ConfigCtrl):
     def render(self):
         self.render_lable()
         with ui.Horizontal(class_="fill"):
-            self.view = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
+            self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER)
             self.render_btn()
         self.view.setOnKeyDown(self.weak.onKey)
 

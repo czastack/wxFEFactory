@@ -1,9 +1,8 @@
 import fefactory_api
-from lib import wxconst
+from lib import ui
 from ..module import BaseListBoxModuel
 from . import forms
 from . import config
-from fefactory_api import ui
 
 
 class Module(BaseListBoxModuel):
@@ -25,7 +24,7 @@ class Module(BaseListBoxModuel):
     def render_main(self):
         this = self.weak
         with ui.Horizontal(class_="padding expand") as infobar:
-            ui.ComboBox(wxstyle=wxconst.CB_READONLY, choices=('地址预览', *(key for key in config.ADDR_MAP)),
+            ui.ComboBox(wxstyle=ui.wx.CB_READONLY, choices=('地址预览', *(key for key in config.ADDR_MAP)),
                 onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
             ui.Text("地址", class_="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True)
@@ -56,10 +55,10 @@ class Module(BaseListBoxModuel):
 
     def onclose(self, _=None):
         if self.pg.changed:
-            choice = self.confirm('保存修改', '有修改，是否保存？', wxconst.CANCEL)
-            if choice is wxconst.CANCEL:
+            choice = self.confirm('保存修改', '有修改，是否保存？', ui.wx.CANCEL)
+            if choice is ui.wx.CANCEL:
                 return False
-            elif choice is wxconst.YES:
+            elif choice is ui.wx.YES:
                 self.onSave(None)
         return super().onclose()
 

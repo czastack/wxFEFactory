@@ -1,8 +1,7 @@
 import fefactory_api
 from ..module import BaseListBoxModuel
-from fefactory_api import ui
 from styles import dialog_style
-from lib import exui, wxconst
+from lib import ui
 
 
 class Module(BaseListBoxModuel):
@@ -31,7 +30,7 @@ class Module(BaseListBoxModuel):
 
         self.textarea = ui.TextInput(multiline=True, class_="fill")
         with ui.Horizontal(class_="expand"):
-            ui.ComboBox(wxstyle=wxconst.CB_READONLY, class_="fill")
+            ui.ComboBox(wxstyle=ui.wx.CB_READONLY, class_="fill")
             ui.Button(label="保存该项", class_="button", onclick=self.onSaveIt)
             ui.Button(label="保存文件", class_="button", onclick=self.onSave)
             ui.Button(label="另存为", class_="button", onclick=self.onSaveAs)
@@ -121,7 +120,7 @@ class Module(BaseListBoxModuel):
     def readFrom(self, reader):
         unique = False
 
-        choice = exui.CheckChoiceDialog(self.unique_title, (
+        choice = ui.dialog.CheckChoiceDialog(self.unique_title, (
             ('unique', '是否过滤重复文本？'),
             ('show_addr', '是否显示文本在rom中的地址'),
             ('show_code', '是否显示文本的码表代码'),

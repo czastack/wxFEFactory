@@ -2,15 +2,14 @@ import json
 import fefactory
 import fefactory_api
 from pathlib import Path
-from lib import exui, utils
+from lib import ui, utils
 from lib.win32.keys import WXK
 from .widgets import ModelWidget, TwoWayWidget
-ui = fefactory_api.ui
 
 
 class CoordWidget(TwoWayWidget):
     def __init__(self, name, label, addr, offsets=(), length=3, type=float, size=4,
-            labels=None, savable=False, wrap=False, preset=None):
+                 labels=None, savable=False, wrap=False, preset=None):
         """
         :param length: 坐标维数
         :param saveble: 是否支持存取文件
@@ -51,9 +50,9 @@ class CoordWidget(TwoWayWidget):
                         with ui.FlexGridLayout(cols=2, vgap=10, class_="fill") as grid:
                             grid.AddGrowableCol(1)
                             for label in self.labels or ('X坐标', 'Y坐标', 'Z坐标'):
-                                exui.Label(label)
+                                ui.Label(label)
                                 views.append(ui.TextInput(class_="fill"))
-                            exui.Label("名称")
+                            ui.Label("名称")
                             self.name_view = ui.TextInput(class_="fill")
                         with ui.Horizontal(class_="expand padding") as container:
                             self.render_btn()
@@ -167,7 +166,7 @@ class CoordWidget(TwoWayWidget):
 
     def choosePreset(self, btn):
         if self.preset:
-            dialog = exui.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.weak.onPreset)
+            dialog = ui.dialog.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.weak.onPreset)
             self.dialog = dialog
             dialog.showModal()
 

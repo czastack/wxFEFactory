@@ -1,4 +1,4 @@
-from fefactory_api import ui
+from lib import ui
 from lib.hack.forms import ModelWidget, TwoWayWidget
 from lib.utils import rgb2bgr
 from styles import btn_sm_style
@@ -6,11 +6,11 @@ from styles import btn_sm_style
 
 class WeaponWidget(TwoWayWidget):
     def __init__(self, ped, name, label, weapon, has_ammo=True, callback=None):
-         self._ped = ped
-         self.weapon = weapon
-         self.has_ammo = has_ammo
-         self.callback = callback
-         super().__init__(name, label, None, None)
+        self._ped = ped
+        self.weapon = weapon
+        self.has_ammo = has_ammo
+        self.callback = callback
+        super().__init__(name, label, None, None)
 
     def render(self):
         super().render()

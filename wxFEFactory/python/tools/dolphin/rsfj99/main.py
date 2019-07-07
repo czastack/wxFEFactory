@@ -1,6 +1,6 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, CheckBox, ModelInput, ListFooterButtons
-from fefactory_api import ui
+from lib import ui
 from ..base import BaseDolphinHack
 from . import models, datasets
 

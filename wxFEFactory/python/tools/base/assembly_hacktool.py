@@ -2,7 +2,7 @@ import types
 from functools import partial
 from lib.extypes import DataClass
 from lib.hack import utils
-from fefactory_api import ui
+from lib import ui
 from .hacktool import BaseHackTool
 from .assembly_code import AssemblyGroup
 

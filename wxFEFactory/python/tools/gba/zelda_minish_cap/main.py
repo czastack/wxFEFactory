@@ -2,7 +2,7 @@ from ..base import BaseGbaHack
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCheckBox, ModelFlagWidget, Choice
 from lib.hack.models import Model, Field, ByteField, WordField, ToggleField, ArrayField
 from lib.win32.keys import VK
-from fefactory_api import ui
+from lib import ui
 
 
 class Global(Model):

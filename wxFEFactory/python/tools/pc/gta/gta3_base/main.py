@@ -1,5 +1,5 @@
 from functools import partial
-from fefactory_api import ui
+from lib import ui
 from ..gta_base.main import BaseGTATool
 from . import opcodes
 
@@ -11,7 +11,8 @@ class BaseGTA3_VC_SA_Tool(BaseGTATool):
         super().onattach()
 
         script_ctx_addr = self.handler.alloc_memory(self.RunningScript.SIZE)
-        self.script_context = self.RunningScript(script_ctx_addr, self,
+        self.script_context = self.RunningScript(
+            script_ctx_addr, self,
             self.address.SCRIPT_SPACE_BASE, self.address.FUNC_CRunningScript__Init,
             self.address.FUNC_CRunningScript__ProcessOneCommand)
 

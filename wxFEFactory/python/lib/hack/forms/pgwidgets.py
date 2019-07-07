@@ -1,5 +1,4 @@
-from lib import utils
-from fefactory_api import ui
+from lib import ui, utils
 from .widgets import BaseGroup, Group, TwoWayWidget, ModelWidget, OffsetsWidget
 
 

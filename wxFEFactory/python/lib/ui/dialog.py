@@ -1,6 +1,6 @@
-from styles import styles, dialog_style
 from lib import ui
 from lib.extypes import WeakBinder
+from styles import styles, dialog_style
 
 
 __ALL__ = ('StdDialog', 'ListDialog', 'ChoiceDialog', 'CheckChoiceDialog', 'SearchDialog')

@@ -6,8 +6,7 @@ from .basetool import NestedTool
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler
-from lib import exui
-from fefactory_api import ui
+from lib import ui
 
 
 class BaseHackTool(NestedTool):
@@ -211,7 +210,7 @@ class BaseHackTool(NestedTool):
         names = tuple(data['data'].keys())
         exportable_fields = [model.field(name) for name in names]
         choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
-        dialog = exui.ListDialog("选择导出的字段", listbox={'choices': choices})
+        dialog = ui.dialog.ListDialog("选择导出的字段", listbox={'choices': choices})
         if dialog.showModal():
             for i in dialog.listbox.getCheckedItems():
                 field = exportable_fields[i]
@@ -228,7 +227,7 @@ class BaseHackTool(NestedTool):
             names = model.exportable_fields
         exportable_fields = [model.field(name) for name in names]
         choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
-        dialog = exui.ListDialog("选择导出的字段", listbox={'choices': choices})
+        dialog = ui.dialog.ListDialog("选择导出的字段", listbox={'choices': choices})
         if dialog.showModal():
             data = {'model': model.__name__, 'data': {}}
             for i in dialog.listbox.getCheckedItems():

@@ -1,8 +1,7 @@
 import struct
-from lib import wxconst
+from lib import ui
 from lib.hack.utils import bytes_beautify
 from tools.base.basetool import BaseTool
-from fefactory_api import ui
 
 
 class Main(BaseTool):
@@ -23,7 +22,7 @@ class Main(BaseTool):
                     on_enter = self.weak.on_enter
                     for label in ('bytes', 'byte(1字节)', 'word(2字节)', 'dword(4字节)', 'float(4字节)', 'double(8字节)'):
                         ui.Text(label)
-                        text_input = ui.TextInput(class_="fill", wxstyle=wxconst.TE_PROCESS_ENTER)
+                        text_input = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER)
                         text_input.setOnEnter(on_enter)
                         self.text_inputs.append(text_input)
                     container.AddGrowableCol(1)

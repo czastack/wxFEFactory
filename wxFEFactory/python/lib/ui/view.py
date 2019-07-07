@@ -73,7 +73,10 @@ class View:
 
     def onready(self):
         """渲染后的操作"""
-        pass
+        if self.extra:
+            tooltip = self.extra.get('tooltip', None)
+            if tooltip is not None:
+                self.SetToolTip(tooltip)
 
     def add_style(self, target):
         """添加样式
@@ -247,6 +250,24 @@ class View:
     def wxstyle(self, value):
         self.SetWindowStyle(value)
 
+    @property
+    def size(self):
+        size = self.GetSize()
+        return size.x, size.y
+
+    @size.setter
+    def size(self, value):
+        self.SetSize(*value)
+
+    @property
+    def position(self):
+        position = self.GetPosition()
+        return position.x, position.y
+
+    @position.setter
+    def position(self, value):
+        self.Move(*value)
+
     def has_wxstyle(self, flag):
         """是否有wxWidgets样式flag"""
         return self.GetWindowStyle() & flag != 0
@@ -414,6 +435,7 @@ class Layout(View):
                 child._render(self)
             self.pendding_children.clear()
         self.layout()
+        super().onready()
 
     def layout_child(self, child, style):
         """布局子元素"""

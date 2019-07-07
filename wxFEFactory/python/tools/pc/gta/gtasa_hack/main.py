@@ -4,14 +4,13 @@ import json
 import time
 import __main__
 from functools import partial
-from lib import utils
+from lib import ui, utils
 from lib.hack.forms import (
     Group, StaticGroup, Input, ProxyInput, Select, ModelInput, ModelCoordWidget
 )
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from styles import dialog_style, styles, btn_md_style
-from fefactory_api import ui
 from ..gta3_base.main import BaseGTA3_VC_SA_Tool
 from ..gta_base.widgets import WeaponWidget, ColorWidget
 from . import cheat, address, models, datasets, coords
