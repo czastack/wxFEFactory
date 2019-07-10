@@ -707,12 +707,12 @@ class Main(BaseGTATool):
 
     @property
     def spawn_vehicle_id_view(self):
-        return self.vehicle_model_book.getPage()
+        return self.vehicle_model_book.get_page()
 
     def get_selected_vehicle_model(self):
         """获取刷车器选中的载具模型"""
         page_index = self.vehicle_model_book.index
-        item_index = self.vehicle_model_book.getPage(page_index).index
+        item_index = self.vehicle_model_book.get_page(page_index).index
         if item_index is not -1:
             return datasets.VEHICLE_LIST[page_index][1][item_index][1]
 

@@ -70,15 +70,15 @@ class ColorWidget(ModelWidget, TwoWayWidget):
         super().render()
         self.view = ui.Text("", style=self.view_style, class_="input_label")
         self.view.background = 0xaabccc
-        self.view.setOnDoubleClick(self.onDoubleClick)
-        self.view.setOnLeftDown(self.onClick)
+        self.view.set_on_double_click(self.onDoubleClick)
+        self.view.set_on_left_down(self.onClick)
 
     def onClick(self, v, e):
         self.read()
 
     def onDoubleClick(self, _):
         __class__.cur_view = self
-        self.dialog.showModal()
+        self.dialog.ShowModal()
 
     @property
     def dialog(self):
@@ -91,7 +91,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
                     for color in self.color_list:
                         view = ui.Text("", style=cls.color_item_style)
                         view.background = color
-                        view.setOnDoubleClick(cls.onSelectColor)
+                        view.set_on_double_click(cls.onSelectColor)
             cls._dialog = dialog
 
         return dialog
@@ -102,7 +102,7 @@ class ColorWidget(ModelWidget, TwoWayWidget):
         cls.cur_view.view.refresh()
         cls.cur_view.write()
         cls.cur_view = None
-        cls._dialog.endModal()
+        cls._dialog.EndModal()
 
     @property
     def input_value(self):

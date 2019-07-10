@@ -1,6 +1,14 @@
 from . import wx
 
 
+def event_binder(event_type, name=None, **args):
+    def binder(self, fn, reset=True):
+        self.bind_event(event_type, EventFunctor(fn, **args), reset)
+    if name is not None:
+        binder.__name__ = name
+    return binder
+
+
 class View:
     """视图元素"""
     LAYOUTS = []
@@ -38,9 +46,6 @@ class View:
             # 立即渲染
             self._render(parent)
 
-    def __del__(self):
-        print('del', self)
-
     @classmethod
     def active_layout(cls):
         return cls.LAYOUTS[-1] if __class__.LAYOUTS else None
@@ -54,9 +59,62 @@ class View:
     def safe_active_wxwindow(cls):
         return self.active_wxwindow() or wx.GetApp().GetTopWindow()
 
+    @property
+    def parent(self):
+        parent = self.GetParent()
+        if parent is not None:
+            parent = parent.GetHost()
+        return parent
+
+    @property
+    def wxstyle(self):
+        return self.GetWindowStyle()
+
+    @wxstyle.setter
+    def wxstyle(self, value):
+        self.SetWindowStyle(value)
+
+    @property
+    def size(self):
+        size = self.GetSize()
+        return size.x, size.y
+
+    @size.setter
+    def size(self, value):
+        self.SetSize(*value)
+
+    @property
+    def position(self):
+        position = self.GetPosition()
+        return position.x, position.y
+
+    @position.setter
+    def position(self, value):
+        self.Move(*value)
+
+    def has_wxstyle(self, flag):
+        """是否有wxWidgets样式flag"""
+        return self.GetWindowStyle() & flag != 0
+
+    def toggle_wxstyle(self, flag, toggle=None):
+        """切换wxWidgets样式flag
+        :param toggle: None 切换, True 设置, False 取消
+        """
+        style = self.GetWindowStyle()
+        if toggle is None:
+            toggle = style & flag == 0
+        if toggle:
+            style |= flag
+        else:
+            style &= ~flag
+        self.SetWindowStyle(style)
+
     def bind_wx(self, wxwindow):
         self.wxwindow = wxwindow
         wxwindow.SetHost(self)
+
+    def __getattr__(self, name):
+        return getattr(self.wxwindow, name)
 
     def _render(self, parent):
         self.compute_style()
@@ -231,59 +289,9 @@ class View:
 
     def set_context_menu(self, contextmenu):
         """设置右键菜单"""
-        # m_elem->Bind(wx.EVT_CONTEXT_MENU, &View::onPopMenu, this);
-        # m_elem->Bind(wx.EVT_MENU, &View::onContextMenu, this);
+        self.Bind(wx.EVT_CONTEXT_MENU, self.on_pop_menu)
+        self.Bind(wx.EVT_MENU, self.on_context_menu)
         self.contextmenu = contextmenu
-
-    @property
-    def parent(self):
-        parent = self.GetParent()
-        if parent is not None:
-            parent = parent.GetHost()
-        return parent
-
-    @property
-    def wxstyle(self):
-        return self.GetWindowStyle()
-
-    @wxstyle.setter
-    def wxstyle(self, value):
-        self.SetWindowStyle(value)
-
-    @property
-    def size(self):
-        size = self.GetSize()
-        return size.x, size.y
-
-    @size.setter
-    def size(self, value):
-        self.SetSize(*value)
-
-    @property
-    def position(self):
-        position = self.GetPosition()
-        return position.x, position.y
-
-    @position.setter
-    def position(self, value):
-        self.Move(*value)
-
-    def has_wxstyle(self, flag):
-        """是否有wxWidgets样式flag"""
-        return self.GetWindowStyle() & flag != 0
-
-    def toggle_wxstyle(self, flag, toggle=None):
-        """切换wxWidgets样式flag
-        :param toggle: None 切换, True 设置, False 取消
-        """
-        style = self.GetWindowStyle()
-        if toggle is None:
-            toggle = style & flag == 0
-        if toggle:
-            style |= flag
-        else:
-            style &= ~flag
-        self.SetWindowStyle(style)
 
     def bind_event(self, event_type, func, reset=True, pass_event=False, pass_view=True):
         """添加事件监听器"""
@@ -332,17 +340,31 @@ class View:
         """手动添加事件"""
         self.AddPendingEvent(wx.Event(event_type, self.GetId()))
 
-    def __getattr__(self, name):
-        return getattr(self.wxwindow, name)
+    def set_on_keydown(self, fn):
+        self.bind_event(wx.EVT_KEY_DOWN, fn, False, True)
 
-    def set_on_keydown(fn):
-        self.bind_event(wx.EVT_KEY_DOWN, fn, false, true)
+    set_on_left_down = event_binder(wx.EVT_LEFT_DOWN, pass_event=True)
+    set_on_left_up = event_binder(wx.EVT_LEFT_UP, pass_event=True)
+    set_on_right_down = event_binder(wx.EVT_RIGHT_DOWN, pass_event=True)
+    set_on_right_up = event_binder(wx.EVT_RIGHT_UP, pass_event=True)
 
-    # void setOnFileDrop(pycref ondrop);
+    def on_pop_menu(self, event):
+        if self.contextmenu:
+            self.PopupMenu(self.contextmenu.wxmenu)
 
-    # void setOnTextDrop(pycref ondrop);
+    def on_context_menu(self, event):
+        if self.contextmenu:
+            self.contextmenu.onselect(self, event.GetId())
+
+    def set_on_file_drop(self, fn):
+        self.SetDropTarget(FileDropListener(fn))
+
+    def set_on_text_drop(self, fn):
+        self.SetDropTarget(TextDropListener(fn))
 
     # void startTextDrag(wxcstr text, pycref callback);
+    def start_text_drop(fn):
+        pass
 
     def set_on_destroy(fn):
         bind_event(wx.EVT_DESTROY, fn)
@@ -475,7 +497,7 @@ class Layout(View):
         """当前获取焦点的元素"""
         child = self.FindFocus()
         if child is not None:
-            return child.GetClientData()
+            return child.GetHost()
 
     @staticmethod
     def parsecolor(color):

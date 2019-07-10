@@ -16,7 +16,7 @@ class Main(BaseTool):
                         with ui.Horizontal(class_="expand padding"):
                             ui.Text('输入进制', class_="padding_right")
                             self.base_in = ui.Choice(class_="fill",
-                                choices=self.BASES_CHOICES).setSelection(2)
+                                choices=self.BASES_CHOICES).set_selection(2)
                         self.text_input = ui.TextInput(class_="fill", multiline=True)
                     with ui.Vertical(class_="expand padding"):
                         ui.Button('<->', class_='btn_sm', onclick=self.reverse_base)
@@ -26,7 +26,7 @@ class Main(BaseTool):
                         with ui.Horizontal(class_="expand padding"):
                             ui.Text('输出进制', class_="padding_right")
                             self.base_out = ui.Choice(class_="fill",
-                                choices=self.BASES_CHOICES).setSelection(3)
+                                choices=self.BASES_CHOICES).set_selection(3)
                         self.text_output = ui.TextInput(class_="fill", readonly=True, multiline=True)
         return win
 

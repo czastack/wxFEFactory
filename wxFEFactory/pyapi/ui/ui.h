@@ -116,17 +116,17 @@ public:
 
 	static void start_cache()
 	{
-		m_choices_cache_on = true;
+		m_choices_cached = true;
 	}
 
 	static void end_cache()
 	{
-		m_choices_cache_on = false;
+		m_choices_cached = false;
 		m_choices_cache.clear();
 	}
 protected:
 	static std::unordered_map<PyObject*, wxArrayString> m_choices_cache;
-	static bool m_choices_cache_on;
+	static bool m_choices_cached;
 
 private:
 	pybind11::module module;

@@ -20,7 +20,7 @@ void UiModule::init_datacontrols()
 		.def("GetPropertyByName", (wxPGProperty * (wxPropertyGrid::*)(const wxString & name) const) & wxPropertyGrid::GetPropertyByName);
 
 
-	py::class_<wxPGProperty>(ui, "PGProperty")
+	py::class_<NODELETE(wxPGProperty)>(ui, "PGProperty")
 		.def("GetName", &wxPGProperty::GetName)
 		.def("GetLabel", &wxPGProperty::GetLabel)
 		.def("GetValue", &wxPGProperty::GetValue)
@@ -28,42 +28,42 @@ void UiModule::init_datacontrols()
 		.def("SetAttribute", &wxPGProperty::SetAttribute, name, value)
 		.def("SetFlagRecursively", &wxPGProperty::SetFlagRecursively, "flag"_a, "set"_a);
 
-	py::class_<wxPropertyCategory, wxPGProperty>(ui, "PropertyCategory")
+	py::class_<NODELETE(wxPropertyCategory), wxPGProperty>(ui, "PropertyCategory")
 		.def(py::init<const wxString&, const wxString&>(), label, name = wxPG_LABEL);
 
-	py::class_<wxStringProperty, wxPGProperty>(ui, "StringProperty")
+	py::class_<NODELETE(wxStringProperty), wxPGProperty>(ui, "StringProperty")
 		.def(py::init<const wxString&, const wxString&, const wxString&>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = wxEmptyString);
 
-	py::class_<wxIntProperty, wxPGProperty>(ui, "IntProperty")
+	py::class_<NODELETE(wxIntProperty), wxPGProperty>(ui, "IntProperty")
 		.def(py::init<const wxString&, const wxString&, long>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = 0L);
 
-	py::class_<wxUIntProperty, wxPGProperty>(ui, "UIntProperty")
+	py::class_<NODELETE(wxUIntProperty), wxPGProperty>(ui, "UIntProperty")
 		.def(py::init<const wxString&, const wxString&, unsigned long>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = 0L);
 
-	py::class_<wxFloatProperty, wxPGProperty>(ui, "FloatProperty")
+	py::class_<NODELETE(wxFloatProperty), wxPGProperty>(ui, "FloatProperty")
 		.def(py::init<const wxString&, const wxString&, double>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = 0.0);
 
-	py::class_<wxBoolProperty, wxPGProperty>(ui, "BoolProperty")
+	py::class_<NODELETE(wxBoolProperty), wxPGProperty>(ui, "BoolProperty")
 		.def(py::init<const wxString&, const wxString&, bool>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = false);
 
-	py::class_<wxEnumProperty, wxPGProperty>(ui, "EnumProperty")
+	py::class_<NODELETE(wxEnumProperty), wxPGProperty>(ui, "EnumProperty")
 		.def(py::init<const wxString&, const wxString&, const wxArrayString&, const wxArrayInt&, int>(),
 			label, name, "labels"_a, "values"_a = wxArrayInt(), value = 0);
 
-	py::class_<wxFlagsProperty, wxPGProperty>(ui, "FlagsProperty")
+	py::class_<NODELETE(wxFlagsProperty), wxPGProperty>(ui, "FlagsProperty")
 		.def(py::init<const wxString&, const wxString&, const wxArrayString&, const wxArrayInt&, int>(),
 			label=wxPG_LABEL, name=wxPG_LABEL, "labels"_a, "values"_a, value = 0);
 
-	py::class_<wxLongStringProperty, wxPGProperty>(ui, "LongStringProperty")
+	py::class_<NODELETE(wxLongStringProperty), wxPGProperty>(ui, "LongStringProperty")
 		.def(py::init<const wxString&, const wxString&, const wxString&>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value = wxEmptyString);
 
-	py::class_<wxArrayStringProperty, wxPGProperty>(ui, "ArrayStringProperty")
+	py::class_<NODELETE(wxArrayStringProperty), wxPGProperty>(ui, "ArrayStringProperty")
 		.def(py::init<const wxString&, const wxString&, const wxArrayString&>(),
 			label = wxPG_LABEL, name = wxPG_LABEL, value);
 

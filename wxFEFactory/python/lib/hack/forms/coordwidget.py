@@ -48,7 +48,7 @@ class CoordWidget(TwoWayWidget):
                 with ui.Horizontal(class_="fill"):
                     with ui.Vertical(style={'weight': 2}):
                         with ui.FlexGridLayout(cols=2, vgap=10, class_="fill") as grid:
-                            grid.AddGrowableCol(1)
+                            grid.sizer.AddGrowableCol(1)
                             for label in self.labels or ('X坐标', 'Y坐标', 'Z坐标'):
                                 ui.Label(label)
                                 views.append(ui.TextInput(class_="fill"))
@@ -64,18 +64,18 @@ class CoordWidget(TwoWayWidget):
                             if self.preset:
                                 ui.Button(label="预设", class_="button", onclick=this.choosePreset)
                     self.listbox = ui.ListBox(class_="fill padding_left", onselect=this.onListBoxSel)
-                    self.listbox.setOnKeyDown(this.onListBoxKey)
+                    self.listbox.set_on_keydown(this.onListBoxKey)
 
                 with ui.ContextMenu() as contextmenu:
                     ui.MenuItem("复制(&C)", onselect=this.onCopy)
                     ui.MenuItem("粘贴(&V)", onselect=this.onPaste)
                     ui.MenuItem("清空列表(&E)", onselect=this.onClear)
-                root.setContextMenu(contextmenu)
+                root.set_context_menu(contextmenu)
             self.views = tuple(views)
         self.view = self.views[0]
         self.container = container
         for view in self.views:
-            view.setOnKeyDown(self.onKey)
+            view.set_on_keydown(self.onKey)
 
     @property
     def mem_value(self):
@@ -130,7 +130,7 @@ class CoordWidget(TwoWayWidget):
     def load(self, data_list):
         self.data_list = data_list
         self.listbox.clear()
-        self.listbox.appendItems(tuple(data['name'] for data in self.data_list))
+        self.listbox.Append(tuple(data['name'] for data in self.data_list))
 
     def onAdd(self, btn):
         name = self.name_view.value
@@ -168,10 +168,10 @@ class CoordWidget(TwoWayWidget):
         if self.preset:
             dialog = ui.dialog.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.weak.onPreset)
             self.dialog = dialog
-            dialog.showModal()
+            dialog.ShowModal()
 
     def onPreset(self, lb):
-        self.dialog.endModal()
+        self.dialog.EndModal()
         del self.dialog
         coords = self.preset.coords
         path = Path(self.preset.__file__).with_name(coords[lb.index][1] + '.json')
@@ -207,16 +207,16 @@ class CoordWidget(TwoWayWidget):
         index = self.listbox.index
         if index != 0:
             self.data_list[index - 1], self.data_list[index] = self.data_list[index], self.data_list[index - 1]
-            self.listbox.setText(self.data_list[index]['name'], index)
-            self.listbox.setText(self.data_list[index - 1]['name'], index - 1)
+            self.listbox.SetString(self.data_list[index]['name'], index)
+            self.listbox.SetString(self.data_list[index - 1]['name'], index - 1)
 
     def move_down(self):
         """下移一项"""
         index = self.listbox.index
         if index != self.listbox.count - 1:
             self.data_list[index + 1], self.data_list[index] = self.data_list[index], self.data_list[index + 1]
-            self.listbox.setText(self.data_list[index]['name'], index)
-            self.listbox.setText(self.data_list[index + 1]['name'], index + 1)
+            self.listbox.SetString(self.data_list[index]['name'], index)
+            self.listbox.SetString(self.data_list[index + 1]['name'], index + 1)
 
     def onCopy(self, view, menu):
         fefactory_api.set_clipboard(str(tuple(self.input_value)))

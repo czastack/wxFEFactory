@@ -8,7 +8,7 @@ class BaseTopLevelWindow(Layout):
 
     def onclose(self, event):
         if self._onclose:
-            if self._onclose(event) is False:
+            if self._onclose(self, event) is False:
                 event.Veto()
                 return False
             event.Skip()
@@ -45,34 +45,34 @@ class BaseFrame(BaseTopLevelWindow):
         self.menubar.onselect(event.GetId())
 
 
-class Window(BaseFrame):
+class Frame(BaseFrame):
     wxtype = wx.Frame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
 
 
 class MDIParentFrame(BaseFrame):
     wxtype = wx.MDIParentFrame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
 
 
 class MDIChildFrame(BaseFrame):
     wxtype = wx.MDIChildFrame
 
     def __init__(self, title, menubar=None, **kwargs):
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
         self.menubar = menubar
+        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
 
 
-class HotkeyWindow(Window):
+class HotkeyFrame(Frame):
     def __init__(self, **kwargs):
-        Window.__init__(self, **kwargs)
         self.hotkey_map = {}
+        Frame.__init__(self, **kwargs)
 
     def prepare_hotkey(self, hotkey):
         if isinstance(hotkey, str):
@@ -85,7 +85,7 @@ class HotkeyWindow(Window):
         pass
 
 
-class KeyHookWindow(Window):
+class KeyHookFrame(Frame):
     pass
 
 

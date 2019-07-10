@@ -25,7 +25,7 @@ class Module(BaseListBoxModuel):
         this = self.weak
         with ui.Horizontal(class_="padding expand") as infobar:
             ui.ComboBox(wxstyle=ui.wx.CB_READONLY, choices=('地址预览', *(key for key in config.ADDR_MAP)),
-                onselect=this.onPreviewAddrChoiceChange).setSelection(0, True)
+                onselect=this.onPreviewAddrChoiceChange).set_selection(0, True)
             ui.Text("地址", class_="vcenter input_label")
             self.addr_view = ui.TextInput(readonly=True)
             ui.Text("说明", class_="vcenter input_label")
@@ -38,8 +38,8 @@ class Module(BaseListBoxModuel):
             ui.Button(label="保存文件", class_="button", onclick=this.onSave)
 
         self.pg.autosave = True
-        self.pg.setOnChange(this.onPgChange)
-        self.pg.setOnSelected(this.onFieldSelect)
+        self.pg.set_onchange(this.onPgChange)
+        self.pg.set_on_selected(this.onFieldSelect)
 
     @property
     def title(self):

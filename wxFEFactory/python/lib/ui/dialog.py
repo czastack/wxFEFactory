@@ -34,7 +34,7 @@ class StdDialog(ui.Dialog):
     def __exit__(self, *args):
         self.view.__exit__(*args)
 
-    def prevent_close(self, v):
+    def prevent_close(self, *args):
         self.dismiss()
         return False
 
@@ -49,14 +49,14 @@ class ListDialog(StdDialog):
             with ui.Vertical(styles=styles, style=styles['class']['fill']):
                 self.listbox = ui.CheckListBox(class_='fill', **listbox_opt)
                 with ui.Horizontal(class_="expand"):
-                    ui.Button(label="全选", class_="button", onclick=self.weak.checkAll)
-                    ui.Button(label="反选", class_="button", onclick=self.weak.reverseCheck)
+                    ui.Button(label="全选", class_="button", onclick=self.weak.checkall)
+                    ui.Button(label="反选", class_="button", onclick=self.weak.reverse_check)
 
-    def checkAll(self, btn):
-        self.listbox.checkAll()
+    def checkall(self, btn):
+        self.listbox.checkall()
 
-    def reverseCheck(self, btn):
-        self.listbox.reverseCheck()
+    def reverse_check(self, btn):
+        self.listbox.reverse_check()
 
 
 class ChoiceDialog(StdDialog):
@@ -93,14 +93,14 @@ class CheckChoiceDialog(ListDialog):
             i += 1
 
         if checked_list:
-            self.listbox.setCheckedItems(checked_list)
+            self.listbox.set_checked_list(checked_list)
 
         self.fields = [item[0] for item in choices]
 
-    def showModal(self):
-        ret = super().showModal()
+    def ShowModal(self):
+        ret = super().ShowModal()
         if ret:
-            checked_list = self.listbox.getCheckedItems()
+            checked_list = self.listbox.GetCheckedItems()
             for name in self.fields:
                 # 把对应的项的值从序号设为是否选中
                 setattr(self, name, getattr(self, name) in checked_list)
@@ -121,7 +121,7 @@ class SearchDialog(StdDialog):
                 self.input = ui.TextInput(class_='fill', wxstyle=ui.wx.TE_PROCESS_ENTER)
                 ui.Button(label="搜索", class_='btn_sm', onclick=self.weak.onenter)
             self.listbox = ui.ListBox(class_='fill', onselect=onselect)
-            self.input.setOnEnter(self.weak.onenter)
+            self.input.set_onenter(self.weak.onenter)
 
     def onenter(self, _):
         if self.onsearch:

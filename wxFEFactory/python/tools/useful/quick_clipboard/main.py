@@ -22,7 +22,7 @@ class Main(BaseTool):
             with ui.Vertical(class_="padding"):
                 with ui.Vertical(class_="fill padding"):
                     self.input = ui.TextInput(class_="expand", multiline=True, style={'height': 200})
-                    self.listbox = ui.ListBox(class_="expand", onselect=self.onSelectChange, style={'height': 200})
+                    self.listbox = ui.ListBox(class_="expand", onselect=self.on_select_change, style={'height': 200})
                     with ui.Horizontal(class_="expand padding_top"):
                         ui.Button("输入", onclick=self.input_text)
                     with ui.ScrollView(class_="fill padding"):
@@ -33,18 +33,18 @@ class Main(BaseTool):
         return win
 
     def input_text(self, _=None):
-        self.listbox.setItems(self.input.value.split('\n'))
+        self.listbox.Set(self.input.value.split('\n'))
 
     def record_copy(self, _=None):
-        self.input.appendText('\n' + fefactory_api.get_clipboard())
+        self.input.AppendText('\n' + fefactory_api.get_clipboard())
 
     def item_prev(self, _=None):
         self.listbox.prev(False)
-        self.onSelectChange(self.listbox)
+        self.on_select_change(self.listbox)
 
     def item_next(self, _=None):
         self.listbox.next(False)
-        self.onSelectChange(self.listbox)
+        self.on_select_change(self.listbox)
 
     def item_prev_input(self, _=None):
         self.item_prev()
@@ -56,7 +56,7 @@ class Main(BaseTool):
         time.sleep(0.5)
         self.paste()
 
-    def onSelectChange(self, listbox):
+    def on_select_change(self, listbox):
         fefactory_api.set_clipboard(listbox.text)
 
     def copy(self):

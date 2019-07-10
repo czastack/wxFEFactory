@@ -58,7 +58,7 @@ class BaseForm(metaclass=FormMeta):
     def init_pg(self, pg):
         self.elem = pg
         for field in self.fields:
-            field.createProperty(pg)
+            field.create_property(pg)
 
     @classmethod
     def cfield(class_, name):

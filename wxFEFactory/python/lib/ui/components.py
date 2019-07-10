@@ -17,7 +17,7 @@ class Pagination(ui.Horizontal):
             ui.Button(label="跳转", class_="button", onclick=this.on_page)
             ui.Button(label="上页", class_="button", onclick=this.on_prev)
             ui.Button(label="下页", class_="button", onclick=this.on_next)
-        self.page_input.setOnEnter(this.on_page)
+        self.page_input.set_onenter(this.on_page)
 
     def set_total(self, total):
         self.total = total
@@ -63,7 +63,7 @@ class SearchListBox(ui.Vertical):
             self.input = ui.ComboBox(
                 class_='expand', wxstyle=wx.CB_DROPDOWN | wx.TE_PROCESS_ENTER, onselect=self.onsearch_select)
             self.listbox = ui.ListBox(class_='fill', choices=choices, onselect=onselect)
-            self.input.setOnEnter(self.onsearch)
+            self.input.set_onenter(self.onsearch)
 
     def onsearch(self, input):
         value = input.value
@@ -77,9 +77,9 @@ class SearchListBox(ui.Vertical):
                     values.append(i)
                 i += 1
         self.search_values = values
-        self.input.setItems(choices)
+        self.input.Set(choices)
         self.input.value = value
 
     def onsearch_select(self, view):
         # 搜索结果选择后切换到对应的序号
-        self.listbox.setSelection(self.search_values[view.index], True)
+        self.listbox.set_selection(self.search_values[view.index], True)

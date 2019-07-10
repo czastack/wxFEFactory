@@ -266,7 +266,7 @@ class MetalMaxHack(BaseNdsHack):
                     dialog.use_max = ui.CheckBox(label="最大", class_="vcenter", checked=True)
                     dialog.use_weight = ui.CheckBox(label="重量", class_="vcenter", checked=True)
                     dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", class_="vcenter", checked=True)
-                dialog.listview.appendColumns(*head)
+                dialog.listview.append_columns(*head)
 
                 dialog.data_list = []  # 读取预设数据时的列表
                 dialog.name_list = []  # 搜索时用的名称列表
@@ -277,14 +277,14 @@ class MetalMaxHack(BaseNdsHack):
                         # 多个星级
                         part_id = item[:1]
                         for sub in item[1]:
-                            listview.insertItems([part_name + sub + item[2:]])
+                            listview.insert_items([part_name + sub + item[2:]])
                             dialog.data_list.append(part_id + sub)
                             dialog.name_list.append(item_name)
                     else:
-                        listview.insertItems([part_name + item[1:]])
+                        listview.insert_items([part_name + item[1:]])
                         dialog.data_list.append(item)
                         dialog.name_list.append(item_name)
-                listview.setOnItemActivated(partial(__class__.on_chariot_item_preset_selected,
+                listview.set_on_item_activated(partial(__class__.on_chariot_item_preset_selected,
                     self.weak, dialog=dialog))
             setattr(self, name, dialog)
         return dialog
@@ -301,7 +301,7 @@ class MetalMaxHack(BaseNdsHack):
 
     def on_chariot_item_preset_selected(self, view, event, dialog):
         """战车物品预设选中处理"""
-        data = dialog.data_list[event.index]
+        data = dialog.data_list[event.GetSelection()]
         ins = self.chariot_item_info
         use_max = dialog.use_max.checked
         item_type = self.models.Chariot.item_type(data[0])
@@ -318,7 +318,7 @@ class MetalMaxHack(BaseNdsHack):
                     # 武器弹舱
                     ins.ammo = attr2
 
-        dialog.endModal()
+        dialog.EndModal()
 
     def on_chariot_item_preset_search(self, _, dialog):
         """预设搜索"""
@@ -332,15 +332,15 @@ class MetalMaxHack(BaseNdsHack):
                 choices.append(name)
                 values.append(i)
             i += 1
-        dialog.search.setItems(choices)
+        dialog.search.Set(choices)
         dialog.search.popup()
 
     def on_chariot_item_preset_search_select(self, view, dialog):
         """点击搜索项定位"""
         list_index = dialog.search_values[view.index]
-        dialog.listview.clearSelected()
-        dialog.listview.selectItem(list_index)
-        dialog.listview.focused_item = list_index
+        dialog.listview.clear_selected()
+        dialog.listview.SelectItem(list_index)
+        dialog.listview.Focus(list_index)
 
     def show_chariot_item_info(self, view, key=None, read=True):
         """显示详情对话框"""
@@ -368,12 +368,12 @@ class MetalMaxHack(BaseNdsHack):
                         if item[0] == equip and item[1] == star:
                             i = i + j
                             break
-                    dialog.listview.clearSelected()
-                    dialog.listview.selectItem(i)
-                    dialog.listview.focused_item = i
+                    dialog.listview.clear_selected()
+                    dialog.listview.SelectItem(i)
+                    dialog.listview.Focus(i)
                     break
                 i += 1
-        dialog.showModal()
+        dialog.ShowModal()
 
     def on_person_change(self, lb):
         self.person.set_addr_by_index(lb.index)

@@ -19,6 +19,12 @@ class PropertyGrid(Control):
         self.Bind(wx.EVT_PG_CHANGING, self.onchange)
         super().onready()
 
+    def set_prop_help(self, name, help):
+        self.GetPropertyByName(name).SetHelpString(help)
+
+    def set_readonly(self, name, readonly=True):
+        self.GetPropertyByName(name).SetFlagRecursively(wx.PG_PROP_READONLY, readonly)
+
     def onchange(self, event):
         self.changed = True
         if self.autosave:
@@ -46,6 +52,82 @@ class PropertyGrid(Control):
     def set_onselected(self, fn):
         self.bind_event(wx.EVT_PG_SELECTED, fn)
 
+    def append_property(self, prop, help=None):
+        self.Append(prop)
+        if help is not None:
+            prop.SetHelpString(help)
+
+    def add_category(self, title):
+        self.append_property(wx.PropertyCategory(self.label))
+
+    def add_string_property(title, name, help, value):
+        self.append_property(wx.StringProperty(title, name, value), help)
+
+    def add_int_property(title, name, help, value=0):
+        self.append_property(wx.IntProperty(title, name, value), help)
+
+    def add_uint_property(title, name, help, value=0):
+        self.append_property(wx.UIntProperty(title, name, value), help)
+
+    def add_hex_property(title, name, help, value=0):
+        prop = wx.UIntProperty(title, name, value)
+        prop.SetAttribute(wx.PG_UINT_BASE, wx.PG_BASE_HEX)
+        # prop.SetAttribute(wx.PG_UINT_PREFIX, wx.PG_PREFIX_0x)
+        self.append_property(prop, help)
+
+    def add_float_property(title, name, help, value=0):
+        self.append_property(wx.FloatProperty(title, name, value), help)
+
+    def add_bool_property(title, name, help, value=False):
+        prop = wx.BoolProperty(title, name, value)
+        prop.SetAttribute(wx.PG_BOOL_USE_CHECKBOX, true)
+        self.append_property(prop, help)
+
+    def add_enum_property(title, name, help, labels, values, value=0):
+        values = wx.ArrayInt() if values is None else values
+        self.append_property(wx.EnumProperty(title, name, labels, values, value), help)
+
+    def add_flags_property(title, name, help, items, values=None, value=0):
+        if value is None:
+            value = [1 << i for i in range(len(items))]
+        prop = wx.FlagsProperty(title, name, labels, values, value)
+        prop.SetAttribute(wx.PG_BOOL_USE_CHECKBOX, True)
+        self.append_property(prop, help)
+
+    def add_long_string_property(title, name, help, value):
+        self.append_property(wx.LongStringProperty(title, name, value), help)
+
+    def add_array_string_property(title, name, help, values):
+        self.append_property(wx.ArrayStringProperty(title, name, values), help)
+
+    def set_enum_choices(name, labels, values):
+        prop = self.GetPropertyByName(name)
+        if isinstance(prop, wx.EnumProperty):
+            choices = wx.PGChoices(labels, wx.ArrayInt() if values is None else values)
+            prop.SetChoices(choices)
+
+    def get_value(self, name):
+        prop = self.GetPropertyByName(name)
+        variant = prop.GetValue()
+        type = variant.GetType()
+        if type == "long":
+            return variant.GetLong()
+        elif type == "string":
+            return variant.GetString()
+        elif type == "bool":
+            return variant.GetBool()
+        elif type == "arrstring":
+            return variant.GetArrayString()
+
+    def set_value(self, name, value):
+        prop = self.GetPropertyByName(name)
+        type = prop.GetValueType()
+        if value is None:
+            variant = wx.Variant("")
+        else:
+            variant = wx.Variant(value)
+        self.SetPropVal(prop, variant)
+
 
 class ListView(Control):
     wxtype = wx.ListView
@@ -54,8 +136,7 @@ class ListView(Control):
         widths_len = len(widths) if widths else 0
         i = 0
         for item in columns:
-            self.AppendColumn(item, wx.LIST_FORMAT_LEFT,
-                widths[i] if i < widths_len else -1)
+            self.AppendColumn(item, wx.LIST_FORMAT_LEFT, widths[i] if i < widths_len else -1)
 
     def insert_items(self, rows, pos=-1, create=False):
         info = wx.ListItem()
@@ -85,6 +166,11 @@ class ListView(Control):
     def selectall(self, selected):
         for i in range(0, self.GetItemCount()):
             self.SelectItem(i, selected)
+
+    def reverse_check(self):
+        """反选"""
+        for i in range(0, self.GetItemCount()):
+            self.toggle_item(i)
 
     def clear_selected(self):
         for i in self.get_selected_list():

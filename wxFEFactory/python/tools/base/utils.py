@@ -23,9 +23,9 @@ class PresetDialog:
                         onselect=weak.on_search_select)
                     ui.Button("搜索", onclick=weak.on_search)
                 dialog.listview = listview = ui.ListView(class_="fill")
-                dialog.listview.appendColumns(*self.head)
-                listview.insertItems(self.items)
-                listview.setOnItemActivated(weak.on_item_selected)
+                dialog.listview.append_columns(*self.head)
+                listview.insert_items(self.items)
+                listview.set_on_item_activated(weak.on_item_selected)
             self._dialog = dialog
         return dialog
 
@@ -33,18 +33,18 @@ class PresetDialog:
         dialog = self.dialog
         if index is not -1:
             self.select(index)
-        dialog.showModal()
+        dialog.ShowModal()
 
     def select(self, index):
         dialog = self.dialog
-        dialog.listview.clearSelected()
-        dialog.listview.selectItem(index)
-        dialog.listview.focused_item = index
+        dialog.listview.clear_selected()
+        dialog.listview.SelectItem(index)
+        dialog.listview.Focus(index)
 
     def on_item_selected(self, view, event):
         """物品预设选中处理"""
-        setattr(self.model, self.model_prop, event.index)
-        self.dialog.endModal()
+        setattr(self.model, self.model_prop, event.GetSelection())
+        self.dialog.EndModal()
 
     def on_search(self, _):
         """搜索"""
@@ -59,7 +59,7 @@ class PresetDialog:
                 choices.append(item[0])
                 values.append(i)
             i += 1
-        dialog.search.setItems(choices)
+        dialog.search.Set(choices)
         dialog.search.popup()
 
     def on_search_select(self, view):

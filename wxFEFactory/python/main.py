@@ -64,13 +64,13 @@ class MainFrame:
             with ui.Menu("窗口"):
                 ui.MenuItem("保存窗口位置和大小", onselect=self.save_win_option)
 
-        with ui.Window("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
+        with ui.Frame("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
                 toolbar = ui.AuiToolBar(style={'height': 100}, extra=dict(direction="top", captionVisible=False))
                 # ui.ListBox(choices=self.module_names, onselect=self.on_nav, extra=dict(captionVisible=False))
                 self.book = ui.AuiNotebook(extra=dict(direction="center", maximizeButton=True, captionVisible=False))
                 with ui.Vertical(class_="console-bar", extra=dict(
-                        name="console", direction="bottom", row=1, caption="控制台", closeButton=False, maximizeButton=True
+                    name="console", direction="bottom", row=1, caption="控制台", closeButton=False, maximizeButton=True
                 )) as console:
                     self.console_output = ui.TextInput(readonly=True, multiline=True, class_="console-output")
                     with ui.Horizontal(class_="expand console-input-bar"):
@@ -104,8 +104,8 @@ class MainFrame:
         self.book.set_on_page_changed(self.on_tool_change)
 
         win.Show()
-        # self.console.setOnFileDrop(self.onConsoleFileDrop)
-        # self.console_input_multi.setOnKeyDown(self.on_console_input_multi_key)
+        # self.console.set_on_file_drop(self.on_console_file_drop)
+        self.console_input_multi.set_on_keydown(self.on_console_input_multi_key)
 
     @property
     def module_names(self):
@@ -136,7 +136,7 @@ class MainFrame:
             print('加载模块%s失败' % name)
             traceback.print_exc()
 
-    def onclose(self, _=None):
+    def onclose(self, *args):
         if self.book.close_all_page():
             del self.book
             self.opened_tools.clear()
@@ -170,7 +170,7 @@ class MainFrame:
 
     def toggle_console(self, menu):
         """显示/隐藏控制台"""
-        self.aui.togglePane("console")
+        self.aui.toggle_pane("console")
 
     def new_project(self, menu):
         """新建工程"""
@@ -183,7 +183,7 @@ class MainFrame:
             else:
                 # TODO
                 project.title = input("请输入工程名称", os.path.basename(path))
-            app.onChangeProject(project)
+            app.on_change_project(project)
             self.on_open_project(project)
 
     def open_project(self, menu):
@@ -192,17 +192,17 @@ class MainFrame:
         if path:
             project = Project(path)
             if project.exists():
-                app.onChangeProject(project)
+                app.on_change_project(project)
             else:
                 fefactory_api.alert("提示", "该目录下没有project.json")
 
     def do_open_project(self, menu):
         """处理打开工程"""
-        path = menu.getText()
+        path = menu.GetText()
         print(path)
         if path != app.project.path:
             project = Project(path)
-            app.onChangeProject(project)
+            app.on_change_project(project)
             self.on_open_project(project)
 
     def on_open_project(self, project):
@@ -237,7 +237,7 @@ class MainFrame:
             else:
                 traceback.print_exc()
 
-    def onConsoleFileDrop(self, files):
+    def on_console_file_drop(self, files):
         """控制台文件拖动事件"""
         # scope = __main__.__dict__
         scope = {'__builtins__': __main__.__builtins__}
@@ -254,17 +254,17 @@ class MainFrame:
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if code == WXK.TAB:
-            text_input.writeText('    ')
+            text_input.WriteText('    ')
             return True
         if mod == WXK.MOD_CONTROL:
             if code == WXK.RETURN:
                 self.console_input_multi_run()
                 return True
             elif code == WXK.A:
-                text_input.selectAll()
+                text_input.SelectAll()
                 return True
             elif code == WXK.L:
-                self.console_output.clear()
+                self.console_output.Clear()
                 return True
 
     # def read_from_rom(self, menu):
@@ -276,7 +276,7 @@ class MainFrame:
     #         print(reader.getRomTitle())
     #         dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
     #         if dialog.ShowModal():
-    #             for i in dialog.listbox.getCheckedItems():
+    #             for i in dialog.listbox.GetCheckedItems():
     #                 name = modules[i][1]
     #                 try:
     #                     Module = self.get_module(name)
@@ -329,7 +329,7 @@ class MainFrame:
         tool.add_close_callback(self.weak.on_tool_close)
         self.opened_tools.append(tool)
         self.opened_tools_map[id(tool.win)] = tool
-        self.book.index = self.book.count - 1
+        self.book.index = self.book.GetPageCount() - 1
 
         __main__.tool = tool
 
@@ -343,11 +343,11 @@ class MainFrame:
                     child.id = tree.InsertItem(item.id, text=child.label, data=ui.wx.PyTreeItemData(child))
         else:
             self.open_tool_by_name(item.module)
-            self.tool_dialog.endModal()
+            self.tool_dialog.EndModal()
 
     def on_tool_change(self, book):
         """切换工具"""
-        __main__.tool = self.opened_tools_map.get(id(book.getPage()), None)
+        __main__.tool = self.opened_tools_map.get(id(book.get_page()), None)
 
     def on_tool_close(self, tool):
         """工具窗口关闭回调，移除引用"""

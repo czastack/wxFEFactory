@@ -16,18 +16,20 @@ class BaseTool(BaseScene):
     def attach(self, frame):
         try:
             if self.nested:
-                with frame.book:
+                with ui.View.HEAR, frame.book:
                     win = self.render()
-                    if win:
-                        win.extra = dict(caption=self.unique_title)
             else:
-                with frame.win:
+                with ui.View.HEAR, frame.win:
                     win = self.render()
             if win:
-                win.setOnClose({'callback': self.onclose, 'arg_event': True})
+                win.set_onclose(ui.EventFunctor(self.onclose, pass_event=True))
                 self.win = win
+                # self.onready()
         except Exception:
             traceback.print_exc()
+
+    def onready(self):
+        pass
 
     def render(self):
         """ 渲染视图，供attach调用
@@ -37,7 +39,7 @@ class BaseTool(BaseScene):
 
     def render_float_win(self):
         """浮动的窗口"""
-        return ui.HotkeyWindow(self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
+        return ui.HotkeyFrame(title=self.title, styles=styles, style=dialog_style, menubar=self.render_menu(),
             wxstyle=ui.wx.FRAME_BASE | ui.wx.FRAME_FLOAT_ON_PARENT)
 
     def render_menu(self):
@@ -88,8 +90,8 @@ class BaseTool(BaseScene):
     def close_window(self, _=None):
         if self.nested:
             try:
-                # closePage会自动调用onclose
-                self.win.parent.closePage()
+                # close_page会自动调用onclose
+                self.win.parent.close_page()
             except Exception:
                 traceback.print_exc()
                 self.win.close()
@@ -101,11 +103,11 @@ class BaseTool(BaseScene):
         """
         有三种情况进入这里
         1. nested且有关闭按钮，点关闭按钮触发
-        2. 手动调用self.close_window(菜单)，由parent.closePage内调用window的onclose触发
+        2. 手动调用self.close_window(菜单)，由parent.close_page内调用window的onclose触发
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
         if self.nested:
-            if event and event.id is not 0:
+            if event and event.GetId() is not 0:
                 # 第一种情况阻止关闭
                 alert('请通过菜单过Tab上的关闭按钮关闭')
                 return False
@@ -120,10 +122,6 @@ class BaseTool(BaseScene):
 
         super().onclose()
 
-        callback = getattr(self, 'close_callback', None)
-        if callback:
-            callback()
-
         self.__dict__.clear()
         return True
 
@@ -137,7 +135,7 @@ class NestedTool(BaseTool):
 
     def render_win(self):
         menubar = self.render_menu()
-        Window = ui.KeyHookWindow if self.key_hook else ui.HotkeyWindow
-        self.win = Window(self.title, styles=styles, menubar=menubar, wxstyle=0x80804)
-        self.win.position = (70, 4)
+        Frame = ui.KeyHookFrame if self.key_hook else ui.HotkeyFrame
+        self.win = Frame(title=self.title, styles=styles, menubar=menubar, pos=ui.wx.Point(70, 4), wxstyle=0x80804,
+                         extra=dict(caption=self.unique_title))
         return self.win

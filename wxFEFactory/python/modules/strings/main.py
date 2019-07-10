@@ -25,8 +25,8 @@ class Module(BaseListBoxModuel):
             ui.Text("代码", class_="vcenter input_label")
             self.code_view = ui.TextInput(readonly=True, multiline=True, class_="expand")
 
-            infobar.AddGrowableCol(1)
-            infobar.AddGrowableRow(1)
+            infobar.sizer.AddGrowableCol(1)
+            infobar.sizer.AddGrowableRow(1)
 
         self.textarea = ui.TextInput(multiline=True, class_="fill")
         with ui.Horizontal(class_="expand"):
@@ -126,7 +126,7 @@ class Module(BaseListBoxModuel):
             ('show_code', '是否显示文本的码表代码'),
         ), style=dialog_style)
 
-        if not choice.showModal():
+        if not choice.ShowModal():
             print("取消操作")
             return
 

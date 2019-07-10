@@ -116,7 +116,7 @@ class Main(BaseGTATool):
                 for category in datasets.WEAPON_LIST:
                     with ui.Vertical():
                         with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as view:
-                            view.AddGrowableCol(1)
+                            view.sizer.AddGrowableCol(1)
                             for item in category[1]:
                                 self.weapon_views.append(WeaponWidget(player, *item))
                     view.parent.extra = dict(caption=category[0])
@@ -191,7 +191,7 @@ class Main(BaseGTATool):
 
         with ui.Vertical(class_="fill padding"):
             self.weapon_component_book = TabList(weapon_components)
-            # self.weapon_component_book.setToolTip("选中后回车键给与配件")
+            # self.weapon_component_book.SetToolTip("选中后回车键给与配件")
             with ui.Horizontal():
                 ui.Button("给予", onclick=self.give_weapon_component)
                 ui.Button("移除", onclick=self.remove_weapon_component)
@@ -1025,13 +1025,13 @@ class Main(BaseGTATool):
 
     @property
     def spawn_vehicle_id_view(self):
-        return self.vehicle_model_book.getPage()
+        return self.vehicle_model_book.get_page()
 
     def get_selected_vehicle_model(self):
         """获取刷车器选中的载具模型"""
         from .datasets.vehicle_models import VEHICLE_MODELS
         page_index = self.vehicle_model_book.index
-        item_index = self.vehicle_model_book.getPage(page_index).index
+        item_index = self.vehicle_model_book.get_page(page_index).index
         if item_index is not -1:
             model_name = VEHICLE_MODELS[page_index][1][item_index][1]
             if isinstance(model_name, int):
@@ -1332,7 +1332,7 @@ class Main(BaseGTATool):
         """获取选中的角色模型"""
         from .datasets.player_models import PLAYER_MODELS
         page_index = self.player_model_book.index
-        item_index = self.player_model_book.getPage(page_index).index
+        item_index = self.player_model_book.get_page(page_index).index
         if item_index is not -1:
             model_name = PLAYER_MODELS[page_index][1][item_index][1]
             return self.get_cache('player_model', model_name, self.get_hash_key)
@@ -1353,7 +1353,7 @@ class Main(BaseGTATool):
         """获取选中的物体模型"""
         from .datasets.object_models import OBJECT_MODELS
         page_index = self.object_model_book.index
-        item_index = self.object_model_book.getPage(page_index).index
+        item_index = self.object_model_book.get_page(page_index).index
         if item_index is not -1:
             model_name = OBJECT_MODELS[page_index][1][item_index][1]
             return self.get_cache('object_model', model_name, self.get_hash_key)
@@ -1547,7 +1547,7 @@ class Main(BaseGTATool):
 
     def get_selected_weapon_component(self):
         page_index = self.weapon_component_book.index
-        item_index = self.weapon_component_book.getPage(page_index).index
+        item_index = self.weapon_component_book.get_page(page_index).index
         if item_index is not -1:
             data = self.weapon_components[page_index]
             weapon_hash = data[2]

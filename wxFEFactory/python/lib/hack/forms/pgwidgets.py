@@ -13,7 +13,7 @@ class PgCategory(BaseGroup):
 
     def render(self):
         PgWidget.render(self)
-        self.pg.addCategory(self.label)
+        self.pg.add_category(self.label)
 
 
 class PgWidget(TwoWayWidget):
@@ -24,15 +24,15 @@ class PgWidget(TwoWayWidget):
         self.pg = group.pg
 
     def set_help(self):
-        self.pg.setHelp(self.name, help)
+        self.pg.set_prop_help(self.name, help)
 
     @property
     def input_value(self):
-        return self.pg.getValue(self.name)
+        return self.pg.get_value(self.name)
 
     @input_value.setter
     def input_value(self, value):
-        self.pg.setValue(self.name, value)
+        self.pg.set_value(self.name, value)
 
 
 class PgBaseInput(PgWidget):
@@ -45,13 +45,13 @@ class PgBaseInput(PgWidget):
         PgWidget.render(self)
         if self.type is int:
             if self.hex:
-                self.pg.addHexProperty(self.label, self.name)
+                self.pg.add_hex_property(self.label, self.name)
             else:
-                self.pg.addIntProperty(self.label, self.name)
+                self.pg.add_int_property(self.label, self.name)
         elif self.type is float:
-            self.pg.addFloatProperty(self.label, self.name)
+            self.pg.add_float_property(self.label, self.name)
         else:
-            self.pg.addStringProperty(self.label, self.name)
+            self.pg.add_string_property(self.label, self.name)
 
 
 class PgInput(PgBaseInput, OffsetsWidget):
@@ -75,7 +75,7 @@ class PgBaseCheckBox(PgWidget):
 
     def render(self):
         PgWidget.render(self)
-        self.pg.addBoolProperty(self.label, self.name)
+        self.pg.add_bool_property(self.label, self.name)
 
     def toggle(self):
         PgWidget.input_value.__set__(self, not PgWidget.input_value.__get__(self))
@@ -100,13 +100,13 @@ class PgModelCheckBox(ModelWidget, PgBaseCheckBox):
     @property
     def input_value(self):
         if self.enable is None:
-            return self.pg.getValue(self.name)
+            return self.pg.get_value(self.name)
         return super().input_value
 
     @input_value.setter
     def input_value(self, value):
         if self.enable is None:
-            self.pg.setValue(self.name, value)
+            self.pg.set_value(self.name, value)
         else:
             PgBaseCheckBox.input_value.__set__(self, value)
 
@@ -124,11 +124,11 @@ class PgBaseSelect(PgWidget):
 
     def render(self):
         PgWidget.render(self)
-        self.pg.addEnumProperty(self.label, self.name, None, self.choices, self.values)
+        self.pg.add_enum_property(self.label, self.name, None, self.choices, self.values)
 
-    def setItems(self, choices, values=None):
+    def Set(self, choices, values=None):
         self.choices, self.values = utils.prepare_option(choices, values)
-        self.pg.setEnumChoices(self.name, self.choices, self.values)
+        self.pg.set_enum_choices(self.name, self.choices, self.values)
 
 
 class PgSelect(PgBaseSelect, OffsetsWidget):
@@ -150,10 +150,10 @@ class PgBaseChoiceDisplay(PgWidget):
 
     def render(self):
         PgWidget.render(self)
-        self.pg.addStringProperty(self.label, self.name)
-        self.pg.setReadonly(self.name)
+        self.pg.add_string_property(self.label, self.name)
+        self.pg.set_readonly(self.name)
 
-    def setItems(self, choices, values=0):
+    def Set(self, choices, values=0):
         self.choices = choices
         if values is not 0:
             self.values = values
@@ -193,7 +193,7 @@ class PgBaseFlagWidget(PgWidget):
 
     def render(self):
         PgWidget.render(self)
-        self.pg.addFlagsProperty(self.label, self.name, None, self.labels, self.values)
+        self.pg.add_flags_property(self.label, self.name, None, self.labels, self.values)
 
 
 class PgFlagWidget(PgBaseFlagWidget, OffsetsWidget):

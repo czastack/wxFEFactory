@@ -31,11 +31,11 @@ class BaseHackTool(NestedTool):
                     self.attach_status_view = ui.Text("", class_="vcenter grow padding_left")
                     ui.CheckBox("保持最前", class_="vcenter", onchange=self.swith_keeptop)
                 with ui.Notebook(class_="fill") as book:
-                    book.setOnPageChange(self.onNotePageChange)
+                    book.set_onchange(self.on_page_changed)
                     self.begin_group()
                     try:
                         self.render_main()
-                        self.onNotePageChange(book)
+                        self.on_page_changed(book)
                     except Exception:
                         win.close()
                         raise
@@ -102,10 +102,10 @@ class BaseHackTool(NestedTool):
             group.after_lazy()
             del self.lazy_groups[root]
 
-    def onNotePageChange(self, book):
+    def on_page_changed(self, book):
         groups = getattr(self, 'lazy_groups', None)
         if groups:
-            root = book.getPage()
+            root = book.get_page()
             if root:
                 self.handle_lazy_group(root)
 
@@ -196,7 +196,7 @@ class BaseHackTool(NestedTool):
         with ui.ContextMenu() as contextmenu:
             ui.MenuItem("设为alt+c快捷键(&C)", onselect=self.set_cfn)
         for btn in parent.children:
-            btn.setContextMenu(contextmenu)
+            btn.set_context_menu(contextmenu)
 
     def load_model_fields(self, model):
         """导入模型字段数据"""
@@ -211,8 +211,8 @@ class BaseHackTool(NestedTool):
         exportable_fields = [model.field(name) for name in names]
         choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
         dialog = ui.dialog.ListDialog("选择导出的字段", listbox={'choices': choices})
-        if dialog.showModal():
-            for i in dialog.listbox.getCheckedItems():
+        if dialog.ShowModal():
+            for i in dialog.listbox.GetCheckedItems():
                 field = exportable_fields[i]
                 value = data['data'][names[i]]
                 if isinstance(value, str):
@@ -228,9 +228,9 @@ class BaseHackTool(NestedTool):
         exportable_fields = [model.field(name) for name in names]
         choices = [field.label or names[i] for i, field in enumerate(exportable_fields)]
         dialog = ui.dialog.ListDialog("选择导出的字段", listbox={'choices': choices})
-        if dialog.showModal():
+        if dialog.ShowModal():
             data = {'model': model.__name__, 'data': {}}
-            for i in dialog.listbox.getCheckedItems():
+            for i in dialog.listbox.GetCheckedItems():
                 field = exportable_fields[i]
                 value = field.__get__(self.chariot)
                 if not isinstance(value, (int, float)):

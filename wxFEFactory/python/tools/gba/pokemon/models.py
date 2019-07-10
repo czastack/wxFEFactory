@@ -410,7 +410,7 @@ class PokemonItemField(ModelField):
         super().__init__(offset, PokemonItem)
 
     def create_cache(self, instance):
-        return self.modelClass(instance.addr + self.offset, instance)
+        return self.model_t(instance.addr + self.offset, instance)
 
 
 class PointerGlobal(BaseGlobal):

@@ -19,14 +19,14 @@ class Main(BaseTool):
                     ui.Text("哈夫曼编码  ")
                     self.haff_view = ui.TextInput(class_="fill", multiline=True, readonly=True,
                         wxstyle=ui.wx.TE_PROCESS_ENTER)
-                    container.AddGrowableCol(1)
+                    container.sizer.AddGrowableCol(1)
                     for i in (2, 3, 4):
-                        container.AddGrowableRow(i)
+                        container.sizer.AddGrowableRow(i)
 
-        self.rom_picker.setOnChange(self.onRomChange)
-        self.dict_picker.setOnChange(self.onDictChange)
-        self.text_view.setOnEnter(self.onConvertText)
-        self.code_view.setOnEnter(self.onConvertCode)
+        self.rom_picker.set_onchange(self.onRomChange)
+        self.dict_picker.set_onchange(self.onDictChange)
+        self.text_view.set_onenter(self.onConvertText)
+        self.code_view.set_onenter(self.onConvertCode)
         self.dict_picker.enabled = False
         self.reader = None
         return win

@@ -146,10 +146,10 @@ class Main(BaseSfcHack):
                 with ui.Horizontal(class_="expand"):
                     dialog.use_weight = ui.CheckBox(label="重量", class_="vcenter", checked=True)
                     dialog.use_attr2 = ui.CheckBox(label="武器弹舱/C装置回避", class_="vcenter", checked=True)
-                dialog.listview.appendColumns(*head)
+                dialog.listview.append_columns(*head)
 
-                listview.insertItems(items)
-                listview.setOnItemActivated(partial(__class__.on_chariot_item_preset_selected, self.weak,
+                listview.insert_items(items)
+                listview.set_on_item_activated(partial(__class__.on_chariot_item_preset_selected, self.weak,
                     dialog=dialog))
             setattr(self, name, dialog)
         return dialog
@@ -161,7 +161,7 @@ class Main(BaseSfcHack):
 
     def on_chariot_item_preset_selected(self, view, event, dialog):
         """战车物品预设选中处理"""
-        equip = event.index
+        equip = event.GetSelection()
         data = datasets.CHARIOT_EQUIP_INFOS[equip]
         item_type = models.Chariot.item_type(equip)
         ins = self.chariot_equip_info
@@ -176,7 +176,7 @@ class Main(BaseSfcHack):
                 if item_type == 'weapon':
                     ins.ammo = attr2
 
-        dialog.endModal()
+        dialog.EndModal()
 
     def on_chariot_item_preset_search(self, _, dialog):
         """预设搜索"""
@@ -190,15 +190,15 @@ class Main(BaseSfcHack):
                 choices.append(item[0])
                 values.append(i)
             i += 1
-        dialog.search.setItems(choices)
+        dialog.search.Set(choices)
         dialog.search.popup()
 
     def on_chariot_item_preset_search_select(self, view, dialog):
         """点击搜索项定位"""
         list_index = dialog.search_values[view.index]
-        dialog.listview.clearSelected()
-        dialog.listview.selectItem(list_index)
-        dialog.listview.focused_item = list_index
+        dialog.listview.clear_selected()
+        dialog.listview.SelectItem(list_index)
+        dialog.listview.Focus(list_index)
 
     def show_chariot_equip_info(self, view, key=None, read=True):
         """显示详情对话框"""
@@ -216,10 +216,10 @@ class Main(BaseSfcHack):
         dialog = self.chariot_equip_preset_dialog
         equip = self.chariot_equip_info.equip
         if equip < 0x7F:
-            dialog.listview.clearSelected()
-            dialog.listview.selectItem(equip)
-            dialog.listview.focused_item = equip
-        dialog.showModal()
+            dialog.listview.clear_selected()
+            dialog.listview.SelectItem(equip)
+            dialog.listview.Focus(equip)
+        dialog.ShowModal()
 
     def on_person_change(self, lb):
         self.person.set_addr_by_index(lb.index)

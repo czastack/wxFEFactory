@@ -254,7 +254,7 @@ class AtkDefItemsMgr:
                     result.append("类别: %s, 值: %d" % (datasets.ATK_TYPES[item_type], item.value))
                 else:
                     result.append("类别: %d, 值: %d" % (item_type, item.value))
-            self.listbox.setItems(result)
+            self.listbox.Set(result)
 
     def get_item(self):
         unit_type = self.owner._unit_type()

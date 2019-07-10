@@ -73,7 +73,7 @@ class ConfigCtrl(ABC):
         if text is None:
             text = self.help
         try:
-            self.view.setToolTip(text)
+            self.view.SetToolTip(text)
         except Exception:
             self.help = text
         return self
@@ -106,7 +106,7 @@ class InputConfig(ConfigCtrl):
         with ui.Horizontal(class_="fill"):
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER)
             self.render_btn()
-        self.view.setOnKeyDown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onKey)
 
     def get_input_value(self):
         return self.type(self.view.value)
@@ -150,7 +150,7 @@ class SelectConfig(ConfigCtrl):
     def render(self):
         self.render_lable()
         self.view = ui.Choice(self.choices, class_="fill", onselect=self.weak.write)
-        self.view.setSelection(0, True)
+        self.view.set_selection(0, True)
 
     def get_input_value(self):
         index = self.view.index

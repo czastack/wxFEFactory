@@ -1,4 +1,5 @@
 import ctypes
+from lib.ui import wx
 
 u8 = ctypes.c_ubyte
 u16 = ctypes.c_ushort
@@ -34,25 +35,25 @@ class Group(Field):
         super().__init__(name, label, 0)
         self.children = children
 
-    def createProperty(self, pg):
-        pg.addCategory(self.label)
+    def create_property(self, pg):
+        pg.add_category(self.label)
         for field in self.children:
-            field.createProperty(pg)
+            field.create_property(pg)
 
 
 class Int(Field):
-    def createProperty(self, pg):
-        pg.addIntProperty(self.label, self.name)
+    def create_property(self, pg):
+        pg.add_int_property(self.label, self.name)
 
 
 class Uint(Field):
-    def createProperty(self, pg):
-        pg.addHexProperty(self.label, self.name)
+    def create_property(self, pg):
+        pg.add_hex_property(self.label, self.name)
 
 
 class Text(Field):
-    def createProperty(self, pg):
-        pg.addStringProperty(self.label, self.name)
+    def create_property(self, pg):
+        pg.add_string_property(self.label, self.name)
 
 
 class SimpleSelect(Field):
@@ -62,8 +63,8 @@ class SimpleSelect(Field):
         super().__init__(name, label, size)
         self.options = options
 
-    def createProperty(self, pg):
-        pg.addEnumProperty(self.label, self.name, None, self.options, None)
+    def create_property(self, pg):
+        pg.add_enum_property(self.label, self.name, None, self.options, None)
 
 
 class FlagSelect(Field):
@@ -73,10 +74,10 @@ class FlagSelect(Field):
         super().__init__(name, label, size)
         self.options = options
 
-    def createProperty(self, pg):
-        pg.addFlagsProperty(self.label, self.name, None, self.options)
+    def create_property(self, pg):
+        pg.add_flags_property(self.label, self.name, None, self.options)
 
 
 class Bytes(Field):
-    def createProperty(self, pg):
-        pg.addHexProperty(self.label, self.name)
+    def create_property(self, pg):
+        pg.add_hex_property(self.label, self.name)

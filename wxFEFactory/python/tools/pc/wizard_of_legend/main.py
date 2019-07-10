@@ -74,9 +74,9 @@ class Main(MonoHacktool):
     def render_skills(self):
         """渲染技能列表"""
         li = self.skill_listview = ui.ListView(class_="fill")
-        li.enableCheckboxes()
-        li.appendColumns(("名称", "加强", "描述"), (260, 400, 800))
-        li.insertItems((item[1:] for item in datasets.skills_info))
+        li.EnableCheckboxes()
+        li.append_columns(("名称", "加强", "描述"), (260, 400, 800))
+        li.insert_items((item[1:] for item in datasets.skills_info))
 
         with ui.Horizontal(class_="expand padding_top"):
             ListFooterButtons(li)
@@ -86,9 +86,9 @@ class Main(MonoHacktool):
     def render_items(self):
         """渲染符文列表"""
         li = self.item_listview = ui.ListView(class_="fill")
-        li.enableCheckboxes()
-        li.appendColumns(("名称", "描述"), (260, 1000))
-        li.insertItems((item[1:] for item in datasets.items_info))
+        li.EnableCheckboxes()
+        li.append_columns(("名称", "描述"), (260, 1000))
+        li.insert_items((item[1:] for item in datasets.items_info))
 
         with ui.Horizontal(class_="expand padding_top"):
             ListFooterButtons(li)
@@ -194,12 +194,12 @@ class Main(MonoHacktool):
 
     def unlock_checked_skills(self, _):
         """解锁所选技能"""
-        skills = (datasets.skills_info[i][0] for i in self.skill_listview.getCheckedList())
+        skills = (datasets.skills_info[i][0] for i in self.skill_listview.get_checked_list())
         self.HandleSkillsUnlock(skills)
 
     def pickup_selected_skill(self, _):
         """捡起当前第一个高亮选中的技能"""
-        indexs = self.skill_listview.getSelectedList()
+        indexs = self.skill_listview.get_selected_list()
         if indexs:
             index = indexs[0]
             self.PickUpSkill(datasets.skills_info[index][0])
@@ -208,10 +208,10 @@ class Main(MonoHacktool):
 
     def give_checked_items(self, _):
         """给予所选物品"""
-        items = (datasets.items_info[i][0] for i in self.item_listview.getCheckedList())
+        items = (datasets.items_info[i][0] for i in self.item_listview.get_checked_list())
         self.GiveItems(items)
 
     def give_selected_items(self, _):
         """给予高亮选中物品"""
-        items = (datasets.items_info[i][0] for i in self.item_listview.getSelectedList())
+        items = (datasets.items_info[i][0] for i in self.item_listview.get_selected_list())
         self.GiveItems(items)

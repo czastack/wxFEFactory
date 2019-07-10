@@ -76,7 +76,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                         bitindex=Player.SPECIAL_FP)),
                 ]
                 ui.Button("全部", style=btn_md_style, onclick=self.player_proof_all)
-                ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).setToolTip(
+                ui.Button("再次应用", style=btn_md_style, onclick=self.player_proof_apply).SetToolTip(
                     "死亡或者重新读档后需要再次应用")
 
     def render_vehicle(self):
@@ -109,7 +109,7 @@ class Main(BaseGTA3_VC_SA_Tool):
                         bitindex=Vehicle.SPECIAL_FP)),
                 ]
                 ui.Button("全部", style=btn_md_style, onclick=self.vehicle_proof_all)
-                ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).setToolTip(
+                ui.Button("再次应用", style=btn_md_style, onclick=self.vehicle_proof_apply).SetToolTip(
                     "切换载具后需要再次应用")
         ui.Text("颜色")
         with ui.Horizontal(class_="fill"):

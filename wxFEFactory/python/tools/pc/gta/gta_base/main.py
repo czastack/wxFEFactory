@@ -521,14 +521,14 @@ class BaseGTATool(NativeHacktool):
         pos = self.spawn_vehicle_id_view.index
         if pos == 0:
             pos = len(self.VEHICLE_LIST)
-        self.spawn_vehicle_id_view.setSelection(pos - 1, True)
+        self.spawn_vehicle_id_view.set_selection(pos - 1, True)
 
     def spawn_vehicle_id_next(self, _=None):
         """选中下一个载具"""
         pos = self.spawn_vehicle_id_view.index
         if pos == len(self.VEHICLE_LIST) - 1:
             pos = -1
-        self.spawn_vehicle_id_view.setSelection(pos + 1, True)
+        self.spawn_vehicle_id_view.set_selection(pos + 1, True)
 
     def lock_door(self, _=None):
         """锁最近使用的载具的车门"""

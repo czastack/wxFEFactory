@@ -65,7 +65,7 @@ class Widget:
 
     def set_help(self, help):
         if self.view:
-            self.view.setToolTip(help)
+            self.view.SetToolTip(help)
 
     def onKey(self, v, event):
         mod = event.GetModifiers()
@@ -317,16 +317,12 @@ class Group(BaseGroup):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        root = self.render_root()
-        if self.label:
-            # 作为Tab标签
-            root.extra = dict(caption=self.label)
-        self.root = root
+        self.root = self.render_root()
 
     def render_root(self):
         """渲染外层框架"""
         this = self.weak
-        with ui.Vertical(class_="fill") as root:
+        with ui.Vertical(class_="fill", extra={'caption': self.label} if self.label else None) as root:
             if self.hasheader:
                 self.header = ui.Horizontal(class_="expand padding")
 
@@ -350,10 +346,10 @@ class Group(BaseGroup):
                 self.view = ui.FlexGridLayout(cols=self.cols, vgap=10, hgap=10, class_="fill")
                 if self.horizontal:
                     for i in range(self.cols >> 1):
-                        self.view.AddGrowableCol((i << 1) + 1)
+                        self.view.sizer.AddGrowableCol((i << 1) + 1)
                 else:
                     for i in range(self.cols):
-                        self.view.AddGrowableCol(i)
+                        self.view.sizer.AddGrowableCol(i)
             else:
                 self.view = content
 
@@ -385,8 +381,8 @@ class DialogGroup(Group):
     def show(self, _=None):
         self.root.show()
 
-    def showModal(self, _=None):
-        self.root.showModal()
+    def ShowModal(self, _=None):
+        self.root.ShowModal()
 
 
 class StaticGroup(Group):
@@ -415,8 +411,8 @@ class VirtualGroup(BaseGroup):
 
 class Groups(BaseGroup):
     """可容纳子Group"""
-    def __init__(self, caption, onPageChange=None, **kwargs):
-        self.onPageChange = onPageChange
+    def __init__(self, caption, on_page_changed=None, **kwargs):
+        self.on_page_changed = on_page_changed
         return super().__init__(None, caption, **kwargs)
 
     def render(self):
@@ -425,8 +421,8 @@ class Groups(BaseGroup):
         if self.label:
             root.extra = dict(caption=self.label)
         self.root = root
-        if self.onPageChange:
-            self.view.setOnPageChange(self.onPageChange)
+        if self.on_page_changed:
+            self.view.set_on_page_changed(self.on_page_changed)
 
     def __enter__(self):
         super().__enter__()
@@ -435,8 +431,8 @@ class Groups(BaseGroup):
     def __exit__(self, *args):
         super().__exit__(*args)
         self.root.thaw()
-        if self.onPageChange:
-            self.onPageChange(self.view)
+        if self.on_page_changed:
+            self.on_page_changed(self.view)
 
 
 class BaseInput(TwoWayWidget):
@@ -459,7 +455,7 @@ class BaseInput(TwoWayWidget):
             else:
                 self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
-            self.view.setOnKeyDown(self.weak.onKey)
+            self.view.set_on_keydown(self.weak.onKey)
         self.container = container
         del self.min, self.max
 
@@ -607,19 +603,19 @@ class BaseSelect(TwoWayWidget):
         super().render()
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.Choice(class_="fill", choices=self.choices, onselect=self.onselect)
-            self.view.setContextMenu(self.contextmenu)
-            self.view.setOnDestroy(self.weak.onDestroy)
+            self.view.set_context_menu(self.contextmenu)
+            self.view.set_on_destroy(self.weak.onDestroy)
             self.render_btn()
         self.container = container
-        self.view.setOnKeyDown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onKey)
         if self.dragable:
-            self.view.setOnLeftDown(self.weak.onLeftDown)
-            self.view.setOnTextDrop(self.weak.onTextDrop)
+            self.view.set_on_left_down(self.weak.onLeftDown)
+            self.view.set_on_text_drop(self.weak.onTextDrop)
         self.search_map[id(self.view)] = self
 
-    def setItems(self, choices, values=0):
+    def Set(self, choices, values=0):
         self.choices = choices
-        self.view.setItems(choices)
+        self.view.Set(choices)
         if values is not 0:
             self.values = values
 
@@ -663,7 +659,7 @@ class BaseSelect(TwoWayWidget):
             cls.search_dialog.listbox.clear()
         else:
             cls.search_dialog.listbox.index = -1
-        cls.search_dialog.showModal()
+        cls.search_dialog.ShowModal()
         del cls.active_ins
 
     @classmethod
@@ -681,22 +677,22 @@ class BaseSelect(TwoWayWidget):
                 choices.append(item)
                 values.append(i)
             i += 1
-        cls.search_dialog.listbox.setItems(choices)
+        cls.search_dialog.listbox.Set(choices)
         cls.search_last_choices = cls.active_ins.choices  # 上次搜索的内容集
         cls.search_values = values
 
     @classmethod
     def onsearch_select(cls, view):
         # 搜索结果选择后切换到对应的序号
-        cls.active_ins.view.setSelection(cls.search_values[view.index], True)
-        cls.search_dialog.endModal()
+        cls.active_ins.view.set_selection(cls.search_values[view.index], True)
+        cls.search_dialog.EndModal()
 
     def onDestroy(self, view):
         self.search_map.pop(id(view), None)
 
     def onLeftDown(self, view, event):
-        if fefactory_api.getKeyState(WXK.SHIFT):
-            view.startTextDrag(str(id(self.view)))
+        if fefactory_api.GetKeyState(WXK.SHIFT):
+            view.start_text_drag(str(id(self.view)))
             return False
 
     def onTextDrop(self, i):
@@ -705,10 +701,10 @@ class BaseSelect(TwoWayWidget):
             instance = self.search_map.get(int(i), None)
             if instance and self != instance:
                 if instance.choices == self.choices:
-                    ctrl = fefactory_api.getKeyState(WXK.CONTROL)
+                    ctrl = fefactory_api.GetKeyState(WXK.CONTROL)
                     value = instance.view.index
                     if not ctrl:
-                        alt = fefactory_api.getKeyState(WXK.ALT)
+                        alt = fefactory_api.GetKeyState(WXK.ALT)
                         if not alt:
                             # 交换
                             instance.view.index = self.view.index
@@ -735,11 +731,11 @@ class BaseSelect(TwoWayWidget):
     class CacheContex:
         """选项数组缓存，避免重复C++类型转换"""
         def __enter__(self):
-            ui.Choice.start_cache()
+            ui.wx.start_cache()
             return self
 
         def __exit__(self, exc_type, exc_value, traceback):
-            ui.Choice.end_cache()
+            ui.wx.Choice.end_cache()
 
     choices_cache = CacheContex()
 
@@ -768,10 +764,10 @@ class BaseChoiceDisplay(Widget):
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
-        self.view.setOnKeyDown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onKey)
         self.container = container
 
-    def setItems(self, choices, values=0):
+    def Set(self, choices, values=0):
         self.choices = choices
         if values is not 0:
             self.values = values
@@ -806,7 +802,7 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
 def Choice(laebl, choices, onselect):
     """选项框"""
     ui.Label(laebl)
-    return ui.Choice(class_="fill", choices=choices, onselect=onselect).setSelection(0)
+    return ui.Choice(class_="fill", choices=choices, onselect=onselect).set_selection(0)
 
 
 def Title(label):
@@ -839,7 +835,7 @@ class BaseFlagWidget(TwoWayWidget):
                 )
                 if self.helps:
                     for view, help in zip(self.views, self.helps):
-                        view.setToolTip(help)
+                        view.SetToolTip(help)
             if self.checkbtn:
                 ui.Button(label="全选", style=btn_xs_style, onclick=self.weak.check_all)
                 ui.Button(label="不选", style=btn_xs_style, onclick=self.weak.uncheck_all)
@@ -931,16 +927,16 @@ class ListFooterButtons:
     """渲染带复选框列表的底部按钮"""
     def __init__(self, li):
         self.li = li
-        ui.Button(label="全选", class_="button", onclick=lambda btn: li.checkAll())
-        ui.Button(label="全不选", class_="button", onclick=lambda btn: li.checkAll(False))
-        ui.Button(label="勾选高亮", class_="button", onclick=lambda btn: li.checkSelection())
+        ui.Button(label="全选", class_="button", onclick=lambda btn: li.checkall())
+        ui.Button(label="全不选", class_="button", onclick=lambda btn: li.checkall(False))
+        ui.Button(label="勾选高亮", class_="button", onclick=lambda btn: li.check_selection())
         ui.Button(label="导出勾选", class_="button", onclick=self.dump_checked)
         ui.Button(label="导入勾选", class_="button", onclick=self.load_checked)
 
     def dump_checked(self, _):
         """导出勾选"""
-        fefactory.json_dump_file(self, self.li.getCheckedList())
+        fefactory.json_dump_file(self, self.li.get_checked_list())
 
     def load_checked(self, _):
         """导入勾选"""
-        self.li.setCheckedList(fefactory.json_load_file(self))
+        self.li.set_checked_list(fefactory.json_load_file(self))

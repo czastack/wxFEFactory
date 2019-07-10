@@ -1,5 +1,6 @@
 from .view import View, Layout
 from . import wx
+from lib.exctypes import int32
 
 
 class SizerLayout(Layout):
@@ -11,6 +12,10 @@ class SizerLayout(Layout):
 
     def layout(self):
         self.GetSizer().Layout()
+
+    def set_sizer(self, sizer):
+        self.sizer = sizer
+        self.SetSizer(sizer)
 
     def get_box_flag(self, style):
         """获取布局参数"""
@@ -64,55 +69,57 @@ class SizerPanel(SizerLayout):
 class Vertical(SizerPanel):
     """垂直布局"""
     def onready(self):
-        self.SetSizer(wx.BoxSizer(wx.VERTICAL))
+        self.set_sizer(wx.BoxSizer(wx.VERTICAL))
         super().onready()
 
 
 class Horizontal(SizerPanel):
     """水平布局"""
     def onready(self):
-        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
+        self.set_sizer(wx.BoxSizer(wx.HORIZONTAL))
         super().onready()
 
 
 class GridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        super().__init__(**kwargs)
         self.rows = rows
         self.cols = cols
         self.vgap = vgap
         self.hgap = hgap
+        super().__init__(**kwargs)
 
     def onready(self):
-        self.SetSizer(wx.GridSizer(self.rows, self.cols, self.vgap, self.hgap))
+        self.set_sizer(wx.GridSizer(self.rows, self.cols, self.vgap, self.hgap))
         super().onready()
 
 
 class FlexGridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        super().__init__(**kwargs)
         self.rows = rows
         self.cols = cols
         self.vgap = vgap
         self.hgap = hgap
+        super().__init__(**kwargs)
 
     def onready(self):
         sizer = wx.FlexGridSizer(self.rows, self.cols, self.vgap, self.hgap)
         sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
-        self.SetSizer(sizer)
+        self.set_sizer(sizer)
         super().onready()
 
 
 class ScrollView(SizerLayout):
-    def __init__(self, horizontal=False, wxstyle=wx.HSCROLL | wx.VSCROLL, **kwargs):
-        super().__init__(wxstyle=wxstyle, **kwargs)
+    wxtype = wx.ScrolledWindow
+
+    def __init__(self, horizontal=False, wxstyle=int32(wx.HSCROLL | wx.VSCROLL).value, **kwargs):
         self.horizontal = horizontal
+        super().__init__(wxstyle=wxstyle, **kwargs)
 
     def onready(self):
         self.SetScrollRate(5, 5)
-        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
+        self.set_sizer(wx.BoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
         super().onready()
 
     def layout(self):
@@ -125,9 +132,9 @@ class SplitterWindow(Layout):
     wxtype = wx.SplitterWindow
 
     def __init__(self, horizontal=False, sashpos=0, **kwargs):
-        Layout.__init__(self, **kwargs)
         self.horizontal = horizontal
         self.sashpos = sashpos
+        Layout.__init__(self, **kwargs)
 
     def onready(self):
         super().onready()
@@ -156,16 +163,16 @@ class StaticBox(SizerLayout):
     def onready(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.InsertSpacer(0, 15)
-        self.SetSizer(sizer)
+        self.set_sizer(sizer)
         super().onready()
 
 
 class BookCtrlBase(Layout):
     def layout_child(self, child, style):
         caption = child.extra['caption']
-        self.AddPage(child, caption)
+        self.AddPage(child.wxwindow, caption)
 
-    def getpage(self, n=None):
+    def get_page(self, n=None):
         if n is None:
             n = self.GetSelection()
         else:
@@ -175,7 +182,7 @@ class BookCtrlBase(Layout):
             if not 0 <= n < count:
                 raise IndexError('list index out of range')
 
-        return self.GetPage(n).GetClientData()
+        return self.GetPage(n).GetHost()
 
     def set_onchange(self, onchange, reset=True):
         self.bind_event(self.wxevent, onchange, reset)

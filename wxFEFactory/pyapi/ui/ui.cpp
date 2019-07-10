@@ -1,4 +1,5 @@
 #include <wx/wx.h>
+#include <wx/dnd.h>
 #include "ui.h"
 #include "thread.h"
 #include "console.h"
@@ -22,11 +23,11 @@ namespace pybind11 {
 
 
 std::unordered_map<PyObject*, wxArrayString> UiModule::m_choices_cache;
-bool UiModule::m_choices_cache_on = false;
+bool UiModule::m_choices_cached = false;
 
 wxArrayString UiModule::get_choices(pycref choices)
 {
-	if (m_choices_cache_on) {
+	if (m_choices_cached) {
 		auto it = m_choices_cache.find(choices.ptr());
 		if (it != m_choices_cache.end())
 		{
@@ -103,6 +104,10 @@ UiModule::UiModule(pybind11::module &module) :
 
 void UiModule::init_ui()
 {
+	ui.def("get_choices", &UiModule::get_choices)
+		.def("start_cache", &UiModule::start_cache)
+		.def("end_cache", &UiModule::end_cache);
+
 	py::class_<ConsoleHandler>(ui, "Console")
 		.def("bind_elem", &ConsoleHandler::bindElem)
 		.def("get_history", Console__get_history);
@@ -137,6 +142,7 @@ void UiModule::init_ui()
 		;
 
 	py::class_<wxArrayInt>(ui, "ArrayInt");
+	py::class_<wxArrayString>(ui, "wxArrayString");
 	py::class_<wxValidator>(ui, "Validator");
 	py::class_<wxObject>(ui, "Object");
 
@@ -211,6 +217,8 @@ void UiModule::init_ui()
 		.def_readwrite("m_x", &wxMouseState::m_x)
 		.def_readwrite("m_y", &wxMouseState::m_y);
 
+	py::class_<wxDropTarget>(ui, "DropTarget");
+
 	py::class_<wxEvtHandler>(ui, "EvtHandler")
 		.def("GetClientData", &wxEvtHandler::GetClientData)
 		.def("SetClientData", &wxEvtHandler::SetClientData, data)
@@ -229,7 +237,10 @@ void UiModule::init_ui()
 	py::class_<wxApp>(ui, "App")
 		.def("GetTopWindow", &wxApp::GetTopWindow);
 
-	py::class_<NODELETE(wxWindow), wxEvtHandler>(ui, "Window")
+
+	py::class_<wxWindowBase, wxEvtHandler>(ui, "WindowBase");
+
+	py::class_<NODELETE(wxWindow), wxWindowBase>(ui, "Window")
 		.def(py::init<>())
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, pos_v, size_v, style_0, name = (const char*)wxPanelNameStr)
@@ -268,9 +279,14 @@ void UiModule::init_ui()
 		.def("SetToolTip", py::overload_cast<const wxString&>(&wxWindow::SetToolTip))
 		.def("Reparent", &wxWindow::Reparent)
 		.def("Layout", &wxWindow::Layout)
+		.def("PopupMenu", py::overload_cast<wxMenu*, const wxPoint&>(&wxWindow::PopupMenu),
+			"menu"_a, pos_v)
+		.def("PopupMenu", py::overload_cast<wxMenu*, int, int>(&wxWindow::PopupMenu),
+			"menu"_a, "x"_a, "y"_a)
 		.def("AddPendingEvent", &wxWindow::wxEvtHandler::AddPendingEvent, event)
 		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
 		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
+		.def("SetDropTarget", &wxWindow::SetDropTarget, "hotkeyId"_a)
 		.def("Bind", [](wxWindow* self, wxEventType eventType, pycref fn, int winid, int lastId, wxObject* userData)
 		{
 			self->Bind(wxEventTypeTag<wxEvent>(eventType), PyFunctor(fn), winid, lastId, userData);

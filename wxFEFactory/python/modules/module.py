@@ -113,11 +113,11 @@ class BaseListBoxModuel(BaseModule):
             with ui.Vertical():
                 self.render_main()
 
-        self.listbox.setOnKeyDown(this.onListBoxKey)
+        self.listbox.set_on_keydown(this.onListBoxKey)
 
         contextmenu = self.render_contextmenu()
         if contextmenu:
-            self.listbox.setContextMenu(contextmenu)
+            self.listbox.set_context_menu(contextmenu)
         return panel
 
     def render_main(self):
@@ -147,7 +147,7 @@ class BaseListBoxModuel(BaseModule):
         name = self.listbox.text
         if name:
             newname = input("新名称", name)
-            self.listbox.setText(newname)
+            self.listbox.SetString(self.listbox.GetSelection(), newname)
             return name, newname
 
     def onDel(self, btn):
@@ -185,4 +185,4 @@ class BaseListBoxModuel(BaseModule):
             text = tuple(text)
         elif not extypes.is_list_tuple(text):
             text = (text,)
-        self.listbox.appendItems(text)
+        self.listbox.Append(text)

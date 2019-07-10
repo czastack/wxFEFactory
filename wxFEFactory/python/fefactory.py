@@ -87,7 +87,7 @@ class Screen:
     dpi = fefactory_api.ui.GetDisplaySize()
 
 
-if getattr(fefactory_api, 'fefactory_inited', False) is not True:
+if not getattr(fefactory_api, 'fefactory_inited', False):
     # 重定向标准输出
     class _LogWriter:
         def flush(self):
@@ -97,21 +97,26 @@ if getattr(fefactory_api, 'fefactory_inited', False) is not True:
             fefactory_api.log_message(s)
 
     sys.stdout = sys.stderr = _LogWriter()
-    _alert = fefactory_api.alert
 
-    def alert(title, msg=None):
-        if not msg:
-            msg = title
-            title = '提示'
-        _alert(title, msg)
 
-    def confirm_yes(msg, defdefaultButton=wx.YES):
-        return fefactory_api.confirm('确认', msg, defdefaultButton) == wx.YES
+_alert = fefactory_api.alert
 
-    fefactory_api.alert = alert
-    fefactory_api.confirm_yes = confirm_yes
-    fefactory_api.fefactory_inited = True
-    __builtins__['input'] = partial(fefactory_api.input, '输入')
+
+def alert(title, msg=None):
+    if not msg:
+        msg = title
+        title = '提示'
+    _alert(title, msg)
+
+
+def confirm_yes(msg, defdefaultButton=wx.YES):
+    return fefactory_api.confirm('确认', msg, defdefaultButton) == wx.YES
+
+
+fefactory_api.alert = alert
+fefactory_api.confirm_yes = confirm_yes
+fefactory_api.fefactory_inited = True
+__builtins__['input'] = partial(fefactory_api.input, '输入')
 
 
 if __name__ == 'fefactory':

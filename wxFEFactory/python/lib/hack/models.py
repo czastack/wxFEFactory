@@ -477,14 +477,14 @@ class BitsField(Field):
 
 class ModelPtrField(Cachable, PtrField):
     """模型指针字段"""
-    def __init__(self, offset, modelClass, size=0, label=None):
+    def __init__(self, offset, model_t, size=0, label=None):
         super().__init__(offset, size=size, label=label)
-        self.modelClass = modelClass
+        self.model_t = model_t
 
     def create_cache(self, instance):
-        if self.modelClass == 'self':
-            self.modelClass = type(instance)
-        return self.modelClass(PtrField.__get__(self, instance, None), instance.handler)
+        if self.model_t == 'self':
+            self.model_t = type(instance)
+        return self.model_t(PtrField.__get__(self, instance, None), instance.handler)
 
     def update_cache(self, instance, cache):
         cache.addr = PtrField.__get__(self, instance, None)
@@ -498,23 +498,23 @@ class ModelPtrField(Cachable, PtrField):
 class ManagedModelPtrField(ModelPtrField):
     """托管模型指针字段"""
     def create_cache(self, instance):
-        return self.modelClass(super().__get__(instance, owner), instance.context)
+        return self.model_t(super().__get__(instance, owner), instance.context)
 
 
 class ModelField(Cachable, Field):
     """模型字段"""
-    def __init__(self, offset, modelClass, size=0, label=None):
-        super().__init__(offset, None, size or getattr(modelClass, 'SIZE', 0), label)
-        self.modelClass = modelClass
+    def __init__(self, offset, model_t, size=0, label=None):
+        super().__init__(offset, None, size or getattr(model_t, 'SIZE', 0), label)
+        self.model_t = model_t
 
     def create_cache(self, instance):
-        return self.modelClass(self.get_addr(instance), instance.handler)
+        return self.model_t(self.get_addr(instance), instance.handler)
 
     def update_cache(self, instance, cache):
         cache.addr = self.get_addr(instance)
 
     def __set__(self, instance, value):
-        if isinstance(value, self.modelClass):
+        if isinstance(value, self.model_t):
             instance.handler.write(self.get_addr(instance), value.to_bytes())
         elif isinstance(value, bytes):
             if len(value) != self.size:
@@ -527,7 +527,7 @@ class ModelField(Cachable, Field):
 class ManagedModelField(ModelField):
     """托管模型字段"""
     def create_cache(self, instance):
-        return self.modelClass(self.get_addr(instance), instance.context)
+        return self.model_t(self.get_addr(instance), instance.context)
 
 
 class CoordField(Cachable, FieldType):

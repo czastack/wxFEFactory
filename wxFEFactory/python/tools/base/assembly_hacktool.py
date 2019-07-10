@@ -42,7 +42,7 @@ class AssemblyHacktool(BaseHackTool):
                 button = ui.ToggleButton(label=item.label,
                     onchange=partial(__class__.toggle_assembly_function, self.weak, item=item))
                 if item.help:
-                    button.setToolTip(item.help)
+                    button.SetToolTip(item.help)
                 self.assembly_buttons[item.key] = button
 
     def toggle_assembly_function(self, btn, item):

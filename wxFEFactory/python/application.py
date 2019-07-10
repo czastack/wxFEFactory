@@ -30,7 +30,7 @@ class Application(Configurable):
             return False
         return True
 
-    def onChangeProject(self, project):
+    def on_change_project(self, project):
         self.config['recent_project'].append(project.path)
         self.config_changed = True
         self.project = project

@@ -17,15 +17,15 @@ class Main(BaseTool):
             with ui.Vertical():
                 ui.Text("按回车转换", class_="padding")
                 self.int_format = ui.RadioBox("整型格式", class_="expand padding",
-                    choices=self.INT_FORMAT_CHOICES).setSelection(1)
+                    choices=self.INT_FORMAT_CHOICES).set_selection(1)
                 with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as container:
                     on_enter = self.weak.on_enter
                     for label in ('bytes', 'byte(1字节)', 'word(2字节)', 'dword(4字节)', 'float(4字节)', 'double(8字节)'):
                         ui.Text(label)
                         text_input = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER)
-                        text_input.setOnEnter(on_enter)
+                        text_input.set_onenter(on_enter)
                         self.text_inputs.append(text_input)
-                    container.AddGrowableCol(1)
+                    container.sizer.AddGrowableCol(1)
         return win
 
     def on_enter(self, view):

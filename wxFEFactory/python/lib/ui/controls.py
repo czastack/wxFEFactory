@@ -47,7 +47,7 @@ class ToggleButton(Control):
     def onready(self):
         if self.checked:
             self.SetValue(True)
-        self.set_onchange(self.change)
+        self.set_onchange(self.onchange)
         del self.checked, self.onchange
 
     def set_onchange(self, onchange, reset=True):
@@ -71,11 +71,10 @@ class CheckBox(Control):
         self.onchange = onchange
         Control.__init__(self, **kwargs)
 
-    def render(self, parent):
-        self.bind_wx(wx.CheckBox(parent, **self.wxparams))
+    def onready(self):
         if self.checked:
             self.SetValue(True)
-        self.set_onchange(self.change)
+        self.set_onchange(self.onchange)
         del self.checked, self.onchange
 
     def set_onchange(self, onchange):
@@ -92,12 +91,12 @@ class StaticBitmap(Control):
     wxtype = wx.StaticBitmap
 
     def __init__(self, label, **kwargs):
-        self.label = label
+        kwargs['wxparams'] = {'label': label}
         Control.__init__(self, **kwargs)
 
     def render(self, parent):
         bitmap = wx.Bitmap(self.label)
-        self.bind_wx(wx.StaticBitmap(parent, label=bitmap, **self.wxparams))
+        self.bind_wx(wx.StaticBitmap(parent.wxwindow, label=bitmap, **self.wxparams))
         del self.label
 
 
@@ -212,6 +211,12 @@ class ControlWithItems(ItemContainer):
     def post_select(self):
         self.post_event(self.wxevent)
 
+    def set_selection(self, n, trigger=False):
+        self.SetSelection(n)
+        if trigger:
+            self.post_select()
+        return self
+
 
 class ListBox(ControlWithItems):
     """列表框"""
@@ -219,10 +224,10 @@ class ListBox(ControlWithItems):
     wxevent = wx.EVT_LISTBOX
 
     def __init__(self, choices=None, onselect=None, **kwargs):
-        if choices is not None:
-            kwargs['wxparams'] = {'choices': choices}
-        Control.__init__(self, **kwargs)
         self.onselect = onselect
+        if choices is not None:
+            kwargs['wxparams'] = {'choices': wx.get_choices(choices)}
+        Control.__init__(self, **kwargs)
 
 
 class CheckListBox(ListBox):
@@ -244,10 +249,10 @@ class Choice(ControlWithItems):
     wxevent = wx.EVT_CHOICE
 
     def __init__(self, choices=None, onselect=None, **kwargs):
-        if choices is not None:
-            kwargs['wxparams'] = {'choices': choices}
-        Control.__init__(self, **kwargs)
         self.onselect = onselect
+        if choices is not None:
+            kwargs['wxparams'] = {'choices': wx.get_choices(choices)}
+        Control.__init__(self, **kwargs)
 
 
 class ComboBox(ControlWithItems):
@@ -256,12 +261,12 @@ class ComboBox(ControlWithItems):
     wxevent = wx.EVT_COMBOBOX
 
     def __init__(self, choices=None, value="", onselect=None, **kwargs):
+        self.onselect = onselect
         wxparams = {'value': value}
         if choices is not None:
-            wxparams['choices'] = choices
+            wxparams['choices'] = wx.get_choices(choices)
         kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
-        self.onselect = onselect
 
     def set_onenter(self, fn, reset=True):
         self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
@@ -273,12 +278,12 @@ class RadioBox(ControlWithItems):
     wxevent = wx.EVT_RADIOBOX
 
     def __init__(self, label="", choices=None, onselect=None, **kwargs):
+        self.onselect = onselect
         wxparams = {'label': label}
         if choices:
-            wxparams['choices'] = choices
+            wxparams['choices'] = wx.get_choices(choices)
         kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
-        self.onselect = onselect
 
     def apply_style(self):
         super().apply_style()
@@ -356,12 +361,15 @@ def Label(text):
 
 class HotkeyCtrl(TextInput):
     def __init__(self, *args, **kwargs):
-        kwargs['wxstyle'] = wx.TE_PROCESS_ENTER
-        super().__init__(*args, **kwargs)
         self.value = None
         self.code = None
         self.mode = None
-        self.setOnKeyDown(self.onKey)
+        kwargs['wxstyle'] = wx.TE_PROCESS_ENTER
+        super().__init__(*args, **kwargs)
+
+    def onready(self):
+        super().onready()
+        self.set_on_keydown(self.onKey)
 
     def onKey(self, _, event):
         code = event.GetKeyCode()

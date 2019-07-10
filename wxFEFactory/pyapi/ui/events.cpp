@@ -34,13 +34,17 @@ void UiModule::init_events()
 
 	py::class_<wxCommandEvent, wxEvent>(ui, "CommandEvent");
 
+	py::class_<wxNotifyEvent, wxCommandEvent>(ui, "NotifyEvent")
+		.def("Veto", &wxNotifyEvent::Veto);
+
 	// Ê÷¿Ø¼þÊÂ¼þ
 	py::class_<wxTreeEvent, wxCommandEvent>(ui, "TreeEvent")
 		.def("GetItem", &wxTreeEvent::GetItem);
 
 
 	py::class_<wxPropertyGridEvent, wxCommandEvent>(ui, "PropertyGridEvent")
-		.def("GetPropertyName", &wxPropertyGridEvent::GetPropertyName);
+		.def("GetPropertyName", &wxPropertyGridEvent::GetPropertyName)
+		.def("Veto", &wxPropertyGridEvent::Veto);
 
 	py::class_<wxListEvent, wxCommandEvent>(ui, "ListEvent")
 		.def("GetKeyCode", &wxListEvent::GetKeyCode)
@@ -48,7 +52,13 @@ void UiModule::init_events()
 		.def("GetColumn", &wxListEvent::GetColumn);
 
 	py::class_<wxCloseEvent, wxEvent>(ui, "CloseEvent")
-		.def(py::init<wxEventType, int>(), "type"_a = wxEVT_NULL, "winid"_a = 0);
+		.def(py::init<wxEventType, int>(), "type"_a = wxEVT_NULL, "winid"_a = 0)
+		.def("Veto", &wxCloseEvent::Veto);
+
+	py::class_<wxBookCtrlEvent, wxNotifyEvent>(ui, "BookCtrlEvent")
+		.def("GetSelection", &wxBookCtrlEvent::GetSelection);
+
+	py::class_<wxAuiNotebookEvent, wxBookCtrlEvent>(ui, "AuiNotebookEvent");
 
 	auto wx = ui.ptr();
 #define EVENT_TYPE(name) PyObject_SetAttrString(wx, #name, PyLong_FromLong(wx##name.operator const wxEventType& ()))

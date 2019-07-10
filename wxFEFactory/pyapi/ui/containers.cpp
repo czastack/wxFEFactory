@@ -40,6 +40,14 @@ void UiModule::init_containers()
 		.def(py::init<int, int, int>(), "cols"_a, "vgap"_a, "hgap"_a)
 		.def(py::init<int, int, int, int>(), "rows"_a, "cols"_a, "vgap"_a, "hgap"_a);
 
+#define ENUM_VAL(name) value(#name, wx##name)
+
+	py::enum_<wxFlexSizerGrowMode>(ui, "FlexSizerGrowMode")
+		.ENUM_VAL(FLEX_GROWMODE_NONE)
+		.ENUM_VAL(FLEX_GROWMODE_SPECIFIED)
+		.ENUM_VAL(FLEX_GROWMODE_ALL)
+		.export_values();
+
 	py::class_<NODELETE(wxFlexGridSizer), wxGridSizer>(ui, "FlexGridSizer")
 		.def(py::init<int, int, int>(), "cols"_a, "vgap"_a, "hgap"_a)
 		.def(py::init<int, int, int, int>(), "rows"_a, "cols"_a, "vgap"_a, "hgap"_a)
@@ -49,6 +57,7 @@ void UiModule::init_containers()
 		.def("RemoveGrowableCol", &wxFlexGridSizer::RemoveGrowableCol, "idx"_a)
 		.def("GetFlexibleDirection", &wxFlexGridSizer::GetFlexibleDirection)
 		.def("SetFlexibleDirection", &wxFlexGridSizer::SetFlexibleDirection, "direction"_a)
+		.def("SetNonFlexibleGrowMode", &wxFlexGridSizer::SetNonFlexibleGrowMode, "mode"_a)
 		;
 
 	py::class_<NODELETE(wxPanel), wxWindow>(ui, "Panel")
@@ -75,6 +84,7 @@ void UiModule::init_containers()
 		.def("AddPage", &wxBookCtrlBase::AddPage, "page"_a, text, "bSelect"_a = false, "imageId"_a = -1)
 		.def("GetPageCount", &wxBookCtrlBase::GetPageCount)
 		.def("GetSelection", &wxBookCtrlBase::GetSelection)
+		.def("GetPage", &wxBookCtrlBase::GetPage, "n"_a)
 		.def("SetSelection", &wxBookCtrlBase::SetSelection, "n"_a)
 		.def("SetPageText", &wxBookCtrlBase::SetPageText, "n"_a, text)
 		.def("GetPageText", &wxBookCtrlBase::GetPageText, "n"_a);

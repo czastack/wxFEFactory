@@ -33,11 +33,11 @@ class Main(BaseDolphinHack):
     def render_one_list(self, group):
         """渲染其中一个列表"""
         li = ui.ListView(class_="fill")
-        li.enableCheckboxes()
-        li.appendColumns(*group['head'])
+        li.EnableCheckboxes()
+        li.append_columns(*group['head'])
         if group['hascount']:
-            li.appendColumn('数量')
-        li.insertItems(group['items'])
+            li.AppendColumn('数量')
+        li.insert_items(group['items'])
 
         with ui.Horizontal(class_="expand padding_top"):
             uncheck_action = ui.CheckBox(label="不选中表示移除该物品", class_="vcenter")
@@ -59,16 +59,16 @@ class Main(BaseDolphinHack):
         hascount = group['hascount']
 
         if hascount:
-            numcol = view.getColumnCount() - 1
+            numcol = view.GetColumnCount() - 1
             count_data = self.count_data[group['name']]
 
         for i in range(len(group['items'])):
             if hascount:
-                view.setItem(i, numcol, str(data[i]))
+                view.SetItem(i, numcol, str(data[i]))
                 count_data[i] = data[i]
 
             if data[i]:
-                view.checkItem(i)
+                view.CheckItem(i)
 
     def list_view_write(self, _, view, group, uncheck_action):
         field = getattr(self._global, group['name'])
@@ -76,7 +76,7 @@ class Main(BaseDolphinHack):
         hascount = group['hascount']
         # 不选中表示移除该物品
         uncheck_as_no = uncheck_action.checked
-        checked = view.getCheckedList()
+        checked = view.get_checked_list()
         if hascount:
             count_data = self.count_data[group['name']]
         for i in range(len(group['items'])):
@@ -89,8 +89,8 @@ class Main(BaseDolphinHack):
         self.handler.write(field.addr, data, field.size)
 
     def set_count(self, _, view, group, input_num):
-        numcol = view.getColumnCount() - 1
-        for i in view.getSelectedList():
+        numcol = view.SetColumnCount() - 1
+        for i in view.get_selected_list():
             value = input_num.value
-            view.setItem(i, numcol, str(value))
+            view.SetItem(i, numcol, str(value))
             self.count_data[group['name']][i] = value

@@ -124,9 +124,9 @@ void UiModule::init_controls()
 	py::class_<NODELETE(wxControlWithItems), wxControl, wxItemContainer>(ui, "ControlWithItems")
 		;
 
-	py::class_<wxListBox, wxControlWithItems>(ui, "ListBox")
+	py::class_<NODELETE(wxListBox), wxControlWithItems>(ui, "ListBox")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, const wxArrayString&, long, const wxValidator&, const wxString&>(),
-			parent, id, pos_v, size_v, choices, style_0, validator_v, name = (const char*)wxListBoxNameStr)
+			parent, id, pos_v, size_v, choices=py::tuple(), style_0, validator_v, name = (const char*)wxListBoxNameStr)
 		;
 
 	py::class_<NODELETE(wxCheckListBox), wxListBox>(ui, "CheckListBox")
