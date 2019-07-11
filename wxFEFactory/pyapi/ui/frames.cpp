@@ -1,7 +1,6 @@
 #include <wx/wx.h>
 #include <wx/mdi.h>
 #include "ui.h"
-#include "keyhook/keyhook.h"
 
 
 void UiModule::init_frames()

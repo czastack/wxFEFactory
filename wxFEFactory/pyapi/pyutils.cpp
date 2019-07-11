@@ -17,12 +17,13 @@ wxString& pystrcpy(wxString &text, const py::handle &h) {
 	return text;
 }
 
-void wxArrayAddAll(wxArrayString &array, py::iterable &items)
+template<>
+void wxArrayAddAll<wxArrayString>(wxArrayString& array, pycref items)
 {
 	wxString text;
 	if (!items.is_none())
 	{
-		for (auto &item : items) {
+		for (auto& item : items) {
 			array.Add(pystrcpy(text, item));
 		}
 	}

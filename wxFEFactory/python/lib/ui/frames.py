@@ -1,3 +1,4 @@
+import traceback
 import fefactory_api
 from .view import Layout
 from . import wx
@@ -74,15 +75,58 @@ class HotkeyFrame(Frame):
         self.hotkey_map = {}
         Frame.__init__(self, **kwargs)
 
+    def __del__(self):
+        self.hotkey_map.clear()
+
+    def onready(self):
+        self.Bind(wx.EVT_HOTKEY, self.onhotkey)
+
     def prepare_hotkey(self, hotkey):
+        """获取全局唯一的id"""
         if isinstance(hotkey, str):
             return fefactory_api.GlobalAddAtom(hotkey)
         else:
             return hotkey
 
-    def RegisterHotKeys(self, hotkeys):
-        # TODO
-        pass
+    def register_hotkey(self, hotkey_id, modifiers, vk, onhotkey):
+        """注册热键"""
+        hotkey_int = self.prepare_hotkey(hotkey_id)
+        if hotkey_int in self.hotkey_map:
+            print(hotkey_id, '已经在使用了')
+        else:
+            if self.RegisterHotKey(hotkey_int, modifiers, vk):
+                self.hotkey_map[hotkey_int] = onhotkey
+            else:
+                print(hotkey_id, "热键注册失败")
+
+    def unregister_hotkey(self, hotkey_id, force=False):
+        """卸载热键"""
+        hotkey_int = self.prepare_hotkey(hotkey_id)
+        if force or hotkey_int in self.hotkey_map:
+            if self.UnregisterHotKey(hotkey_int):
+                self.hotkey_map.pop(hotkey_int, None)
+                return True
+        return False
+
+    def register_hotkeys(self, hotkeys):
+        """批量注册热键"""
+        for modifiers, vk, onhotkey, *hotkey_id in hotkeys:
+            if hotkey_id:
+                hotkey_id = hotkey_id[0]
+            else:
+                hotkey_id = onhotkey.__name__
+            self.register_hotkey(hotkey_id, modifiers, vk, onhotkey)
+
+    def stop_hotkey(self):
+        for hotkey_int in self.hotkey_map:
+            if fefactory_api.GlobalDeleteAtom(hotkey_int) is 0:
+                self.unregister_hotkey(hotkey_int)
+
+    def onhotkey(self, event):
+        hokey_int = event.GetId()
+        ret = self.hotkey_map[hokey_int]()
+        if ret is not True:
+            event.Skip()
 
 
 class KeyHookFrame(Frame):

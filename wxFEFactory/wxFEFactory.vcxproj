@@ -149,6 +149,7 @@
     <ClCompile Include="pyapi\fe\fe.cpp" />
     <ClCompile Include="pyapi\fe\graph.cpp" />
     <ClCompile Include="pyapi\ui\aui.cpp" />
+    <ClCompile Include="pyapi\ui\extend.cpp" />
     <ClCompile Include="pyapi\ui\image.cpp" />
     <ClCompile Include="pyapi\ui\console.cpp" />
     <ClCompile Include="pyapi\ui\controls.cpp" />

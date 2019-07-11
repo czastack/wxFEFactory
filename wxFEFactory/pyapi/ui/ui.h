@@ -19,29 +19,6 @@ public:
 
 namespace pybind11 {
 	namespace detail {
-
-		// wxSize
-		/*template <> class type_caster<wxSize> {
-		public:
-			bool load(handle src, bool) {
-				auto temp = py::reinterpret_borrow<sequence>(src);
-				value.x = temp[0].cast<int>();
-				value.y = temp[1].cast<int>();
-				return true;
-			}
-
-			static handle cast(const wxSize& src, return_value_policy, handle) {
-				py::tuple result(2);
-				result[0] = src.x;
-				result[0] = src.y;
-				return result;
-			}
-
-			PYBIND11_TYPE_CASTER(wxSize, (_)("wxSize"));
-		protected:
-			bool success = false;
-		};*/
-
 		// PyFunctor
 		template <> struct type_caster<PyFunctor> {
 		public:
@@ -108,6 +85,7 @@ public:
 	void init_frames();
 	void init_menu();
 	void init_events();
+	void init_extend();
 
 	/**
 	 * Ñ¡Ïî×ª»»

@@ -66,9 +66,9 @@ namespace pybind11 {
 		};
 
 
-		HAS_MEM_FUNC(Add, hasAdd);
+		HAS_MEM_FUNC(Add, HasAdd);
 
-		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<hasAdd<ArrayType>::value>> {
+		template <typename ArrayType> class type_caster<ArrayType, std::enable_if_t<HasAdd<ArrayType>::value>> {
 		public:
 			PYBIND11_TYPE_CASTER(ArrayType, (_)("wxArrayLike"));
 

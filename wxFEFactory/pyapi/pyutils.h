@@ -28,9 +28,6 @@ inline wxString pywxstr(const py::object & str, wxcstr def = wxNoneString)
 
 wxString& pystrcpy(wxString &text, const py::handle &h);
 
-
-void wxArrayAddAll(wxArrayString &array, py::iterable &items);
-
 /**
  * Dict getitem
  */
@@ -73,6 +70,9 @@ void wxArrayAddAll(T &array, pycref items)
 	}
 }
 
+template<>
+void wxArrayAddAll<wxArrayString>(wxArrayString& array, pycref items);
+
 template<class T> class wxSharedPtr;
 
 template<class T>
@@ -94,7 +94,7 @@ pyobj PyListFromArray(T &array)
 	py::list list;
 	for (const auto &i : array)
 	{
-		list.append(i);
+		list.append(py::cast(i));
 	}
 	return list;
 }

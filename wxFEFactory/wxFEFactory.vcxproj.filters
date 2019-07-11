@@ -59,6 +59,9 @@
       <Filter>pyapi\ui</Filter>
     </ClCompile>
     <ClCompile Include="myapp.cpp" />
+    <ClCompile Include="pyapi\ui\extend.cpp">
+      <Filter>pyapi\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="types.h" />

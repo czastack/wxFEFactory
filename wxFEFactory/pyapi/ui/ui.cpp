@@ -83,13 +83,13 @@ UiModule::UiModule(pybind11::module &module) :
 	data("data"_a),
 
 	late_v(NULL, NULL), // ÑÓ³Ù³õÊ¼»¯µÄarg_v
-	id_v(id = (int)wxID_ANY),
-	label_v(label = wxEmptyString),
+	id_v(id, (int)wxID_ANY),
+	label_v(label, wxEmptyString),
 	pos_v(late_v),
 	size_v(late_v),
-	style_0(style = 0),
+	style_0(style, 0),
 	validator_v(late_v),
-	name_v(name = wxEmptyString)
+	name_v(name, wxEmptyString)
 {
 	init_ui();
 	init_image();
@@ -100,14 +100,11 @@ UiModule::UiModule(pybind11::module &module) :
 	init_aui();
 	init_datacontrols();
 	init_events();
+	init_extend();
 }
 
 void UiModule::init_ui()
 {
-	ui.def("get_choices", &UiModule::get_choices)
-		.def("start_cache", &UiModule::start_cache)
-		.def("end_cache", &UiModule::end_cache);
-
 	py::class_<ConsoleHandler>(ui, "Console")
 		.def("bind_elem", &ConsoleHandler::bindElem)
 		.def("get_history", Console__get_history);
@@ -115,10 +112,6 @@ void UiModule::init_ui()
 	py::class_<PyThread>(ui, "Thread")
 		.def(py::init<pyobj, DWORD>(), "fn"_a, "delay"_a = 0)
 		.def("Run", &PyThread::Run);
-
-
-	py::setattr(module, "console", py::cast(&console));
-
 
 	py::class_<wxSize>(ui, "Size")
 		.def(py::init<>())
@@ -142,7 +135,7 @@ void UiModule::init_ui()
 		;
 
 	py::class_<wxArrayInt>(ui, "ArrayInt");
-	py::class_<wxArrayString>(ui, "wxArrayString");
+	py::class_<wxArrayString>(ui, "ArrayString");
 	py::class_<wxValidator>(ui, "Validator");
 	py::class_<wxObject>(ui, "Object");
 
@@ -208,6 +201,11 @@ void UiModule::init_ui()
 	size_v = size = wxDefaultSize;
 	validator_v = validator = wxDefaultValidator;
 
+
+	py::setattr(module, "console", py::cast(&console));
+	ui.def("get_choices", &UiModule::get_choices)
+		.def("start_cache", &UiModule::start_cache)
+		.def("end_cache", &UiModule::end_cache);
 	py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
 	py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
 	py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
