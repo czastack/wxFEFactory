@@ -113,5 +113,13 @@ class MenuItem:
             return self._onselect(self)
         return False
 
+    @property
+    def checked(self):
+        return self.IsChecked()
+
+    @checked.setter
+    def checked(self, checked):
+        self.Check(checked)
+
     def __getattr__(self, name):
         return getattr(self.wxmenuitem, name)

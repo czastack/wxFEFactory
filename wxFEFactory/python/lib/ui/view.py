@@ -1,11 +1,22 @@
 from . import wx
 
 
+class BinderHelper:
+    def __init__(self, fn):
+        self.fn = fn
+
+    def __set_name__(self, owner, name):
+        self.fn.__qualname__ = name
+        setattr(owner, name, self.fn)
+
+
 def event_binder(event_type, name=None, **args):
     def binder(self, fn, reset=True):
         self.bind_event(event_type, EventFunctor(fn, **args), reset)
     if name is not None:
-        binder.__name__ = name
+        binder.__qualname__ = name
+    else:
+        binder = BinderHelper(binder)
     return binder
 
 
@@ -112,7 +123,7 @@ class View:
         """
         style = self.GetWindowStyle()
         if toggle is None:
-            toggle = style & flag == 0
+            toggle = style & flag != 0
         if toggle:
             style |= flag
         else:
@@ -350,9 +361,7 @@ class View:
         """手动添加事件"""
         self.AddPendingEvent(wx.CommandEvent(event_type, self.GetId()))
 
-    def set_on_keydown(self, fn):
-        self.bind_event(wx.EVT_KEY_DOWN, fn, False, True)
-
+    set_on_keydown = event_binder(wx.EVT_KEY_DOWN, pass_event=True)
     set_on_left_down = event_binder(wx.EVT_LEFT_DOWN, pass_event=True)
     set_on_left_up = event_binder(wx.EVT_LEFT_UP, pass_event=True)
     set_on_right_down = event_binder(wx.EVT_RIGHT_DOWN, pass_event=True)
@@ -536,4 +545,4 @@ class EventFunctor:
             args.append(view)
         if self.pass_event:
             args.append(event)
-        self.fn(*args)
+        return self.fn(*args)

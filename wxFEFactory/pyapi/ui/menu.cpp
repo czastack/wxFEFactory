@@ -36,7 +36,7 @@ void UiModule::init_menu()
 		.def("GetItemLabel", &wxMenuItem::GetItemLabel)
 		.def("SetItemLabel", &wxMenuItem::SetItemLabel)
 		.def("GetId", &wxMenuItem::GetId)
-		.def("IsCheck", &wxMenuItem::IsCheck)
+		.def("IsChecked", &wxMenuItem::IsChecked)
 		.def("Check", &wxMenuItem::Check, "bDoCheck"_a = true)
 		.def("Enable", &wxMenuItem::Enable, "bDoEnable"_a = true)
 		;

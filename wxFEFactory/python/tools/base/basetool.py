@@ -50,7 +50,7 @@ class BaseTool(BaseScene):
             with ui.Menu("窗口"):
                 ui.MenuItem("关闭\tCtrl+W", onselect=self.close_window)
                 ui.MenuItem("重载\tCtrl+R", onselect=self.reload)
-                ui.MenuItem("切换置顶", onselect=self.swith_keeptop)
+                ui.MenuItem("切换置顶", onselect=self.swith_keeptop, kind=ui.wx.ITEM_CHECK)
 
         return menubar
 
@@ -125,8 +125,8 @@ class BaseTool(BaseScene):
         self.__dict__.clear()
         return True
 
-    def swith_keeptop(self, _):
-        self.win.keeptop = not self.win.keeptop
+    def swith_keeptop(self, view):
+        self.win.keeptop = view.checked
 
 
 class NestedTool(BaseTool):

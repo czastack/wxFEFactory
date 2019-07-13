@@ -1,4 +1,4 @@
-from .view import View, Control
+from .view import View, Control, event_binder
 from . import wx
 
 
@@ -46,11 +46,9 @@ class PropertyGrid(Control):
     def set_onchange(self, fn):
         self._onchange = fn
 
-    def set_onhighlight(self, fn):
-        self.bind_event(wx.EVT_PG_HIGHLIGHTED, fn)
+    set_onhighlight = event_binder(wx.EVT_PG_HIGHLIGHTED)
 
-    def set_onselected(self, fn):
-        self.bind_event(wx.EVT_PG_SELECTED, fn)
+    set_onselected = event_binder(wx.EVT_PG_SELECTED)
 
     def append_property(self, prop, help=None):
         self.Append(prop)
@@ -233,23 +231,16 @@ class ListView(Control):
         for i in selection:
             self.SelectItem(i, True)
 
-    def set_on_item_selected(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_ITEM_SELECTED, fn, reset)
+    set_on_item_selected = event_binder(wx.EVT_LIST_ITEM_SELECTED)
 
-    def set_on_item_deselected(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_ITEM_DESELECTED, fn, reset)
+    set_on_item_deselected = event_binder(wx.EVT_LIST_ITEM_DESELECTED)
 
-    def set_on_item_checked(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_ITEM_CHECKED, fn, reset)
+    set_on_item_checked = event_binder(wx.EVT_LIST_ITEM_CHECKED)
 
-    def set_on_item_unchecked(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_ITEM_UNCHECKED, fn, reset)
+    set_on_item_unchecked = event_binder(wx.EVT_LIST_ITEM_UNCHECKED)
 
-    def set_on_item_activated(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_ITEM_ACTIVATED, fn, reset)
+    set_on_item_activated = event_binder(wx.EVT_LIST_ITEM_ACTIVATED)
 
-    def set_on_col_click(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_COL_CLICK, fn, reset)
+    set_on_col_click = event_binder(wx.EVT_LIST_COL_CLICK)
 
-    def set_on_col_right_click(self, fn, reset=True):
-        self.bind_event(wx.EVT_LIST_COL_RIGHT_CLICK, fn, reset)
+    set_on_col_right_click = event_binder(wx.EVT_LIST_COL_RIGHT_CLICK)

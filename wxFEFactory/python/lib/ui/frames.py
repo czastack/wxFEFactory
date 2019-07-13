@@ -32,7 +32,6 @@ class BaseFrame(BaseTopLevelWindow):
         self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.onclose)
         if self.menubar:
             self.set_menu(self.menubar)
-
         super().onready()
 
     def set_menu(self, menubar):
@@ -79,6 +78,7 @@ class HotkeyFrame(Frame):
         self.hotkey_map.clear()
 
     def onready(self):
+        super().onready()
         self.Bind(wx.EVT_HOTKEY, self.onhotkey)
 
     def prepare_hotkey(self, hotkey):
@@ -138,6 +138,7 @@ class KeyHookFrame(Frame):
         self.hotkey_map.clear()
 
     def onready(self):
+        super().onready()
         self.mgr = wx.KeyHookManager(self.wxwindow)
         self.setHook = self.mgr.setHook
         self.unsetHook = self.mgr.unsetHook

@@ -141,7 +141,7 @@ class MainFrame:
             del self.book
             self.opened_tools.clear()
             self.opened_tools_map.clear()
-            return True
+            return
         return False
 
     def close_window(self, _=None):

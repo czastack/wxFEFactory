@@ -130,10 +130,10 @@ class BaseHackTool(NestedTool):
         """放弃修改的配置"""
         self.config.cancel_change()
 
-    def swith_keeptop(self, cb):
+    def swith_keeptop(self, view):
         """切换置顶"""
         win = __main__.win if self.nested else self.win
-        win.keeptop = cb.checked
+        win.keeptop = view.checked
 
     def read_vector(self, addr):
         """ 在addr读三个float类型

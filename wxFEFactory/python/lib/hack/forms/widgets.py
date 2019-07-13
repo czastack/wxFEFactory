@@ -9,7 +9,8 @@ from styles import btn_xs_style, styles, dialog_style
 from ..utils import uint_hex
 
 
-__ALL__ = ('Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox',
+__ALL__ = (
+    'Widget', 'TwoWayWidget', 'ModelWidget', 'OffsetsWidget', 'Group', 'DialogGroup', 'StaticGroup', 'GroupBox',
     'Groups', 'Input', 'ModelInput', 'ProxyInput', 'SimpleCheckBox', 'CheckBox', 'ModelCheckBox', 'Select',
     'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'TabList')
 

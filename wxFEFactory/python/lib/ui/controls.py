@@ -1,4 +1,4 @@
-from .view import View, Control, EventFunctor, value_property
+from .view import View, Control, EventFunctor, event_binder, value_property
 from . import wx
 
 
@@ -15,8 +15,7 @@ class Button(Control):
         self.set_onclick(self.onclick)
         del self.onclick
 
-    def set_onclick(self, onclick, reset=True):
-        self.bind_event(wx.EVT_BUTTON, onclick, reset)
+    set_onclick = event_binder(wx.EVT_BUTTON)
 
     def click(self):
         self.post_event(wx.CommandEvent)
@@ -35,35 +34,39 @@ class BitmapButton(Button):
         del self.src, self.onclick
 
 
-class ToggleButton(Control):
-    """开关按钮"""
-    wxtype = wx.ToggleButton
-
-    def __init__(self, label, checked=False, onchange=None, **kwargs):
-        self._checked = checked
-        self.onchange = onchange
-        Control.__init__(self, wxparams={'label': label}, **kwargs)
-
+class CheckableControl(Control):
     def onready(self):
         if self._checked:
             self.SetValue(True)
         self.set_onchange(self.onchange)
         del self._checked, self.onchange
 
-    def set_onchange(self, onchange, reset=True):
-        self.bind_event(wx.EVT_TOGGLEBUTTON, onchange, reset)
+    def set_onchange(self, fn, reset=True):
+        self.bind_event(self.wxevent, fn, reset)
 
     def toggle(self):
         """切换状态"""
         self.SetValue(not self.GetValue())
-        self.post_event(wx.EVT_TOGGLEBUTTON)
+        self.post_event(self.wxevent)
 
     checked = value = value_property
 
 
-class CheckBox(Control):
+class ToggleButton(CheckableControl):
+    """开关按钮"""
+    wxtype = wx.ToggleButton
+    wxevent = wx.EVT_TOGGLEBUTTON
+
+    def __init__(self, label, checked=False, onchange=None, **kwargs):
+        self._checked = checked
+        self.onchange = onchange
+        CheckableControl.__init__(self, wxparams={'label': label}, **kwargs)
+
+
+class CheckBox(CheckableControl):
     """复选框"""
     wxtype = wx.CheckBox
+    wxevent = wx.EVT_CHECKBOX
 
     def __init__(self, label="", checked=False, align_right=False, onchange=None, **kwargs):
         if align_right:
@@ -71,23 +74,7 @@ class CheckBox(Control):
         kwargs['wxparams'] = {'label': label}
         self._checked = checked
         self.onchange = onchange
-        Control.__init__(self, **kwargs)
-
-    def onready(self):
-        if self._checked:
-            self.SetValue(True)
-        self.set_onchange(self.onchange)
-        del self._checked, self.onchange
-
-    def set_onchange(self, onchange):
-        pass
-
-    def toggle(self):
-        """切换状态"""
-        self.SetValue(not self.GetValue())
-        self.post_event(wx.EVT_CHECKBOX)
-
-    checked = value = value_property
+        CheckableControl.__init__(self, **kwargs)
 
 
 class StaticBitmap(Control):
@@ -135,11 +122,8 @@ class TextInput(Control):
         kwargs['wxparams'] = {'value': value}
         Control.__init__(self, **kwargs)
 
-    def set_onenter(self, fn, reset=True):
-        self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
-
-    def set_onchar(self, fn, reset=True):
-        self.bind_event(wx.EVT_CHAR, fn, reset)
+    set_onenter = event_binder(wx.EVT_TEXT_ENTER)
+    set_onchar = event_binder(wx.EVT_CHAR)
 
     @property
     def selection(self):
@@ -169,12 +153,8 @@ class SearchCtrl(Control):
             self.ShowCancelButton(True)
         del self.search_button, self.cancel_button
 
-    def set_onsubmit(self, fn, reset=True):
-        self.bind_event(wx.EVT_SEARCHCTRL_SEARCH_BTN, fn, reset)
-
-    def set_oncancel(self, fn, reset=True):
-        self.bind_event(wx.EVT_SEARCHCTRL_CANCEL_BTN, fn, reset)
-
+    set_onsubmit = event_binder(wx.EVT_SEARCH)
+    set_oncancel = event_binder(wx.EVT_SEARCH_CANCEL)
     value = value_property
 
 
@@ -187,11 +167,8 @@ class SpinCtrl(Control):
         kwargs['wxstyle'] = wxstyle
         Control.__init__(self, **kwargs)
 
-    def set_onchange(self, fn, reset=True):
-        self.bind_event(wx.EVT_SPINCTRL, fn, reset)
-
-    def set_onchar(self, fn, reset=True):
-        self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
+    set_onchange = event_binder(wx.EVT_SPINCTRL)
+    set_onchar = event_binder(wx.EVT_TEXT_ENTER)
 
 
 class ColorPicker(Control):
@@ -207,8 +184,7 @@ class ColorPicker(Control):
         self.set_onchange(self.onchange)
         del self.onchange
 
-    def set_onchange(self, fn, reset=True):
-        self.bind_event(wx.EVT_SPINCTRL, fn, reset)
+    set_onchange = event_binder(wx.EVT_SPINCTRL)
 
 
 class ItemContainer(Control):
@@ -296,9 +272,7 @@ class ComboBox(ControlWithItems):
         kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
 
-    def set_onenter(self, fn, reset=True):
-        self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
-
+    set_onenter = event_binder(wx.EVT_TEXT_ENTER)
     value = value_property
 
 
@@ -342,8 +316,7 @@ class FilePickerCtrl(Control):
         kwargs['wxparams'] = dict(path=path, msg=msg, wildcard=wildcard)
         Control.__init__(self, **kwargs)
 
-    def set_onchange(self, onchange, reset=True):
-        self.bind_event(wx.EVT_FILEPICKER_CHANGED, onchange, reset)
+    set_onchange = event_binder(wx.EVT_FILEPICKER_CHANGED)
 
 
 class DirPickerCtrl(Control):
@@ -354,8 +327,7 @@ class DirPickerCtrl(Control):
         kwargs['wxparams'] = dict(path=path, msg=msg)
         Control.__init__(self, **kwargs)
 
-    def set_onchange(self, onchange, reset=True):
-        self.bind_event(wx.EVT_DIRPICKER_CHANGED, onchange, reset)
+    set_onchange = event_binder(wx.EVT_DIRPICKER_CHANGED)
 
 
 class TreeCtrl(Control):
@@ -365,8 +337,7 @@ class TreeCtrl(Control):
     def __init__(self, wxstyle=wx.TR_HAS_BUTTONS | wx.TR_SINGLE, **kwargs):
         Control.__init__(self, wxstyle=wxstyle, **kwargs)
 
-    def set_on_item_activated(self, fn, reset=True):
-        self.bind_event(wx.EVT_TREE_ITEM_ACTIVATED, EventFunctor(fn, pass_event=True), reset)
+    set_onchange = event_binder(wx.EVT_FILEPICKER_CHANGED, pass_event=True)
 
 
 class StatusBar(Control):

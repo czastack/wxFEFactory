@@ -1,5 +1,6 @@
 from .containers import Layout
 from .frames import BaseFrame, BaseTopLevelWindow
+from .view import event_binder
 from . import wx
 
 
@@ -29,7 +30,7 @@ class AuiManager(Layout):
     def render(self, parent):
         self.wxwindow = parent.wxwindow
         self.mgr = wx.AuiManager(parent.wxwindow)
-        self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.on_owner_close)
+        self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.on_owner_close, reset=False)
 
     def layout(self):
         self.mgr.Update()
@@ -142,6 +143,7 @@ class AuiNotebook(Layout):
         if self.can_page_close(n):
             self.remove_page(n)
             self.DeletePage(n)
+            return True
         return False
 
     def close_all_page(self):
@@ -170,12 +172,11 @@ class AuiNotebook(Layout):
                 page.onclose(wx.CloseEvent(wx.EVT_CLOSE_WINDOW))
         return succeed
 
-    def set_on_page_changed(self, fn):
-        """设置页面切换事件"""
-        self.bind_event(wx.EVT_AUINOTEBOOK_PAGE_CHANGED, fn)
+    # 设置页面切换事件
+    set_on_page_changed = event_binder(wx.EVT_AUINOTEBOOK_PAGE_CHANGED)
 
     def set_on_page_close(self, page, fn):
-        """设置页面切换事件"""
+        """设置页面关闭事件"""
         self.close_listeners[page] = fn
 
     @property
