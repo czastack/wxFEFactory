@@ -27,18 +27,18 @@ class Main(BaseTool):
         self.dict_picker.set_onchange(self.on_dict_change)
         self.text_view.set_onenter(self.on_convert_text)
         self.code_view.set_onenter(self.on_convert_code)
-        self.dict_picker.enabled = False
+        self.dict_picker.Enable(False)
         self.reader = None
         return win
 
     def on_rom_change(self, picker):
         self.reader = FeRomRW(picker.path)
         if not self.reader.closed:
-            self.dict_picker.enabled = True
+            self.dict_picker.Enable(True)
             self.reader.open_dict()
             self.dict_picker.path = self.reader.dict_path
         else:
-            self.dict_picker.enabled = False
+            self.dict_picker.Enable(False)
 
     def on_dict_change(self, picker):
         self.reader.open_dict(picker.path)

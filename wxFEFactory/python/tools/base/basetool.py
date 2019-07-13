@@ -94,10 +94,10 @@ class BaseTool(BaseScene):
                 self.win.parent.close_page()
             except Exception:
                 traceback.print_exc()
-                self.win.close()
+                self.win.Close()
         else:
             # win应该设置close回调为self.onclose
-            self.win.close()
+            self.win.Close()
 
     def onclose(self, view=None, event=None):
         """

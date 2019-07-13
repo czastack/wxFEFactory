@@ -81,7 +81,7 @@ class CoordWidget(TwoWayWidget):
     def mem_value(self):
         offsets = list(self.offsets)
         addr = self.addr
-        ret = []
+        result = []
         for child in self.views:
             if offsets:
                 value = self.handler.ptrs_read(addr, offsets, self.type, self.size)
@@ -92,8 +92,8 @@ class CoordWidget(TwoWayWidget):
                 else:
                     value = self.handler.read(addr, self.type, self.size)
                 addr += self.size
-            ret.append(value)
-        return ret
+            result.append(value)
+        return result
 
     @mem_value.setter
     def mem_value(self, values):
@@ -135,7 +135,7 @@ class CoordWidget(TwoWayWidget):
     def onadd(self, btn):
         name = self.name_view.value
         if name:
-            self.listbox.append(name)
+            self.listbox.Append(name)
             self.data_list.append({'name': name, 'value': tuple(self.input_value)})
 
     def on_update(self, btn):
@@ -149,7 +149,7 @@ class CoordWidget(TwoWayWidget):
     def ondelete(self, btn):
         pos = self.listbox.index
         if pos != -1:
-            self.listbox.pop(pos)
+            self.listbox.Delete(pos)
             self.data_list.pop(pos)
 
     def on_save(self, btn):

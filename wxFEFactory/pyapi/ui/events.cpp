@@ -32,7 +32,8 @@ void UiModule::init_events()
 		.def("GetModifiers", &wxKeyEvent::GetModifiers);
 
 
-	py::class_<wxCommandEvent, wxEvent>(ui, "CommandEvent");
+	py::class_<wxCommandEvent, wxEvent>(ui, "CommandEvent")
+		.def(py::init<wxEventType, int>(), "type"_a = wxEVT_NULL, "winid"_a = 0);
 
 	py::class_<wxNotifyEvent, wxCommandEvent>(ui, "NotifyEvent")
 		.def("Veto", &wxNotifyEvent::Veto);

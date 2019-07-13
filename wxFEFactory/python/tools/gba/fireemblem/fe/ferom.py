@@ -139,7 +139,7 @@ class FeRomHandler(RomHandler):
         code = self.get_rom_code()
         if code not in config.romcode:
             print(f'{self.name}不是火纹的rom, code={code}')
-            self.close()
+            self.Close()
         else:
             self.key = config.romcode[code]
         self._dict = None

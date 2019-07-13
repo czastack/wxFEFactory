@@ -187,6 +187,14 @@ class BookCtrlBase(Layout):
     def set_onchange(self, onchange, reset=True):
         self.bind_event(self.wxevent, onchange, reset)
 
+    @property
+    def index(self):
+        return self.GetSelection()
+
+    @index.setter
+    def index(self, n):
+        self.SetSelection(n)
+
 
 class Notebook(BookCtrlBase):
     wxtype = wx.Notebook

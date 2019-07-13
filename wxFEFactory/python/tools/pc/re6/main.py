@@ -249,7 +249,7 @@ class Main(NativeHacktool):
         person = self.person
         for i in range(7):
             if items[i].type:
-                person.items[i].enabled = True
+                person.items[i].Enable(True)
 
     def give_rocket_launcher(self, _):
         """火箭发射器(检查点)"""

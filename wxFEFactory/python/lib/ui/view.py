@@ -9,6 +9,16 @@ def event_binder(event_type, name=None, **args):
     return binder
 
 
+@property
+def value_property(self):
+    return self.GetValue()
+
+
+@value_property.setter
+def value_property(self, value):
+    self.SetValue(value)
+
+
 class View:
     """视图元素"""
     LAYOUTS = []
@@ -338,7 +348,7 @@ class View:
 
     def post_event(self, event_type):
         """手动添加事件"""
-        self.AddPendingEvent(wx.Event(event_type, self.GetId()))
+        self.AddPendingEvent(wx.CommandEvent(event_type, self.GetId()))
 
     def set_on_keydown(self, fn):
         self.bind_event(wx.EVT_KEY_DOWN, fn, False, True)

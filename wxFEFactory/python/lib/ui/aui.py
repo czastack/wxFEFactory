@@ -178,6 +178,18 @@ class AuiNotebook(Layout):
         """设置页面切换事件"""
         self.close_listeners[page] = fn
 
+    @property
+    def index(self):
+        return self.GetSelection()
+
+    @index.setter
+    def index(self, n):
+        self.SetSelection(n)
+
+    @property
+    def count(self):
+        return self.GetPageCount()
+
 
 class AuiMDIParentFrame(BaseFrame):
     wxtype = wx.AuiMDIParentFrame

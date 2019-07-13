@@ -37,7 +37,7 @@ class BaseHackTool(NestedTool):
                         self.render_main()
                         self.on_page_changed(book)
                     except Exception:
-                        win.close()
+                        win.Close()
                         raise
                     self.end_group()
 
@@ -192,7 +192,7 @@ class BaseHackTool(NestedTool):
                 ui.Button(func.__doc__, onclick=func)
 
     def set_buttons_contextmenu(self):
-        parent = ui.View.get_active_layout()
+        parent = ui.View.active_layout()
         with ui.ContextMenu() as contextmenu:
             ui.MenuItem("设为alt+c快捷键(&C)", onselect=self.set_cfn)
         for btn in parent.children:

@@ -156,7 +156,7 @@ class BaseListBoxModuel(BaseModule):
         if pos is not -1:
             if self.confirm('提示', '确认删除该项？', ui.wx.NO) is ui.wx.YES:
                 text = self.listbox[pos]
-                self.listbox.pop(pos)
+                self.listbox.Delete(pos)
                 return pos, text
         return -1, None
 

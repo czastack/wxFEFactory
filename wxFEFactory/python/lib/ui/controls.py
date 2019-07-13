@@ -1,4 +1,4 @@
-from .view import View, Control, EventFunctor
+from .view import View, Control, EventFunctor, value_property
 from . import wx
 
 
@@ -40,15 +40,15 @@ class ToggleButton(Control):
     wxtype = wx.ToggleButton
 
     def __init__(self, label, checked=False, onchange=None, **kwargs):
-        self.checked = checked
+        self._checked = checked
         self.onchange = onchange
         Control.__init__(self, wxparams={'label': label}, **kwargs)
 
     def onready(self):
-        if self.checked:
+        if self._checked:
             self.SetValue(True)
         self.set_onchange(self.onchange)
-        del self.checked, self.onchange
+        del self._checked, self.onchange
 
     def set_onchange(self, onchange, reset=True):
         self.bind_event(wx.EVT_TOGGLEBUTTON, onchange, reset)
@@ -57,6 +57,8 @@ class ToggleButton(Control):
         """切换状态"""
         self.SetValue(not self.GetValue())
         self.post_event(wx.EVT_TOGGLEBUTTON)
+
+    checked = value = value_property
 
 
 class CheckBox(Control):
@@ -67,15 +69,15 @@ class CheckBox(Control):
         if align_right:
             kwargs['wxstyle'] = kwargs.get('wxstyle', 0) | wx.ALIGN_RIGHT
         kwargs['wxparams'] = {'label': label}
-        self.checked = checked
+        self._checked = checked
         self.onchange = onchange
         Control.__init__(self, **kwargs)
 
     def onready(self):
-        if self.checked:
+        if self._checked:
             self.SetValue(True)
         self.set_onchange(self.onchange)
-        del self.checked, self.onchange
+        del self._checked, self.onchange
 
     def set_onchange(self, onchange):
         pass
@@ -84,6 +86,8 @@ class CheckBox(Control):
         """切换状态"""
         self.SetValue(not self.GetValue())
         self.post_event(wx.EVT_CHECKBOX)
+
+    checked = value = value_property
 
 
 class StaticBitmap(Control):
@@ -137,6 +141,16 @@ class TextInput(Control):
     def set_onchar(self, fn, reset=True):
         self.bind_event(wx.EVT_CHAR, fn, reset)
 
+    @property
+    def selection(self):
+        return self.GetSelection()
+
+    @selection.setter
+    def selection(self, value):
+        self.SetSelection(value)
+
+    value = value_property
+
 
 class SearchCtrl(Control):
     """搜索框"""
@@ -160,6 +174,8 @@ class SearchCtrl(Control):
 
     def set_oncancel(self, fn, reset=True):
         self.bind_event(wx.EVT_SEARCHCTRL_CANCEL_BTN, fn, reset)
+
+    value = value_property
 
 
 class SpinCtrl(Control):
@@ -217,6 +233,18 @@ class ControlWithItems(ItemContainer):
             self.post_select()
         return self
 
+    @property
+    def count(self):
+        return self.GetCount()
+
+    @property
+    def index(self):
+        return self.GetSelection()
+
+    @index.setter
+    def index(self, n):
+        self.SetSelection(n)
+
 
 class ListBox(ControlWithItems):
     """列表框"""
@@ -270,6 +298,8 @@ class ComboBox(ControlWithItems):
 
     def set_onenter(self, fn, reset=True):
         self.bind_event(wx.EVT_TEXT_ENTER, fn, reset)
+
+    value = value_property
 
 
 class RadioBox(ControlWithItems):
