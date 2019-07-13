@@ -226,7 +226,7 @@ class ListBox(ControlWithItems):
     def __init__(self, choices=None, onselect=None, **kwargs):
         self.onselect = onselect
         if choices is not None:
-            kwargs['wxparams'] = {'choices': wx.get_choices(choices)}
+            kwargs['wxparams'] = {'choices': choices}
         Control.__init__(self, **kwargs)
 
 
@@ -251,7 +251,7 @@ class Choice(ControlWithItems):
     def __init__(self, choices=None, onselect=None, **kwargs):
         self.onselect = onselect
         if choices is not None:
-            kwargs['wxparams'] = {'choices': wx.get_choices(choices)}
+            kwargs['wxparams'] = {'choices': choices}
         Control.__init__(self, **kwargs)
 
 
@@ -264,7 +264,7 @@ class ComboBox(ControlWithItems):
         self.onselect = onselect
         wxparams = {'value': value}
         if choices is not None:
-            wxparams['choices'] = wx.get_choices(choices)
+            wxparams['choices'] = choices
         kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
 
@@ -281,7 +281,7 @@ class RadioBox(ControlWithItems):
         self.onselect = onselect
         wxparams = {'label': label}
         if choices:
-            wxparams['choices'] = wx.get_choices(choices)
+            wxparams['choices'] = choices
         kwargs['wxparams'] = wxparams
         Control.__init__(self, **kwargs)
 

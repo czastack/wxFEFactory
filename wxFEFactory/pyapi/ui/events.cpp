@@ -44,7 +44,7 @@ void UiModule::init_events()
 
 	py::class_<wxPropertyGridEvent, wxCommandEvent>(ui, "PropertyGridEvent")
 		.def("GetPropertyName", &wxPropertyGridEvent::GetPropertyName)
-		.def("Veto", &wxPropertyGridEvent::Veto);
+		.def("Veto", &wxPropertyGridEvent::Veto, "veto"_a=true);
 
 	py::class_<wxListEvent, wxCommandEvent>(ui, "ListEvent")
 		.def("GetKeyCode", &wxListEvent::GetKeyCode)
@@ -53,7 +53,7 @@ void UiModule::init_events()
 
 	py::class_<wxCloseEvent, wxEvent>(ui, "CloseEvent")
 		.def(py::init<wxEventType, int>(), "type"_a = wxEVT_NULL, "winid"_a = 0)
-		.def("Veto", &wxCloseEvent::Veto);
+		.def("Veto", &wxCloseEvent::Veto, "veto"_a = true);
 
 	py::class_<wxBookCtrlEvent, wxNotifyEvent>(ui, "BookCtrlEvent")
 		.def("GetSelection", &wxBookCtrlEvent::GetSelection);

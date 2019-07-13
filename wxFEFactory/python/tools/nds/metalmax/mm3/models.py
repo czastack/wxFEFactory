@@ -209,7 +209,7 @@ class Global(BaseGlobal):
         label="特技使用次数不减"
     )
 
-    can_go_hear = ToggleFields(
+    can_go_here = ToggleFields(
         ToggleField(0x020686F0, size=8, enable=0x00C9314521F0E046, disable=0xF009A9008B30E046),
         ToggleField(0x020686F8, size=8, enable=0xA902688868081861, disable=0xA90298019800FEAD),
         label="传送系统可以移動到现在地"

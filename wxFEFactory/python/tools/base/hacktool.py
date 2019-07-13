@@ -55,7 +55,7 @@ class BaseHackTool(NestedTool):
             if not self.win.hotkeys:
                 hotkeys = self.get_hotkeys()
                 if hotkeys:
-                    self.win.RegisterHotKeys(hotkeys)
+                    self.win.register_hotkeys(hotkeys)
             self.onattach()
             return True
         else:
@@ -96,7 +96,7 @@ class BaseHackTool(NestedTool):
             group, fn, depend = item
             if depend:
                 self.handle_lazy_group(depend)
-            with group:
+            with ui.View.HERE, group:
                 if fn() is False:
                     return
             group.after_lazy()
@@ -262,7 +262,7 @@ class ProxyHackTool(BaseHackTool):
                 if not self.win.hotkeys:
                     hotkeys = self.get_hotkeys()
                     if hotkeys:
-                        self.win.RegisterHotKeys(hotkeys)
+                        self.win.register_hotkeys(hotkeys)
                 self.onattach()
                 return True
         else:

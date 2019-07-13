@@ -17,6 +17,7 @@ auto Console__get_history(ConsoleHandler* self)
 
 namespace pybind11 {
 	namespace detail {
+		ENUM_CASTER(wxKeyCode);
 		ENUM_CASTER(wxStandardID);
 	}
 }
@@ -39,7 +40,9 @@ wxArrayString UiModule::get_choices(pycref choices)
 	}
 	else
 	{
-		return py::cast<wxArrayString>(choices);
+		wxArrayString array;
+		wxArrayAddAll(array, choices);
+		return array;
 	}
 }
 
@@ -201,15 +204,6 @@ void UiModule::init_ui()
 	size_v = size = wxDefaultSize;
 	validator_v = validator = wxDefaultValidator;
 
-
-	py::setattr(module, "console", py::cast(&console));
-	ui.def("get_choices", &UiModule::get_choices)
-		.def("start_cache", &UiModule::start_cache)
-		.def("end_cache", &UiModule::end_cache);
-	py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
-	py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
-	py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
-
 	py::class_<wxMouseState>(ui, "MouseState")
 		.def("ButtonIsDown", &wxMouseState::ButtonIsDown, "but"_a)
 		.def_readwrite("m_x", &wxMouseState::m_x)
@@ -291,9 +285,15 @@ void UiModule::init_ui()
 		}, "eventType"_a, "fn"_a, "winid"_a=(int)wxID_ANY, "lastId"_a=(int)wxID_ANY, "userData"_a=(wxObject*)nullptr)
 		;
 
-	ui.def("GetDisplaySize", &wxGetDisplaySize)
-		.def("GetDisplayPPI", &wxGetDisplayPPI)
-		.def("GetKeyState", wxGetKeyState)
-		.def("GetMouseState", wxGetMouseState)
-		.def("GetApp", &wxGetApp, py::return_value_policy::reference);
+		py::setattr(module, "console", py::cast(&console));
+		ui.def("start_cache", &UiModule::start_cache)
+			.def("end_cache", &UiModule::end_cache)
+			.def("GetDisplaySize", &wxGetDisplaySize)
+			.def("GetDisplayPPI", &wxGetDisplayPPI)
+			.def("GetKeyState", wxGetKeyState)
+			.def("GetMouseState", wxGetMouseState)
+			.def("GetApp", &wxGetApp, py::return_value_policy::reference);
+		py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
+		py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
+		py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
 }

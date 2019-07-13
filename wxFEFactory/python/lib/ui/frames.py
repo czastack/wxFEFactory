@@ -130,7 +130,46 @@ class HotkeyFrame(Frame):
 
 
 class KeyHookFrame(Frame):
-    pass
+    def __init__(self, **kwargs):
+        self.hotkey_map = {}
+        Frame.__init__(self, **kwargs)
+
+    def __del__(self):
+        self.hotkey_map.clear()
+
+    def onready(self):
+        self.mgr = wx.KeyHookManager(self.wxwindow)
+        self.setHook = self.mgr.setHook
+        self.unsetHook = self.mgr.unsetHook
+        self.Bind(wx.EVT_KEYHOOK, self.onhotkey)
+
+    def register_hotkeys(self, hotkeys):
+        """批量注册热键"""
+        for modifiers, vk, onhotkey in hotkeys:
+            key = (modifiers << 16) | vk
+            if key in self.hotkey_map:
+                print('已经在使用了')
+            else:
+                self.hotkey_map[key] = onhotkey
+
+    def onhotkey(self, event):
+        modifiers = 0
+        if (event.lParam & 0x20000000) != 0:
+            modifiers |= MOD_ALT
+        if wx.GetKeyState(wx.VK_CONTROL) < 0:
+            modifiers |= MOD_CONTROL
+        if wx.GetKeyState(wx.VK_SHIFT) < 0:
+            modifiers |= MOD_SHIFT
+        key = modifiers << 16 | event.wParam
+        fn = self.hotkey_map.get(key, None)
+        if fn is not None:
+            fn()
+
+    def _uninited(self, *args, **kwargs):
+        raise ValueError('mgr未初始化')
+
+    setHook = _uninited
+    unsetHook = _uninited
 
 
 class Dialog(BaseTopLevelWindow):

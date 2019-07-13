@@ -13,7 +13,7 @@ class View:
     """视图元素"""
     LAYOUTS = []
     wxtype = None
-    _hear = False
+    _here = False
 
     def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, wxparams=None, extra=None):
@@ -42,7 +42,7 @@ class View:
                 for style in styles:
                     self.try_styles(style)
 
-        if View._hear:
+        if View._here:
             # 立即渲染
             self._render(parent)
 
@@ -369,15 +369,15 @@ class View:
     def set_on_destroy(fn):
         bind_event(wx.EVT_DESTROY, fn)
 
-    class Hear:
+    class Here:
         """立即渲染"""
         def __enter__(self):
-            View._hear = True
+            View._here = True
 
         def __exit__(self, exc_type, exc_val, exc_tb):
-            View._hear = False
+            View._here = False
 
-    HEAR = Hear()
+    HERE = Here()
 
 
 class Layout(View):
@@ -419,13 +419,13 @@ class Layout(View):
 
     def __enter__(self):
         self.LAYOUTS.append(self)
-        if View._hear:
+        if View._here:
             self.Freeze()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         __class__.LAYOUTS.pop()
-        if View._hear:
+        if View._here:
             self.layout()
             self.Thaw()
         elif self.wxwindow is None and not __class__.LAYOUTS:
@@ -437,7 +437,7 @@ class Layout(View):
 
     def append(self, child):
         self.children.append(child)
-        if not View._hear:
+        if not View._here:
             self.pendding_children.append(child)
 
     def render_as_root(self, parent=None):
@@ -452,7 +452,7 @@ class Layout(View):
         del self.computed_style
 
     def onready(self):
-        if not View._hear:
+        if not View._here:
             for child in self.pendding_children:
                 child._render(self)
             self.pendding_children.clear()

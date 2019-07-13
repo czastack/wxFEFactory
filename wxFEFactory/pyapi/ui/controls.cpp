@@ -14,6 +14,25 @@
 #include "ui.h"
 
 
+namespace pybind11 {
+	namespace detail {
+		// PyFunctor
+		template <> struct type_caster<wxArrayString> {
+		public:
+			PYBIND11_TYPE_CASTER(wxArrayString, _("ArrayString"));
+
+			bool load(handle src, bool) {
+				value = UiModule::get_choices(py::reinterpret_borrow<py::object>(src));
+				return true;
+			}
+
+			static handle cast(const wxArrayString& src, return_value_policy, handle) {
+				return PyListFromArray(src).release();
+			}
+		};
+	}
+}
+
 class PyTreeItemData : public wxTreeItemData
 {
 public:

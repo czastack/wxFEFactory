@@ -59,7 +59,7 @@ namespace pybind11 {
 			}
 
 			static handle cast(const ArrayType& src, return_value_policy, handle) {
-				return PyListFromArray(src);
+				return PyListFromArray(src).release();
 			}
 		protected:
 			bool success = false;
@@ -78,7 +78,7 @@ namespace pybind11 {
 			}
 
 			static handle cast(const ArrayType& src, return_value_policy, handle) {
-				return PyListFromArray(src);
+				return PyListFromArray(src).release();
 			}
 		protected:
 			bool success = false;

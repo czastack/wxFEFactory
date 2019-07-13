@@ -9,7 +9,7 @@ from tools.base.basetool import BaseTool
 class Main(BaseTool):
     def attach(self, frame):
         super().attach(frame)
-        self.win.RegisterHotKeys((
+        self.win.register_hotkeys((
             (VK.MOD_ALT, VK.C, self.record_copy),
             (VK.MOD_ALT, VK.getCode('['), self.item_prev),
             (VK.MOD_ALT, VK.getCode(']'), self.item_next),

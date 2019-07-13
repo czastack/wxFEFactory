@@ -61,8 +61,6 @@ namespace pybind11 {
 				return PyLong_FromUnsignedLong(src);\
 			}\
 		}
-
-		ENUM_CASTER(wxKeyCode);
 	}
 }
 

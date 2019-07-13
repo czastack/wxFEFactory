@@ -16,10 +16,10 @@ class BaseTool(BaseScene):
     def attach(self, frame):
         try:
             if self.nested:
-                with ui.View.HEAR, frame.book:
+                with ui.View.HERE, frame.book:
                     win = self.render()
             else:
-                with ui.View.HEAR, frame.win:
+                with ui.View.HERE, frame.win:
                     win = self.render()
             if win:
                 win.set_onclose(ui.EventFunctor(self.onclose, pass_event=True))
