@@ -15,7 +15,7 @@ class Module(BaseListBoxModuel):
         count = self.listbox.count
         for item in self.data_list:
             name = "%04X" % count
-            super().doAdd(name)
+            super().append(name)
             count += 1
 
     def render_main(self):
@@ -31,45 +31,45 @@ class Module(BaseListBoxModuel):
         self.textarea = ui.TextInput(multiline=True, class_="fill")
         with ui.Horizontal(class_="expand"):
             ui.ComboBox(wxstyle=ui.wx.CB_READONLY, class_="fill")
-            ui.Button(label="保存该项", class_="button", onclick=self.onSaveIt)
-            ui.Button(label="保存文件", class_="button", onclick=self.onSave)
-            ui.Button(label="另存为", class_="button", onclick=self.onSaveAs)
+            ui.Button(label="保存该项", class_="button", onclick=self.on_save_it)
+            ui.Button(label="保存文件", class_="button", onclick=self.on_save)
+            ui.Button(label="另存为", class_="button", onclick=self.on_save_as)
 
-    def onAdd(self, btn):
+    def onadd(self, btn):
         text = self.longtext_dialog("输入内容")
         if text:
-            self.doAdd(text)
+            self.append(text)
 
-    def doAdd(self, text, unique=True):
+    def append(self, text, unique=True):
         """ 添加列表项 """
         if not unique or text not in self.data_list:
             count = self.listbox.count
             name = "%04X" % count
-            super().doAdd(name)
+            super().append(name)
             self.data_list.append(text)
 
-    def onDel(self, btn):
-        pos, text = super().onDel(btn)
+    def ondelete(self, btn):
+        pos, text = super().ondelete(btn)
         if text:
             self.data_list.pop(pos)
 
-    def onRename(self, m):
-        # args = super().onRename(m)
+    def on_rename(self, m):
+        # args = super().on_rename(m)
         # if args:
         #     name, newname = args
         #     item = self.data_map[newname] = self.data_map.pop(name)
         #     item['name'] = newname
-        #     self.pg.setValues({'name': newname})
+        #     self.pg.set_values({'name': newname})
         pass
 
-    def onSaveIt(self, btn):
+    def on_save_it(self, btn):
         """保存当前项"""
         self.data_list[self.listbox.index]['text'] = self.textarea.value
 
-    def onSave(self, btn):
+    def on_save(self, btn):
         self.dump_json('strings', self.data_list, indent=0)
 
-    def onSaveAs(self, btn):
+    def on_save_as(self, btn):
         tpl = self.longtext_dialog("输入模板", "{i:04X} {addr:08X}\n{text}\n")
         path = fefactory_api.choose_file("选择保存文件", wildcard='*.txt')
         if path:
@@ -82,10 +82,10 @@ class Module(BaseListBoxModuel):
                 file.write('\n'.join(result))
             print("保存成功: " + path)
 
-    def getCurData(self):
+    def get_cur_data(self):
         return self.data_list[self.listbox.index]
 
-    def onListSelect(self, _):
+    def on_list_select(self, _):
         self._lastpos = self.listbox.index
         item = self.data_list[self._lastpos]
         self.textarea.value = item['text']
@@ -112,12 +112,12 @@ class Module(BaseListBoxModuel):
             self.data_list[index + 1], self.data_list[index] = self.data_list[index], self.data_list[index + 1]
             self.listbox.index = index + 1
 
-    def onClear(self, m):
+    def onclear(self, m):
         """清空列表"""
-        if super().onClear(m):
+        if super().onclear(m):
             self.data_list.clear()
 
-    def readFrom(self, reader):
+    def read_from(self, reader):
         unique = False
 
         choice = ui.dialog.CheckChoiceDialog(self.unique_title, (
@@ -154,7 +154,7 @@ class Module(BaseListBoxModuel):
             if codes is not None:
                 codes.clear()
 
-            text = reader.readText(addr, codes)
+            text = reader.read_text(addr, codes)
             if not choice.unique or text not in added:
                 item = {'text': text, 'addr': addr}
 
@@ -168,4 +168,4 @@ class Module(BaseListBoxModuel):
             ptr += 4
             i += 1
 
-        super().doAdd(names)
+        super().append(names)

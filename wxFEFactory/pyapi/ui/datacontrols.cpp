@@ -8,18 +8,6 @@ void UiModule::init_datacontrols()
 {
 	using namespace py::literals;
 
-	py::class_<NODELETE(wxPropertyGrid), wxControl>(ui, "PropertyGrid")
-		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
-			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
-		.def("GetSelection", &wxPropertyGrid::GetSelection)
-		.def("SetPropVal", &wxPropertyGrid::SetPropVal)
-		.def("SetExtraStyle", &wxPropertyGrid::SetExtraStyle, "exStyle"_a)
-		.def("SetCaptionBackgroundColour", &wxPropertyGrid::SetCaptionBackgroundColour, "col"_a)
-		.def("SetMarginColour", &wxPropertyGrid::SetMarginColour, "col"_a)
-		.def("Append", &wxPropertyGrid::Append)
-		.def("GetPropertyByName", (wxPGProperty * (wxPropertyGrid::*)(const wxString & name) const) & wxPropertyGrid::GetPropertyByName);
-
-
 	py::class_<NODELETE(wxPGProperty)>(ui, "PGProperty")
 		.def("GetName", &wxPGProperty::GetName)
 		.def("GetLabel", &wxPGProperty::GetLabel)
@@ -82,6 +70,25 @@ void UiModule::init_datacontrols()
 		.def("GetDouble", &wxVariant::GetDouble)
 		.def("GetString", &wxVariant::GetString)
 		.def("GetArrayString", &wxVariant::GetArrayString);
+
+
+	py::class_<wxPropertyGridIterator>(ui, "PropertyGridIterator")
+		.def("Get", &wxPropertyGridIterator::operator*)
+		.def("AtEnd", &wxPropertyGridIterator::AtEnd);
+
+
+	py::class_<NODELETE(wxPropertyGrid), wxControl>(ui, "PropertyGrid")
+		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxString&>(),
+			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
+		.def("GetSelection", &wxPropertyGrid::GetSelection)
+		.def("GetIterator", py::overload_cast<int, wxPGProperty*>(&wxPropertyGrid::GetIterator),
+			"flags"_a=(int)wxPG_ITERATE_DEFAULT, "first"_a=(wxPGProperty*)nullptr, py::return_value_policy::reference)
+		.def("SetPropVal", &wxPropertyGrid::SetPropVal)
+		.def("SetExtraStyle", &wxPropertyGrid::SetExtraStyle, "exStyle"_a)
+		.def("SetCaptionBackgroundColour", &wxPropertyGrid::SetCaptionBackgroundColour, "col"_a)
+		.def("SetMarginColour", &wxPropertyGrid::SetMarginColour, "col"_a)
+		.def("Append", &wxPropertyGrid::Append)
+		.def("GetPropertyByName", (wxPGProperty * (wxPropertyGrid::*)(const wxString & name) const) & wxPropertyGrid::GetPropertyByName);
 
 	// ListView
 	py::class_<NODELETE(wxListView), wxControl>(ui, "ListView")

@@ -6,10 +6,10 @@ ROM_MASK = ~(1 << 27)
 class RomHandler:
     __slots__ = ()
 
-    def getRomTitle(self):
+    def get_rom_title(self):
         return self.read(0xA0, bytes, 12).decode()
 
-    def getRomCode(self):
+    def get_rom_code(self):
         return self.read(0xAC, bytes, 4).decode()
 
 

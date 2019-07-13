@@ -18,7 +18,7 @@ class Player(Entity, GTA3Player):
     ap = Field(0x358, float)
     rotation = Field(0x378, float)
     stamina = Field(0x600, float)
-    isInVehicle = Field(0x3AC, bool, 1)
+    in_vehicle = Field(0x3AC, bool, 1)
     cur_weapon = Field(0x504, int, 1)
     crouch = Field(0x150, bool)
     isOnGround = Field(0x150, bool)
@@ -54,7 +54,7 @@ class Player(Entity, GTA3Player):
         return Vehicle(ptr, self.context) if ptr else None
 
     @property
-    def nearPersons(self):
+    def near_persons(self):
         offset = 0x56c
         for i in range(10):
             yield Player(self.handler.read32(self.addr + offset), self.context)
@@ -121,7 +121,7 @@ class Marker(BaseBlip):
     SIZE = 56
 
     color = Field(0)
-    blipType = Field(4)
+    blip_type = Field(4)
     entity_handle = Field(8)
     coord = CoordField(24)
     index = WordField(36)

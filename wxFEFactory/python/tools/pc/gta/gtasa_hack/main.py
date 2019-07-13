@@ -60,7 +60,7 @@ class Main(BaseGTA3_VC_SA_Tool):
         with ui.Vertical(class_="fill"):
             with ui.GridLayout(cols=5, vgap=10, class_="expand"):
                 ui.Button(label="车坐标->人坐标", onclick=self.from_vehicle_coord)
-                ui.Button(label="从地图读取坐标", onclick=self.playerCoordFromMap)
+                ui.Button(label="从地图读取坐标", onclick=self.player_coord_from_map)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_ped_invincible)
 
             ui.Text("防止主角受到来自以下的伤害")
@@ -91,7 +91,7 @@ class Main(BaseGTA3_VC_SA_Tool):
         with ui.Vertical(class_="fill"):
             with ui.GridLayout(cols=5, vgap=10, class_="expand"):
                 ui.Button(label="人坐标->车坐标", onclick=self.from_player_coord)
-                ui.Button(label="从地图读取坐标", onclick=self.vehicleCoordFromMap)
+                ui.Button(label="从地图读取坐标", onclick=self.vehicle_coord_from_map)
                 ui.ToggleButton(label="切换无伤状态", onchange=self.set_vehicle_invincible)
                 ui.Button(label="锁车", onclick=self.vehicle_lock_door)
                 ui.Button(label="开锁", onclick=partial(self.vehicle_lock_door, lock=False))
@@ -237,7 +237,7 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def dir_correct(self, _=None):
         # 按当前视角方向旋转
-        if self.isInVehicle:
+        if self.in_vehicle:
             mycar = self.vehicle
             mycar.coord[2] += 0.05
             self.handler.write(mycar.pos.addr, self.handler.read(address.CAMERA, bytes, 28), 0)
@@ -250,12 +250,12 @@ class Main(BaseGTA3_VC_SA_Tool):
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
             self.rot_view.mem_value = rot
 
-    def playerCoordFromMap(self, _=None):
+    def player_coord_from_map(self, _=None):
         # 从大地图读取坐标
         self.coord_view.views[0].value = str(self.handler.read_float(address.MAP_X_ADDR))
         self.coord_view.views[1].value = str(self.handler.read_float(address.MAP_Y_ADDR))
 
-    def vehicleCoordFromMap(self, _=None):
+    def vehicle_coord_from_map(self, _=None):
         # 从大地图读取坐标
         self.vehicle_coord_view.views[0].value = str(self.handler.read_float(address.MAP_X_ADDR))
         self.vehicle_coord_view.views[1].value = str(self.handler.read_float(address.MAP_Y_ADDR))
@@ -297,14 +297,14 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def raise_up(self, _=None, speed=15):
         """升高(有速度)"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.speed[2] = 0.5
         else:
             self.player.speed[2] = 1
 
     def to_up(self, _=None):
         """升高(无速度)"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3

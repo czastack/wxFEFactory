@@ -35,7 +35,7 @@ class Application(Configurable):
         self.config_changed = True
         self.project = project
 
-    def onExit(self):
+    def on_exit(self):
         self.writeconfig()
         if self.project:
             self.project.writeconfig()
@@ -45,4 +45,4 @@ class Application(Configurable):
 
 
 app = Application()
-fefactory_api.set_on_exit(app.onExit)
+fefactory_api.set_on_exit(app.on_exit)

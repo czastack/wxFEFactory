@@ -162,10 +162,10 @@ class Main(NativeHacktool):
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
-            (VK.MOD_ALT, VK.getCode(','), this.save_coord),
-            (VK.MOD_ALT, VK.getCode('.'), this.load_coord),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(','), this.undo_coord),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('.'), this.reload_coord),
+            (VK.MOD_ALT, VK(','), this.save_coord),
+            (VK.MOD_ALT, VK('.'), this.load_coord),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK(','), this.undo_coord),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK('.'), this.reload_coord),
             (VK.MOD_ALT, VK.O, this.p1_go_p2),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.O, this.p2_go_p1),
         )

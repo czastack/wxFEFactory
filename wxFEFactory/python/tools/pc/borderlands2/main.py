@@ -36,7 +36,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("ammo", "弹药", self._global, cols=4), self.render_ammo)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("team", "团队", team_config, cols=4), self.render_team)
-        self.lazy_group(Groups("技能", self.weak.onNotePageChange, addr=team_config), self.render_skill)
+        self.lazy_group(Groups("技能", self.weak.on_note_page_change, addr=team_config), self.render_skill)
         self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
@@ -340,10 +340,10 @@ class Main(AssemblyHacktool):
             (VK.MOD_SHIFT, VK.N, this.go_down),
             (VK.MOD_ALT, VK.F, this.ability_cooldown),
             (0, VK.F3, this.move_quickly),
-            (0, VK.getCode(';'), this.all_ammo_full),
-            (0, VK.getCode('.'), this.level_up),
-            (0, VK.getCode("'"), this.make_weapon_useful),
-            (0, VK.getCode('/'), this.sync_weapon_level),
+            (0, VK(';'), this.all_ammo_full),
+            (0, VK('.'), this.level_up),
+            (0, VK("'"), this.make_weapon_useful),
+            (0, VK('/'), this.sync_weapon_level),
         )
 
     def _character(self):

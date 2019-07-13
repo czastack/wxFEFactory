@@ -38,7 +38,7 @@ class MetalMaxHack(BaseNdsHack):
         self.lazy_group(Group("chariot_special_bullets", "特殊炮弹", self.chariot), self.render_chariot_special_bullets)
         self.lazy_group(Group("battle_status", "战斗状态", self._global, cols=4), self.render_battle_status)
         self.lazy_group(Group("enemy", "敌人", self.enemy, cols=4), self.render_enemy)
-        self.lazy_group(Groups("包裹", self.weak.onNotePageChange), self.render_package_group)
+        self.lazy_group(Groups("包裹", self.weak.on_note_page_change), self.render_package_group)
         self.render_ext()
 
         with StaticGroup("功能"):

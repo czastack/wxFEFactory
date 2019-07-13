@@ -44,6 +44,9 @@ class KEY:
     Y = 89
     Z = 90
 
+    def __new__(cls, name):
+        return cls.getcode(name)
+
 
 class VK(KEY):
     ASCII = {
@@ -112,7 +115,8 @@ class VK(KEY):
     F12 = 123
     NUMLOCK = 144
 
-    def getCode(name):
+    @staticmethod
+    def gecode(name):
         """根据名称获取windows的keyCode"""
         if len(name) == 1:
             code = ord(name)
@@ -125,7 +129,8 @@ class VK(KEY):
         name = name.upper()
         return VK.ASCII.get(name, 0) or getattr(VK, name, 0)
 
-    def getName(code, mod=None):
+    @staticmethod
+    def getname(code, mod=None):
         """根据windows的keyCode和modifiers得到名称"""
         # 0~9, A~Z
         if 48 <= code <= 57 or 65 <= code <= 90:
@@ -240,12 +245,14 @@ class WXK(KEY):
     WINDOWS_RIGHT = 394
     WINDOWS_MENU = 395
 
-    def isMod(code):
+    @staticmethod
+    def ismod(code):
         """判断一个keyCode是否是ctrl, shift, alt"""
         return code == WXK.SHIFT or code == WXK.ALT or code == WXK.CONTROL
 
-    def getCode(name):
-        """根据名称获取onKeyDown时wxWidgets的的keyCode"""
+    @staticmethod
+    def getcode(name):
+        """根据名称获取onKeyDown时wxWidgets的keyCode"""
         if len(name) == 1:
             code = ord(name)
             # 0~9, A~Z
@@ -256,7 +263,8 @@ class WXK(KEY):
                 return code - 32
         return getattr(WXK, name.upper(), 0)
 
-    def getName(code, mod=None):
+    @staticmethod
+    def getname(code, mod=None):
         """根据wxWidgets的keyCode和modifiers得到名称"""
         if 33 <= code <= 126:
             name = chr(code)
@@ -267,7 +275,7 @@ class WXK(KEY):
                     break
             else:
                 return ''
-        if mod and not WXK.isWXKMod(code):
+        if mod and not WXK.ismod(code):
             if mod & KEY.MOD_ALT:
                 name = 'alt+' + name
             if mod & KEY.MOD_SHIFT:

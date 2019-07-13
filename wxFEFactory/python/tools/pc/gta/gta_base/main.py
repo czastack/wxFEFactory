@@ -26,7 +26,7 @@ class BaseGTATool(NativeHacktool):
         """重写这个函数，返回要注册的热键列表"""
         return self.get_common_hotkeys()
 
-    def inputCheat(self, text):
+    def input_cheat(self, text):
         auto.sendKey(TextVK(text), 10)
 
     def _player(self):
@@ -53,14 +53,14 @@ class BaseGTATool(NativeHacktool):
         return self.player.vehicle or self.vehicle
 
     @property
-    def isInVehicle(self):
+    def in_vehicle(self):
         """当前是否在乘车"""
-        return self.player.isInVehicle
+        return self.player.in_vehicle
 
     @property
     def entity(self):
         """在车中则返回载具对象，否则返回角色对象"""
-        return self.vehicle if self.isInVehicle else self.player
+        return self.vehicle if self.in_vehicle else self.player
 
     @property
     def ped_pool(self):
@@ -139,7 +139,7 @@ class BaseGTATool(NativeHacktool):
         speed[0] += x * speed_rate
         speed[1] += y * speed_rate
 
-        if not self.isInVehicle:
+        if not self.in_vehicle:
             safe_speed_up = getattr(self, 'SAFE_SPEED_UP', 0.2)
             speed[2] = safe_speed_up
             self.raise_up(speed=safe_speed_up)
@@ -168,7 +168,7 @@ class BaseGTATool(NativeHacktool):
 
     def restore_hp(self, _=None):
         """恢复HP"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.hp = 1000
             self.vehicle_fix(self.vehicle)
         else:
@@ -177,7 +177,7 @@ class BaseGTATool(NativeHacktool):
 
     def restore_hp_large(self, _=None):
         """恢复大量HP"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.hp = 2000
             self.vehicle_fix(self.vehicle)
         else:
@@ -198,13 +198,13 @@ class BaseGTATool(NativeHacktool):
 
     def go_prev_pos(self, _=None):
         """瞬移到上一处地点"""
-        view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
+        view = self.vehicle_coord_view if self.in_vehicle else self.coord_view
         view.listbox.prev()
         view.write()
 
     def go_next_pos(self, _=None):
         """瞬移到下一处地点"""
-        view = self.vehicle_coord_view if self.isInVehicle else self.coord_view
+        view = self.vehicle_coord_view if self.in_vehicle else self.coord_view
         view.listbox.next()
         view.write()
 
@@ -408,8 +408,8 @@ class BaseGTATool(NativeHacktool):
         it = Marker(addr, self)
 
         for i in range(self.MARKER_RANGE):
-            blipType = it.blipType
-            if (it.blipType and (types is None or blipType in types) and (color is None or it.color is color)
+            blip_type = it.blip_type
+            if (it.blip_type and (types is None or blip_type in types) and (color is None or it.color is color)
                     and (sprite is None or it.sprite is sprite)):
                 yield Marker(it.addr, self)
             it.next()
@@ -471,8 +471,8 @@ class BaseGTATool(NativeHacktool):
     def teleport_to_blip(self, blip):
         """瞬移到指定标记"""
         if blip:
-            blipType = blip.blipType
-            if blipType is self.models.Marker.MARKER_TYPE_COORDS:
+            blip_type = blip.blip_type
+            if blip_type is self.models.Marker.MARKER_TYPE_COORDS:
                 coord = blip.coord
             else:
                 entity = blip.entity
@@ -554,7 +554,7 @@ class BaseGTATool(NativeHacktool):
             if need_set_coord:
                 coord_up = getattr(self, 'SLING_COORD_UP', 1)
                 coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
-                if self.isInVehicle:
+                if self.in_vehicle:
                     coord_delta *= 1.5
                 coord = self.player.coord.values()
                 coord[0] += cam_x * coord_delta
@@ -578,7 +578,7 @@ class BaseGTATool(NativeHacktool):
             vehicle = getattr(self, '_last_spawn_and_launch_vehicle', None)
         if not vehicle or vehicle.model_id != self.get_selected_vehicle_model():
             coord_delta = getattr(self, 'SLING_COORD_DELTA', 5)
-            if self.isInVehicle:
+            if self.in_vehicle:
                 coord_delta *= 1.5
             vehicle = self.spawn_choosed_vehicle(coord=self.get_cam_front_coord(coord_delta))
             self._last_spawn_and_launch_vehicle = vehicle
@@ -601,7 +601,7 @@ class BaseGTATool(NativeHacktool):
 
     def explode_art(self, _=None, count=10):
         """焰之炼金术 (向前生成数个爆炸)"""
-        distance = (getattr(self, 'EXPLODE_DISTANCE_VEHICLE', 8) if self.isInVehicle
+        distance = (getattr(self, 'EXPLODE_DISTANCE_VEHICLE', 8) if self.in_vehicle
             else getattr(self, 'EXPLODE_DISTANCE', 6))
         for coord in self.iter_cam_dir_coords(count, distance, True):
             self.create_explosion(coord)
@@ -697,8 +697,8 @@ class BaseGTATool(NativeHacktool):
             (VK.MOD_ALT, VK.M, self.speed_up),
             (VK.MOD_ALT, VK.SPACE, self.raise_up),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.SPACE, self.go_down),
-            (VK.MOD_ALT, VK.getCode(','), self.to_up),
-            (VK.MOD_ALT, VK.getCode('.'), self.to_down),
+            (VK.MOD_ALT, VK(','), self.to_up),
+            (VK.MOD_ALT, VK('.'), self.to_down),
             (VK.MOD_ALT, VK.X, self.stop),
             (VK.MOD_ALT, VK.H, self.restore_hp),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, self.restore_hp_large),
@@ -709,11 +709,11 @@ class BaseGTATool(NativeHacktool):
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.K, self.near_vehicles_flip),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.P, self.near_peds_to_front),
             (VK.MOD_ALT, VK.P, self.near_vehicles_to_front),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(','), self.go_prev_pos),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('.'), self.go_next_pos),
-            (VK.MOD_ALT, VK.getCode("'"), self.recal_markers),
-            (VK.MOD_ALT, VK.getCode('/'), self.go_next_marker),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('/'), self.move_marker_to_front),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK(','), self.go_prev_pos),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK('.'), self.go_next_pos),
+            (VK.MOD_ALT, VK("'"), self.recal_markers),
+            (VK.MOD_ALT, VK('/'), self.go_next_marker),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK('/'), self.move_marker_to_front),
             (VK.MOD_ALT, VK.L, self.lock_door),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK.L, self.unlock_door),
             (VK.MOD_ALT, VK.D, self.sling),
@@ -723,12 +723,12 @@ class BaseGTATool(NativeHacktool):
             (VK.MOD_ALT, VK.Z, self.explode_last_launch_vehicle),
             (VK.MOD_ALT, VK.B, self.bring_one_vehicle),
             (VK.MOD_ALT, VK._0, self.clear_wanted_level),
-            (VK.MOD_ALT, VK.getCode('`'), self.explode_art),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('`'), partial(self.explode_art, count=24), 'explode_art_long'),
+            (VK.MOD_ALT, VK('`'), self.explode_art),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK('`'), partial(self.explode_art, count=24), 'explode_art_long'),
             (VK.MOD_ALT, VK.Q, partial(self.explode_art, count=1), 'explode_art_one'),
             (VK.MOD_ALT, VK._1, self.teleport_to_destination),
-            (VK.MOD_ALT, VK.getCode('['), self.spawn_vehicle_id_prev),
-            (VK.MOD_ALT, VK.getCode(']'), self.spawn_vehicle_id_next),
+            (VK.MOD_ALT, VK('['), self.spawn_vehicle_id_prev),
+            (VK.MOD_ALT, VK(']'), self.spawn_vehicle_id_next),
             (VK.MOD_ALT, VK.V, self.spawn_choosed_vehicle),
             (VK.MOD_ALT, VK.C, self.custom_hotkey),
         )

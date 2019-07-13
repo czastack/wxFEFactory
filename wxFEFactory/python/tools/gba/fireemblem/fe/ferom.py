@@ -130,12 +130,13 @@ ctrl_table = (
     CtrlCode(0x4D00, "{Unknow4D00}"),
 )
 
+
 class FeRomHandler(RomHandler):
     FONT_POINTER = 0x06E0
     TEXT_TABLE_POINTER = 0x06DC
 
     def __init__(self):
-        code = self.getRomCode()
+        code = self.get_rom_code()
         if code not in config.romcode:
             print(f'{self.name}不是火纹的rom, code={code}')
             self.close()
@@ -143,7 +144,7 @@ class FeRomHandler(RomHandler):
             self.key = config.romcode[code]
         self._dict = None
 
-    def openDict(self, path=None):
+    def open_dict(self, path=None):
         # 码表路径，默认放在本文件夹下面
         if path is None:
             path = config.dictmap[self.key]
@@ -160,19 +161,19 @@ class FeRomHandler(RomHandler):
     def text_table_start(self):
         return self.read32(self.TEXT_TABLE_POINTER) + 4
 
-    def getTextEntryPtr(self, i):
+    def get_text_entry_ptr(self, i):
         """
         读取文本指针表项的值（地址）
         i从0开始
         """
         return self.read32(self.text_table_start + i * 4)
 
-    def getTextEntryText(self, i):
+    def get_text_entry_text(self, i):
         """
         读取文本指针表项的内容（文本）
         i从0开始
         """
-        return self.readText(self.getTextEntryPtr(i))
+        return self.read_text(self.get_text_entry_ptr(i))
 
     @property
     def dict_path(self):
@@ -181,7 +182,7 @@ class FeRomHandler(RomHandler):
     @property
     def dict(self):
         if not self._dict:
-            self.openDict()
+            self.open_dict()
         return self._dict
 
     def __iter__(self):
@@ -190,7 +191,7 @@ class FeRomHandler(RomHandler):
     def __next__(self):
         return self._file.read(1)[0]
 
-    def readText(self, addr, codebuff=None):
+    def read_text(self, addr, codebuff=None):
         """
         从rom中读取文本，遇结束符00结束
         :param codebuff: 用于返回原始字码 byte数组
@@ -200,15 +201,15 @@ class FeRomHandler(RomHandler):
             text = self.dict.decode_it(self.pos(addr), codebuff)
         else:
             # print("%04X" % addr)
-            text = self.dict.decodeHaffumanText(self.pos(addr), codebuff)
+            text = self.dict.decode_haffuman_text(self.pos(addr), codebuff)
         return text
 
-    def writeText(self, addr, text):
-        huffbytes = self.dict.encodeHaffuman(text)
+    def write_text(self, addr, text):
+        huffbytes = self.dict.encode_haffuman(text)
         self.write(addr, bytes)
 
-    def writeTextCodes(self, addr, codes):
-        huffbytes = self.dict.encodeHaffumanCode(codes)
+    def write_text_codes(self, addr, codes):
+        huffbytes = self.dict.encode_haffuman_code(codes)
         self.write(addr, huffbytes)
 
 

@@ -54,7 +54,7 @@ class Vehicle(Entity, GTA3Vehicle):
     def unlock_door(self):
         self.door_status = 1
 
-    def ignoreDamage(self, ignore=True):
+    def ignore_damage(self, ignore=True):
         if ignore:
             self.flags |= 4
         else:
@@ -68,7 +68,7 @@ class Player(Entity, GTA3Player):
     ap = Field(0x2c4, float)
     rotation = Field(0x2dc, float)
     # stamina = Field(0x600, float)
-    isInVehicle = Field(0x314, bool, 1)
+    in_vehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
     vehicle = ManagedModelPtrField(0x310, Vehicle)
     collidingCar = ManagedModelPtrField(0x34c, Vehicle)
@@ -105,7 +105,7 @@ class Marker(BaseBlip):
     SIZE = 48
 
     color = Field(0)
-    blipType = Field(4)
+    blip_type = Field(4)
     entity_handle = Field(8)
     coord = CoordField(20)
     index = WordField(3)

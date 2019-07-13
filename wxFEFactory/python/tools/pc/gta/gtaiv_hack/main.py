@@ -14,7 +14,7 @@ from lib import ui
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
 from ..gta_base.widgets import WeaponWidget
-from ..gta_base.utils import degreeToRadian
+from ..gta_base.utils import degree_to_radian
 from . import address, datasets, models, coords
 from .models import Player, Vehicle
 from .native import NativeContext
@@ -386,7 +386,7 @@ class Main(BaseGTATool):
 
     def to_up(self, _=None):
         """升高(无速度)"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3
@@ -535,8 +535,8 @@ class Main(BaseGTATool):
     def get_blips(self, sprites, color=None, types=None):
         """根据sprite获取所有标记"""
         def check_blip(blip):
-            return (blip.blipType and (color is None or blip.color is color)
-                and (types is None or blip.blipType in types))
+            return (blip.blip_type and (color is None or blip.color is color)
+                and (types is None or blip.blip_type in types))
 
         if isinstance(sprites, int):
             sprites = (sprites,)
@@ -655,13 +655,13 @@ class Main(BaseGTATool):
         :return: (x分量, y分量, z方位角)
         """
         data = self.get_camera_rot_raw()
-        yaw = degreeToRadian(data[2]) + math.pi / 2
-        return (math.cos(yaw), math.sin(yaw), degreeToRadian(data[0]))
+        yaw = degree_to_radian(data[2]) + math.pi / 2
+        return (math.cos(yaw), math.sin(yaw), degree_to_radian(data[0]))
 
     def get_camera_yaw(self):
         """获取xy面上的旋转量"""
         data = self.get_camera_rot_raw()
-        return degreeToRadian(data[2])
+        return degree_to_radian(data[2])
 
     def dir_correct(self):
         """根据摄像机朝向设置当前实体的朝向"""

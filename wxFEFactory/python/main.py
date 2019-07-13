@@ -273,7 +273,7 @@ class MainFrame:
     #         return
     #     reader = FeRomRW(rom)
     #     if not reader.closed:
-    #         print(reader.getRomTitle())
+    #         print(reader.get_rom_title())
     #         dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
     #         if dialog.ShowModal():
     #             for i in dialog.listbox.GetCheckedItems():
@@ -282,7 +282,7 @@ class MainFrame:
     #                     Module = self.get_module(name)
     #                     module = Module()
     #                     module.attach()
-    #                     module.readFrom(reader)
+    #                     module.read_from(reader)
 
     #                 except Exception:
     #                     print('加载模块%s失败' % name)

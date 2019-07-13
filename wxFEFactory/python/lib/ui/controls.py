@@ -369,17 +369,17 @@ class HotkeyCtrl(TextInput):
 
     def onready(self):
         super().onready()
-        self.set_on_keydown(self.onKey)
+        self.set_on_keydown(self.onkey)
 
-    def onKey(self, _, event):
+    def onkey(self, _, event):
         code = event.GetKeyCode()
-        if WXK.isMod(code):
+        if WXK.ismod(code):
             return
         mod = event.GetModifiers()
-        self.handleKey(code, mod)
+        self.handle_key(code, mod)
         return True
 
-    def handleKey(self, code, mod):
-        self.value = WXK.getName(code, mod)
+    def handle_key(self, code, mod):
+        self.value = WXK.getname(code, mod)
         self.code = code
         self.mode = mod

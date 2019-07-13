@@ -15,7 +15,7 @@ class TreeNode:
     def __init__(self, parent=None):
         self.parent = parent
 
-    def isLeaf(self):
+    def isleaf(self):
         return self.right is None
 
     @property
@@ -78,7 +78,7 @@ class FeDict(Dictionary):
         self.tree = root
         self.leafmap = leafmap
 
-    def decodeHaffuman(self, data, result=None):
+    def decode_haffuman(self, data, result=None):
         """ 哈夫曼字节流转字码列表
         :param result: 返回解码后的code列表
         """
@@ -105,7 +105,7 @@ class FeDict(Dictionary):
                 else:
                     node = node.right
                 curbyte >>= 1
-                if node.isLeaf():
+                if node.isleaf():
                     code = node.value
                     if (code & 0xFF00) is not 0:
                         # 读到叶子结点
@@ -118,7 +118,7 @@ class FeDict(Dictionary):
 
         return result
 
-    def decodeText(self, codes, codebytes=None):
+    def decode_text(self, codes, codebytes=None):
         """字码列表转文本"""
         if codebytes is not None:
             codebytes.extend(self.codes_to_bytes(codes))
@@ -157,14 +157,14 @@ class FeDict(Dictionary):
                     print("Error: %04X can't decode" % code)
         return ''.join(text)
 
-    def decodeHaffumanText(self, data, codebytes=None):
+    def decode_haffuman_text(self, data, codebytes=None):
         """ 哈夫曼字节流转文本
         :param data: 哈夫曼字节流可迭代变量
         """
-        codes = self.decodeHaffuman(data)
-        return self.decodeText(codes, codebytes)
+        codes = self.decode_haffuman(data)
+        return self.decode_text(codes, codebytes)
 
-    def encodeText(self, text):
+    def encode_text(self, text):
         """文本转字码列表，支持控制码"""
         codes = []
         length = len(text) - 1
@@ -202,26 +202,26 @@ class FeDict(Dictionary):
 
         return codes
 
-    def encodeHaffuman(self, text, buf=None, null=True):
+    def encode_haffuman(self, text, buf=None, null=True):
         """ 文本转哈夫曼字节数组
         :param null: 把\\0添加到结尾
         :param buf: 可选的缓冲区（存放哈夫曼字节数据）
         """
-        codes = self.encodeText(text)
+        codes = self.encode_text(text)
 
         if null:
             codes.append(0x00)
 
-        return self.encodeHaffumanCode(codes, buf)
+        return self.encode_haffuman_code(codes, buf)
 
-    def encodeHaffumanCode(self, codes, buf=None):
+    def encode_haffuman_code(self, codes, buf=None):
         """ 文本转哈夫曼字节数组
         :param codes: 字码数组
         :param buf: 可选的缓冲区（存放哈夫曼字节数据）
         """
         result = bytearray() if buf is None else buf
         byte = 0
-        bit  = 0
+        bit = 0
         # 因哈夫曼值从根结点开始，先从叶结点往上，写入逆序的比特流，再用huffmanBit控制比特位逆转
         huffmanBit = 0
         for code in codes:
@@ -279,11 +279,10 @@ class FeDict(Dictionary):
 if __name__ == '__main__' or __name__ == 'builtins':
     # workdir = 'E:/GBA/fe8/'
     # di = FeDict((workdir + 'font.bin', 0, 0x52B4), workdir + 'fe8dict.txt')
-    # print(di.encodeHaffuman('铁剑'))
-    # print(di.decodeHaffuman(b'\x93\xe4\x93\xbf\x01'))
+    # print(di.encode_haffuman('铁剑'))
+    # print(di.decode_haffuman(b'\x93\xe4\x93\xbf\x01'))
 
     # import os
     # di = FeDict((r'E:\GBA\rom\烈火之剑汉化版.gba', 0xbb5a80, 0x58ec), os.path.join(os.path.dirname(__file__), 'dict-fe7.txt'))
-    # print(di.decodeHaffuman(b'\xCD\x1B'))
+    # print(di.decode_haffuman(b'\xCD\x1B'))
     pass
-

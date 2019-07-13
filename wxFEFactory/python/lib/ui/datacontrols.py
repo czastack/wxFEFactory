@@ -106,8 +106,7 @@ class PropertyGrid(Control):
             choices = wx.PGChoices(labels, wx.ArrayInt() if values is None else values)
             prop.SetChoices(choices)
 
-    def get_value(self, name):
-        prop = self.GetPropertyByName(name)
+    def _get_value(self, prop):
         variant = prop.GetValue()
         type = variant.GetType()
         if type == "long":
@@ -119,14 +118,42 @@ class PropertyGrid(Control):
         elif type == "arrstring":
             return variant.GetArrayString()
 
-    def set_value(self, name, value):
+    def get_value(self, name):
         prop = self.GetPropertyByName(name)
+        return self._get_value(prop)
+
+    def _set_value(self, prop, value):
         type = prop.GetValueType()
         if value is None:
             variant = wx.Variant("")
         else:
             variant = wx.Variant(value)
         self.SetPropVal(prop, variant)
+
+    def set_value(self, name, value):
+        prop = self.GetPropertyByName(name)
+        self._set_value(prop, value)
+
+    def get_values(self, data=None):
+        """批量获取值"""
+        if data is None:
+            data = {}
+        it = self.GetIterator()
+        while not it.AtEnd():
+            prop = it.Get()
+            data[prop.GetName()] = self._get_value(prop)
+        return data
+
+    def set_values(self, data, all):
+        """批量设置值"""
+        if all:
+            it = self.GetIterator()
+            while not it.AtEnd():
+                prop = it.Get()
+                self._set_value(prop, data.get(prop.GetName(), None))
+        else:
+            for name, value in data.items():
+                self.set_value(name, value)
 
 
 class ListView(Control):

@@ -3,16 +3,16 @@ from functools import reduce
 PI = math.pi
 
 
-def degreeToRadian(degrees):
+def degree_to_radian(degrees):
     return degrees * (PI / 180.0)
 
 
-def radianToDegree(radian):
+def radian_to_degree(radian):
     return radian / PI * 180.0
 
 
-def headingToDirection(heading):
-    heading = degreeToRadian(heading)
+def heading_to_direction(heading):
+    heading = degree_to_radian(heading)
     return -math.sin(heading), math.cos(heading)
 
 

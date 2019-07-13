@@ -204,8 +204,8 @@ class Main(AssemblyHacktool):
             (0, VK.N, this.go_up),
             (VK.MOD_SHIFT, VK.N, this.go_down),
             (VK.MOD_ALT, VK.F, this.ability_cooldown),
-            (0, VK.getCode(';'), this.all_ammo_full),
-            (0, VK.getCode('.'), this.level_up),
+            (0, VK(';'), this.all_ammo_full),
+            (0, VK('.'), this.level_up),
         )
 
     def _character(self):

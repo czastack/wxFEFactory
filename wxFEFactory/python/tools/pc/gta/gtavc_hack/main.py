@@ -128,14 +128,14 @@ class Main(BaseGTA3Tool):
 
     def get_yaw(self):
         yaw = self.handler.read_float(address.CAMERA_ROTZ)
-        if not self.isInVehicle:
+        if not self.in_vehicle:
             yaw = yaw - math.pi
         return yaw
 
     def get_camera_rot(self):
         return self.read_vector(address.CAMERA_FRONT)
 
-    def promptWrite(self, text):
+    def prompt_write(self, text):
         text = (text + '\0').encode('utf-16le')
         TEXT1_ADDR = 0x7D3E40
         TEXT2_ADDR = 0x939028
@@ -145,7 +145,7 @@ class Main(BaseGTA3Tool):
         self.handler.ptrs_write(TEXT2_ADDR, (), text)
 
     def bigbang(self):
-        self.inputCheat('bigbang')
+        self.input_cheat('bigbang')
 
     def vehicle_fix(self, vehicle):
         """修车"""

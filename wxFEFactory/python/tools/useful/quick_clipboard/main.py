@@ -11,10 +11,10 @@ class Main(BaseTool):
         super().attach(frame)
         self.win.register_hotkeys((
             (VK.MOD_ALT, VK.C, self.record_copy),
-            (VK.MOD_ALT, VK.getCode('['), self.item_prev),
-            (VK.MOD_ALT, VK.getCode(']'), self.item_next),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode('['), self.item_prev_input),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.getCode(']'), self.item_next_input),
+            (VK.MOD_ALT, VK('['), self.item_prev),
+            (VK.MOD_ALT, VK(']'), self.item_next),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK('['), self.item_prev_input),
+            (VK.MOD_ALT | VK.MOD_SHIFT, VK(']'), self.item_next_input),
         ))
 
     def render(self):

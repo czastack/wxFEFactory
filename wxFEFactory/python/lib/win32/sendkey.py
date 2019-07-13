@@ -5,7 +5,7 @@ from fefactory_api import auto
 def TextVK(text):
     ret = []
     for s in text:
-        keycode = VK.getCode(s)
+        keycode = VK(s)
         if keycode:
             ret.append(auto.VKey(keycode))
             ret.append(auto.VKey(keycode, True))

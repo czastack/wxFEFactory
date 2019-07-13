@@ -21,13 +21,13 @@ class BaseBlip(ManagedModel):
 
     @property
     def entity(self):
-        blipType = self.blipType
+        blip_type = self.blip_type
         index = self.entity_handle >> 8
-        if blipType is __class__.MARKER_TYPE_CAR:
+        if blip_type is __class__.MARKER_TYPE_CAR:
             return self.context.vehicle_pool[index]
-        elif blipType is __class__.MARKER_TYPE_PED:
+        elif blip_type is __class__.MARKER_TYPE_PED:
             return self.context.ped_pool[index]
-        elif blipType is __class__.MARKER_TYPE_OBJECT:
+        elif blip_type is __class__.MARKER_TYPE_OBJECT:
             return self.context.object_pool[index]
 
 

@@ -52,24 +52,24 @@ class Main(MonoHacktool):
         ui.Hr()
         ui.Text('游戏版本: v1.1')
         ProxyInput("CurrentHealthValue", "生命",
-            *Descriptor(lambda: self.activePlayer.health, "CurrentHealthValue"))
+            *Descriptor(lambda: self.active_player.health, "CurrentHealthValue"))
         ProxyInput("CurrentHealthValue", "生命上限",
-            *Descriptor(lambda: self.activePlayer.health.healthStat, "ModifiedValue"))
+            *Descriptor(lambda: self.active_player.health.healthStat, "ModifiedValue"))
         ProxyInput("CurrentShieldValue", "护盾",
-            *Descriptor(lambda: self.activePlayer.health, "CurrentShieldValue"))
+            *Descriptor(lambda: self.active_player.health, "CurrentShieldValue"))
         ProxyInput("CurrentShieldValue", "护盾上限",
-            *Descriptor(lambda: self.activePlayer.health.shieldStat, "ModifiedValue"))
+            *Descriptor(lambda: self.active_player.health.shieldStat, "ModifiedValue"))
         ProxyInput("CurrentGuardCountValue", "防御次数",
-            *Descriptor(lambda: self.activePlayer.health, "CurrentGuardCountValue"))
+            *Descriptor(lambda: self.active_player.health, "CurrentGuardCountValue"))
         ProxyInput("CurrentGuardCountValue", "防御次数上限",
-            *Descriptor(lambda: self.activePlayer.health.guardCountStat, "ModifiedValue"))
-        ProxyInput("balance", "宝石", *Descriptor(lambda: self.activePlayer.platWallet, "balance"))
-        ProxyInput("balance", "金币", *Descriptor(lambda: self.activePlayer.goldWallet, "balance"))
-        ProxyInput("overdriveMinValue", "必杀槽最小值", *Descriptor(lambda: self.activePlayer, "overdriveMinValue"))
+            *Descriptor(lambda: self.active_player.health.guardCountStat, "ModifiedValue"))
+        ProxyInput("balance", "宝石", *Descriptor(lambda: self.active_player.platWallet, "balance"))
+        ProxyInput("balance", "金币", *Descriptor(lambda: self.active_player.goldWallet, "balance"))
+        ProxyInput("overdriveMinValue", "必杀槽最小值", *Descriptor(lambda: self.active_player, "overdriveMinValue"))
         ProxyInput("overdriveBuildDecayRate", "必杀槽未满衰减",
-            *Descriptor(lambda: self.activePlayer.overdriveBuildDecayRate, "ModifiedValue"))
+            *Descriptor(lambda: self.active_player.overdriveBuildDecayRate, "ModifiedValue"))
         ProxyInput("overdriveActiveDecayRate", "必杀槽满后衰减",
-            *Descriptor(lambda: self.activePlayer.overdriveActiveDecayRate, "ModifiedValue"))
+            *Descriptor(lambda: self.active_player.overdriveActiveDecayRate, "ModifiedValue"))
 
     def render_skills(self):
         """渲染技能列表"""
@@ -137,34 +137,34 @@ class Main(MonoHacktool):
         )
 
     @property
-    def activePlayer(self):
+    def active_player(self):
         """当前玩家"""
-        return self.GameController and self.GameController.activePlayers[0]
+        return self.GameController and self.GameController.active_players[0]
 
     def recovery(self):
         """恢复健康"""
-        player = self.activePlayer
+        player = self.active_player
         if player:
             health = player.health
             health.CurrentHealthValue = health.healthStat.ModifiedValue
 
     def overdrive(self):
         """必杀槽满"""
-        player = self.activePlayer
+        player = self.active_player
         if player:
             player.OverdriveProgress = 100.0
 
     def GetSkill(self, skill):
         """获取技能"""
-        return self.activePlayer.GetSkill(self.call_mono_string_new(skill))
+        return self.active_player.GetSkill(self.call_mono_string_new(skill))
 
     def HandleSkillUnlock(self, skill):
         """技能解锁"""
-        self.activePlayer.HandleSkillUnlock(self.call_mono_string_new(skill), True)
+        self.active_player.HandleSkillUnlock(self.call_mono_string_new(skill), True)
 
     def HandleSkillsUnlock(self, skills):
         """解锁多个技能"""
-        player = self.activePlayer
+        player = self.active_player
         args = tuple(
             player.__class__.HandleSkillUnlock.op_runtime_invoke(player, (self.call_mono_string_new(skill), True))
             for skill in skills
@@ -173,15 +173,15 @@ class Main(MonoHacktool):
 
     def PickUpSkill(self, skill):
         """捡起技能，原有技能会掉出"""
-        self.activePlayer.PickUpSkill(self.call_mono_string_new(skill), True, True)
+        self.active_player.PickUpSkill(self.call_mono_string_new(skill), True, True)
 
     def GiveItem(self, item):
         """给予物品"""
-        self.activePlayer.GiveDesignatedItem(self.call_mono_string_new(item))
+        self.active_player.GiveDesignatedItem(self.call_mono_string_new(item))
 
     def GiveItems(self, items):
         """给予物品"""
-        player = self.activePlayer
+        player = self.active_player
         args = tuple(
             player.__class__.GiveDesignatedItem.op_runtime_invoke(player, (self.call_mono_string_new(item),))
             for item in items

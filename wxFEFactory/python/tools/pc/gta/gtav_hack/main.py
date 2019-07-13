@@ -13,7 +13,7 @@ from lib.config.widgets import IntConfig, BoolConfig, FloatConfig, SelectConfig,
 from lib import ui
 from styles import dialog_style, styles
 from ..gta_base.main import BaseGTATool
-from ..gta_base.utils import degreeToRadian, Vector3
+from ..gta_base.utils import degree_to_radian, Vector3
 from ..gta_base.native import SafeScriptEnv
 from ..gta_base.widgets import ColorWidget
 from . import address, models, datasets, coords
@@ -534,7 +534,7 @@ class Main(BaseGTATool):
 
     def restore_hp_large(self, _=None):
         """恢复大量HP"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.hp = 1000
             self.vehicle_fix(self.vehicle)
         self.player.hp = 200
@@ -542,7 +542,7 @@ class Main(BaseGTATool):
 
     def to_up(self, _=None):
         """升高(无速度)"""
-        if self.isInVehicle:
+        if self.in_vehicle:
             self.vehicle.coord[2] += 10
         else:
             self.player.coord[2] += 3
@@ -751,8 +751,8 @@ class Main(BaseGTATool):
             types = (types,)
 
         def check_blip(blip):
-            blipType = blip.blipType
-            return blipType and (types is None or blipType in types) and (color is None or blip.color in color)
+            blip_type = blip.blip_type
+            return blip_type and (types is None or blip_type in types) and (color is None or blip.color in color)
 
         for i in sprites:
             blip = self.get_first_blip(i)
@@ -1146,7 +1146,7 @@ class Main(BaseGTATool):
     def shoot_vehicle_rocket(self, ped=0, count=1):
         """发射车载火箭"""
         weapon = self.get_shoot_weapon()
-        isInVehicle = self.isInVehicle
+        in_vehicle = self.in_vehicle
         rot = Vector3(self.get_camera_rot())
         coord = Vector3(self.player.get_bone_coord(12844)) + rot * 2
         coord.z -= 0.1
@@ -1154,7 +1154,7 @@ class Main(BaseGTATool):
         #     rot.z += 0.015
         # 目标坐标
         target = coord + rot * 100
-        if isInVehicle:
+        if in_vehicle:
             vehicle = self.vehicle
             coord += Vector3(vehicle.speed) * 0.5
             height = vehicle.height
@@ -1173,7 +1173,7 @@ class Main(BaseGTATool):
 
         if count > 1:
             vertical_1, vertical_2 = rot.get_vetical_xy()
-            if not isInVehicle:
+            if not in_vehicle:
                 vertical_1 *= 0.5
                 vertical_2 *= 0.5
             for i in range(1, count + 1):

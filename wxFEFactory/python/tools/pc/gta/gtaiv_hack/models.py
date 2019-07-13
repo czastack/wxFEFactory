@@ -53,7 +53,7 @@ class MemPlayer(Entity):
     hp = Field(0x1f0, float)
     ap = Field(0x2c4, float)
     rotation = Field(0x2dc, float)
-    isInVehicle = Field(0x314, bool, 1)
+    in_vehicle = Field(0x314, bool, 1)
     cur_weapon = Field(0x504, int)
     vehicle = ManagedModelPtrField(0x310, MemVehicle)
     cur_weapon_slop = Field(0x498, int, 1)
@@ -97,15 +97,15 @@ class NativeEntity(NativeModel):
 
     @property
     def rotation(self):
-        return utils.degreeToRadian(self.heading)
+        return utils.degree_to_radian(self.heading)
 
     @rotation.setter
     def rotation(self, value):
-        self.heading = utils.radianToDegree(value)
+        self.heading = utils.radian_to_degree(value)
 
     @property
     def direction(self):
-        return utils.headingToDirection(self.heading)
+        return utils.heading_to_direction(self.heading)
 
     def stop(self):
         self.speed = (0, 0, 0)
@@ -207,7 +207,7 @@ class Player(NativeEntity):
             self.native_call('CLEAR_WANTED_LEVEL', 'L', self.index)
         self.script_call('APPLY_WANTED_LEVEL_CHANGE_NOW', 'L', self.index, sync=False)
 
-    isInVehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
+    in_vehicle = property(getter('IS_CHAR_IN_ANY_CAR', bool, 1))
     # 被其他角色忽略
     ignored_by_everyone = player_setter('SET_EVERYONE_IGNORE_PLAYER', bool)
     # 不会累
@@ -705,7 +705,7 @@ class Blip(NativeModel):
     BLIP_COLOR_FRIEND = 0x9
 
     color = property(NativeModel.getter_ptr('GET_BLIP_COLOUR'), NativeModel.setter('CHANGE_BLIP_COLOUR'))
-    blipType = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
+    blip_type = property(NativeModel.getter('GET_BLIP_INFO_ID_TYPE'))
     sprite = property(NativeModel.getter('GET_BLIP_SPRITE'))
     existed = property(NativeModel.getter('DOES_BLIP_EXIST', bool))
     car_index = property(NativeModel.getter('GET_BLIP_INFO_ID_CAR_INDEX'))
@@ -725,10 +725,10 @@ class Blip(NativeModel):
 
     @property
     def entity(self):
-        blipType = self.blipType
-        if blipType is self.BLIP_TYPE_CAR:
+        blip_type = self.blip_type
+        if blip_type is self.BLIP_TYPE_CAR:
             return Vehicle(self.car_index, self.context)
-        elif blipType is self.BLIP_TYPE_CHAR:
+        elif blip_type is self.BLIP_TYPE_CHAR:
             return Player(0, self.ped_index, self.context)
 
     @classmethod

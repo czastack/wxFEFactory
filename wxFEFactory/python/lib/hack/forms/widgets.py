@@ -67,7 +67,7 @@ class Widget:
         if self.view:
             self.view.SetToolTip(help)
 
-    def onKey(self, v, event):
+    def onkey(self, v, event):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
@@ -77,7 +77,7 @@ class Widget:
             elif code == WXK.W or code == 13:
                 self.write()
                 return True
-            elif code == WXK.getCode('='):
+            elif code == WXK('='):
                 # 逻辑地址
                 print(uint_hex(self.get_addr()))
                 return True
@@ -455,7 +455,7 @@ class BaseInput(TwoWayWidget):
             else:
                 self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
-            self.view.set_on_keydown(self.weak.onKey)
+            self.view.set_on_keydown(self.weak.onkey)
         self.container = container
         del self.min, self.max
 
@@ -520,9 +520,9 @@ class SimpleCheckBox(Widget):
         self.size = size
 
     def render(self):
-        self.view = ui.CheckBox(self.label, onchange=self.weak.onChange)
+        self.view = ui.CheckBox(self.label, onchange=self.weak.onchange)
 
-    def onChange(self, checkbox):
+    def onchange(self, checkbox):
         data = self.enable if checkbox.checked else self.disable
         self.handler.ptrs_write(self.addr, self.offsets, data, self.size)
 
@@ -604,13 +604,13 @@ class BaseSelect(TwoWayWidget):
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.Choice(class_="fill", choices=self.choices, onselect=self.onselect)
             self.view.set_context_menu(self.contextmenu)
-            self.view.set_on_destroy(self.weak.onDestroy)
+            self.view.set_on_destroy(self.weak.on_destroy)
             self.render_btn()
         self.container = container
-        self.view.set_on_keydown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onkey)
         if self.dragable:
-            self.view.set_on_left_down(self.weak.onLeftDown)
-            self.view.set_on_text_drop(self.weak.onTextDrop)
+            self.view.set_on_left_down(self.weak.on_left_down)
+            self.view.set_on_text_drop(self.weak.on_text_drop)
         self.search_map[id(self.view)] = self
 
     def Set(self, choices, values=0):
@@ -687,15 +687,15 @@ class BaseSelect(TwoWayWidget):
         cls.active_ins.view.set_selection(cls.search_values[view.index], True)
         cls.search_dialog.EndModal()
 
-    def onDestroy(self, view):
+    def on_destroy(self, view):
         self.search_map.pop(id(view), None)
 
-    def onLeftDown(self, view, event):
+    def on_left_down(self, view, event):
         if fefactory_api.GetKeyState(WXK.SHIFT):
             view.start_text_drag(str(id(self.view)))
             return False
 
-    def onTextDrop(self, i):
+    def on_text_drop(self, i):
         """拖动事件"""
         if i.isdigit():
             instance = self.search_map.get(int(i), None)
@@ -764,7 +764,7 @@ class BaseChoiceDisplay(Widget):
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
-        self.view.set_on_keydown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onkey)
         self.container = container
 
     def Set(self, choices, values=0):

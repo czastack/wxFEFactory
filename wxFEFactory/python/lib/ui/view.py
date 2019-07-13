@@ -362,7 +362,6 @@ class View:
     def set_on_text_drop(self, fn):
         self.SetDropTarget(TextDropListener(fn))
 
-    # void startTextDrag(wxcstr text, pycref callback);
     def start_text_drop(fn):
         pass
 

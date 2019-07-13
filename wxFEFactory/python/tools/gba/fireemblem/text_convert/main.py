@@ -23,38 +23,38 @@ class Main(BaseTool):
                     for i in (2, 3, 4):
                         container.sizer.AddGrowableRow(i)
 
-        self.rom_picker.set_onchange(self.onRomChange)
-        self.dict_picker.set_onchange(self.onDictChange)
-        self.text_view.set_onenter(self.onConvertText)
-        self.code_view.set_onenter(self.onConvertCode)
+        self.rom_picker.set_onchange(self.on_rom_change)
+        self.dict_picker.set_onchange(self.on_dict_change)
+        self.text_view.set_onenter(self.on_convert_text)
+        self.code_view.set_onenter(self.on_convert_code)
         self.dict_picker.enabled = False
         self.reader = None
         return win
 
-    def onRomChange(self, picker):
+    def on_rom_change(self, picker):
         self.reader = FeRomRW(picker.path)
         if not self.reader.closed:
             self.dict_picker.enabled = True
-            self.reader.openDict()
+            self.reader.open_dict()
             self.dict_picker.path = self.reader.dict_path
         else:
             self.dict_picker.enabled = False
 
-    def onDictChange(self, picker):
-        self.reader.openDict(picker.path)
+    def on_dict_change(self, picker):
+        self.reader.open_dict(picker.path)
 
-    def onConvertText(self, tv):
+    def on_convert_text(self, tv):
         if not self.reader:
             print("请先选择Rom")
             return
         di = self.reader._dict
         text = tv.value
-        codebytes = di.encodeText(text)
-        haffbytes = di.encodeHaffuman(text)
+        codebytes = di.encode_text(text)
+        haffbytes = di.encode_haffuman(text)
         self.code_view.value = ''.join(['%04X' % item for item in codebytes])
         self.haff_view.value = haffbytes.hex().upper()
 
-    def onConvertCode(self, tv):
+    def on_convert_code(self, tv):
         if not self.reader:
             print("请先选择Rom")
             return
@@ -62,13 +62,13 @@ class Main(BaseTool):
         codebytes = bytes.fromhex(tv.value)
         codes = di.bytes_to_codes(codebytes)
         try:
-            text = di.decodeText(codes)
+            text = di.decode_text(codes)
         except KeyError as e:
             print("%04X" % e.args[0] + '不在码表中', '忽略文本转换')
             text = ''
 
         try:
-            haffbytes = di.encodeHaffumanCode(codes)
+            haffbytes = di.encode_haffuman_code(codes)
         except ValueError as e:
             print(e.args[0], '忽略哈夫曼编码转换')
             haffbytes = b''

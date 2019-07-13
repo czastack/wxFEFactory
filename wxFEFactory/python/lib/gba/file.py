@@ -77,7 +77,7 @@ class FileRW:
     def write32(self, pos, value=None):
         return self.write_uint(pos, value, 4)
 
-    def patchFile(self, addr, file, offset=0, size=-1):
+    def patch_file(self, addr, file, offset=0, size=-1):
         with open(file, 'rb') as f:
             if offset:
                 f.seek(offset)

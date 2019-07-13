@@ -58,7 +58,7 @@ class Player(Entity, GTA3Player):
     cur_rotation = Field(0x558, float)
     rotation = Field(0x55c, float)
     cur_weapon_slop = Field(0x718, int, 1)
-    _isInVehicle = Field(0x530, int, 1)
+    _in_vehicle = Field(0x530, int, 1)
 
     @property
     def vehicle(self):
@@ -72,8 +72,8 @@ class Player(Entity, GTA3Player):
         return Vehicle(ptr, self.context) if ptr else None
 
     @property
-    def isInVehicle(self):
-        return self._isInVehicle == 50
+    def in_vehicle(self):
+        return self._in_vehicle == 50
 
     @property
     def weapons(self):
@@ -179,16 +179,16 @@ class Marker(ManagedModel):
         return self.flags1 & 1
 
     @property
-    def blipType(self):
+    def blip_type(self):
         return self.flags2 >> 2
 
     @property
     def entity(self):
-        blipType = self.blipType
+        blip_type = self.blip_type
         index = self.entity_handle >> 8
-        if blipType is __class__.MARKER_TYPE_CAR:
+        if blip_type is __class__.MARKER_TYPE_CAR:
             return self.context.vehicle_pool[index]
-        elif blipType is __class__.MARKER_TYPE_PED:
+        elif blip_type is __class__.MARKER_TYPE_PED:
             return self.context.ped_pool[index]
-        elif blipType is __class__.MARKER_TYPE_OBJECT:
+        elif blip_type is __class__.MARKER_TYPE_OBJECT:
             return self.context.object_pool[index]

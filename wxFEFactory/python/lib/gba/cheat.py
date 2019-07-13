@@ -101,13 +101,19 @@ REG_GS = re.compile("(?i)\\b([0-9a-f]{8}) ?([0-9a-f]{8})\\b$")  # Gameshark
 REG_CB = re.compile("(?i)([0-9a-f]{8}) ([0-9a-f]{4})$")
 REG_RAW = re.compile("(?i)(0[23][0-9a-f]{6})[ :]([0-9a-f]{1,8})$")
 
-TYPE_8BIT = {INT_8_BIT_WRITE, GSA_8_BIT_GS_WRITE, GSA_8_BIT_GS_WRITE2, GSA_8_BIT_SLIDE, GSA_8_BIT_IF_TRUE,
-    GSA_8_BIT_IF_FALSE, GSA_8_BIT_FILL, GSA_8_BIT_IF_TRUE2, GSA_8_BIT_IF_FALSE2, GSA_SLOWDOWN}
-TYPE_16BIT = {INT_16_BIT_WRITE, GSA_16_BIT_ROM_PATCH, GSA_16_BIT_GS_WRITE, CBA_IF_KEYS_PRESSED, CBA_IF_TRUE,
+TYPE_8BIT = {
+    INT_8_BIT_WRITE, GSA_8_BIT_GS_WRITE, GSA_8_BIT_GS_WRITE2, GSA_8_BIT_SLIDE, GSA_8_BIT_IF_TRUE,
+    GSA_8_BIT_IF_FALSE, GSA_8_BIT_FILL, GSA_8_BIT_IF_TRUE2, GSA_8_BIT_IF_FALSE2, GSA_SLOWDOWN
+}
+TYPE_16BIT = {
+    INT_16_BIT_WRITE, GSA_16_BIT_ROM_PATCH, GSA_16_BIT_GS_WRITE, CBA_IF_KEYS_PRESSED, CBA_IF_TRUE,
     CBA_SLIDE_CODE, CBA_IF_FALSE, CBA_AND, GSA_16_BIT_GS_WRITE2, GSA_16_BIT_ROM_PATCH2, GSA_16_BIT_SLIDE,
-    GSA_16_BIT_FILL, GSA_16_BIT_IF_TRUE2, GSA_16_BIT_IF_FALSE2, CBA_ADD, CBA_OR, CBA_LT, CBA_GT, CBA_SUPER}
-TYPE_32BIT = {INT_32_BIT_WRITE, GSA_32_BIT_GS_WRITE, GSA_32_BIT_GS_WRITE2, GSA_32_BIT_SLIDE,
-    GSA_32_BIT_IF_TRUE, GSA_32_BIT_IF_FALSE, GSA_32_BIT_IF_TRUE2, GSA_32_BIT_IF_FALSE2}
+    GSA_16_BIT_FILL, GSA_16_BIT_IF_TRUE2, GSA_16_BIT_IF_FALSE2, CBA_ADD, CBA_OR, CBA_LT, CBA_GT, CBA_SUPER
+}
+TYPE_32BIT = {
+    INT_32_BIT_WRITE, GSA_32_BIT_GS_WRITE, GSA_32_BIT_GS_WRITE2, GSA_32_BIT_SLIDE,
+    GSA_32_BIT_IF_TRUE, GSA_32_BIT_IF_FALSE, GSA_32_BIT_IF_TRUE2, GSA_32_BIT_IF_FALSE2
+}
 
 CB_TYPE = {
     INT_8_BIT_WRITE: 0x3,
@@ -151,7 +157,7 @@ GSV3_TYPE = {
 }
 
 
-def getBit(type):
+def get_bit(type):
     if type in TYPE_8BIT:
         return 8
     elif type in TYPE_16BIT:
@@ -161,7 +167,7 @@ def getBit(type):
     return 0
 
 
-def getBitMask(bit):
+def get_bit_mask(bit):
     if bit is 8:
         return MASK_8
     elif bit is 16:
@@ -171,12 +177,12 @@ def getBitMask(bit):
     return -1
 
 
-def getTypeMask(type):
-    return getBitMask(getBit(type))
+def get_type_mask(type):
+    return get_bit_mask(get_bit(type))
 
 
-def getTypeSize(type):
-    return getBit(type) >> 3
+def get_type_size(type):
+    return get_bit(type) >> 3
 
 
 def high4(num):
@@ -423,11 +429,12 @@ def encode(code):
         if func != GSA_16_BIT_ROM_PATCH2:
             code.address = ((code.address & 0x000FFFFF) | ((code.address >> 4) & 0x00F00000)
                 | (GSV3_TYPE.get(func, 0) << 25))
-        code.value &= getTypeMask(func)
+        code.value &= get_type_mask(func)
         if GSA_8_BIT_FILL <= func <= GSA_16_BIT_FILL:
-            code.value = code.value | ((code.dataSize - 1) << getBit(type))
+            code.value = code.value | ((code.dataSize - 1) << get_bit(type))
             code.set_gs(True)
-        elif func in {INT_32_BIT_WRITE, GSA_8_BIT_IF_TRUE, CBA_IF_TRUE,
+        elif func in {
+                INT_32_BIT_WRITE, GSA_8_BIT_IF_TRUE, CBA_IF_TRUE,
                 GSA_32_BIT_IF_TRUE, GSA_8_BIT_IF_FALSE, CBA_IF_FALSE, GSA_32_BIT_IF_FALSE,
                 GSA_8_BIT_IF_TRUE2, GSA_16_BIT_IF_TRUE2, GSA_32_BIT_IF_TRUE2,
                 GSA_8_BIT_IF_FALSE2, GSA_16_BIT_IF_FALSE2, GSA_32_BIT_IF_FALSE2}:
@@ -452,15 +459,15 @@ def encode(code):
             code.add_line(gsencode_string(code.value, value2, True))
     elif code.type is TYPE_V1:
         code.address &= MASK_28
-        code.value &= getTypeMask(func)
+        code.value &= get_type_mask(func)
         if INT_8_BIT_WRITE <= func <= INT_32_BIT_WRITE:
-            code.address |= (getBit(func) & 0xf0) << 24
+            code.address |= (get_bit(func) & 0xf0) << 24
             code.set_gs(False)
         elif func is GSA_16_BIT_ROM_PATCH:
             code.address = (code.address >> 1) | 0x64000000
             code.set_gs(False)
         elif GSA_8_BIT_GS_WRITE <= func <= GSA_32_BIT_GS_WRITE:
-            code.address = code.address & 0x0F0FFFFF | 0x80000000 | (((getBit(func) & 0xf0) + 0x10) << 16)
+            code.address = code.address & 0x0F0FFFFF | 0x80000000 | (((get_bit(func) & 0xf0) + 0x10) << 16)
             code.set_gs(False)
         elif func is CBA_IF_TRUE:
             code.address |= 0xD << 28

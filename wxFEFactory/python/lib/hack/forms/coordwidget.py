@@ -56,26 +56,26 @@ class CoordWidget(TwoWayWidget):
                             self.name_view = ui.TextInput(class_="fill")
                         with ui.Horizontal(class_="expand padding") as container:
                             self.render_btn()
-                            ui.Button(label="添加", class_="button", onclick=this.onAdd)
-                            ui.Button(label="更新", class_="button", onclick=this.onUpdate)
-                            ui.Button(label="删除", class_="button", onclick=this.onDel)
-                            ui.Button(label="保存", class_="button", onclick=this.onSave)
-                            ui.Button(label="载入", class_="button", onclick=this.onLoad)
+                            ui.Button(label="添加", class_="button", onclick=this.onadd)
+                            ui.Button(label="更新", class_="button", onclick=this.on_update)
+                            ui.Button(label="删除", class_="button", onclick=this.ondelete)
+                            ui.Button(label="保存", class_="button", onclick=this.on_save)
+                            ui.Button(label="载入", class_="button", onclick=this.on_load)
                             if self.preset:
-                                ui.Button(label="预设", class_="button", onclick=this.choosePreset)
-                    self.listbox = ui.ListBox(class_="fill padding_left", onselect=this.onListBoxSel)
-                    self.listbox.set_on_keydown(this.onListBoxKey)
+                                ui.Button(label="预设", class_="button", onclick=this.choose_preset)
+                    self.listbox = ui.ListBox(class_="fill padding_left", onselect=this.on_listbox_sel)
+                    self.listbox.set_on_keydown(this.on_listbox_key)
 
                 with ui.ContextMenu() as contextmenu:
-                    ui.MenuItem("复制(&C)", onselect=this.onCopy)
-                    ui.MenuItem("粘贴(&V)", onselect=this.onPaste)
-                    ui.MenuItem("清空列表(&E)", onselect=this.onClear)
+                    ui.MenuItem("复制(&C)", onselect=this.on_copy)
+                    ui.MenuItem("粘贴(&V)", onselect=this.on_paste)
+                    ui.MenuItem("清空列表(&E)", onselect=this.onclear)
                 root.set_context_menu(contextmenu)
             self.views = tuple(views)
         self.view = self.views[0]
         self.container = container
         for view in self.views:
-            view.set_on_keydown(self.onKey)
+            view.set_on_keydown(self.onkey)
 
     @property
     def mem_value(self):
@@ -132,13 +132,13 @@ class CoordWidget(TwoWayWidget):
         self.listbox.clear()
         self.listbox.Append(tuple(data['name'] for data in self.data_list))
 
-    def onAdd(self, btn):
+    def onadd(self, btn):
         name = self.name_view.value
         if name:
             self.listbox.append(name)
             self.data_list.append({'name': name, 'value': tuple(self.input_value)})
 
-    def onUpdate(self, btn):
+    def on_update(self, btn):
         pos = self.listbox.index
         if pos != -1:
             name = self.name_view.value
@@ -146,31 +146,33 @@ class CoordWidget(TwoWayWidget):
                 self.listbox.text = name
                 self.data_list[pos] = {'name': name, 'value': tuple(self.input_value)}
 
-    def onDel(self, btn):
+    def ondelete(self, btn):
         pos = self.listbox.index
         if pos != -1:
             self.listbox.pop(pos)
             self.data_list.pop(pos)
 
-    def onSave(self, btn):
+    def on_save(self, btn):
         def dumper(data, file):
             content = json.dumps(data, ensure_ascii=False).replace('{', '\n\t{')[:-1] + '\n]'
             file.write(content)
 
         fefactory.json_dump_file(self, self.data_list, dumper)
 
-    def onLoad(self, btn):
+    def on_load(self, btn):
         data = fefactory.json_load_file(self)
         if data:
             self.load(data)
 
-    def choosePreset(self, btn):
+    def choose_preset(self, btn):
         if self.preset:
-            dialog = ui.dialog.ChoiceDialog("预设的坐标", (item[0] for item in self.preset.coords), onselect=self.weak.onPreset)
+            dialog = ui.dialog.ChoiceDialog(
+                "预设的坐标", (item[0] for item in self.preset.coords),
+                onselect=self.weak.on_preset)
             self.dialog = dialog
             dialog.ShowModal()
 
-    def onPreset(self, lb):
+    def on_preset(self, lb):
         self.dialog.EndModal()
         del self.dialog
         coords = self.preset.coords
@@ -183,13 +185,13 @@ class CoordWidget(TwoWayWidget):
                     data = [{'name': name % (i + 1), 'value': data[i]} for i in range(len(data))]
                 self.load(data)
 
-    def onListBoxSel(self, v):
+    def on_listbox_sel(self, v):
         pos = self.listbox.index
         data = self.data_list[pos]
         self.name_view.value = data['name']
         self.input_value = data['value']
 
-    def onListBoxKey(self, v, event):
+    def on_listbox_key(self, v, event):
         """按键监听"""
         mod = event.GetModifiers()
         code = event.GetKeyCode()
@@ -198,7 +200,7 @@ class CoordWidget(TwoWayWidget):
                 self.move_up()
             elif code == WXK.DOWN:
                 self.move_down()
-        elif super().onKey(v, event):
+        elif super().onkey(v, event):
             return True
         event.Skip()
 
@@ -218,14 +220,14 @@ class CoordWidget(TwoWayWidget):
             self.listbox.SetString(self.data_list[index]['name'], index)
             self.listbox.SetString(self.data_list[index + 1]['name'], index + 1)
 
-    def onCopy(self, view, menu):
+    def on_copy(self, view, menu):
         fefactory_api.set_clipboard(str(tuple(self.input_value)))
 
-    def onPaste(self, view, menu):
+    def on_paste(self, view, menu):
         values = eval(fefactory_api.get_clipboard())
         self.input_value = values
 
-    def onClear(self, view, menu):
+    def onclear(self, view, menu):
         self.clear()
 
 

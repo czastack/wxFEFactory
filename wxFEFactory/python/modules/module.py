@@ -89,7 +89,7 @@ class BaseModule(BaseScene):
             json.dump(data, file, ensure_ascii=False, indent=indent)
         print("保存成功: " + file.name)
 
-    def readFrom(self, reader):
+    def read_from(self, reader):
         """从rom等数据源读取数据"""
         pass
 
@@ -104,16 +104,16 @@ class BaseListBoxModuel(BaseModule):
         with ui.SplitterWindow(False, 220, styles=styles, extra=dict(
                 caption=self.unique_title, onclose=self.onclose)) as panel:
             with ui.Vertical():
-                self.listbox = ui.RearrangeList(class_="fill", onselect=this.onListSelect)
+                self.listbox = ui.RearrangeList(class_="fill", onselect=this.on_list_select)
                 with ui.Horizontal(class_="expand"):
                     ui.Text("Ctrl+↑↓ 上移/下移当前项")
                 with ui.Horizontal(class_="expand"):
-                    ui.Button(label="添加", class_="button", onclick=this.onAdd)
-                    ui.Button(label="删除", class_="button", onclick=this.onDel)
+                    ui.Button(label="添加", class_="button", onclick=this.onadd)
+                    ui.Button(label="删除", class_="button", onclick=this.ondelete)
             with ui.Vertical():
                 self.render_main()
 
-        self.listbox.set_on_keydown(this.onListBoxKey)
+        self.listbox.set_on_keydown(this.on_listbox_key)
 
         contextmenu = self.render_contextmenu()
         if contextmenu:
@@ -127,22 +127,22 @@ class BaseListBoxModuel(BaseModule):
     def render_contextmenu(self):
         """ListBox右键菜单"""
         with ui.ContextMenu() as contextmenu:
-            ui.MenuItem("重命名", onselect=self.weak.onRename)
+            ui.MenuItem("重命名", onselect=self.weak.on_rename)
 
         return contextmenu
 
     def get_menu(self):
         with ui.Menu(self.unique_title) as menu:
-            ui.MenuItem("清空", onselect=self.weak.onClear)
+            ui.MenuItem("清空", onselect=self.weak.onclear)
         return menu
 
-    def onClear(self, menu):
+    def onclear(self, menu):
         """清空列表"""
         if self.confirm('提示', '确认清空所有列表项？', ui.wx.NO) is ui.wx.YES:
             self.listbox.clear()
             return True
 
-    def onRename(self, view, menu):
+    def on_rename(self, view, menu):
         """重命名列表项"""
         name = self.listbox.text
         if name:
@@ -150,7 +150,7 @@ class BaseListBoxModuel(BaseModule):
             self.listbox.SetString(self.listbox.GetSelection(), newname)
             return name, newname
 
-    def onDel(self, btn):
+    def ondelete(self, btn):
         """删除一项"""
         pos = self.listbox.index
         if pos is not -1:
@@ -168,7 +168,7 @@ class BaseListBoxModuel(BaseModule):
         """下移一项"""
         self.listbox.MoveCurrentDown()
 
-    def onListBoxKey(self, lb, event):
+    def on_listbox_key(self, lb, event):
         """按键监听"""
         mod = event.GetModifiers()
         if mod == WXK.MOD_CONTROL:
@@ -179,7 +179,7 @@ class BaseListBoxModuel(BaseModule):
                 self.move_down()
         event.Skip()
 
-    def doAdd(self, text):
+    def append(self, text):
         """添加列表项"""
         if isinstance(text, types.GeneratorType):
             text = tuple(text)

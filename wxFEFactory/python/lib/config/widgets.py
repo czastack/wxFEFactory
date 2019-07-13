@@ -25,9 +25,9 @@ class ConfigCtrl(ABC):
         self.default = default
         self.owner = parent.owner
         self.owner.setdefault(name, default)
-        self.owner.register_observer(name, self.weak._onConfigChange)
+        self.owner.register_observer(name, self.weak._on_config_change)
 
-    def _onConfigChange(self, config, name, value):
+    def _on_config_change(self, config, name, value):
         self.read()
 
     def __get__(self, obj, type=None):
@@ -106,7 +106,7 @@ class InputConfig(ConfigCtrl):
         with ui.Horizontal(class_="fill"):
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER)
             self.render_btn()
-        self.view.set_on_keydown(self.weak.onKey)
+        self.view.set_on_keydown(self.weak.onkey)
 
     def get_input_value(self):
         return self.type(self.view.value)
@@ -114,7 +114,7 @@ class InputConfig(ConfigCtrl):
     def set_input_value(self, value):
         self.view.value = extypes.astr(value)
 
-    def onKey(self, v, event):
+    def onkey(self, v, event):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
