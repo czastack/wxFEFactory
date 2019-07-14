@@ -1,4 +1,4 @@
-import fefactory_api
+import pyapi
 from ..module import BaseListBoxModuel
 from styles import dialog_style
 from lib import ui
@@ -71,7 +71,7 @@ class Module(BaseListBoxModuel):
 
     def on_save_as(self, btn):
         tpl = self.longtext_dialog("输入模板", "{i:04X} {addr:08X}\n{text}\n")
-        path = fefactory_api.choose_file("选择保存文件", wildcard='*.txt')
+        path = pyapi.choose_file("选择保存文件", wildcard='*.txt')
         if path:
             result = []
             i = 0

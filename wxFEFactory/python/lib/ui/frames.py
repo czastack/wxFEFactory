@@ -1,5 +1,6 @@
 import traceback
-import fefactory_api
+import pyapi
+from lib.win32.keys import VK
 from .view import Layout
 from . import wx
 
@@ -13,7 +14,11 @@ class BaseTopLevelWindow(Layout):
                 event.Veto()
                 return False
             event.Skip()
+            self.release()
         return True
+
+    def release(self):
+        self.event_table.clear()
 
     def set_onclose(self, fn):
         self._onclose = fn
@@ -34,6 +39,11 @@ class BaseFrame(BaseTopLevelWindow):
             self.set_menu(self.menubar)
         super().onready()
 
+    def release(self):
+        if self.menubar:
+            self.menubar = None
+        super().release()
+
     def set_menu(self, menubar):
         self.menubar = menubar
         self.SetMenuBar(menubar.wxwindow)
@@ -51,6 +61,9 @@ class Frame(BaseFrame):
     def __init__(self, title, menubar=None, **kwargs):
         self.menubar = menubar
         BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
+
+    def __del__(self):
+        print('del', self)
 
 
 class MDIParentFrame(BaseFrame):
@@ -74,8 +87,9 @@ class HotkeyFrame(Frame):
         self.hotkey_map = {}
         Frame.__init__(self, **kwargs)
 
-    def __del__(self):
+    def release(self):
         self.hotkey_map.clear()
+        super().release()
 
     def onready(self):
         super().onready()
@@ -84,7 +98,7 @@ class HotkeyFrame(Frame):
     def prepare_hotkey(self, hotkey):
         """获取全局唯一的id"""
         if isinstance(hotkey, str):
-            return fefactory_api.GlobalAddAtom(hotkey)
+            return pyapi.GlobalAddAtom(hotkey)
         else:
             return hotkey
 
@@ -119,7 +133,7 @@ class HotkeyFrame(Frame):
 
     def stop_hotkey(self):
         for hotkey_int in self.hotkey_map:
-            if fefactory_api.GlobalDeleteAtom(hotkey_int) is 0:
+            if pyapi.GlobalDeleteAtom(hotkey_int) is 0:
                 self.unregister_hotkey(hotkey_int)
 
     def onhotkey(self, event):
@@ -134,8 +148,10 @@ class KeyHookFrame(Frame):
         self.hotkey_map = {}
         Frame.__init__(self, **kwargs)
 
-    def __del__(self):
+    def release(self):
+        self.unsetHook()
         self.hotkey_map.clear()
+        super().release()
 
     def onready(self):
         super().onready()
@@ -156,11 +172,11 @@ class KeyHookFrame(Frame):
     def onhotkey(self, event):
         modifiers = 0
         if (event.lParam & 0x20000000) != 0:
-            modifiers |= MOD_ALT
-        if wx.GetKeyState(wx.VK_CONTROL) < 0:
-            modifiers |= MOD_CONTROL
-        if wx.GetKeyState(wx.VK_SHIFT) < 0:
-            modifiers |= MOD_SHIFT
+            modifiers |= VK.MOD_ALT
+        if wx.GetKeyState(VK.CONTROL) < 0:
+            modifiers |= VK.MOD_CONTROL
+        if wx.GetKeyState(VK.SHIFT) < 0:
+            modifiers |= VK.MOD_SHIFT
         key = modifiers << 16 | event.wParam
         fn = self.hotkey_map.get(key, None)
         if fn is not None:

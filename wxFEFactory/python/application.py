@@ -1,5 +1,5 @@
 import json
-import fefactory_api
+import pyapi
 import __main__
 from lib.utils import HistoryList
 from lib.config import Configurable
@@ -26,7 +26,7 @@ class Application(Configurable):
 
     def project_confirm(self):
         if not self.project:
-            fefactory_api.alert('未打开工程')
+            pyapi.alert('未打开工程')
             return False
         return True
 
@@ -36,13 +36,10 @@ class Application(Configurable):
         self.project = project
 
     def on_exit(self):
-        self.writeconfig()
-        if self.project:
-            self.project.writeconfig()
-        # globals().pop('app')
-        del __main__.app
-        del __main__.win
+        for name in dir(__main__):
+            if not name.startswith('__'):
+                delattr(__main__, name)
 
 
-app = Application()
-fefactory_api.set_on_exit(app.on_exit)
+__main__.app = Application()
+pyapi.set_on_exit(__main__.app.on_exit)

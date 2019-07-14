@@ -33,7 +33,7 @@ class Main(BaseDolphinHack):
     def render_one_list(self, group):
         """渲染其中一个列表"""
         li = ui.ListView(class_="fill")
-        li.EnableCheckboxes()
+        li.EnableCheckBoxes()
         li.append_columns(*group['head'])
         if group['hascount']:
             li.AppendColumn('数量')

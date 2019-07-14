@@ -5,7 +5,7 @@
 #include <wx/textctrl.h>
 #include "pyutils.h"
 #include "functions.h"
-#include "fefactory_api.h"
+#include "pyapi.h"
 #include "ui/console.h"
 #include "ui/dialogs.h"
 

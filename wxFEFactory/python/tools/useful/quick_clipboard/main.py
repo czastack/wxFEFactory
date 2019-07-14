@@ -1,8 +1,8 @@
 import json
 import time
-import fefactory_api
+import pyapi
 from lib.win32.keys import VK
-from fefactory_api import auto, ui
+from pyapi import auto, ui
 from tools.base.basetool import BaseTool
 
 
@@ -36,7 +36,7 @@ class Main(BaseTool):
         self.listbox.Set(self.input.value.split('\n'))
 
     def record_copy(self, _=None):
-        self.input.AppendText('\n' + fefactory_api.get_clipboard())
+        self.input.AppendText('\n' + pyapi.get_clipboard())
 
     def item_prev(self, _=None):
         self.listbox.prev(False)
@@ -57,7 +57,7 @@ class Main(BaseTool):
         self.paste()
 
     def on_select_change(self, listbox):
-        fefactory_api.set_clipboard(listbox.text)
+        pyapi.set_clipboard(listbox.text)
 
     def copy(self):
         auto.sendKey(auto.CombKey(VK.MOD_CONTROL, VK.C), 10)

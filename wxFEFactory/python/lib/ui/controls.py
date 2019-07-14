@@ -12,7 +12,8 @@ class Button(Control):
 
     def onready(self):
         super().onready()
-        self.set_onclick(self.onclick)
+        if self.onclick:
+            self.set_onclick(self.onclick)
         del self.onclick
 
     set_onclick = event_binder(wx.EVT_BUTTON)
@@ -168,7 +169,7 @@ class SpinCtrl(Control):
         Control.__init__(self, **kwargs)
 
     set_onchange = event_binder(wx.EVT_SPINCTRL)
-    set_onchar = event_binder(wx.EVT_TEXT_ENTER)
+    set_onenter = event_binder(wx.EVT_TEXT_ENTER)
 
 
 class ColorPicker(Control):
@@ -184,7 +185,7 @@ class ColorPicker(Control):
         self.set_onchange(self.onchange)
         del self.onchange
 
-    set_onchange = event_binder(wx.EVT_SPINCTRL)
+    set_onchange = event_binder(wx.EVT_COLOURPICKER_CHANGED)
 
 
 class ItemContainer(Control):
@@ -337,7 +338,7 @@ class TreeCtrl(Control):
     def __init__(self, wxstyle=wx.TR_HAS_BUTTONS | wx.TR_SINGLE, **kwargs):
         Control.__init__(self, wxstyle=wxstyle, **kwargs)
 
-    set_onchange = event_binder(wx.EVT_FILEPICKER_CHANGED, pass_event=True)
+    set_on_item_activated = event_binder(wx.EVT_TREE_ITEM_ACTIVATED, pass_event=True)
 
 
 class StatusBar(Control):

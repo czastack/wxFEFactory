@@ -68,7 +68,7 @@ class Player(MonoClass):
 class GameController(MonoClass):
     # 获取玩家实例
     need_vtable = True
-    active_players = MonoStaticField(type=MonoArrayT(Player))
+    activePlayers = MonoStaticField(type=MonoArrayT(Player))
 
 
 class Cooldown(MonoClass):

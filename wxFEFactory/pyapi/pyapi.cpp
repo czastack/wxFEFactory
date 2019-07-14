@@ -1,7 +1,7 @@
 #include <pybind11/embed.h>
 #include <wx/wx.h>
 #include "pyutils.h"
-#include "fefactory_api.h"
+#include "pyapi.h"
 #include "myapp.h"
 #include "functions.h"
 #include "ui/console.h"
@@ -22,7 +22,7 @@ void set_on_exit(pycref fn)
 }
 
 
-PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
+PYBIND11_EMBEDDED_MODULE(pyapi, m) {
 	using namespace py::literals;
 	m.def("log_message", log_message)
 		.def("alert", alert, "title"_a, "msg"_a)
@@ -54,7 +54,7 @@ PYBIND11_EMBEDDED_MODULE(fefactory_api, m) {
 
 void initPyEnv()
 {
-	py::module::import("fefactory_api");
+	py::module::import("pyapi");
 	auto &app = wxGetApp();
 	auto &args = app.argv.GetArguments();
 	const wchar_t ** argv = new const wchar_t *[app.argc];
@@ -81,5 +81,6 @@ void destroyPyEnv()
 	if (onAppExit)
 	{
 		PyCall(onAppExit);
+		onAppExit = None;
 	}
 }

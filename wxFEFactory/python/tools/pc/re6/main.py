@@ -1,4 +1,4 @@
-import fefactory_api
+import pyapi
 from functools import partial
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
@@ -195,10 +195,10 @@ class Main(NativeHacktool):
                 item.quantity = quantity
 
     def ingame_item_copy(self, _):
-        fefactory_api.set_clipboard(self.ingame_item.hex())
+        pyapi.set_clipboard(self.ingame_item.hex())
 
     def ingame_item_paste(self, _):
-        self.ingame_item.fromhex(fefactory_api.get_clipboard())
+        self.ingame_item.fromhex(pyapi.get_clipboard())
 
     def pull_through(self):
         self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')

@@ -1,5 +1,5 @@
 from lib.extypes import WeakBinder
-from fefactory_api import alert, confirm, confirm_yes, longtext_dialog
+from pyapi import alert, confirm, confirm_yes, longtext_dialog
 
 
 class BaseScene:

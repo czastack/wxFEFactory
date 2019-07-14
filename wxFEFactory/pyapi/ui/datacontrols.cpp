@@ -90,11 +90,18 @@ void UiModule::init_datacontrols()
 		.def("Append", &wxPropertyGrid::Append)
 		.def("GetPropertyByName", (wxPGProperty * (wxPropertyGrid::*)(const wxString & name) const) & wxPropertyGrid::GetPropertyByName);
 
+	py::enum_<wxListColumnFormat>(ui, "ListColumnFormat")
+		.ENUM_VAL(LIST_FORMAT_LEFT)
+		.ENUM_VAL(LIST_FORMAT_RIGHT)
+		.ENUM_VAL(LIST_FORMAT_CENTRE)
+		.export_values();
+
 	// ListView
 	py::class_<NODELETE(wxListView), wxControl>(ui, "ListView")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
 			parent, id, pos_v, size_v, style = wxLC_REPORT, validator_v, name = (const char*)wxListCtrlNameStr)
-		.def("AppendColumn", &wxListView::AppendColumn, "heading"_a, "format"_a, "width"_a = -1)
+		.def("AppendColumn", &wxListView::AppendColumn,
+			"heading"_a, "format"_a=wxLIST_FORMAT_LEFT, "width"_a = -1)
 		.def("GetItemCount", &wxListView::GetItemCount)
 		.def("InsertItem", (long (wxListView::*)(const wxListItem & info)) & wxListView::InsertItem, "info"_a)
 		.def("InsertItem", (long (wxListView::*)(long index, const wxString & label_v, int imageIndex)) & wxListView::InsertItem,
@@ -106,7 +113,7 @@ void UiModule::init_datacontrols()
 		.def("GetNextSelected", &wxListView::GetNextSelected)
 		.def("GetItemCount", &wxListView::GetItemCount)
 		.def("GetColumnCount", &wxListView::GetColumnCount)
-		.def("EnableCheckBoxes", &wxListView::EnableCheckBoxes)
+		.def("EnableCheckBoxes", &wxListView::EnableCheckBoxes, "enable"_a=true)
 		.def("IsItemChecked", &wxListView::IsItemChecked, item)
 		.def("IsSelected", &wxListView::IsSelected, item)
 		.def("CheckItem", &wxListView::CheckItem, item, "check"_a)
@@ -116,6 +123,7 @@ void UiModule::init_datacontrols()
 		;
 
 	py::class_<wxListItem>(ui, "ListItem")
+		.def(py::init<>())
 		.def_readwrite("m_mask", &wxListItem::m_mask)
 		.def_readwrite("m_itemId", &wxListItem::m_itemId)
 		.def_readwrite("m_col", &wxListItem::m_col)

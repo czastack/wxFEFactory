@@ -1,3 +1,4 @@
+from lib import extypes
 from .view import View, Control, event_binder
 from . import wx
 
@@ -167,7 +168,7 @@ class ListView(Control):
         info = wx.ListItem()
         info.m_mask = wx.LIST_MASK_TEXT
         info.m_itemId = pos if pos is not -1 else self.GetItemCount()
-        if create and pos is -1:
+        if not create and pos is -1:
             create = True
 
         for cols in rows:
@@ -175,7 +176,7 @@ class ListView(Control):
             if create:
                 self.InsertItem(info)
             for item in cols:
-                info.m_text = item
+                info.m_text = extypes.astr(item)
                 self.SetItem(info)
                 info.m_col += 1
 

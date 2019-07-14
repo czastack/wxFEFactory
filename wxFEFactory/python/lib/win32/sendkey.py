@@ -1,5 +1,5 @@
 from .keys import VK
-from fefactory_api import auto
+from pyapi import auto
 
 
 def TextVK(text):

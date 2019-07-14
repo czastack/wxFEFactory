@@ -52,7 +52,7 @@ class BaseHackTool(NestedTool):
         if succeed or succeed is None and self.handler.attach_window(self.CLASS_NAME, self.WINDOW_NAME):
             self.attach_status_view.label = (self.WINDOW_NAME or self.CLASS_NAME) + ' 正在运行'
 
-            if not self.win.hotkeys:
+            if not self.win.hotkey_map:
                 hotkeys = self.get_hotkeys()
                 if hotkeys:
                     self.win.register_hotkeys(hotkeys)
@@ -99,6 +99,9 @@ class BaseHackTool(NestedTool):
             with ui.View.HERE, group:
                 if fn() is False:
                     return
+                # 释放tmp_style_list
+                if group.view.keep_styles:
+                    group.view.keep_styles = False
             group.after_lazy()
             del self.lazy_groups[root]
 
@@ -259,7 +262,7 @@ class ProxyHackTool(BaseHackTool):
             if handler.attach():
                 self.handler.set(handler)
                 self.attach_status_view.label = (getattr(handler, 'WINDOW_NAME', None) or handler.CLASS_NAME) + ' 正在运行'
-                if not self.win.hotkeys:
+                if not self.win.hotkey_map:
                     hotkeys = self.get_hotkeys()
                     if hotkeys:
                         self.win.register_hotkeys(hotkeys)

@@ -8,7 +8,6 @@ void UiModule::init_image()
 {
 	using namespace py::literals;
 
-#define ENUM_VAL(name) value(#name, wx##name)
 	py::enum_<wxBitmapType>(ui, "BitmapType")
 		.ENUM_VAL(BITMAP_TYPE_BMP)
 		.ENUM_VAL(BITMAP_TYPE_ICO)

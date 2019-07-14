@@ -1,6 +1,6 @@
 import json
 import fefactory
-import fefactory_api
+import pyapi
 from pathlib import Path
 from lib import ui, utils
 from lib.win32.keys import WXK
@@ -221,10 +221,10 @@ class CoordWidget(TwoWayWidget):
             self.listbox.SetString(self.data_list[index + 1]['name'], index + 1)
 
     def on_copy(self, view, menu):
-        fefactory_api.set_clipboard(str(tuple(self.input_value)))
+        pyapi.set_clipboard(str(tuple(self.input_value)))
 
     def on_paste(self, view, menu):
-        values = eval(fefactory_api.get_clipboard())
+        values = eval(pyapi.get_clipboard())
         self.input_value = values
 
     def onclear(self, view, menu):

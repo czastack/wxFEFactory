@@ -2,13 +2,12 @@ import os
 import json
 import types
 import __main__
-from application import app
 from lib import extypes, lazy, ui
 from lib.scene import BaseScene
 from styles import styles
 from . import modules
 
-DUMP_INDENT = app.getconfig('json_indent', 4)
+DUMP_INDENT = __main__.app.getconfig('json_indent', 4)
 
 
 class BaseModule(BaseScene):
@@ -67,7 +66,7 @@ class BaseModule(BaseScene):
     @classmethod
     def get_dir(cls):
         """根据当前项目获取模块数据存放目录，即模块工作目录"""
-        return os.path.join(app.project.path, cls.module_name)
+        return os.path.join(__main__.app.project.path, cls.module_name)
 
     @classmethod
     def load_json(cls, name, defval={}):

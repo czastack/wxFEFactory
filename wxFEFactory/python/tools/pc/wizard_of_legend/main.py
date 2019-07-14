@@ -74,7 +74,7 @@ class Main(MonoHacktool):
     def render_skills(self):
         """渲染技能列表"""
         li = self.skill_listview = ui.ListView(class_="fill")
-        li.EnableCheckboxes()
+        li.EnableCheckBoxes()
         li.append_columns(("名称", "加强", "描述"), (260, 400, 800))
         li.insert_items((item[1:] for item in datasets.skills_info))
 
@@ -86,7 +86,7 @@ class Main(MonoHacktool):
     def render_items(self):
         """渲染符文列表"""
         li = self.item_listview = ui.ListView(class_="fill")
-        li.EnableCheckboxes()
+        li.EnableCheckBoxes()
         li.append_columns(("名称", "描述"), (260, 1000))
         li.insert_items((item[1:] for item in datasets.items_info))
 
@@ -139,7 +139,7 @@ class Main(MonoHacktool):
     @property
     def active_player(self):
         """当前玩家"""
-        return self.GameController and self.GameController.active_players[0]
+        return self.GameController and self.GameController.activePlayers[0]
 
     def recovery(self):
         """恢复健康"""

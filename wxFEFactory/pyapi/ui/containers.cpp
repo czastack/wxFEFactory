@@ -40,8 +40,6 @@ void UiModule::init_containers()
 		.def(py::init<int, int, int>(), "cols"_a, "vgap"_a, "hgap"_a)
 		.def(py::init<int, int, int, int>(), "rows"_a, "cols"_a, "vgap"_a, "hgap"_a);
 
-#define ENUM_VAL(name) value(#name, wx##name)
-
 	py::enum_<wxFlexSizerGrowMode>(ui, "FlexSizerGrowMode")
 		.ENUM_VAL(FLEX_GROWMODE_NONE)
 		.ENUM_VAL(FLEX_GROWMODE_SPECIFIED)

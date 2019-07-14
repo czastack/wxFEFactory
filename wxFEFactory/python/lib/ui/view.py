@@ -113,6 +113,14 @@ class View:
     def position(self, value):
         self.Move(*value)
 
+    @property
+    def label(self):
+        return self.GetLabel()
+
+    @label.setter
+    def label(self, value):
+        self.SetLabel(value)
+
     def has_wxstyle(self, flag):
         """是否有wxWidgets样式flag"""
         return self.GetWindowStyle() & flag != 0

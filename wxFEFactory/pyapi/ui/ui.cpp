@@ -142,8 +142,6 @@ void UiModule::init_ui()
 	py::class_<wxValidator>(ui, "Validator");
 	py::class_<wxObject>(ui, "Object");
 
-#define ENUM_VAL(name) value(#name, wx##name)
-
 	py::enum_<wxItemKind>(ui, "ItemKind")
 		.ENUM_VAL(ITEM_SEPARATOR)
 		.ENUM_VAL(ITEM_NORMAL)

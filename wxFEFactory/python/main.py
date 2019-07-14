@@ -1,11 +1,11 @@
 import os
+import sys
 import traceback
 import types
 import __main__
-import fefactory_api
+import pyapi
 import fefactory
 import tools
-from application import app
 from project import Project
 from modules import modules
 # from fe.ferom import FeRomRW
@@ -37,32 +37,33 @@ class MainFrame:
             if position:
                 self.win.Move(*position)
 
-        if getattr(app, 'project', None):
-            self.on_open_project(app.project)
+        if getattr(__main__.app, 'project', None):
+            self.on_open_project(__main__.app.project)
 
     def render(self):
+        weak = self.weak
         with ui.MenuBar() as menubar:
             with ui.Menu("文件"):
                 with ui.Menu("新建"):
-                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=self.new_project)
+                    ui.MenuItem("新建工程\tCtrl+Shift+N", onselect=weak.new_project)
                 with ui.Menu("打开"):
-                    ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=self.open_project)
+                    ui.MenuItem("打开工程\tCtrl+Shift+O", onselect=weak.open_project)
                 with ui.Menu("最近的工程"):
-                    for path in app.config['recent_project']:
-                        ui.MenuItem(path, onselect=self.do_open_project)
-                    if app.config['recent_project']:
-                        ui.MenuItem("清除列表", onselect=self.clear_recent_project, sep=True)
-                ui.MenuItem("打开工程所在文件夹", onselect=self.open_project_dir)
-                # ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=self.read_from_rom)
-                ui.MenuItem("重启\tCtrl+R", onselect=self.restart)
-                ui.MenuItem("退出\tCtrl+Q", onselect=self.close_window)
+                    for path in __main__.app.config['recent_project']:
+                        ui.MenuItem(path, onselect=weak.do_open_project)
+                    if __main__.app.config['recent_project']:
+                        ui.MenuItem("清除列表", onselect=weak.clear_recent_project, sep=True)
+                ui.MenuItem("打开工程所在文件夹", onselect=weak.open_project_dir)
+                # ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=weak.read_from_rom)
+                ui.MenuItem("重启\tCtrl+R", onselect=weak.restart)
+                ui.MenuItem("退出\tCtrl+Q", onselect=weak.close_window)
             with ui.Menu("视图"):
-                ui.MenuItem("切换控制台\tCtrl+`", onselect=self.toggle_console)
-                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=self.toggle_console_input_multi)
+                ui.MenuItem("切换控制台\tCtrl+`", onselect=weak.toggle_console)
+                ui.MenuItem("切换控制台长文本输入\tCtrl+Shift+`", onselect=weak.toggle_console_input_multi)
             with ui.Menu("工具"):
-                ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=self.open_tool)
+                ui.MenuItem("打开工具\tCtrl+Shift+P", onselect=weak.open_tool)
             with ui.Menu("窗口"):
-                ui.MenuItem("保存窗口位置和大小", onselect=self.save_win_option)
+                ui.MenuItem("保存窗口位置和大小", onselect=weak.save_win_option)
 
         with ui.Frame("火纹工厂", style=window_style, styles=styles, menubar=menubar) as win:
             with ui.AuiManager() as aui:
@@ -76,15 +77,15 @@ class MainFrame:
                     with ui.Horizontal(class_="expand console-input-bar"):
                         self.console_input = ui.ComboBox(
                             wxstyle=ui.wx.CB_DROPDOWN | ui.wx.TE_PROCESS_ENTER, class_="expand console-input")
-                        ui.Button("∧", class_="btn-sm", onclick=self.toggle_console_input_multi)
+                        ui.Button("∧", class_="btn-sm", onclick=weak.toggle_console_input_multi)
                 with ui.Horizontal(
                     class_="console-input-multi",
                     extra=dict(name="multiline_console", direction="bottom", captionVisible=False, hide=True)
                 ) as multiline_console:
                     self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
                     with ui.Vertical(class_="expand"):
-                        ui.Button("∨", class_="btn-sm fill", onclick=self.toggle_console_input_multi)
-                        ui.Button(">>", class_="btn-sm fill", onclick=self.console_input_multi_run,
+                        ui.Button("∨", class_="btn-sm fill", onclick=weak.toggle_console_input_multi)
+                        ui.Button(">>", class_="btn-sm fill", onclick=weak.console_input_multi_run,
                                   extra={"tooltip": "执行输入框中代码 Ctrl+Enter"})
             ui.StatusBar()
 
@@ -93,19 +94,19 @@ class MainFrame:
         self.console = console
 
         # 绑定控制台控件
-        fefactory_api.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
-        win.set_onclose(self.onclose)
+        pyapi.console.bind_elem(self.console_input.wxwindow, self.console_output.wxwindow)
+        win.set_onclose(self.weak.onclose)
         # 尝试加载图标
         icon_path = fefactory.executable_name() + '.ico'
         if os.path.exists(icon_path):
             icon = ui.wx.Icon(icon_path, ui.wx.BITMAP_TYPE_ICO)
             win.SetIcon(icon)
         self.render_toolbar(toolbar)
-        self.book.set_on_page_changed(self.on_tool_change)
+        self.book.set_on_page_changed(self.weak.on_tool_change)
 
         win.Show()
-        # self.console.set_on_file_drop(self.on_console_file_drop)
-        self.console_input_multi.set_on_keydown(self.on_console_input_multi_key)
+        # self.console.set_on_file_drop(self.weak.on_console_file_drop)
+        self.console_input_multi.set_on_keydown(self.weak.on_console_input_multi_key)
 
     @property
     def module_names(self):
@@ -138,9 +139,10 @@ class MainFrame:
 
     def onclose(self, *args):
         if self.book.close_all_page():
-            del self.book
             self.opened_tools.clear()
             self.opened_tools_map.clear()
+            del self.book
+            del self.win
             return
         return False
 
@@ -149,13 +151,15 @@ class MainFrame:
 
     def restart(self, _=None, callback=None):
         """重启"""
+        size = self.win.size
+        position = self.win.position
         self.close_window()
-        fefactory.reload({"size": self.win.size, "position": self.win.position}, callback)
+        fefactory.reload({"size": size, "position": position}, callback)
 
     def render_toolbar(self, toolbar):
         """渲染快捷工具栏"""
         bitmap = ui.wx.Bitmap()
-        listener = self.on_toolbar_tool_click
+        listener = self.weak.on_toolbar_tool_click
         for name, module in tools.toolbar_tools:
             icon = ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/'), ui.wx.BITMAP_TYPE_ICO)
             bitmap.CopyFromIcon(icon)
@@ -174,35 +178,35 @@ class MainFrame:
 
     def new_project(self, menu):
         """新建工程"""
-        path = fefactory_api.choose_dir("选择工程文件夹")
+        path = pyapi.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
             if project.exists():
                 # TODO
-                fefactory_api.confirm_yes("此工程已存在，是否覆盖", fefactory_api.NO)
+                pyapi.confirm_yes("此工程已存在，是否覆盖", pyapi.NO)
             else:
                 # TODO
                 project.title = input("请输入工程名称", os.path.basename(path))
-            app.on_change_project(project)
+            __main__.app.on_change_project(project)
             self.on_open_project(project)
 
     def open_project(self, menu):
         """打开工程"""
-        path = fefactory_api.choose_dir("选择工程文件夹")
+        path = pyapi.choose_dir("选择工程文件夹")
         if path:
             project = Project(path)
             if project.exists():
-                app.on_change_project(project)
+                __main__.app.on_change_project(project)
             else:
-                fefactory_api.alert("提示", "该目录下没有project.json")
+                pyapi.alert("提示", "该目录下没有project.json")
 
     def do_open_project(self, menu):
         """处理打开工程"""
         path = menu.GetText()
         print(path)
-        if path != app.project.path:
+        if path != __main__.app.project.path:
             project = Project(path)
-            app.on_change_project(project)
+            __main__.app.on_change_project(project)
             self.on_open_project(project)
 
     def on_open_project(self, project):
@@ -212,8 +216,8 @@ class MainFrame:
 
     def open_project_dir(self, menu):
         """打开工程目录"""
-        if app.project_confirm():
-            os.startfile(app.project.path)
+        if __main__.app.project_confirm():
+            os.startfile(__main__.app.project.path)
 
     def clear_recent_project(self, menu):
         # 清除最近的工程
@@ -244,7 +248,7 @@ class MainFrame:
         for file in files:
             if file.endswith('.py'):
                 print('执行脚本: ' + file)
-                fefactory_api.exec_file(file, scope)
+                pyapi.exec_file(file, scope)
 
         if scope != __main__.__dict__:
             __main__.last_scope = scope
@@ -268,7 +272,7 @@ class MainFrame:
                 return True
 
     # def read_from_rom(self, menu):
-    #     rom = fefactory_api.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
+    #     rom = pyapi.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
     #     if not rom:
     #         return
     #     reader = FeRomRW(rom)
@@ -292,7 +296,8 @@ class MainFrame:
         """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
-            with ui.View.HERE, ui.dialog.StdDialog("选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
+            with ui.View.HERE, ui.dialog.StdDialog(
+                    "选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
                 tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)
                 root = tree.AddRoot("")
@@ -359,7 +364,7 @@ class MainFrame:
 
     def save_win_option(self, menu):
         """保存窗口参数(大小和位置等)"""
-        app.setconfig('start_option', {
+        __main__.app.setconfig('start_option', {
             'position': self.win.position,
             'size': self.win.size,
         })
@@ -391,11 +396,14 @@ styles = {
     }
 }
 
-if __name__ == 'main':
-    frame = MainFrame(app.start_option)
 
-    __main__.app = app
+def main():
+    start_option = getattr(__main__, 'start_option', __main__.app.start_option)
+    frame = MainFrame(start_option)
     __main__.frame = frame
-    __main__.win = win = frame.win
-    __main__.fefactory_api = fefactory_api
-    __main__.copy = fefactory_api.set_clipboard
+    __main__.win = frame.win
+    __main__.pyapi = pyapi
+    __main__.copy = pyapi.set_clipboard
+
+if __name__ == 'main':
+    main()

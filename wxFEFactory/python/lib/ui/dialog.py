@@ -1,4 +1,5 @@
 from lib import ui
+from lib.ui import wx
 from lib.extypes import WeakBinder
 from styles import styles, dialog_style
 
@@ -18,9 +19,9 @@ class StdDialog(ui.Dialog):
             self.view = (ui.ScrollView if scrollable else ui.Vertical)(class_="fill padding", keep_styles=True)
             with ui.Horizontal(class_="padding right") as footer:
                 if cancel:
-                    ui.Button(label="取消", id=ui.wx.ID_CANCEL)
+                    ui.Button(label="取消", id=wx.ID_CANCEL)
                 if ok:
-                    ui.Button(label="确定", id=ui.wx.ID_OK)
+                    ui.Button(label="确定", id=wx.ID_OK)
             self.footer = footer
         super().__exit__(None, None, None)
 
@@ -37,6 +38,13 @@ class StdDialog(ui.Dialog):
     def prevent_close(self, *args):
         self.dismiss()
         return False
+
+    def EndModal(self, code=True):
+        if code is True:
+            code = wx.ID_OK
+        elif code is False:
+            code = wx.ID_CANCEL
+        self.wxwindow.EndModal(code)
 
 
 class ListDialog(StdDialog):
@@ -118,7 +126,7 @@ class SearchDialog(StdDialog):
 
         with self:
             with ui.Horizontal(class_='expand'):
-                self.input = ui.TextInput(class_='fill', wxstyle=ui.wx.TE_PROCESS_ENTER)
+                self.input = ui.TextInput(class_='fill', wxstyle=wx.TE_PROCESS_ENTER)
                 ui.Button(label="搜索", class_='btn_sm', onclick=self.weak.onenter)
             self.listbox = ui.ListBox(class_='fill', onselect=onselect)
             self.input.set_onenter(self.weak.onenter)

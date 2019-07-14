@@ -69,6 +69,8 @@ class VK(KEY):
     TAB = 9
     ENTER = 13
     RETURN = 13
+    SHIFT = 16
+    CONTROL = 17
     CAPSLOCK = 20
     ESCAPE = 27
     SPACE = 32

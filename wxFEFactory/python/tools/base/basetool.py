@@ -3,15 +3,15 @@ import __main__
 from lib import lazy, ui
 from lib.scene import BaseScene
 from styles import styles, dialog_style
-from fefactory import alert
+from pyapi import alert
 
 
 class BaseTool(BaseScene):
     # 窗口嵌套
     nested = False
 
-    # def __del__(self):
-    #     print(self.module_name, '析构')
+    def __del__(self):
+        print(self.module_name, '析构')
 
     def attach(self, frame):
         try:
@@ -81,7 +81,7 @@ class BaseTool(BaseScene):
             __main__.frame.restart(callback=callback)
 
         if self.nested:
-            # 现在改成了主窗口的onclose里会先关闭所有未关闭子窗口
+            # 主窗口的onclose里会先关闭所有未关闭子窗口
             close_callback()
         else:
             self.close_window()

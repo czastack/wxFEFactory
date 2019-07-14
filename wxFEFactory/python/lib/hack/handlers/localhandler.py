@@ -1,6 +1,6 @@
 import ctypes
 import struct
-from fefactory_api import mem_read, mem_write
+from pyapi import mem_read, mem_write
 from ..models import Model
 
 

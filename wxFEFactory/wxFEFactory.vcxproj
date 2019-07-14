@@ -155,7 +155,7 @@
     <ClCompile Include="pyapi\ui\controls.cpp" />
     <ClCompile Include="pyapi\ui\datacontrols.cpp" />
     <ClCompile Include="pyapi\ui\dialogs.cpp" />
-    <ClCompile Include="pyapi\fefactory_api.cpp" />
+    <ClCompile Include="pyapi\pyapi.cpp" />
     <ClCompile Include="pyapi\functions.cpp" />
     <ClCompile Include="pyapi\ui\events.cpp" />
     <ClCompile Include="pyapi\ui\frames.cpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="pyapi\fe\graph.h" />
     <ClInclude Include="pyapi\ui\console.h" />
     <ClInclude Include="pyapi\ui\dialogs.h" />
-    <ClInclude Include="pyapi\fefactory_api.h" />
+    <ClInclude Include="pyapi\pyapi.h" />
     <ClInclude Include="pyapi\functions.h" />
     <ClInclude Include="pyapi\ui\drop.hpp" />
     <ClInclude Include="pyapi\ui\ui.h" />

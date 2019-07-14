@@ -65,8 +65,9 @@ namespace pybind11 {
 }
 
 
-#define PACK(...) __VA_ARGS__
+#define ENUM_VAL(name) value(#name, wx##name)
 #define NODELETE(type) type, std::unique_ptr<type, py::nodelete>
+#define PACK(...) __VA_ARGS__
 
 
 class UiModule

@@ -1,4 +1,4 @@
-import fefactory_api
+import pyapi
 import json
 import os
 import sys
@@ -24,17 +24,12 @@ def reload(start_option=None, callback=None):
         if file.startswith(pydir):
             del sys.modules[name]
 
-    for name in list(__main__.__dict__):
+    for name in dir(__main__):
         if not name.startswith('__'):
-            del __main__.__dict__[name]
-
-    try:
-        del __builtins__['fpy']
-    except Exception:
-        pass
+            delattr(__main__, name)
 
     if start_option:
-        application.app.start_option = start_option
+        __main__.start_option = start_option
 
     __import__(__name__)
 
@@ -59,7 +54,7 @@ def execfile(path, encoding="utf-8"):
 def json_dump_file(owner, data, dumper=None):
     """选择json文件导出"""
     lastfile = owner and getattr(owner, 'lastfile', None)
-    path = fefactory_api.choose_file("选择保存文件", file=lastfile, wildcard='*.json')
+    path = pyapi.choose_file("选择保存文件", file=lastfile, wildcard='*.json')
     if path:
         if owner:
             owner.lastfile = path
@@ -73,7 +68,7 @@ def json_dump_file(owner, data, dumper=None):
 def json_load_file(owner):
     """选择json文件导入"""
     lastfile = owner and getattr(owner, 'lastfile', None)
-    path = fefactory_api.choose_file("选择要读取的文件", file=lastfile, wildcard='*.json')
+    path = pyapi.choose_file("选择要读取的文件", file=lastfile, wildcard='*.json')
     if path:
         if owner:
             owner.lastfile = path
@@ -82,43 +77,40 @@ def json_load_file(owner):
 
 
 class Screen:
-    size = fefactory_api.ui.GetDisplaySize()
+    size = pyapi.ui.GetDisplaySize()
     width, height = size.x, size.y
-    dpi = fefactory_api.ui.GetDisplaySize()
+    dpi = pyapi.ui.GetDisplaySize()
 
 
-if not getattr(fefactory_api, 'fefactory_inited', False):
+def main():
     # 重定向标准输出
-    class _LogWriter:
+    class LogWriter:
         def flush(self):
             pass
 
         def write(self, s):
-            fefactory_api.log_message(s)
+            pyapi.log_message(s)
 
-    sys.stdout = sys.stderr = _LogWriter()
+    sys.stdout = sys.stderr = LogWriter()
 
+    if not hasattr(pyapi, '_alert'):
+        pyapi._alert = pyapi.alert
 
-_alert = fefactory_api.alert
+    def alert(title, msg=None):
+        if not msg:
+            msg = title
+            title = '提示'
+        pyapi._alert(title, msg)
 
+    def confirm_yes(msg, defdefaultButton=wx.YES):
+        return pyapi.confirm('确认', msg, defdefaultButton) == wx.YES
 
-def alert(title, msg=None):
-    if not msg:
-        msg = title
-        title = '提示'
-    _alert(title, msg)
+    pyapi.alert = alert
+    pyapi.confirm_yes = confirm_yes
+    __builtins__['input'] = partial(pyapi.input, '输入')
 
-
-def confirm_yes(msg, defdefaultButton=wx.YES):
-    return fefactory_api.confirm('确认', msg, defdefaultButton) == wx.YES
-
-
-fefactory_api.alert = alert
-fefactory_api.confirm_yes = confirm_yes
-fefactory_api.fefactory_inited = True
-__builtins__['input'] = partial(fefactory_api.input, '输入')
+    import main
 
 
 if __name__ == 'fefactory':
-    __builtins__['fpy'] = sys.modules[__name__]
-    import main
+    main()

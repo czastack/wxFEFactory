@@ -1,4 +1,4 @@
-import fefactory_api
+import pyapi
 from lib import ui
 from ..module import BaseListBoxModuel
 from . import forms
@@ -113,7 +113,7 @@ class Module(BaseListBoxModuel):
     def on_pg_change(self, pg, name, value):
         if name == 'name':
             if value != self.listbox.text and value in self.listbox.get_texts():
-                fefactory_api.alert('名称已存在')
+                pyapi.alert('名称已存在')
                 return False
             self.listbox[self._lastpos] = value
 

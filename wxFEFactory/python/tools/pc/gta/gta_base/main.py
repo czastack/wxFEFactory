@@ -1,7 +1,7 @@
 import math
 import time
 import traceback
-import fefactory_api
+import pyapi
 from functools import partial
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -608,11 +608,11 @@ class BaseGTATool(NativeHacktool):
 
     def g3l2json(self, _=None):
         """g3l坐标转json"""
-        path = fefactory_api.choose_file("选择要读取的文件", wildcard='*.g3l')
+        path = pyapi.choose_file("选择要读取的文件", wildcard='*.g3l')
         if path:
             with open(path) as file:
                 if not file.readline().strip() == '[Locks]':
-                    fefactory_api.alert('不支持的格式')
+                    pyapi.alert('不支持的格式')
                     return
 
                 coord = [0, 0, 0]
@@ -635,7 +635,7 @@ class BaseGTATool(NativeHacktool):
             with open(jsonpath, 'w', encoding="utf-8") as file:
                 json.dump(datas, file, ensure_ascii=False)
 
-            fefactory_api.alert('转换成功: ' + jsonpath)
+            pyapi.alert('转换成功: ' + jsonpath)
 
     def render_common_button(self):
         ui.Button("杀掉附近的人", onclick=self.kill_near_peds)
