@@ -47,7 +47,7 @@ class UnitType(Model):
     # dll_help = Field(0xA8, label="语言DLL:帮助说明")
     # dll_hot_text = Field(0xAC, label="语言DLL:热键文字")
     # dll_hot_text_ = Field(0xB0, label="热键文字")
-    hp_max = WordField(0x2A, label="HP上限")
+    hpmax = WordField(0x2A, label="HP上限")
     view = FloatField(0x2C, label="视野")
     shipload = ByteField(0x30, label="Shipload")
     collision = FloatField(0x34, label="碰撞")

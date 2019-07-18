@@ -28,7 +28,7 @@ class Main(BaseNesHack):
             ModelSelect("dragon", "当前龙", choices=DRAGONS)
 
         with StaticGroup("功能"):
-            self.render_functions(('hp_max', 'all_dragons', 'all_tools'))
+            self.render_functions(('hpmax', 'all_dragons', 'all_tools'))
 
     def get_hotkeys(self):
         this = self.weak
@@ -45,7 +45,7 @@ class Main(BaseNesHack):
         """无敌"""
         self._global.invincible = 0xFF
 
-    def hp_max(self, _=None):
+    def hpmax(self, _=None):
         """HP最大"""
         self._global.hp = 0x20
         self._global.hpmax = 0x20

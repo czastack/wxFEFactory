@@ -269,12 +269,15 @@ class FieldType:
 
     def get_addr(self, instance):
         offset = self.offset
+        addr = instance.addr
+        if callable(addr):
+            addr = addr()
         if isinstance(offset, int):
-            return instance.addr + offset
+            return addr + offset
         elif isinstance(offset, tuple):
             if len(offset) == 2:
-                return instance.handler.read_ptr(instance.addr + offset[0]) + offset[1]
-            return instance.handler.read_last_addr(instance.addr + offset[0], offset[1:])
+                return instance.handler.read_ptr(addr + offset[0]) + offset[1]
+            return instance.handler.read_last_addr(addr + offset[0], offset[1:])
         elif callable(offset):
             return offset(instance, self)
 

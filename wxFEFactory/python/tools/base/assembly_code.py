@@ -64,13 +64,16 @@ class Cmp(AssemblyNode):
 
     def generate(self, owner, context):
         target = self.get_target(owner)
-        offset = self.offsetof(target, context.addr, 7)
-        if offset:
-            return b'\x83\x3D' + offset + self.value.to_bytes(1, 'little')
+        if owner.is32process:
+            return b'\x83\x3D' + target.to_bytes(4, 'little') + self.value.to_bytes(1, 'little')
         else:
-            if target > 0xFFFFFFFF:
-                raise ValueError("cmp 83 3C 25 不支持64位地址" + hex(target))
-            return b'\x83\x3C\x25' + target.to_bytes(4, 'little') + self.value.to_bytes(1, 'little')
+            offset = self.offsetof(target, context.addr, 7)
+            if offset:
+                return b'\x83\x3D' + offset + self.value.to_bytes(1, 'little')
+            else:
+                if target > 0xFFFFFFFF:
+                    raise ValueError("cmp 83 3C 25 不支持64位地址" + hex(target))
+                return b'\x83\x3C\x25' + target.to_bytes(4, 'little') + self.value.to_bytes(1, 'little')
 
 
 class Dec(AssemblyNode):

@@ -4,7 +4,7 @@ from lib.hack.models import Model, Field, ByteField, WordField, ArrayField
 class Global(Model):
     level = ByteField(0x00E464FC)  # 等级
     hp = Field(0x00E464D8)  # 生命
-    max_hp = Field(0x00E464DC)  # 最大生命
+    hpmax = Field(0x00E464DC)  # 最大生命
     money = Field(0x00E464F0)  # 金钱
     power = WordField(0x00E46500)  # 力
     stamina = WordField(0x00E46502)  # 体力

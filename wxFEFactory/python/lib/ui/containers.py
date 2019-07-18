@@ -8,10 +8,10 @@ class SizerLayout(Layout):
         flag = self.get_box_flag(style)
         weight = style.get('weight', 0)
         padding = style.get('padding', 5)
-        self.GetSizer().Add(child.wxwindow, weight, flag, padding)
+        self.sizer.Add(child.wxwindow, weight, flag, padding)
 
     def layout(self):
-        self.GetSizer().Layout()
+        self.sizer.Layout()
 
     def set_sizer(self, sizer):
         self.sizer = sizer
@@ -123,7 +123,7 @@ class ScrollView(SizerLayout):
         super().onready()
 
     def layout(self):
-        self.GetSizer().FitInside(self.wxwindow)
+        self.sizer.FitInside(self.wxwindow)
         self.Layout()
 
 

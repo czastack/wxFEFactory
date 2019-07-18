@@ -36,7 +36,7 @@ class Main(BaseGbaHack):
 
     def render_person(self):
         Choice("角色", datasets.PERSONS, self.on_person_change)
-        ModelInput("hp_max")
+        ModelInput("hpmax")
         ModelInput("resist")
         ModelInput("str")
         ModelInput("mgc")
@@ -95,7 +95,7 @@ class Main(BaseGbaHack):
 
     def pull_through(self):
         for person in self.persons():
-            person.hp = person.hp_max
+            person.hp = person.hpmax
 
     def enable_extra(self, btn):
         """附加项开启"""

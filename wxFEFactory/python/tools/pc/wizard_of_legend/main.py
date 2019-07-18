@@ -1,14 +1,14 @@
 from functools import partial
+from lib import ui
 from lib.hack.forms import (
     Group, StaticGroup, ProxyInput, ListFooterButtons
 )
 from lib.hack.handlers import MemHandler
 from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
-from lib import ui
+from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, ORIGIN
 from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta
 from tools.base.mono_hacktool import MonoHacktool, call_arg
-from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, ORIGIN
 from . import models, datasets
 
 

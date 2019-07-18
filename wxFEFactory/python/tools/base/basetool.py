@@ -10,8 +10,8 @@ class BaseTool(BaseScene):
     # 窗口嵌套
     nested = False
 
-    def __del__(self):
-        print(self.module_name, '析构')
+    # def __del__(self):
+    #     print(self.module_name, '析构')
 
     def attach(self, frame):
         try:

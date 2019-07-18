@@ -254,6 +254,10 @@ class AssemblyHacktool(BaseHackTool):
         if variable:
             self.handler.write(variable.addr, variable.type(value), variable.size)
 
+    def variable_getter(self, name):
+        weak = self.weak
+        return lambda: weak.get_variable_value(name)
+
 
 class VariableModel:
     """主要用于ModelWidget绑定变量"""

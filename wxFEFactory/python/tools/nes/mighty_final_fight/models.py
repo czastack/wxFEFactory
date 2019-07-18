@@ -22,5 +22,5 @@ class Global(Model):
         self._exp = int(str(value), 16)
 
     @property
-    def maxhp(self):
+    def hpmax(self):
         return 64 + self.level * 8

@@ -16,7 +16,7 @@ class Main(BaseDolphinHack):
         with Group("player", "角色", self._global):
             ModelInput("level", "等级(1+)")
             ModelInput("hp", "生命")
-            ModelInput("max_hp", "最大生命")
+            ModelInput("hpmax", "最大生命")
             ModelInput("money", "金钱")
             ModelInput("power", "力")
             ModelInput("stamina", "体力")

@@ -53,7 +53,7 @@ class Player(Entity, GTA3Player):
     SIZE = 0x7c4
 
     hp = Field(0x540, float)
-    maxhp = Field(0x544, float)
+    hpmax = Field(0x544, float)
     ap = Field(0x548, float)
     cur_rotation = Field(0x558, float)
     rotation = Field(0x55c, float)

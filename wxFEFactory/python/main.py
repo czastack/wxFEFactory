@@ -153,7 +153,7 @@ class MainFrame:
         """重启"""
         size = self.win.size
         position = self.win.position
-        self.close_window()
+        # self.close_window()
         fefactory.reload({"size": size, "position": position}, callback)
 
     def render_toolbar(self, toolbar):

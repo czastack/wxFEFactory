@@ -45,7 +45,7 @@ class Main(NativeHacktool):
         self.lazy_group(StaticGroup("功能"), self.render_functions)
 
     def render_unit_type(self):
-        ModelInput("hp_max")
+        ModelInput("hpmax")
         ModelInput("view")
         ModelInput("collision")
         ModelInput("move_speed")
@@ -151,7 +151,7 @@ class Main(NativeHacktool):
     def pull_through(self):
         """选中单位恢复HP"""
         for unit in self.selected_units:
-            unit.hp = unit.type.hp_max
+            unit.hp = unit.type.hpmax
 
     def selected_finish(self):
         """选中单位完成建造"""
@@ -159,7 +159,7 @@ class Main(NativeHacktool):
         if unit:
             unit_type = unit.type
             unit.construction_progress = unit_type.construction_time
-            unit.hp = unit_type.hp_max
+            unit.hp = unit_type.hpmax
 
     def selected_die(self):
         """选中单位死亡"""

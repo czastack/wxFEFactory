@@ -49,7 +49,7 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def render_player(self):
         ModelInput("hp", "生命")
-        self.maxhp_view = ModelInput("maxhp", "最大生命")
+        self.hpmax_view = ModelInput("hpmax", "最大生命")
         ModelInput("ap", "防弹衣")
         ModelInput("rotation", "旋转")
         self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)

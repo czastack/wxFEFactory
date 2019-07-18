@@ -62,9 +62,6 @@ class Frame(BaseFrame):
         self.menubar = menubar
         BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
 
-    def __del__(self):
-        print('del', self)
-
 
 class MDIParentFrame(BaseFrame):
     wxtype = wx.MDIParentFrame

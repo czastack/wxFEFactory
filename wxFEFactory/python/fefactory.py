@@ -11,7 +11,16 @@ from lib.ui import wx
 
 
 def reload(start_option=None, callback=None):
-    """重新加载相关模块"""
+    """重新加载程序"""
+    frame = __main__.frame
+    for name in dir(__main__):
+        if not name.startswith('__'):
+            delattr(__main__, name)
+
+    if start_option:
+        __main__.start_option = start_option
+
+    # 重新加载相关模块
     pydir = os.path.dirname(__file__)
     for name in list(sys.modules):
         file = getattr(sys.modules[name], '__file__', None)
@@ -24,14 +33,11 @@ def reload(start_option=None, callback=None):
         if file.startswith(pydir):
             del sys.modules[name]
 
-    for name in dir(__main__):
-        if not name.startswith('__'):
-            delattr(__main__, name)
-
-    if start_option:
-        __main__.start_option = start_option
-
-    __import__(__name__)
+    try:
+        __import__(__name__)
+        frame.close_window()
+    except Exception as e:
+        print(e)
 
     if callback:
         callback()

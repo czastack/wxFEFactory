@@ -11,7 +11,7 @@ class ItemSlot(Model):
 class Person(Model):
     SIZE = 0xA0
 
-    hp_max = WordField(0x0126ACB4, label="HP上限")
+    hpmax = WordField(0x0126ACB4, label="HP上限")
     resist = WordField(0x0126ACB6, label="RESIST")
     str = ByteField(0x0126ACB8, label="STR")
     mgc = ByteField(0x0126ACB9, label="MGC")

@@ -34,7 +34,7 @@ class Main(BaseNesHack):
         )
 
     def pull_through(self):
-        self._global.hp = self._global.maxhp
+        self._global.hp = self._global.hpmax
 
     def one_hit_kill(self):
         self._global.enemy_hp = 0
