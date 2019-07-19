@@ -4,6 +4,7 @@ from lib.hack.models import (
 
 
 class Global(Model):
+    hp = Field(0xDB, label='HP')
     hpmax = Field(0xEC, label='HP上限')
     attr_red = ByteField(0x114, label='暴虐')
     attr_blue = ByteField(0x110, label='战术')
