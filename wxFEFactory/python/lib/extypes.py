@@ -121,6 +121,7 @@ class DataClassType:
 
     def set_data(self, *args, **kwargs):
         self._set_data(args, kwargs)
+        return self
 
     def _set_data(self, args, kwargs):
         for field, arg in zip(self.__slots__, args):
@@ -135,7 +136,7 @@ class DataClassType:
         return tuple(self)
 
     def clone(self):
-        return self.__class__(self)
+        return self.__class__(*self)
 
     def __iter__(self):
         return (getattr(self, field) for field in self.__slots__)

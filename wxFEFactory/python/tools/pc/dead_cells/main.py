@@ -39,11 +39,16 @@ class Main(AssemblyHacktool):
         ui.Text('游戏版本')
         ModelInput('hp')
         ModelInput('hpmax')
-        ModelInput('attr_red')
-        ModelInput('attr_blue')
-        ModelInput('attr_green')
+        ModelInput('red_tier')
+        ModelInput('purple_tier')
+        ModelInput('green_tier')
 
     def render_assembly_functions(self):
+        tier_item = AssemblyItem(
+            None, None, b'\x89\x45\xF8\x01\x45\xFC\xFF',
+            0x0C000000, 0x0FFF0000, b'', AssemblyGroup(b'\x83\xC0\x08', ORIGIN),
+            inserted=True, replace_len=7, replace_offset=-7)
+
         super().render_assembly_functions((
             AssemblyItem('health_base', '生命值', b'\x8B\x90\xE8\x00\x00\x00\x89\x55\xF4\xF2',
                 0x0C000000, 0x0FFF0000, b'',
@@ -74,6 +79,9 @@ class Main(AssemblyHacktool):
             AssemblyItem('blue_count', '蓝细胞数量', b'\x8B\x91\x3C\x03\x00\x00\x89\x55\xF4\xB8????\x89',
                 0x0D000000, 0x0FFF0000, b'', b'\xC7\x81\x3C\x03\x00\x00\x36\x42\x0F\x00\x8B\x91\x3C\x03\x00\x00',
                 replace_len=6, inserted=True, fuzzy=True, help='投资1次细胞后开启'),
+            tier_item.clone().set_data('red_tier', '暴虐等级+8', ordinal=3),
+            tier_item.clone().set_data('purple_tier', '战术等级+8', ordinal=1),
+            tier_item.clone().set_data('green_tier', '生存等级+8', ordinal=2),
         ))
 
     def render_hotkeys(self):

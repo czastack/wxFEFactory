@@ -94,7 +94,7 @@ class AssemblyHacktool(BaseHackTool):
             replace_len = item.replace_len
             replace_offset = item.replace_offset
 
-            addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.fuzzy)
+            addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.ordinal, item.fuzzy)
             if addr is -1:
                 print('找不到地址: ', item.key)
                 return
@@ -202,7 +202,7 @@ class AssemblyHacktool(BaseHackTool):
         self.handler.write(item['addr'], item['original'])
         item['active'] = False
 
-    def find_address(self, original, find_start, find_end, find_base=True, fuzzy=False):
+    def find_address(self, original, find_start, find_end, find_base=True, ordinal=1, fuzzy=False):
         base_addr = find_base is True and self.handler.base_addr or callable(find_base) and find_base() or find_base
         if callable(find_start):
             find_start = find_start()
@@ -213,7 +213,7 @@ class AssemblyHacktool(BaseHackTool):
         if base_addr:
             find_start += base_addr
             find_end += base_addr
-        return self.handler.find_bytes(original, find_start, find_end, fuzzy=fuzzy)
+        return self.handler.find_bytes(original, find_start, find_end, ordinal, fuzzy)
 
     def register_variable(self, variable):
         """注册变量"""
@@ -304,12 +304,13 @@ class Delta(int):
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
-        'inserted', 'fuzzy', 'replace_len', 'replace_offset', 'args', 'help', 'ext'),
+        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext'),
     defaults={
         'assembly': None,
         'find_base': True,
-        'inserted': False,
+        'ordinal': 1,
         'fuzzy': False,
+        'inserted': False,
         'replace_len': 0,
         'replace_offset': 0,
         'args': ()

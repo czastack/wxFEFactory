@@ -334,7 +334,10 @@ class MainFrame:
         tool.add_close_callback(self.weak.on_tool_close)
         self.opened_tools.append(tool)
         self.opened_tools_map[id(tool.win)] = tool
-        self.book.index = self.book.GetPageCount() - 1
+        if tool.nested:
+            self.book.index = self.book.GetPageCount() - 1
+        else:
+            tool.win.Show()
 
         __main__.tool = tool
 

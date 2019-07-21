@@ -6,6 +6,6 @@ from lib.hack.models import (
 class Global(Model):
     hp = Field(0xDB, label='HP')
     hpmax = Field(0xEC, label='HP上限')
-    attr_red = ByteField(0x114, label='暴虐')
-    attr_blue = ByteField(0x110, label='战术')
-    attr_green = ByteField(0x118, label='生存')
+    red_tier = ByteField(0x114, label='暴虐')
+    purple_tier = ByteField(0x110, label='战术')
+    green_tier = ByteField(0x118, label='生存')
