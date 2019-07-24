@@ -19,5 +19,5 @@ class Game(Model):
 
 
 class HlHandle(Model):
-    player = ModelPtrField(0x64, Player)
-    game = ModelPtrField(0x5C, Game)
+    player = ModelPtrField((0x18, 0x64), Player)
+    game = ModelPtrField((0x18, 0x5C), Game)

@@ -27,7 +27,7 @@ class Main(AssemblyHacktool):
         super().onattach()
         self._libhl = self.handler.get_module('libhl.dll')
         self._hl_base = self.handler.ptrs_read(self._libhl + 0x00049184, (0x560, 4))
-        self.hlhandle.addr = self.handler.read32(self._hl_base + 0x18)
+        self.hlhandle.addr = self._hl_base
 
     def render_main(self):
         with Group(None, "全局"):
@@ -104,7 +104,7 @@ class Main(AssemblyHacktool):
                 0x0C000000, 0x0FFF0000, b'\x33\xD2\x89\x90\xB0\x02\x00\x00'),
             AssemblyItem('time_reset', '时间重记', b'\x8B\x4D\xE8\xF2\x0F\x11\x49\x28',
                 0x0C000000, 0x0FFF0000, b'', b'\x8B\x4D\xE8\x0F\x57\xC9\xF2\x0F\x11\x49\x28', inserted=True),
-            AssemblyItem('time_reset', '时间暂停', b'\xF2\x0F\x11\x49\x28\x8B\x15',
+            AssemblyItem('time_pause', '时间暂停', b'\xF2\x0F\x11\x49\x28\x8B\x15',
                 0x0C000000, 0x0FFF0000, b'\x90\x90\x90\x90\x90', replace_len=5),
             AssemblyItem('kill_keep', '无伤击杀数保持', b'\x89\x48\x50\x8B\x55\x08\x8B\x42\x48',
                 0x0C000000, 0x0FFF0000, b'\x90\x90\x90', replace_len=3),
