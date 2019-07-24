@@ -45,10 +45,15 @@ class CheckableControl(Control):
     def set_onchange(self, fn, reset=True):
         self.bind_event(self.wxevent, fn, reset)
 
-    def toggle(self):
+    def toggle(self, value=None, post=True):
         """切换状态"""
-        self.SetValue(not self.GetValue())
-        self.post_event(self.wxevent)
+        if value is None:
+            value = not self.GetValue()
+        self.SetValue(value)
+        if post:
+            self.post_event(self.wxevent)
+        else:
+            self.call_event(self.wxevent)
 
     checked = value = value_property
 

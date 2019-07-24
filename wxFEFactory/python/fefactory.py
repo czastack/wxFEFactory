@@ -10,34 +10,32 @@ from functools import partial
 from lib.ui import wx
 
 
-def reload(start_option=None, callback=None):
+def reload(start_option=None, callback=None, clear=False):
     """重新加载程序"""
-    frame = __main__.frame
-    for name in dir(__main__):
-        if not name.startswith('__'):
-            delattr(__main__, name)
+    if clear:
+        for name in dir(__main__):
+            if not name.startswith('__'):
+                delattr(__main__, name)
+
+        # 重新加载相关模块
+        pydir = os.path.dirname(__file__)
+        for name in list(sys.modules):
+            file = getattr(sys.modules[name], '__file__', None)
+            if file is None:
+                file = getattr(sys.modules[name], '__path__', None)
+                if file is not None:
+                    file = file._path[0]
+                else:
+                    continue
+            if file.startswith(pydir):
+                del sys.modules[name]
 
     if start_option:
         __main__.start_option = start_option
 
-    # 重新加载相关模块
-    pydir = os.path.dirname(__file__)
-    for name in list(sys.modules):
-        file = getattr(sys.modules[name], '__file__', None)
-        if file is None:
-            file = getattr(sys.modules[name], '__path__', None)
-            if file is not None:
-                file = file._path[0]
-            else:
-                continue
-        if file.startswith(pydir):
-            del sys.modules[name]
-
-    try:
-        __import__(__name__)
-        frame.close_window()
-    except Exception as e:
-        print(e)
+    module = __import__(__name__)
+    if not clear:
+        module.main()
 
     if callback:
         callback()
@@ -116,6 +114,7 @@ def main():
     __builtins__['input'] = partial(pyapi.input, '输入')
 
     import main
+    main.main()
 
 
 if __name__ == 'fefactory':

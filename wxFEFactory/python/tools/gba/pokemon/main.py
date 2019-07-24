@@ -68,7 +68,7 @@ class PMHack(BaseGbaHack):
         ui.RadioBox("带着的宝可梦", class_="expand", choices=tuple(str(i) for i in range(1, 7)),
             onselect=self.on_active_pokemo_swith)
 
-        with Groups(None, self.weak.on_note_page_change):
+        with Groups(None, self.weak.on_page_changed):
             with Group("basic", "基本", active_pokemon):
                 ModelInput("breedInfo.bIntimate", "亲密度", spin=True, max=255)
                 ModelSelect("breedInfo.wBreed", "种族", choices=self.datasets.BREED_NAMES)

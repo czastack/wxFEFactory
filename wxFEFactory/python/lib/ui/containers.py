@@ -184,7 +184,7 @@ class BookCtrlBase(Layout):
 
         return self.GetPage(n).GetHost()
 
-    def set_onchange(self, onchange, reset=True):
+    def set_on_page_changed(self, onchange, reset=True):
         self.bind_event(self.wxevent, onchange, reset)
 
     @property

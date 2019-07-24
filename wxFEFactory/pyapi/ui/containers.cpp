@@ -27,8 +27,8 @@ void UiModule::init_containers()
 
 	py::class_<NODELETE(wxSizer)>(ui, "Sizer")
 		.def("Add", (wxSizerItem * (wxSizer::*)(wxWindow*, int, int, int, wxObject*)) & wxSizer::Add,
-			window, proportion, flag, border, userData, py::return_value_policy::reference)
-		.def("Add", (wxSizerItem * (wxSizer::*)(wxSizerItem*)) & wxSizer::Add, "item"_a, py::return_value_policy::reference)
+			window, proportion, flag, border, userData, py::return_value_policy::reference_internal)
+		.def("Add", (wxSizerItem * (wxSizer::*)(wxSizerItem*)) & wxSizer::Add, "item"_a, py::return_value_policy::reference_internal)
 		.def("InsertSpacer", &wxSizer::InsertSpacer, "index"_a, "size"_a)
 		.def("Layout", &wxSizer::Layout)
 		.def("FitInside", &wxSizer::FitInside, window);

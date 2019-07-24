@@ -72,7 +72,7 @@ class MemHandler(ProcessHandler):
             return self.write(addr + offset, data, size)
         return False
 
-    def ptrs_read(self, addr, offsets, type, size=0):
+    def ptrs_read(self, addr, offsets, type=int, size=0):
         addr = self.read_last_addr(addr, offsets)
         if addr:
             return self.read(addr, type, size)

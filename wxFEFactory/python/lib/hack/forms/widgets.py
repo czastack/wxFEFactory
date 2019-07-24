@@ -418,21 +418,20 @@ class Groups(BaseGroup):
         return super().__init__(None, caption, **kwargs)
 
     def render(self):
-        with ui.Vertical(class_="fill") as root:
+        extra = dict(caption=self.label) if self.label else None
+        with ui.Vertical(class_="fill", extra=extra) as root:
             self.view = ui.Notebook(class_="fill")
-        if self.label:
-            root.extra = dict(caption=self.label)
         self.root = root
         if self.on_page_changed:
             self.view.set_on_page_changed(self.on_page_changed)
 
     def __enter__(self):
         super().__enter__()
-        self.root.freeze()
+        self.root.Freeze()
 
     def __exit__(self, *args):
         super().__exit__(*args)
-        self.root.thaw()
+        self.root.Thaw()
         if self.on_page_changed:
             self.on_page_changed(self.view)
 

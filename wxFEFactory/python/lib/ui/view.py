@@ -369,6 +369,10 @@ class View:
         """手动添加事件"""
         self.AddPendingEvent(wx.CommandEvent(event_type, self.GetId()))
 
+    def call_event(self, event_type):
+        """手动执行事件"""
+        self.handle_event(wx.CommandEvent(event_type, self.GetId()))
+
     set_on_keydown = event_binder(wx.EVT_KEY_DOWN, pass_event=True)
     set_on_left_down = event_binder(wx.EVT_LEFT_DOWN, pass_event=True)
     set_on_left_up = event_binder(wx.EVT_LEFT_UP, pass_event=True)

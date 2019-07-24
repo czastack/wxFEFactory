@@ -118,7 +118,7 @@ class VK(KEY):
     NUMLOCK = 144
 
     @staticmethod
-    def gecode(name):
+    def getcode(name):
         """根据名称获取windows的keyCode"""
         if len(name) == 1:
             code = ord(name)

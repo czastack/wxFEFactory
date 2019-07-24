@@ -31,7 +31,7 @@ class BaseHackTool(NestedTool):
                     self.attach_status_view = ui.Text("", class_="vcenter grow padding_left")
                     ui.CheckBox("保持最前", class_="vcenter", onchange=self.swith_keeptop)
                 with ui.Notebook(class_="fill") as book:
-                    book.set_onchange(self.on_page_changed)
+                    book.set_on_page_changed(self.on_page_changed)
                     self.begin_group()
                     try:
                         self.render_main()

@@ -82,7 +82,7 @@ void UiModule::init_datacontrols()
 			parent, id, pos_v, size_v, style = (long)wxTB_DEFAULT_STYLE, name = (const char*)wxToolBarNameStr)
 		.def("GetSelection", &wxPropertyGrid::GetSelection)
 		.def("GetIterator", py::overload_cast<int, wxPGProperty*>(&wxPropertyGrid::GetIterator),
-			"flags"_a=(int)wxPG_ITERATE_DEFAULT, "first"_a=(wxPGProperty*)nullptr, py::return_value_policy::reference)
+			"flags"_a=(int)wxPG_ITERATE_DEFAULT, "first"_a=(wxPGProperty*)nullptr, py::return_value_policy::reference_internal)
 		.def("SetPropVal", &wxPropertyGrid::SetPropVal)
 		.def("SetExtraStyle", &wxPropertyGrid::SetExtraStyle, "exStyle"_a)
 		.def("SetCaptionBackgroundColour", &wxPropertyGrid::SetCaptionBackgroundColour, "col"_a)

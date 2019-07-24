@@ -63,8 +63,8 @@ class AssemblyHacktool(BaseHackTool):
         elif isinstance(item, SimpleButton):
             item.onclick(checked)
 
-    def toggle_assembly_button(self, key):
-        self.assembly_buttons[key].toggle()
+    def toggle_assembly_button(self, key, checked=None):
+        self.assembly_buttons[key].toggle(checked, False)
 
     def insure_memory(self):
         if self.allocated_memory is None:
@@ -81,6 +81,12 @@ class AssemblyHacktool(BaseHackTool):
             return
 
         self.insure_memory()
+
+        if item.depends:
+            if isinstance(item.depends, str):
+                item.depends = item.depends.split()
+            for key in item.depends:
+                self.toggle_assembly_button(key, True)
 
         if item.key in self.registed_assembly:
             data = self.registed_assembly[item.key]
@@ -258,6 +264,10 @@ class AssemblyHacktool(BaseHackTool):
         weak = self.weak
         return lambda: weak.get_variable_value(name)
 
+    def assambly_patcher(self, *args, **kwargs):
+        """汇编码补丁"""
+        return AssamblyPatcher(self.weak, *args, **kwargs)
+
 
 class VariableModel:
     """主要用于ModelWidget绑定变量"""
@@ -273,6 +283,38 @@ class VariableModel:
     def __and__(self, field):
         variable = self.owner.get_variable(field)
         return variable and variable.addr or 0
+
+
+class AssamblyPatcher:
+    """汇编码补丁"""
+    def __init__(self, owner, name, offset, size=4, type=int, is_memory=False):
+        self.owner = owner
+        self.name = name
+        self.offset = offset
+        self.size = size
+        self.type = type
+        self.is_memory = is_memory
+
+    def get_addr(self):
+        items = getattr(self.owner, 'registed_assembly', None)
+        if items:
+            item = items.get(self.name, None)
+            if item is not None:
+                return item['memory' if self.is_memory else 'addr'] + self.offset
+
+    def read(self):
+        addr = self.get_addr()
+        if addr:
+            return self.owner.handler.read(addr, self.type, self.size)
+
+    def write(self, value):
+        addr = self.get_addr()
+        if addr:
+            self.owner.handler.write(addr, self.type(value), self.size)
+
+    def __iter__(self):
+        yield self.read
+        yield self.write
 
 
 class AssemblyItems:
@@ -300,11 +342,13 @@ class Delta(int):
     :param find_base: 是否将find_start和find_end加上模块起始地址
     :param inserted: 是否自动加入jmp代码
     :param replace_len: 只记录original前n个字节
+    :param ordinal: 出现的序号(相同原始数据查出的第n个)
+    :param fuzzy: 模糊查找，?表示任意字节
 """
 AssemblyItem = DataClass(
     'AssemblyItem',
     ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
-        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext'),
+        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext', 'depends'),
     defaults={
         'assembly': None,
         'find_base': True,

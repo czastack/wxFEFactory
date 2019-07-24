@@ -1,5 +1,5 @@
 from styles import styles
-from pyapi import auto, ui
+from lib import ui
 from lib.gba import cheat
 from tools.base.basetool import NestedTool
 

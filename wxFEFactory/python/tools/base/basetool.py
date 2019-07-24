@@ -24,12 +24,8 @@ class BaseTool(BaseScene):
             if win:
                 win.set_onclose(ui.EventFunctor(self.onclose, pass_event=True))
                 self.win = win
-                # self.onready()
         except Exception:
             traceback.print_exc()
-
-    def onready(self):
-        pass
 
     def render(self):
         """ 渲染视图，供attach调用
@@ -48,9 +44,9 @@ class BaseTool(BaseScene):
         """
         with ui.MenuBar() as menubar:
             with ui.Menu("窗口"):
-                ui.MenuItem("关闭\tCtrl+W", onselect=self.close_window)
-                ui.MenuItem("重载\tCtrl+R", onselect=self.reload)
-                ui.MenuItem("切换置顶", onselect=self.swith_keeptop, kind=ui.wx.ITEM_CHECK)
+                ui.MenuItem("关闭\tCtrl+W", onselect=self.weak.close_window)
+                ui.MenuItem("重载\tCtrl+R", onselect=self.weak.reload)
+                ui.MenuItem("切换置顶", onselect=self.weak.swith_keeptop, kind=ui.wx.ITEM_CHECK)
 
         return menubar
 
@@ -121,7 +117,7 @@ class BaseTool(BaseScene):
             close_callbacks.clear()
 
         super().onclose()
-
+        self.win.Destroy()
         self.__dict__.clear()
         return True
 

@@ -1,7 +1,7 @@
 from styles import styles
-from pyapi import auto, ui
-from tools.base.basetool import NestedTool
+from lib import ui
 from lib.ndstool import ar
+from tools.base.basetool import NestedTool
 
 
 class Main(NestedTool):

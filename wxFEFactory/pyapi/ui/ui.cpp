@@ -225,7 +225,7 @@ void UiModule::init_ui()
 
 
 	py::class_<wxApp>(ui, "App")
-		.def("GetTopWindow", &wxApp::GetTopWindow);
+		.def("GetTopWindow", &wxApp::GetTopWindow, py::return_value_policy::reference_internal);
 
 
 	py::class_<wxWindowBase, wxEvtHandler>(ui, "WindowBase");
@@ -248,7 +248,7 @@ void UiModule::init_ui()
 		.def("GetSize", py::overload_cast<>(&wxWindow::GetSize, py::const_))
 		.def("SetSize", py::overload_cast<int, int>(&wxWindow::SetSize), "width"_a, "height"_a)
 		.def("SetSize", py::overload_cast<const wxSize&>(&wxWindow::SetSize), "size"_a)
-		.def("GetSizer", &wxWindow::GetSizer, py::return_value_policy::reference)
+		.def("GetSizer", &wxWindow::GetSizer, py::return_value_policy::reference_internal)
 		.def("SetSizer", &wxWindow::SetSizer, "sizer"_a, "deleteOld"_a = true)
 		.def("GetFont", &wxWindow::GetFont)
 		.def("SetFont", &wxWindow::SetFont, "font"_a)

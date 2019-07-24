@@ -1,8 +1,9 @@
 import json
 import time
 import pyapi
+from lib import ui
 from lib.win32.keys import VK
-from pyapi import auto, ui
+from pyapi import auto
 from tools.base.basetool import BaseTool
 
 

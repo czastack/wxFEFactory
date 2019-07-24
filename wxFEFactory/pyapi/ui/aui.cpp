@@ -45,14 +45,14 @@ void UiModule::init_aui()
 		.def("AddPane", (bool (wxAuiManager::*)(wxWindow*, const wxAuiPaneInfo&)) & wxAuiManager::AddPane, window, "paneInfo"_a)
 		.def("AddPane", (bool (wxAuiManager::*)(wxWindow*, int, const wxString&))
 			& wxAuiManager::AddPane, window, "direction"_a = wxLEFT, "caption"_a = wxEmptyString)
-		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(wxWindow*)) & wxAuiManager::GetPane, window, py::return_value_policy::reference)
-		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(const wxString&)) & wxAuiManager::GetPane, name, py::return_value_policy::reference)
+		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(wxWindow*)) & wxAuiManager::GetPane, window, py::return_value_policy::reference_internal)
+		.def("GetPane", (wxAuiPaneInfo & (wxAuiManager::*)(const wxString&)) & wxAuiManager::GetPane, name, py::return_value_policy::reference_internal)
 		;
 
 	py::class_<NODELETE(wxAuiMDIParentFrame), wxFrame>(ui, "AuiMDIParentFrame")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, const wxString&>(),
 			parent, id, title, pos_v, size_v, style = wxDEFAULT_FRAME_STYLE | wxVSCROLL | wxHSCROLL, name = (const char*)wxFrameNameStr)
-		.def("GetNotebook", &wxAuiMDIParentFrame::GetNotebook, py::return_value_policy::reference)
+		.def("GetNotebook", &wxAuiMDIParentFrame::GetNotebook, py::return_value_policy::reference_internal)
 		;
 
 	py::class_<NODELETE(wxAuiMDIChildFrame), wxFrame>(ui, "AuiMDIChildFrame")
@@ -67,7 +67,7 @@ void UiModule::init_aui()
 		.def("GetSelection", &wxAuiNotebook::GetSelection)
 		.def("SetSelection", &wxAuiNotebook::SetSelection)
 		.def("GetPageCount", &wxAuiNotebook::GetPageCount)
-		.def("GetPage", &wxAuiNotebook::GetPage, py::return_value_policy::reference)
+		.def("GetPage", &wxAuiNotebook::GetPage, py::return_value_policy::reference_internal)
 		.def("DeletePage", &wxAuiNotebook::DeletePage)
 		.def("AddPage", (bool (wxAuiNotebook::*)(wxWindow*, const wxString&, bool, const wxBitmap&)) & wxAuiNotebook::AddPage,
 			"page"_a, "caption"_a, "select"_a = false, "bitmap"_a = wxNullBitmap)
@@ -83,9 +83,9 @@ void UiModule::init_aui()
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, long>(),
 			parent, id, pos_v, size_v, style = (long)wxAUI_TB_DEFAULT_STYLE)
 		.def("AddTool", (wxAuiToolBarItem * (wxAuiToolBar::*)(int, const wxString&, const wxBitmap&, const wxString&, wxItemKind))
-			& wxAuiToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL, py::return_value_policy::reference)
+			& wxAuiToolBar::AddTool, "toolid"_a, label, "bitmap"_a, "shortHelp"_a = wxEmptyString, "kind"_a = wxITEM_NORMAL, py::return_value_policy::reference_internal)
 		.def("AddControl", &wxAuiToolBar::AddControl, "control"_a, label_v)
-		.def("AddSeparator", &wxAuiToolBar::AddSeparator, py::return_value_policy::reference)
+		.def("AddSeparator", &wxAuiToolBar::AddSeparator, py::return_value_policy::reference_internal)
 		.def("Realize", &wxAuiToolBar::Realize)
 		.def("ClearTools", &wxAuiToolBar::ClearTools)
 		.def("GetToolPos", &wxAuiToolBar::GetToolPos)

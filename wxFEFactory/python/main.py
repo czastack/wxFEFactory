@@ -87,7 +87,7 @@ class MainFrame:
                         ui.Button("∨", class_="btn-sm fill", onclick=weak.toggle_console_input_multi)
                         ui.Button(">>", class_="btn-sm fill", onclick=weak.console_input_multi_run,
                                   extra={"tooltip": "执行输入框中代码 Ctrl+Enter"})
-            ui.StatusBar()
+            # ui.StatusBar()
 
         self.win = win
         self.aui = aui
@@ -143,8 +143,8 @@ class MainFrame:
             self.opened_tools_map.clear()
             del self.book
             del self.win
-            return
-        return False
+        else:
+            return False
 
     def close_window(self, _=None):
         self.win.Close()
@@ -153,8 +153,8 @@ class MainFrame:
         """重启"""
         size = self.win.size
         position = self.win.position
-        # self.close_window()
-        fefactory.reload({"size": size, "position": position}, callback)
+        self.close_window()
+        fefactory.reload({"size": size, "position": position}, callback, True)
 
     def render_toolbar(self, toolbar):
         """渲染快捷工具栏"""
@@ -408,5 +408,5 @@ def main():
     __main__.pyapi = pyapi
     __main__.copy = pyapi.set_clipboard
 
-if __name__ == 'main':
-    main()
+# if __name__ == 'main':
+#     main()

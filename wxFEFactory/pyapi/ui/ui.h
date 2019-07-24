@@ -19,21 +19,6 @@ public:
 
 namespace pybind11 {
 	namespace detail {
-		// PyFunctor
-		template <> struct type_caster<PyFunctor> {
-		public:
-			PYBIND11_TYPE_CASTER(PyFunctor, _("PyFunctor"));
-
-			bool load(handle src, bool) {
-				value.fn = reinterpret_steal<object>(src);
-				return true;
-			}
-
-			static handle cast(const PyFunctor& src, return_value_policy, handle) {
-				return src.fn;
-			}
-		};
-
 		// wxColor
 		template <> struct type_caster<wxColour> {
 		public:
