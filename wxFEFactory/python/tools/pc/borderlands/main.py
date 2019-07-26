@@ -2,7 +2,7 @@ import pyapi
 import types
 from functools import partial
 from lib.hack.forms import (
-    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget, Input, Title
+    Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect, ModelCoordWidget, Input, Title
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -110,7 +110,7 @@ class Main(AssemblyHacktool):
             ModelInput('another_mgr.weapon_profs.%d.exp' % i, '经验')
 
     def render_weapon(self):
-        ModelInput('addr_hex', '地址', readonly=True)
+        ModelAddrInput()
         ModelInput('level')
         ModelInput('item_price')
         # ModelInput('display_level')

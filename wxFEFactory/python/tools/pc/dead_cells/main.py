@@ -1,7 +1,7 @@
 from functools import partial
 from lib import ui
 from lib.hack.forms import (
-    Group, StaticGroup, ModelInput, ProxyInput
+    Group, StaticGroup, ModelInput, ModelAddrInput, ProxyInput, Title
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -30,31 +30,58 @@ class Main(AssemblyHacktool):
         self.hlhandle.addr = self._hl_base
 
     def render_main(self):
+        hlhandle = self.hlhandle
         with Group(None, "全局"):
             self.render_global()
-        self.lazy_group(Group("player", "玩家", (self.get_player, models.Player)), self.render_player)
+        self.lazy_group(Group("game", "游戏数据", (lambda: hlhandle.game, models.Game)), self.render_game)
+        self.lazy_group(Group("progress", "统计", (lambda: hlhandle.progress, models.Progress)), self.render_progress)
+        self.lazy_group(Group("player", "玩家", (lambda: hlhandle.player, models.Player)), self.render_player)
+        self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
-        ui.Hr()
-        ui.Text('游戏版本: 1.1')
-
-        game = (self.get_game, models.Game)
-        ModelInput('time', instance=game)
-        ModelInput('gold', instance=game)
-        ModelInput('kill', instance=game)
+        Title('游戏版本: 1.1')
         ProxyInput('red_tier', '暴虐等级+', *self.assambly_patcher('red_tier', 2, 1, is_memory=True))
         ProxyInput('purple_tier', '战术等级+', *self.assambly_patcher('purple_tier', 2, 1, is_memory=True))
         ProxyInput('green_tier', '生存等级+', *self.assambly_patcher('green_tier', 2, 1, is_memory=True))
 
+    def render_game(self):
+        for name in models.Game.field_names:
+            ModelInput(name)
+
+    def render_progress(self):
+        for name in models.Progress.field_names:
+            ModelInput(name)
+
     def render_player(self):
-        ModelInput('hp')
-        ModelInput('hpmax')
-        ModelInput('red_tier')
-        ModelInput('purple_tier')
-        ModelInput('green_tier')
-        ModelInput('cell')
+        ModelAddrInput()
+        for name in models.Player.form_fields:
+            ModelInput(name)
+
+    def render_weapon(self):
+        hlhandle = self.hlhandle
+        primary_weapon = (lambda: hlhandle.player.primary_weapon, models.Weapon)
+        secondary_weapon = (lambda: hlhandle.player.secondary_weapon, models.Weapon)
+        for label, instance in (
+            ('主武器', primary_weapon),
+            ('副武器', secondary_weapon)
+        ):
+            Title(label)
+            ModelAddrInput(instance=instance)
+            for name in models.Weapon.field_names:
+                ModelInput(name, instance=instance)
+
+        left_skill = (lambda: hlhandle.player.left_skill, models.Skill)
+        right_skill = (lambda: hlhandle.player.right_skill, models.Skill)
+        for label, instance in (
+            ('左技能', left_skill),
+            ('右技能', right_skill)
+        ):
+            Title(label)
+            ModelAddrInput(instance=instance)
+            for name in models.Skill.field_names:
+                ModelInput(name, instance=instance)
 
     def render_assembly_functions(self):
         tier_item = AssemblyItem(
@@ -133,9 +160,3 @@ class Main(AssemblyHacktool):
 
     def quick_health(self):
         self.toggle_assembly_button('quick_health')
-
-    def get_player(self):
-        return self.hlhandle.player
-
-    def get_game(self):
-        return self.hlhandle.game

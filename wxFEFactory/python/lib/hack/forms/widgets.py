@@ -487,6 +487,11 @@ class ModelInput(ModelWidget, BaseInput):
     pass
 
 
+class ModelAddrInput(ModelInput):
+    def __init__(self, **kwargs):
+        super().__init__('addr_hex', '地址', readonly=True, **kwargs)
+
+
 class ProxyInput(BaseInput):
     """代理输入框"""
     def __init__(self, name, label, getter, setter):
