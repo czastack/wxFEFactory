@@ -156,7 +156,24 @@ class Main(AssemblyHacktool):
     def get_hotkeys(self):
         return (
             (VK.MOD_ALT, VK.B, self.quick_health),
+            (VK.MOD_ALT, VK.LEFT, self.move_left),
+            (VK.MOD_ALT, VK.RIGHT, self.move_right),
+            (VK.MOD_ALT, VK.UP, self.move_up),
+            (VK.MOD_ALT, VK.DOWN, self.move_down),
         )
+
+
+    def move_left(self):
+        self.hlhandle.player.coord_x -= 5
+
+    def move_right(self):
+        self.hlhandle.player.coord_x += 5
+
+    def move_up(self):
+        self.hlhandle.player.coord_y -= 5
+
+    def move_down(self):
+        self.hlhandle.player.coord_y += 5
 
     def quick_health(self):
         self.toggle_assembly_button('quick_health')
