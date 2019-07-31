@@ -94,6 +94,9 @@ class Main(AssemblyHacktool):
                 0x0C000000, 0x0FFF0000, b'\x2C\x01', replace_offset=6, replace_len=2),
             AssemblyItem('double_money', '两倍钱', b'\x89\x45\xF8\x03\x45\x0C\x89\x45\xF8\x89\x42\x34',
                 0x0C000000, 0x0FFF0000, b'\x03\x45\x0C', replace_len=3),
+            AssemblyItem('quadruple_cell', '四倍细胞', b'\x03\xCA\x89\x4D\xF8\x89\x88\x3C\x03\x00\x00',
+                0x0C000000, 0x0FFF0000, b'', b'\xC1\xE2\x02\x03\xCA\x89\x4D\xF8',
+                replace_len=5, inserted=True),
             AssemblyItem('curse_quick', '诅咒快消', b'\x89\x82\xC4\x02\x00\x00\x8B\x8A\xC4\x02\x00\x00',
                 0x0C000000, 0x0FFF0000, b'', b'\x83\xE8\x04\x89\x82\xC4\x02\x00\x00',
                 replace_len=6, inserted=True, help='五倍速度'),
@@ -136,7 +139,7 @@ class Main(AssemblyHacktool):
             AssemblyItem('kill_keep', '无伤击杀数保持', b'\x89\x48\x50\x8B\x55\x08\x8B\x42\x48',
                 0x0C000000, 0x0FFF0000, b'\x90\x90\x90', replace_len=3),
             AssemblyItem('boss_kill', 'BOSS快速杀死', b'\x8B\x4D\x08\x89\x81\xE8\x00\x00\x00\xE9',
-                0x0CE00000, 0x0FFF0000, b'', b'\x8B\x4D\x08\xB8\x00\x00\x00\x00\x89\x81\xE8\x00\x00\x00',
+                0x0B000000, 0x0FFF0000, b'', b'\x8B\x4D\x08\xB8\x00\x00\x00\x00\x89\x81\xE8\x00\x00\x00',
                 inserted=True, replace_len=9),
             AssemblyItem('yellow_count', '金币数量', b'\x03\x45\x0C\x89\x45\xF8\x89\x42\x34',
                 0x0C000000, 0x0FFF0000, b'', b'\x89\x45\xF8\xB8\x3F\x42\x0F\x00\x89\x42\x34',
@@ -161,7 +164,6 @@ class Main(AssemblyHacktool):
             (VK.MOD_ALT, VK.UP, self.move_up),
             (VK.MOD_ALT, VK.DOWN, self.move_down),
         )
-
 
     def move_left(self):
         self.hlhandle.player.coord_x -= 5

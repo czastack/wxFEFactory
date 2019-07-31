@@ -77,7 +77,7 @@ class Player(Model):
     coord_y = Field(0x50, label='Y坐标')
     curse_kill = Field(0x2C4, label='诅咒剩余击杀')
     health_flask = Field(0x310, label='药瓶')
-    forgotten_sepulcher_darkness = Field(0x344, label='遗忘墓穴黑暗')
+    forgotten_sepulcher_darkness = FloatField(0x344, label='遗忘墓穴黑暗')
     # 计时器
     # Roll 4
     # Stunned 9
