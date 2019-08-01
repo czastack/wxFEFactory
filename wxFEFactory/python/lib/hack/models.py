@@ -19,12 +19,23 @@ class Model:
                 return field
 
     @classproperty
+    def field_items(cls):
+        # (字段名, 字段实例)元组
+        field_items = getattr(cls, '_field_items', None)
+        if field_items is None:
+            field_items = []
+            for base in cls.__bases__:
+                if base is not Model and issubclass(base, Model):
+                    field_items.extend(base.field_items)
+            field_items.extend(item for item in cls.__dict__.items() if isinstance(item[1], FieldType))
+        return field_items
+
+    @classproperty
     def field_names(cls):
         # 字段名元组
         field_names = getattr(cls, '_field_names', None)
         if field_names is None:
-            field_names = cls._field_names = tuple(name for name, value in cls.__dict__.items()
-                if isinstance(value, FieldType))
+            field_names = tuple(field[0] for field in cls.field_items)
         return field_names
 
     @classproperty
@@ -32,8 +43,7 @@ class Model:
         # 字段实例元组
         fields = getattr(cls, '_fields', None)
         if fields is None:
-            # tuple(cls.field(name) for name in cls.field_names)
-            fields = cls._fields = tuple(value for value in cls.__dict__.values() if isinstance(value, FieldType))
+            fields = tuple(field[1] for field in cls.field_items)
         return fields
 
     @property
