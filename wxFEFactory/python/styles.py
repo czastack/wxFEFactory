@@ -1,7 +1,7 @@
-import fefactory
+from fefactory import Screen
 
 
-screen_width = fefactory.Screen.width
+screen_width = Screen.width
 
 if screen_width <= 1920:
     btn_width = 50

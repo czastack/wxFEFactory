@@ -1,4 +1,3 @@
-#include <pybind11/embed.h>
 #include <wx/imagpng.h>
 #include "types.h"
 #include "myapp.h"
@@ -15,16 +14,16 @@ bool MyApp::OnInit()
 
 	wxImage::AddHandler(new wxPNGHandler);
 
-	SetEnvironmentVariable(L"PYTHONPATH", L"python");
-	m_guard = new pybind11::scoped_interpreter;
-	initPyEnv();
-
+	py_init();
 	return true;
 }
 
 int MyApp::OnExit()
 {
-	destroyPyEnv();
-	delete m_guard;
+	py_exit();
+	if (m_restart_flag)
+	{
+		wxExecute(argv[0]);
+	}
 	return 0;
 }

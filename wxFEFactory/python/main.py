@@ -7,8 +7,7 @@ import pyapi
 import fefactory
 import tools
 from project import Project
-from modules import modules
-# from fe.ferom import FeRomRW
+# from modules import modules
 from lib import ui, extypes
 from lib.win32.keys import WXK
 
@@ -23,12 +22,14 @@ ToolTreeItem = extypes.DataClass("ToolTreeItem", ("module", "label", "package", 
 
 
 class MainFrame:
-    def __init__(self, start_option=None):
+    def __init__(self):
         self.weak = extypes.WeakBinder(self)
         self.opened_tools = []
         self.opened_tools_map = {}
+        self.toolbar_items = __main__.app.getconfig('toolbar_items') or []
         self.render()
 
+        start_option = __main__.app.start_option
         if start_option:
             size = start_option.get('size', None)
             if size:
@@ -36,6 +37,9 @@ class MainFrame:
             position = start_option.get('position', None)
             if position:
                 self.win.Move(*position)
+            toolname = start_option.get('open_tool')
+            if toolname:
+                self.open_tool_by_name(toolname)
 
         if getattr(__main__.app, 'project', None):
             self.on_open_project(__main__.app.project)
@@ -54,7 +58,6 @@ class MainFrame:
                     if __main__.app.config['recent_project']:
                         ui.MenuItem("清除列表", onselect=weak.clear_recent_project, sep=True)
                 ui.MenuItem("打开工程所在文件夹", onselect=weak.open_project_dir)
-                # ui.MenuItem("从ROM中读取内容\tCtrl+Shift+R", "打开火纹的rom读取对应的资源", onselect=weak.read_from_rom)
                 ui.MenuItem("重启\tCtrl+R", onselect=weak.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=weak.close_window)
             with ui.Menu("视图"):
@@ -108,34 +111,34 @@ class MainFrame:
         # self.console.set_on_file_drop(self.weak.on_console_file_drop)
         self.console_input_multi.set_on_keydown(self.weak.on_console_input_multi_key)
 
-    @property
-    def module_names(self):
-        return (module[0] for module in modules)
+    # @property
+    # def module_names(self):
+    #     return (module[0] for module in modules)
 
     @property
     def tool_names(self):
         return (f'{t[1]}: {t[0]}' for t in tools.tools)
 
-    def get_module(self, name):
-        module = __import__('modules.' + name, fromlist=['main']).main
-        return module.Module
+    # def get_module(self, name):
+    #     module = __import__('modules.' + name, fromlist=['main']).main
+    #     return module.Module
 
     def get_tool(self, name):
         name = name.__name__ if isinstance(name, types.ModuleType) else 'tools.' + name
         module = __import__(name, fromlist=['main']).main
         return module.Main
 
-    def on_nav(self, listbox):
-        """左边导航切换模块"""
-        name = modules[listbox.index][1]
-        try:
-            Module = self.get_module(name)
-            module = Module()
-            module.attach(self)
-            __main__.module = module
-        except Exception:
-            print('加载模块%s失败' % name)
-            traceback.print_exc()
+    # def on_nav(self, listbox):
+    #     """左边导航切换模块"""
+    #     name = modules[listbox.index][1]
+    #     try:
+    #         Module = self.get_module(name)
+    #         module = Module()
+    #         module.attach(self)
+    #         __main__.module = module
+    #     except Exception:
+    #         print('加载模块%s失败' % name)
+    #         traceback.print_exc()
 
     def onclose(self, *args):
         if self.book.close_all_page():
@@ -149,18 +152,21 @@ class MainFrame:
     def close_window(self, _=None):
         self.win.Close()
 
-    def restart(self, _=None, callback=None):
+    def restart(self, _=None, extra_option=None):
         """重启"""
         size = self.win.size
         position = self.win.position
+        start_option = {"size": size, "position": position}
+        if extra_option:
+            start_option.update(extra_option)
+        fefactory.restart(start_option)
         self.close_window()
-        fefactory.reload({"size": size, "position": position}, callback, True)
 
     def render_toolbar(self, toolbar):
         """渲染快捷工具栏"""
         bitmap = ui.wx.Bitmap()
         listener = self.weak.on_toolbar_tool_click
-        for name, module in tools.toolbar_tools:
+        for name, module in self.toolbar_items:
             icon = ui.wx.Icon('python/tools/%s/icon.ico' % module.replace('.', '/'), ui.wx.BITMAP_TYPE_ICO)
             bitmap.CopyFromIcon(icon)
             toolitem = toolbar.AddTool(ui.wx.ID_ANY, name, bitmap, name)
@@ -170,7 +176,7 @@ class MainFrame:
 
     def on_toolbar_tool_click(self, toolbar, toolid):
         """快捷工具栏点击处理"""
-        self.open_tool_by_name(tools.toolbar_tools[toolbar.GetToolPos(toolid)][1])
+        self.open_tool_by_name(self.toolbar_items[toolbar.GetToolPos(toolid)][1])
 
     def toggle_console(self, menu):
         """显示/隐藏控制台"""
@@ -270,27 +276,6 @@ class MainFrame:
             elif code == WXK.L:
                 self.console_output.Clear()
                 return True
-
-    # def read_from_rom(self, menu):
-    #     rom = pyapi.choose_file("选择火纹的Rom", wildcard='*.gba|*.gba')
-    #     if not rom:
-    #         return
-    #     reader = FeRomRW(rom)
-    #     if not reader.closed:
-    #         print(reader.get_rom_title())
-    #         dialog = exui.ListDialog("选择执行导入的模块", listbox={'choices': self.module_names})
-    #         if dialog.ShowModal():
-    #             for i in dialog.listbox.GetCheckedItems():
-    #                 name = modules[i][1]
-    #                 try:
-    #                     Module = self.get_module(name)
-    #                     module = Module()
-    #                     module.attach()
-    #                     module.read_from(reader)
-
-    #                 except Exception:
-    #                     print('加载模块%s失败' % name)
-    #                     traceback.print_exc()
 
     def open_tool(self, menu):
         """打开工具菜单"""
@@ -401,12 +386,8 @@ styles = {
 
 
 def main():
-    start_option = getattr(__main__, 'start_option', __main__.app.start_option)
-    frame = MainFrame(start_option)
+    frame = MainFrame()
     __main__.frame = frame
     __main__.win = frame.win
     __main__.pyapi = pyapi
     __main__.copy = pyapi.set_clipboard
-
-# if __name__ == 'main':
-#     main()

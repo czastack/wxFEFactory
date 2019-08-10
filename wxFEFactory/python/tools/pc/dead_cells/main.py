@@ -139,7 +139,7 @@ class Main(AssemblyHacktool):
             AssemblyItem('kill_keep', '无伤击杀数保持', b'\x89\x48\x50\x8B\x55\x08\x8B\x42\x48',
                 0x0C000000, 0x0FFF0000, b'\x90\x90\x90', replace_len=3),
             AssemblyItem('boss_kill', 'BOSS快速杀死', b'\x8B\x4D\x08\x89\x81\xE8\x00\x00\x00\xE9',
-                0x0B000000, 0x0FFF0000, b'', b'\x8B\x4D\x08\xB8\x00\x00\x00\x00\x89\x81\xE8\x00\x00\x00',
+                0x0C000FF0, 0x0FFF0000, b'', b'\x8B\x4D\x08\xB8\x00\x00\x00\x00\x89\x81\xE8\x00\x00\x00',
                 inserted=True, replace_len=9),
             AssemblyItem('yellow_count', '金币数量', b'\x03\x45\x0C\x89\x45\xF8\x89\x42\x34',
                 0x0C000000, 0x0FFF0000, b'', b'\x89\x45\xF8\xB8\x3F\x42\x0F\x00\x89\x42\x34',

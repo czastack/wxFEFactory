@@ -1,4 +1,5 @@
 import json
+import traceback
 import pyapi
 import __main__
 from lib.utils import HistoryList
@@ -22,7 +23,7 @@ class Application(Configurable):
             config['recent_project'] = HistoryList(maxsize=history_size)
             self.project = None
 
-        self.start_option = self.getconfig('start_option')
+        self.start_option = self.load_temp_start_option() or self.getconfig('start_option')
 
     def project_confirm(self):
         if not self.project:
@@ -40,6 +41,20 @@ class Application(Configurable):
             if not name.startswith('__'):
                 delattr(__main__, name)
 
+    def load_temp_start_option(self):
+        data = None
+        try:
+            with open('config/start_option.json', 'r+') as file:
+                data = json.load(file)
+                file.seek(0)
+                file.truncate()
+                file.write('null')
+        except FileNotFoundError:
+            pass
+        except Exception:
+            traceback.print_exc()
+        return data
 
-__main__.app = Application()
-pyapi.set_on_exit(__main__.app.on_exit)
+    def save_temp_start_option(self, start_option):
+        with open('config/start_option.json', 'w') as file:
+            json.dump(start_option, file)

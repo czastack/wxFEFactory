@@ -14,11 +14,18 @@
 #endif
 
 ConsoleHandler console;
-pyobj onAppExit;
+pybind11::scoped_interpreter* g_interpreter = nullptr;
+pyobj on_app_exit;
 
 void set_on_exit(pycref fn)
 {
-	onAppExit = fn;
+	on_app_exit = fn;
+}
+
+void restart()
+{
+	auto& app = wxGetApp();
+	app.SetRestartFlag(true);
 }
 
 
@@ -39,6 +46,7 @@ PYBIND11_EMBEDDED_MODULE(pyapi, m) {
 		.def("mem_write", mem_write, "address"_a, "value"_a, "size"_a)
 		.def("get_bit", get_bit)
 		.def("object_from_id", object_from_id)
+		.def("restart", restart)
 
 		.def("GlobalAddAtom", GlobalAddAtom)
 		.def("GlobalGetAtomName", GlobalGetAtomName)
@@ -52,8 +60,10 @@ PYBIND11_EMBEDDED_MODULE(pyapi, m) {
 #endif
 }
 
-void initPyEnv()
+void py_init()
 {
+	SetEnvironmentVariable(L"PYTHONPATH", L"python");
+	g_interpreter = new pybind11::scoped_interpreter;
 	py::module::import("pyapi");
 	auto &app = wxGetApp();
 	auto &args = app.argv.GetArguments();
@@ -76,11 +86,14 @@ void initPyEnv()
 	}
 }
 
-void destroyPyEnv()
+void py_exit()
 {
-	if (onAppExit)
+	if (on_app_exit)
 	{
-		PyCall(onAppExit);
-		onAppExit = None;
+		PyCall(on_app_exit);
+		on_app_exit = None;
 	}
+
+	delete g_interpreter;
+	g_interpreter = nullptr;
 }

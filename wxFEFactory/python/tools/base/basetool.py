@@ -69,12 +69,9 @@ class BaseTool(BaseScene):
         return module[module.find('.') + 1: module.rfind('.')]
 
     def reload(self, _=None):
-        name = self.module_name
 
         def close_callback():
-            def callback():
-                __main__.frame.open_tool_by_name(name)
-            __main__.frame.restart(callback=callback)
+            __main__.frame.restart(extra_option={'open_tool': self.module_name})
 
         if self.nested:
             # 主窗口的onclose里会先关闭所有未关闭子窗口

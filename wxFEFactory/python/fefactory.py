@@ -1,44 +1,18 @@
-import pyapi
 import json
 import os
 import sys
 import traceback
-import application
 import __main__
-from modules import modules
+import pyapi
+from application import Application
 from functools import partial
 from lib.ui import wx
 
 
-def reload(start_option=None, callback=None, clear=False):
+def restart(start_option=None):
     """重新加载程序"""
-    if clear:
-        for name in dir(__main__):
-            if not name.startswith('__'):
-                delattr(__main__, name)
-
-        # 重新加载相关模块
-        pydir = os.path.dirname(__file__)
-        for name in list(sys.modules):
-            file = getattr(sys.modules[name], '__file__', None)
-            if file is None:
-                file = getattr(sys.modules[name], '__path__', None)
-                if file is not None:
-                    file = file._path[0]
-                else:
-                    continue
-            if file.startswith(pydir):
-                del sys.modules[name]
-
-    if start_option:
-        __main__.start_option = start_option
-
-    module = __import__(__name__)
-    if not clear:
-        module.main()
-
-    if callback:
-        callback()
+    __main__.app.save_temp_start_option(start_option)
+    pyapi.restart()
 
 
 def executable_file():
@@ -112,6 +86,9 @@ def main():
     pyapi.alert = alert
     pyapi.confirm_yes = confirm_yes
     __builtins__['input'] = partial(pyapi.input, '输入')
+
+    __main__.app = Application()
+    pyapi.set_on_exit(__main__.app.on_exit)
 
     import main
     main.main()

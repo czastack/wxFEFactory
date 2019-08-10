@@ -1,4 +1,5 @@
 import json
+import traceback
 from abc import ABC, abstractmethod
 
 
@@ -48,14 +49,17 @@ class Configurable(ABC):
 
     def loadconfig(self):
         try:
-            with open(self.config_file) as file:
+            with open(self.config_file, encoding='utf-8') as file:
                 self.config = json.load(file)
+        except FileNotFoundError:
+            self.config = {}
         except Exception:
+            traceback.print_exc()
             self.config = {}
 
     def writeconfig(self):
         if self.config_changed:
-            with open(self.config_file, 'w') as file:
+            with open(self.config_file, 'w', encoding='utf-8') as file:
                 json.dump(self.config, file)
             self.config_changed = False
 
