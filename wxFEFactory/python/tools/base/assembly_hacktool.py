@@ -10,6 +10,7 @@ from .assembly_code import AssemblyGroup
 class AssemblyHacktool(BaseHackTool):
     """现在支持x86 jmp"""
     allocated_memory = None
+    allocated_size = 2048
 
     def __init__(self):
         super().__init__()
@@ -69,7 +70,8 @@ class AssemblyHacktool(BaseHackTool):
     def insure_memory(self):
         if self.allocated_memory is None:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
-            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(2048, protect=0x40)
+            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(
+                self.allocated_size, protect=0x40)
             self.registed_assembly = {}
             self.registed_variable = {}
 
@@ -190,6 +192,10 @@ class AssemblyHacktool(BaseHackTool):
                 if memory == self.next_usable_memory:
                     self.next_usable_memory += utils.align_4(len(assembly))
                 self.handler.write(memory, assembly)
+            else:
+                # 仅替换
+                if replace_len > len(replace):
+                    replace += b'\x90' * (replace_len - len(replace))
 
             data = self.registed_assembly[item.key] = {'active': True, 'addr': addr, 'original': original,
                 'replace': replace, 'memory': memory}
@@ -232,10 +238,10 @@ class AssemblyHacktool(BaseHackTool):
         if temp is None:
             if variable.addr:
                 variable = variable.clone()
-            align = variable.align or variable.size
+            align = variable.align
             variable.addr = utils.align_size(self.next_usable_memory, align)
             self.registed_variable[variable.name] = variable
-            self.next_usable_memory += utils.align_size(variable.size, align)
+            self.next_usable_memory = variable.addr + utils.align_size(variable.size, align)
         else:
             variable = temp
         if variable.value is not 0:
@@ -366,4 +372,4 @@ AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
 SimpleButton = DataClass('SimpleButton', ('key', 'label', 'onclick'))
 
 VariableType = DataClass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
-    defaults={'size': 4, 'type': int, 'value': 0})
+    defaults={'size': 4, 'type': int, 'value': 0, 'align': 4})

@@ -37,7 +37,7 @@ void UiModule::init_aui()
 		.def_readwrite("dock_proportion", &wxAuiPaneInfo::dock_proportion) */
 		;
 
-	py::class_<wxAuiManager>(ui, "AuiManager")
+	py::class_<wxAuiManager, wxEvtHandler>(ui, "AuiManager")
 		.def(py::init<wxWindow*, unsigned int>(),
 			"managedWnd"_a = NULL, "flags"_a = (long)wxAUI_MGR_DEFAULT)
 		.def("UnInit", &wxAuiManager::UnInit)

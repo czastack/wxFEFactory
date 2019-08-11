@@ -224,7 +224,7 @@ void UiModule::init_ui()
 		}, "host"_a);
 
 
-	py::class_<wxApp>(ui, "App")
+	py::class_<wxApp, wxEvtHandler>(ui, "App")
 		.def("GetTopWindow", &wxApp::GetTopWindow, py::return_value_policy::reference_internal);
 
 

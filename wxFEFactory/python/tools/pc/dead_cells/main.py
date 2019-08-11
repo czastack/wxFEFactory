@@ -153,8 +153,7 @@ class Main(AssemblyHacktool):
         ))
 
     def render_hotkeys(self):
-        ui.Text("Capslock: 必杀槽满\n"
-            "h: 血量满\n")
+        ui.Text("h: 血量满\n")
 
     def get_hotkeys(self):
         return (

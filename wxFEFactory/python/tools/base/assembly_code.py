@@ -134,3 +134,11 @@ class Origin(AssemblyNode):
 
 
 ORIGIN = Origin()
+
+
+def insert_before(data):
+    return AssemblyGroup(data, ORIGIN)
+
+
+def insert_after(data):
+    return AssemblyGroup(ORIGIN, data)
