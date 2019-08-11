@@ -5,7 +5,7 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, Cmp, insert_before
+from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, Offset, Cmp, ORIGIN
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
 )
@@ -38,6 +38,7 @@ class Main(AssemblyHacktool):
         Title('游戏版本: 1.1')
         ModelInput('money')
         ModelInput('exp')
+        ModelInput('exp_mult', '多倍经验', instance=self.variable_model)
 
     def render_game(self):
         for name in models.Game.field_names:
@@ -95,6 +96,9 @@ class Main(AssemblyHacktool):
                 b'\x00', replace_offset=6, replace_len=1),
             AssemblyItem('easy_kill', '容易击杀', b'\x4D\x8B\xC7\x8B\xD3\xFF\xC9',
                 0x002F5200, delta, b'', b'\x4D\x8B\xC7\xBA\x40\x54\x89\x00\xFF\xC9', inserted=True),
+            AssemblyItem('exp_mult', '多倍经验', b'\x03\xCF\xB8\x7F\x96\x98\x00',
+                0x00596000, delta, b'', AssemblyGroup(b'\x0F\xAF\x3D', Offset('exp_mult'), ORIGIN), inserted=True,
+                args=(VariableType('exp_mult', value=2),)),
         ))
 
     def render_hotkeys(self):

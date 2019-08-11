@@ -135,7 +135,7 @@ class AssemblyHacktool(BaseHackTool):
 
             if item.inserted:
                 available_len = original_len - len(replace)  # 可用于跳转到插入的代码的jmp指令的长度
-                # 使用参数(暂时支持4字节)
+                # 使用参数(暂时支持32位地址)
                 if item.args:
                     memory_conflict = memory == self.next_usable_memory
                     if isinstance(assembly, AssemblyGroup):
@@ -150,16 +150,20 @@ class AssemblyHacktool(BaseHackTool):
                         memory = self.next_usable_memory
 
                 # 动态生成机器码
-                if isinstance(assembly, AssemblyGroup):
-                    assembly = assembly.generate(self, types.SimpleNamespace(
-                        item=item, original_addr=addr, original=original, addr=memory,
-                    ))
+                # 因为根据情况，addr可能会变
+                def gan_assembly(assembly):
+                    if isinstance(assembly, AssemblyGroup):
+                        return assembly.generate(self, types.SimpleNamespace(
+                            item=item, original_addr=addr, original=original, addr=memory,
+                        ))
+                    return assembly
 
                 jmp_offset = memory - (addr + 5)
                 if abs(jmp_offset) < 0x7FFFFFFF or self.is32process:
                     # E9 relative address
                     # 计算jump地址, 5是jmp opcode的长度
                     jmp_len = 5
+                    assembly = gan_assembly(assembly)
                     diff_new = utils.u32(jmp_offset)
                     diff_back = utils.u32(addr + original_len - (memory + len(assembly) + 5))
                     replace += replace + b'\xE9' + diff_new.to_bytes(4, 'little')
@@ -181,6 +185,7 @@ class AssemblyHacktool(BaseHackTool):
                     else:
                         raise ValueError('不支持当前情况jmp')
 
+                    assembly = gan_assembly(assembly)
                     assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + original_len).to_bytes(8, 'little')
 
                 if available_len < jmp_len:

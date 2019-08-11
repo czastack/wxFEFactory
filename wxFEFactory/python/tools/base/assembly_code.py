@@ -77,7 +77,7 @@ class Cmp(AssemblyNode):
 
 
 class Dec(AssemblyNode):
-    """相减节点"""
+    """自减节点"""
     def __init__(self, target):
         self.target = target
 

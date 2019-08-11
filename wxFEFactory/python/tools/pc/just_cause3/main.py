@@ -43,7 +43,7 @@ class Main(AssemblyHacktool):
                     AssemblyGroup(
                         b'\x53\x48\x8B\x99\xD0\x01\x00\x00',
                         assembly_code.IfInt64('vehicle_addr',
-                            AssemblyGroup(b'\x48\x89\x1D', assembly_code.Offset('vehicle_addr', 4)),
+                            AssemblyGroup(b'\x48\x89\x1D', assembly_code.Offset('vehicle_addr')),
                             AssemblyGroup(b'\x48\x89\x1C\x25', assembly_code.Variable('vehicle_addr'))
                         ),
                         b'\x48\x85\xDB\x74\x09\x66\xC7\x83\x32\x02\x00\x00\x0F\x27\x5B\x48\x83\xB9\xD0\x01\x00\x00\x00'
@@ -75,7 +75,7 @@ class Main(AssemblyHacktool):
                     AssemblyGroup(
                         b'\x51\x52\x53',
                         assembly_code.IfInt64('rapid_fire_temp',
-                            AssemblyGroup(b'\x4C\x89\x25', assembly_code.Offset('rapid_fire_temp', 4)),
+                            AssemblyGroup(b'\x4C\x89\x25', assembly_code.Offset('rapid_fire_temp')),
                             AssemblyGroup(b'\x4C\x89\x24\x25', assembly_code.Variable('rapid_fire_temp'))
                         ),
                         b'\x41\x8B\x94\x24\x24\x02\x00\x00\x48\x8B\x4E\x60\x48\x81\xC1\x80\x09\x00\x00'
