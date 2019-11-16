@@ -56,7 +56,7 @@ class MainFrame:
                     for path in __main__.app.config['recent_project']:
                         ui.MenuItem(path, onselect=weak.do_open_project)
                     if __main__.app.config['recent_project']:
-                        ui.MenuItem("清除列表", onselect=weak.clear_recent_project, sep=True)
+                        ui.MenuItem("清除列表", onselect=weak.clear_recent_project)
                 ui.MenuItem("打开工程所在文件夹", onselect=weak.open_project_dir)
                 ui.MenuItem("重启\tCtrl+R", onselect=weak.restart)
                 ui.MenuItem("退出\tCtrl+Q", onselect=weak.close_window)
@@ -114,10 +114,6 @@ class MainFrame:
     # @property
     # def module_names(self):
     #     return (module[0] for module in modules)
-
-    @property
-    def tool_names(self):
-        return (f'{t[1]}: {t[0]}' for t in tools.tools)
 
     # def get_module(self, name):
     #     module = __import__('modules.' + name, fromlist=['main']).main
@@ -304,7 +300,7 @@ class MainFrame:
         files = os.listdir(dir_path)
         result = []
         for file in files:
-            if not file.startswith('__') and file.find('.') is -1 and os.path.isdir(os.path.join(dir_path, file)):
+            if not file.startswith('__') and file.find('.') == -1 and os.path.isdir(os.path.join(dir_path, file)):
                 module = __import__(parent.__name__ + '.' + file, fromlist=file)
                 name = getattr(module, 'name', None)
                 if name is not None:

@@ -622,7 +622,7 @@ class BaseSelect(TwoWayWidget):
     def Set(self, choices, values=0):
         self.choices = choices
         self.view.Set(choices)
-        if values is not 0:
+        if values != 0:
             self.values = values
 
     def read(self):
@@ -631,7 +631,7 @@ class BaseSelect(TwoWayWidget):
     @property
     def input_value(self):
         index = self.view.index
-        if index is -1:
+        if index == -1:
             return None
         return self.values[index] if self.values else index
 
@@ -647,16 +647,16 @@ class BaseSelect(TwoWayWidget):
             self.onselect(self.view)
 
     @lazy.classlazy
-    def contextmenu(cls):
+    def contextmenu(self):
         """右键菜单"""
         with ui.ContextMenu() as contextmenu:
-            ui.MenuItem("搜索(&S)", onselect=cls.menu_search)
-            ui.MenuItem("拖拽帮助", onselect=cls.move_about)
+            ui.MenuItem("搜索(&S)", onselect=self.menu_search)
+            ui.MenuItem("拖拽帮助", onselect=self.move_about)
         return contextmenu
 
     @lazy.classlazy
-    def search_dialog(cls):
-        return ui.dialog.SearchDialog("搜索", onselect=cls.onsearch_select, onsearch=cls.onsearch)
+    def search_dialog(self):
+        return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=cls.onsearch)
 
     @classmethod
     def menu_search(cls, view, menu):
@@ -741,7 +741,7 @@ class BaseSelect(TwoWayWidget):
             return self
 
         def __exit__(self, exc_type, exc_value, traceback):
-            ui.wx.Choice.end_cache()
+            ui.wx.end_cache()
 
     choices_cache = CacheContex()
 
@@ -775,7 +775,7 @@ class BaseChoiceDisplay(Widget):
 
     def Set(self, choices, values=0):
         self.choices = choices
-        if values is not 0:
+        if values != 0:
             self.values = values
 
     def read(self):
@@ -791,7 +791,7 @@ class BaseChoiceDisplay(Widget):
             index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
         except ValueError:
             index = -1
-        self.view.value = self.choices[index] if index is not -1 else ''
+        self.view.value = self.choices[index] if index != -1 else ''
 
 
 class ChoiceDisplay(OffsetsWidget, BaseChoiceDisplay):

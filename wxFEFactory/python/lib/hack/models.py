@@ -19,31 +19,31 @@ class Model:
                 return field
 
     @classproperty
-    def field_items(cls):
+    def field_items(self):
         # (字段名, 字段实例)元组
-        field_items = getattr(cls, '_field_items', None)
+        field_items = getattr(self, '_field_items', None)
         if field_items is None:
             field_items = []
-            for base in cls.__bases__:
+            for base in self.__bases__:
                 if base is not Model and issubclass(base, Model):
                     field_items.extend(base.field_items)
-            field_items.extend(item for item in cls.__dict__.items() if isinstance(item[1], FieldType))
+            field_items.extend(item for item in self.__dict__.items() if isinstance(item[1], FieldType))
         return field_items
 
     @classproperty
-    def field_names(cls):
+    def field_names(self):
         # 字段名元组
-        field_names = getattr(cls, '_field_names', None)
+        field_names = getattr(self, '_field_names', None)
         if field_names is None:
-            field_names = tuple(field[0] for field in cls.field_items)
+            field_names = tuple(field[0] for field in self.field_items)
         return field_names
 
     @classproperty
-    def fields(cls):
+    def fields(self):
         # 字段实例元组
-        fields = getattr(cls, '_fields', None)
+        fields = getattr(self, '_fields', None)
         if fields is None:
-            fields = tuple(field[1] for field in cls.field_items)
+            fields = tuple(field[1] for field in self.field_items)
         return fields
 
     @property
@@ -132,7 +132,7 @@ class Model:
     def __getitem__(self, attrs):
         # 获取一个或多个字段的值
         if isinstance(attrs, str):
-            return getattr(self, attr)
+            return getattr(self, attrs)
         else:
             return (getattr(self, attr) for attr in attrs)
 
@@ -217,7 +217,7 @@ class Model:
                     else:
                         prev = item
                         item = getattr(item, attr)
-                        if item is None or item is 0:
+                        if item is None or item == 0:
                             break
                 i += 1
             return result
@@ -374,7 +374,7 @@ class PtrField(Field):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        if self.size is 0:
+        if self.size == 0:
             # 对于ProcessHandler，根据目标进程获取指针大小
             self.size = instance.handler.ptr_size
         return instance.handler.read_uint(self.get_addr(instance), self.size)
@@ -511,7 +511,7 @@ class ModelPtrField(Cachable, PtrField):
 class ManagedModelPtrField(ModelPtrField):
     """托管模型指针字段"""
     def create_cache(self, instance):
-        return self.model_t(super().__get__(instance, owner), instance.context)
+        return self.model_t(super().__get__(instance, None), instance.context)
 
 
 class ModelField(Cachable, Field):
@@ -607,7 +607,7 @@ class CoordData:
             for i, it in enumerate(value):
                 self[i] += it
         else:
-            for i in range(self.len):
+            for i in range(self.owner.len):
                 self[i] += value
         return self
 
@@ -616,7 +616,7 @@ class CoordData:
             for i, it in enumerate(value):
                 self[i] *= it
         else:
-            for i in range(self.len):
+            for i in range(self.owner.len):
                 self[i] *= value
         return self
 
@@ -688,7 +688,8 @@ class ArrayField(Cachable, Field):
                 data[i] = item
 
     def __str__(self):
-        return "{}(offset={}, length={}, field)".format(self.__class__.__name__, self.offset, self.length, self.field)
+        return "{}(offset={}, length={}, field={})".format(
+            self.__class__.__name__, self.offset, self.length, self.field)
 
     __repr__ = __str__
 
@@ -698,7 +699,7 @@ class ArrayData:
     def __init__(self, owner, instance):
         self.owner = owner
         self.instance = instance
-        if owner.field.size is 0:
+        if owner.field.size == 0:
             # 传入了延迟设置size的field
             owner.field.__get__(instance)
 
@@ -865,13 +866,13 @@ def test_comlex_attr(text):
     """
     it = COMLEX_ATTR_MAP.get(text, None)
     if it is None:
-        if text.find('.') is not -1:
+        if text.find('.') != -1:
             attrs = []
             offsets = None
             args = text.split('.')
             i = 0
             for arg in args:
-                if arg.find('+') is not -1:
+                if arg.find('+') != -1:
                     arg, offset = arg.split('+')
                     arg = int(arg)
                     if offsets is None:

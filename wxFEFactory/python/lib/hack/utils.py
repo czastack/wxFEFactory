@@ -150,7 +150,7 @@ def int_of_size(n, size=0, exp=True):
     """
     bitlen = n.bit_length()
     origin_size = math.ceil(bitlen / 8)
-    if size is 0:
+    if size == 0:
         size = (ceil_exp(bitlen) >> 3) if exp else origin_size
     elif size < origin_size:
         n &= (1 << (size << 3)) - 1
@@ -222,9 +222,9 @@ def iter_signature(signature):
         else:
             fmt = chr(ch)
 
-        if repeat is 0:
+        if repeat == 0:
             repeat = 1
 
-        for i in range(repeat):
+        for _ in range(repeat):
             yield fmt
         repeat = 0

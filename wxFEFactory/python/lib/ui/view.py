@@ -388,16 +388,18 @@ class View:
             self.contextmenu.onselect(self, event.GetId())
 
     def set_on_file_drop(self, fn):
-        self.SetDropTarget(FileDropListener(fn))
-
-    def set_on_text_drop(self, fn):
-        self.SetDropTarget(TextDropListener(fn))
-
-    def start_text_drop(fn):
+        # self.SetDropTarget(FileDropListener(fn))
         pass
 
-    def set_on_destroy(fn):
-        bind_event(wx.EVT_DESTROY, fn)
+    def set_on_text_drop(self, fn):
+        # self.SetDropTarget(TextDropListener(fn))
+        pass
+
+    def start_text_drop(self, fn):
+        pass
+
+    def set_on_destroy(self, fn):
+        self.bind_event(wx.EVT_DESTROY, fn)
 
     class Here:
         """立即渲染"""

@@ -42,6 +42,6 @@ class BaseScene:
         如果打开了多个实例，会在标题后添加序号
         """
         title = self.title
-        if self.index is not 0:
+        if self.index != 0:
             title += str(self.index + 1)
         return title

@@ -57,15 +57,15 @@ class BaseTool(BaseScene):
         close_callbacks.append(callback)
 
     @lazy.classlazy
-    def title(cls):
+    def title(self):
         """获取原始标题，显示在标签页标题和菜单栏"""
-        module = cls.__module__
+        module = self.__module__
         return __import__(module[:module.rfind('.')], fromlist='__init__').name
 
     @lazy.classlazy
-    def module_name(cls):
+    def module_name(self):
         """模块名称，即模块文件夹名"""
-        module = cls.__module__
+        module = self.__module__
         return module[module.find('.') + 1: module.rfind('.')]
 
     def reload(self, _=None):
@@ -100,7 +100,7 @@ class BaseTool(BaseScene):
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
         if self.nested:
-            if event and event.GetId() is not 0:
+            if event and event.GetId() != 0:
                 # 第一种情况阻止关闭
                 alert('请通过菜单过Tab上的关闭按钮关闭')
                 return False
