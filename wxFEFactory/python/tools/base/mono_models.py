@@ -20,7 +20,8 @@ class MonoClass(MonoType):
 
     def __init_subclass__(cls):
         super().__init_subclass__()
-        if not getattr(cls, '__abstract__', False):
+        cls.__dict__.setdefault('__abstract__', False)
+        if not cls.__dict__['__abstract__']:
             if cls.name is None:
                 cls.name = cls.__name__
                 if cls.namepath is not None:

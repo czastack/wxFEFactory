@@ -6,8 +6,9 @@ class FormMeta(type):
     SLOTS = ()
 
     def __new__(class_, name, bases, attrs):
-        # 排除抽象类:
-        if not attrs.get('__abstract__', False):
+        # 排除抽象类
+        attrs.setdefault('__abstract__', False)
+        if not attrs['__abstract__']:
             # 获取所有的Field
 
             base_fields = []
