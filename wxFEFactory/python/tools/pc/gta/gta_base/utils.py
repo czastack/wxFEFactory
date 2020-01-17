@@ -149,7 +149,7 @@ class Vector3(Vector):
 
     def __init__(self, values=(0.0, 0.0, 0.0)):
         Vector.__init__(self, values)
-        if self.len is not 3:
+        if self.len != 3:
             raise ValueError('Vector3 need 3 element values')
 
     get_vetical_xy = Vector2.get_vetical_xy
@@ -159,7 +159,7 @@ class Quaternion(Vector3):
     w = Vector.Item(3)
 
     def __init__(self, values=(0.0, 0.0, 0.0, 0.0)):
-        if len(values) is not 4:
+        if len(values) != 4:
             raise ValueError('Quaternion need 4 element values')
         Vector.__init__(self, values)
 

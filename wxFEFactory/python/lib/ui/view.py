@@ -43,7 +43,7 @@ class View:
         if wxparams is None:
             wxparams = {}
         wxparams.update(id=id, pos=pos, size=size)
-        if wxstyle is not 0:
+        if wxstyle != 0:
             wxparams['style'] = wxstyle
         if class_ is not None:
             class_ = class_.split()
@@ -234,7 +234,7 @@ class View:
         # 尺寸
         width = style.get('width', -1)
         height = style.get('height', -1)
-        if width is not -1 or height is not -1:
+        if width != -1 or height != -1:
             self.wxparams['size'] = wx.Size(width, height)
         return style
 
@@ -430,7 +430,7 @@ class Layout(View):
         else:
             i = len(self.LAYOUTS) - 1
             # 加上父控件的样式列表
-            while i is not -1:
+            while i != -1:
                 styles = self.LAYOUTS[i].styles
                 if styles is not None:
                     if isinstance(styles, list):

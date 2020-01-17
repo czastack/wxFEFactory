@@ -103,7 +103,7 @@ class AssemblyHacktool(BaseHackTool):
             replace_offset = item.replace_offset
 
             addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.ordinal, item.fuzzy)
-            if addr is -1:
+            if addr == -1:
                 print('找不到地址: ', item.key)
                 return
 
@@ -111,7 +111,7 @@ class AssemblyHacktool(BaseHackTool):
             original_len = len(original)
             read_original = False  # 是否需要通过handler读取最新的original
             if replace_offset:
-                if replace_len is 0:
+                if replace_len == 0:
                     if 0 < replace_offset < original_len:
                         replace_len = original_len - replace_offset
                     else:
@@ -249,7 +249,7 @@ class AssemblyHacktool(BaseHackTool):
             self.next_usable_memory = variable.addr + utils.align_size(variable.size, align)
         else:
             variable = temp
-        if variable.value is not 0:
+        if variable.value != 0:
             self.handler.write(variable.addr, variable.value, variable.size)
         return variable
 

@@ -451,14 +451,14 @@ class Main(BaseGTA3_VC_SA_Tool):
             color = blip.color
             if blip.bright:
                 color -= 7
-            if color is 0:
+            if color == 0:
                 yield blip.entity
 
     def get_friends(self):
         """获取蓝色标记的peds"""
         for blip in self.get_target_blips():
             color = blip.color
-            if color is 7 and not blip.bright:
+            if color == 7 and not blip.bright:
                 yield blip.entity
 
     def add_bullet(self, creator, weaponType, coord, velocity):

@@ -359,7 +359,7 @@ class Main(BaseGTATool):
     # def get_native_addr(self, name):
     #     """根据脚本名称获取装载后原生函数地址"""
     #     addr = address.NATIVE_ADDRS.get(name, 0)
-    #     if addr is 0:
+    #     if addr == 0:
     #         # 获取原生函数地址
     #         hash = address.NATIVE_HASH[name]
     #         registration = self.NativeRegistration(self.handler.read64(
@@ -1032,7 +1032,7 @@ class Main(BaseGTATool):
         from .datasets.vehicle_models import VEHICLE_MODELS
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.get_page(page_index).index
-        if item_index is not -1:
+        if item_index != -1:
             model_name = VEHICLE_MODELS[page_index][1][item_index][1]
             if isinstance(model_name, int):
                 return model_name
@@ -1248,7 +1248,7 @@ class Main(BaseGTATool):
             if p.handle:
                 coord1 = Vector3(p.coord)
                 coord0 = (coord + coord1) * 0.5
-                if count is 1:
+                if count == 1:
                     self.shoot_between(coord0, coord1, damage, weapon, ped, speed, False)
                 else:
                     if rot is None:
@@ -1333,7 +1333,7 @@ class Main(BaseGTATool):
         from .datasets.player_models import PLAYER_MODELS
         page_index = self.player_model_book.index
         item_index = self.player_model_book.get_page(page_index).index
-        if item_index is not -1:
+        if item_index != -1:
             model_name = PLAYER_MODELS[page_index][1][item_index][1]
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
@@ -1354,7 +1354,7 @@ class Main(BaseGTATool):
         from .datasets.object_models import OBJECT_MODELS
         page_index = self.object_model_book.index
         item_index = self.object_model_book.get_page(page_index).index
-        if item_index is not -1:
+        if item_index != -1:
             model_name = OBJECT_MODELS[page_index][1][item_index][1]
             return self.get_cache('object_model', model_name, self.get_hash_key)
 
@@ -1548,7 +1548,7 @@ class Main(BaseGTATool):
     def get_selected_weapon_component(self):
         page_index = self.weapon_component_book.index
         item_index = self.weapon_component_book.get_page(page_index).index
-        if item_index is not -1:
+        if item_index != -1:
             data = self.weapon_components[page_index]
             weapon_hash = data[2]
             component_hash = data[1][item_index][1]

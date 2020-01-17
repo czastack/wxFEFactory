@@ -147,7 +147,7 @@ class Module(BaseListBoxModuel):
             addr = reader.read32(ptr)
             high = (addr >> 24) & 0xF
 
-            if not (high is 8 or high is 9):
+            if not (high == 8 or high == 9):
                 # 读取结束
                 break
 

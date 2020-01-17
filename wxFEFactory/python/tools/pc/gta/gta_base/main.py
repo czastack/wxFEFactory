@@ -31,7 +31,7 @@ class BaseGTATool(NativeHacktool):
 
     def _player(self):
         player_addr = self.handler.read32(self.address.PLAYER_PTR)
-        if player_addr is 0:
+        if player_addr == 0:
             return None
         player = getattr(self, '_player_ins', None)
         if not player:
@@ -498,7 +498,7 @@ class BaseGTATool(NativeHacktool):
             types = (Marker.MARKER_TYPE_CAR, Marker.MARKER_TYPE_PED, Marker.MARKER_TYPE_COORDS)
 
         for blip in self.get_blips(color, types):
-            if blip.sprite is 0:
+            if blip.sprite == 0:
                 if self.teleport_to_blip(blip):
                     break
 

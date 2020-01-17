@@ -26,7 +26,7 @@ class ItemInfo(LookAfterModel):
     str_addition = BitsField(0x1A, 1, 4, 4, label="强度改造级别")
 
     def set_field(self, name, value):
-        if self.addr is 0:
+        if self.addr == 0:
             print("目标为空，无法设置")
         else:
             return super().set_field(name, value)

@@ -35,7 +35,7 @@ class Dictionary:
 
     def get_code(self, ch):
         code = self._char_code.get(ord(ch), 0)
-        if code is 0 and self.use_ascii:
+        if code == 0 and self.use_ascii:
             temp = ord(ch)
             if 0x20 <= temp < 0x7f:
                 code = temp
@@ -112,7 +112,7 @@ class Dictionary:
                     return ''.join(words)
                 result.append((offset, ''.join(words)))
 
-            if len(result) is 0 and one:
+            if len(result) == 0 and one:
                 result = ''
             elif one:
                 return result[0][1]
@@ -165,7 +165,7 @@ class Dictionary:
         """不支持控制码"""
         def get_code(ch):
             code = self._char_code.get(ord(ch), 0x00)
-            if code is 0:
+            if code == 0:
                 print("warning: %s不在码表中" % ch)
             return code
 
@@ -266,9 +266,9 @@ class CtrlCode:
 
     def decode(self, data, i):
         """解码"""
-        if self.argc is 0:
+        if self.argc == 0:
             return self.fmt, i
-        if self.argc is 1:
+        if self.argc == 1:
             i += 1
             return self.fmt % data[i], i
         else:
@@ -278,9 +278,9 @@ class CtrlCode:
         """解码迭代器
         :param it: 类byte迭代器
         """
-        if self.argc is 0:
+        if self.argc == 0:
             return self.fmt
-        if self.argc is 1:
+        if self.argc == 1:
             return self.fmt % next(it)
         else:
             return self.fmt % tuple(next(it) for i in range(self.argc))
@@ -304,7 +304,7 @@ class CtrlCode:
     def encode_args(self, text, i):
         """手动编码时，获取所需参数"""
         code = self.code
-        if self.argc is 0:
+        if self.argc == 0:
             fmt_len = len(self.fmt)
             if text.find(self.fmt, i, i + fmt_len) == i:
                 return code, None, i + fmt_len

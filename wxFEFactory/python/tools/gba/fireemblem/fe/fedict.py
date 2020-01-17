@@ -100,20 +100,20 @@ class FeDict(Dictionary):
                     curbyte = next(it)
                     bit = 7
 
-                if (curbyte & 1) is 0:
+                if (curbyte & 1) == 0:
                     node = node.left
                 else:
                     node = node.right
                 curbyte >>= 1
                 if node.isleaf():
                     code = node.value
-                    if (code & 0xFF00) is not 0:
+                    if (code & 0xFF00) != 0:
                         # 读到叶子结点
                         result.append(code)
                         break_continue = True
                     break
 
-            if not break_continue and (code & 0xFF) is 0:
+            if not break_continue and (code & 0xFF) == 0:
                 break
 
         return result
@@ -174,7 +174,7 @@ class FeDict(Dictionary):
             i += 1
             ch = text[i]
             code = self.get_code(ch)
-            if code is 0:
+            if code == 0:
                 if self.ctrl_table and CtrlCode.FMT_START.startswith(ch):
                     con = False
                     for ctrlcode in self.ctrl_table.values():
@@ -243,11 +243,11 @@ class FeDict(Dictionary):
                 huffmanBit -= 1
                 byte |= ((huffmanCode >> huffmanBit) & 1) << bit
                 bit += 1
-                if bit is 8:
+                if bit == 8:
                     bit = 0
                     result.append(byte)
                     byte = 0
-                if huffmanBit is 0:
+                if huffmanBit == 0:
                     break
 
         if bit < 8:

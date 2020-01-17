@@ -130,7 +130,7 @@ class Main(NativeHacktool):
         if self.handler.active:
             chars = self._global.character_struct.chars
             person = chars[self.char_index]
-            if person.addr is 0:
+            if person.addr == 0:
                 for i in range(len(datasets.PERSONS)):
                     if chars[i].addr:
                         self.char_choice.index = self.char_index = i

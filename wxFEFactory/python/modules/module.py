@@ -152,7 +152,7 @@ class BaseListBoxModuel(BaseModule):
     def ondelete(self, btn):
         """删除一项"""
         pos = self.listbox.index
-        if pos is not -1:
+        if pos != -1:
             if self.confirm('提示', '确认删除该项？', ui.wx.NO) is ui.wx.YES:
                 text = self.listbox[pos]
                 self.listbox.Delete(pos)

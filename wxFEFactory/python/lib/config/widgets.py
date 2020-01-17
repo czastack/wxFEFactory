@@ -154,7 +154,7 @@ class SelectConfig(ConfigCtrl):
 
     def get_input_value(self):
         index = self.view.index
-        if index is -1:
+        if index == -1:
             return None
         return self.values[index] if self.values else index
 

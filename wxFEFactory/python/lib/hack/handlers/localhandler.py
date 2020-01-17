@@ -53,7 +53,7 @@ class LocalHandler:
     def read_last_addr(self, addr, offsets):
         for offset in offsets:
             addr = self.read_addr(addr)
-            if addr is 0:
+            if addr == 0:
                 return 0
             addr += offset
         return addr

@@ -33,7 +33,7 @@ class HistoryList(list):
             i = self.index(e)
             self.append(self.pop(i))
         except ValueError:
-            if self.maxsize is not -1 and self.maxsize == len(self):
+            if self.maxsize != -1 and self.maxsize == len(self):
                 self.pop(0)
             super().append(e)
         self._index = 0

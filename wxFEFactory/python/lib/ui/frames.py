@@ -131,7 +131,7 @@ class HotkeyFrame(Frame):
 
     def stop_hotkey(self):
         for hotkey_int in self.hotkey_map:
-            if pyapi.GlobalDeleteAtom(hotkey_int) is 0:
+            if pyapi.GlobalDeleteAtom(hotkey_int) == 0:
                 self.UnregisterHotKey(hotkey_int)
 
     def onhotkey(self, event):

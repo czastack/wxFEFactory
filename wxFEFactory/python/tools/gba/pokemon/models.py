@@ -252,7 +252,7 @@ class PokemonStruct(LocalModel):
         dwDiff = bType + 25 - GetPersonality()
         if dwDiff >= 25:
             dwDiff %= 25
-        if dwDiff is 0:
+        if dwDiff == 0:
             return
         # note: 0x00100000 % 25 = 1
         # it is an ideal number for preserving the low word

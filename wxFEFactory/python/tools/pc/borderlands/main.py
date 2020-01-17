@@ -310,9 +310,9 @@ class Main(AssemblyHacktool):
         for _id, key, label in self._drop_rates_table:
             find_data = _id.join(self._drop_rates_scan_data)
             addr = self.handler.find_bytes(find_data, start, end, fuzzy=True)
-            if addr is -1:
+            if addr == -1:
                 addr = self.handler.find_bytes(find_data, start - 0x10000, end - 0x10000, fuzzy=True)
-                if addr is -1:
+                if addr == -1:
                     raise ValueError('找不到地址, ' + label)
             if start == 0x1E000000:
                 start = addr & 0xFFFF0000
@@ -321,7 +321,7 @@ class Main(AssemblyHacktool):
 
     def get_drop_rates_item(self, key):
         addr = getattr(self._drop_rates, key, 0)
-        if addr is 0:
+        if addr == 0:
             print('未读取地址')
         return addr
 

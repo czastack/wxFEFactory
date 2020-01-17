@@ -148,7 +148,7 @@ class NativeContext(Model):
 
     def get_vector_result(self, size=4, fixed=-1):
         """获取三个浮点数结果"""
-        if fixed is -1:
+        if fixed == -1:
             r = self.handler.read_float
         else:
             def r(addr):
@@ -160,7 +160,7 @@ class NativeContext(Model):
         """获取字符串结果"""
         data = self.handler.read(self.handler.read_ptr(self.m_pReturn), bytes, size)
         n = data.find(0)
-        if n is not -1:
+        if n != -1:
             data = data[:n]
         return data
 
@@ -181,16 +181,16 @@ class NativeContext(Model):
     def type_signature(type, size=4):
         """type转参数签名"""
         if type is int:
-            if size is 1:
+            if size == 1:
                 return 'B'
-            elif size is 2:
+            elif size == 2:
                 return 'H'
-            elif size is 4:
+            elif size == 4:
                 return 'I'
-            elif size is 8:
+            elif size == 8:
                 return 'Q'
         elif type is float:
-            if size is 8:
+            if size == 8:
                 return 'd'
             return 'f'
 
@@ -274,7 +274,7 @@ class NativeContext64(NativeContext):
         if type is not float:
             return super().get_result(type, size)
         else:
-            if size is 8:
+            if size == 8:
                 return self.handler.read_double(self.m_pReturn + 16)
             return self.handler.read_float(self.m_pReturn + 8)
 

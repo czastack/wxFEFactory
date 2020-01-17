@@ -38,7 +38,7 @@ class MonoHacktool(NativeHacktool):
     def onattach(self):
         super().onattach()
         mono = self.handler.get_module("mono.dll")
-        if mono is 0:
+        if mono == 0:
             return
         helper = self.handler.get_proc_helper(mono)
         address_map = helper.get_proc_address(self.MONO_FUNC.keys())

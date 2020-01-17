@@ -24,8 +24,8 @@ class SizerLayout(Layout):
             flag |= wx.EXPAND
 
         padding_flag = style.get('padding-flag', 0)
-        if padding_flag is not 0:
-            if padding_flag is 1:
+        if padding_flag != 0:
+            if padding_flag == 1:
                 flag |= wx.ALL
             else:
                 if padding_flag & 0b1000:
@@ -142,9 +142,9 @@ class SplitterWindow(Layout):
         if length > 2:
             print('SplitterWindow不支持大于两个子元素')
             return
-        if length is 1:
+        if length == 1:
             self.Initialize(self.children[0])
-        elif length is 2:
+        elif length == 2:
             child1 = self.children[0]
             child2 = self.children[1]
             if self.horizontal:

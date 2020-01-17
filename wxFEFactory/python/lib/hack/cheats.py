@@ -46,7 +46,7 @@ class LoopWrite(Cheat):
     def write(self, handler):
         value = self.value
         if self.step == self.size:
-            if self.inc is 0:
+            if self.inc == 0:
                 value = self.value.to_bytes(self.size, 'little') * self.count
             else:
                 fmt = ('B', 'H', 'I', 'Q')[self.size >> 1]

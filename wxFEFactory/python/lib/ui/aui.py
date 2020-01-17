@@ -155,7 +155,7 @@ class AuiNotebook(Layout):
 
     def can_page_close(self, n=None):
         """检查页面能否删除"""
-        if self.GetPageCount() is 0:
+        if self.GetPageCount() == 0:
             return False
         if n is None:
             n = self.GetSelection()

@@ -167,8 +167,8 @@ class ListView(Control):
     def insert_items(self, rows, pos=-1, create=False):
         info = wx.ListItem()
         info.m_mask = wx.LIST_MASK_TEXT
-        info.m_itemId = pos if pos is not -1 else self.GetItemCount()
-        if not create and pos is -1:
+        info.m_itemId = pos if pos != -1 else self.GetItemCount()
+        if not create and pos == -1:
             create = True
 
         for cols in rows:
@@ -216,7 +216,7 @@ class ListView(Control):
     def get_selected_list(self):
         """高亮选中的序号"""
         i = self.GetFirstSelected()
-        while i is not -1:
+        while i != -1:
             yield i
             i = self.GetNextSelected(i)
 

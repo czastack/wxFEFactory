@@ -100,25 +100,25 @@ class GSHack(BaseGbaHack):
         self.skills_group.read()
 
     def move_left(self):
-        if self._global.map_x is 0:
+        if self._global.map_x == 0:
             self._global.town_x -= 10
         else:
             self._global.map_x -= 10
 
     def move_right(self):
-        if self._global.map_x is 0:
+        if self._global.map_x == 0:
             self._global.town_x += 10
         else:
             self._global.map_x += 10
 
     def move_up(self):
-        if self._global.map_x is 0:
+        if self._global.map_x == 0:
             self._global.town_y -= 10
         else:
             self._global.map_y -= 10
 
     def move_down(self):
-        if self._global.map_x is 0:
+        if self._global.map_x == 0:
             self._global.town_y += 10
         else:
             self._global.map_y += 10

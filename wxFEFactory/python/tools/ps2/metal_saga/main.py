@@ -284,7 +284,7 @@ class Main(BasePs2Hack):
             for person in self._global.persons:
                 if i > 5:
                     break
-                if person.driving is 1:
+                if person.driving == 1:
                     indexs.append(i)
                     person.driving = 0
                     if len(indexs) == 3:

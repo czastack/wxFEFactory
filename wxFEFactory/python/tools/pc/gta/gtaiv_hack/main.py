@@ -221,7 +221,7 @@ class Main(BaseGTATool):
     def get_native_addr(self, name):
         """根据脚本名称获取装载后原生函数地址"""
         addr = address.NATIVE_ADDRS.get(name, 0)
-        if addr is 0:
+        if addr == 0:
             # 获取原生函数地址
             addr = address.NATIVE_ADDRS[name] = self.handler.remote_call(self.FindNativeAddress,
                 address.NATIVE_HASH[name])
@@ -249,7 +249,7 @@ class Main(BaseGTATool):
     def _player(self):
         """获取当前角色"""
         # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
-        # if player_addr is 0:
+        # if player_addr == 0:
         #     return None
         player = getattr(self, '_player_ins', None)
         player_index = self.get_player_index()
@@ -713,7 +713,7 @@ class Main(BaseGTATool):
         """获取刷车器选中的载具模型"""
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.get_page(page_index).index
-        if item_index is not -1:
+        if item_index != -1:
             return datasets.VEHICLE_LIST[page_index][1][item_index][1]
 
     def spawn_vehicle(self, model_id, coord=None):
@@ -749,7 +749,7 @@ class Main(BaseGTATool):
         """产生爆炸"""
         if uiExplosionType is None:
             uiExplosionType = self.config.explotion_type
-        if fRadius is 0:
+        if fRadius == 0:
             fRadius = self.config.explotion_radius
         self.script_call('ADD_EXPLOSION', '3fLfLLf', *coord, uiExplosionType, fRadius, bSound, bInvisible, fCameraShake)
 

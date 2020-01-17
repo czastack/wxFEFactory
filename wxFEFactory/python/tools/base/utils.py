@@ -31,7 +31,7 @@ class PresetDialog:
 
     def show(self, index=-1):
         dialog = self.dialog
-        if index is not -1:
+        if index != -1:
             self.select(index)
         dialog.ShowModal()
 

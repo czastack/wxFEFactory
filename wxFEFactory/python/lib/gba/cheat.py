@@ -168,11 +168,11 @@ def get_bit(type):
 
 
 def get_bit_mask(bit):
-    if bit is 8:
+    if bit == 8:
         return MASK_8
-    elif bit is 16:
+    elif bit == 16:
         return MASK_16
-    elif bit is 32:
+    elif bit == 32:
         return MASK_32
     return -1
 
@@ -318,17 +318,17 @@ def decode(src, code):
                 return
             v3type = (address >> 25) & 0x7F
             address = (address & 0x00F00000) << 4 | (address & 0x0003FFFF)
-            if v3type is 0x00:
-                if address is 0:
+            if v3type == 0x00:
+                if address == 0:
                     # 对于特殊代码 地址其实是第一行的数值
                     v3type = (value >> 25) & 0x7F
                     address = (value & 0x00F00000) << 4 | (value & 0x0003FFFF)
-                    if v3type is 0x04:
+                    if v3type == 0x04:
                         codeFunc = GSA_SLOWDOWN
                     elif 0x08 <= v3type <= 0x0a:
-                        if v3type is 0x08:
+                        if v3type == 0x08:
                             codeFunc = GSA_8_BIT_GS_WRITE2
-                        elif v3type is 0x09:
+                        elif v3type == 0x09:
                             codeFunc = GSA_16_BIT_GS_WRITE2
                         else:
                             codeFunc = GSA_32_BIT_GS_WRITE2
@@ -340,9 +340,9 @@ def decode(src, code):
                         code.wait_second = True
                         value = 0
                     elif 0x40 <= v3type <= 0x42:
-                        if v3type is 0x40:
+                        if v3type == 0x40:
                             codeFunc = GSA_8_BIT_SLIDE
-                        elif v3type is 0x41:
+                        elif v3type == 0x41:
                             codeFunc = GSA_16_BIT_SLIDE
                         else:
                             codeFunc = GSA_32_BIT_SLIDE
@@ -352,7 +352,7 @@ def decode(src, code):
                     codeFunc = GSA_8_BIT_FILL
                     code.dataSize = value >> 8
                     value &= MASK_8
-            elif v3type is 0x01:
+            elif v3type == 0x01:
                 codeFunc = GSA_16_BIT_FILL
                 code.dataSize = value >> 16
                 value &= MASK_16
@@ -365,36 +365,36 @@ def decode(src, code):
             # v1/v2
             codeType = TYPE_V1
             v1type = high4(address)
-            if v1type is 0:
+            if v1type == 0:
                 # 8位ram写入
                 codeFunc = INT_8_BIT_WRITE
-            elif v1type is 1:
+            elif v1type == 1:
                 # 16位ram写入
                 codeFunc = INT_16_BIT_WRITE
-            elif v1type is 2:
+            elif v1type == 2:
                 # 32位ram写入
                 codeFunc = INT_32_BIT_WRITE
-            elif v1type is 6:
+            elif v1type == 6:
                 # 16位rom patch (补丁) GSA_16_BIT_ROM_PATCH
                 address <<= 1
                 subtype = high4(address)
-                if subtype is 0x0C:
+                if subtype == 0x0C:
                     codeFunc = GSA_16_BIT_ROM_PATCH
                     address &= MASK_28
                 # UNKNOWN_CODE
-            elif v1type is 8:
+            elif v1type == 8:
                 subtype = (address >> 20) & 0xF
                 if 1 <= subtype <= 3:
-                    if subtype is 1:
+                    if subtype == 1:
                         codeFunc = GSA_8_BIT_GS_WRITE
-                    elif subtype is 2:
+                    elif subtype == 2:
                         codeFunc = GSA_16_BIT_GS_WRITE
                     else:
                         codeFunc = GSA_32_BIT_GS_WRITE
-                elif subtype is 15:
+                elif subtype == 15:
                     codeFunc = GSA_SLOWDOWN
                     value &= 0xFF00
-            elif v1type is 0x0D:
+            elif v1type == 0x0D:
                 if address != 0xDEADFACE:
                     codeFunc = CBA_IF_TRUE
                     address &= MASK_28

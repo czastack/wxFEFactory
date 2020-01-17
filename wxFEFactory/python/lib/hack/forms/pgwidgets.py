@@ -155,7 +155,7 @@ class PgBaseChoiceDisplay(PgWidget):
 
     def Set(self, choices, values=0):
         self.choices = choices
-        if values is not 0:
+        if values != 0:
             self.values = values
 
     def read(self):
@@ -171,7 +171,7 @@ class PgBaseChoiceDisplay(PgWidget):
             index = self.values.index(value) if self.values else value if value < len(self.choices) else -1
         except ValueError:
             index = -1
-        PgWidget.input_value.__set__(self, self.choices[index] if index is not -1 else '')
+        PgWidget.input_value.__set__(self, self.choices[index] if index != -1 else '')
 
 
 class PgChoiceDisplay(PgBaseChoiceDisplay, OffsetsWidget):
