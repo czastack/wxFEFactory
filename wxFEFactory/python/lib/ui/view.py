@@ -78,7 +78,7 @@ class View:
 
     @classmethod
     def safe_active_wxwindow(cls):
-        return self.active_wxwindow() or wx.GetApp().GetTopWindow()
+        return cls.active_wxwindow() or wx.GetApp().GetTopWindow()
 
     @property
     def parent(self):

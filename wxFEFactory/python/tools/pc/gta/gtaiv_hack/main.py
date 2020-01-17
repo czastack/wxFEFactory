@@ -808,8 +808,8 @@ class Main(BaseGTATool):
         """清空区域内的警察"""
         self.script_call('CLEAR_AREA_OF_COPS', '4f', *self.player.coord, 1000)
 
-    def clear_area_of_cops(self, _=None):
-        """清空区域内的警察"""
+    def clear_area_of_objects(self, _=None):
+        """清空区域内的物体"""
         self.script_call('CLEAR_AREA_OF_OBJECTS', '4f', *self.player.coord, 1000)
 
     def clear_area_of_fire(self, _=None):

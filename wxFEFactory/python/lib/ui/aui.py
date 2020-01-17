@@ -108,7 +108,7 @@ class AuiNotebook(Layout):
         child.Reparent(None)
         self.AddPage(child.wxwindow, caption)
         if onclose:
-            self.set_on_page_close(self, child, onclose)
+            self.set_on_page_close(child, onclose)
 
     def on_page_close(self, event):
         """页面关闭事件"""

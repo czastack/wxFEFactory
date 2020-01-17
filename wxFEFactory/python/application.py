@@ -6,7 +6,7 @@ from lib.utils import HistoryList
 from lib.config import Configurable
 from project import Project
 
-CONFIG_FILE = 'config/config.json'
+CONFIG_FILE = 'configs/config.json'
 
 
 class Application(Configurable):
@@ -44,7 +44,7 @@ class Application(Configurable):
     def load_temp_start_option(self):
         data = None
         try:
-            with open('config/start_option.json', 'r+') as file:
+            with open('configs/start_option.json', 'r+') as file:
                 data = json.load(file)
                 file.seek(0)
                 file.truncate()
@@ -56,5 +56,5 @@ class Application(Configurable):
         return data
 
     def save_temp_start_option(self, start_option):
-        with open('config/start_option.json', 'w') as file:
+        with open('configs/start_option.json', 'w') as file:
             json.dump(start_option, file)

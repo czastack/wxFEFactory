@@ -9,7 +9,7 @@ class PgGroup(Group):
 
 class PgCategory(BaseGroup):
     def __init__(self, label, addr=None, handler=None, cachable=True):
-        return super().__init__(None, label, addr, handler, cachable)
+        super().__init__(None, label, addr, handler, cachable)
 
     def render(self):
         PgWidget.render(self)

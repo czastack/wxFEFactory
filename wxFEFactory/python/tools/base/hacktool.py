@@ -14,7 +14,7 @@ class BaseHackTool(NestedTool):
 
     def __init__(self):
         super().__init__()
-        self.config = Config("config/%s.config.json" % self.module_name + '')
+        self.config = Config("configs/%s.config.json" % self.module_name + '')
         if callable(self.handler_class):
             self.handler = self.handler_class()
 

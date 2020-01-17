@@ -206,8 +206,6 @@ class Quaternion(Vector3):
             cos
         ))
 
-        return result
-
     def __mul__(self, right):
 
         lx, ly, lz, lw = self

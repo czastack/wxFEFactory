@@ -202,7 +202,7 @@ class PokemonStruct(LocalModel):
         bOrder = self.DetermineWhichIsWhere()
         values = tuple(rgInfo[bOrder[i]].value for i in range(4))
         Header = self.Header
-        Header.dwChar = dwChar
+        Header.dwChar = char
         bOrder = self.DetermineWhichIsWhere()
         for i in range(4):
             rgInfo[bOrder[i]].value = values[i]
@@ -213,7 +213,7 @@ class PokemonStruct(LocalModel):
             Header.dwID = self.GenShinyID()
         elif bShiny is False:
             while self.GetIsShiny():
-                SetID(Header.dwID + 0x00010000)
+                self.SetID(Header.dwID + 0x00010000)
 
     def GetIsShiny(self):
         if self.bEncoded:
@@ -246,10 +246,10 @@ class PokemonStruct(LocalModel):
     def SetPersonality(self, bType):
         if self.bEncoded:
             return
-        bShiny = GetIsShiny()
+        bShiny = self.GetIsShiny()
         if bType >= 25:
             bType %= 25
-        dwDiff = bType + 25 - GetPersonality()
+        dwDiff = bType + 25 - self.GetPersonality()
         if dwDiff >= 25:
             dwDiff %= 25
         if dwDiff == 0:

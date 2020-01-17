@@ -59,47 +59,47 @@ class PropertyGrid(Control):
     def add_category(self, title):
         self.append_property(wx.PropertyCategory(self.label))
 
-    def add_string_property(title, name, help, value):
+    def add_string_property(self, title, name, help, value):
         self.append_property(wx.StringProperty(title, name, value), help)
 
-    def add_int_property(title, name, help, value=0):
+    def add_int_property(self, title, name, help, value=0):
         self.append_property(wx.IntProperty(title, name, value), help)
 
-    def add_uint_property(title, name, help, value=0):
+    def add_uint_property(self, title, name, help, value=0):
         self.append_property(wx.UIntProperty(title, name, value), help)
 
-    def add_hex_property(title, name, help, value=0):
+    def add_hex_property(self, title, name, help, value=0):
         prop = wx.UIntProperty(title, name, value)
         prop.SetAttribute(wx.PG_UINT_BASE, wx.PG_BASE_HEX)
         # prop.SetAttribute(wx.PG_UINT_PREFIX, wx.PG_PREFIX_0x)
         self.append_property(prop, help)
 
-    def add_float_property(title, name, help, value=0):
+    def add_float_property(self, title, name, help, value=0):
         self.append_property(wx.FloatProperty(title, name, value), help)
 
-    def add_bool_property(title, name, help, value=False):
+    def add_bool_property(self, title, name, help, value=False):
         prop = wx.BoolProperty(title, name, value)
-        prop.SetAttribute(wx.PG_BOOL_USE_CHECKBOX, true)
-        self.append_property(prop, help)
-
-    def add_enum_property(title, name, help, labels, values, value=0):
-        values = wx.ArrayInt() if values is None else values
-        self.append_property(wx.EnumProperty(title, name, labels, values, value), help)
-
-    def add_flags_property(title, name, help, items, values=None, value=0):
-        if value is None:
-            value = [1 << i for i in range(len(items))]
-        prop = wx.FlagsProperty(title, name, labels, values, value)
         prop.SetAttribute(wx.PG_BOOL_USE_CHECKBOX, True)
         self.append_property(prop, help)
 
-    def add_long_string_property(title, name, help, value):
+    def add_enum_property(self, title, name, help, labels, values, value=0):
+        values = wx.ArrayInt() if values is None else values
+        self.append_property(wx.EnumProperty(title, name, labels, values, value), help)
+
+    def add_flags_property(self, title, name, help, items, values=None, value=0):
+        if value is None:
+            value = [1 << i for i in range(len(items))]
+        prop = wx.FlagsProperty(title, name, items, values, value)
+        prop.SetAttribute(wx.PG_BOOL_USE_CHECKBOX, True)
+        self.append_property(prop, help)
+
+    def add_long_string_property(self, title, name, help, value):
         self.append_property(wx.LongStringProperty(title, name, value), help)
 
-    def add_array_string_property(title, name, help, values):
+    def add_array_string_property(self, title, name, help, values):
         self.append_property(wx.ArrayStringProperty(title, name, values), help)
 
-    def set_enum_choices(name, labels, values):
+    def set_enum_choices(self, name, labels, values):
         prop = self.GetPropertyByName(name)
         if isinstance(prop, wx.EnumProperty):
             choices = wx.PGChoices(labels, wx.ArrayInt() if values is None else values)

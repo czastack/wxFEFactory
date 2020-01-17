@@ -1070,7 +1070,7 @@ class Main(BaseGTATool):
         """生成物体"""
         if isinstance(model_id, str):
             model_id = self.get_hash_key(model_id)
-        model = model_ids.VModel(model_id, self)
+        model = models.VModel(model_id, self)
         model.request()
         handle = self.script_call('CREATE_OBJECT', 'Q3f3Q', model_id, *(coord or self.get_front_coord()), 0, 1, 1)
         if handle:
