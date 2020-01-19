@@ -1,8 +1,9 @@
+import abc
 import ctypes
 from .fields import Field, Group
 
 
-class FormMeta(type):
+class FormMeta(abc.ABCMeta):
     SLOTS = ()
 
     def __new__(class_, name, bases, attrs):
@@ -38,7 +39,7 @@ class FormMeta(type):
             if slots is None:
                 attrs.pop('__slots__')
             elif slots is False:
-                attrs['__slots__'] = __class__.SLOTS
+                attrs['__slots__'] = class_.SLOTS
 
         return super().__new__(class_, name, bases, attrs)
 
@@ -49,6 +50,14 @@ class BaseForm(metaclass=FormMeta):
     """
 
     __abstract__ = True
+
+    @abc.abstractproperty
+    def fields(self):
+        pass
+
+    @abc.abstractproperty
+    def structure(self):
+        pass
 
     def __init__(self):
         """

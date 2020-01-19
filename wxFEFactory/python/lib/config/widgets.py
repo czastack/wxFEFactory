@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+import abc
 from lib import extypes, utils
 from styles import btn_xs_style
 from lib import ui
@@ -10,9 +10,10 @@ from .group import ConfigGroup
 __all__ = ('BoolConfig', 'InputConfig', 'IntConfig', 'FloatConfig')
 
 
-class ConfigCtrl(ABC):
+class ConfigCtrl(abc.ABC):
     """配置项控件"""
-    def __init__(self, name, label, default):
+
+    def __init__(self, name, label, default, help=None):
         parent = ConfigGroup.active_group()
 
         if not parent:
@@ -23,9 +24,11 @@ class ConfigCtrl(ABC):
         self.name = name
         self.label = label
         self.default = default
+        self.help = help
         self.owner = parent.owner
         self.owner.setdefault(name, default)
         self.owner.register_observer(name, self.weak._on_config_change)
+        self.view = None
 
     def _on_config_change(self, config, name, value):
         self.read()
@@ -42,12 +45,12 @@ class ConfigCtrl(ABC):
     def set_config_value(self, value, notity=True):
         return self.owner.setconfig(self.name, value, notity)
 
-    @abstractmethod
+    @abc.abstractmethod
     def get_input_value(self):
         """获取控件的输入值"""
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def set_input_value(self, value):
         """设置控件的输入值"""
         pass
@@ -130,13 +133,13 @@ class InputConfig(ConfigCtrl):
 class IntConfig(InputConfig):
     """整型输入控件"""
     def __init__(self, name, label, default=0):
-        return super().__init__(name, label, default, int)
+        super().__init__(name, label, default, int)
 
 
 class FloatConfig(InputConfig):
     """浮点型输入控件"""
     def __init__(self, name, label, default=0.0):
-        return super().__init__(name, label, default, float)
+        super().__init__(name, label, default, float)
 
 
 class SelectConfig(ConfigCtrl):

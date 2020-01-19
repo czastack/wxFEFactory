@@ -1,10 +1,15 @@
+import abc
 from .file import FileRW
 
 ROM_MASK = ~(1 << 27)
 
 
-class RomHandler:
+class RomHandler(metaclass=abc.ABCMeta):
     __slots__ = ()
+
+    @abc.abstractmethod
+    def read(self, addr, type, size):
+        pass
 
     def get_rom_title(self):
         return self.read(0xA0, bytes, 12).decode()

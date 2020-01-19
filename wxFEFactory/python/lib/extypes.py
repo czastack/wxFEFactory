@@ -60,11 +60,11 @@ class Dict(Map):
             Map.__setitem__(self, key, value)
 
     def __repr__(self):
-        return '%s(%s)' % (__class__.__name__, Map.__repr__(self))
+        return '%s(%s)' % (self.__class__.__name__, Map.__repr__(self))
 
     def __and__(self, keys):
         if is_list_tuple(keys):
-            return __class__({key: Map.__getitem__(self, key) for key in keys})
+            return self.__class__({key: Map.__getitem__(self, key) for key in keys})
 
 
 class INum:
@@ -200,4 +200,4 @@ def DataClass(name, fields, default=None, defaults=None, attrs=None, bases=None)
     if attrs:
         attrs.update(the_attrs)
         the_attrs = attrs
-    return DataClassMeta.__new__(DataClassMeta, name, bases, the_attrs)
+    return DataClassMeta(name, bases, the_attrs)

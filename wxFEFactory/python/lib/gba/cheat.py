@@ -243,7 +243,7 @@ def gsencode(address, value, isv3):
 
 
 def gsencode_string(address, value, isv3):
-    address, value = gsencode(address, value)
+    address, value = gsencode(address, value, isv3)
     address = "%08X" % address
     value = "%08X" % value
     if isv3:

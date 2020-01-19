@@ -1,3 +1,4 @@
+import abc
 from lib import ui
 from lib.ui.components import Pagination
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
@@ -5,9 +6,25 @@ from lib.win32.keys import VK
 from ..base import BaseGbaHack
 
 
-class GSHack(BaseGbaHack):
+class GSHack(BaseGbaHack, metaclass=abc.ABCMeta):
     SKILLS_PAGE_LENGTH = 5
     SKILLS_PAGE_TOTAL = 7
+
+    @abc.abstractproperty
+    def models(self):
+        pass
+
+    @abc.abstractproperty
+    def coords(self):
+        pass
+
+    @abc.abstractproperty
+    def datasets(self):
+        pass
+
+    @abc.abstractproperty
+    def PERSON_ADDR_START(self):
+        pass
 
     def __init__(self):
         super().__init__()

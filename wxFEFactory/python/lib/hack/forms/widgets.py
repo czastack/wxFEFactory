@@ -1,3 +1,4 @@
+import abc
 import json
 import fefactory
 import pyapi
@@ -15,7 +16,7 @@ __ALL__ = (
     'ModelSelect', 'Choice', 'FlagWidget', 'ModelFlagWidget', 'TabList')
 
 
-class Widget:
+class Widget(metaclass=abc.ABCMeta):
     GROUPS = []
     horizontal = True
 
@@ -26,6 +27,7 @@ class Widget:
         self.addr = addr
         self.offsets = offsets
         self.readonly = readonly
+        self.view = None
 
         parent = self.active_group()
         if parent:
@@ -102,8 +104,25 @@ class Widget:
         return '%s("%s", "%s")' % (self.__class__.__name__, self.name, self.label)
 
 
+class OneWayWidget(Widget):
+    """单向控件"""
+
+    @abc.abstractproperty
+    def mem_value(self):
+        pass
+
+
 class TwoWayWidget(Widget):
     """双向控件"""
+
+    @abc.abstractproperty
+    def mem_value(self):
+        pass
+
+    @mem_value.setter
+    def mem_value(self):
+        pass
+
     def read(self):
         value = self.mem_value
         if value is not None:
@@ -117,14 +136,15 @@ class TwoWayWidget(Widget):
             self.mem_value = value
 
 
-class ModelWidget:
+class ModelWidget(Widget):
+
     """模型绑定控件"""
     def __init__(self, name, label=None, instance=None, prop=None, **kwargs):
         """
         :param instance: Model实例，或者返回Model实例的函数，在Widget中用addr占位
         :param prop: Widget对应Field的属性名称，在Widget中用offsets占位
         """
-        super().__init__(name, label, instance, prop or name, **kwargs)
+        super().__init__(name, label, addr=instance, offsets=prop or name, **kwargs)
 
     def oninit(self):
         if isinstance(self.addr, tuple):
@@ -182,7 +202,13 @@ class ModelWidget:
         return self.instance & self.offsets
 
 
-class OffsetsWidget:
+class OffsetsWidget(Widget):
+    @staticmethod
+    def type(value):
+        raise NotImplementedError
+
+    size = 0
+
     """多级偏移控件"""
     def get_addr(self):
         return self.addr() if callable(self.addr) else self.addr
@@ -210,7 +236,6 @@ class BaseGroup(Widget):
         :param cachable: 子元素是ModelWidget时有用
         """
         self.children = []
-        self.view = None
         origin_addr = addr
         if isinstance(origin_addr, tuple):
             # (instance_getter, instance_type)
@@ -374,7 +399,8 @@ class DialogGroup(Group):
 
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with __main__.win:
-            with ui.dialog.StdDialog(self.label, style=style, styles=styles, cancel=False, closable=self.closable) as root:
+            with ui.dialog.StdDialog(self.label, style=style, styles=styles,
+                    cancel=False, closable=self.closable) as root:
                 self.render_root()
 
         self.root = root
@@ -390,7 +416,7 @@ class DialogGroup(Group):
 class StaticGroup(Group):
     """静态容器，不绑定目标"""
     def __init__(self, caption):
-        return Group.__init__(self, None, caption, 0, flexgrid=False, hasfooter=False)
+        Group.__init__(self, None, caption, 0, flexgrid=False, hasfooter=False)
 
 
 class GroupBox(BaseGroup):
@@ -415,7 +441,7 @@ class Groups(BaseGroup):
     """可容纳子Group"""
     def __init__(self, caption, on_page_changed=None, **kwargs):
         self.on_page_changed = on_page_changed
-        return super().__init__(None, caption, **kwargs)
+        super().__init__(None, caption, **kwargs)
 
     def render(self):
         extra = dict(caption=self.label) if self.label else None
@@ -656,7 +682,7 @@ class BaseSelect(TwoWayWidget):
 
     @lazy.classlazy
     def search_dialog(self):
-        return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=cls.onsearch)
+        return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=self.onsearch)
 
     @classmethod
     def menu_search(cls, view, menu):
@@ -757,7 +783,7 @@ class ModelSelect(ModelWidget, BaseSelect):
     pass
 
 
-class BaseChoiceDisplay(Widget):
+class BaseChoiceDisplay(OneWayWidget):
     """静态选项(只显示)"""
     def __init__(self, *args, choices=None, values=None, **kwargs):
         # 预处理choices, values

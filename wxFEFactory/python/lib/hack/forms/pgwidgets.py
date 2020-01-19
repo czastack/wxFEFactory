@@ -7,15 +7,6 @@ class PgGroup(Group):
         self.pg = ui.PropertyGrid(class_="fill")
 
 
-class PgCategory(BaseGroup):
-    def __init__(self, label, addr=None, handler=None, cachable=True):
-        super().__init__(None, label, addr, handler, cachable)
-
-    def render(self):
-        PgWidget.render(self)
-        self.pg.add_category(self.label)
-
-
 class PgWidget(TwoWayWidget):
     def render(self):
         group = Group.active_group()
@@ -33,6 +24,16 @@ class PgWidget(TwoWayWidget):
     @input_value.setter
     def input_value(self, value):
         self.pg.set_value(self.name, value)
+
+
+class PgCategory(BaseGroup):
+    def __init__(self, label, addr=None, handler=None, cachable=True):
+        super().__init__(None, label, addr, handler, cachable)
+        self.pg = None
+
+    def render(self):
+        PgWidget.render(self)
+        self.pg.add_category(self.label)
 
 
 class PgBaseInput(PgWidget):
