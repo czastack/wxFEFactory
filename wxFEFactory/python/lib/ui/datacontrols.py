@@ -107,14 +107,14 @@ class PropertyGrid(Control):
 
     def _get_value(self, prop):
         variant = prop.GetValue()
-        type = variant.GetType()
-        if type == "long":
+        typestr = variant.GetType()
+        if typestr == "long":
             return variant.GetLong()
-        elif type == "string":
+        elif typestr == "string":
             return variant.GetString()
-        elif type == "bool":
+        elif typestr == "bool":
             return variant.GetBool()
-        elif type == "arrstring":
+        elif typestr == "arrstring":
             return variant.GetArrayString()
 
     def get_value(self, name):
@@ -122,11 +122,20 @@ class PropertyGrid(Control):
         return self._get_value(prop)
 
     def _set_value(self, prop, value):
-        type = prop.GetValueType()
+        typestr = prop.GetValueType()
+        pytype = None
+        if typestr == "long":
+            pytype = int
+        elif typestr == "string":
+            pytype = str
+        elif typestr == "bool":
+            pytype = bool
+        elif typestr == "arrstring":
+            pytype = list
         if value is None:
             variant = wx.Variant("")
         else:
-            variant = wx.Variant(value)
+            variant = wx.Variant(pytype(value))
         self.SetPropVal(prop, variant)
 
     def set_value(self, name, value):

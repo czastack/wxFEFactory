@@ -84,11 +84,9 @@ class BufferedPrinter:
         self.buff = []
 
     def start(self):
-        an.stdout = self
+        pass
 
     def end(self):
-        an.stdout = None
-        _print('123')
         print("".join(self.buff), end="")
         self.buff.clear()
 

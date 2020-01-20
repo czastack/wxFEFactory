@@ -1,3 +1,4 @@
+import abc
 from . import wx
 
 
@@ -30,11 +31,14 @@ def value_property(self, value):
     self.SetValue(value)
 
 
-class View:
+class View(metaclass=abc.ABCMeta):
     """视图元素"""
     LAYOUTS = []
-    wxtype = None
     _here = False
+
+    @abc.abstractproperty
+    def wxtype(self):
+        pass
 
     def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, wxparams=None, extra=None):
@@ -69,7 +73,7 @@ class View:
 
     @classmethod
     def active_layout(cls):
-        return cls.LAYOUTS[-1] if __class__.LAYOUTS else None
+        return cls.LAYOUTS[-1] if View.LAYOUTS else None
 
     @classmethod
     def active_wxwindow(cls):
@@ -456,11 +460,11 @@ class Layout(View):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        __class__.LAYOUTS.pop()
+        View.LAYOUTS.pop()
         if View._here:
             self.layout()
             self.Thaw()
-        elif self.wxwindow is None and not __class__.LAYOUTS:
+        elif self.wxwindow is None and not View.LAYOUTS:
             # 根节点，开始渲染
             self.render_as_root(None)
         # 释放临时样式表

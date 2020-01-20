@@ -1,3 +1,5 @@
+import abc
+from typing import Callable, Sequence, Union
 from lib.utils import float32, Accumulator
 from lib.extypes import DataClass, classproperty
 from functools import partialmethod
@@ -241,11 +243,12 @@ class ManagedModel(Model):
         return self.__class__(self.addr, self.context)
 
 
-class LookAfterModel(Model):
+class LookAfterModel(Model, metaclass=abc.ABCMeta):
     """带字段拦截功能的Model"""
     own_fields = ()
 
-    def __init_subclass__(cls):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
         fields = []
         for name, value in cls.__dict__.items():
             if isinstance(value, FieldType):
@@ -265,17 +268,22 @@ class LookAfterModel(Model):
                 return
         object.__setattr__(self, name, value)
 
+    @abc.abstractmethod
     def get_field(self, nam):
         pass
 
+    @abc.abstractmethod
     def set_field(self, name, value):
         pass
 
 
 class FieldType:
+    offset: Union[Sequence[int], Callable]
+
     """最基本的字段类型"""
     def __init__(self, label):
         self.label = label
+        self.offset = None
 
     def get_addr(self, instance):
         offset = self.offset
@@ -295,10 +303,10 @@ class FieldType:
 class Field(FieldType):
     """通用字段基类"""
     def __init__(self, offset, type=int, size=4, label=None):
+        super().__init__(label)
         self.offset = offset
         self.type = type
         self.size = size
-        super().__init__(label)
 
     def __get__(self, instance, owner=None):
         if instance is None:
@@ -325,8 +333,8 @@ class Field(FieldType):
 class Fields(FieldType):
     """同步控制多个地址的值"""
     def __init__(self, *args, label=None):
-        self.fields = args
         super().__init__(label)
+        self.fields = args
 
     def __get__(self, instance, owner=None):
         if instance is None:
@@ -338,7 +346,7 @@ class Fields(FieldType):
             field.__set__(instance, value)
 
 
-class Cachable:
+class Cachable(metaclass=abc.ABCMeta):
     """可缓存对象"""
     key = None
 
@@ -357,6 +365,7 @@ class Cachable:
             self.update_cache(instance, cache)
         return cache
 
+    @abc.abstractmethod
     def create_cache(self, instance):
         pass
 
@@ -446,8 +455,8 @@ class ToggleField(Field):
 class ToggleFields(FieldType):
     """同步控制多个ToggleField"""
     def __init__(self, *args, label=None):
-        self.fields = args
         super().__init__(label)
+        self.fields = args
 
     def __get__(self, instance, owner=None):
         if instance is None:
@@ -546,12 +555,12 @@ class ManagedModelField(ModelField):
 class CoordField(Cachable, FieldType):
     """坐标字段(Vector3)"""
     def __init__(self, offset, type=float, length=3, field_size=4, label=None):
+        super().__init__(label)
         self.offset = offset
         self.type = type
         self.field_size = field_size
         self.length = length
         self.size = self.length * field_size
-        super().__init__(label)
 
     def create_cache(self, instance):
         return CoordData(self, instance)
@@ -806,7 +815,7 @@ class FieldPrep:
         self.field.__set__(instance, self.preset(instance, value, self.field))
 
     def __call__(self, field):
-        return __class__(self.preget, self.preset, field)
+        return FieldPrep(self.preget, self.preset, field)
 
     @property
     def offset(self):

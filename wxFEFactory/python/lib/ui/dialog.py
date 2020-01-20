@@ -96,7 +96,7 @@ class CheckChoiceDialog(ListDialog):
         checked_list = []
         for item in choices:
             setattr(self, item[0], i)
-            if len(item) == 3 and item[2] == True:
+            if len(item) == 3 and item[2] is True:
                 checked_list.append(i)
             i += 1
 

@@ -1,8 +1,10 @@
+import abc
 import math
+import struct
 from lib.utils import split_label_value
 
 
-class BaseItemProvider:
+class BaseItemProvider(metaclass=abc.ABCMeta):
     """基础items提供器"""
     def __init__(self):
         self._choices = None
@@ -20,6 +22,10 @@ class BaseItemProvider:
             self.generate()
         return self._values
 
+    @abc.abstractmethod
+    def generate(self):
+        pass
+
 
 class ItemProvider(BaseItemProvider):
     """截取部分items提供器"""
@@ -32,12 +38,12 @@ class ItemProvider(BaseItemProvider):
 
     def generate(self):
         choices = self.datas[self.start:self.end]
-        values = tuple(range(self.start, self.end))
+        values = choices.__class__(range(self.start, self.end))
         if self.can_empty:
-            if isinstance(self.datas, list):
+            if isinstance(choices, list):
                 choices.insert(0, "无")
                 values.insert(0, 0)
-            elif isinstance(self.datas, tuple):
+            elif isinstance(choices, tuple):
                 choices = ("无",) + choices
                 values = (0,) + values
         self._choices = choices

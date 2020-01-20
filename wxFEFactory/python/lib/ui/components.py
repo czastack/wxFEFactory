@@ -1,13 +1,12 @@
 import math
-from lib.extypes import WeakBinder
-from lib import ui
+from lib import ui, extypes
 from . import wx
 
 
 class Pagination(ui.Horizontal):
     def __init__(self, onpagechange, total, page=1):
         super().__init__(class_="expand center")
-        this = WeakBinder(self)
+        this = extypes.WeakBinder(self)
         self.onpagechange = onpagechange
         self.total = total
         self.page = page

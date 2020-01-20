@@ -1,3 +1,4 @@
+from lib.win32.keys import WXK
 from .view import View, Control, EventFunctor, event_binder, value_property
 from . import wx
 
@@ -31,7 +32,7 @@ class BitmapButton(Button):
 
     def render(self, parent):
         bitmap = wx.Bitmap(self.src)
-        self.bind_wx(wx.BitmapButton(parent, label=self.label, **self.wxparams))
+        self.bind_wx(wx.BitmapButton(parent, label=bitmap, **self.wxparams))
         del self.src, self.onclick
 
 

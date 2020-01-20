@@ -1,4 +1,7 @@
-class KEY:
+import abc
+
+
+class KEY(metaclass=abc.ABCMeta):
     MOD_ALT = 0x0001
     MOD_CONTROL = 0x0002
     MOD_SHIFT = 0x0004
@@ -44,6 +47,10 @@ class KEY:
     Y = 89
     Z = 90
 
+    @abc.abstractclassmethod
+    def getcode(cls, name):
+        pass
+
     def __new__(cls, name):
         return cls.getcode(name)
 
@@ -62,7 +69,6 @@ class VK(KEY):
         '\\': 220,
         ']': 221,
         "'": 222,
-        '`': 192
     }
 
     BACK = 8
@@ -138,8 +144,8 @@ class VK(KEY):
         if 48 <= code <= 57 or 65 <= code <= 90:
             name = chr(code)
         else:
-            for key in VK.CODE:
-                if VK.CODE[key] == code:
+            for key in VK.__dict__:
+                if VK.__dict__[key] == code:
                     name = key
             else:
                 return ''

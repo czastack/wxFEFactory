@@ -2,7 +2,8 @@ from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, Mode
 
 
 class PersonChariot(Model):
-    def __init_subclass__(cls):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
         for field in cls.fields:
             field.origin_offset = field.offset
 

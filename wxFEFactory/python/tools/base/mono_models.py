@@ -18,8 +18,8 @@ class MonoClass(MonoType):
         self.mono_object = mono_object
         self.owner = owner
 
-    def __init_subclass__(cls):
-        super().__init_subclass__()
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
         cls.__dict__.setdefault('__abstract__', False)
         if not cls.__dict__['__abstract__']:
             if cls.name is None:

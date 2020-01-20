@@ -15,8 +15,8 @@ FieldItem = DataClass('FieldItem', ('addr', 'name', 'size', 'max'))
 
 
 class SimpleNesHack(BaseNesHack):
-    def __init_subclass__(cls):
-        super().__init_subclass__()
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
 
         if not hasattr(cls, 'fields'):
             raise ValueError('missing class variable "fields"')
