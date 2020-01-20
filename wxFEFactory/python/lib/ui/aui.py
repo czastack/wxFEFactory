@@ -6,6 +6,9 @@ from . import wx
 
 class AuiManager(Layout):
     """自动布局器"""
+
+    wxtype = None
+
     def __init__(self, **kwargs):
         self.mgr = None
         self.close_listeners = {}

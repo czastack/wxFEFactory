@@ -38,6 +38,10 @@ class Proxy(metaclass=ProxyMetaclass):
 
 
 class Magic:
+    @property
+    def proxy(self):
+        raise NotImplementedError
+
     def __str__(self):
         return self.proxy.__str__()
 
