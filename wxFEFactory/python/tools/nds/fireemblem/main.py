@@ -1,6 +1,7 @@
+import abc
 from lib import ui
 from lib.ui.components import Pagination
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice, Label
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
 from ..base import BaseNdsHack
 
@@ -8,6 +9,14 @@ from ..base import BaseNdsHack
 class FeHack(BaseNdsHack):
     TRAIN_ITEMS_PAGE_LENGTH = 10
     TRAIN_ITEMS_PAGE_TOTAL = 20
+
+    @abc.abstractproperty
+    def models(self):
+        pass
+
+    @abc.abstractproperty
+    def datasets(self):
+        pass
 
     def __init__(self):
         super().__init__()
@@ -93,7 +102,7 @@ class FeHack(BaseNdsHack):
     def render_iteminfos(self):
         datasets = self.datasets
         Choice("物品", datasets.ITEMS, self.on_item_change)
-        Label("复制属性")
+        ui.Label("复制属性")
         with ui.Horizontal(class_="fill"):
             self.copy_iteminfo_view = ui.Choice(class_="fill", choices=datasets.ITEMS)
             ui.Button("复制", onclick=self.copy_iteminfo)

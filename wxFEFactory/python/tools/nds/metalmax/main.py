@@ -1,3 +1,4 @@
+import abc
 from lib import ui
 from lib.ui.components import Pagination
 from lib.hack.forms import (
@@ -11,6 +12,18 @@ from ..base import BaseNdsHack
 class MetalMaxHack(BaseNdsHack):
     IREM_PAGE_LENGTH = 9
 
+    @abc.abstractproperty
+    def models(self):
+        pass
+
+    @abc.abstractproperty
+    def datasets(self):
+        pass
+
+    @abc.abstractproperty
+    def chariot_equips(self):
+        pass
+
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
@@ -22,9 +35,6 @@ class MetalMaxHack(BaseNdsHack):
         self.has_holes = self.chariot.field('hole_type') is not None
 
     def render_main(self):
-        datasets = self.datasets
-        weak = self.weak
-
         with Group("global", "全局", self._global, cols=4):
             ModelInput("money")
             ModelInput("stamp")
@@ -116,17 +126,20 @@ class MetalMaxHack(BaseNdsHack):
     def render_chariot_items(self):
         datasets = self.datasets
 
+        show_chariot_item_info = self.__class__.show_chariot_item_info
+        show_chariot_item_preset = self.__class__.show_chariot_item_preset
+
         def detail_keep_click(key):
-            return partial(__class__.show_chariot_item_info, self.weak, key=key, read=False)
+            return partial(show_chariot_item_info, self.weak, key=key, read=False)
 
         def detail_click(key):
-            return partial(__class__.show_chariot_item_info, self.weak, key=key)
+            return partial(show_chariot_item_info, self.weak, key=key)
 
         def preset_click(key):
-            return partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
+            return partial(show_chariot_item_preset, self.weak, dialog_name='chariot_weapon_dialog', key=key)
 
         def preset_ci_click(key):
-            return partial(__class__.show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
+            return partial(show_chariot_item_preset, self.weak, dialog_name='chariot_ci_dialog', key=key)
 
         item_choices = self.datasets.CHARIOT_ALL_ITEM.choices
         item_values = self.datasets.CHARIOT_ALL_ITEM.values
@@ -254,13 +267,14 @@ class MetalMaxHack(BaseNdsHack):
         """战车物品预设对话框"""
         dialog = getattr(self, name, None)
         if dialog is None:
-            chariot_equips = self.chariot_equips
             datasets = self.datasets
-            with ui.dialog.StdDialog(label, style={'width': 1400, 'height': 900}, cancel=False, closable=False) as dialog:
+            with ui.dialog.StdDialog(label, style={'width': 1400, 'height': 900},
+                                     cancel=False, closable=False) as dialog:
                 with ui.Horizontal(class_="expand"):
                     dialog.search = ui.ComboBox(wxstyle=ui.wx.CB_DROPDOWN, class_="fill",
-                        onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
-                    ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
+                        onselect=partial(self.__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
+                    ui.Button("搜索", onclick=partial(self.__class__.on_chariot_item_preset_search,
+                              self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(class_="fill")
                 with ui.Horizontal(class_="expand"):
                     dialog.use_max = ui.CheckBox(label="最大", class_="vcenter", checked=True)
@@ -284,7 +298,7 @@ class MetalMaxHack(BaseNdsHack):
                         listview.insert_items([part_name + item[1:]])
                         dialog.data_list.append(item)
                         dialog.name_list.append(item_name)
-                listview.set_on_item_activated(partial(__class__.on_chariot_item_preset_selected,
+                listview.set_on_item_activated(partial(self.__class__.on_chariot_item_preset_selected,
                     self.weak, dialog=dialog))
             setattr(self, name, dialog)
         return dialog
