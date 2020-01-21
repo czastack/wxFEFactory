@@ -340,6 +340,7 @@ class Group(BaseGroup):
             self.cols = cols
         if not horizontal:
             self.horizontal = horizontal
+        self.footer = None
         super().__init__(*args, **kwargs)
 
     def render(self):
@@ -407,7 +408,7 @@ class DialogGroup(Group):
         del self.button, self.closable
 
     def show(self, _=None):
-        self.root.show()
+        self.root.Show()
 
     def ShowModal(self, _=None):
         self.root.ShowModal()

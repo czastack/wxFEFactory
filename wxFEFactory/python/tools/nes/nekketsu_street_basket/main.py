@@ -29,7 +29,7 @@ class Main(BaseNesHack):
             ModelInput("basketry_right_bottom")
             ModelInput("ball_owner").set_help('球在人手里(0~3),地上或空中(6)')
 
-        with Group("player", "我方角色", self.person) as group:
+        with Group("player", "我方角色", self.person):
             Choice("角色", ("1P", "2P", "3P", "4P"), self.on_person_change)
 
             # ModelInput("jump")

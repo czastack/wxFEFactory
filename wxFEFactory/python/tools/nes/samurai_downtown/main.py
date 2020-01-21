@@ -29,7 +29,7 @@ class Main(BaseNesHack):
 
         with group.footer:
             dialog_style = {'width': 1200, 'height': 900}
-            with DialogGroup("items", "道具", self.itemholder, cols=4, dialog_style=dialog_style) as dialog_group:
+            with DialogGroup("items", "道具", self.itemholder, cols=4, dialog_style=dialog_style):
                 indexs = (0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15)
                 with ModelSelect.choices_cache:
                     for i in indexs:

@@ -251,7 +251,7 @@ class Main(BasePs2Hack):
             yield person
 
     def chariots(self):
-        chariot = models.chariot(0, self.handler)
+        chariot = models.Chariot(0, self.handler)
         for i in range(len(datasets.CHARIOTS)):
             chariot.set_addr_by_index(i)
             yield chariot

@@ -92,10 +92,6 @@ class Main(BaseNesHack):
     def on_chariot_change(self, lb):
         self.chariot.set_index(lb.index)
 
-    def on_storage_page(self, page):
-        self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
-        self.storage_group.read()
-
     def persons(self):
         person = models.Person(0, self.handler)
         for i in range(len(datasets.PERSONS)):
@@ -103,7 +99,7 @@ class Main(BaseNesHack):
             yield person
 
     def chariots(self):
-        chariot = models.chariot(0, self.handler)
+        chariot = models.Chariot(0, self.handler)
         for i in range(len(datasets.CHARIOTS)):
             chariot.set_index(i)
             yield chariot

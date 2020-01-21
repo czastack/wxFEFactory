@@ -70,8 +70,8 @@ class Main(BaseNesHack):
     def on_person_change(self, lb):
         self.person.addr = lb.index
 
-    def on_weapon_change(self, lb):
-        self.weapon.index = self._global.weapons.addr_at(self.lb.index - 1)
+    # def on_weapon_change(self, lb):
+    #     self.weapon.index = self._global.weapons.addr_at(lb.index - 1)
 
     def persons(self):
         person = models.Person(0, self.handler)
