@@ -243,7 +243,7 @@ class ManagedModel(Model):
         return self.__class__(self.addr, self.context)
 
 
-class LookAfterModel(Model, metaclass=abc.ABCMeta):
+class LookAfterModel(Model):
     """带字段拦截功能的Model"""
     own_fields = ()
 
@@ -268,11 +268,9 @@ class LookAfterModel(Model, metaclass=abc.ABCMeta):
                 return
         object.__setattr__(self, name, value)
 
-    @abc.abstractmethod
-    def get_field(self, nam):
+    def get_field(self, name):
         pass
 
-    @abc.abstractmethod
     def set_field(self, name, value):
         pass
 

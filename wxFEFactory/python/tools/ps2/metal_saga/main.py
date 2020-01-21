@@ -91,9 +91,9 @@ class Main(BasePs2Hack):
             select = ModelChoiceDisplay(prop + ".item", label, choices=datasets.ALL_EQUIP.choices,
                 values=datasets.ALL_EQUIP.values)
             with select.container:
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_item_info, self.weak,
                     instance=self.person, prop=prop))
-                ui.Button("选择", class_="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
+                ui.Button("选择", class_="btn_sm", onclick=partial(self.__class__.show_item_preset, self.weak,
                     instance=self.person, prop=prop))
 
     def render_human_items(self):
@@ -102,9 +102,9 @@ class Main(BasePs2Hack):
             select = ModelChoiceDisplay(prop + ".item", "物品%d" % (i + 1),
                 choices=datasets.ALL_HUMEN_ITEM.choices, values=datasets.ALL_HUMEN_ITEM.values)
             with select.container:
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_item_info, self.weak,
                     instance=self._global, prop=prop))
-                ui.Button("选择", class_="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
+                ui.Button("选择", class_="btn_sm", onclick=partial(self.__class__.show_item_preset, self.weak,
                     instance=self._global, prop=prop))
         with Group.active_group().footer:
             Pagination(self.on_human_items_page, self.HUMEN_ITEMS_PAGE_TOTAL)
@@ -129,9 +129,9 @@ class Main(BasePs2Hack):
             select = ModelChoiceDisplay(prop + ".item", "物品%d" % (i + 1),
                 choices=datasets.CHARIOT_ALL_ITEM.choices, values=datasets.CHARIOT_ALL_ITEM.values)
             with select.container:
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_item_info, self.weak,
                     instance=self.chariot, prop=prop))
-                ui.Button("选择", class_="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
+                ui.Button("选择", class_="btn_sm", onclick=partial(self.__class__.show_item_preset, self.weak,
                     instance=self.chariot, prop=prop))
 
     def render_special_bullets(self):
@@ -140,9 +140,9 @@ class Main(BasePs2Hack):
             select = ModelChoiceDisplay(prop + ".item", "特殊炮弹%d" % (i + 1),
                 choices=datasets.SPECIAL_BULLETS.choices, values=datasets.SPECIAL_BULLETS.values)
             with select.container:
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_item_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_item_info, self.weak,
                     instance=self.chariot, prop=prop))
-                ui.Button("选择", class_="btn_sm", onclick=partial(__class__.show_item_preset, self.weak,
+                ui.Button("选择", class_="btn_sm", onclick=partial(self.__class__.show_item_preset, self.weak,
                     instance=self.chariot, prop=prop))
 
     def render_wanted(self):
@@ -240,10 +240,6 @@ class Main(BasePs2Hack):
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
 
-    def on_storage_page(self, page):
-        self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
-        self.storage_group.read()
-
     def persons(self):
         person = models.Person(0, self.handler)
         for i in range(len(datasets.PERSONS)):
@@ -256,17 +252,17 @@ class Main(BasePs2Hack):
             chariot.set_addr_by_index(i)
             yield chariot
 
-    def move_left(self):
-        self.chariot.posx -= 24
+    # def move_left(self):
+    #     self.chariot.posx -= 24
 
-    def move_right(self):
-        self.chariot.posx += 24
+    # def move_right(self):
+    #     self.chariot.posx += 24
 
-    def move_up(self):
-        self.chariot.posy -= 24
+    # def move_up(self):
+    #     self.chariot.posy -= 24
 
-    def move_down(self):
-        self.chariot.posy += 24
+    # def move_down(self):
+    #     self.chariot.posy += 24
 
     def pull_through(self):
         for person in self.persons():

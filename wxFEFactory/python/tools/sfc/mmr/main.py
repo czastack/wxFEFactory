@@ -92,11 +92,11 @@ class Main(BaseSfcHack):
 
         for i in range(self.chariot.equips.length):
             with ModelChoiceDisplay("equips.0.equip", "装备%d" % (i + 1), choices=datasets.CHARIOT_EQUIPS).container:
-                ui.Button("上次", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
+                ui.Button("上次", class_="btn_sm", onclick=partial(self.__class__.show_chariot_equip_info, self.weak,
                     key="equips.%d" % i, read=False))
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_info, self.weak,
+                ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_chariot_equip_info, self.weak,
                     key="equips.%d" % i))
-                ui.Button("预设", class_="btn_sm", onclick=partial(__class__.show_chariot_equip_preset, self.weak,
+                ui.Button("预设", class_="btn_sm", onclick=partial(self.__class__.show_chariot_equip_preset, self.weak,
                     key="equips.%d" % i))
 
     def render_wanted(self):
@@ -140,8 +140,9 @@ class Main(BaseSfcHack):
             with ui.dialog.StdDialog(label, style={'width': 1100, 'height': 900}, closable=False) as dialog:
                 with ui.Horizontal(class_="expand"):
                     dialog.search = ui.ComboBox(wxstyle=ui.wx.CB_DROPDOWN, class_="fill",
-                        onselect=partial(__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
-                    ui.Button("搜索", onclick=partial(__class__.on_chariot_item_preset_search, self.weak, dialog=dialog))
+                        onselect=partial(self.__class__.on_chariot_item_preset_search_select, self.weak, dialog=dialog))
+                    ui.Button("搜索", onclick=partial(self.__class__.on_chariot_item_preset_search,
+                              self.weak, dialog=dialog))
                 dialog.listview = listview = ui.ListView(class_="fill")
                 with ui.Horizontal(class_="expand"):
                     dialog.use_weight = ui.CheckBox(label="重量", class_="vcenter", checked=True)
@@ -149,7 +150,7 @@ class Main(BaseSfcHack):
                 dialog.listview.append_columns(*head)
 
                 listview.insert_items(items)
-                listview.set_on_item_activated(partial(__class__.on_chariot_item_preset_selected, self.weak,
+                listview.set_on_item_activated(partial(self.__class__.on_chariot_item_preset_selected, self.weak,
                     dialog=dialog))
             setattr(self, name, dialog)
         return dialog
@@ -226,10 +227,6 @@ class Main(BaseSfcHack):
 
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
-
-    def on_storage_page(self, page):
-        self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
-        self.storage_group.read()
 
     def persons(self):
         person = models.Person(0, self.handler)
