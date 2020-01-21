@@ -81,7 +81,7 @@ class Module(BaseListBoxModuel):
             self.data_map.pop(text, None)
 
     def on_rename(self, menu):
-        args = super().on_rename(menu)
+        args = super().on_rename(None, menu)
         if args:
             name, newname = args
             item = self.data_map[newname] = self.data_map.pop(name)

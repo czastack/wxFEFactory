@@ -152,7 +152,7 @@ class PropertyGrid(Control):
             data[prop.GetName()] = self._get_value(prop)
         return data
 
-    def set_values(self, data, all):
+    def set_values(self, data, all=False):
         """批量设置值"""
         if all:
             it = self.GetIterator()

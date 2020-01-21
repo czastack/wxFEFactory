@@ -1,5 +1,5 @@
 import pyapi
-from ..module import BaseListBoxModuel
+from modules.module import BaseListBoxModuel
 from styles import dialog_style
 from lib import ui
 

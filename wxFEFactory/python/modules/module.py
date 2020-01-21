@@ -4,6 +4,7 @@ import types
 import __main__
 from lib import extypes, lazy, ui
 from lib.scene import BaseScene
+from lib.win32.keys import WXK
 from styles import styles
 from . import modules
 
@@ -50,18 +51,18 @@ class BaseModule(BaseScene):
         pass
 
     @lazy.classlazy
-    def title(cls):
+    def title(self):
         """获取原始标题，显示在标签页标题和菜单栏"""
-        name = cls.module_name
+        name = self.module_name
         for item in modules:
             if item[1] == name:
                 return item[0]
         return name
 
     @lazy.classlazy
-    def module_name(cls):
+    def module_name(self):
         """模块名称，即模块文件夹名"""
-        return cls.__module__.split('.')[1]
+        return self.__module__.split('.')[1]
 
     @classmethod
     def get_dir(cls):

@@ -32,16 +32,19 @@ class Application(Configurable):
         return True
 
     def on_change_project(self, project):
+        """切换工程"""
         self.config['recent_project'].append(project.path)
         self.config_changed = True
         self.project = project
 
     def on_exit(self):
+        """退出处理"""
         for name in dir(__main__):
             if not name.startswith('__'):
                 delattr(__main__, name)
 
     def load_temp_start_option(self):
+        """加载临时启动参数"""
         data = None
         try:
             with open('configs/start_option.json', 'r+') as file:
@@ -56,5 +59,6 @@ class Application(Configurable):
         return data
 
     def save_temp_start_option(self, start_option):
+        """保存临时启动参数"""
         with open('configs/start_option.json', 'w') as file:
             json.dump(start_option, file)

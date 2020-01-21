@@ -90,7 +90,7 @@ class MainFrame:
                         ui.Button("∨", class_="btn-sm fill", onclick=weak.toggle_console_input_multi)
                         ui.Button(">>", class_="btn-sm fill", onclick=weak.console_input_multi_run,
                                   extra={"tooltip": "执行输入框中代码 Ctrl+Enter"})
-            # ui.StatusBar()
+            self.status_bar = ui.StatusBar()
 
         self.win = win
         self.aui = aui

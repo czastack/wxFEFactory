@@ -14,7 +14,7 @@ class Project(Configurable):
         Configurable.__init__(self, Path.join(self.path, 'project.json'))
 
     def exists(self):
-        return Path.exists(self.get_config_file())
+        return Path.exists(self.config_file)
 
     @property
     def title(self):
