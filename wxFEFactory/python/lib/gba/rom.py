@@ -11,6 +11,26 @@ class RomHandler(metaclass=abc.ABCMeta):
     def read(self, addr, type, size):
         pass
 
+    @abc.abstractmethod
+    def raw_read(self, size):
+        pass
+
+    @abc.abstractmethod
+    def write(self, addr, data, size=0):
+        pass
+
+    @abc.abstractmethod
+    def read32(self, addr):
+        pass
+
+    @abc.abstractmethod
+    def write32(self, addr, data):
+        pass
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
     def get_rom_title(self):
         return self.read(0xA0, bytes, 12).decode()
 

@@ -123,9 +123,9 @@ class Main(BaseGbaHack):
             yield person
 
     def chariots(self):
-        chariot = models.chariot(0, self.handler)
+        chariot = models.Chariot(0, self.handler)
         for i in range(len(datasets.CHARIOTS)):
-            chariot.addr = i * models.chariot.SIZE
+            chariot.addr = i * models.Chariot.SIZE
             yield chariot
 
     def move_left(self):

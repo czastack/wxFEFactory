@@ -6,7 +6,7 @@ from lib.win32.keys import VK
 from ..base import BaseGbaHack
 
 
-class GSHack(BaseGbaHack, metaclass=abc.ABCMeta):
+class GSHack(BaseGbaHack):
     SKILLS_PAGE_LENGTH = 5
     SKILLS_PAGE_TOTAL = 7
 

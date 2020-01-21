@@ -1,3 +1,4 @@
+import abc
 from lib import ui
 from lib.ui.components import Pagination
 from lib.hack.forms import Group, Groups, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
@@ -11,6 +12,10 @@ BREED_COUNT = 412
 
 class PMHack(BaseGbaHack):
     BACKPACK_PAGE_LENGTH = 10
+
+    @abc.abstractproperty
+    def datasets(self):
+        pass
 
     def __init__(self):
         super().__init__()
@@ -54,7 +59,7 @@ class PMHack(BaseGbaHack):
     def render_backpack(self):
         datasets = self.datasets
         with self.backpack_group.header:
-            ui.RadioBox("类型", class_="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_swith)
+            ui.RadioBox("类型", class_="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_switch)
         for i in range(self.BACKPACK_PAGE_LENGTH):
             ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
             ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
@@ -66,7 +71,7 @@ class PMHack(BaseGbaHack):
         active_pokemon = self._active_pokemon
 
         ui.RadioBox("带着的宝可梦", class_="expand", choices=tuple(str(i) for i in range(1, 7)),
-            onselect=self.on_active_pokemo_swith)
+            onselect=self.on_active_pokemo_switch)
 
         with Groups(None, self.weak.on_page_changed):
             with Group("basic", "基本", active_pokemon):
@@ -160,17 +165,20 @@ class PMHack(BaseGbaHack):
         self._global_ins.backpack_offset = (page - 1) * self.BACKPACK_PAGE_LENGTH
         self.backpack_group.read()
 
-    def on_backpack_swith(self, view):
+    def on_backpack_switch(self, view):
+        """背包切换"""
         self._global_ins.backpack_type = self.datasets.BACKPACK_KEYS[view.index]
         self.backpack_pageview.asset_total(self._global_ins.backpack_items.length, self.BACKPACK_PAGE_LENGTH)
         self.backpack_group.read()
 
-    def on_active_pokemo_swith(self, view):
+    def on_active_pokemo_switch(self, view):
+        """首个宝可梦切换"""
         self.active_pokemon_index = view.index
         self.read_active_pokemon()
         self.pokemon_group.read()
 
     def on_personality_select(self, view):
+        """个性选择切换"""
         personality = view.index
         b = [1, 1, 1, 1, 1]
         b[personality // 5] += 1

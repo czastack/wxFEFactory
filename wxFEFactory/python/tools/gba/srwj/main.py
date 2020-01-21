@@ -90,7 +90,7 @@ class Main(BaseGbaHack):
     def all_move_10(self, _):
         """全员十次移动次数"""
         addr = 0x0203424F
-        for i in range(60):
+        for _ in range(60):
             self.handler.write8(addr, 10)
             addr += 0x84
 

@@ -1,3 +1,4 @@
+import abc
 import traceback
 import base64
 import fefactory
@@ -10,7 +11,13 @@ from lib import ui
 
 
 class BaseHackTool(NestedTool):
-    handler_class = None
+    @abc.abstractproperty
+    def handler_class(self):
+        pass
+
+    @abc.abstractmethod
+    def render_main(self):
+        pass
 
     def __init__(self):
         super().__init__()
@@ -29,7 +36,7 @@ class BaseHackTool(NestedTool):
                     ui.Button("检测", class_="vcenter", onclick=self.check_attach)
                     self.render_top_button()
                     self.attach_status_view = ui.Text("", class_="vcenter grow padding_left")
-                    ui.CheckBox("保持最前", class_="vcenter", onchange=self.swith_keeptop)
+                    ui.CheckBox("保持最前", class_="vcenter", onchange=self.switch_keeptop)
                 with ui.Notebook(class_="fill") as book:
                     book.set_on_page_changed(self.on_page_changed)
                     self.begin_group()
@@ -133,7 +140,7 @@ class BaseHackTool(NestedTool):
         """放弃修改的配置"""
         self.config.cancel_change()
 
-    def swith_keeptop(self, view):
+    def switch_keeptop(self, view):
         """切换置顶"""
         win = __main__.win if self.nested else self.win
         win.keeptop = view.checked
@@ -201,11 +208,13 @@ class BaseHackTool(NestedTool):
         for btn in parent.children:
             btn.set_context_menu(contextmenu)
 
-    def load_model_fields(self, model):
+    def load_model_fields(self, instance):
         """导入模型字段数据"""
         data = fefactory.json_load_file(self)
         if not data:
             return
+
+        model = type(instance)
         if data['model'] != model.__name__:
             print('Model不匹配，需要的Model为%s，读取到的为%s' % (data['model'], model.__name__))
             return
@@ -220,12 +229,12 @@ class BaseHackTool(NestedTool):
                 value = data['data'][names[i]]
                 if isinstance(value, str):
                     value = base64.b64decode(value.encode())
-                field.__set__(self.chariot, value)
+                field.__set__(instance, value)
             print('导入成功')
 
-    def dump_model_fields(self, model, names=None):
+    def dump_model_fields(self, instance, names=None):
         """导出模型字段数据"""
-        model = self.models.Chariot
+        model = type(instance)
         if names is None:
             names = model.exportable_fields
         exportable_fields = [model.field(name) for name in names]
@@ -235,7 +244,7 @@ class BaseHackTool(NestedTool):
             data = {'model': model.__name__, 'data': {}}
             for i in dialog.listbox.GetCheckedItems():
                 field = exportable_fields[i]
-                value = field.__get__(self.chariot)
+                value = field.__get__(instance)
                 if not isinstance(value, (int, float)):
                     # 尝试按bytes处理
                     if not hasattr(value, 'to_bytes'):

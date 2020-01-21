@@ -1,3 +1,4 @@
+import abc
 import os
 from lib.gba.rom import BaseRomRW, RomProxyRW, RomHandler
 from lib.lazy import lazy
@@ -135,11 +136,16 @@ class FeRomHandler(RomHandler):
     FONT_POINTER = 0x06E0
     TEXT_TABLE_POINTER = 0x06DC
 
+    @abc.abstractmethod
+    def pos(self, pos):
+        pass
+
     def __init__(self):
         code = self.get_rom_code()
+        title = self.get_rom_title()
         if code not in config.romcode:
-            print('{}不是火纹的rom, code={}'.format(self.name, code))
-            self.Close()
+            print('{}不是火纹的rom, code={}'.format(title, code))
+            self.close()
         else:
             self.key = config.romcode[code]
         self._dict = None
@@ -189,7 +195,7 @@ class FeRomHandler(RomHandler):
         return self
 
     def __next__(self):
-        return self._file.read(1)[0]
+        return self.raw_read(1)[0]
 
     def read_text(self, addr, codebuff=None):
         """
@@ -206,7 +212,7 @@ class FeRomHandler(RomHandler):
 
     def write_text(self, addr, text):
         huffbytes = self.dict.encode_haffuman(text)
-        self.write(addr, bytes)
+        self.write(addr, huffbytes)
 
     def write_text_codes(self, addr, codes):
         huffbytes = self.dict.encode_haffuman_code(codes)

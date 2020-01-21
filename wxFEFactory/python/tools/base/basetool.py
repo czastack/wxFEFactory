@@ -1,3 +1,4 @@
+import abc
 import traceback
 import __main__
 from lib import lazy, ui
@@ -6,7 +7,7 @@ from styles import styles, dialog_style
 from pyapi import alert
 
 
-class BaseTool(BaseScene):
+class BaseTool(BaseScene, metaclass=abc.ABCMeta):
     # 窗口嵌套
     nested = False
 
@@ -27,6 +28,7 @@ class BaseTool(BaseScene):
         except Exception:
             traceback.print_exc()
 
+    @abc.abstractmethod
     def render(self):
         """ 渲染视图，供attach调用
         :return: 返回根元素
@@ -46,7 +48,7 @@ class BaseTool(BaseScene):
             with ui.Menu("窗口"):
                 ui.MenuItem("关闭\tCtrl+W", onselect=self.weak.close_window)
                 ui.MenuItem("重载\tCtrl+R", onselect=self.weak.reload)
-                ui.MenuItem("切换置顶", onselect=self.weak.swith_keeptop, kind=ui.wx.ITEM_CHECK)
+                ui.MenuItem("切换置顶", onselect=self.weak.switch_keeptop, kind=ui.wx.ITEM_CHECK)
 
         return menubar
 
@@ -118,7 +120,7 @@ class BaseTool(BaseScene):
         self.__dict__.clear()
         return True
 
-    def swith_keeptop(self, view):
+    def switch_keeptop(self, view):
         self.win.keeptop = view.checked
 
 

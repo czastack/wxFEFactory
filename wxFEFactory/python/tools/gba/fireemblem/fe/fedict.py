@@ -12,8 +12,10 @@ LP_CNODE = ctypes.POINTER(CTreeNode)
 class TreeNode:
     __slots__ = ('left', 'right', 'parent')
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, left=None, right=None):
         self.parent = parent
+        self.left = left
+        self.right = right
 
     def isleaf(self):
         return self.right is None
@@ -283,6 +285,7 @@ if __name__ == '__main__' or __name__ == 'builtins':
     # print(di.decode_haffuman(b'\x93\xe4\x93\xbf\x01'))
 
     # import os
-    # di = FeDict((r'E:\GBA\rom\烈火之剑汉化版.gba', 0xbb5a80, 0x58ec), os.path.join(os.path.dirname(__file__), 'dict-fe7.txt'))
+    # di = FeDict((r'E:\GBA\rom\烈火之剑汉化版.gba', 0xbb5a80, 0x58ec),
+    #             os.path.join(os.path.dirname(__file__), 'dict-fe7.txt'))
     # print(di.decode_haffuman(b'\xCD\x1B'))
     pass

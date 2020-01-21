@@ -396,7 +396,7 @@ class MetalMaxHack(BaseNdsHack):
             enemy.hp = 1
 
     def load_chariot_fields(self, _):
-        super().load_model_fields(self.models.Chariot)
+        super().load_model_fields(self.chariot)
 
     def dump_chariot_fields(self, _):
-        super().dump_model_fields(self.models.Chariot)
+        super().dump_model_fields(self.chariot)

@@ -8,6 +8,7 @@ class MonoType:
 
 
 class MonoClass(MonoType):
+    """mono类"""
     namespace = ''
     name = None
     namepath = None  # 内部类前缀 /分隔
@@ -45,6 +46,7 @@ class MonoClass(MonoType):
 
 
 class MonoMember:
+    """mono成员"""
     def __init__(self, name=None):
         self.name = name
 

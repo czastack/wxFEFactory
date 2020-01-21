@@ -1,3 +1,4 @@
+import abc
 from lib import ui
 from lib.ui.components import Pagination
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
@@ -8,6 +9,14 @@ from ..base import BaseGbaHack
 class FeHack(BaseGbaHack):
     TRAIN_ITEMS_PAGE_LENGTH = 10
     TRAIN_ITEMS_PAGE_TOTAL = 10
+
+    @abc.abstractproperty
+    def models(self):
+        pass
+
+    @abc.abstractproperty
+    def datasets(self):
+        pass
 
     def __init__(self):
         super().__init__()

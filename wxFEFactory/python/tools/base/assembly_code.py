@@ -30,15 +30,20 @@ class AssemblyNode:
         if abs(diff) < 0x7FFFFFFF:
             return utils.u32(diff).to_bytes(4, 'little')
 
+    def generate(self, owner, context):
+        return b''
+
+
+class TargetAssemblyNode(AssemblyNode):
+    def __init__(self, target):
+        self.target = target
+
     def get_target(self, owner):
         """获取目标符号(变量地址)"""
         target = self.target
         if isinstance(self.target, str):
             target = owner.get_variable(target).addr
         return target
-
-    def generate(self, owner, context):
-        return b''
 
 
 class Variable(AssemblyNode):
@@ -54,12 +59,12 @@ class Variable(AssemblyNode):
         return addr.to_bytes(size, 'little')
 
 
-class Cmp(AssemblyNode):
+class Cmp(TargetAssemblyNode):
     """比较节点"""
     def __init__(self, target, value):
         if value > 0xFF:
             raise ValueError("暂时只支持8位立即数的值")
-        self.target = target
+        super().__init__(target)
         self.value = value
 
     def generate(self, owner, context):
@@ -76,11 +81,8 @@ class Cmp(AssemblyNode):
                 return b'\x83\x3C\x25' + target.to_bytes(4, 'little') + self.value.to_bytes(1, 'little')
 
 
-class Dec(AssemblyNode):
+class Dec(TargetAssemblyNode):
     """自减节点"""
-    def __init__(self, target):
-        self.target = target
-
     def generate(self, owner, context):
         target = self.get_target(owner)
         offset = self.offsetof(target, context.addr, 6)
@@ -92,10 +94,10 @@ class Dec(AssemblyNode):
             return b'\xFF\x0C\x25' + target.to_bytes(4, 'little')
 
 
-class IfInt64(AssemblyNode):
+class IfInt64(TargetAssemblyNode):
     """条件分支节点"""
     def __init__(self, target, true_node, false_node):
-        self.target = target
+        super().__init__(target)
         self.true_node = true_node
         self.false_node = false_node
 
@@ -116,10 +118,10 @@ class MemRead(AssemblyNode):
         return owner.handler.read(addr, bytes, self.size)
 
 
-class Offset(AssemblyNode):
+class Offset(TargetAssemblyNode):
     """计算偏移地址"""
     def __init__(self, target, size=4):
-        self.target = target
+        super().__init__(target)
         self.size = size
 
     def generate(self, owner, context):
