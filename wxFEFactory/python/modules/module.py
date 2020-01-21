@@ -139,7 +139,7 @@ class BaseListBoxModuel(BaseModule):
     def onclear(self, menu):
         """清空列表"""
         if self.confirm('提示', '确认清空所有列表项？', ui.wx.NO) is ui.wx.YES:
-            self.listbox.clear()
+            self.listbox.Clear()
             return True
 
     def on_rename(self, view, menu):

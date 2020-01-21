@@ -288,9 +288,9 @@ class RadioBox(ControlWithItems):
     wxtype = wx.RadioBox
     wxevent = wx.EVT_RADIOBOX
 
-    def __init__(self, label="", choices=None, onselect=None, **kwargs):
+    def __init__(self, title="", choices=None, onselect=None, **kwargs):
         self.onselect = onselect
-        wxparams = {'label': label}
+        wxparams = {'title': title}
         if choices:
             wxparams['choices'] = choices
         kwargs['wxparams'] = wxparams
@@ -319,8 +319,8 @@ class FilePickerCtrl(Control):
     """文件选择器"""
     wxtype = wx.FilePickerCtrl
 
-    def __init__(self, path=None, msg="", wildcard="", **kwargs):
-        kwargs['wxparams'] = dict(path=path, msg=msg, wildcard=wildcard)
+    def __init__(self, path="", message="", wildcard="", **kwargs):
+        kwargs['wxparams'] = dict(path=path, message=message, wildcard=wildcard)
         Control.__init__(self, **kwargs)
 
     set_onchange = event_binder(wx.EVT_FILEPICKER_CHANGED)
@@ -330,8 +330,8 @@ class DirPickerCtrl(Control):
     """目录选择器"""
     wxtype = wx.DirPickerCtrl
 
-    def __init__(self, path=None, msg="", **kwargs):
-        kwargs['wxparams'] = dict(path=path, msg=msg)
+    def __init__(self, path="", message="", **kwargs):
+        kwargs['wxparams'] = dict(path=path, message=message)
         Control.__init__(self, **kwargs)
 
     set_onchange = event_binder(wx.EVT_DIRPICKER_CHANGED)

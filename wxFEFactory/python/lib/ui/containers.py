@@ -83,30 +83,23 @@ class Horizontal(SizerPanel):
 class GridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        self.rows = rows
-        self.cols = cols
-        self.vgap = vgap
-        self.hgap = hgap
+        self.sizer = wx.GridSizer(rows, cols, vgap, hgap)
         super().__init__(**kwargs)
 
     def onready(self):
-        self.set_sizer(wx.GridSizer(self.rows, self.cols, self.vgap, self.hgap))
+        self.set_sizer(self.sizer)
         super().onready()
 
 
 class FlexGridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        self.rows = rows
-        self.cols = cols
-        self.vgap = vgap
-        self.hgap = hgap
+        self.sizer = wx.FlexGridSizer(rows, cols, vgap, hgap)
+        self.sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
         super().__init__(**kwargs)
 
     def onready(self):
-        sizer = wx.FlexGridSizer(self.rows, self.cols, self.vgap, self.hgap)
-        sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
-        self.set_sizer(sizer)
+        self.set_sizer(self.sizer)
         super().onready()
 
 
@@ -134,7 +127,7 @@ class SplitterWindow(Layout):
     def __init__(self, horizontal=False, sashpos=0, **kwargs):
         self.horizontal = horizontal
         self.sashpos = sashpos
-        Layout.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def onready(self):
         super().onready()

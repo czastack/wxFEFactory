@@ -70,7 +70,7 @@ class CoordWidget(TwoWayWidget):
                     ui.MenuItem("复制(&C)", onselect=this.on_copy)
                     ui.MenuItem("粘贴(&V)", onselect=this.on_paste)
                     ui.MenuItem("清空列表(&E)", onselect=this.onclear)
-                root.set_context_menu(contextmenu)
+            root.set_context_menu(contextmenu)
             self.views = tuple(views)
         self.view = self.views[0]
         self.container = container
@@ -124,12 +124,12 @@ class CoordWidget(TwoWayWidget):
 
     def clear(self):
         self.data_list = []
-        self.listbox.clear()
+        self.listbox.Clear()
         self.lastfile = None
 
     def load(self, data_list):
         self.data_list = data_list
-        self.listbox.clear()
+        self.listbox.Clear()
         self.listbox.Append(tuple(data['name'] for data in self.data_list))
 
     def onadd(self, btn):

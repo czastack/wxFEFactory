@@ -31,7 +31,7 @@ class MenuHolder:
     def setmenu(self, itemid, menu):
         self.handlers[itemid] = menu
 
-    def onselect(self, itemid, owner):
+    def onselect(self, owner, itemid):
         menu = self.getmenu(itemid)
         if menu:
             # Call MenuItem.onselect
@@ -61,8 +61,8 @@ class ContextMenu(Menu):
         Menu.__init__(self, handlers={})
         self._onselect = onselect
 
-    def onselect(self, id, view):
-        if Menu.onselect(self, id, view):
+    def onselect(self, view, id):
+        if Menu.onselect(self, view, id):
             return True
         elif self._onselect is not None:
             self._onselect(view, self.getmenu(id))
@@ -87,7 +87,7 @@ class MenuBar(MenuHolder):
                 break
 
     def onselect(self, id):
-        if Menu.onselect(self, id, None):
+        if Menu.onselect(self, None, id):
             return True
         elif self._onselect is not None:
             self._onselect(self, self.getmenu(id))
@@ -110,6 +110,9 @@ class MenuItem:
 
     def onselect(self, owner):
         if self._onselect:
+            if owner:
+                # contextmenu
+                return self._onselect(owner, self)
             return self._onselect(self)
         return False
 

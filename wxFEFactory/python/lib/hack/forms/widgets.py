@@ -400,7 +400,7 @@ class DialogGroup(Group):
 
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with __main__.win:
-            with ui.dialog.StdDialog(self.label, style=style, styles=styles,
+            with ui.View.HERE, ui.dialog.StdDialog(self.label, style=style, styles=styles,
                     cancel=False, closable=self.closable) as root:
                 self.render_root()
 
@@ -689,7 +689,7 @@ class BaseSelect(TwoWayWidget):
     def menu_search(cls, view, menu):
         cls.active_ins = cls.search_map[id(view)]
         if getattr(cls, 'search_last_choices', None) is not cls.active_ins.choices:
-            cls.search_dialog.listbox.clear()
+            cls.search_dialog.listbox.Clear()
         else:
             cls.search_dialog.listbox.index = -1
         cls.search_dialog.ShowModal()
