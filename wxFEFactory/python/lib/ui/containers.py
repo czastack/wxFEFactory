@@ -83,24 +83,18 @@ class Horizontal(SizerPanel):
 class GridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        self.sizer = wx.GridSizer(rows, cols, vgap, hgap)
         super().__init__(**kwargs)
-
-    def onready(self):
-        self.set_sizer(self.sizer)
-        super().onready()
+        sizer = wx.GridSizer(rows, cols, vgap, hgap)
+        self.set_sizer(sizer)
 
 
 class FlexGridLayout(SizerPanel):
     """网格布局"""
     def __init__(self, rows=0, cols=2, vgap=0, hgap=0, **kwargs):
-        self.sizer = wx.FlexGridSizer(rows, cols, vgap, hgap)
-        self.sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
         super().__init__(**kwargs)
-
-    def onready(self):
-        self.set_sizer(self.sizer)
-        super().onready()
+        sizer = wx.FlexGridSizer(rows, cols, vgap, hgap)
+        sizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+        self.set_sizer(sizer)
 
 
 class ScrollView(SizerLayout):
@@ -109,11 +103,8 @@ class ScrollView(SizerLayout):
     def __init__(self, horizontal=False, wxstyle=int32(wx.HSCROLL | wx.VSCROLL).value, **kwargs):
         self.horizontal = horizontal
         super().__init__(wxstyle=wxstyle, **kwargs)
-
-    def onready(self):
         self.SetScrollRate(5, 5)
         self.set_sizer(wx.BoxSizer(wx.HORIZONTAL if self.horizontal else wx.VERTICAL))
-        super().onready()
 
     def layout(self):
         self.sizer.FitInside(self.wxwindow)
@@ -129,8 +120,8 @@ class SplitterWindow(Layout):
         self.sashpos = sashpos
         super().__init__(**kwargs)
 
-    def onready(self):
-        super().onready()
+    def layout(self):
+        super().layout()
         length = len(self.children)
         if length > 2:
             print('SplitterWindow不支持大于两个子元素')
@@ -152,12 +143,9 @@ class StaticBox(SizerLayout):
 
     def __init__(self, label, **kwargs):
         super().__init__(wxparams={'label': label}, **kwargs)
-
-    def onready(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.InsertSpacer(0, 15)
         self.set_sizer(sizer)
-        super().onready()
 
 
 class BookCtrlBase(Layout):

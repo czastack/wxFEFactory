@@ -12,7 +12,7 @@ class AuiManager(Layout):
     def __init__(self, **kwargs):
         self.mgr = None
         self.close_listeners = {}
-        Layout.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def __del__(self):
         if self.mgr:
@@ -96,13 +96,11 @@ class AuiNotebook(Layout):
 
     def __init__(self, **kwagrs):
         self.close_listeners = {}
-        Layout.__init__(self, **kwagrs)
+        super().__init__(**kwagrs)
+        self.Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, self.on_page_close)
 
     def __del__(self):
         self.close_listeners.clear()
-
-    def onready(self):
-        self.Bind(wx.EVT_AUINOTEBOOK_PAGE_CLOSE, self.on_page_close)
 
     def layout_child(self, child, style):
         data = child.extra
@@ -199,11 +197,11 @@ class AuiMDIParentFrame(BaseFrame):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        Layout.__init__(self, wxparams={'title': title}, **kwagrs)
+        super().__init__(wxparams={'title': title}, **kwagrs)
 
 
 class AuiMDIChildFrame(BaseTopLevelWindow):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        Layout.__init__(self, wxparams={'title': title}, **kwagrs)
+        super().__init__(wxparams={'title': title}, **kwagrs)

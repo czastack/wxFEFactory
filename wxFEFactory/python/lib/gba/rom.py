@@ -40,7 +40,7 @@ class RomHandler(metaclass=abc.ABCMeta):
 
 class BaseRomRW(FileRW):
     def __init__(self, path, addrmask=ROM_MASK, mode=None):
-        FileRW.__init__(self, path, addrmask, mode)
+        super().__init__(path, addrmask, mode)
 
 
 class RomRW(BaseRomRW):

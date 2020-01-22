@@ -33,11 +33,11 @@ class BaseTopLevelWindow(Layout):
 
 
 class BaseFrame(BaseTopLevelWindow):
-    def onready(self):
+    def __init__(self, title, menubar=None, **kwargs):
+        super().__init__(wxparams={'title': title}, **kwargs)
         self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.onclose)
-        if self.menubar:
-            self.set_menu(self.menubar)
-        super().onready()
+        if menubar:
+            self.set_menu(menubar)
 
     def release(self):
         if self.menubar:
@@ -58,40 +58,25 @@ class BaseFrame(BaseTopLevelWindow):
 class Frame(BaseFrame):
     wxtype = wx.Frame
 
-    def __init__(self, title, menubar=None, **kwargs):
-        self.menubar = menubar
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
-
 
 class MDIParentFrame(BaseFrame):
     wxtype = wx.MDIParentFrame
-
-    def __init__(self, title, menubar=None, **kwargs):
-        self.menubar = menubar
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
 
 
 class MDIChildFrame(BaseFrame):
     wxtype = wx.MDIChildFrame
 
-    def __init__(self, title, menubar=None, **kwargs):
-        self.menubar = menubar
-        BaseFrame.__init__(self, wxparams={'title': title}, **kwargs)
-
 
 class HotkeyFrame(Frame):
     def __init__(self, **kwargs):
         self.hotkey_map = {}
-        Frame.__init__(self, **kwargs)
+        super().__init__(**kwargs)
+        self.Bind(wx.EVT_HOTKEY, self.onhotkey)
 
     def release(self):
         self.stop_hotkey()
         self.hotkey_map.clear()
         super().release()
-
-    def onready(self):
-        super().onready()
-        self.Bind(wx.EVT_HOTKEY, self.onhotkey)
 
     def prepare_hotkey(self, hotkey):
         """获取全局唯一的id"""
@@ -144,19 +129,16 @@ class HotkeyFrame(Frame):
 class KeyHookFrame(Frame):
     def __init__(self, **kwargs):
         self.hotkey_map = {}
-        Frame.__init__(self, **kwargs)
+        super().__init__(**kwargs)
+        self.mgr = wx.KeyHookManager(self.wxwindow)
+        self.setHook = self.mgr.setHook
+        self.unsetHook = self.mgr.unsetHook
+        self.Bind(wx.EVT_KEYHOOK, self.onhotkey)
 
     def release(self):
         self.unsetHook()
         self.hotkey_map.clear()
         super().release()
-
-    def onready(self):
-        super().onready()
-        self.mgr = wx.KeyHookManager(self.wxwindow)
-        self.setHook = self.mgr.setHook
-        self.unsetHook = self.mgr.unsetHook
-        self.Bind(wx.EVT_KEYHOOK, self.onhotkey)
 
     def register_hotkeys(self, hotkeys):
         """批量注册热键"""
@@ -192,7 +174,7 @@ class Dialog(BaseTopLevelWindow):
     default_style = wx.DEFAULT_DIALOG_STYLE | wx.MINIMIZE_BOX | wx.RESIZE_BORDER | wx.CLIP_CHILDREN
 
     def __init__(self, title, wxstyle=default_style, **kwargs):
-        BaseTopLevelWindow.__init__(self, wxparams={'title': title}, wxstyle=wxstyle, **kwargs)
+        super().__init__(wxparams={'title': title}, wxstyle=wxstyle, **kwargs)
 
     def dismiss(self, ok=True):
         if self.IsModal():

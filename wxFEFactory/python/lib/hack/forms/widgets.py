@@ -48,12 +48,6 @@ class Widget(metaclass=abc.ABCMeta):
         else:
             self.render()
 
-        if self.view:
-            if ui.View._here:
-                self.onready()
-            else:
-                self.view.once('ready', self.onready)
-
     @classmethod
     def active_group(cls):
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
@@ -71,9 +65,6 @@ class Widget(metaclass=abc.ABCMeta):
         btn_write = (ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write())
             if not self.readonly else None)
         return btn_read, btn_write
-
-    def onready(self):
-        pass
 
     def set_help(self, help):
         if self.view:
@@ -409,7 +400,7 @@ class DialogGroup(Group):
 
         style = dict(dialog_style, **self.dialog_style) if self.dialog_style else dialog_style
         with __main__.win:
-            with ui.View.HERE, ui.dialog.StdDialog(self.label, style=style, styles=styles,
+            with ui.dialog.StdDialog(self.label, style=style, styles=styles,
                     cancel=False, closable=self.closable) as root:
                 self.render_root()
 
@@ -426,7 +417,7 @@ class DialogGroup(Group):
 class StaticGroup(Group):
     """静态容器，不绑定目标"""
     def __init__(self, caption):
-        Group.__init__(self, None, caption, 0, flexgrid=False, hasfooter=False)
+        super().__init__(None, caption, 0, flexgrid=False, hasfooter=False)
 
 
 class GroupBox(BaseGroup):
@@ -458,9 +449,6 @@ class Groups(BaseGroup):
         with ui.Vertical(class_="fill", extra=extra) as root:
             self.view = ui.Notebook(class_="fill")
         self.root = root
-
-    def onready(self):
-        super().onready()
         if self.on_page_changed:
             self.view.set_on_page_changed(self.on_page_changed)
 
@@ -496,11 +484,8 @@ class BaseInput(TwoWayWidget):
                 self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
         self.container = container
-        del self.min, self.max
-
-    def onready(self):
-        super().onready()
         self.view.set_on_keydown(self.weak.onkey)
+        del self.min, self.max
 
     @property
     def input_value(self):
@@ -654,8 +639,6 @@ class BaseSelect(TwoWayWidget):
             self.render_btn()
         self.container = container
         self.search_map[id(self.view)] = self
-
-    def onready(self):
         self.view.set_context_menu(self.contextmenu)
         self.view.set_on_destroy(self.weak.on_destroy)
         self.view.set_on_keydown(self.weak.onkey)
@@ -702,7 +685,7 @@ class BaseSelect(TwoWayWidget):
     def search_dialog(self):
         """搜索对话框"""
         # 如果不寄托在主窗口，关闭主窗口后程序后无法退出
-        with __main__.win, ui.View.HERE:
+        with __main__.win:
             return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=self.onsearch)
 
     @classmethod
@@ -818,9 +801,6 @@ class BaseChoiceDisplay(OneWayWidget):
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
         self.container = container
-
-    def onready(self):
-        super().onready()
         self.view.set_on_keydown(self.weak.onkey)
 
     def Set(self, choices, values=0):

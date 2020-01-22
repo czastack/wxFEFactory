@@ -7,18 +7,15 @@ class PropertyGrid(Control):
     wxtype = wx.PropertyGrid
 
     def __init__(self, data=None, exstyle=wx.PG_EX_HELP_AS_TOOLTIPS, **kwargs):
-        Control.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self._data = data
         self._onchange = None
         self.exstyle = exstyle
         self.changed = False
-
-    def onready(self):
         self.SetExtraStyle(self.exstyle)
         self.SetCaptionBackgroundColour(0xeeeeee)
         self.SetMarginColour(0xeeeeee)
         self.Bind(wx.EVT_PG_CHANGING, self.onchange)
-        super().onready()
 
     def set_prop_help(self, name, help):
         self.GetPropertyByName(name).SetHelpString(help)
@@ -200,7 +197,7 @@ class ListView(Control):
 
     def selectall(self, selected):
         for i in range(0, self.GetItemCount()):
-            self.SelectItem(i, selected)
+            self.Select(i, selected)
 
     def reverse_check(self):
         """反选"""
@@ -209,7 +206,7 @@ class ListView(Control):
 
     def clear_selected(self):
         for i in self.get_selected_list():
-            self.SelectItem(i, False)
+            self.Select(i, False)
 
     def check_selection(self, toogle):
         """勾选高亮选中的项"""
@@ -239,7 +236,7 @@ class ListView(Control):
         """设置高亮列表"""
         self.clear_selected()
         for i in selection:
-            self.SelectItem(i, True)
+            self.Select(i, True)
 
     set_on_item_selected = event_binder(wx.EVT_LIST_ITEM_SELECTED)
 

@@ -268,7 +268,7 @@ class MetalMaxHack(BaseNdsHack):
         dialog = getattr(self, name, None)
         if dialog is None:
             datasets = self.datasets
-            with ui.dialog.StdDialog(label, style={'width': 1400, 'height': 900},
+            with ui.dialog.StdDialog(label, parent=self.win, style={'width': 1400, 'height': 900},
                                      cancel=False, closable=False) as dialog:
                 with ui.Horizontal(class_="expand"):
                     dialog.search = ui.ComboBox(wxstyle=ui.wx.CB_DROPDOWN, class_="fill",
@@ -347,13 +347,13 @@ class MetalMaxHack(BaseNdsHack):
                 values.append(i)
             i += 1
         dialog.search.Set(choices)
-        dialog.search.popup()
+        dialog.search.Popup()
 
     def on_chariot_item_preset_search_select(self, view, dialog):
         """点击搜索项定位"""
         list_index = dialog.search_values[view.index]
         dialog.listview.clear_selected()
-        dialog.listview.SelectItem(list_index)
+        dialog.listview.Select(list_index)
         dialog.listview.Focus(list_index)
 
     def show_chariot_item_info(self, view, key=None, read=True):
@@ -361,8 +361,8 @@ class MetalMaxHack(BaseNdsHack):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
         dialog = self.get_chariot_item_info_dialog()
-        # if read:
-        #     dialog.read()
+        if read and self.handler.active():
+            dialog.read()
         dialog.show()
 
     def show_chariot_item_preset(self, view, dialog_name=None, key=None):
@@ -370,7 +370,7 @@ class MetalMaxHack(BaseNdsHack):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
         dialog = getattr(self, dialog_name)
-        equip = self.chariot_item_info.equip
+        equip = self.handler.active() and self.chariot_item_info.equip
         if equip:
             i = 0
             for item in dialog.data_list:
@@ -383,7 +383,7 @@ class MetalMaxHack(BaseNdsHack):
                             i = i + j
                             break
                     dialog.listview.clear_selected()
-                    dialog.listview.SelectItem(i)
+                    dialog.listview.Select(i)
                     dialog.listview.Focus(i)
                     break
                 i += 1

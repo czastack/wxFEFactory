@@ -11,9 +11,7 @@ from lib import ui
 
 
 class BaseHackTool(NestedTool):
-    @abc.abstractproperty
-    def handler_class(self):
-        pass
+    handler_class = None
 
     @abc.abstractmethod
     def render_main(self):
@@ -103,7 +101,7 @@ class BaseHackTool(NestedTool):
             group, fn, depend = item
             if depend:
                 self.handle_lazy_group(depend)
-            with ui.View.HERE, group:
+            with group:
                 if fn() is False:
                     return
                 # 释放tmp_style_list

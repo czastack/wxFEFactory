@@ -42,7 +42,7 @@ class MenuHolder:
 class Menu(MenuHolder):
     """基本菜单"""
     def __init__(self, text=None, help="", handlers=None):
-        MenuHolder.__init__(self, handlers)
+        super().__init__(handlers)
         self.wxmenu = wx.Menu()
         if text is not None:
             parent = self.active_menu()
@@ -58,7 +58,7 @@ class Menu(MenuHolder):
 class ContextMenu(Menu):
     """右键菜单"""
     def __init__(self, onselect=None):
-        Menu.__init__(self, handlers={})
+        super().__init__(handlers={})
         self._onselect = onselect
 
     def onselect(self, view, id):
@@ -72,7 +72,7 @@ class ContextMenu(Menu):
 class MenuBar(MenuHolder):
     """菜单栏"""
     def __init__(self, onselect=None):
-        MenuHolder.__init__(self, handlers={})
+        super().__init__(handlers={})
         self._onselect = onselect
         self.wxwindow = wx.MenuBar(0)
         self.wxwindow.SetHost(self)

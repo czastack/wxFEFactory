@@ -132,7 +132,7 @@ class Vector2(Vector):
     y = Vector.Item(1)
 
     def __init__(self, values=(0.0, 0.0)):
-        Vector.__init__(self, values)
+        super().__init__(values)
 
     def get_vetical_xy(self):
         """获取xy面上垂直的向量"""
@@ -148,7 +148,7 @@ class Vector3(Vector):
     z = Vector.Item(2)
 
     def __init__(self, values=(0.0, 0.0, 0.0)):
-        Vector.__init__(self, values)
+        super().__init__(values)
         if self.len != 3:
             raise ValueError('Vector3 need 3 element values')
 
@@ -161,7 +161,7 @@ class Quaternion(Vector3):
     def __init__(self, values=(0.0, 0.0, 0.0, 0.0)):
         if len(values) != 4:
             raise ValueError('Quaternion need 4 element values')
-        Vector.__init__(self, values)
+        super().__init__(values)
 
     def to_rotation(self):
         x, y, z, w = self

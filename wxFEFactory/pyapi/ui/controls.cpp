@@ -169,6 +169,7 @@ void UiModule::init_controls()
 			parent, id, value, pos_v, size_v, choices=py::tuple(), style_0, validator_v, name = (const char*)wxComboBoxNameStr)
 		.def("GetValue", &wxComboBox::GetValue)
 		.def("SetValue", &wxComboBox::SetValue, value)
+		.def("Popup", &wxComboBox::Popup)
 		.def("AutoComplete", (bool (wxComboBox::*)(const wxArrayString & choices)) & wxComboBox::AutoComplete, choices)
 		;
 

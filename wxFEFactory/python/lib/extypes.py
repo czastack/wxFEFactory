@@ -18,7 +18,7 @@ class Map(dict):
     __slots__ = ('__dict__',)
 
     def __init__(self, *args, **kwargs):
-        dict.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__dict__ = self
 
 
@@ -31,7 +31,7 @@ class Dict(Map):
     __slots__ = ('dafault_value',)
 
     def __init__(self, *args, dafault_value=None, **kwargs):
-        Map.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.dafault_value = dafault_value
 
     def __missing__(self, name):

@@ -1,6 +1,5 @@
 import abc
 from . import wx
-from lib.event_emitter import EventEmitter
 
 
 class BinderHelper:
@@ -32,10 +31,9 @@ def value_property(self, value):
     self.SetValue(value)
 
 
-class View(EventEmitter, metaclass=abc.ABCMeta):
+class View(metaclass=abc.ABCMeta):
     """视图元素"""
     LAYOUTS = []
-    _here = False
 
     @abc.abstractproperty
     def wxtype(self):
@@ -43,7 +41,6 @@ class View(EventEmitter, metaclass=abc.ABCMeta):
 
     def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, wxparams=None, extra=None):
-        EventEmitter.__init__(self)
         # style: None | [{}] | {}
         self.style = style
         if wxparams is None:
@@ -69,9 +66,8 @@ class View(EventEmitter, metaclass=abc.ABCMeta):
                 for style in styles:
                     self.try_styles(style)
 
-        if View._here:
-            # 立即渲染
-            self._render(parent)
+        # 立即渲染
+        self._render(parent)
 
     @classmethod
     def active_layout(cls):
@@ -156,7 +152,8 @@ class View(EventEmitter, metaclass=abc.ABCMeta):
         self.render(parent)
         self.apply_style()
         self.onready()
-        parent.layout_child(self, self.computed_style)
+        if parent:
+            parent.layout_child(self, self.computed_style)
         del self.wxparams
         del self.computed_style
 
@@ -170,7 +167,6 @@ class View(EventEmitter, metaclass=abc.ABCMeta):
             tooltip = self.extra.get('tooltip', None)
             if tooltip is not None:
                 self.SetToolTip(tooltip)
-        self.emit('ready')
 
     def add_style(self, target):
         """添加样式
@@ -408,24 +404,13 @@ class View(EventEmitter, metaclass=abc.ABCMeta):
     def set_on_destroy(self, fn):
         self.bind_event(wx.EVT_DESTROY, fn)
 
-    class Here:
-        """立即渲染"""
-        def __enter__(self):
-            View._here = True
-
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            View._here = False
-
-    HERE = Here()
-
 
 class Layout(View):
     """容器元素"""
     def __init__(self, *args, keep_styles=False, styles=None, **kwargs):
-        View.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.styles = styles
         self.children = []
-        self.pendding_children = []
         self.keep_styles = keep_styles
 
         # 合并父元素持有的样式表
@@ -458,45 +443,19 @@ class Layout(View):
 
     def __enter__(self):
         self.LAYOUTS.append(self)
-        if View._here:
-            self.Freeze()
+        self.Freeze()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         View.LAYOUTS.pop()
-        if View._here:
-            self.layout()
-            self.Thaw()
-        elif self.wxwindow is None and not View.LAYOUTS:
-            # 根节点，开始渲染
-            self.render_as_root(None)
+        self.layout()
+        self.Thaw()
         # 释放临时样式表
         if not self.keep_styles:
             self.tmp_styles_list = None
 
     def append(self, child):
         self.children.append(child)
-        if not View._here:
-            self.pendding_children.append(child)
-
-    def render_as_root(self, parent=None):
-        """作为根节点渲染，通常是另外添加的元素"""
-        self.compute_style()
-        self.render(parent)
-        self.Freeze()
-        self.apply_style()
-        self.onready()
-        self.Thaw()
-        del self.wxparams
-        del self.computed_style
-
-    def onready(self):
-        if not View._here:
-            for child in self.pendding_children:
-                child._render(self)
-            self.pendding_children.clear()
-        self.layout()
-        super().onready()
 
     def layout_child(self, child, style):
         """布局子元素"""

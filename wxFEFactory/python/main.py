@@ -84,7 +84,7 @@ class MainFrame:
                 with ui.Horizontal(
                     class_="console-input-multi",
                     extra=dict(name="multiline_console", direction="bottom", captionVisible=False, hide=True)
-                ) as multiline_console:
+                ):
                     self.console_input_multi = ui.TextInput(class_="console-input", multiline=True)
                     with ui.Vertical(class_="expand"):
                         ui.Button("∨", class_="btn-sm fill", onclick=weak.toggle_console_input_multi)
@@ -277,7 +277,7 @@ class MainFrame:
         """打开工具菜单"""
         dialog = getattr(self, 'tool_dialog', None)
         if dialog is None:
-            with ui.View.HERE, ui.dialog.StdDialog(
+            with ui.dialog.StdDialog(
                     "选择工具", parent=self.win, style={'width': 640, 'height': 900}) as dialog:
                 # wxTR_HIDE_ROOT|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_ROW_LINES|wxTR_HAS_BUTTONS|wxTR_SINGLE
                 tree = ui.TreeCtrl(class_="fill", wxstyle=0x2C05)

@@ -166,7 +166,8 @@ class Main(NativeHacktool):
         if item and item.addr:
             self.ingame_item.addr = item.addr
             dialog = self.get_ingame_item_dialog()
-            dialog.read()
+            if self.handler.active():
+                dialog.read()
             dialog.show()
         else:
             print("没有数据")

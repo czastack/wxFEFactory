@@ -117,7 +117,7 @@ void UiModule::init_datacontrols()
 		.def("IsItemChecked", &wxListView::IsItemChecked, item)
 		.def("IsSelected", &wxListView::IsSelected, item)
 		.def("CheckItem", &wxListView::CheckItem, item, "check"_a)
-		.def("Select", &wxListView::Select, item, "select"_a)
+		.def("Select", &wxListView::Select, item, "select"_a=true)
 		.def("GetFocusedItem", &wxListView::GetFocusedItem)
 		.def("Focus", &wxListView::Focus, "index"_a)
 		;

@@ -4,11 +4,8 @@ from . import wx
 
 class ToolBarBase(Layout):
     def __init__(self, **kwargs):
-        Layout.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.listeners = {}
-
-    def onready(self):
-        super().onready()
         self.Bind(wx.EVT_COMMAND_TOOL_CLICKED, self.onclick)
 
     def set_onclick(self, toolid, listener):

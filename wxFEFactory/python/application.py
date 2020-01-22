@@ -12,7 +12,7 @@ CONFIG_FILE = 'configs/config.json'
 class Application(Configurable):
     """保存一些全局数据"""
     def __init__(self):
-        Configurable.__init__(self, CONFIG_FILE)
+        super().__init__(CONFIG_FILE)
         config = self.config
         recent_project = self.getconfig('recent_project')
         history_size = self.getconfig('history_size', 10)

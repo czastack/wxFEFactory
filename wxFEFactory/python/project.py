@@ -11,7 +11,7 @@ class Project(Configurable):
         self.title = title
         if not Path.exists(self.path):
             os.mkdir(self.path)
-        Configurable.__init__(self, Path.join(self.path, 'project.json'))
+        super().__init__(Path.join(self.path, 'project.json'))
 
     def exists(self):
         return Path.exists(self.config_file)

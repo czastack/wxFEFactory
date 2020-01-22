@@ -38,7 +38,7 @@ class PresetDialog:
     def select(self, index):
         dialog = self.dialog
         dialog.listview.clear_selected()
-        dialog.listview.SelectItem(index)
+        dialog.listview.Select(index)
         dialog.listview.Focus(index)
 
     def on_item_selected(self, view, event):
@@ -60,7 +60,7 @@ class PresetDialog:
                 values.append(i)
             i += 1
         dialog.search.Set(choices)
-        dialog.search.popup()
+        dialog.search.Popup()
 
     def on_search_select(self, view):
         """点击搜索项定位"""

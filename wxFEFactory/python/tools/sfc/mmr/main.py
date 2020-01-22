@@ -192,13 +192,13 @@ class Main(BaseSfcHack):
                 values.append(i)
             i += 1
         dialog.search.Set(choices)
-        dialog.search.popup()
+        dialog.search.Popup()
 
     def on_chariot_item_preset_search_select(self, view, dialog):
         """点击搜索项定位"""
         list_index = dialog.search_values[view.index]
         dialog.listview.clear_selected()
-        dialog.listview.SelectItem(list_index)
+        dialog.listview.Select(list_index)
         dialog.listview.Focus(list_index)
 
     def show_chariot_equip_info(self, view, key=None, read=True):
@@ -206,7 +206,7 @@ class Main(BaseSfcHack):
         item = getattr(self.chariot, key)
         self.chariot_equip_info.addr = item.addr
         dialog = self.get_chariot_equip_info_dialog()
-        if read:
+        if read and self.handler.active():
             dialog.read()
         dialog.show()
 
@@ -218,7 +218,7 @@ class Main(BaseSfcHack):
         equip = self.chariot_equip_info.equip
         if equip < 0x7F:
             dialog.listview.clear_selected()
-            dialog.listview.SelectItem(equip)
+            dialog.listview.Select(equip)
             dialog.listview.Focus(equip)
         dialog.ShowModal()
 
