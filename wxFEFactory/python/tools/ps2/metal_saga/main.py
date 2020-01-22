@@ -208,7 +208,7 @@ class Main(BasePs2Hack):
         if item and item.addr:
             self.item_info.addr = item.addr
             dialog = self.get_item_info_dialog()
-            if self.handler.active():
+            if self.handler.active:
                 dialog.read()
             dialog.show()
         else:
@@ -221,7 +221,7 @@ class Main(BasePs2Hack):
             item = self._global.static_items[index - 1]
             self.static_item.addr = item.addr
             dialog = self.get_static_item_dialog()
-            if self.handler.active():
+            if self.handler.active:
                 dialog.read()
             dialog.show()
 

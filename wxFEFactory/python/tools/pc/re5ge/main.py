@@ -196,7 +196,7 @@ class Main(NativeHacktool):
         if item and item.addr:
             self.ingame_item.addr = item.addr
             dialog = self.get_ingame_item_dialog()
-            if self.handler.active():
+            if self.handler.active:
                 dialog.read()
             dialog.show()
         else:
@@ -210,7 +210,7 @@ class Main(NativeHacktool):
         if item and item.addr:
             self.saved_item.addr = item.addr
             dialog = self.get_saved_item_dialog()
-            if self.handler.active():
+            if self.handler.active:
                 dialog.read()
             dialog.show()
         else:
