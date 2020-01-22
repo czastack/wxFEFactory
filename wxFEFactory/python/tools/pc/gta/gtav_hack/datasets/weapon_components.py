@@ -7,7 +7,7 @@ WEAPON_COMPONENTS = (
         ("尤素福·阿米尔奢华涂饰", 0x9B76C72C),
     )),
 
-    ("SNSPISTOL",(
+    ("SNSPISTOL", (
         ("默认弹匣", 0xF8802ED9),
         ("扩充弹匣", 0x7B0033B3),
         ("Lowrider", 0x8033ECAF)

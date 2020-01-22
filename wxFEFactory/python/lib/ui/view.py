@@ -381,6 +381,7 @@ class View(metaclass=abc.ABCMeta):
     set_on_left_up = event_binder(wx.EVT_LEFT_UP, pass_event=True)
     set_on_right_down = event_binder(wx.EVT_RIGHT_DOWN, pass_event=True)
     set_on_right_up = event_binder(wx.EVT_RIGHT_UP, pass_event=True)
+    set_on_double_click = event_binder(wx.EVT_LEFT_DCLICK)
 
     def on_pop_menu(self, event):
         if self.contextmenu:

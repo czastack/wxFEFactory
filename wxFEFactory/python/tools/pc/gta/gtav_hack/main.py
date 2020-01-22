@@ -2,7 +2,6 @@ import math
 import os
 import json
 import time
-import __main__
 from functools import partial
 from lib import utils
 from lib.lazy import lazy

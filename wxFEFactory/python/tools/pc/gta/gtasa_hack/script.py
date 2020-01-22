@@ -1,9 +1,9 @@
 import struct
 from lib.hack import models
-from ..gta3_base.script import ArgType, BaseRunningScript
+from ..gta3_base.script import ArgType as BaseArgType, BaseRunningScript
 
 
-class ArgType(ArgType):
+class ArgType(BaseArgType):
     # Types below are only available in GTA SA
     INTRODUCED_IN_GTASA = 7
 

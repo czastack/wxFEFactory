@@ -69,7 +69,7 @@ class Player(Entity, GTA3Player):
     rotation = Field(0x2dc, float)
     # stamina = Field(0x600, float)
     in_vehicle = Field(0x314, bool, 1)
-    cur_weapon = Field(0x504, int)
+    # cur_weapon = Field(0x504, int)
     vehicle = ManagedModelPtrField(0x310, Vehicle)
     collidingCar = ManagedModelPtrField(0x34c, Vehicle)
     cur_weapon_slop = Field(0x498, int, 1)

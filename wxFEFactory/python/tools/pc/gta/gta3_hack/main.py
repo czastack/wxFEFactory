@@ -2,7 +2,6 @@ import math
 import os
 import json
 import time
-import __main__
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, Input, ModelInput, ModelCoordWidget
 from lib.win32.sendkey import auto, TextVK

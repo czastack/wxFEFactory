@@ -77,7 +77,7 @@ class NativeEntity(NativeModel):
         values = self.native_call_vector('GET_ENTITY_ROTATION_VELOCITY', 'Q', self.handle)
         return utils.VectorField(self, values, 'turn_speed')
 
-    @speed.setter
+    @turn_speed.setter
     def turn_speed(self, value):
         # 结果还是speed...
         self.script_call('APPLY_FORCE_TO_ENTITY', '2Q6f6Q', self.handle, 3, *value,
@@ -208,15 +208,15 @@ class Player(NativeEntity):
         self.index = index
 
     def player_getter(name, ret_type=int, ret_size=4):
-        def getter(self):
+        def _getter(self):
             return self.native_call(name, 'Q', self.index, ret_type=ret_type, ret_size=ret_size)
-        return getter
+        return _getter
 
     def player_getter_ptr(name, ret_type=int, ret_size=4):
-        def getter(self):
+        def _getter(self):
             self.native_call(name, '2Q', self.index, self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
-        return getter
+        return _getter
 
     def player_setter(name, type=int, default=None):
         if type is int:
@@ -228,12 +228,12 @@ class Player(NativeEntity):
         else:
             raise ValueError('not support type: ' + type.__name__)
         if default is not None:
-            def setter(self, value=default):
+            def _setter(self, value=default):
                 self.native_call(name, 'Q' + s, self.index, type(value))
         else:
-            def setter(self, value):
+            def _setter(self, value):
                 self.native_call(name, 'Q' + s, self.index, type(value))
-        return setter
+        return _setter
 
     @property
     def ped_index(self):
@@ -558,7 +558,7 @@ class Vehicle(NativeEntity):
         self.native_call('GET_VEHICLE_EXTRA_COLOURS', '3Q', self.handle, ctx.get_temp_addr(1), ctx.get_temp_addr(2))
         return ctx.get_temp_value(1), ctx.get_temp_value(2)
 
-    @colors.setter
+    @ext_colors.setter
     def ext_colors(self, value):
         self.native_call('SET_VEHICLE_EXTRA_COLOURS', '3Q', self.handle, *value)
 

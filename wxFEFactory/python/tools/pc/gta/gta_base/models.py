@@ -112,6 +112,7 @@ class NativeModel:
     def __init__(self, handle, context):
         self.handle = handle
         self.context = context
+        self.addr = 0
 
     @property
     def native_context(self):
@@ -129,20 +130,16 @@ class NativeModel:
     def script_call(self):
         return self.context.script_call
 
-    @property
-    def native_call_vector(self):
-        return self.context.script_call_vector
-
     def getter(name, ret_type=int, ret_size=4):
-        def getter(self):
+        def _getter(self):
             return self.native_call(name, self.P, self.handle, ret_type=ret_type, ret_size=ret_size)
-        return getter
+        return _getter
 
     def getter_ptr(name, ret_type=int, ret_size=4):
-        def getter(self):
+        def _getter(self):
             self.native_call(name, self.P * 2, self.handle, self.native_context.get_temp_addr())
             return self.native_context.get_temp_value(type=ret_type, size=ret_size)
-        return getter
+        return _getter
 
     def setter(name, type=int, default=None):
         if type is int:
@@ -154,12 +151,12 @@ class NativeModel:
         else:
             raise ValueError('not support type: ' + type.__name__)
         if default is not None:
-            def setter(self, value=default):
+            def _setter(self, value=default):
                 self.native_call(name, self.P + (s or self.P), self.handle, type(value))
         else:
-            def setter(self, value):
+            def _setter(self, value):
                 self.native_call(name, self.P + (s or self.P), self.handle, type(value))
-        return setter
+        return _setter
 
     @staticmethod
     def make_handle(arg):

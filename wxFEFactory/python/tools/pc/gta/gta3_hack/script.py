@@ -1,9 +1,9 @@
 import struct
 from lib.hack import models
-from ..gta3_base.script import ArgType, RunningScript
+from ..gta3_base.script import ArgType, RunningScript as BaseRunningScript
 
 
-class RunningScript(RunningScript):
+class RunningScript(BaseRunningScript):
     """原生脚本调用环境"""
     SIZE = 0x88
 

@@ -1,3 +1,4 @@
+import abc
 from functools import partial
 from lib import ui
 from ..gta_base.main import BaseGTATool
@@ -6,6 +7,18 @@ from . import opcodes
 
 class BaseGTA3_VC_SA_Tool(BaseGTATool):
     """GTA3, VC, SA公共基类"""
+
+    @abc.abstractproperty
+    def RunningScript(self):
+        pass
+
+    @abc.abstractmethod
+    def get_enemys(self):
+        pass
+
+    @abc.abstractmethod
+    def load_model(self, model_id):
+        pass
 
     def onattach(self):
         super().onattach()

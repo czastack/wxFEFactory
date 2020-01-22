@@ -1,3 +1,4 @@
+import abc
 import json
 import math
 import time
@@ -19,9 +20,46 @@ class BaseGTATool(NativeHacktool):
     TO_DOWN_DELTA = 6
     key_hook = False
 
+    MARKER_RANGE = None
+    DEST_DEFAULT_COLOR = None
+
+    @abc.abstractproperty
+    def address(self):
+        pass
+
+    @abc.abstractproperty
+    def models(self):
+        pass
+
+    @abc.abstractproperty
+    def Player(self):
+        pass
+
+    @abc.abstractproperty
+    def Vehicle(self):
+        pass
+
+    @abc.abstractproperty
+    def GO_FORWARD_COORD_RATE(self):
+        pass
+
+    @abc.abstractproperty
+    def VEHICLE_LIST(self):
+        pass
+
+    @abc.abstractmethod
+    def spawn_vehicle(self, model_id, coord=None):
+        pass
+
+    @abc.abstractmethod
+    def create_explosion(self, *args, **kwargs):
+        pass
+
     def __init__(self):
         super().__init__()
         self.handler = MemHandler()
+        self.vehicle_coord_view = None
+        self.coord_view = None
 
     def get_hotkeys(self):
         """重写这个函数，返回要注册的热键列表"""

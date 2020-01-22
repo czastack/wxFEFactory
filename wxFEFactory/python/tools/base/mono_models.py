@@ -21,8 +21,9 @@ class MonoClass(MonoType):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.__dict__.setdefault('__abstract__', False)
-        if not cls.__dict__['__abstract__']:
+        if not hasattr(cls, '__abstract__'):
+            cls.__abstract__ = False
+        if not cls.__abstract__:
             if cls.name is None:
                 cls.name = cls.__name__
                 if cls.namepath is not None:

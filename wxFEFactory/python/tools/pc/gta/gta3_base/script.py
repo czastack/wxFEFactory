@@ -62,7 +62,7 @@ class BaseRunningScript(ManagedModel):
 
         for fmt in utils.iter_signature(signature):
             try:
-                arg_type = self.get_arg_type(ch)
+                arg_type = self.get_arg_type(fmt)
             except IndexError:
                 raise ValueError('unsupported format: ' + fmt)
             arg = next(arg_it)

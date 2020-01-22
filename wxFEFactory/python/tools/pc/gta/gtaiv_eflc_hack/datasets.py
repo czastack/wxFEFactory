@@ -1,7 +1,7 @@
 # 无弹药数的武器分组
 SLOT_NO_AMMO = [0, 1]
 
-WEAPON_NONE = ( 0, 0, "无" )
+WEAPON_NONE = (0, 0, "无")
 
 WEAPON_LIST = [
     [

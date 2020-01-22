@@ -7,7 +7,6 @@ from tools.base.assembly_hacktool import AssemblyHacktool, AssemblyItem, Assembl
 from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
 from styles import styles
-# import pyapi
 from . import models
 
 
@@ -53,7 +52,7 @@ class Main(AssemblyHacktool):
                 AssemblyItem('vehicle_health_inf2', None, b'\x0F\xB7\x97\x32\x02\x00\x00\x48\x8B\x07',
                     0x3B00000, 0x3C00000, b'',
                     AssemblyGroup(
-                        b'\x48\xBA', assembly_code.Variable('vehicle_addr', 8),
+                        b'\x48\xBA', assembly_code.Variable('vehicle_addr'),
                         b'\x48\x39\x3A\x75\x09\x66\x83\xFD\x00\x7E\x03\x66\x31\xED'
                         b'\x0F\xB7\x97\x32\x02\x00\x00\x48\x8B\x07'),
                     inserted=True)),
@@ -87,7 +86,7 @@ class Main(AssemblyHacktool):
                 AssemblyItem('rapid_fire2', None, b'\xF3\x0F\x10\x87\x98\x01\x00\x00\x0F\x2F\xC6',
                     0x3C00000, 0x3D00000, b'',
                     AssemblyGroup(
-                        b'\x50\x48\xA1', assembly_code.Variable('rapid_fire_temp', 8),
+                        b'\x50\x48\xA1', assembly_code.Variable('rapid_fire_temp'),
                         b'\x48\x39\xF8\x75\x0A\xC7\x87\x98\x01\x00\x00\x00\xC0\x79\x44'
                         b'\x58\xF3\x0F\x10\x87\x98\x01\x00\x00'),
                     inserted=True,
