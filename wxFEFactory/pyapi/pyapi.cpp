@@ -83,6 +83,7 @@ void py_init()
 	{
 		e.restore();
 		PyErr_Print();
+		console.write(e.what());
 	}
 }
 

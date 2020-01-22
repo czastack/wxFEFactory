@@ -1,17 +1,24 @@
 import json
 import traceback
+import os
 import pyapi
 import __main__
 from lib.utils import HistoryList
 from lib.config import Configurable
 from project import Project
 
-CONFIG_FILE = 'configs/config.json'
+CONFIG_DIR = 'configs'
+CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.json')
+CONFIG_START_OPTION = os.path.join(CONFIG_DIR, 'start_option.json')
 
 
 class Application(Configurable):
     """保存一些全局数据"""
     def __init__(self):
+
+        if not os.path.exists(CONFIG_DIR):
+            os.makedirs(CONFIG_DIR, exist_ok=True)
+
         super().__init__(CONFIG_FILE)
         config = self.config
         recent_project = self.getconfig('recent_project')
@@ -47,7 +54,7 @@ class Application(Configurable):
         """加载临时启动参数"""
         data = None
         try:
-            with open('configs/start_option.json', 'r+') as file:
+            with open(CONFIG_START_OPTION, 'r+') as file:
                 data = json.load(file)
                 file.seek(0)
                 file.truncate()
@@ -60,5 +67,5 @@ class Application(Configurable):
 
     def save_temp_start_option(self, start_option):
         """保存临时启动参数"""
-        with open('configs/start_option.json', 'w') as file:
+        with open(CONFIG_START_OPTION, 'w') as file:
             json.dump(start_option, file)

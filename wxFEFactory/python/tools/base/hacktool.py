@@ -1,9 +1,11 @@
 import abc
-import traceback
 import base64
+import os
+import traceback
 import fefactory
 import __main__
 from .basetool import NestedTool
+from application import CONFIG_DIR
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler
@@ -19,7 +21,7 @@ class BaseHackTool(NestedTool):
 
     def __init__(self):
         super().__init__()
-        self.config = Config("configs/%s.config.json" % self.module_name + '')
+        self.config = Config(os.path.join(CONFIG_DIR, "{}.config.json".format(self.module_name)))
         if callable(self.handler_class):
             self.handler = self.handler_class()
 

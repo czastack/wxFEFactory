@@ -40,13 +40,19 @@ class NdsEmuHandler(MemHandler):
 
 
 class DeSmuMEHandler(NdsEmuHandler):
-    # DeSmuME_0.9.10?: 0x51E8B90
     CLASS_NAME = "DeSmuME"
+
+    BASE_ADDR_MAP = {
+        '0.9.10': 0x51E8B90,
+        '0.9.11': 0x5411250,
+    }
 
     def attach(self):
         succeed = self.attach_window(self.CLASS_NAME, None)
         if succeed:
-            self.memory_base = self.base_addr + 0x5411250
+            window_name = self.window_text
+            version = window_name.split()[1]
+            self.memory_base = self.base_addr + self.BASE_ADDR_MAP[version]
         return succeed
 
     def address_map(self, addr):
