@@ -48,7 +48,7 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def render_player(self):
         ModelInput("hp", "生命")
-        self.hpmax_view = ModelInput("hpmax", "最大生命")
+        ModelInput("hpmax", "最大生命")
         ModelInput("ap", "防弹衣")
         ModelInput("rotation", "旋转")
         self.coord_view = ModelCoordWidget("coord", "坐标", savable=True, preset=coords)
@@ -242,12 +242,11 @@ class Main(BaseGTA3_VC_SA_Tool):
             self.handler.write(mycar.pos.addr, self.handler.read(address.CAMERA, bytes, 28), 0)
             mycar.flip()
         else:
-            PI = math.pi
-            HALF_PI = PI / 2
+            HALF_PI = math.pi / 2
             cam_x = self.handler.read_float(address.CAMERA)
             cam_y = self.handler.read_float(address.CAMERA + 4)
             rot = -math.atan2(cam_x, cam_y) - HALF_PI
-            self.rot_view.mem_value = rot
+            self.player.rotation = rot
 
     def player_coord_from_map(self, _=None):
         # 从大地图读取坐标
@@ -459,9 +458,3 @@ class Main(BaseGTA3_VC_SA_Tool):
             color = blip.color
             if color == 7 and not blip.bright:
                 yield blip.entity
-
-    def add_bullet(self, creator, weaponType, coord, velocity):
-        self.native_call_auto(address.FUNC_AddBullet, '2L6f', creator, 0x13, *coord, *velocity)
-
-    def shoot_bullet(self):
-        pass

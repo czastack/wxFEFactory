@@ -247,7 +247,7 @@ class Main(BaseGTATool):
 
     def _player(self):
         """获取当前角色"""
-        # player_addr = self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
+        # player_addr = self.handler.read32(self.handler.read32(address.PLAYER_INFO_ARRAY) + 0x58C)
         # if player_addr == 0:
         #     return None
         player = getattr(self, '_player_ins', None)
@@ -269,7 +269,7 @@ class Main(BaseGTATool):
 
     def get_ped_addr(self):
         """获取当前角色的Ped结构地址"""
-        return self.handler.read32(self.handler.read32(self.address.PLAYER_INFO_ARRAY) + 0x58C)
+        return self.handler.read32(self.handler.read32(address.PLAYER_INFO_ARRAY) + 0x58C)
 
     def get_player_index(self):
         """获取当前角色的序号"""
@@ -303,17 +303,17 @@ class Main(BaseGTATool):
     @property
     def ped_pool(self):
         """角色池"""
-        return models.Pool(self.address.PED_POOL, self, models.MemPlayer)
+        return models.Pool(address.PED_POOL, self, models.MemPlayer)
 
     @property
     def vehicle_pool(self):
         """载具池"""
-        return models.Pool(self.address.VEHICLE_POOL, self, models.MemVehicle)
+        return models.Pool(address.VEHICLE_POOL, self, models.MemVehicle)
 
     @property
     def object_pool(self):
         """物体池"""
-        return models.Pool(self.address.OBJECT_POOL, self, models.MemObject)
+        return models.Pool(address.OBJECT_POOL, self, models.MemObject)
 
     def get_peds(self):
         """获取角色池中的角色列表"""
