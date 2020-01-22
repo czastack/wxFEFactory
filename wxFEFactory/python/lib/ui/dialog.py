@@ -1,5 +1,5 @@
 from lib import ui
-from lib.ui import wx, View
+from lib.ui import wx
 from lib.extypes import WeakBinder
 from styles import styles, dialog_style
 
@@ -124,7 +124,7 @@ class SearchDialog(StdDialog):
         self.onsearch = onsearch
         super().__init__(title, *args, **kwargs)
 
-        with View.HERE, self:
+        with self:
             with ui.Horizontal(class_='expand'):
                 self.input = ui.TextInput(class_='fill', wxstyle=wx.TE_PROCESS_ENTER)
                 ui.Button(label="搜索", class_='btn_sm', onclick=self.weak.onenter)

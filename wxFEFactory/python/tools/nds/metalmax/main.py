@@ -361,8 +361,8 @@ class MetalMaxHack(BaseNdsHack):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
         dialog = self.get_chariot_item_info_dialog()
-        if read:
-            dialog.read()
+        # if read:
+        #     dialog.read()
         dialog.show()
 
     def show_chariot_item_preset(self, view, dialog_name=None, key=None):

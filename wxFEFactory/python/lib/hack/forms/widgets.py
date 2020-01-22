@@ -48,6 +48,12 @@ class Widget(metaclass=abc.ABCMeta):
         else:
             self.render()
 
+        if self.view:
+            if ui.View._here:
+                self.onready()
+            else:
+                self.view.once('ready', self.onready)
+
     @classmethod
     def active_group(cls):
         return cls.GROUPS[-1] if len(cls.GROUPS) else None
@@ -65,6 +71,9 @@ class Widget(metaclass=abc.ABCMeta):
         btn_write = (ui.Button(label="w", style=btn_xs_style, onclick=lambda btn: this.write())
             if not self.readonly else None)
         return btn_read, btn_write
+
+    def onready(self):
+        pass
 
     def set_help(self, help):
         if self.view:
@@ -449,6 +458,9 @@ class Groups(BaseGroup):
         with ui.Vertical(class_="fill", extra=extra) as root:
             self.view = ui.Notebook(class_="fill")
         self.root = root
+
+    def onready(self):
+        super().onready()
         if self.on_page_changed:
             self.view.set_on_page_changed(self.on_page_changed)
 
@@ -483,9 +495,12 @@ class BaseInput(TwoWayWidget):
             else:
                 self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=self.readonly)
             self.render_btn()
-            self.view.set_on_keydown(self.weak.onkey)
         self.container = container
         del self.min, self.max
+
+    def onready(self):
+        super().onready()
+        self.view.set_on_keydown(self.weak.onkey)
 
     @property
     def input_value(self):
@@ -636,15 +651,17 @@ class BaseSelect(TwoWayWidget):
         super().render()
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.Choice(class_="fill", choices=self.choices, onselect=self.onselect)
-            self.view.set_context_menu(self.contextmenu)
-            self.view.set_on_destroy(self.weak.on_destroy)
             self.render_btn()
         self.container = container
+        self.search_map[id(self.view)] = self
+
+    def onready(self):
+        self.view.set_context_menu(self.contextmenu)
+        self.view.set_on_destroy(self.weak.on_destroy)
         self.view.set_on_keydown(self.weak.onkey)
         if self.dragable:
             self.view.set_on_left_down(self.weak.on_left_down)
             self.view.set_on_text_drop(self.weak.on_text_drop)
-        self.search_map[id(self.view)] = self
 
     def Set(self, choices, values=0):
         self.choices = choices
@@ -683,7 +700,10 @@ class BaseSelect(TwoWayWidget):
 
     @lazy.classlazy
     def search_dialog(self):
-        return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=self.onsearch)
+        """搜索对话框"""
+        # 如果不寄托在主窗口，关闭主窗口后程序后无法退出
+        with __main__.win, ui.View.HERE:
+            return ui.dialog.SearchDialog("搜索", onselect=self.onsearch_select, onsearch=self.onsearch)
 
     @classmethod
     def menu_search(cls, view, menu):
@@ -797,8 +817,11 @@ class BaseChoiceDisplay(OneWayWidget):
         with ui.Horizontal(class_="fill") as container:
             self.view = ui.TextInput(class_="fill", wxstyle=ui.wx.TE_PROCESS_ENTER, readonly=True)
             self.render_btn()
-        self.view.set_on_keydown(self.weak.onkey)
         self.container = container
+
+    def onready(self):
+        super().onready()
+        self.view.set_on_keydown(self.weak.onkey)
 
     def Set(self, choices, values=0):
         self.choices = choices

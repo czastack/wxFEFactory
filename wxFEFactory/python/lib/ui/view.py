@@ -1,5 +1,6 @@
 import abc
 from . import wx
+from lib.event_emitter import EventEmitter
 
 
 class BinderHelper:
@@ -31,7 +32,7 @@ def value_property(self, value):
     self.SetValue(value)
 
 
-class View(metaclass=abc.ABCMeta):
+class View(EventEmitter, metaclass=abc.ABCMeta):
     """视图元素"""
     LAYOUTS = []
     _here = False
@@ -42,6 +43,7 @@ class View(metaclass=abc.ABCMeta):
 
     def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, wxparams=None, extra=None):
+        EventEmitter.__init__(self)
         # style: None | [{}] | {}
         self.style = style
         if wxparams is None:
@@ -168,6 +170,7 @@ class View(metaclass=abc.ABCMeta):
             tooltip = self.extra.get('tooltip', None)
             if tooltip is not None:
                 self.SetToolTip(tooltip)
+        self.emit('ready')
 
     def add_style(self, target):
         """添加样式
