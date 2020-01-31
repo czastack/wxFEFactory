@@ -1,14 +1,12 @@
-from functools import partial
 from lib import ui
 from lib.hack.forms import (
     Group, StaticGroup, ProxyInput, ListFooterButtons
 )
-from lib.hack.handlers import MemHandler
 from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
-from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, ORIGIN
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta
-from tools.base.mono_hacktool import MonoHacktool, call_arg
+from tools.base.assembly_code import AssemblyGroup, MemRead, ORIGIN
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, Delta
+from tools.base.mono_hacktool import MonoHacktool
 from . import models, datasets
 
 
@@ -45,7 +43,7 @@ class Main(MonoHacktool):
             self.render_global()
         self.lazy_group(StaticGroup("技能"), self.render_skills)
         self.lazy_group(StaticGroup("符文"), self.render_items)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
@@ -95,13 +93,13 @@ class Main(MonoHacktool):
             ui.Button(label="给予所选", class_="button", onclick=self.give_checked_items)
             ui.Button(label="给予高亮", class_="button", onclick=self.give_selected_items)
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         Cooldown = models.Cooldown
         if not Cooldown.get_ChargesMissing.mono_compile:
             print('需要先加载游戏')
             return False
 
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItems('无冷却',
                 AssemblyItem('no_cooldown', None, b'\x48???\x2B\xC1',
                     Cooldown.get_ChargesMissing.mono_compile, Delta(0x2d), b'',

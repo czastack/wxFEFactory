@@ -194,7 +194,7 @@ class BaseHackTool(NestedTool):
         """渲染额外顶部按钮"""
         pass
 
-    def render_functions(self, names, cols=4):
+    def render_buttons(self, names, cols=4):
         """渲染功能按钮"""
         with ui.GridLayout(cols=cols, vgap=10, class_="expand"):
             for name in names:

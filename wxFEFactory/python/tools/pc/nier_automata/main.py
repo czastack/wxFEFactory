@@ -31,7 +31,7 @@ class Main(AssemblyHacktool):
             self.render_global()
         self.lazy_group(Group("player", "玩家", None), self.render_player)
         self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
@@ -52,9 +52,9 @@ class Main(AssemblyHacktool):
     def render_weapon(self):
         pass
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         delta = Delta(0x1000)
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItem('inf_health', '无限生命', b'\x89\x87\x58\x08\x00\x00\x8B\x9F\x68\x06\x01\x00', 0x001A6800, delta,
                 b'', b'\xC7\x87\x58\x08\x00\x00\x7F\x96\x98\x00\x8B\x9F\x68\x06\x01\x00', inserted=True),
             AssemblyItem('locked_item', '锁定物品', b'\x44\x01\x40\x08\x83\x78\x08', 0x005DCC00, delta, b'',

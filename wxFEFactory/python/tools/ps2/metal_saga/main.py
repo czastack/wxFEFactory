@@ -49,7 +49,7 @@ class Main(BasePs2Hack):
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("special_bullets", "特殊炮弹", chariot, cols=4), self.render_special_bullets)
         # self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
-        self.lazy_group(StaticGroup("功能"), self.render_functions)
+        self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
         with StaticGroup("快捷键"):
             ui.Text("左移(目标战车坐标): alt+left\n"
@@ -151,8 +151,8 @@ class Main(BasePs2Hack):
                 ModelSelect("wanted_status.%d" % i, name, choices=datasets.WANTED_STATUS,
                     values=datasets.WANTED_STATUS_VALUES)
 
-    def render_functions(self):
-        super().render_functions(('fake_down',))
+    def render_buttons_own(self):
+        self.render_buttons(('fake_down',))
 
     def get_hotkeys(self):
         this = self.weak

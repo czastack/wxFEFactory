@@ -28,7 +28,7 @@ class Main(BaseNesHack):
             ModelSelect("dragon", "当前龙", choices=DRAGONS)
 
         with StaticGroup("功能"):
-            self.render_functions(('hpmax', 'all_dragons', 'all_tools'))
+            self.render_buttons(('hpmax', 'all_dragons', 'all_tools'))
 
     def get_hotkeys(self):
         this = self.weak

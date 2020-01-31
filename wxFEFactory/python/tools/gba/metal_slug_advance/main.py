@@ -56,7 +56,7 @@ class Main(BaseGbaHack):
             ModelSelect("bombtype", choices=BOMB_TYPES, values=BOMB_VALUES)
 
         with StaticGroup("功能"):
-            self.render_functions(('max_ammo', 'fast_shoot'))
+            self.render_buttons(('max_ammo', 'fast_shoot'))
 
         with StaticGroup("快捷键"):
             ui.Text("恢复HP: alt+h")

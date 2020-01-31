@@ -55,7 +55,7 @@ class Main(BaseGbaHack):
             ModelCheckBox("invincible2")
 
         with StaticGroup("功能"):
-            self.render_functions(('set_monster_flag', 'set_skill_flag', 'set_soul_flag', 'set_equip_counts',
+            self.render_buttons(('set_monster_flag', 'set_skill_flag', 'set_soul_flag', 'set_equip_counts',
                         'set_tool_counts', 'set_enemy_flag', 'set_map_flag', 'set_extra_flag', 'set_boss_rush_flag'))
 
     def get_hotkeys(self):

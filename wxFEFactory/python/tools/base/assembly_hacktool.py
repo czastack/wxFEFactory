@@ -15,6 +15,8 @@ class AssemblyHacktool(BaseHackTool):
     def __init__(self):
         super().__init__()
         self.variable_model = VariableModel(self.weak)
+        self.is32process = False
+        self.reset()
 
     def reset(self):
         self.allocated_memory = None
@@ -36,7 +38,7 @@ class AssemblyHacktool(BaseHackTool):
                     self.unregister_assembly_item(value)
             self.reset()
 
-    def render_assembly_functions(self, functions, cols=4, vgap=10):
+    def render_assembly_buttons(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, class_="expand"):
             self.assembly_buttons = {}
             for item in functions:

@@ -37,7 +37,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("progress", "统计", (lambda: hlhandle.progress, models.Progress)), self.render_progress)
         self.lazy_group(Group("player", "玩家", (lambda: hlhandle.player, models.Player)), self.render_player)
         self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
@@ -83,13 +83,13 @@ class Main(AssemblyHacktool):
             for name in models.Skill.field_names:
                 ModelInput(name, instance=instance)
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         tier_item = AssemblyItem(
             None, None, b'\x89\x45\xF8\x01\x45\xFC\xFF',
             0x0C000000, 0x0FFF0000, b'', AssemblyGroup(b'\x83\xC0\x08', ORIGIN),
             inserted=True, replace_len=7, replace_offset=-7)
 
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItem('three_health', '三倍血', b'\xF2\x0F\x11\x45\xE8\xB8\x64\x00\x00\x00\x89\x45\xBC',
                 0x0C000000, 0x0FFF0000, b'\x2C\x01', replace_offset=6, replace_len=2),
             AssemblyItem('double_money', '两倍钱', b'\x89\x45\xF8\x03\x45\x0C\x89\x45\xF8\x89\x42\x34',

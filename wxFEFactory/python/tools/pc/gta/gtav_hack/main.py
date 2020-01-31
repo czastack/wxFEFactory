@@ -53,7 +53,7 @@ class Main(BaseGTATool):
         self.lazy_group(StaticGroup("载具模型"), self.render_vehicle_model)
         self.lazy_group(StaticGroup("物体模型"), self.render_object_model)
         self.lazy_group(StaticGroup("武器配件"), self.render_weapon_components)
-        self.lazy_group(StaticGroup("测试"), self.render_functions)
+        self.lazy_group(StaticGroup("测试"), self.render_buttons_own)
 
         with Group(None, "设置", None, hasfooter=False):
             self.render_config()
@@ -195,7 +195,7 @@ class Main(BaseGTATool):
                 ui.Button("给予", onclick=self.give_weapon_component)
                 ui.Button("移除", onclick=self.remove_weapon_component)
 
-    def render_functions(self):
+    def render_buttons_own(self):
         with ui.GridLayout(cols=4, vgap=10, class_="expand"):
             self.render_common_button()
             # ui.Button("附近的车爆炸", onclick=self.near_vehicles_explode)

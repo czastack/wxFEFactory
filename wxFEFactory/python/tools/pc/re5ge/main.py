@@ -41,7 +41,7 @@ class Main(NativeHacktool):
         self.lazy_group(Group("saved_items", "整理界面物品", self._saved_items, serializable=False, cols=6),
             self.render_saved_items)
         # self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_person_items(self):
         """游戏中物品"""
@@ -78,11 +78,11 @@ class Main(NativeHacktool):
     #                             onclick=partial(__class__.show_inventory_treasure_item, self.weak,
     #                                 instance=self._gloabl.character_struct, prop=prop))
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         NOP_7 = b'\x90' * 7
         NOP_8 = b'\x90' * 8
         NOP_9 = b'\x90' * 9
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItem('hp_keep', '生命不减', b'\x66\x29\x8E\x64\x13\x00\x00', 0x700000, 0x800000, NOP_7),
             AssemblyItem('ammo_keep', '弹药不减', b'\x2B\x44\x24\x08\x89\x41\x08', 0x800000, 0x900000, NOP_7),
             AssemblyItem('infinity_ammo', '无限弹药', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,

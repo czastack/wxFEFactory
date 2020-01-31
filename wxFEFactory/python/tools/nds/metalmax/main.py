@@ -52,7 +52,7 @@ class MetalMaxHack(BaseNdsHack):
         self.render_ext()
 
         with StaticGroup("功能"):
-            self.render_functions(('enemy_weak',))
+            self.render_buttons(('enemy_weak',))
 
     def get_hotkeys(self):
         this = self.weak

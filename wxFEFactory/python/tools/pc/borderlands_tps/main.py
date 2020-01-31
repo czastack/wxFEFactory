@@ -37,7 +37,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("team", "团队", team_config, cols=4), self.render_team)
         self.lazy_group(Groups("技能", self.weak.on_page_changed, addr=team_config), self.render_skill)
         self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(Group("assembly_variable", "代码变量", self.variable_model), self.render_assembly_variable)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
@@ -196,8 +196,8 @@ class Main(AssemblyHacktool):
         self._drop_rates_views = [Input(key, label, addr=partial(__class__.get_drop_rates_item, self.weak, key=key),
             type=float) for _id, key, label in self._drop_rates_table]
 
-    def render_assembly_functions(self):
-        super().render_assembly_functions((
+    def render_assembly_buttons_own(self):
+        self.render_assembly_buttons((
             AssemblyItem('ammo_inf', '子弹不减+精准不减', b'\xF3\x0F\x58\x45\x08\x51',
                 0x005C0000, 0x008D0000, b'',
                 AssemblyGroup(

@@ -35,7 +35,7 @@ class Main(AssemblyHacktool):
             ModelInput("attr_earth")
             ModelInput("attr_metal")
             ModelInput("attr_water")
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
         # with Group("movement", "移动", (self._movement, models.Movement)):
         #     ModelInput("air_time")
@@ -46,8 +46,8 @@ class Main(AssemblyHacktool):
         with Group("movement", "变量", self.variable_model):
             ModelInput("jump_height", "跳跃高度")
 
-    def render_assembly_functions(self):
-        super().render_assembly_functions((
+    def render_assembly_buttons_own(self):
+        self.render_assembly_buttons((
             AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
                 0x137500, 0x137800, b'',
                 assembly_code.AssemblyGroup(

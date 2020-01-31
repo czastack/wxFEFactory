@@ -36,7 +36,7 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("weapon_prof", "武器熟练度", self._global, cols=4), self.render_weapon_prof)
         self.lazy_group(Group("weapon", "武器", weapon, cols=4), self.render_weapon)
         self.lazy_group(Group("drop_rates", "掉落率", None), self.render_drop_rates)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_global(self):
@@ -162,8 +162,8 @@ class Main(AssemblyHacktool):
         self._drop_rates_views = [Input(key, label, addr=partial(__class__.get_drop_rates_item, self.weak, key=key),
             type=float) for _id, key, label in self._drop_rates_table]
 
-    def render_assembly_functions(self):
-        super().render_assembly_functions((
+    def render_assembly_buttons_own(self):
+        self.render_assembly_buttons((
             # AssemblyItem('accuracy_keep', '精准度不减', b'\xF3\x0F\x10\x40\x68\xF3\x0F\x11\x44\x24\x08',
             #     0x008D0000, 0x008F0000, b'\x0F\x57\xC0\x90\x90'),
             AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x10\x81\x94\x02\x00\x00\x0F\x2F',

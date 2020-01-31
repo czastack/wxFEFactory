@@ -21,7 +21,7 @@ class Main(BaseGbaHack):
         self.lazy_group(Group("items", "道具", self._global, cols=4), self.render_items)
         self.lazy_group(Group("event_items", "事件道具", self._global), self.render_event_items)
         self.lazy_group(Group("person_battles", "战斗中", self._global, cols=4), self.render_person_battles)
-        self.lazy_group(StaticGroup("功能"), self.render_functions)
+        self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
         with StaticGroup("快捷键"):
             ui.Text("恢复HP: alt+h")
@@ -75,8 +75,8 @@ class Main(BaseGbaHack):
         for i in range(3):
             ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
-    def render_functions(self):
-        super().render_functions(('enable_extra', 'all_cg', 'all_item_book', 'all_music', 'all_face', 'all_dubbing',
+    def render_buttons_own(self):
+        self.render_buttons(('enable_extra', 'all_cg', 'all_item_book', 'all_music', 'all_face', 'all_dubbing',
             'enable_chapter8', 'all_item_desc', 'over_drive', 'rage_clear', 's_ranking'))
 
     def get_hotkeys(self):

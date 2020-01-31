@@ -42,7 +42,7 @@ class Main(NativeHacktool):
             self.render_unit_type)
         self.lazy_group(StaticGroup("选中单位兵种攻防"), self.render_unit_type_atk_def)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
-        self.lazy_group(StaticGroup("功能"), self.render_functions)
+        self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
     def render_unit_type(self):
         ModelInput("hpmax")
@@ -81,8 +81,8 @@ class Main(NativeHacktool):
                 "选中单位投诚: alt+f\n"
                 "生成指定兵种单位: alt+v", class_="padding")
 
-    def render_functions(self):
-        super().render_functions(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
+    def render_buttons_own(self):
+        self.render_buttons(('all_map', 'no_fog', 'get_car', 'fly_dog', 'angry_boy',
             'create_all_unit'))
 
     def onattach(self):

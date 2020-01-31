@@ -32,7 +32,7 @@ class Main(BaseGbaHack):
             self.render_pilot()
 
         with StaticGroup("功能"):
-            self.render_functions(('all_intensified_parts', 'all_mini_games', 'all_skill_chip', 'all_move_10'))
+            self.render_buttons(('all_intensified_parts', 'all_mini_games', 'all_skill_chip', 'all_move_10'))
 
     def render_robot(self):
         Choice("机体", datasets.ROBOT_CHOICES, self.on_robot_change)

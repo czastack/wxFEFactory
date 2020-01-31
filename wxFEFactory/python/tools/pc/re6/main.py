@@ -20,6 +20,7 @@ class Main(NativeHacktool):
         self._global = models.Global(0, self.handler)
         self.ingame_item = models.IngameItem(0, self.handler)
         self.char_index = self._global.char_index = 0
+        self.char_choice = None
 
     def render_main(self):
         person = (self._person, models.Character)
@@ -41,8 +42,8 @@ class Main(NativeHacktool):
 
         self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4), self.render_person_items)
         self.lazy_group(Group("person_skills", "角色技能", self._global, cols=4), self.render_person_skills)
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
-        self.lazy_group(StaticGroup("功能"), self.render_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
+        self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
     def render_person_items(self):
         """游戏中物品"""
@@ -62,11 +63,11 @@ class Main(NativeHacktool):
             for i in range(3):
                 ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         # NOP_7 = b'\x90' * 7
         NOP_8 = b'\x90' * 8
         # NOP_9 = b'\x90' * 9
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
                 b'\x66\x4A\x90\x90\x90'),
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
@@ -83,8 +84,8 @@ class Main(NativeHacktool):
                 inserted=True, args=('skill_points_base',)),
         ))
 
-    def render_functions(self):
-        super().render_functions(('unlock_guns', 'give_rocket_launcher'))
+    def render_buttons_own(self):
+        self.render_buttons(('unlock_guns', 'give_rocket_launcher'))
 
     def get_ingame_item_dialog(self):
         """物品信息对话框"""

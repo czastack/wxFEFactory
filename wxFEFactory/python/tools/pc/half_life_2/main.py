@@ -24,7 +24,7 @@ class Main(AssemblyHacktool):
     def render_main(self):
         # with Group("global", "全局", self._global):
         #     pass
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def onattach(self):
         super().onattach()
@@ -33,10 +33,10 @@ class Main(AssemblyHacktool):
     def server_base(self):
         return self._server_base
 
-    def render_assembly_functions(self):
+    def render_assembly_buttons_own(self):
         server_base = self.server_base
         NOP_6 = b'\x90' * 6
-        super().render_assembly_functions((
+        self.render_assembly_buttons((
             AssemblyItem('invincible', '血量不减', b'\x89\xBE\x9C\x00\x00\x00\x5F\x5E\x5D\xB8',
                 0x218000, 0x228000, NOP_6, find_base=server_base),
             AssemblyItem('suit_keep', '护甲不减', b'\x2B\xE8\x39\xAE\xB4\x0B\x00\x00',

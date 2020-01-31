@@ -50,7 +50,7 @@ class Main(BaseGbaHack):
             ModelCheckBox("invincible", enable=0xFF, disable=0)
 
         with StaticGroup("功能"):
-            self.render_functions(('max_weapon_level', 'all_weapon', 'all_element', 'all_fairy',
+            self.render_buttons(('max_weapon_level', 'all_weapon', 'all_element', 'all_fairy',
                 'fairy_use_count_infinite'))
 
     def get_hotkeys(self):

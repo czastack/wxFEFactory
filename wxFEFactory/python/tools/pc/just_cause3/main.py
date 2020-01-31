@@ -22,10 +22,10 @@ class Main(AssemblyHacktool):
     def render_main(self):
         # with Group("global", "全局", self._global):
         #     pass
-        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_functions)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
-    def render_assembly_functions(self):
-        super().render_assembly_functions((
+    def render_assembly_buttons_own(self):
+        self.render_assembly_buttons((
             AssemblyItems('无限生命',
                 AssemblyItem('health_inf', None, b'\x0F\xBF\x82\x32\x02\x00\x00\x4C\x89\x41\x04\x44\x89\x41\x0C',
                     0x3A00000, 0x3B00000, b'',
