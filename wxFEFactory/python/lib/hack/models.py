@@ -388,19 +388,29 @@ class PtrField(Field):
 
 
 class ByteField(Field):
+    """字节字段"""
     __init__ = partialmethod(Field.__init__, size=1)
 
 
 class WordField(Field):
+    """双字节字段"""
     __init__ = partialmethod(Field.__init__, size=2)
 
 
 class QWordField(Field):
+    """四字节字段"""
     __init__ = partialmethod(Field.__init__, size=8)
 
 
 class FloatField(Field):
+    """浮点字段"""
     __init__ = partialmethod(Field.__init__, type=float)
+
+
+class BytesField(Field):
+    """字节数据字段"""
+    def __init__(self, offset, size=4, label=None):
+        super().__init__(offset, bytes, size, label)
 
 
 DWordField = Field
