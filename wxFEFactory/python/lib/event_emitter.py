@@ -162,9 +162,13 @@ class Listener(object):
 
 
 if __name__ == "__main__":
-    event = EventEmitter()
-    @event.on('test')
-    def test():
-        print('test emited')
+    def main():
+        event = EventEmitter()
 
-    event.emit('test')
+        @event.on('test')
+        def test():
+            print('test emited')
+
+        event.emit('test')
+
+    main()
