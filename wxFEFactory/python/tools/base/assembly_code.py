@@ -12,6 +12,10 @@ class AssemblyGroup:
             if isinstance(node, bytes):
                 buff.extend(node)
                 context.addr += len(node)
+            elif isinstance(node, str):
+                node = bytes.fromhex(node)
+                buff.extend(node)
+                context.addr += len(node)
             elif isinstance(node, AssemblyNode):
                 data = node.generate(owner, context)
                 buff.extend(data)

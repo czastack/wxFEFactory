@@ -373,6 +373,8 @@ class AssemblyItem(DataClass):
 
     def oninit(self):
         # 字符串转bytes
+        if self.fuzzy:
+            self.original = self.original.replace('*', '2A')
         for name in ('original', 'replace', 'assembly'):
             value = self[name]
             if isinstance(value, str):

@@ -7,6 +7,7 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool, AssemblyItem
+from tools.base.assembly_code import AssemblyGroup, ORIGIN
 from . import models, datasets
 
 
@@ -51,14 +52,18 @@ class Main(NativeHacktool):
     def render_assembly_buttons_own(self):
         NOP_8 = b'\x90' * 8
         self.render_assembly_buttons((
-            AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
-                b'\x66\x4A\x90\x90\x90'),
-            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
-            AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, 0x700000,
-                b'', b'\xF3\x0F\x58\xD2\xF3\x0F\x58\xD2\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
+            # AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
+            #     b'\x66\x4A\x90\x90\x90'),
+            # AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
+            AssemblyItem('inf_modai', '保存时墨带无限', '48 8B 42 10 48 85 C0 74 03 8B 58 20 2B DF', 0xE8AE00, 0xE8B000,
+                b'', '48 8B 42 10 48 85 C0 74 07 C7 40 20 0A000000 48 85 C0 74 03 8B 58 20 2B DF',
                 inserted=True),
+            AssemblyItem('min_save_count', '最小保存次数', '8D 42 01 89 41 24', 0xBA0000, 0xBA0200, '31 C0', replace_len=3),
             AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20 01 00 00 48 8D 94 24 C8000000', 0x01705000, 0x01705F00,
                 b'', 'C7 87 20010000 0000C842F3 0F10 87 20010000 48 8D 94 24 C8000000',
+                inserted=True),
+            AssemblyItem('no_recoil', '稳定射击', 'F3 0F10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', 0x01125000, 0x01126000,
+                b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
         ))
 
