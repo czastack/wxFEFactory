@@ -1,6 +1,6 @@
 import types
 from functools import partial
-from lib.extypes import DataClass
+from lib.extypes import new_dataclass, DataClass
 from lib.hack import utils
 from lib import ui
 from .hacktool import BaseHackTool
@@ -10,7 +10,8 @@ from .assembly_code import AssemblyGroup
 class AssemblyHacktool(BaseHackTool):
     """现在支持x86 jmp"""
     allocated_memory = None
-    allocated_size = 2048
+    allocation_size = 2048
+    allocation_type = 0x00003000
 
     def __init__(self):
         super().__init__()
@@ -73,7 +74,7 @@ class AssemblyHacktool(BaseHackTool):
         if self.allocated_memory is None:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
             self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(
-                self.allocated_size, protect=0x40)
+                self.allocation_size, allocation_type=self.allocation_type, protect=0x40)
             self.registed_assembly = {}
             self.registed_variable = {}
 
@@ -87,8 +88,6 @@ class AssemblyHacktool(BaseHackTool):
         self.insure_memory()
 
         if item.depends:
-            if isinstance(item.depends, str):
-                item.depends = item.depends.split()
             for key in item.depends:
                 self.toggle_assembly_button(key, True)
 
@@ -346,23 +345,22 @@ class Delta(int):
     pass
 
 
-""" register_assembly 的参数类型
-    :param original: 原始数据
-    :param find_start: 原始数据查找起始
-    :param find_end: 原始数据查找结束
-    :param replace: 原始数据替换为的内容
-    :param assembly: 写到新内存的内容
-    :param find_base: 是否将find_start和find_end加上模块起始地址
-    :param inserted: 是否自动加入jmp代码
-    :param replace_len: 只记录original前n个字节
-    :param ordinal: 出现的序号(相同原始数据查出的第n个)
-    :param fuzzy: 模糊查找，?表示任意字节
-"""
-AssemblyItem = DataClass(
-    'AssemblyItem',
-    ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
-        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext', 'depends'),
-    defaults={
+class AssemblyItem(DataClass):
+    """ register_assembly 的参数类型
+        :param original: 原始数据
+        :param find_start: 原始数据查找起始
+        :param find_end: 原始数据查找结束
+        :param replace: 原始数据替换为的内容
+        :param assembly: 写到新内存的内容
+        :param find_base: 是否将find_start和find_end加上模块起始地址
+        :param inserted: 是否自动加入jmp代码
+        :param replace_len: 只记录original前n个字节
+        :param ordinal: 出现的序号(相同原始数据查出的第n个)
+        :param fuzzy: 模糊查找，?表示任意字节
+    """
+    fields = ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
+        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext', 'depends')
+    defaults = {
         'assembly': None,
         'find_base': True,
         'ordinal': 1,
@@ -372,11 +370,19 @@ AssemblyItem = DataClass(
         'replace_offset': 0,
         'args': ()
     }
-)
+
+    def oninit(self):
+        # 字符串转bytes
+        for name in ('original', 'replace', 'assembly'):
+            value = self[name]
+            if isinstance(value, str):
+                self[name] = bytes.fromhex(value)
+        if isinstance(self.depends, str):
+            self.depends = self.depends.split()
 
 
-AssemblySwitch = DataClass('AssemblySwitch', ('key', 'label'))
-SimpleButton = DataClass('SimpleButton', ('key', 'label', 'onclick'))
+AssemblySwitch = new_dataclass('AssemblySwitch', ('key', 'label'))
+SimpleButton = new_dataclass('SimpleButton', ('key', 'label', 'onclick'))
 
-VariableType = DataClass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
+VariableType = new_dataclass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
     defaults={'size': 4, 'type': int, 'value': 0, 'align': 4})

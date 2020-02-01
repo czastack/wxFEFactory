@@ -238,9 +238,9 @@ addr_t ProcessHandler::getModuleHandle(LPCTSTR name)
 	return 0;
 }
 
-addr_t ProcessHandler::alloc_memory(size_t size, size_t start, DWORD protect)
+addr_t ProcessHandler::alloc_memory(size_t size, size_t start, DWORD allocationType, DWORD protect)
 {
-	return (addr_t)VirtualAllocEx(m_process, (LPVOID)start, size, MEM_COMMIT | MEM_RESERVE, protect);
+	return (addr_t)VirtualAllocEx(m_process, (LPVOID)start, size, allocationType, protect);
 }
 
 void ProcessHandler::free_memory(addr_t addr)
@@ -261,7 +261,7 @@ addr_t ProcessHandler::alloc_data(LPCVOID buf, size_t size, size_t start)
 
 addr_t ProcessHandler::write_function(LPCVOID buf, size_t size, size_t start)
 {
-	addr_t addr = alloc_memory(size, start, PAGE_EXECUTE_READWRITE);
+	addr_t addr = alloc_memory(size, start, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	if (!addr || !raw_write(addr, buf, size))
 	{
 		// std::cout << "Write failed" << std::endl;
@@ -331,7 +331,7 @@ addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, ad
 			for (page_cursor = page; page_cursor < page_end; ++page_cursor)
 			{
 				for (i = 0; i < data_size; ++i) {
-					if (page_cursor[i] != data[i] && (!fuzzy || data[i] != '?'))
+					if (page_cursor[i] != data[i] && (!fuzzy || data[i] != '*'))
 					{
 						break;
 					}

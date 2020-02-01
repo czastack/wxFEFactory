@@ -18,7 +18,7 @@ from lib.win32.keys import WXK
 :param packae: 是否是工具集(有子工具)
 :param children: 子工具元组
 """
-ToolTreeItem = extypes.DataClass("ToolTreeItem", ("module", "label", "package", "children", "id"))
+ToolTreeItem = extypes.new_dataclass("ToolTreeItem", ("module", "label", "package", "children", "id"))
 
 
 class MainFrame:

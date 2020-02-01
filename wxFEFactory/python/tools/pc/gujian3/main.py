@@ -48,7 +48,7 @@ class Main(AssemblyHacktool):
 
     def render_assembly_buttons_own(self):
         self.render_assembly_buttons((
-            AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48???\x48\x8b\x0c\x01',
+            AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48***\x48\x8b\x0c\x01',
                 0x137500, 0x137800, b'',
                 assembly_code.AssemblyGroup(
                     b'\x41\x81\xFC\xFF\xFF\xFF\xFF'

@@ -112,7 +112,7 @@ class LocalHandler:
             return self.write(addr, data, size)
         return False
 
-    def alloc_memory(self, init, size=None):
+    def alloc_memory(self, init, size=None, **kwargs):
         """ 申请内存
         (aBytes)
         (anInteger)

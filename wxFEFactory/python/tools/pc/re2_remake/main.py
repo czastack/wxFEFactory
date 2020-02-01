@@ -1,5 +1,5 @@
 import pyapi
-from functools import partial
+from base64 import b64decode
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
     ModelChoiceDisplay
@@ -13,6 +13,7 @@ from . import models, datasets
 class Main(NativeHacktool):
     CLASS_NAME = 'via'
     WINDOW_NAME = 'RESIDENT EVIL 2'
+    key_hook = False
 
     def __init__(self):
         super().__init__()
@@ -28,7 +29,6 @@ class Main(NativeHacktool):
             ModelInput("inventory.capcity", label="物品容量")
             ModelInput("save_count")
             ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
-            # ModelCheckBox("ammo_reducer")
 
         with Group("player", "角色", person):
             self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_person_change)
@@ -56,6 +56,9 @@ class Main(NativeHacktool):
             AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
             AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, 0x700000,
                 b'', b'\xF3\x0F\x58\xD2\xF3\x0F\x58\xD2\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
+                inserted=True),
+            AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20 01 00 00 48 8D 94 24 C8000000', 0x01705000, 0x01705F00,
+                b'', 'C7 87 20010000 0000C842F3 0F10 87 20010000 48 8D 94 24 C8000000',
                 inserted=True),
         ))
 
@@ -126,8 +129,9 @@ class Main(NativeHacktool):
         person.items[person.cur_item].set_with('quantity', 'max_quantity')
 
     def set_ammo_one(self):
-        person = self.person
-        person.items[person.cur_item].quantity = 1
+        # person = self.person
+        # person.items[person.cur_item].quantity = 1
+        self._global.inventory.items[0].info.choice += 1
 
     def save_coord(self):
         self.last_coord = self.person.coord.values()

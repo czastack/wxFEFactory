@@ -144,7 +144,7 @@ class Main(AssemblyHacktool):
             AssemblyItem('yellow_count', '金币数量', b'\x03\x45\x0C\x89\x45\xF8\x89\x42\x34',
                 0x0C000000, 0x0FFF0000, b'', b'\x89\x45\xF8\xB8\x3F\x42\x0F\x00\x89\x42\x34',
                 replace_offset=3, replace_len=6, inserted=True, help='获得1次细胞后开启 '),
-            AssemblyItem('blue_count', '细胞数量', b'\x8B\x91\x3C\x03\x00\x00\x89\x55\xF4\xB8????\x89',
+            AssemblyItem('blue_count', '细胞数量', b'\x8B\x91\x3C\x03\x00\x00\x89\x55\xF4\xB8****\x89',
                 0x0D000000, 0x0FFF0000, b'', b'\xC7\x81\x3C\x03\x00\x00\x36\x42\x0F\x00\x8B\x91\x3C\x03\x00\x00',
                 replace_len=6, inserted=True, fuzzy=True, help='投资1次细胞后开启'),
             tier_item.clone().set_data('red_tier', '暴虐等级+8', ordinal=3),

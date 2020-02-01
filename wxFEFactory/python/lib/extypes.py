@@ -112,12 +112,48 @@ class classproperty:
         return self.method(owner)
 
 
-class DataClassType:
-    __slots__ = ()
+class DataClassMeta(type):
+    """数据类元类"""
+    def __new__(cls, name, bases, attrs):
+        fields = attrs.pop('fields', None)
+
+        dataclass_bases = []
+        for base in reversed(bases):
+            if base != DataClass and issubclass(base, DataClass):
+                dataclass_bases.append(base)
+
+        if dataclass_bases:
+            # 处理继承
+            base_slots = []
+            base_defaults = {}
+            defaults = attrs.pop('defaults', None)
+            for base in dataclass_bases:
+                base_slots.extend(base.__slots__)
+                if base.defaults:
+                    base_defaults.update(base.defaults)
+            if defaults:
+                base_defaults.update(defaults)
+            attrs['defaults'] = base_defaults
+            if fields:
+                base_slots.extend(fields)
+            slots = base_slots
+        else:
+            slots = tuple(fields) if fields else ()
+        attrs['__slots__'] = slots
+        return super().__new__(cls, name, bases, attrs)
+
+
+class DataClass(metaclass=DataClassMeta):
+    """数据类"""
     default = None
 
     def __init__(self, *args, **kwargs):
         self._set_data(args, kwargs)
+        self.oninit()
+
+    def oninit(self):
+        """初始化"""
+        pass
 
     def set_data(self, *args, **kwargs):
         self._set_data(args, kwargs)
@@ -142,10 +178,12 @@ class DataClassType:
         return (getattr(self, field) for field in self.__slots__)
 
     def __getitem__(self, i):
-        return getattr(self, self.__slots__[i], self.default)
+        key = i if isinstance(i, str) else self.__slots__[i]
+        return getattr(self, key, self.default)
 
     def __setitem__(self, i, value):
-        return setattr(self, self.__slots__[i], value)
+        key = i if isinstance(i, str) else self.__slots__[i]
+        return setattr(self, key, value)
 
     def __str__(self):
         return str(self.to_tuple())
@@ -159,45 +197,15 @@ class DataClassType:
         return self.default
 
 
-class DataClassMeta(type):
-    def __new__(class_, name, bases, attrs):
-        fields = attrs.pop('fields')
-
-        the_bases = (DataClassType,)
-        if bases:
-            # 处理继承
-            dataclass_base = False
-            base_slots = []
-            base_defaults = {}
-            defaults = attrs.pop('defaults', None)
-            for base in bases:
-                if issubclass(base, DataClassType):
-                    dataclass_base = True
-                    base_slots.extend(base.__slots__)
-                    if base.defaults:
-                        base_defaults.update(base.defaults)
-            if defaults:
-                base_defaults.update(defaults)
-            attrs['defaults'] = base_defaults
-            base_slots.extend(fields)
-            slots = base_slots
-
-            if dataclass_base:
-                if dataclass_base:
-                    the_bases = bases
-                else:
-                    the_bases = bases + the_bases
-        else:
-            slots = tuple(fields)
-        attrs['__slots__'] = slots
-        return super().__new__(class_, name, the_bases, attrs)
-
-
-def DataClass(name, fields, default=None, defaults=None, attrs=None, bases=None):
+def new_dataclass(name, fields, default=None, defaults=None, attrs=None, bases=None):
     """ 直接构造数据类
     :param bases: 父类元组或None"""
     the_attrs = {'fields': fields, 'default': default, 'defaults': defaults}
     if attrs:
         attrs.update(the_attrs)
         the_attrs = attrs
+    if bases is None:
+        bases = (DataClass,)
+    elif DataClass not in bases:
+        bases = (*bases, DataClass)
     return DataClassMeta(name, bases, the_attrs)

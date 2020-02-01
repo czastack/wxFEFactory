@@ -83,5 +83,3 @@ class Global(Model):
     inventory = ModelPtrField((0x070B0840, 0x50), Inventory)
     camera_dist = Field((0x07081988, 0x98, 0x160, 0x34), label="摄像机参数")
     save_count = Field((0x07081A90, 0x198, 0x24), label="保存次数")
-
-    ammo_reducer = ToggleField(0x0B6C88E7, int, 2, enable=0x9090, disable=0xfb29, label="子弹不减")

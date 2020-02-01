@@ -101,7 +101,7 @@ class Main(MonoHacktool):
 
         self.render_assembly_buttons((
             AssemblyItems('无冷却',
-                AssemblyItem('no_cooldown', None, b'\x48???\x2B\xC1',
+                AssemblyItem('no_cooldown', None, b'\x48***\x2B\xC1',
                     Cooldown.get_ChargesMissing.mono_compile, Delta(0x2d), b'',
                     AssemblyGroup(b'\x89\x46', MemRead(offset=3, size=1), ORIGIN),
                     inserted=True, find_base=False, fuzzy=True),

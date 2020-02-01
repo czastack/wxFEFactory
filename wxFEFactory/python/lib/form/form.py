@@ -6,7 +6,7 @@ from .fields import Field, Group
 class FormMeta(abc.ABCMeta):
     SLOTS = ()
 
-    def __new__(class_, name, bases, attrs):
+    def __new__(cls, name, bases, attrs):
         # 排除抽象类
         attrs.setdefault('__abstract__', False)
         if not attrs['__abstract__']:
@@ -39,9 +39,9 @@ class FormMeta(abc.ABCMeta):
             if slots is None:
                 attrs.pop('__slots__')
             elif slots is False:
-                attrs['__slots__'] = class_.SLOTS
+                attrs['__slots__'] = cls.SLOTS
 
-        return super().__new__(class_, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 class BaseForm(metaclass=FormMeta):
@@ -71,31 +71,31 @@ class BaseForm(metaclass=FormMeta):
             field.create_property(pg)
 
     @classmethod
-    def cfield(class_, name):
-        return getattr(class_.structure, name, None)
+    def cfield(cls, name):
+        return getattr(cls.structure, name, None)
 
     @classmethod
-    def cfield_names(class_):
-        for field in class_.structure._fields_:
+    def cfield_names(cls):
+        for field in cls.structure._fields_:
             yield field[0]
 
     @classmethod
-    def size(class_):
-        return ctypes.sizeof(class_.structure)
+    def size(cls):
+        return ctypes.sizeof(cls.structure)
 
     @classmethod
-    def ptr_from_bytes(class_, data, length=0):
+    def ptr_from_bytes(cls, data, length=0):
         """
         :param data: bytes
         """
-        length = length or ctypes.sizeof(class_.structure)
+        length = length or ctypes.sizeof(cls.structure)
         stream = (ctypes.c_char * length)()
         stream.raw = data
-        ptr = ctypes.cast(stream, ctypes.POINTER(class_.structure))
+        ptr = ctypes.cast(stream, ctypes.POINTER(cls.structure))
         return ptr
 
     @classmethod
-    def struct_to_bytes(class_, s):
+    def struct_to_bytes(cls, s):
         """
         :param s: struct object
         """
@@ -104,16 +104,16 @@ class BaseForm(metaclass=FormMeta):
         return ptr.contents.raw
 
     @classmethod
-    def struct_to_dict(class_, s):
+    def struct_to_dict(cls, s):
         data = {}
-        for name in class_.cfield_names():
+        for name in cls.cfield_names():
             data[name] = getattr(s, name)
         return data
 
     @classmethod
-    def dict_to_struct(class_, data):
-        s = class_.structure()
-        for name in class_.cfield_names():
+    def dict_to_struct(cls, data):
+        s = cls.structure()
+        for name in cls.cfield_names():
             if name in data:
                 setattr(s, name, data[name])
         return s

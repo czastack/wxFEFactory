@@ -1,6 +1,6 @@
 class ProxyMetaclass(type):
 
-    def __new__(class_, name, bases, attrs):
+    def __new__(cls, name, bases, attrs):
         magic = attrs.pop('__magic__', None)
 
         if magic:
@@ -15,7 +15,7 @@ class ProxyMetaclass(type):
                     exec(code, None, attrs)
                     setattr(Magic, key, attrs[key])
 
-        return super().__new__(class_, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 class Proxy(metaclass=ProxyMetaclass):

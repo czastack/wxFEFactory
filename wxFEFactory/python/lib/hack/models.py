@@ -1,7 +1,7 @@
 import abc
 from typing import Callable, Sequence, Union
 from lib.utils import float32, Accumulator
-from lib.extypes import DataClass, classproperty
+from lib.extypes import new_dataclass, classproperty
 from functools import partialmethod
 from types import SimpleNamespace
 from . import utils
@@ -871,7 +871,7 @@ class MinuendFieldPrep(FieldPrep):
 :param attr: 下一层的属性
 :param offsets {level: 偏移字段名}
 """
-CAttr = DataClass("CAttr", ("attrs", "offsets"))
+CAttr = new_dataclass("CAttr", ("attrs", "offsets"))
 COMLEX_ATTR_MAP = {}
 COMLEX_ATTR_NONE = object()
 

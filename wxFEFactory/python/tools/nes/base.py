@@ -3,7 +3,7 @@ from lib.hack.handlers.neshandler import VirtuaNesHandler, NestopiaHandler
 from lib.hack.forms import Group, StaticGroup, ModelInput
 from lib.hack.models import Model, Field, ByteField, WordField
 from lib.win32.keys import VK
-from lib.extypes import DataClass
+from lib.extypes import new_dataclass
 from tools.base.hacktool import ProxyHackTool
 
 
@@ -11,7 +11,7 @@ class BaseNesHack(ProxyHackTool):
     handler_class = VirtuaNesHandler, NestopiaHandler
 
 
-FieldItem = DataClass('FieldItem', ('addr', 'name', 'size', 'max'))
+FieldItem = new_dataclass('FieldItem', ('addr', 'name', 'size', 'max'))
 
 
 class SimpleNesHack(BaseNesHack):

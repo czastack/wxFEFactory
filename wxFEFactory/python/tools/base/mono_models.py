@@ -311,5 +311,5 @@ class MonoArray(MonoType):
 
 class MonoArrayT(type):
     """主要用于field的type参数，表示这是一个数组"""
-    def __new__(class_, type_=int, itemsize=0, a=None):
+    def __new__(cls, type_=int, itemsize=0):
         return type('MonoArrayNew', (MonoArray,), {'type': type_, 'itemsize': itemsize})

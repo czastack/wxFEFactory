@@ -161,7 +161,7 @@ class Main(AssemblyHacktool):
             self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
 
     def render_drop_rates(self):
-        self._drop_rates_scan_data = (b'\x00\x00\x00????????????????????\x00\x00\x00\x00\x01\x00\x00\x00????'
+        self._drop_rates_scan_data = (b'\x00\x00\x00********************\x00\x00\x00\x00\x01\x00\x00\x00****'
             b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3F\x00\x00\x80\x3F')
 
         self._drop_rates_table = (
@@ -206,7 +206,7 @@ class Main(AssemblyHacktool):
             #         b'\x89\x8F\x10\x0E\x00\x00\x89\x8F\x14\x0E\x00\x00\x89\x8F\x18\x0E\x00\x00\x89\x8F\x1C\x0E\x00\x00'
             #         b'\x61\x9D\x8B\x86\x28\x0A\x00\x00',
             #         inserted=True, replace_len=6, replace_offset=3),
-            #     AssemblyItem('ammo_keep2', None, b'\x89\x7D?\x89\x7D?\x89\x7D?\x8B\x06\x8B\x55',
+            #     AssemblyItem('ammo_keep2', None, b'\x89\x7D*\x89\x7D*\x89\x7D*\x8B\x06\x8B\x55',
             #         0x008A0000, 0x008B0000, b'',
             #         b'\x9C\x60\x8B\x0D\x04\x09\xB7\x03\x8B\x89\x70\x04\x00\x00\x39\xC8\x0F\x85\x08\x00\x00\x00'
             #         b'\xC7\x44\x24\x2C\x00\x00\x00\x00\x61\x9D\x55\x8B\xEC\x6A\xFF',

@@ -217,7 +217,7 @@ public:
 
 	addr_t getModuleHandle(LPCTSTR name);
 
-	addr_t alloc_memory(size_t start, size_t size, DWORD protect = PAGE_READWRITE);
+	addr_t alloc_memory(size_t start, size_t size, DWORD allocationType = MEM_COMMIT | MEM_RESERVE, DWORD protect = PAGE_READWRITE);
 	void free_memory(addr_t addr);
 
 	addr_t alloc_data(LPCVOID buf, size_t size, size_t start=0);

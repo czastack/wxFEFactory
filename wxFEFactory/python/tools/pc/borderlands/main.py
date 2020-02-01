@@ -122,7 +122,7 @@ class Main(AssemblyHacktool):
         ModelInput('calculated_bullets_used')
 
     def render_drop_rates(self):
-        self._drop_rates_scan_data = (b'\xFF\xFF\xFF\xFF', b'\x00\x00\x00????????????????????'
+        self._drop_rates_scan_data = (b'\xFF\xFF\xFF\xFF', b'\x00\x00\x00********************'
             b'\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
         self._drop_rates_table = (

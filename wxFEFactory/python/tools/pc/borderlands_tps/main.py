@@ -163,7 +163,7 @@ class Main(AssemblyHacktool):
             self.lazy_group(Groups(item[0]), partial(render_sub_skill, item[2]))
 
     def render_drop_rates(self):
-        self._drop_rates_scan_data = (b'\x00\x00\x00????????????????????\x00\x00\x00\x00\x01\x00\x00\x00????'
+        self._drop_rates_scan_data = (b'\x00\x00\x00********************\x00\x00\x00\x00\x01\x00\x00\x00****'
             b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3F\x00\x00\x80\x3F')
 
         self._drop_rates_table = (
