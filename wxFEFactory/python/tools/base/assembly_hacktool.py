@@ -71,12 +71,25 @@ class AssemblyHacktool(BaseHackTool):
         self.assembly_buttons[key].toggle(checked, False)
 
     def insure_memory(self):
+        """确保分配内存"""
         if self.allocated_memory is None:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
-            self.next_usable_memory = self.allocated_memory = self.handler.alloc_memory(
-                self.allocation_size, allocation_type=self.allocation_type, protect=0x40)
+            start = 0
+            if not self.handler.is32process:
+                start = self.handler.base_addr - 0x10000000
+            self.alloc_memory(start)
+            if self.allocated_memory == 0:
+                self.alloc_memory()
+            if self.allocated_memory == 0:
+                raise ValueError('分配内存失败')
+            self.next_usable_memory = self.allocated_memory
             self.registed_assembly = {}
             self.registed_variable = {}
+
+    def alloc_memory(self, start=0):
+        """分配内存"""
+        self.allocated_memory = self.handler.alloc_memory(
+            self.allocation_size, start=start, allocation_type=self.allocation_type, protect=0x40)
 
     def register_assembly(self, item):
         """注册机器码修改
@@ -136,6 +149,8 @@ class AssemblyHacktool(BaseHackTool):
 
             if item.inserted:
                 available_len = original_len - len(replace)  # 可用于跳转到插入的代码的jmp指令的长度
+                jump_back = addr + original_len  # 跳转回(下一个指令)的地址
+
                 # 使用参数(暂时支持32位地址)
                 if item.args:
                     memory_conflict = memory == self.next_usable_memory
@@ -152,10 +167,10 @@ class AssemblyHacktool(BaseHackTool):
 
                 # 动态生成机器码
                 # 因为根据情况，addr可能会变
-                def gan_assembly(assembly):
+                def gen_assembly(assembly):
                     if isinstance(assembly, AssemblyGroup):
                         return assembly.generate(self, types.SimpleNamespace(
-                            item=item, original_addr=addr, original=original, addr=memory,
+                            item=item, original_addr=addr, original=original, addr=memory, jump_back=jump_back
                         ))
                     return assembly
 
@@ -164,9 +179,9 @@ class AssemblyHacktool(BaseHackTool):
                     # E9 relative address
                     # 计算jump地址, 5是jmp opcode的长度
                     jmp_len = 5
-                    assembly = gan_assembly(assembly)
+                    assembly = gen_assembly(assembly)
                     diff_new = utils.u32(jmp_offset)
-                    diff_back = utils.u32(addr + original_len - (memory + len(assembly) + 5))
+                    diff_back = utils.u32(jump_back - (memory + len(assembly) + 5))
                     replace += replace + b'\xE9' + diff_new.to_bytes(4, 'little')
                     assembly = assembly + b'\xE9' + diff_back.to_bytes(4, 'little')
                 else:
@@ -186,8 +201,8 @@ class AssemblyHacktool(BaseHackTool):
                     else:
                         raise ValueError('不支持当前情况jmp')
 
-                    assembly = gan_assembly(assembly)
-                    assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + (addr + original_len).to_bytes(8, 'little')
+                    assembly = gen_assembly(assembly)
+                    assembly = assembly + b'\xFF\x25\x00\x00\x00\x00' + jump_back.to_bytes(8, 'little')
 
                 if available_len < jmp_len:
                     raise ValueError("可用长度不足以插入jmp代码")

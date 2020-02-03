@@ -6,7 +6,8 @@ from lib.hack.forms import (
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
-from tools.base.native_hacktool import NativeHacktool, AssemblyItem
+from tools.base.native_hacktool import NativeHacktool
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems
 from tools.base.assembly_code import AssemblyGroup, ORIGIN
 from . import models, datasets
 
@@ -55,16 +56,47 @@ class Main(NativeHacktool):
             # AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
             #     b'\x66\x4A\x90\x90\x90'),
             # AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
+
+            AssemblyItem('inf_ammo', '弹药锁定', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
+                0x00401000, 0x00402000, b'',
+                '48 8B 48 10 48 85 C9 74 07 C7 41 20 E7030000',
+                inserted=True, replace_len=7),
+
+            AssemblyItems('弹夹子弹锁定',
+                AssemblyItem('inf_clip_ammo1', None, '48 8B 48 10 48 85 C9',
+                    0x00E88000, 0x00E89000, b'',
+                    '48 8B 48 10 48 85 C9 74 13 83 79 1C 00 74 0D 83 79 14 FF 74 07 C7 41 20 63000000 48 85 C9',
+                    inserted=True),
+
+                AssemblyItem('inf_clip_ammo2', None, '48 8B 46 10 48 85 C0',
+                    0x00E87C00, 0x00E87D00, b'',
+                    '48 8B 46 10 48 85 C0 74 14 83 78 1C 00 74 0E 83 78 14 FF 74 08 BB 63000000 89 58 20 48 85 C0',
+                    inserted=True)),
             AssemblyItem('inf_modai', '保存时墨带无限', '48 8B 42 10 48 85 C0 74 03 8B 58 20 2B DF', 0xE8AE00, 0xE8B000,
                 b'', '48 8B 42 10 48 85 C0 74 07 C7 40 20 0A000000 48 85 C0 74 03 8B 58 20 2B DF',
                 inserted=True),
+
+            AssemblyItem('inf_knife', '小刀无限耐久', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 66 0F 6E C6',
+                0x00E88000, 0x00E89000, b'',
+                '48 8B 48 10 48 85 C9 74 0B 83 79 14 2E 75 05 8B C6 89 41 20 48 85 C9',
+                inserted=True, replace_len=7),
+
             AssemblyItem('min_save_count', '最小保存次数', '8D 42 01 89 41 24', 0xBA0000, 0xBA0200, '31 C0', replace_len=3),
-            AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20 01 00 00 48 8D 94 24 C8000000', 0x01705000, 0x01705F00,
-                b'', 'C7 87 20010000 0000C842F3 0F10 87 20010000 48 8D 94 24 C8000000',
-                inserted=True),
+            AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20010000 48', 0x01705000, 0x01705F00,
+                b'', 'C7 87 20010000 0000C842F3 0F10 87 20010000',
+                inserted=True, replace_len=8),
             AssemblyItem('no_recoil', '稳定射击', 'F3 0F10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', 0x01125000, 0x01126000,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
+            AssemblyItems('暴君一击倒地&无法起身',
+                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F C0', 0x0178F000, 0x01790000,
+                    b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
+                    inserted=True, replace_len=8),
+                AssemblyItem('baojun_down_2', None, '66 0F 5A CE F3 0F 11 8F F4 01 00 00 48 8B 43 50 48 39 48 18 75 1F',
+                    0x01C62000, 0x01C63000,
+                    b'', '68 00 00 C8 41 F3 0F 10 0C 24 48 83 C4 08',
+                    inserted=True, replace_len=8),
+            )
         ))
 
     def render_buttons_own(self):

@@ -2,7 +2,7 @@ from lib.hack.models import (
     Model, Field, Fields, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField,
     CoordField, BytesField, ToggleField
 )
-from .datasets import INVENTORY_OPTIONS
+from .datasets import INVENTORY_OPTIONS, AMMO_MAP
 
 
 class Character(Model):
@@ -40,6 +40,7 @@ class InventoryItemInfo(Model):
     SIZE = 240
     item_code = Field(0x10, label="物品编码")
     weapon_code = Field(0x14, label="武器编码")
+    ammo_code = Field(0x1C, label="子弹编码")
     count = Field(0x20, label="数量")
 
     @property
@@ -61,6 +62,7 @@ class InventoryItemInfo(Model):
         item, weapon, _ = INVENTORY_OPTIONS[value]
         self.item_code = item
         self.weapon_code = 0xFFFFFFFF if weapon == -1 else weapon
+        self.ammo_code = AMMO_MAP.get(weapon, 0)
 
 
 class InventoryItem(Model):
