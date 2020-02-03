@@ -7,8 +7,8 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems
-from tools.base.assembly_code import AssemblyGroup, ORIGIN
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType
+from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset
 from . import models, datasets
 
 
@@ -89,18 +89,32 @@ class Main(NativeHacktool):
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
             AssemblyItems('暴君一击倒地&无法起身',
-                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F C0', 0x0178F000, 0x01790000,
+                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F', 0x0178F000, 0x01790000,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
-                    inserted=True, replace_len=8),
-                AssemblyItem('baojun_down_2', None, '66 0F 5A CE F3 0F 11 8F F4 01 00 00 48 8B 43 50 48 39 48 18 75 1F',
+                    inserted=True, replace_len=6),
+                AssemblyItem('baojun_down_2', None,
+                    'F2 0F 5C F0 66 0F 5A CE F3 0F 11 8F F4 01 00 00 48 8B 43 50 48 39 48 18 75 1F',
                     0x01C62000, 0x01C63000,
                     b'', '68 00 00 C8 41 F3 0F 10 0C 24 48 83 C4 08',
                     inserted=True, replace_len=8),
-            )
+            ),
+            AssemblyItem('show_action', '显示可互动&可收集物品', 'F3 0F 59 63 6C F2 0F 10 D6', 0x022BE000, 0x022BF000,
+                b'', AssemblyGroup(
+                    '50 51 0F 29 05',
+                    Offset('float_1'),
+                    'F3 0F 10 43 6C 48 8B 4B 28 48 85 C9 74 35 48 8B 89 80 00 00 00 48 85 C9 74 29'
+                    '48 B8 2F 00 4E 00 6F 00 74 0048 39 41 30 75 19 48 B8 69 00 63 00 65 00 2F 00'
+                    '48 39 41 38 75 09 B8 28 00 00 00 F3 0F 2A C0 F3 0F 59 E0 0F 28 05',
+                    Offset('float_1'),
+                    '59 58',
+                    ORIGIN
+                ),
+                inserted=True, replace_len=5,
+                args=(VariableType('float_1', size=40, type=float, value=1.0),)),
         ))
 
     def render_buttons_own(self):
-        self.render_buttons(('unlock_guns', 'give_rocket_launcher'))
+        pass
 
     def get_ingame_item_dialog(self):
         """物品信息对话框"""
