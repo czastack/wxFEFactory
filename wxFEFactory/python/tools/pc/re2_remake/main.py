@@ -89,9 +89,9 @@ class Main(NativeHacktool):
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
             AssemblyItems('暴君一击倒地&无法起身',
-                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F', 0x0178F000, 0x01790000,
+                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', 0x0178F000, 0x01790000,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
-                    inserted=True, replace_len=6),
+                    inserted=True, fuzzy=True),
                 AssemblyItem('baojun_down_2', None,
                     'F2 0F 5C F0 66 0F 5A CE F3 0F 11 8F F4 01 00 00 48 8B 43 50 48 39 48 18 75 1F',
                     0x01C62000, 0x01C63000,
@@ -111,6 +111,10 @@ class Main(NativeHacktool):
                 ),
                 inserted=True, replace_len=5,
                 args=(VariableType('float_1', size=40, type=float, value=1.0),)),
+            AssemblyItem('through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38', 0x01DC8000, 0x01DC9000,
+                '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
+            AssemblyItem('through_wall', '穿墙(包括地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38', 0x01DC8000, 0x01DC9000,
+                '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
         ))
 
     def render_buttons_own(self):

@@ -72,12 +72,13 @@ class AssemblyHacktool(BaseHackTool):
 
     def insure_memory(self):
         """确保分配内存"""
-        if self.allocated_memory is None:
+        if not self.allocated_memory:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
-            start = 0
             if not self.handler.is32process:
                 start = self.handler.base_addr - 0x10000000
-            self.alloc_memory(start)
+                self.alloc_memory(start)
+                if self.allocated_memory == 0:
+                    self.alloc_memory(start - 0x10000000)
             if self.allocated_memory == 0:
                 self.alloc_memory()
             if self.allocated_memory == 0:
