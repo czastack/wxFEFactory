@@ -40,7 +40,8 @@ class Main(NativeHacktool):
             # ModelInput("weapon_state")
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", self._global, serializable=False, cols=4), self.render_person_items)
+        self.lazy_group(Group("person_items", "角色物品", self._global, serializable=False, cols=4),
+            self.render_person_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
@@ -111,10 +112,27 @@ class Main(NativeHacktool):
                 ),
                 inserted=True, replace_len=5,
                 args=(VariableType('float_1', size=40, type=float, value=1.0),)),
-            AssemblyItem('through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38', 0x01DC8000, 0x01DC9000,
-                '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
-            AssemblyItem('through_wall', '穿墙(包括地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38', 0x01DC8000, 0x01DC9000,
-                '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
+            AssemblyItem('through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
+                0x01DC8000, 0x01DC9000, '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
+            AssemblyItem('through_wall', '穿墙(包括地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
+                0x01DC8000, 0x01DC9000, '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
+            AssemblyItem('reset_time', '重置游戏时间',
+                '48 8D 04 2A 48 89 41 18 48 8B 43 50 4C 39 70 18 0F85 * * * *'
+                '44 38 77 53 0F85 * * * * 44 38 77 52 75 52', 0x00B7F000, 0x00B80000,
+                b'', AssemblyGroup(
+                    '48 8D 04 2A 48 89 41 18 48 2B 41 20 81 3D',
+                    Offset('reset_time_temp1'),
+                    '00879303 7C 0A C7 05',
+                    Offset('reset_time_temp1'),
+                    '00000000 81 05',
+                    Offset('reset_time_temp1'),
+                    '40420F00 48 2B 05',
+                    Offset('reset_time_temp1'),
+                    '48 89 41 30 48 31 C0 48 89 41 28',
+                ), inserted=True, replace_len=8, fuzzy=True,
+                args=(VariableType('reset_time_temp1', 8),)),
+            AssemblyItem('lock_time', '锁定倒计时', 'F3 0F 10 47 78 0F 57 F6', 0x0187A000, 0x0187B000,
+                b'', 'C7 47 78 00 A0 0C 47 F3 0F 10 47 78', replace_len=5, inserted=True),
         ))
 
     def render_buttons_own(self):
@@ -128,13 +146,13 @@ class Main(NativeHacktool):
         this = self.weak
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK.H, this.pull_through_all),
-            (VK.MOD_ALT, VK.E, this.set_ammo_one),
+            (VK.MOD_ALT, VK.E, this.set_ammo_up),
             (VK.MOD_ALT, VK.R, this.set_ammo_full),
             (VK.MOD_ALT, VK(','), this.save_coord),
             (VK.MOD_ALT, VK('.'), this.load_coord),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK(','), this.undo_coord),
-            (VK.MOD_ALT | VK.MOD_SHIFT, VK('.'), this.reload_coord),
+            (VK.MOD_ALT, VK.W, this.go_up),
+            (VK.MOD_ALT, VK.S, this.go_down),
         )
 
     def onattach(self):
@@ -180,13 +198,14 @@ class Main(NativeHacktool):
             character_struct.chars[i].set_with('health', 'health_max')
 
     def set_ammo_full(self):
-        person = self.person
-        person.items[person.cur_item].set_with('quantity', 'max_quantity')
+        # person = self.person
+        # person.items[person.cur_item].set_with('quantity', 'max_quantity')
+        self._global.inventory.items[0].info.count = 99
 
-    def set_ammo_one(self):
+    def set_ammo_up(self):
         # person = self.person
         # person.items[person.cur_item].quantity = 1
-        self._global.inventory.items[0].info.choice += 1
+        self._global.inventory.items[0].info.count += 10
 
     def save_coord(self):
         self.last_coord = self.person.coord.values()
@@ -205,12 +224,8 @@ class Main(NativeHacktool):
         if hasattr(self, 'last_coord'):
             self.person.coord = self.last_coord
 
-    def p1_go_p2(self):
-        self._person()  # 确保当前角色正确
-        chars = self._global.character_struct.chars
-        chars[self.char_index].coord = chars[self.char_index + 1].coord.values()
+    def go_up(self):
+        self._global.position_struct.coord[1] += 2
 
-    def p2_go_p1(self):
-        self._person()  # 确保当前角色正确
-        chars = self._global.character_struct.chars
-        chars[self.char_index + 1].coord = chars[self.char_index].coord.values()
+    def go_down(self):
+        self._global.position_struct.coord[1] -= 2
