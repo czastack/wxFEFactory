@@ -1,7 +1,22 @@
 from lib.hack import utils
 
 
-class AssemblyGroup:
+class AssemblyNode:
+    """汇编节点"""
+    @staticmethod
+    def offsetof(target, addr, size):
+        """计算偏移
+        :param size: 指令长度
+        """
+        diff = target - addr - size
+        if abs(diff) < 0x7FFFFFFF:
+            return utils.u32(diff).to_bytes(4, 'little')
+
+    def generate(self, owner, context):
+        return b''
+
+
+class AssemblyGroup(AssemblyNode):
     """节点组合"""
     def __init__(self, *nodes):
         self.nodes = nodes
@@ -21,21 +36,6 @@ class AssemblyGroup:
                 buff.extend(data)
                 context.addr += len(data)
         return bytes(buff)
-
-
-class AssemblyNode:
-    """汇编节点"""
-    @staticmethod
-    def offsetof(target, addr, size):
-        """计算偏移
-        :param size: 指令长度
-        """
-        diff = target - addr - size
-        if abs(diff) < 0x7FFFFFFF:
-            return utils.u32(diff).to_bytes(4, 'little')
-
-    def generate(self, owner, context):
-        return b''
 
 
 class TargetAssemblyNode(AssemblyNode):

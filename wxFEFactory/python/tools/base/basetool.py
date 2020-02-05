@@ -127,6 +127,7 @@ class BaseTool(BaseScene, metaclass=abc.ABCMeta):
 class NestedTool(BaseTool):
     nested = True
     key_hook = True
+    key_hook_ll = False  # low level
 
     def render_win(self):
         menubar = self.render_menu()

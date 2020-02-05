@@ -154,7 +154,7 @@ class BaseHackTool(NestedTool):
 
     def onattach(self):
         if self.key_hook:
-            self.win.setHook(self.handler.thread_id)
+            self.win.setHook(0 if self.key_hook_ll else self.handler.thread_id)
 
     def ondetach(self):
         pass

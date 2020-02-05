@@ -1,10 +1,11 @@
 import types
 from functools import partial
+from typing import Union, List
 from lib.extypes import new_dataclass, DataClass
 from lib.hack import utils
 from lib import ui
 from .hacktool import BaseHackTool
-from .assembly_code import AssemblyGroup
+from .assembly_code import AssemblyNode
 
 
 class AssemblyHacktool(BaseHackTool):
@@ -17,9 +18,11 @@ class AssemblyHacktool(BaseHackTool):
         super().__init__()
         self.variable_model = VariableModel(self.weak)
         self.is32process = False
+        self.assembly_buttons = {}
         self.reset()
 
     def reset(self):
+        """重置状态"""
         self.allocated_memory = None
         self.next_usable_memory = None
         self.registed_assembly = None
@@ -34,14 +37,13 @@ class AssemblyHacktool(BaseHackTool):
         super().ondetach()
         if self.allocated_memory is not None:
             self.handler.free_memory(self.allocated_memory)
-            for key, value in self.registed_assembly.items():
+            for _, value in self.registed_assembly.items():
                 if value['active']:
                     self.unregister_assembly_item(value)
             self.reset()
 
     def render_assembly_buttons(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, class_="expand"):
-            self.assembly_buttons = {}
             for item in functions:
                 button = ui.ToggleButton(label=item.label,
                     onchange=partial(self.__class__.toggle_assembly_function, self.weak, item=item))
@@ -155,7 +157,7 @@ class AssemblyHacktool(BaseHackTool):
                 # 使用参数(暂时支持32位地址)
                 if item.args:
                     memory_conflict = memory == self.next_usable_memory
-                    if isinstance(assembly, AssemblyGroup):
+                    if isinstance(assembly, AssemblyNode):
                         for arg in item.args:
                             self.register_variable(arg)
                     else:
@@ -169,7 +171,7 @@ class AssemblyHacktool(BaseHackTool):
                 # 动态生成机器码
                 # 因为根据情况，addr可能会变
                 def gen_assembly(assembly):
-                    if isinstance(assembly, AssemblyGroup):
+                    if isinstance(assembly, AssemblyNode):
                         return assembly.generate(self, types.SimpleNamespace(
                             item=item, original_addr=addr, original=original, addr=memory, jump_back=jump_back
                         ))
@@ -358,7 +360,6 @@ class AssemblyItems:
 
 class Delta(int):
     """差值"""
-    pass
 
 
 class AssemblyItem(DataClass):
@@ -387,10 +388,15 @@ class AssemblyItem(DataClass):
         'args': ()
     }
 
+    original: Union[str, bytes]
+    depends: Union[str, List[str]]
+
     def oninit(self):
         # 字符串转bytes
-        if self.fuzzy:
-            self.original = self.original.replace('*', '2A')
+        if isinstance(self.original, str):
+            if '*' in self.original:
+                self.original = self.original.replace('*', '2A')
+                self.fuzzy = True
         for name in ('original', 'replace', 'assembly'):
             value = self[name]
             if isinstance(value, str):
