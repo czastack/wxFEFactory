@@ -130,6 +130,7 @@ class Offset(TargetAssemblyNode):
 
     def generate(self, owner, context):
         target = self.get_target(owner)
+        print(hex(target), hex(context.addr))
         return self.offsetof(target, context.addr, self.size)
 
 

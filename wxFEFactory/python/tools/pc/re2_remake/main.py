@@ -8,7 +8,7 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
 from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta
-from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset
+from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Variable
 from . import models, datasets
 
 
@@ -89,6 +89,23 @@ class Main(NativeHacktool):
             AssemblyItem('no_recoil', '稳定射击', 'F3 0F10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', 0x01125000, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
+            AssemblyItems('一击必杀',
+                AssemblyItem('one_hit_kill_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', 0x004CD400, 0x004CD800, b'',
+                    AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 14 50 8F 05',
+                        Offset('player_addr'),
+                        '53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B'),
+                    inserted=True, replace_len=7, args=(VariableType('player_addr', size=8),)),
+                AssemblyItem('one_hit_kill_2', None,
+                    '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
+                    0x00C58600, 0x00C58800, b'',
+                    AssemblyGroup(
+                        '48 8D 4A 58 48 A1',
+                        Variable('player_addr'),
+                        '48 39 D0 0F 85 0D 00 00 00 8B 41 FC 89 01 45 31 C0 E9 10 00 00 00 41 83 F8 00'
+                        '0F 8E 06 00 00 00 41 B8 9F 86 01 00 8B 09 41 8B C0'
+                    ),
+                    inserted=True, replace_len=6),
+            ),
             AssemblyItems('暴君一击倒地&无法起身',
                 AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', 0x0178F000, delta,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',

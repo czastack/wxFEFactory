@@ -59,7 +59,7 @@ class Main(AssemblyHacktool):
                     '01 75 07 C7 41 38 0F 27 00 00',
                     Cmp('b_inf_mp', 1),
                     '01 75 07 C7 41 3C 0F 27 00 00 48 8B 49 28 48 85 C9'),
-                args=('player_addr', 'b_inf_health', 'b_inf_mp'),
+                args=(VariableType('player_addr', size=8), 'b_inf_health', 'b_inf_mp'),
                 inserted=True, fuzzy=True, replace_len=7),
             AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_mp',)),
             AssemblySwitch('b_inf_mp', '无限MP', depends=('inf_health_mp',)),
