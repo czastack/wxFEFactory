@@ -422,7 +422,7 @@ class AssemblyItem(AssemblyButton):
 
 class AssemblySwitch(AssemblyButton):
     """变量开关"""
-    fields = ('depends',)
+    fields = ('help', 'depends')
 
     depends: Union[str, List[str]]
 
@@ -433,7 +433,7 @@ class AssemblySwitch(AssemblyButton):
 
 class SimpleButton(AssemblyButton):
     """简易按钮"""
-    fields = ('onclick',)
+    fields = ('help', 'onclick')
 
 
 class VariableType(DataClass):

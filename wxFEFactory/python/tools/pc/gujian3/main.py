@@ -4,7 +4,7 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, SimpleButton
+    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
 )
 from tools.base import assembly_code
 from . import models
