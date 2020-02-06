@@ -126,7 +126,7 @@ class DataClassMeta(type):
             # 处理继承
             base_slots = []
             base_defaults = {}
-            defaults = attrs.pop('defaults', None)
+            defaults = attrs.get('defaults', None)
             for base in dataclass_bases:
                 base_slots.extend(base.__slots__)
                 if base.defaults:
@@ -139,6 +139,7 @@ class DataClassMeta(type):
             slots = base_slots
         else:
             slots = tuple(fields) if fields else ()
+            attrs.setdefault('defaults', None)
         attrs['__slots__'] = slots
         return super().__new__(cls, name, bases, attrs)
 

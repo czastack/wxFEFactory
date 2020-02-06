@@ -52,6 +52,7 @@ class AssemblyHacktool(BaseHackTool):
                 self.assembly_buttons[item.key] = button
 
     def toggle_assembly_function(self, btn, item):
+        """切换单个汇编功能"""
         checked = btn.checked
         if isinstance(item, AssemblyItem):
             if checked:
@@ -65,6 +66,9 @@ class AssemblyHacktool(BaseHackTool):
                 else:
                     self.unregister_assembly(item.key)
         elif isinstance(item, AssemblySwitch):
+            if checked and item.depends:
+                for key in item.depends:
+                    self.toggle_assembly_button(key, True)
             self.set_variable_value(item.key, int(checked))
         elif isinstance(item, SimpleButton):
             item.onclick(checked)
@@ -362,7 +366,12 @@ class Delta(int):
     """差值"""
 
 
-class AssemblyItem(DataClass):
+class AssemblyButton(DataClass):
+    """汇编功能按钮"""
+    fields = ('key', 'label')
+
+
+class AssemblyItem(AssemblyButton):
     """ register_assembly 的参数类型
         :param original: 原始数据
         :param find_start: 原始数据查找起始
@@ -372,17 +381,23 @@ class AssemblyItem(DataClass):
         :param find_base: 是否将find_start和find_end加上模块起始地址
         :param inserted: 是否自动加入jmp代码
         :param replace_len: 只记录original前n个字节
+        :param replace_offset: 替换其实位置偏移(可以为负数)
         :param ordinal: 出现的序号(相同原始数据查出的第n个)
         :param fuzzy: 模糊查找，?表示任意字节
+        :param args: 变量列表
+        :param help: 帮助文本，显示在按钮hover时
+        :param depends: 依赖
+        :param ext: 其他数据
     """
-    fields = ('key', 'label', 'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
-        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'ext', 'depends')
+    fields = ('original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
+        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'depends', 'ext')
     defaults = {
         'assembly': None,
         'find_base': True,
         'ordinal': 1,
         'fuzzy': False,
         'inserted': False,
+        'hidden': False,
         'replace_len': 0,
         'replace_offset': 0,
         'args': ()
@@ -405,8 +420,23 @@ class AssemblyItem(DataClass):
             self.depends = self.depends.split()
 
 
-AssemblySwitch = new_dataclass('AssemblySwitch', ('key', 'label'))
-SimpleButton = new_dataclass('SimpleButton', ('key', 'label', 'onclick'))
+class AssemblySwitch(AssemblyButton):
+    """变量开关"""
+    fields = ('depends',)
 
-VariableType = new_dataclass('VariableType', ('name', 'size', 'type', 'value', 'align', 'addr'),
-    defaults={'size': 4, 'type': int, 'value': 0, 'align': 4})
+    depends: Union[str, List[str]]
+
+    def oninit(self):
+        if isinstance(self.depends, str):
+            self.depends = self.depends.split()
+
+
+class SimpleButton(AssemblyButton):
+    """简易按钮"""
+    fields = ('onclick',)
+
+
+class VariableType(DataClass):
+    """变量类型"""
+    fields = ('name', 'size', 'type', 'value', 'align', 'addr')
+    defaults = {'size': 4, 'type': int, 'value': 0, 'align': 4}

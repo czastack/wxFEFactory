@@ -108,7 +108,6 @@ class Main(NativeHacktool):
                     '48 39 41 38 75 09 B8 28 00 00 00 F3 0F 2A C0 F3 0F 59 E0 0F 28 05',
                     Offset('float_1'),
                     '59 58',
-                    ORIGIN
                 ),
                 inserted=True, replace_len=5,
                 args=(VariableType('float_1', size=40, type=float, value=1.0),)),
