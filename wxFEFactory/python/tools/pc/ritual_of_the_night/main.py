@@ -75,7 +75,7 @@ class Main(AssemblyHacktool):
                     '75 07 BA 7F 96 98 00 EB 15',
                     Cmp('exp_mult', 0),
                     '74 0C 83 FA 00 7E 07',
-                    '0F AF 15', Offset('exp_mult', 7),
+                    '0F AF 15', Offset('exp_mult'),
                     '44 8B C2 48 8B D9'),
                 args=('b_inf_money', 'exp_mult'),
                 inserted=True, replace_len=6),
