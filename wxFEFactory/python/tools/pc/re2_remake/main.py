@@ -12,10 +12,51 @@ from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Variable
 from . import models, datasets
 
 
+ADDRESS_SOURCES = {
+    'steam': {
+        'inf_ammo': 0x004FF000,
+        'inf_modai': 0x00F3D000,
+        'item_keep': 0x004FF000,
+        'inf_knife': 0x004FD000,
+        'min_save_count': 0x01C1E000,
+        'quick_aim': 0x00EC4000,
+        'no_recoil': 0x007CE000,
+        'one_hit_kill_1': 0x0042A000,
+        'one_hit_kill_2': 0x00F87000,
+        'baojun_down_1': 0x00F4A000,
+        'baojun_down_2': 0x0137F000,
+        'show_action': 0x022C8000,
+        'through_wall_xy': 0x01DD2000,
+        'through_wall': 0x01DD2000,
+        'reset_time': 0x00EA7000,
+        'lock_time': 0x01037000,
+    },
+    'codex': {
+        'inf_ammo': 0x00E8A800,
+        'inf_modai': 0x00401000,
+        'item_keep': 0x00E8A800,
+        'inf_knife': 0x00E88000,
+        'min_save_count': 0x00BA0000,
+        'quick_aim': 0x01705000,
+        'no_recoil': 0x01125000,
+        'one_hit_kill_1': 0x004CD400,
+        'one_hit_kill_2': 0x00C58600,
+        'baojun_down_1': 0x0178F000,
+        'baojun_down_2': 0x01C62000,
+        'show_action': 0x022BE000,
+        'through_wall_xy': 0x01DC8000,
+        'through_wall': 0x01DC8000,
+        'reset_time': 0x00B7F000,
+        'lock_time': 0x0187A000,
+    }
+}
+
+
 class Main(NativeHacktool):
     CLASS_NAME = 'via'
     WINDOW_NAME = 'RESIDENT EVIL 2'
     key_hook = False
+    assembly_address_sources = ADDRESS_SOURCES
 
     def __init__(self):
         super().__init__()
@@ -52,52 +93,40 @@ class Main(NativeHacktool):
             ModelInput("inventory.items.%d.info.count" % i, "数量")
 
     def render_assembly_buttons_own(self):
-        delta = Delta(0x1000)
+        delta = Delta(0x2000)
         self.render_assembly_buttons((
-            # AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
-            #     b'\x66\x4A\x90\x90\x90'),
-            # AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
+            AssemblyItem('item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5', None, delta,
+                b'\x90\x90', replace_len=2),
 
             AssemblyItem('inf_ammo', '弹药锁定', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
-                0x00401000, delta, b'',
+                None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 07 C7 41 20 E7030000',
                 inserted=True, replace_len=7),
 
-            AssemblyItems('弹夹子弹锁定',
-                AssemblyItem('inf_clip_ammo1', None, '48 8B 48 10 48 85 C9',
-                    0x00E88000, delta, b'',
-                    '48 8B 48 10 48 85 C9 74 13 83 79 1C 00 74 0D 83 79 14 FF 74 07 C7 41 20 63000000 48 85 C9',
-                    inserted=True),
-
-                AssemblyItem('inf_clip_ammo2', None, '48 8B 46 10 48 85 C0',
-                    0x00E87C00, delta, b'',
-                    '48 8B 46 10 48 85 C0 74 14 83 78 1C 00 74 0E 83 78 14 FF 74 08 BB 63000000 89 58 20 48 85 C0',
-                    inserted=True)),
-            AssemblyItem('inf_modai', '保存时墨带无限+物品不减', '48 8B 42 10 48 85 C0 74 03 8B 58 20 2B DF', 0xE8AE00, delta,
+            AssemblyItem('inf_modai', '保存时墨带无限', '48 8B 42 10 48 85 C0 74 03 8B 58 20 2B DF', None, delta,
                 b'', '48 8B 42 10 48 85 C0 74 07 C7 40 20 0A000000 48 85 C0 74 03 8B 58 20 2B DF',
-                inserted=True),
+                inserted=True, replace_len=7),
 
             AssemblyItem('inf_knife', '小刀无限耐久', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 66 0F 6E C6',
-                0x00E88000, delta, b'',
+                None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 0B 83 79 14 2E 75 05 8B C6 89 41 20 48 85 C9',
                 inserted=True, replace_len=7),
 
-            AssemblyItem('min_save_count', '最小保存次数', '8D 42 01 89 41 24', 0xBA0000, delta, '31 C0', replace_len=3),
-            AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20010000 48', 0x01705000, delta,
+            AssemblyItem('min_save_count', '最小保存次数', '8D 42 01 89 41 24', None, delta, '31 C0', replace_len=3),
+            AssemblyItem('quick_aim', '快速瞄准', 'F3 0F 10 87 20010000 48', None, delta,
                 b'', 'C7 87 20010000 0000C842F3 0F10 87 20010000',
                 inserted=True, replace_len=8),
-            AssemblyItem('no_recoil', '稳定射击', 'F3 0F10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', 0x01125000, delta,
+            AssemblyItem('no_recoil', '稳定射击', 'F3 0F 10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', None, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
             AssemblyItems('一击必杀',
-                AssemblyItem('one_hit_kill_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', 0x004CD400, 0x004CD800, b'',
+                AssemblyItem('one_hit_kill_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
                     AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 14 50 8F 05',
                         Offset('player_addr'),
                         '53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B'),
                     inserted=True, replace_len=7, args=(VariableType('player_addr', size=8),)),
-                AssemblyItem('one_hit_kill_2', None,
-                    '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
-                    0x00C58600, 0x00C58800, b'',
+                AssemblyItem('one_hit_kill_2', None, '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
+                    None, delta, b'',
                     AssemblyGroup(
                         '48 8D 4A 58 48 A1',
                         Variable('player_addr'),
@@ -107,16 +136,16 @@ class Main(NativeHacktool):
                     inserted=True, replace_len=6),
             ),
             AssemblyItems('暴君一击倒地且无法起身',
-                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', 0x0178F000, delta,
+                AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', None, delta,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
                     inserted=True, fuzzy=True),
                 AssemblyItem('baojun_down_2', None,
                     'F2 0F 5C F0 66 0F 5A CE F3 0F 11 8F F4 01 00 00 48 8B 43 50 48 39 48 18 75 1F',
-                    0x01C62000, delta,
+                    None, delta,
                     b'', '68 00 00 C8 41 F3 0F 10 0C 24 48 83 C4 08',
                     inserted=True, replace_len=8),
             ),
-            AssemblyItem('show_action', '显示可互动及可收集物品', 'F3 0F 59 63 6C F2 0F 10 D6', 0x022BE000, delta,
+            AssemblyItem('show_action', '显示可互动及可收集物品', 'F3 0F 59 63 6C F2 0F 10 D6', None, delta,
                 b'', AssemblyGroup(
                     '50 51 0F 29 05',
                     Offset('float_1'),
@@ -129,12 +158,11 @@ class Main(NativeHacktool):
                 inserted=True, replace_len=5,
                 args=(VariableType('float_1', size=40, align=16, type=float, value=1.0),)),
             AssemblyItem('through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
-                0x01DC8000, delta, '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
+                None, delta, '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
             AssemblyItem('through_wall', '穿墙(包括地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
-                0x01DC8000, delta, '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
+                None, delta, '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
             AssemblyItem('reset_time', '重置游戏时间',
-                '48 8D 04 2A 48 89 41 18 48 8B 43 50 4C 39 70 18 0F85 * * * *'
-                '44 38 77 53 0F85 * * * * 44 38 77 52 75 52', 0x00B7F000, delta,
+                '48 8D 04 2A 48 89 41 18 48 8B 43 50 4C 39 70 18 0F 85 * * * * 44 38 77 53', None, delta,
                 b'', AssemblyGroup(
                     '48 8D 04 2A 48 89 41 18 48 2B 41 20 81 3D',
                     Offset('reset_time_temp1'),
@@ -147,7 +175,7 @@ class Main(NativeHacktool):
                     '48 89 41 30 48 31 C0 48 89 41 28',
                 ), inserted=True, replace_len=8, fuzzy=True,
                 args=(VariableType('reset_time_temp1', 8),)),
-            AssemblyItem('lock_time', '锁定倒计时', 'F3 0F 10 47 78 0F 57 F6', 0x0187A000, delta,
+            AssemblyItem('lock_time', '锁定倒计时', 'F3 0F 10 47 78 0F 57 F6', None, delta,
                 b'', 'C7 47 78 00 A0 0C 47 F3 0F 10 47 78', replace_len=5, inserted=True),
         ))
 

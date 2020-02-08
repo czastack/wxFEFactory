@@ -13,6 +13,7 @@ class AssemblyHacktool(BaseHackTool):
     allocated_memory = None
     allocation_size = 2048
     allocation_type = 0x00003000
+    assembly_address_sources = None
 
     def __init__(self):
         super().__init__()
@@ -27,6 +28,7 @@ class AssemblyHacktool(BaseHackTool):
         self.next_usable_memory = None
         self.registed_assembly = None
         self.registed_variable = None
+        self.assembly_address_dict = None
 
     def onattach(self):
         super().onattach()
@@ -122,8 +124,31 @@ class AssemblyHacktool(BaseHackTool):
             assembly = item.assembly
             replace_len = item.replace_len
             replace_offset = item.replace_offset
+            find_start = item.find_start
+            find_end = item.find_end
 
-            addr = self.find_address(original, item.find_start, item.find_end, item.find_base, item.ordinal, item.fuzzy)
+            # 动态判断地址起始数据源
+            if find_start is None:
+                if not self.assembly_address_dict and self.assembly_address_sources:
+                    for _, address_dict in self.assembly_address_sources.items():
+                        temp = address_dict[item.key]
+                        if isinstance(temp, (list, tuple)):
+                            find_start, find_end = temp
+                        else:
+                            find_start = temp
+                        if self.find_address(original, find_start, find_end, item.find_base, item.ordinal, item.fuzzy):
+                            self.assembly_address_dict = address_dict
+                            break
+                if self.assembly_address_dict:
+                    temp = self.assembly_address_dict[item.key]
+                    if isinstance(temp, (list, tuple)):
+                        find_start, find_end = temp
+                    else:
+                        find_start = temp
+                else:
+                    raise ValueError('no find_start')
+
+            addr = self.find_address(original, find_start, find_end, item.find_base, item.ordinal, item.fuzzy)
             if addr == -1:
                 print('找不到地址: ', item.key)
                 return
