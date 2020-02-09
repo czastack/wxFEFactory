@@ -7,22 +7,22 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta
-from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Variable
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, AssemblySwitch
+from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Cmp, Variable
 from . import models, datasets
 
 
 ADDRESS_SOURCES = {
     'steam': {
-        'inf_ammo': 0x004FF000,
-        'inf_modai': 0x00F3D000,
         'item_keep': 0x004FF000,
+        'inf_ammo': 0x00F3D000,
+        'inf_modai': 0x004FF000,
         'inf_knife': 0x004FD000,
         'min_save_count': 0x01C1E000,
         'quick_aim': 0x00EC4000,
         'no_recoil': 0x007CE000,
-        'one_hit_kill_1': 0x0042A000,
-        'one_hit_kill_2': 0x00F87000,
+        'inf_health_base_1': 0x0042A000,
+        'inf_health_base_2': 0x00F87000,
         'baojun_down_1': 0x00F4A000,
         'baojun_down_2': 0x0137F000,
         'show_action': 0x022C8000,
@@ -32,15 +32,15 @@ ADDRESS_SOURCES = {
         'lock_time': 0x01037000,
     },
     'codex': {
-        'inf_ammo': 0x00E8A800,
-        'inf_modai': 0x00401000,
         'item_keep': 0x00E8A800,
+        'inf_ammo': 0x00401000,
+        'inf_modai': 0x00E8A800,
         'inf_knife': 0x00E88000,
         'min_save_count': 0x00BA0000,
         'quick_aim': 0x01705000,
         'no_recoil': 0x01125000,
-        'one_hit_kill_1': 0x004CD400,
-        'one_hit_kill_2': 0x00C58600,
+        'inf_health_base_1': 0x004CD400,
+        'inf_health_base_2': 0x00C58600,
         'baojun_down_1': 0x0178F000,
         'baojun_down_2': 0x01C62000,
         'show_action': 0x022BE000,
@@ -119,22 +119,27 @@ class Main(NativeHacktool):
             AssemblyItem('no_recoil', '稳定射击', 'F3 0F 10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', None, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True),
-            AssemblyItems('一击必杀',
-                AssemblyItem('one_hit_kill_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
-                    AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 14 50 8F 05',
+            AssemblyItems('无限生命&一击必杀依赖',
+                AssemblyItem('inf_health_base_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
+                    AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 1D 50 8F 05',
                         Offset('player_addr'),
-                        '53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B'),
-                    inserted=True, replace_len=7, args=(VariableType('player_addr', size=8),)),
-                AssemblyItem('one_hit_kill_2', None, '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
+                        Cmp('b_inf_health', 1),
+                        '75 0D 53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B'),
+                    inserted=True, replace_len=7,
+                    args=(VariableType('player_addr', size=8), 'b_inf_health', 'b_one_hit_kill')),
+                AssemblyItem('inf_health_base_2', None, '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
                     None, delta, b'',
                     AssemblyGroup(
                         '48 8D 4A 58 48 A1',
                         Variable('player_addr'),
-                        '48 39 D0 0F 85 0D 00 00 00 8B 41 FC 89 01 45 31 C0 E9 10 00 00 00 41 83 F8 00'
-                        '0F 8E 06 00 00 00 41 B8 9F 86 01 00 8B 09 41 8B C0'
+                        '48 39 D0 75 0A 8B 41 FC 89 01 45 31 C0 EB 15',
+                        Cmp('b_one_hit_kill', 1),
+                        '75 0C 41 83 F8 00 7E 06 41 B8 9F 86 01 00 8B 09 41 8B C0'
                     ),
                     inserted=True, replace_len=6),
             ),
+            AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base_1')),
+            AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
             AssemblyItems('暴君一击倒地且无法起身',
                 AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', None, delta,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
