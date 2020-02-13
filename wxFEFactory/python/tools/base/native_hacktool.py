@@ -41,7 +41,8 @@ class NativeHacktool(AssemblyHacktool):
             self.NativeContext = NativeContext if self.is32process else NativeContext64
         # 初始化Native调用的参数环境
         context_addr = self.handler.alloc_memory(self.NativeContext.SIZE)
-        self.native_context = self.NativeContext(context_addr, self.handler)
+        with self.handler.raw_env():
+            self.native_context = self.NativeContext(context_addr, self.handler)
 
     def ondetach(self):
         """释放远程函数"""

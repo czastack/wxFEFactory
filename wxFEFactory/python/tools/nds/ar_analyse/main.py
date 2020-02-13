@@ -6,6 +6,7 @@ from tools.base.basetool import NestedTool
 
 class Main(NestedTool):
     def render(self):
+        textstyle = {'height': 200}
         with self.render_win() as win:
             with ui.Vertical():
                 with ui.Vertical(class_="fill padding"):
@@ -17,7 +18,3 @@ class Main(NestedTool):
 
     def analyse(self, _=None):
         self.textoutput.value = ar.analyse(self.textinput.value)
-
-
-win_style = {'width': 640, 'height': 820}
-textstyle = {'height': 200}

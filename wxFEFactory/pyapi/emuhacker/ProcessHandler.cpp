@@ -310,19 +310,25 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
 
 /**
  * ordinal: 第n次出现，默认为1
- * fuzzy: 模糊查询，?(\x3F)为通配符
+ * fuzzy: 模糊查询，?(\x2A)为通配符
  */
 addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, addr_t end, int ordinal, bool fuzzy)
 {
-	const DWORD PAGE_SIZE = 4096;
+	const DWORD PAGE_SIZE = 65536;
 	bool finded = false;
 	BYTE page[PAGE_SIZE];
 	addr_t cur_addr = start;
 
 	BYTE *page_end = page + PAGE_SIZE - data_size;
 	BYTE *page_cursor = page;
+	int data_size_aligned = data_size; // 数据大小对其4字节
 	int i; // data内偏移量
 	int ord = 0; // 找到的数据序号
+
+	if (data_size_aligned & 3)
+	{
+		data_size_aligned += 4 - (data_size_aligned & 3);
+	}
 
 
 	while (cur_addr < end) {
@@ -350,7 +356,7 @@ addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, ad
 				break;
 			}
 		}
-		cur_addr += PAGE_SIZE;
+		cur_addr += PAGE_SIZE - data_size_aligned;
 	}
 
 	if (finded)

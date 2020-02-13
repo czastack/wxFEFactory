@@ -30,11 +30,11 @@ class NdsEmuHandler(MemHandler):
         addr &= 0xFFFFFFFF
         if addr < 0x0A000000:
             index = (addr & 0x0F000000) >> 24
-            if (index > 8):
+            if index > 8:
                 index = 8
             addr &= 0x00FFFFFF
 
-            if (addr <= NDS_MEMORY_SIZE[index]):
+            if addr <= NDS_MEMORY_SIZE[index]:
                 return self.ptr_table[index] + addr
         return False
 

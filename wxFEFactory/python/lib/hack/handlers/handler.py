@@ -58,7 +58,7 @@ class MemHandler(ProcessHandler):
         return struct.unpack('d', data)[0]
 
     def write_double(self, addr, data):
-        return self.read(addr, struct.pack('d', data), 8)
+        self.write(addr, struct.pack('d', data), 8)
 
     def ptr_read(self, addr, offset, type, size=0):
         addr = self.read_addr(addr)
@@ -91,10 +91,9 @@ class MemHandler(ProcessHandler):
             helper = self.get_proc_helper(module)
             address_map = helper.get_proc_address(('LoadLibraryW', 'FreeLibrary'))
             self._LoadLibrary = LoadLibrary = address_map['LoadLibraryW']
-            self._FreeLibrary = LoadLibrary = address_map['FreeLibrary']
+            self._FreeLibrary = address_map['FreeLibrary']
 
         if LoadLibrary and path:
-            print(LoadLibrary)
             data = path.encode('unicode_internal') + b'\x00\x00'
             lpname = self.alloc_data(data)
             result = self.remote_call(LoadLibrary, lpname)
@@ -111,6 +110,35 @@ class MemHandler(ProcessHandler):
 
     def raw_env(self):
         return _RawEnv(self)
+
+
+class LookAfterHandler(MemHandler):
+    """帶拦截功能的Handler"""
+    def __init__(self):
+        super().__init__()
+        self.before_read = None
+        self.after_write = None
+
+    def read(self, addr, type, size=0):
+        if self.before_read and not self._raw_addr:
+            self.before_read(addr, size)
+        return ProcessHandler.read(self, addr, type, size)
+
+    def write(self, addr, data, size=0):
+        result = ProcessHandler.write(self, addr, data, size)
+        if self.after_write and not self._raw_addr:
+            self.after_write(addr, size)
+        return result
+
+    def read_uint(self, addr, size=0):
+        if self.before_read and not self._raw_addr:
+            self.before_read(addr, size)
+        return ProcessHandler.read_uint(self, addr, size)
+
+    def write_uint(self, addr, data, size=0):
+        if self.after_write and not self._raw_addr:
+            self.after_write(addr, size)
+        return ProcessHandler.write_uint(self, addr, data, size)
 
 
 class BigendHandler(MemHandler):

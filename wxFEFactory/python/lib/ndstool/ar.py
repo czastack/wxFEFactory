@@ -32,7 +32,6 @@ NDS_AR_HANDLERS = {
         _F("2({i7}) {i}{6}({b})"),
         "write8(0x{0}+offset, 0x{1})",
     ),
-
     "3": (
         _F("3({i7}) ({w})"),
         "if 0x{1} > read32(0x{0}):",
@@ -159,23 +158,23 @@ def iter_code_strict(lines):
 
 def analyse(lines, strict=False):
     # 从字符串中获取一条代码
-    iter_code = iter_code_strict if iter_code_strict else iter_code_simple
+    iter_code = iter_code_strict if strict else iter_code_simple
     indent = 0
     preloop = False
     result = []
 
     for code in iter_code(lines.upper()):
-        ID = code[:2]
-        if ID not in NDS_AR_HANDLERS:
-            ID = code[0]
-        if ID not in NDS_AR_HANDLERS:
+        id_ = code[:2]
+        if id_ not in NDS_AR_HANDLERS:
+            id_ = code[0]
+        if id_ not in NDS_AR_HANDLERS:
             raise ValueError(code + ' is not a valid AR code')
-        fmt, value = NDS_AR_HANDLERS[ID]
+        fmt, value = NDS_AR_HANDLERS[id_]
         matcher = fmt.match(code)
         if matcher:
-            if preloop and (ID == 'D1' or ID == 'D2'):
+            if preloop and (id_ == 'D1' or id_ == 'D2'):
                 preloop = False
-            elif ID == 'D2':
+            elif id_ == 'D2':
                 value = 'end'
                 indent -= 1
 
@@ -186,7 +185,7 @@ def analyse(lines, strict=False):
 
             if value[-1] == ':':
                 indent += 1
-                if ID == 'C':
+                if id_ == 'C':
                     preloop = True
 
     return ''.join(result)

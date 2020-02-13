@@ -454,6 +454,8 @@ class ToggleField(Field):
 
     def __set__(self, instance, value):
         if value is True:
+            if self.disable is None:
+                self.disable = super().__get__(instance, None)
             value = self.enable
         elif value is False:
             value = self.disable
