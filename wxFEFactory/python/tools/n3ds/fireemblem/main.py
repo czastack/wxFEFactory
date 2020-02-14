@@ -20,8 +20,7 @@ class FeHack(BaseN3dsHack):
 
     def __init__(self):
         super().__init__()
-        self._global = self.models.Global_1_0(0, self.handler)
-        self._global.train_items_offset = 0
+        self._global_ins = self.models.Global_1_0(0, self.handler)
         self._person_ins = self.models.Person(0, self.handler)
         self.item_index = 1
 
@@ -29,7 +28,19 @@ class FeHack(BaseN3dsHack):
         datasets = self.datasets
         weak = self.weak
 
-        with Group("global", "全局", self._global, cols=4):
+        with Group("global", "全局", (self._global, self.models.Global_1_0), cols=4):
+            self.render_global()
+
+        self.lazy_group(Group("player", "角色", weak._person, cols=4), self.render_person)
+        self.lazy_group(Group("items", "角色物品", weak._person, cols=4), self.render_items)
+        self.lazy_group(Group("iteminfos", "武器属性", weak._iteminfo), self.render_iteminfos)
+
+        # self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
+        # self.lazy_group(self.train_items_group, self.render_train_items)
+
+    def render_global(self):
+        Choice("版本", self.datasets.VERSIONS, self.on_version_change)
+        with self.active_widgets:
             ModelCheckBox("control_enemy")
             ModelCheckBox("inf_move")
             ModelCheckBox("exchange_enemy")
@@ -43,26 +54,8 @@ class FeHack(BaseN3dsHack):
             ModelCheckBox("first_turn_withdraw")
             ModelCheckBox("no_battle_3d")
             ModelCheckBox("well_no_driy")
-            ModelSelect("exp_rate", "经验值倍数", choices=datasets.RATE, values=datasets.EXP_RATE_VALUES)
-            # ModelSelect("pro_rate", "熟练度倍数", choices=datasets.RATE, values=datasets.PRO_RATE_VALUES)
-
-        self.lazy_group(Group("config", "配置", weak._config, cols=4), self.render_config)
-        self.lazy_group(Group("player", "角色", weak._person, cols=4), self.render_person)
-        self.lazy_group(Group("items", "角色物品", weak._person, cols=4), self.render_items)
-        self.lazy_group(Group("iteminfos", "武器属性", weak._iteminfo), self.render_iteminfos)
-
-        self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
-        self.lazy_group(self.train_items_group, self.render_train_items)
-
-    def render_config(self):
-        datasets = self.datasets
-        ModelSelect("difficulty", "难易度", choices=datasets.DIFFICULTY, values=datasets.DIFFICULTY_VALUES)
-        if self.models.Config.character_gender:
-            ModelSelect("character_gender", "主人公性别", choices=datasets.CHARACTER_GENDER)
-            ModelSelect("character_hair_style", "主人公发色", choices=datasets.CHARACTER_HAIR_STYLE)
-            ModelSelect("character_hair_color", "主人公发型", choices=datasets.CHARACTER_HAIR_COLOR)
-            ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
-            ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
+        # ModelSelect("exp_rate", "经验值倍数", choices=datasets.RATE, values=datasets.EXP_RATE_VALUES)
+        # ModelSelect("pro_rate", "熟练度倍数", choices=datasets.RATE, values=datasets.PRO_RATE_VALUES)
 
     def render_person(self):
         datasets = self.datasets
@@ -158,6 +151,13 @@ class FeHack(BaseN3dsHack):
             return self._person_ins
 
     person = property(_person)
+
+    def on_version_change(self, lb):
+        version = lb.text
+        self._global_ins = self.models.SPECIFIC_GLOBALS[version](0, self.handler)
+
+    def _global(self):
+        return self._global_ins
 
     def _config(self):
         return self._global.config

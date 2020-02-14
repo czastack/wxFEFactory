@@ -1,4 +1,5 @@
 import abc
+import copy
 from typing import Callable, Sequence, Union
 from lib.utils import float32, Accumulator
 from lib.extypes import new_dataclass, classproperty
@@ -297,10 +298,15 @@ class FieldType:
         elif callable(offset):
             return offset(instance, self)
 
+    def replace(self, **kwargs):
+        obj = copy.copy(self)
+        obj.__dict__.update(kwargs)
+        return obj
+
 
 class Field(FieldType):
     """通用字段基类"""
-    def __init__(self, offset, type=int, size=4, label=None):
+    def __init__(self, offset=None, type=int, size=4, label=None):
         super().__init__(label)
         self.offset = offset
         self.type = type
@@ -459,6 +465,8 @@ class ToggleField(Field):
             value = self.enable
         elif value is False:
             value = self.disable
+            if value is None:
+                return
         super().__set__(instance, value)
 
 
@@ -479,6 +487,15 @@ class ToggleFields(FieldType):
     def __set__(self, instance, value):
         for field in self.fields:
             field.__set__(instance, value)
+
+    def replace(self, **kwagrs):
+        offset = kwagrs.pop('offset', None)
+        obj = super().replace(**kwagrs)
+        if offset:
+            obj.fields = tuple(
+                field.replace(offset=offset[i]) for i, field in enumerate(self.fields)
+            )
+        return obj
 
 
 class BitsField(Field):

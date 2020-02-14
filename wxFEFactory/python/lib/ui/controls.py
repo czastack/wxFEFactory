@@ -175,7 +175,21 @@ class ColorPicker(Control):
 
 
 class ItemContainer(Control):
-    pass
+    @property
+    def count(self):
+        return self.GetCount()
+
+    @property
+    def index(self):
+        return self.GetSelection()
+
+    @index.setter
+    def index(self, n):
+        self.SetSelection(n)
+
+    @property
+    def text(self):
+        return self.GetString(self.GetSelection())
 
 
 class ControlWithItems(ItemContainer):
@@ -194,18 +208,6 @@ class ControlWithItems(ItemContainer):
         if trigger:
             self.post_select()
         return self
-
-    @property
-    def count(self):
-        return self.GetCount()
-
-    @property
-    def index(self):
-        return self.GetSelection()
-
-    @index.setter
-    def index(self, n):
-        self.SetSelection(n)
 
 
 class ListBox(ControlWithItems):

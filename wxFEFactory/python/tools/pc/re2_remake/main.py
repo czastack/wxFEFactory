@@ -88,9 +88,10 @@ class Main(NativeHacktool):
 
     def render_person_items(self):
         """游戏中物品"""
-        for i in range(20):
-            ModelSelect("inventory.items.%d.info.choice" % i, "物品%d" % (i + 1), choices=datasets.INVENTORY_LABELS)
-            ModelInput("inventory.items.%d.info.count" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(20):
+                ModelSelect("inventory.items.%d.info.choice" % i, "物品%d" % (i + 1), choices=datasets.INVENTORY_LABELS)
+                ModelInput("inventory.items.%d.info.count" % i, "数量")
 
     def render_assembly_buttons_own(self):
         delta = Delta(0x2000)

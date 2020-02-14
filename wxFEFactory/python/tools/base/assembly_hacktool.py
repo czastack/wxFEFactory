@@ -35,6 +35,10 @@ class AssemblyHacktool(BaseHackTool):
         self.reset()
         self.is32process = self.handler.is32process
 
+        for key, button in self.assembly_buttons:
+            if button.checked:
+                self.toggle_assembly_button(key, True)
+
     def ondetach(self):
         super().ondetach()
         if self.allocated_memory is not None:

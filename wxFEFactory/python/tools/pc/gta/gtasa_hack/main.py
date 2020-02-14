@@ -5,7 +5,7 @@ import time
 from functools import partial
 from lib import ui, utils
 from lib.hack.forms import (
-    Group, StaticGroup, Input, ProxyInput, Select, ModelInput, ModelCoordWidget
+    Group, StaticGroup, Input, ProxyInput, Select, ModelInput, ModelCoordWidget, ModelSelect
 )
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
@@ -124,11 +124,12 @@ class Main(BaseGTA3_VC_SA_Tool):
     def render_weapon(self):
         player = self.weak._player
         self.weapon_views = []
-        for i in range(13):
-            self.weapon_views.append(
-                WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO,
-                    datasets.WEAPON_LIST, self.on_weapon_change)
-            )
+        with ModelSelect.choices_cache:
+            for i in range(13):
+                self.weapon_views.append(
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % (i + 1), i, datasets.SLOT_NO_AMMO,
+                        datasets.WEAPON_LIST, self.on_weapon_change)
+                )
         ui.Button(label="一键最大", onclick=self.weapon_max)
 
     def render_weapon_prop(self):

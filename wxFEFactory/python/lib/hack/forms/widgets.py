@@ -6,6 +6,7 @@ import __main__
 from lib import ui, utils, lazy
 from lib.extypes import WeakBinder
 from lib.win32.keys import WXK
+from lib.event_emitter import EventEmitter
 from styles import btn_xs_style, styles, dialog_style
 from ..utils import uint_hex
 
@@ -19,6 +20,7 @@ __ALL__ = (
 class Widget(metaclass=abc.ABCMeta):
     GROUPS = []
     horizontal = True
+    event_emitter = EventEmitter()
 
     def __init__(self, name, label, addr=None, offsets=(), readonly=False):
         self.weak = WeakBinder(self)
@@ -39,6 +41,7 @@ class Widget(metaclass=abc.ABCMeta):
                 self.handler = parent.handler
 
         self.oninit()
+        self.event_emitter.emit('widget_init', self)
 
         if isinstance(parent, Group) and not parent.horizontal:
             self.horizontal = False
@@ -153,6 +156,7 @@ class ModelWidget(Widget):
             self.instance_type = type(self.addr)
         else:
             self.instance_type = None
+        super().oninit()
 
     def render(self):
         if self.label is self.name:
@@ -561,15 +565,17 @@ class SimpleCheckBox(Widget):
 
 
 class BaseCheckBox(TwoWayWidget):
-    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, alone=False):
+    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, alone=False, realtime=False):
         """
         :param enable: 激活时写入的数据
         :param disable: 关闭时写入的数据
+        :param realtime: 即时写入
         """
         self.alone = alone
         self.enable = enable
         self.disable = disable
         self.type = type(enable)
+        self.realtime = realtime
         super().__init__(name, label, addr, offsets)
 
     def render(self):
@@ -580,12 +586,16 @@ class BaseCheckBox(TwoWayWidget):
         if self.alone:
             self.label = label
         with ui.Horizontal(class_="fill") as container:
-            self.view = ui.CheckBox("" if not self.alone else label, class_="fill")
+            self.view = ui.CheckBox("" if not self.alone else label, class_="fill", onchange=self.weak.onchange)
             self.render_btn()
         self.container = container
 
     def toggle(self):
         self.view.toggle()
+
+    def onchange(self, checkbox):
+        if self.realtime:
+            self.write()
 
     @property
     def input_value(self):

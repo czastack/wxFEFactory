@@ -9,6 +9,10 @@ class BaseN3dsHack(NativeHacktool):
         super().__init__()
         self.handler.after_write = self.InvalidateCacheRange
 
+    def onattach(self):
+        super().onattach()
+        self.wake_widgets_up()
+
     def InvalidateCacheRange(self, addr, size):
         if self.native_context and self.handler.InvalidateCacheRangeAddr:
             with self.handler.raw_env():

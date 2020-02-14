@@ -29,6 +29,12 @@ class NativeHacktool(AssemblyHacktool):
     FUNCTION_NATIVE_CALL_N_64 = base64.b64decode(b'RIlEJBhIiVQkEEiJTCQISIPsOMdEJCAAAAAA6wqLRCQg/8CJRCQgi0QkUDlEJCB9IEhj'
         b'RCQgSGnAoAAAAEiLTCRISAPISIvBSIvI/1QkQOvMSIPEOMM=')
 
+    def __init__(self):
+        super().__init__()
+        self.native_call_addr = None
+        self.native_call_n_addr = None
+        self.native_context = None
+
     def onattach(self):
         """初始化远程函数"""
         super().onattach()

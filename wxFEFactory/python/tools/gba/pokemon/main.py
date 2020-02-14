@@ -60,9 +60,10 @@ class PMHack(BaseGbaHack):
         datasets = self.datasets
         with self.backpack_group.header:
             ui.RadioBox("类型", class_="fill", choices=datasets.BACKPACK_LABELS, onselect=self.on_backpack_switch)
-        for i in range(self.BACKPACK_PAGE_LENGTH):
-            ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
-            ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(self.BACKPACK_PAGE_LENGTH):
+                ModelSelect("backpack_items.%d+backpack_offset.item" % i, "", choices=datasets.ITEMS)
+                ModelInput("backpack_items.%d+backpack_offset.quantity" % i, "数量")
         with self.backpack_group.footer:
             self.backpack_pageview = Pagination(self.on_backpack_page, self.BACKPACK_PAGE_LENGTH)
 

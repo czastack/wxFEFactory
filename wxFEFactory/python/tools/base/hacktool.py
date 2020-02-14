@@ -12,6 +12,14 @@ from lib.hack.handlers import ProxyHandler
 from lib import ui
 
 
+class AppendWidgetsList(list):
+    def __enter__(self):
+        Widget.event_emitter.on('widget_init', self.append)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        Widget.event_emitter.off('widget_init', self.append)
+
+
 class BaseHackTool(NestedTool):
     handler_class = None
 
@@ -24,6 +32,7 @@ class BaseHackTool(NestedTool):
         self.config = Config(os.path.join(CONFIG_DIR, "{}.config.json".format(self.module_name)))
         if callable(self.handler_class):
             self.handler = self.handler_class()
+        self.active_widgets = AppendWidgetsList()
 
     def attach(self, frame):
         super().attach(frame)
@@ -252,6 +261,10 @@ class BaseHackTool(NestedTool):
                     value = base64.b64encode(value.to_bytes()).decode()
                 data['data'][names[i]] = value
             fefactory.json_dump_file(self, data)
+
+    def wake_widgets_up(self):
+        for widget in self.active_widgets:
+            widget.write()
 
 
 class ProxyHackTool(BaseHackTool):

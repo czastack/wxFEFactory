@@ -180,12 +180,13 @@ class MetalMaxHack(BaseNdsHack):
 
     def render_chariot_special_bullets(self):
         datasets = self.datasets
-        for i in range(self.chariot.special_bullets.length):
-            ui.Label("特殊炮弹%d" % (i + 1))
-            with ui.Horizontal(class_="fill"):
-                ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices,
-                    values=datasets.SPECIAL_BULLETS.values)
-                ModelInput("special_bullets.%d.count" % i, "数量")
+        with ModelSelect.choices_cache:
+            for i in range(self.chariot.special_bullets.length):
+                ui.Label("特殊炮弹%d" % (i + 1))
+                with ui.Horizontal(class_="fill"):
+                    ModelSelect("special_bullets.%d.item" % i, "", choices=datasets.SPECIAL_BULLETS.choices,
+                        values=datasets.SPECIAL_BULLETS.values)
+                    ModelInput("special_bullets.%d.count" % i, "数量")
 
     def render_package_group(self):
         datasets = self.datasets

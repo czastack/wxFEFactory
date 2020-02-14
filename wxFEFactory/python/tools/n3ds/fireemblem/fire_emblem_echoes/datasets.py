@@ -1,3 +1,4 @@
+VERSIONS = ('1.0', '1.1')
 RATE = ('1', '2', '4', '8', '16', '32', '64', '128')
 EXP_RATE_VALUES = ()
 PRO_RATE_VALUES = ()

@@ -62,7 +62,8 @@ class CitraHandler(N3dsEmuHandler):
                     s_instance_start = s_instance_start + offset + 4
 
                     self.InvalidateCacheRangeAddr = self.write_function(
-                        s_instance_start.to_bytes(8, 'little').join(self.InvalidateCacheRangeAsm)
+                        s_instance_start.to_bytes(8, 'little').join(self.InvalidateCacheRangeAsm),
+                        self.InvalidateCacheRangeAddr
                     )
                 else:
                     print('无法使用InvalidateCacheRangeAddr')

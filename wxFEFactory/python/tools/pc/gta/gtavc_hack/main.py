@@ -3,7 +3,7 @@ import os
 import json
 import time
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, Input, SimpleCheckBox, ModelInput, ModelCoordWidget
+from lib.hack.forms import Group, StaticGroup, Input, SimpleCheckBox, ModelInput, ModelCoordWidget, ModelSelect
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib import ui
@@ -74,11 +74,12 @@ class Main(BaseGTA3Tool):
     def render_weapon(self):
         player = self.weak._player
         self.weapon_views = []
-        for i in range(11):
-            self.weapon_views.append(
-                WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST,
-                    self.on_weapon_change)
-            )
+        with ModelSelect.choices_cache:
+            for i in range(11):
+                self.weapon_views.append(
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST,
+                        self.on_weapon_change)
+                )
 
     def render_cheat(self):
         with ui.Vertical(class_="fill padding"):
