@@ -3,6 +3,7 @@ from tools.base.native_hacktool import NativeHacktool
 
 
 class BaseN3dsHack(NativeHacktool):
+    """3DS修改工具"""
     handler_class = CitraHandler
 
     def __init__(self):

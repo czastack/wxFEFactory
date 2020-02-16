@@ -31,7 +31,7 @@ class CitraHandler(N3dsEmuHandler):
     def __init__(self):
         super().__init__()
         self.hwnd = None
-        self.g_memory = 0
+        self.g_memory_start = 0
         self.s_instance = 0
         self.InvalidateCacheRangeAddr = 0
 
@@ -53,8 +53,7 @@ class CitraHandler(N3dsEmuHandler):
                 if asm_start != -1:
                     g_memory_start = asm_start + 18
                     offset = self.read_int(g_memory_start, 4)
-                    g_memory_start = g_memory_start + offset + 4
-                    self.g_memory = self.read_ptr(g_memory_start)
+                    self.g_memory_start = g_memory_start + offset + 4
 
                     # 查找Core::System::GetInstance()
                     mov_rax_720 = self.read(asm_start, bytes, 0x80).find(
@@ -87,9 +86,9 @@ class CitraHandler(N3dsEmuHandler):
             return addr
 
         addr &= 0xFFFFFFFF
-        if self.g_memory:
+        if self.g_memory_start:
             page_pointer = (addr >> 12) * 8
             offset = addr & PAGE_MASK
             with self.raw_env():
-                return self.ptrs_read(self.g_memory, (0x18, page_pointer)) + offset
+                return self.ptrs_read(self.g_memory_start, (0, 0x18, page_pointer)) + offset
         return False
