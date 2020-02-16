@@ -1,4 +1,5 @@
-from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, ModelPtrField, ToggleField, ToggleFields
+import struct
+from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, ToggleField, ToggleFields
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -69,70 +70,125 @@ class ItemInfo(Model):
 
 
 COMMON_FIELDS = {
-    'control_enemy': ToggleField(enable=0xE1500000, disable=0xE1520001, label="可以操作敌人"),
-    'inf_move': ToggleField(enable=0xE1500000, disable=0xE3100001, label="无限行动"),
-    'exchange_enemy': ToggleField(enable=0xE1500000, disable=0xE1510002, label="可以和敌人换物品"),
-    'anyone_bag': ToggleFields(
-        ToggleField(enable=0xE1A00000, disable=0xA000004),
-        ToggleField(enable=0xE1A00000, disable=0xA000004),
-        label="任何人可使用行囊"),
-    'quick_info': ToggleField(enable=0xE35000FF, disable=0xE3100001, label="快速显示信息"),
-    'custom_exp': ToggleField(enable=0xE3A0003C, disable=0xC3A00064, label="自定义获取经验值"),
+    'control_enemy': (
+        ToggleField(enable=0xE1500000, disable=0xE1520001, label="可以操作敌人"),
+        0x002F9584,  # 1.0
+        0x002FA18C,  # 1.1
+    ),
+    'inf_move': (
+        ToggleField(enable=0xE1500000, disable=0xE3100001, label="无限行动"),
+        0x002F9590,
+        0x002FA198,
+    ),
+    'exchange_enemy': (
+        ToggleField(enable=0xE1500000, disable=0xE1510002, label="可以和敌人换物品"),
+        0x00333C4C,
+        0x00334948,
+    ),
+    'anyone_bag': (
+        ToggleFields(
+            ToggleField(enable=0xE1A00000, disable=0xA000004),
+            ToggleField(enable=0xE1A00000, disable=0xA000004),
+            label="任何人可使用行囊"
+        ),
+        (0x0031C5B0, 0x0031C9D8),
+        (0x0031D2AC, 0x0031D6D4),
+    ),
+    'quick_info': (
+        ToggleField(enable=0xE35000FF, disable=0xE3100001, label="快速显示信息"),
+        0x0039BF2C,
+        0x0039C93C,
+    ),
+    'custom_exp': (
+        ToggleField(enable=0xE3A0003C, disable=0xC3A00064, label="自定义获取经验值"),
+        0x004509EC,
+        0x0045127C,
+    ),
 
-    'growth_rate_add': ToggleField(enable=0xEA000000A3A060FFE35600FFE2866064,
-        disable=0xA3A060FFE35600FF, size=16, label="成长率XX%加算(最大255%)"),
+    'growth_rate_add': (
+        ToggleField(
+            enable=0xEA000000A3A060FFE35600FFE2866064,
+            disable=0xE3560000AA000001A3A060FFE35600FF, size=16, label="成长率XX%加算(最大255%)"
+        ),
+        0x00356A58,
+        0x00357468,
+    ),
 
-    'add_all_attr': ToggleField(enable=0xE3A00001, disable=0xEB01A8F8, label="成长率1%以上升级后能力值必定+1"),
+    'add_all_attr': (
+        ToggleField(enable=0xE3A00001, disable=0xEB01A8F8, label="成长率1%以上升级后能力值必定+1"),
+        0x00356B84,
+        0x00357594,
+    ),
 
-    'break_keep': ToggleField(enable=0xE12FFF1E, disable=0xE92D4010, label="中断存档不消失"),
-    'item_keep': ToggleField(enable=0xE1A00000, disable=0xEB08F683, label="道具使用不减"),
-    'first_turn_withdraw': ToggleField(enable=0xE3500001, disable=0xE3500003, label="第一回合可撤退"),
-    'no_battle_3d': ToggleField(enable=0xEA00003F, disable=0xDA00003F, label="3D迷宫接触敌人不战斗"),
-    'well_no_driy': ToggleFields(
-        ToggleField(enable=0xEA000000, disable=0xA3A00001),
-        ToggleField(enable=0xEA000000, disable=0xA3A00001),
-        label="圣井不会干涸"),
-}
-
-
-VERSION_SPECIFIC = {
-    '1.0': {
-        'control_enemy': 0x002F9584,
-        'inf_move': 0x002F9590,
-        'exchange_enemy': 0x00333C4C,
-        'anyone_bag': (0x0031C5B0, 0x0031C9D8),
-        'quick_info': 0x0039BF2C,
-        'custom_exp': 0x004509EC,
-        'growth_rate_add': 0x00356A58,
-        'add_all_attr': 0x00356B84,
-        'break_keep': 0x003BA3F0,
-        'item_keep': 0x001D7024,
-        'first_turn_withdraw': 0x0044D968,
-        'no_battle_3d': 0x0017ED4C,
-        'well_no_driy': (0x0042CE6C, 0x0042CC80),
-    },
-    '1.1': {
-        'control_enemy': 0x002FA18C,
-        'inf_move': 0x002FA198,
-        'exchange_enemy': 0x00334948,
-        'anyone_bag': (0x0031D2AC, 0x0031D6D4),
-        'quick_info': 0x0039C93C,
-        'custom_exp': 0x0045127C,
-        'growth_rate_add': 0x00357468,
-        'add_all_attr': 0x00357594,
-        'break_keep': 0x003BAE00,
-        'item_keep': 0x001D7C30,
-        'first_turn_withdraw': 0x0044E1F8,
-        'no_battle_3d': 0x0017FE6C,
-        'well_no_driy': (0x0042D6FC, 0x0042D510),
-    }
+    'break_keep': (
+        ToggleField(enable=0xE12FFF1E, disable=0xE92D4010, label="中断存档不消失"),
+        0x003BA3F0,
+        0x003BAE00,
+    ),
+    'item_keep': (
+        ToggleField(enable=0xE1A00000, disable=0xEB08F683, label="道具使用不减"),
+        0x001D7024,
+        0x001D7C30,
+    ),
+    'inf_mila': (
+        ToggleField(enable=0x13A00001, disable=0x15900008, label="无限使用米拉齿轮"),
+        0x00434C0C,
+        0x0043549C,
+    ),
+    'no_battle_3d': (
+        ToggleField(enable=0xEA00003F, disable=0xDA00003F, label="3D迷宫接触敌人不战斗"),
+        0x0017ED4C,
+        0x0017FE6C,
+    ),
+    'first_turn_withdraw': (
+        ToggleField(enable=0xE3500001, disable=0xE3500003, label="第一回合可撤退"),
+        0x0044D968,
+        0x0044E1F8,
+    ),
+    'well_no_driy': (
+        ToggleFields(
+            ToggleField(enable=0xEA000000, disable=0xA3A00001),
+            ToggleField(enable=0xEA000000, disable=0xA3A00001),
+            label="圣井不会干涸"
+        ),
+        (0x0042CE6C, 0x0042CC80),
+        (0x0042D6FC, 0x0042D510),
+    ),
+    'support_talk_now': (
+        ToggleFields(
+            ToggleField(enable=0xE3A00006, disable=None),
+            ToggleField(enable=0xE1500000E5C40019E2400001, disable=None, size=12),
+            label="立即发生支援对话"
+        ),
+        (0x001F7E18, 0x001F7E30),
+        (0x001F8A24, 0x001F8A3C),
+    ),
+    'inf_hp': (
+        ToggleFields(
+            ToggleField(
+                enable=struct.pack('20L', 0xE1A00004, 0xE3550000, 0x112FFF1E, 0xE59640CC, 0xE3540000, 0x012FFF1E, 0xE5D44008,
+                    0xE3540000, 0x13540003, 0x112FFF1E, 0xE3A050FF, 0xE59640C4, 0xE5C4503C, 0xE2800064, 0xE35000FF,
+                    0xA3A000FF, 0xE5C600E3, 0xE5C60404, 0xE12FFF1E, 0xEB03558B),
+                disable=None,
+                type=bytes, size=76),
+            ToggleField(enable=0xEB03558B, disable=None),
+            label="HP无限")
+        (0x005279D0, 0x004523B4),
+        (0x005282D0, 0x00452C9C),
+    ),
+    'all_weapon_equipment': (
+        ToggleField(enable=0xE12FFF1EE3A00001, disable=None, size=8, label="可装备全武器"),
+        0x0045077C,
+        0x0045100C,
+    ),
 }
 
 
 def bind_fields(data, version):
-    source = VERSION_SPECIFIC[version]
-    for key, field in COMMON_FIELDS.items():
-        data[key] = field.replace(offset=source[key])
+    """绑定字段"""
+    offset_index = version + 1
+    for key, value in COMMON_FIELDS.items():
+        data[key] = value[0].replace(offset=value[offset_index])
     return data
 
 
@@ -141,11 +197,11 @@ class BaseGlobalEchos(BaseGlobal):
 
 
 class Global_1_0(BaseGlobalEchos):
-    bind_fields(locals(), '1.0')
+    bind_fields(locals(), 0)
 
 
 class Global_1_1(BaseGlobalEchos):
-    bind_fields(locals(), '1.1')
+    bind_fields(locals(), 1)
 
 
 SPECIFIC_GLOBALS = {

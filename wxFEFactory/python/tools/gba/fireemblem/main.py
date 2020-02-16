@@ -59,7 +59,7 @@ class FeHack(BaseGbaHack):
         ModelInput("posx", "X坐标")
         ModelInput("posy", "Y坐标")
         ModelInput("hpmax", "HP最大值")
-        ModelInput("hp", "ＨＰ")
+        ModelInput("hp", "HP")
         ModelInput("power", "力量")
         ModelInput("skill", "技术")
         ModelInput("speed", "速度")

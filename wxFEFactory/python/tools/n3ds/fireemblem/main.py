@@ -68,7 +68,7 @@ class FeHack(BaseN3dsHack):
         ModelInput("posx", "X坐标")
         ModelInput("posy", "Y坐标")
         ModelInput("hpmax", "HP上限+")
-        ModelInput("hp", "ＨＰ")
+        ModelInput("hp", "HP")
         ModelInput("power", "力量+")
         ModelInput("magic", "魔力+")
         ModelInput("skill", "技术+")

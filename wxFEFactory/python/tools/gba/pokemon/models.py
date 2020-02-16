@@ -58,7 +58,7 @@ class PokemonStructSkillInfo(Model):
 
 class PokemonStructAcquiredInfo(Model):
     SIZE = 12
-    rgbBattleBonuses = ArrayField(0x00, 6, ByteField(0))  # 努力值(ＨＰ, 攻击, 防御, 敏捷, 特攻, 特防)
+    rgbBattleBonuses = ArrayField(0x00, 6, ByteField(0))  # 努力值(HP, 攻击, 防御, 敏捷, 特攻, 特防)
     rgbApealPoints = ArrayField(0x06, 6, ByteField(0))  # 魅力值(帅气, 美丽, 可爱, 聪明, 坚强, 软弱)
 
 
@@ -74,7 +74,7 @@ class PokemonStructInnateInfo(Model):
         unk1,          # @0x1F, 0
     ) = BitsField.create(0x00, 4, (4, 4, 8, 7, 4, 4, 1))
     (
-        bHPIndv,       # @0x20, ＨＰ (个体值)
+        bHPIndv,       # @0x20, HP (个体值)
         bAtkIndv,      # @0x25, 攻撃 (个体值)
         bDefIndv,      # @0x2A, 防御 (个体值)
         bDexIndv,      # @0x2F, 敏捷 (个体值)

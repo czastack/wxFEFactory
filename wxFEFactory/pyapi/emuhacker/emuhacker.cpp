@@ -19,8 +19,23 @@ namespace emuhacker {
 	{
 		if (type.ptr() == (PyObject*)&PyLong_Type)
 		{
-			size_t data = self.read_uint(addr, size ? size : self.getPtrSize());
-			return py::cast(data);
+			size = size ? size : self.getPtrSize();
+			if (size <= sizeof(size_t))
+			{
+				return py::cast(self.read_uint(addr, size));
+			}
+			else
+			{
+				// 大整数支持
+				char* buf = new char[size];
+				memset(buf, 0, size);
+				self.read(addr, buf, size);
+				py::bytes ret(buf, size);
+				auto result = py::reinterpret_steal<py::int_>(
+					_PyLong_FromByteArray(reinterpret_cast<unsigned char*>(buf), size, true, false));
+				delete[] buf;
+				return result;
+			}
 		}
 		else if (type.ptr() == (PyObject*)&PyFloat_Type)
 		{
@@ -48,7 +63,20 @@ namespace emuhacker {
 	{
 		if (PyLong_Check(data.ptr()))
 		{
-			return self.write_uint(addr, data.cast<size_t>(), size ? size : self.getPtrSize());
+			size = size ? size : self.getPtrSize();
+			if (size <= sizeof(size_t))
+			{
+				return self.write_uint(addr, data.cast<size_t>(), size);
+			}
+			else
+			{
+				// 大整数支持
+				unsigned char* buf = new unsigned char[size];
+				_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(data.ptr()), buf, size, true, 0);
+				bool result = self.write(addr, buf, size);
+				delete[] buf;
+				return result;
+			}
 		}
 		else if (PyFloat_Check(data.ptr()))
 		{
@@ -229,7 +257,7 @@ public:
 	friend void init_emuhacker(py::module &m);
 
 	bool attach() override {
-		PYBIND11_OVERLOAD_PURE(
+		PYBIND11_OVERLOAD(
 			bool,                /* Return type */
 			ProcessHandler,      /* Parent class */
 			attach,              /* Name of function in C++ (must match Python name) */
@@ -237,7 +265,7 @@ public:
 	}
 
 	addr_t address_map(addr_t addr) override {
-		PYBIND11_OVERLOAD_PURE(
+		PYBIND11_OVERLOAD(
 			addr_t,              /* Return type */
 			ProcessHandler,      /* Parent class */
 			address_map,         /* Name of function in C++ (must match Python name) */
