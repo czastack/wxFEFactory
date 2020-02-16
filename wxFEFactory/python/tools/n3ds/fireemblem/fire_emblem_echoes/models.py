@@ -1,5 +1,6 @@
 import struct
 from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, ToggleField, ToggleFields
+from lib.hack.utils import pack_dwords
 from ..models import ItemSlot, BaseGlobal
 
 
@@ -114,6 +115,12 @@ COMMON_FIELDS = {
         0x00357468,
     ),
 
+    'growth_rate_add_value': (
+        ByteField(label="成长率加算"),
+        0x00356A58,
+        0x00357468,
+    ),
+
     'add_all_attr': (
         ToggleField(enable=0xE3A00001, disable=0xEB01A8F8, label="成长率1%以上升级后能力值必定+1"),
         0x00356B84,
@@ -156,8 +163,8 @@ COMMON_FIELDS = {
     ),
     'support_talk_now': (
         ToggleFields(
-            ToggleField(enable=0xE3A00006, disable=None),
-            ToggleField(enable=0xE1500000E5C40019E2400001, disable=None, size=12),
+            ToggleField(enable=0xE3A00006, disable=0xE5D00054),
+            ToggleField(enable=0xE1500000E5C40019E2400001, disable=0xE1510000E2400001E1D411D9, size=12),
             label="立即发生支援对话"
         ),
         (0x001F7E18, 0x001F7E30),
@@ -166,29 +173,89 @@ COMMON_FIELDS = {
     'inf_hp': (
         ToggleFields(
             ToggleField(
-                enable=struct.pack('20L', 0xE1A00004, 0xE3550000, 0x112FFF1E, 0xE59640CC, 0xE3540000, 0x012FFF1E, 0xE5D44008,
-                    0xE3540000, 0x13540003, 0x112FFF1E, 0xE3A050FF, 0xE59640C4, 0xE5C4503C, 0xE2800064, 0xE35000FF,
-                    0xA3A000FF, 0xE5C600E3, 0xE5C60404, 0xE12FFF1E, 0xEB03558B),
-                disable=None,
-                type=bytes, size=76),
-            ToggleField(enable=0xEB03558B, disable=None),
-            label="HP无限")
-        (0x005279D0, 0x004523B4),
-        (0x005282D0, 0x00452C9C),
+                enable=pack_dwords(0xE1A00004, 0xE3550000, 0x112FFF1E, 0xE59640CC, 0xE3540000, 0x012FFF1E, 0xE5D44008,
+                                   0xE3540000, 0x13540003, 0x112FFF1E, 0xE3A050FF, 0xE59640C4, 0xE5C4503C, 0xE2800064,
+                                   0xE35000FF, 0xA3A000FF, 0xE5C600E3, 0xE5C60404, 0xE12FFF1E),
+                disable=b'\x00' * 76),
+            ToggleField(disable=0xE1A00004),
+            label="HP无限"),
+        (0x005279D0, {'offset': 0x004523B4, 'enable': 0xEB035585}),
+        (0x005282D0, {'offset': 0x00452C9C, 'enable': 0xEB03558B}),
+    ),
+    'range_100': (
+        ToggleFields(
+            ToggleField(disable=0xE1A06002),
+            ToggleField(disable=0xE1A00004),
+            ToggleField(
+                enable=pack_dwords(0xE1A00004, 0xE59740CC, 0xE5D44008, 0xE3540000, 0x03A00064, 0xE12FFF1E, 0xE59060CC,
+                                   0xE5D66008, 0xE3560000, 0x03A05001, 0x028EEF5E, 0x11A06002, 0xE12FFF1E),
+                disable=b'\x00' * 52),
+            label="攻击射程100"),
+        (
+            {'offset': 0x004537C4, 'enable': 0xEB0350D3},
+            {'offset': 0x00453DF4, 'enable': 0xEB034F41},
+            0x00527B00
+        ),
+        (
+            {'offset': 0x004540AC, 'enable': 0xEB0350D9},
+            {'offset': 0x004546DC, 'enable': 0xEB034F47},
+            0x00528400
+        ),
+    ),
+    'move_max': (
+        ToggleFields(
+            ToggleField(
+                enable=pack_dwords(0xE59640CC, 0xE3540000, 0x08BD8070, 0xE5D44008, 0xE3540000,
+                                   0x13540003, 0x18BD8070, 0xE3A04032, 0xE5C640DF, 0xE8BD8070),
+                disable=b'\x00' * 40),
+            ToggleField(disable=0xE8BD8070),
+            label="移动力最大"),
+        (
+            0x00527B40,
+            {'offset': 0x004523B8, 'enable': 0xEA0355E0},
+        ),
+        (
+            0x00528440,
+            {'offset': 0x00452CA0, 'enable': 0xEA0355E6},
+        ),
     ),
     'all_weapon_equipment': (
-        ToggleField(enable=0xE12FFF1EE3A00001, disable=None, size=8, label="可装备全武器"),
+        ToggleField(enable=0xE12FFF1EE3A00001, disable=0xE1A04000E92D40F0, size=8, label="可装备全武器"),
         0x0045077C,
         0x0045100C,
+    ),
+    'all_support_a': (
+        ToggleFields(
+            ToggleField(
+                enable=pack_dwords(0xE92D4002, 0xE59F1008, 0xE5801018, 0xE1D001D8, 0xE8BD8002, 0x63626203),
+                disable=b'\x00' * 24),
+            ToggleField(disable=0xE8BD8070),
+            label="全支援A"),
+        (
+            0x00527C00,
+            {'offset': 0x003A30C4, 'enable': 0xEB0612CD, 'disable': 0xE1D001D8},
+        ),
+        (
+            0x00528500,
+            {'offset': 0x003A3AD4, 'enable': 0xEB061289, 'disable': 0xE1D001D8},
+        ),
+    ),
+    'all_attr_max_99': (
+        ToggleField(
+            enable=pack_dwords(0xE3A0C063, 0xE5C0C03C, 0xE59600C8, 0xE0804005, 0xE5D4402C, 0xE084400C, 0xEA000002),
+            disable=pack_dwords(0xE5D0C03C, 0xE59600C8, 0xE0804005, 0xE5D4402C, 0xE084400C, 0xE35400FF, 0xA3A040FF),
+            label="全能力上限99"),
+        0x00452290,
+        0x00452B78,
     ),
 }
 
 
 def bind_fields(data, version):
     """绑定字段"""
-    offset_index = version + 1
+    index = version + 1
     for key, value in COMMON_FIELDS.items():
-        data[key] = value[0].replace(offset=value[offset_index])
+        data[key] = value[0].replace(value[index])
     return data
 
 
@@ -197,11 +264,41 @@ class BaseGlobalEchos(BaseGlobal):
 
 
 class Global_1_0(BaseGlobalEchos):
+    """version 1.0"""
     bind_fields(locals(), 0)
+
+    all_class_selectable = ToggleFields(
+        ToggleField(
+            0x00527A40,
+            enable=pack_dwords(0xE59F0014, 0xE5900000, 0xE2800C06, 0xE28000CC, 0xE0800385, 0xE0800285,
+                               0xE12FFF1E, 0x0066013C),
+            disable=b'\x00' * 32),
+        ToggleField(0x001D1020, enable=0xE58D0024E59FA178E3A00049, disable=0xDA000023C59FA178E3500000, size=12),
+        ToggleField(0x001D1050, enable=0xEB0D5A7A, disable=0xEB0A1CF8),
+        ToggleField(0x001D108C, enable=0xE3A00000, disable=0xEB0A1C6F),
+        ToggleField(0x001FBB48, enable=0xE3A00001, disable=0xE3A00000),
+        ToggleField(0x001FBB58, enable=0xEA000036, disable=0x0A000036),
+        label="转职全职业可选",
+    )
 
 
 class Global_1_1(BaseGlobalEchos):
+    """version 1.1"""
     bind_fields(locals(), 1)
+
+    all_class_selectable = ToggleFields(
+        ToggleField(
+            0x00528340,
+            enable=pack_dwords(0xE59F0020, 0xE5908000, 0xE7980105, 0xE3500000, 0x112FFF1E, 0xE2855001,
+                               0xE355006F, 0x1AFFFFF9, 0xE5980000, 0xE12FFF1E, 0x0066114C),
+            disable=b'\x00' * 44),
+        ToggleField(0x001D1BC0, enable=0xE58D0024E59FA178E3A0006F, disable=0xDA000023C59FA178E3500000, size=12),
+        ToggleField(0x001D1BF0, enable=0xEB0D59D2, disable=0xEB0A1C4A),
+        ToggleField(0x001D1C2C, enable=0xE3A00000, disable=0xEB0A1C6F),
+        ToggleField(0x001FC8B0, enable=0xE3A00001, disable=0xE3A00000),
+        ToggleField(0x001FC8C0, enable=0xEA000036, disable=0x0A000036),
+        label="转职全职业可选",
+    )
 
 
 SPECIFIC_GLOBALS = {

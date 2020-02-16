@@ -298,8 +298,13 @@ class FieldType:
         elif callable(offset):
             return offset(instance, self)
 
-    def replace(self, **kwargs):
+    def replace(self, data=None, **kwargs):
+        """替换属性，返回新对象"""
         obj = copy.copy(self)
+        if isinstance(data, dict):
+            obj.__dict__.update(data)
+        else:
+            obj.offset = data
         obj.__dict__.update(kwargs)
         return obj
 
@@ -469,6 +474,14 @@ class ToggleField(Field):
                 return
         super().__set__(instance, value)
 
+    def replace(self, data=None, **kwagrs):
+        obj = super().replace(data, **kwagrs)
+        if self.enable != obj.enable:
+            obj.type = type(obj.enable)
+            if obj.type is bytes:
+                obj.size = len(obj.enable)
+        return obj
+
 
 class ToggleFields(FieldType):
     """同步控制多个ToggleField"""
@@ -488,12 +501,12 @@ class ToggleFields(FieldType):
         for field in self.fields:
             field.__set__(instance, value)
 
-    def replace(self, **kwagrs):
-        offset = kwagrs.pop('offset', None)
-        obj = super().replace(**kwagrs)
-        if offset:
+    def replace(self, data=None, **kwagrs):
+        # data只能用于fields
+        obj = super().replace(None, **kwagrs)
+        if data:
             obj.fields = tuple(
-                field.replace(offset=offset[i]) for i, field in enumerate(self.fields)
+                field.replace(data[i]) for i, field in enumerate(self.fields)
             )
         return obj
 

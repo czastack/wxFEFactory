@@ -102,24 +102,34 @@ class Descriptor:
         yield self.setter
 
 
-def loword(n):
+def loword(num):
     """低字"""
-    return n & 0xFFFF
+    return num & 0xFFFF
 
 
-def hiword(n):
+def hiword(num):
     """高字"""
-    return (n >> 16) & 0xFFFF
+    return (num >> 16) & 0xFFFF
 
 
-def u32(n):
+def u32(num):
     """截取32位整型"""
-    return n & 0xFFFFFFFF
+    return num & 0xFFFFFFFF
 
 
-def qword(n):
+def qword(num):
     """截取64位整型"""
-    return n & 0xFFFFFFFFFFFFFFFF
+    return num & 0xFFFFFFFFFFFFFFFF
+
+
+def pack_dwords(*args):
+    """打包多个DWORD为bytes"""
+    return struct.pack('%dL' % len(args), *args)
+
+
+def combine_dwords(*args):
+    """打包多个DWORD为bytes"""
+    return int.from_bytes(pack_dwords(*args), 'little')
 
 
 def align_4(n):

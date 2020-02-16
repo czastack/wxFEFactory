@@ -264,7 +264,7 @@ class BaseHackTool(NestedTool):
 
     def wake_widgets_up(self):
         for widget in self.active_widgets:
-            widget.write()
+            widget.wakeup()
 
 
 class ProxyHackTool(BaseHackTool):

@@ -100,6 +100,10 @@ class Widget(metaclass=abc.ABCMeta):
     def write(self):
         pass
 
+    def wakeup(self):
+        """onattach后恢复"""
+        self.write()
+
     def get_addr(self):
         return self.addr
 
@@ -565,7 +569,7 @@ class SimpleCheckBox(Widget):
 
 
 class BaseCheckBox(TwoWayWidget):
-    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, alone=False, realtime=False):
+    def __init__(self, name, label, addr=None, offsets=(), enable=None, disable=None, alone=False, realtime=True):
         """
         :param enable: 激活时写入的数据
         :param disable: 关闭时写入的数据
@@ -596,6 +600,10 @@ class BaseCheckBox(TwoWayWidget):
     def onchange(self, checkbox):
         if self.realtime:
             self.write()
+
+    def wakeup(self):
+        if self.view.checked:
+            super().wakeup()
 
     @property
     def input_value(self):
