@@ -86,6 +86,18 @@ COMMON_FIELDS = {
         0x00333C4C,
         0x00334948,
     ),
+    'prepare_enemy': (
+        ToggleFields(
+            ToggleField(enable=0xE1500000, disable=0xE1510000),
+            ToggleField(enable=0xEA000007, disable=0x0A000007),
+            ToggleField(enable=0xE3A00001, disable=0xEB0549CD),
+            ToggleField(enable=0xE3100B02, disable=0xE3100001),
+            ToggleField(enable=0xE3100B02, disable=0xE3100001),
+            label="战斗准备任意配置(包括敌方)"
+        ),
+        (0x002F960C, 0x002F961C, 0x002F9650, 0x00307674, 0x003076DC),
+        (0x002FA214, 0x002FA224, 0x002FA258, 0x0030827C, 0x003082E4),
+    ),
     'anyone_bag': (
         ToggleFields(
             ToggleField(enable=0xE1A00000, disable=0xA000004),
@@ -102,6 +114,12 @@ COMMON_FIELDS = {
     ),
     'custom_exp': (
         ToggleField(enable=0xE3A0003C, disable=0xC3A00064, label="自定义获取经验值"),
+        0x004509EC,
+        0x0045127C,
+    ),
+
+    'custom_exp_value': (
+        ByteField(label="成长率加算"),
         0x004509EC,
         0x0045127C,
     ),
@@ -125,6 +143,28 @@ COMMON_FIELDS = {
         ToggleField(enable=0xE3A00001, disable=0xEB01A8F8, label="成长率1%以上升级后能力值必定+1"),
         0x00356B84,
         0x00357594,
+    ),
+
+    'gold_coin_996': (
+        ToggleFields(
+            ToggleField(enable=0xE51F0130, disable=0xE59F0030),
+            ToggleField(enable=0xE2804C02, disable=0xE2800C02),
+            ToggleField(enable=0xE8BD8010E1C404BCE3A00FF9, disable=0x5FB65CE8BD8010E1D004BC, size=12),
+            label="金币996枚"
+        ),
+        (0x00434DB0, 0x00434DDC, 0x00434DE0),
+        (0x00435640, 0x0043566C, 0x00435670),
+    ),
+
+    'silver_coin_9984': (
+        ToggleFields(
+            ToggleField(enable=0xE51F0220, disable=0xE59F0030),
+            ToggleField(enable=0xE2804C02, disable=0xE2800C02),
+            ToggleField(enable=0xE8BD8010E1C405B2E3A00C27, disable=0x5FB65CE8BD8010E1D005B2, size=12),
+            label="银币9984枚"
+        ),
+        (0x00434EA0, 0x00434ECC, 0x00434ED0),
+        (0x00435730, 0x0043575C, 0x00435760),
     ),
 
     'break_keep': (

@@ -23,10 +23,10 @@ PAGE_MASK = 0x0FFF
 class CitraHandler(N3dsEmuHandler):
     CLASS_NAME = "Qt5QWindowOwnDCIcon"
 
-    InvalidateCacheRangeAsm = [
+    InvalidateCacheRangeAsm = (
         b'\x48\xA1',
         bytes.fromhex('4C 8B C2 48 8B D1 48 8B 48 48 48 8B 01 FF 50 28 C3')
-    ]
+    )
 
     def __init__(self):
         super().__init__()

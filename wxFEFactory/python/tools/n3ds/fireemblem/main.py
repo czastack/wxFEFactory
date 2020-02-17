@@ -47,7 +47,9 @@ class FeHack(BaseN3dsHack):
             ModelCheckBox("anyone_bag")
             ModelCheckBox("quick_info")
             ModelCheckBox("custom_exp")
+            ModelInput("custom_exp_value")
             ModelCheckBox("growth_rate_add")
+            ModelInput("growth_rate_add_value")
             ModelCheckBox("add_all_attr")
             ModelCheckBox("break_keep")
             ModelCheckBox("item_keep")
@@ -62,8 +64,8 @@ class FeHack(BaseN3dsHack):
             ModelCheckBox("all_weapon_equipment")
             ModelCheckBox("all_support_a")
             ModelCheckBox("all_attr_max_99")
-        # ModelSelect("exp_rate", "经验值倍数", choices=datasets.RATE, values=datasets.EXP_RATE_VALUES)
-        # ModelSelect("pro_rate", "熟练度倍数", choices=datasets.RATE, values=datasets.PRO_RATE_VALUES)
+            ModelCheckBox("add_all_attr")
+            ModelCheckBox("gold_coin_996")
 
     def render_person(self):
         datasets = self.datasets
