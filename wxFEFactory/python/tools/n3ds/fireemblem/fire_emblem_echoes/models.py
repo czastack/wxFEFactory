@@ -54,7 +54,7 @@ COMMON_FIELDS = {
     ),
 
     'custom_exp_value': (
-        ByteField(label="成长率加算"),
+        ByteField(label="经验值"),
         0x004509EC,
         0x0045127C,
     ),
