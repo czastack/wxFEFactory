@@ -106,7 +106,10 @@ def flag_generator(n):
 
 def split_value_label(options):
     """把(value, label)分开"""
-    return tuple(item[1] for item in options), tuple(item[0] for item in options)
+    if isinstance(options, dict):
+        return tuple(options.keys()), tuple(options.values())
+    else:
+        return zip(*options)
 
 
 def split_label_value(options):

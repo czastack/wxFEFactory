@@ -1,73 +1,8 @@
 import struct
-from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, ToggleField, ToggleFields
+from lib.hack.models import (
+    Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField, ModelPtrField, ToggleField, ToggleFields
+)
 from lib.hack.utils import pack_dwords
-from ..models import ItemSlot, BaseGlobal
-
-
-class Person(Model):
-    SIZE = 0xA8
-    prof = Field(0x44)
-    level = ByteField(0x6A)
-    level_limit = ByteField(0x63)
-    exp = ByteField(0x6B)
-    no = ByteField(0x41)  # 头像、身份？
-    moved = ByteField(0x9C)
-    posx = ByteField(0x6E)
-    posy = ByteField(0x6F)
-    hpmax = ByteField(0x50)
-    hp = ByteField(0x6C)
-    power = ByteField(0x51)
-    magic = ByteField(0x52)
-    skill = ByteField(0x53)
-    speed = ByteField(0x54)
-    lucky = ByteField(0x55)
-    defense = ByteField(0x56)
-    magicdef = ByteField(0x57)
-    move_add = ByteField(0x6D)
-    items = ArrayField(0x70, 5, ModelField(0, ItemSlot))
-    proficiency = ArrayField(0x84, 6, ByteField(0))  # 武器熟练度(剑, 枪, 斧, 弓, 书, 杖) (00: -, 01: E, 1F: D, 4C: C, 88: B)
-
-
-class Config(Model):
-    money = Field(0x0190)
-    difficulty = ByteField(0x01A5)
-    character_gender = False
-
-
-class ItemInfo(Model):
-    SIZE = 0x3C
-    name_ptr = Field(0x04)  # 名称指针
-    desc_ptr = Field(0x08)  # 介绍文本指针
-    icon = ByteField(0x0C)  # 图标序号
-    type = ByteField(0x10)  # 类型 0: 剑, 枪, 斧, 弓, 魔, 杖, 龙石, 弩车
-    level = ByteField(0x12)  # 要求熟练度 00: -, 01: E, 1F: D, 4C: C, 88: B
-    power = ByteField(0x15)  # 威力
-    hit = ByteField(0x16)  # 命中
-    kill = ByteField(0x17)  # 必杀
-    weight = ByteField(0x18)  # 重量
-    range_min = ByteField(0x19)  # 最小射程
-    range_max = ByteField(0x1A)  # 最大射程
-    move_add = ByteField(0x1B)  # 属性增加效果
-    hp_add = ByteField(0x1C)
-    power_add = ByteField(0x1D)
-    magic_add = ByteField(0x1E)
-    skill_add = ByteField(0x1F)
-    speed_add = ByteField(0x20)
-    lucky_add = ByteField(0x21)
-    defense_add = ByteField(0x22)
-    magicdef_add = ByteField(0x23)
-    attr1 = ByteField(0x24)
-    attr2 = ByteField(0x25)
-    attr3 = ByteField(0x26)
-    attr4 = ByteField(0x27)
-    attr5 = ByteField(0x28)
-    attr6 = ByteField(0x29)
-    attr7 = ByteField(0x2A)
-    attr8 = ByteField(0x2B)
-    attr9 = ByteField(0x2C)
-    attr10 = ByteField(0x2D)
-    attr11 = ByteField(0x2E)
-    attr12 = ByteField(0x2F)
 
 
 COMMON_FIELDS = {
@@ -299,12 +234,55 @@ def bind_fields(data, version):
     return data
 
 
-class BaseGlobalEchos(BaseGlobal):
-    pass
+class System(Model):
+    difficulty = Field(0x3D, label="难易度")
+    renown = Field(0x70, label="名声值")
 
 
-class Global_1_0(BaseGlobalEchos):
+class Item(Model):
+    """物品"""
+    SIZE = 4
+    item = WordField(0)
+    star = BitsField(3, 1, 4, 4, label="星级")
+
+
+class InGameCharacter(Model):
+    """角色数据"""
+    SIZE = 0x420
+    index = ByteField(0x005C, label="序号")
+    level = ByteField(0x005D, label="等级")
+    exp = ByteField(0x005E, label="经验")
+    hp = ByteField(0x005F, label="HP")
+    pow = ByteField(0x0054, label="体力")
+    atk = ByteField(0x0055, label="攻击+")
+    tec = ByteField(0x0056, label="技巧+")
+    spd = ByteField(0x0057, label="速度+")
+    luc = ByteField(0x0058, label="幸运+")
+    def_ = ByteField(0x0059, label="防守+")
+    res = ByteField(0x005A, label="魔防+")
+    mov = ByteField(0x005B, label="移动+")
+    act = ByteField(0x007C, label="动作+")
+    pro = ByteField(0x032D, label="熟练+")
+    item = ModelField(0x034C, Item, label="所携物品")
+
+
+class Convoy(Model):
+    """队伍行囊"""
+    alm_offset = 0
+    celica_offset = 0
+    alm = ArrayField((4, 0), 0xFF, ModelField(0, Item))
+    celica = ArrayField((8, 0), 0xFF, ModelField(0, Item))
+
+
+class EchosGlobal(Model):
+    # TODO
+    chars = ArrayField(0x328B3B4C, 30, ModelField(0, InGameCharacter))
+
+
+class Global_1_0(EchosGlobal):
     """version 1.0"""
+    system = ModelPtrField(0x005C5CEC, System)
+    convoy = ModelField(0x0061EC90, Convoy)
     bind_fields(locals(), 0)
 
     all_class_selectable = ToggleFields(
@@ -322,8 +300,10 @@ class Global_1_0(BaseGlobalEchos):
     )
 
 
-class Global_1_1(BaseGlobalEchos):
+class Global_1_1(EchosGlobal):
     """version 1.1"""
+    system = ModelPtrField(0x005C6CF8, System)
+    convoy = ModelField(0x0061FC90, Convoy)
     bind_fields(locals(), 1)
 
     all_class_selectable = ToggleFields(

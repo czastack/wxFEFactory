@@ -54,10 +54,12 @@ class NativeHacktool(AssemblyHacktool):
         """释放远程函数"""
         super().ondetach()
         self._cached_address = None
-        self.handler.free_memory(self.native_call_addr)
+        if self.native_call_addr:
+            self.handler.free_memory(self.native_call_addr)
         if self.enable_native_call_n:
             self.handler.free_memory(self.native_call_n_addr)
-        self.handler.free_memory(self.native_context.addr)
+        if self.native_context:
+            self.handler.free_memory(self.native_context.addr)
 
     def native_call(self, addr, arg_sign, *args, ret_type=int, ret_size=4):
         """ 远程调用参数为NativeContext*的函数
