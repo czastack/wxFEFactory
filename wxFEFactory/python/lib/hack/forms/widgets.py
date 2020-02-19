@@ -69,9 +69,9 @@ class Widget(metaclass=abc.ABCMeta):
             if not self.readonly else None)
         return btn_read, btn_write
 
-    def set_help(self, help):
+    def set_help(self, text):
         if self.view:
-            self.view.SetToolTip(help)
+            self.view.SetToolTip(text)
 
     def onkey(self, v, event):
         mod = event.GetModifiers()

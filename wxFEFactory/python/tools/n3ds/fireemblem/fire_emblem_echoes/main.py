@@ -26,10 +26,10 @@ class Main(BaseN3dsHack):
         self.lazy_group(Group("player", "角色", (self._person, models.InGameCharacter), cols=4), self.render_person)
 
         self.lazy_group(Group("convoy1", "行囊(阿鲁姆)", _global, cols=4),
-            partial(self.render_convoy, chapter='alm'))
+            partial(self.render_convoy, leader='alm'))
 
         self.lazy_group(Group("convoy2", "行囊(赛莉卡)", _global, cols=4),
-            partial(self.render_convoy, chapter='celica'))
+            partial(self.render_convoy, leader='celica'))
 
     def render_global(self):
         Choice("版本", datasets.VERSIONS, self.on_version_change)
@@ -85,15 +85,18 @@ class Main(BaseN3dsHack):
         ModelInput("charname", "角色", readonly=True)
         ModelInput("profname", "职业", readonly=True)
 
-    def render_convoy(self, chapter):
+    def render_convoy(self, leader):
         group = Group.active_group()
         with ModelSelect.choices_cache:
-            for i in range(10):
-                ModelSelect("convoy.{0}.{1}+{0}_offset.item".format(chapter, i), "",
+            for i in range(self.CONVOY_PAGE_LENGTH):
+                item_path = "convoy.{0}.{1}+{0}_offset".format(leader, i)
+                ModelSelect(item_path + ".item", "",
                     choices=datasets.ITEM_LABELS, values=datasets.ITEM_VALUES)
-                ModelInput("convoy.{0}.{1}+{0}_offset.star".format(chapter, i), "星级")
+                with ModelInput(item_path + ".star", "星级").container:
+                    ui.Button(label="复制", extra={"tooltip": "复制到行囊"}, class_="button",
+                              onclick=partial(self.copy_item, source=item_path, leader=leader))
         with Group.active_group().footer:
-            Pagination(partial(self.on_convoy_page, chapter=chapter, group=group), self.CONVOY_PAGE_TOTAL)
+            Pagination(partial(self.on_convoy_page, leader=leader, group=group), self.CONVOY_PAGE_TOTAL)
 
     def get_hotkeys(self):
         this = self.weak
@@ -123,7 +126,7 @@ class Main(BaseN3dsHack):
         """角色切换"""
         self.person_index = lb.index
 
-    def read_chars(self, _):
+    def _read_chars(self):
         """读取角色列表"""
         chars = self._global_ins.chars
         choices = []
@@ -133,6 +136,29 @@ class Main(BaseN3dsHack):
                 break
             choices.append('%02d-%s' % (i + 1, charname))
         self.chars_view.Set(choices)
+        return choices
+
+    def read_chars(self, _):
+        """读取角色列表调用"""
+        choices = self._read_chars()
+        if not choices:
+            # 尝试动态查找
+            find_start = 0x328B0000
+            start_1 = self.handler.find_bytes(datasets.CHARID_ALM, find_start, find_start + 0x80000)
+            start_2 = self.handler.find_bytes(datasets.CHARID_CELICA, find_start, find_start + 0x80000)
+            start = min(start_1, start_2)
+            if start > 0:
+                self._global_ins.field('chars').offset = start - 0x384
+            self._read_chars()
+
+    def copy_item(self, _, source, leader):
+        """复制物品到行囊"""
+        convoy = getattr(self._global_ins.convoy, leader)
+        source = getattr(self._global_ins, source)
+        for item in convoy:
+            if item.item == 0:
+                item.copy_from(source)
+                break
 
     def move_to_cursor(self):
         person = self.person
@@ -152,7 +178,7 @@ class Main(BaseN3dsHack):
     def move_down(self):
         self.person.posy += 1
 
-    def on_convoy_page(self, page, chapter, group):
+    def on_convoy_page(self, page, leader, group):
         """行囊翻页"""
-        setattr(self._global_ins.convoy, chapter + '_offset', (page - 1) * self.CONVOY_PAGE_LENGTH)
+        setattr(self._global_ins.convoy, leader + '_offset', (page - 1) * self.CONVOY_PAGE_LENGTH)
         group.read()

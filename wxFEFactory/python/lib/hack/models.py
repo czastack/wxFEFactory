@@ -16,7 +16,7 @@ class Model:
 
     @classmethod
     def field(cls, name):
-        # 获取字段实例
+        """获取字段实例"""
         for base in cls.__mro__:
             field = base.__dict__.get(name, None)
             if field:
@@ -24,7 +24,7 @@ class Model:
 
     @classproperty
     def field_items(self):
-        # (字段名, 字段实例)元组
+        """(字段名, 字段实例)元组"""
         field_items = getattr(self, '_field_items', None)
         if field_items is None:
             field_items = []
@@ -36,7 +36,7 @@ class Model:
 
     @classproperty
     def field_names(self):
-        # 字段名元组
+        """字段名元组"""
         field_names = getattr(self, '_field_names', None)
         if field_names is None:
             field_names = tuple(field[0] for field in self.field_items)
@@ -44,7 +44,7 @@ class Model:
 
     @classproperty
     def fields(self):
-        # 字段实例元组
+        """字段实例元组"""
         fields = getattr(self, '_fields', None)
         if fields is None:
             fields = tuple(field[1] for field in self.field_items)
@@ -52,41 +52,49 @@ class Model:
 
     @property
     def addr_hex(self):
-        # 地址16进制
+        """地址16进制"""
         return ("%08X" if self.addr < 0x100000000 else "%016X") % self.addr
 
     def prev(self):
-        # 地址前移一个
+        """地址前移一个"""
         self.addr -= self.SIZE
         return self
 
     def next(self):
-        # 地址后移一个
+        """地址后移一个"""
         self.addr += self.SIZE
         return self
 
     def to_bytes(self):
-        # 从内存中读取bytes数据
+        """从内存中读取bytes数据"""
         return self.handler.read(self.addr, bytes, self.SIZE)
 
-    def to_hex_str(self):
-        # 从内存中读取bytes数据并格式化成可读性强的16进制字符串
-        return utils.bytes_beautify(self.to_bytes())
+    def write_bytes(self, data):
+        """写入bytes数据"""
+        return self.handler.write(self.addr, data, self.SIZE)
+
+    def copy_from(self, obj):
+        """从Model对象复制数据"""
+        return self.handler.write(self.addr, obj.to_bytes(), self.SIZE)
 
     def hex(self):
-        # 从内存中读取bytes数据并转成16进制
+        """从内存中读取bytes数据并转成16进制"""
         return self.to_bytes().hex()
 
-    def fromhex(self, string):
-        # 从16进制字符串读取bytes并写入内存
+    def beautify(self):
+        """从内存中读取bytes数据并格式化成可读性强的16进制字符串"""
+        return utils.bytes_beautify(self.to_bytes())
+
+    def writehex(self, string):
+        """从16进制字符串读取bytes并写入内存"""
         return self.handler.write(self.addr, bytes.fromhex(string), self.SIZE)
 
     def clone(self):
-        # 克隆对象
+        """克隆对象"""
         return self.__class__(self.addr, self.handler)
 
     def addressof(self, field):
-        # 获取字段的地址
+        """获取字段的地址"""
         if isinstance(field, str):
             temp = self.field(field)
             if temp is None:
@@ -96,7 +104,7 @@ class Model:
                     else:
                         return item & attr
 
-                result = self.handle_comlex_attr(field, func)
+                result = self.handle_complex_attr(field, func)
                 if result is not COMLEX_ATTR_NONE:
                     return result
             else:
@@ -106,7 +114,7 @@ class Model:
             return field.get_addr(self)
 
     def offsetof(self, field):
-        # 获取字段的偏移
+        """获取字段的偏移"""
         if isinstance(field, str):
             field = self.field(field)
             if field is None:
@@ -118,30 +126,30 @@ class Model:
             raise TypeError('expected a Field object, got ' + str(field))
 
     def set_with(self, nameto, namefrom):
-        # 把一个字段的值赋予另一个字段
+        """把一个字段的值赋予另一个字段"""
         setattr(self, nameto, getattr(self, namefrom))
         return self
 
     def set_addr_by_index(self, i):
-        # 使用序号设置地址
+        """使用序号设置地址"""
         self.addr = self.SIZE * i
 
-    def test_comlex_attr(self, name):
-        # 测试复合属性，例如"foo.bar[0]"
-        return test_comlex_attr(name)
+    def test_complex_attr(self, name):
+        """测试复合属性，例如foo.bar[0]"""
+        return test_complex_attr(name)
 
     def __and__(self, field):
         return self.addressof(field)
 
     def __getitem__(self, attrs):
-        # 获取一个或多个字段的值
+        """获取一个或多个字段的值"""
         if isinstance(attrs, str):
             return getattr(self, attrs)
         else:
             return (getattr(self, attr) for attr in attrs)
 
     def __setitem__(self, attrs, values):
-        # 设置一个或多项字段的值
+        """设置一个或多项字段的值"""
         if isinstance(attrs, str):
             setattr(self, attrs, values)
         else:
@@ -150,7 +158,7 @@ class Model:
                 setattr(self, attr, next(valueiter))
 
     def __getattr__(self, name):
-        # 获取其他属性，通常是兼容getattr 复合属性
+        """获取其他属性，通常是兼容getattr 复合属性"""
         def func(item, attr, is_int):
             if is_int:
                 try:
@@ -161,13 +169,13 @@ class Model:
                 item = getattr(item, attr)
             return item
 
-        result = self.handle_comlex_attr(name, func)
+        result = self.handle_complex_attr(name, func)
         if result is not COMLEX_ATTR_NONE:
             return result
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
-        # 设置其他属性，通常是兼容setattr 复合属性
+        """设置其他属性，通常是兼容setattr 复合属性"""
         def func(item, attr, is_int):
             if is_int:
                 item[attr] = value
@@ -179,15 +187,15 @@ class Model:
 
             return True
 
-        if self.handle_comlex_attr(name, func) is COMLEX_ATTR_NONE:
+        if self.handle_complex_attr(name, func) is COMLEX_ATTR_NONE:
             super().__setattr__(name, value)
 
-    def handle_comlex_attr(self, name, func, out_range_warn=False):
+    def handle_complex_attr(self, name, func, out_range_warn=False):
         """ 处理复合属性
         func(item, attr, is_int) 最后一项的处理
         :param out_range_warn: 是否警告下标超出范围
         """
-        data = test_comlex_attr(name)
+        data = test_complex_attr(name)
         if data is not None:
             item = self
             prev = None  # 取offset的对象
@@ -228,7 +236,7 @@ class Model:
         return COMLEX_ATTR_NONE
 
     def datasnap(self, fields=None):
-        # 内存快照，返回命名空间
+        """内存快照，返回命名空间"""
         data = SimpleNamespace()
         for name in (fields if fields else self.field_names):
             setattr(data, name, getattr(self, name))
@@ -923,7 +931,7 @@ COMLEX_ATTR_MAP = {}
 COMLEX_ATTR_NONE = object()
 
 
-def test_comlex_attr(text):
+def test_complex_attr(text):
     """
     检查字段名是否是能构造CAttr的字符串
     若是，返回对应的CAttr实例，否则返回None

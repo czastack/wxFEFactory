@@ -14,8 +14,8 @@ class PgWidget(TwoWayWidget):
             raise TypeError('PgWidget父元素必须是PgGroup或PgCategory子类')
         self.pg = group.pg
 
-    def set_help(self):
-        self.pg.set_prop_help(self.name, help)
+    def set_help(self, text):
+        self.pg.set_prop_help(self.name, text)
 
     @property
     def input_value(self):

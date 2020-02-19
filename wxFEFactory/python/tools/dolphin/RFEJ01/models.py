@@ -43,7 +43,7 @@ class Person(Model):
     biorhythm = WordField(0x288)  # 生理节律，01是当前状态大好，08是曲线类型
 
     def __setattr__(self, name, value):
-        data = self.test_comlex_attr(name)
+        data = self.test_complex_attr(name)
         if data:
             if data.attrs[0] == 'skills':
                 skill = self.skills[data.attrs[1]]

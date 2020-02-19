@@ -33,7 +33,7 @@ class ConfigGroup:
             field.read()
             help_text = getattr(field, 'help', None)
             if help_text is not None:
-                field.set_help()
+                field.set_help(help_text)
 
     def read(self, _=None):
         for field in self.children:
