@@ -161,6 +161,7 @@ class SpinCtrl(Control):
 
     set_onchange = event_binder(wx.EVT_SPINCTRL)
     set_onenter = event_binder(wx.EVT_TEXT_ENTER)
+    value = value_property
 
 
 class ColorPicker(Control):

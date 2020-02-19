@@ -113,6 +113,9 @@ void UiModule::init_controls()
 	py::class_<NODELETE(wxSpinCtrl), wxControl>(ui, "SpinCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, long, int, int, int, const wxString&>(),
 			parent, id_v, value = wxEmptyString, pos_v, size_v, style = wxSP_ARROW_KEYS, "min"_a = 0, "max"_a = 100, "initial"_a = 0, name = wxT("wxSpinCtrl"))
+		.def("GetValue", &wxSpinCtrl::GetValue)
+		.def("SetValue", (void (wxSpinCtrl::*)(int value)) &wxSpinCtrl::SetValue, value)
+		.def("SetValue", (void (wxSpinCtrl::*)(const wxString & value)) & wxSpinCtrl::SetValue, value)
 		;
 
 	py::class_<NODELETE(wxColourPickerCtrl), wxControl>(ui, "ColourPickerCtrl")
