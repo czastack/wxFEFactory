@@ -3,6 +3,7 @@ from lib.hack.models import (
     Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField, ModelPtrField, ToggleField, ToggleFields
 )
 from lib.hack.utils import pack_dwords
+from .datasets import CHARACTERS, PROFESSIONS
 
 
 COMMON_FIELDS = {
@@ -246,6 +247,23 @@ class Item(Model):
     star = BitsField(3, 1, 4, 4, label="星级")
 
 
+class Stats(Model):
+    """角色属性"""
+    hp = ByteField(0, label="HP")
+    atk = ByteField(1, label="攻击+")
+    tec = ByteField(2, label="技巧+")
+    spd = ByteField(3, label="速度+")
+    luc = ByteField(4, label="幸运+")
+    def_ = ByteField(5, label="防守+")
+    res = ByteField(6, label="魔防+")
+
+
+class CharacterStats(Model):
+    """角色基本和最大属性"""
+    base = ModelField(0x0034, Stats, label="基本属性")
+    max = ModelField(0x003C, Stats, label="最大属性")
+
+
 class InGameCharacter(Model):
     """角色数据"""
     SIZE = 0x420
@@ -264,6 +282,19 @@ class InGameCharacter(Model):
     act = ByteField(0x007C, label="动作+")
     pro = ByteField(0x032D, label="熟练+")
     item = ModelField(0x034C, Item, label="所携物品")
+    stats = ModelPtrField(0x034C, CharacterStats, label="所携物品")
+    charid = Field(0x0384, bytes, 8, label="角色id")
+    profid = Field(0x0390, bytes, 8, label="职业id")
+
+    @property
+    def charname(self):
+        """角色名称"""
+        return CHARACTERS.get(self.charid, '')
+
+    @property
+    def profname(self):
+        """职业名称"""
+        return PROFESSIONS.get(self.profid, '')
 
 
 class Convoy(Model):
@@ -276,7 +307,7 @@ class Convoy(Model):
 
 class EchosGlobal(Model):
     # TODO
-    chars = ArrayField(0x328B3B4C, 30, ModelField(0, InGameCharacter))
+    chars = ArrayField(0x328B3B4C, 50, ModelField(0, InGameCharacter))
 
 
 class Global_1_0(EchosGlobal):

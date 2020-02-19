@@ -719,7 +719,7 @@ class BaseSelect(TwoWayWidget):
     @classmethod
     def move_about(cls, view, menu):
         pyapi.alert("按住shift，在下拉框上按下鼠标左键，拖拽到同源下拉框上释放，能交换两者的选值；\n"
-            "若释放时按着ctrl，则为复制值；若按着alt，则是把值移到目标处，原有区域下移或上移")
+                    "若释放时按着ctrl，则为复制值；若按着alt，则是把值移到目标处，原有区域下移或上移")
 
     @classmethod
     def onsearch(cls, dialog, value):
@@ -853,16 +853,24 @@ class ModelChoiceDisplay(ModelWidget, BaseChoiceDisplay):
     pass
 
 
-def Choice(laebl, choices, onselect):
-    """选项框"""
-    ui.Label(laebl)
-    return ui.Choice(class_="fill", choices=choices, onselect=onselect).set_selection(0)
+class ChoiceWidget(Widget):
+    """选项框带Container"""
+    def __init__(self, label, choices=None, onselect=None):
+        self.choices = choices
+        self.onselect = onselect
+        super().__init__(None, label, readonly=True)
 
+    def render(self):
+        super().render()
+        with ui.Horizontal(class_="fill") as container:
+            view = ui.Choice(class_="fill", choices=self.choices, onselect=self.onselect).set_selection(0)
+        self.view = view
+        self.container = container
 
-def Title(label):
-    """标题"""
-    ui.Hr()
-    return ui.Text(label)
+    def Set(self, choices):
+        """设置列表"""
+        self.view.Set(choices)
+        self.view.set_selection(0)
 
 
 class BaseFlagWidget(TwoWayWidget):
@@ -949,10 +957,11 @@ class ModelArrayWidget(ModelWidget, Widget):
 
 class ModelArrayInput(ModelArrayWidget):
     """输入框数组"""
+
     def render(self):
         field, labels = self.get_labels()
         self.children = [ModelInput('%s.%d' % (self.name, i), label=labels[i])
-            for i in range(field.length)]
+                         for i in range(field.length)]
 
 
 class ModelArraySelect(ModelArrayWidget):
@@ -965,16 +974,7 @@ class ModelArraySelect(ModelArrayWidget):
         field, labels = self.get_labels()
         with ModelSelect.choices_cache:
             self.children = [ModelSelect('%s.%d' % (self.name, i), label=labels[i], choices=self.choices)
-                for i in range(field.length)]
-
-
-def TabList(data):
-    """多个tab的列表框"""
-    book = ui.Notebook(class_="fill", wxstyle=0x0200)
-    with book:
-        for category in data:
-            ui.ListBox(class_="expand", choices=(item[0] for item in category[1]), extra=dict(caption=category[0]))
-    return book
+                             for i in range(field.length)]
 
 
 class ListFooterButtons:
@@ -994,3 +994,24 @@ class ListFooterButtons:
     def load_checked(self, _):
         """导入勾选"""
         self.li.set_checked_list(fefactory.json_load_file(self))
+
+
+def TabList(data):
+    """多个tab的列表框"""
+    book = ui.Notebook(class_="fill", wxstyle=0x0200)
+    with book:
+        for category in data:
+            ui.ListBox(class_="expand", choices=(item[0] for item in category[1]), extra=dict(caption=category[0]))
+    return book
+
+
+def Choice(label, choices, onselect):
+    """选项框"""
+    ui.Label(label)
+    return ui.Choice(class_="fill", choices=choices, onselect=onselect).set_selection(0)
+
+
+def Title(label):
+    """标题"""
+    ui.Hr()
+    return ui.Text(label)

@@ -166,21 +166,125 @@ ITEMS = {
 
 ITEM_VALUES, ITEM_LABELS = split_value_label(ITEMS)
 
-CHAPTERS = ()
+B = bytes.fromhex
+CHARACTERS = {
+    B("CDE7C2253782C205"): "阿鲁姆",
+    B("07EF94FDE3950E05"): "卢卡",
+    B("174B5327C9CF8706"): "格莱",
+    B("BB31AC11BD5EDDFB"): "罗宾",
+    B("365C7326A87A1A06"): "艾菲",
+    B("A5A73627F7B07906"): "克里夫",
+    B("60741B289A70EA06"): "希尔科",
+    B("24B2362746B87906"): "克莱尔",
+    B("3B907DB3F728EC4E"): "克雷贝",
+    B("5772CA7B27137033"): "弗鲁斯",
+    B("624F88176AC0935F"): "帕伊宋",
+    B("AF47959C9B2644CE"): "鲁特",
+    B("07B0D5DE8F5CDA10"): "玛蒂尔达",
+    B("6974020975121F44"): "迪优特",
+    B("867D31856A31A019"): "缇塔",
+    B("E7D93A282DACFA06"): "吉克",
+    B("E5AE9CDB35BB440F"): "迈森",
+    B("C7D28D28D9CA2207"): "赛莉卡",
+    B("86B994FD52700E05"): "梅伊",
+    B("C05B402C46FAF508"): "波依",
+    B("F071A328AC724235"): "杰妮",
+    B("238581ED8B73B3D1"): "赛巴",
+    B("1664E62A60BC4A08"): "巴尔博",
+    B("360EC426382D4106"): "卡姆依",
+    B("5FF494FDA3990E05"): "雷欧",
+    B("23F4062B2D9C5B08"): "帕奥拉",
+    B("C8C77167F877FC86"): "卡秋雅",
+    B("C924DD07511647AB"): "阿特拉斯",
+    B("FC06A32898274235"): "杰西",
+    B("80B2CB28B2424207"): "索尼娅",
+    B("845D1F1EE06B864E"): "迪恩",
+    B("9FC67226B1111A06"): "爱丝特",
+    B("CCFEAF2A72B13008"): "孔拉特",
+    B("0544223A1727BCFF"): "诺玛",
+    B("96DC98FDD2571105"): "Emma",
+    B("452635116FBCA1FB"): "Randal",
+    B("59D494FD2D830E05"): "Yuzu",
+    B("EFC0B48F4FA55B00"): "Shade",
+}
 
-PROFESSIONS = ()
-PROFESSION_VALUES = tuple(0x022716DC + i * 0x5C for i in range(len(PROFESSIONS)))
+PROFESSIONS = {
+    B("C51B98DC5787885C"): "村民（男）",
+    B("831A98DC2786885C"): "村民（女）",
+    B("4AC058885C6D1EBF"): "轻骑兵（男）",
+    B("08BF58882C6C1EBF"): "轻骑兵（女）",
+    B("89A60099B78ACB0C"): "帕拉丁（男）",
+    B("47A500998789CB0C"): "帕拉丁（女）",
+    B("BD41DF7E3385F1C6"): "黄金骑士（男）",
+    B("7B40DF7E0384F1C6"): "黄金骑士（女）",
+    B("0FFE1B4AA175776F"): "士兵",
+    B("A612F3C21E68886D"): "重甲骑士",
+    B("F6DB920958FF7BF2"): "男爵",
+    B("5A40290862B10470"): "佣兵",
+    B("66F4C9C39A01F651"): "剑士",
+    B("52CF17AB9A7B8DCA"): "魔战士",
+    B("E3E9012321FF7726"): "弓手",
+    B("B28F72B8D40E4C9A"): "狙击手",
+    B("38B628F2D6A2A4F3"): "弓骑兵",
+    B("92F226DE6E78A15D"): "战士（阿鲁姆专用）",
+    B("5A04E7044433696E"): "Hero",
+    B("DD0EAFB1433FCFCC"): "魔道士（男）",
+    B("9B0DAFB1133ECFCC"): "魔道士（女）",
+    B("39DC3BC6D5C02953"): "贤者",
+    B("9C62D71350DE579C"): "天马骑士",
+    B("D74265C1A194D89A"): "角马骑士",
+    B("69705A3B5F5180C6"): "修女",
+    B("F903575FEB1ECE95"): "圣女",
+    B("20FDDBEAF653E363"): "神官（女）",
+    B("27FCDBEA4553E363"): "神官骑士 (赛莉卡专用)",
+    B("E8A51124186AFE85"): "Princess",
+    B("F7F99AE449837761"): "男孩子",
+    B("B5F89AE419827761"): "女孩子",
+    B("9742C34037AEFAD2"): "Lord (Marth)",
+    B("0942133AA9DEAFCF"): "Hero (Ike)",
+    B("EFB6BE25D74AABC5"): "Lord (Lucina)",
+    B("FA8BBF2522E0ABC5"): "Tactician (Robin)",
+    B("185A06A44A912675"): "Lord (Roy)",
+    B("503F90DB3CD08E74"): "Lord (CorrinM)",
+    B("0E3E90DB0CCF8E74"): "Lord (CorrinF)",
+    B("D964005DA93AA3A3"): "Conqueror (DLC)",
+    B("81F6224C9BE113CE"): "Rigain (DLC)",
+    B("7460F8D7AC561E25"): "Spartan (DLC)",
+    B("D6402D042A30E3D3"): "Oliphantier (DLC)",
+    B("572032FD3F4049A8"): "Exemplar (DLC)",
+    B("E78EF6EE29DD61B3"): "Guru (DLC)",
+    B("E5588604F5D2C4FE"): "Harrier (DLC)",
+    B("398FBB505747C11F"): "Skogul (DLC)",
+    B("D0537D79EED22FFD"): "Yasha (DLC)",
+    B("CEAF96134A701BC4"): "Enchantress (DLC)",
+    B("02825A5FA20BD095"): "Fiend",
+    B("0D0D28E04D0CA05D"): "Brigand",
+    B("BE0BFAD1864030EB"): "Arcanist",
+    B("9037EFA118C296D4"): "Cantor",
+    B("08815A5FAE0AD095"): "Witch",
+    B("C56EE1B4938C944D"): "Revenant",
+    B("377579B889EE5A4F"): "Entombed",
+    B("664B89FC580A3B3C"): "Bonewalker",
+    B("6F4E9854F78B45AC"): "Lich",
+    B("3EC029DFF46EE535"): "Gargoyle",
+    B("B8875909E4B75FF2"): "Deathgoyle",
+    B("D81A5502DE4A9974"): "Necrodragon",
+    B("224C595F145FCF95"): "White Dragon",
+    B("FFE63DB7FD3ABF4E"): "Mogall",
+    B("9A19565FB2A7CD95"): "Fell God",
+    B("23D51B8BCB5E75ED"): "Mila's Servant",
+    B("C68A3E760EE2B9D5"): "Duma's Apostle",
+    B("AC37A3DAD8BDFA7F"): "Dracul",
+    B("84E41FF620BD3979"): "Titan",
+    B("83E832D5176CE059"): "Guardian",
+    B("68ADE887607F0182"): "Garuda",
+    B("6B9C3A078F24E84E"): "Vestal",
+    B("FB8D384AD9E62632"): "Fafnir",
+    B("88A21EB5768BB34D"): "Dagon",
+    B("BA7A9509B2027EF2"): "Balor",
+    B("15538ABD115E6820"): "Deimos",
+    B("7F0C525F3B40CB95"): "Fire Dragon",
+    B("F119565FDFA7CD95"): "Fell Dragon",
+}
 
-PROFICIENCYS = ('S级', 'A级', 'B级', 'C级', 'D级', 'E级', '-级')
-PROFICIENCY_VALUES = (0xFB, 0xC9, 0x88, 0x4C, 0x1F, 0x01, 0x00)
-PROFICIENCY_HINT = "00: -, 01: E, 1F: D, 4C: C, 88: B"
-
-DIFFICULTY = ('正常', '难(1星)', '很难(2星)', '超难(3星)', '隐藏难度(4星)')
-DIFFICULTY_VALUES = (0, 3, 4, 5, 6)
-
-WEAPONTYPES = ("剑", "枪", "斧", "弓", "魔", "杖", "龙石", "弩车", "物品")
-
-
-ITEM_ATTRS = (
-
-)
+del B

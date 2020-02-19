@@ -1,7 +1,8 @@
 import abc
 from functools import partial
+from lib import ui
 from lib.ui.components import Pagination
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice, ChoiceWidget
 from lib.win32.keys import VK
 from tools.n3ds.base import BaseN3dsHack
 from . import models, datasets
@@ -24,7 +25,7 @@ class Main(BaseN3dsHack):
 
         self.lazy_group(Group("player", "角色", (self._person, models.InGameCharacter), cols=4), self.render_person)
 
-        self.lazy_group(Group("convoy1", "行囊(阿姆鲁)", _global, cols=4),
+        self.lazy_group(Group("convoy1", "行囊(阿鲁姆)", _global, cols=4),
             partial(self.render_convoy, chapter='alm'))
 
         self.lazy_group(Group("convoy2", "行囊(赛莉卡)", _global, cols=4),
@@ -61,7 +62,9 @@ class Main(BaseN3dsHack):
             ModelCheckBox("gold_coin_996")
 
     def render_person(self):
-        Choice("角色", range(30), self.on_person_change)
+        self.chars_view = ChoiceWidget("角色", (), self.on_person_change)
+        with self.chars_view.container:
+            ui.Button(label="读取列表", class_="button", onclick=self.read_chars)
         ModelInput("addr_hex", "地址", readonly=True)
         ModelInput("index")
         ModelInput("level")
@@ -79,6 +82,8 @@ class Main(BaseN3dsHack):
         ModelInput("pro")
         ModelSelect("item.item", "所携物品", choices=datasets.ITEM_LABELS, values=datasets.ITEM_VALUES)
         ModelInput("item.star", "物品星级")
+        ModelInput("charname", "角色", readonly=True)
+        ModelInput("profname", "职业", readonly=True)
 
     def render_convoy(self, chapter):
         group = Group.active_group()
@@ -114,11 +119,20 @@ class Main(BaseN3dsHack):
     def _global(self):
         return self._global_ins
 
-    def _config(self):
-        return self._global_ins.config
-
     def on_person_change(self, lb):
+        """角色切换"""
         self.person_index = lb.index
+
+    def read_chars(self, _):
+        """读取角色列表"""
+        chars = self._global_ins.chars
+        choices = []
+        for i in range(chars.length):
+            charname = chars[i].charname
+            if not charname:
+                break
+            choices.append('%02d-%s' % (i + 1, charname))
+        self.chars_view.Set(choices)
 
     def move_to_cursor(self):
         person = self.person

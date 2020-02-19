@@ -1,5 +1,6 @@
 import abc
 import copy
+import sys
 from typing import Callable, Sequence, Union
 from lib.utils import float32, Accumulator
 from lib.extypes import new_dataclass, classproperty
@@ -528,13 +529,23 @@ class BitsField(Field):
     def __set__(self, instance, value):
         old = super().__get__(instance)
         value = (old & (~(self.mask << self.bitoffset) & 0xFFFFFFFFFFFFFFFF)
-            | ((int(value) & self.mask) << self.bitoffset))
+                 | ((int(value) & self.mask) << self.bitoffset))
         super().__set__(instance, value)
 
     @classmethod
     def create(cls, offset, size, bits):
         bitoffset = Accumulator()
         return (cls(offset, size, bitoffset.add(bit), bit) for bit in bits)
+
+
+def resolve_model_t(field, instance):
+    """处理字符串model_t"""
+    if isinstance(field.model_t, str):
+        if field.model_t == 'self':
+            field.model_t = type(instance)
+        else:
+            field.model_t = getattr(sys.modules[instance.__class__.__module__], field.model_t)
+        return True
 
 
 class ModelPtrField(Cachable, PtrField):
@@ -544,8 +555,7 @@ class ModelPtrField(Cachable, PtrField):
         self.model_t = model_t
 
     def create_cache(self, instance):
-        if self.model_t == 'self':
-            self.model_t = type(instance)
+        resolve_model_t(self, instance)
         return self.model_t(PtrField.__get__(self, instance, None), instance.handler)
 
     def update_cache(self, instance, cache):
@@ -560,6 +570,7 @@ class ModelPtrField(Cachable, PtrField):
 class ManagedModelPtrField(ModelPtrField):
     """托管模型指针字段"""
     def create_cache(self, instance):
+        resolve_model_t(self, instance)
         return self.model_t(super().__get__(instance, None), instance.context)
 
 
@@ -570,6 +581,8 @@ class ModelField(Cachable, Field):
         self.model_t = model_t
 
     def create_cache(self, instance):
+        if resolve_model_t(self, instance) and self.size == 0:
+            self.size = getattr(self.model_t, 'SIZE', 0)
         return self.model_t(self.get_addr(instance), instance.handler)
 
     def update_cache(self, instance, cache):
@@ -589,6 +602,8 @@ class ModelField(Cachable, Field):
 class ManagedModelField(ModelField):
     """托管模型字段"""
     def create_cache(self, instance):
+        if resolve_model_t(self, instance) and self.size == 0:
+            self.size = getattr(self.model_t, 'SIZE', 0)
         return self.model_t(self.get_addr(instance), instance.context)
 
 
