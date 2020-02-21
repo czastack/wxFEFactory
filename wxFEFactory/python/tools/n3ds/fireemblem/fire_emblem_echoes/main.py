@@ -40,7 +40,6 @@ class Main(BaseN3dsHack):
             ModelCheckBox("prepare_enemy")
             ModelCheckBox("anyone_bag")
             ModelCheckBox("quick_info")
-            ModelCheckBox("add_all_attr")
             ModelCheckBox("custom_exp")
             ModelInput("custom_exp_value")
             ModelCheckBox("growth_rate_add")
@@ -60,6 +59,9 @@ class Main(BaseN3dsHack):
             ModelCheckBox("all_attr_max_99")
             ModelCheckBox("add_all_attr")
             ModelCheckBox("gold_coin_996")
+            ModelSelect("dean_sonya_event", choices=datasets.DEAN_SONYA_EVENT)
+            ModelSelect("system.difficulty", "难易度", choices=datasets.DIFFICULTY)
+            ModelInput("system.renown", "名声值")
 
     def render_person(self):
         self.chars_view = ChoiceWidget("角色", (), self.on_person_change)
@@ -78,7 +80,7 @@ class Main(BaseN3dsHack):
         ModelInput("def_")
         ModelInput("res")
         ModelInput("mov")
-        ModelInput("act")
+        ModelInput("win")
         ModelInput("pro")
         ModelSelect("item.item", "所携物品", choices=datasets.ITEM_LABELS, values=datasets.ITEM_VALUES)
         ModelInput("item.star", "物品星级")
@@ -126,7 +128,7 @@ class Main(BaseN3dsHack):
         """角色切换"""
         self.person_index = lb.index
 
-    def _read_chars(self):
+    def read_chars(self, _):
         """读取角色列表"""
         chars = self._global_ins.chars
         choices = []
@@ -136,20 +138,22 @@ class Main(BaseN3dsHack):
                 break
             choices.append('%02d-%s' % (i + 1, charname))
         self.chars_view.Set(choices)
-        return choices
 
-    def read_chars(self, _):
-        """读取角色列表调用"""
-        choices = self._read_chars()
-        if not choices:
-            # 尝试动态查找
-            find_start = 0x328B0000
-            start_1 = self.handler.find_bytes(datasets.CHARID_ALM, find_start, find_start + 0x80000)
-            start_2 = self.handler.find_bytes(datasets.CHARID_CELICA, find_start, find_start + 0x80000)
-            start = min(start_1, start_2)
-            if start > 0:
-                self._global_ins.field('chars').offset = start - 0x384
-            self._read_chars()
+    # def read_chars(self, _):
+    #     """读取角色列表调用"""
+    #     choices = self._read_chars()
+    #     if not choices:
+    #         # 尝试动态查找
+    #         find_start = 0x328B0000
+    #         start_1 = self.handler.find_bytes(datasets.CHARID_ALM, find_start, find_start + 0x80000)
+    #         start_2 = self.handler.find_bytes(datasets.CHARID_CELICA, find_start, find_start + 0x80000)
+    #         for start in (start_1, start_2):
+    #             if start > 0:
+    #                 start = start - 0x408
+    #                 character = models.InGameCharacter(start, self.handler)
+    #                 if character.index == 1:
+    #                     self._global_ins.field('chars').offset = start
+    #                     self._read_chars()
 
     def copy_item(self, _, source, leader):
         """复制物品到行囊"""
@@ -158,6 +162,7 @@ class Main(BaseN3dsHack):
         for item in convoy:
             if item.item == 0:
                 item.copy_from(source)
+                print('复制成功: ', datasets.ITEMS[source.item])
                 break
 
     def move_to_cursor(self):

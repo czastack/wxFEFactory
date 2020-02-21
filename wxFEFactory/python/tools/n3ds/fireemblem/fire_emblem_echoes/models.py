@@ -224,6 +224,11 @@ COMMON_FIELDS = {
         0x00452290,
         0x00452B78,
     ),
+    'dean_sonya_event': (
+        Field(label="迪恩和索尼娅击败状态"),
+        (0x005C5CEC, 0x24, 0x10, 0x3E0),
+        (0x005C6CF8, 0x24, 0x10, 0x3E0),
+    ),
 }
 
 
@@ -236,7 +241,7 @@ def bind_fields(data, version):
 
 
 class System(Model):
-    difficulty = Field(0x3D, label="难易度")
+    difficulty = ByteField(0x3D, label="难易度")
     renown = Field(0x70, label="名声值")
 
 
@@ -245,6 +250,8 @@ class Item(Model):
     SIZE = 4
     item = WordField(0)
     star = BitsField(3, 1, 4, 4, label="星级")
+    # 2=击败后掉落
+    flag = BitsField(3, 1, 0, 4, label="标记")
 
 
 class Stats(Model):
@@ -267,24 +274,24 @@ class CharacterStats(Model):
 class InGameCharacter(Model):
     """角色数据"""
     SIZE = 0x420
-    index = ByteField(0x005C, label="序号")
-    level = ByteField(0x005D, label="等级")
-    exp = ByteField(0x005E, label="经验")
-    hp = ByteField(0x005F, label="HP")
-    pow = ByteField(0x0054, label="体力")
-    atk = ByteField(0x0055, label="攻击+")
-    tec = ByteField(0x0056, label="技巧+")
-    spd = ByteField(0x0057, label="速度+")
-    luc = ByteField(0x0058, label="幸运+")
-    def_ = ByteField(0x0059, label="防守+")
-    res = ByteField(0x005A, label="魔防+")
-    mov = ByteField(0x005B, label="移动+")
-    act = ByteField(0x007C, label="动作+")
-    pro = ByteField(0x032D, label="熟练+")
-    item = ModelField(0x034C, Item, label="所携物品")
-    stats = ModelPtrField(0x034C, CharacterStats, label="所携物品")
-    charid = Field(0x0384, bytes, 8, label="角色id")
-    profid = Field(0x0390, bytes, 8, label="职业id")
+    stats = ModelPtrField(0x00C4, CharacterStats, label="角色成长")
+    index = ByteField(0x00E0, label="序号")
+    level = ByteField(0x00E1, label="等级")
+    exp = ByteField(0x00E2, label="经验")
+    hp = ByteField(0x00E3, label="HP")
+    pow = ByteField(0x00D8, label="体力")
+    atk = ByteField(0x00D9, label="攻击+")
+    tec = ByteField(0x00DA, label="技巧+")
+    spd = ByteField(0x00DB, label="速度+")
+    luc = ByteField(0x00DC, label="幸运+")
+    def_ = ByteField(0x00DD, label="防守+")
+    res = ByteField(0x00DE, label="魔防+")
+    mov = ByteField(0x00DF, label="移动+")
+    win = ByteField(0x007C, label="击败数")
+    pro = ByteField(0x03B1, label="熟练度")
+    item = ModelField(0x03D0, Item, label="所携物品")
+    charid = Field(0x0408, bytes, 8, label="角色id")
+    profid = Field(0x0414, bytes, 8, label="职业id")
 
     @property
     def charname(self):
@@ -306,13 +313,13 @@ class Convoy(Model):
 
 
 class EchosGlobal(Model):
-    # TODO
-    chars = ArrayField(0x328B3B4C, 50, ModelField(0, InGameCharacter))
+    pass
 
 
 class Global_1_0(EchosGlobal):
     """version 1.0"""
     system = ModelPtrField(0x005C5CEC, System)
+    chars = ArrayField(0x005C5974, 50, ModelField(0, InGameCharacter))
     convoy = ModelField(0x0061EC90, Convoy)
     bind_fields(locals(), 0)
 
@@ -334,6 +341,7 @@ class Global_1_0(EchosGlobal):
 class Global_1_1(EchosGlobal):
     """version 1.1"""
     system = ModelPtrField(0x005C6CF8, System)
+    chars = ArrayField((0x005C6980, 0), 50, ModelField(0, InGameCharacter))
     convoy = ModelField(0x0061FC90, Convoy)
     bind_fields(locals(), 1)
 
