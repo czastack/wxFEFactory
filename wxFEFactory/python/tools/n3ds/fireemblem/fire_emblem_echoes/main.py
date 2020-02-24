@@ -17,6 +17,7 @@ class Main(BaseN3dsHack):
         self._global_ins = models.Global_1_0(0, self.handler)
         self._person_ins = models.InGameCharacter(0, self.handler)
         self.person_index = 0
+        self.version = '1.0'
 
     def render_main(self):
         _global = (self._global, models.Global_1_0)
@@ -32,24 +33,28 @@ class Main(BaseN3dsHack):
             partial(self.render_convoy, leader='celica'))
 
     def render_global(self):
-        Choice("版本", datasets.VERSIONS, self.on_version_change)
+        self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
         with self.active_widgets:
             ModelCheckBox("control_enemy")
             ModelCheckBox("inf_move")
             ModelCheckBox("exchange_enemy")
-            ModelCheckBox("prepare_enemy")
+            ModelCheckBox("prepare_anyone")
             ModelCheckBox("anyone_bag")
             ModelCheckBox("quick_info")
+            ModelCheckBox("critical_100")
             ModelCheckBox("custom_exp")
             ModelInput("custom_exp_value")
             ModelCheckBox("growth_rate_add")
             ModelInput("growth_rate_add_value")
+            ModelCheckBox("add_all_attr")
+            ModelCheckBox("gold_coin_996")
+            ModelCheckBox("silver_coin_9984")
             ModelCheckBox("break_keep")
             ModelCheckBox("item_keep")
-            ModelCheckBox("first_turn_withdraw")
-            ModelCheckBox("no_battle_3d")
-            ModelCheckBox("well_no_driy")
             ModelCheckBox("inf_mila")
+            ModelCheckBox("no_battle_3d")
+            ModelCheckBox("first_turn_retreat")
+            ModelCheckBox("well_no_driy")
             ModelCheckBox("support_talk_now")
             ModelCheckBox("inf_hp")
             ModelCheckBox("range_100")
@@ -57,8 +62,7 @@ class Main(BaseN3dsHack):
             ModelCheckBox("all_weapon_equipment")
             ModelCheckBox("all_support_a")
             ModelCheckBox("all_attr_max_99")
-            ModelCheckBox("add_all_attr")
-            ModelCheckBox("gold_coin_996")
+            ModelCheckBox("quick_get_battle_skill")
             ModelSelect("dean_sonya_event", choices=datasets.DEAN_SONYA_EVENT)
             ModelSelect("system.difficulty", "难易度", choices=datasets.DIFFICULTY)
             ModelInput("system.renown", "名声值")
@@ -111,6 +115,12 @@ class Main(BaseN3dsHack):
             # (VK.MOD_ALT, VK.DOWN, this.move_down),
         )
 
+    def onattach(self):
+        super().onattach()
+        if self.version == '1.0':
+            if self._global_ins.system.addr & 0xFFFF == 0xFF00:
+                self.version_view.set_selection(1, True)
+
     def _person(self):
         self._person_ins.addr = self._global_ins.chars.addr_at(self.person_index)
         return self._person_ins
@@ -118,8 +128,8 @@ class Main(BaseN3dsHack):
     person = property(_person)
 
     def on_version_change(self, lb):
-        version = lb.text
-        self._global_ins = models.SPECIFIC_GLOBALS[version](0, self.handler)
+        self.version = lb.text
+        self._global_ins = models.SPECIFIC_GLOBALS[self.version](0, self.handler)
 
     def _global(self):
         return self._global_ins

@@ -22,7 +22,7 @@ COMMON_FIELDS = {
         0x00333C4C,
         0x00334948,
     ),
-    'prepare_enemy': (
+    'prepare_anyone': (
         ToggleFields(
             ToggleField(enable=0xE1500000, disable=0xE1510000),
             ToggleField(enable=0xEA000007, disable=0x0A000007),
@@ -53,13 +53,11 @@ COMMON_FIELDS = {
         0x004509EC,
         0x0045127C,
     ),
-
     'custom_exp_value': (
         ByteField(label="经验值"),
         0x004509EC,
         0x0045127C,
     ),
-
     'growth_rate_add': (
         ToggleField(
             enable=0xEA000000A3A060FFE35600FFE2866064,
@@ -68,19 +66,16 @@ COMMON_FIELDS = {
         0x00356A58,
         0x00357468,
     ),
-
     'growth_rate_add_value': (
         ByteField(label="成长率加算"),
         0x00356A58,
         0x00357468,
     ),
-
     'add_all_attr': (
         ToggleField(enable=0xE3A00001, disable=0xEB01A8F8, label="成长率1%以上升级后能力值必定+1"),
         0x00356B84,
         0x00357594,
     ),
-
     'gold_coin_996': (
         ToggleFields(
             ToggleField(enable=0xE51F0130, disable=0xE59F0030),
@@ -91,7 +86,6 @@ COMMON_FIELDS = {
         (0x00434DB0, 0x00434DDC, 0x00434DE0),
         (0x00435640, 0x0043566C, 0x00435670),
     ),
-
     'silver_coin_9984': (
         ToggleFields(
             ToggleField(enable=0xE51F0220, disable=0xE59F0030),
@@ -102,7 +96,6 @@ COMMON_FIELDS = {
         (0x00434EA0, 0x00434ECC, 0x00434ED0),
         (0x00435730, 0x0043575C, 0x00435760),
     ),
-
     'break_keep': (
         ToggleField(enable=0xE12FFF1E, disable=0xE92D4010, label="中断存档不消失"),
         0x003BA3F0,
@@ -123,7 +116,7 @@ COMMON_FIELDS = {
         0x0017ED4C,
         0x0017FE6C,
     ),
-    'first_turn_withdraw': (
+    'first_turn_retreat': (
         ToggleField(enable=0xE3500001, disable=0xE3500003, label="第一回合可撤退"),
         0x0044D968,
         0x0044E1F8,
@@ -186,14 +179,8 @@ COMMON_FIELDS = {
                 disable=b'\x00' * 40),
             ToggleField(disable=0xE8BD8070),
             label="移动力最大"),
-        (
-            0x00527B40,
-            {'offset': 0x004523B8, 'enable': 0xEA0355E0},
-        ),
-        (
-            0x00528440,
-            {'offset': 0x00452CA0, 'enable': 0xEA0355E6},
-        ),
+        (0x00527B40, {'offset': 0x004523B8, 'enable': 0xEA0355E0}),
+        (0x00528440, {'offset': 0x00452CA0, 'enable': 0xEA0355E6}),
     ),
     'all_weapon_equipment': (
         ToggleField(enable=0xE12FFF1EE3A00001, disable=0xE1A04000E92D40F0, size=8, label="可装备全武器"),
@@ -207,14 +194,8 @@ COMMON_FIELDS = {
                 disable=b'\x00' * 24),
             ToggleField(disable=0xE8BD8070),
             label="全支援A"),
-        (
-            0x00527C00,
-            {'offset': 0x003A30C4, 'enable': 0xEB0612CD, 'disable': 0xE1D001D8},
-        ),
-        (
-            0x00528500,
-            {'offset': 0x003A3AD4, 'enable': 0xEB061289, 'disable': 0xE1D001D8},
-        ),
+        (0x00527C00, {'offset': 0x003A30C4, 'enable': 0xEB0612CD, 'disable': 0xE1D001D8}),
+        (0x00528500, {'offset': 0x003A3AD4, 'enable': 0xEB061289, 'disable': 0xE1D001D8}),
     ),
     'all_attr_max_99': (
         ToggleField(
@@ -223,6 +204,21 @@ COMMON_FIELDS = {
             label="全能力上限99"),
         0x00452290,
         0x00452B78,
+    ),
+    'quick_get_battle_skill': (
+        ToggleField(enable=0xE3A020FF, disable=0xE5D12001, label="快速学得战技"),
+        0x004257C8,
+        0x00426048,
+    ),
+    'critical_100': (
+        ToggleFields(
+            ToggleField(
+                enable=pack_dwords(0xE5942004, 0xE59220CC, 0xE5D22008, 0xE3520000, 0x03A00064, 0xE0833000, 0xE12FFF1E),
+                disable=b'\x00' * 28),
+            ToggleField(disable=0xE0833000),
+            label="暴击100%"),
+        (0x00527A90, {'offset': 0x002EF08C, 'enable': 0xEB08E27F}),
+        (0x00528390, {'offset': 0x002EFC94, 'enable': 0xEB08E1BD}),
     ),
     'dean_sonya_event': (
         Field(label="迪恩和索尼娅击败状态"),
