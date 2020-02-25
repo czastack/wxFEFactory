@@ -151,6 +151,28 @@ COMMON_FIELDS = {
         (0x005279D0, {'offset': 0x004523B4, 'enable': 0xEB035585}),
         (0x005282D0, {'offset': 0x00452C9C, 'enable': 0xEB03558B}),
     ),
+    'instant_kill_inf_hp': (
+        ToggleFields(
+            ToggleField(
+                enable=pack_dwords(0xE92D4070, 0xE59240CC, 0xE5D44008, 0xE3540000, 0xE3A0504D,
+                                   0x05C250E3, 0x13A06000, 0x15C260E3, 0xE8BD4070, 0xE12FFF1E),
+                disable=b'\x00' * 40),
+            ToggleField(disable=0xE5D220E3),
+            label="对战HP无限+秒杀"),
+        (0x00527A00, {'offset': 0x0044BAE0, 'enable': 0xEB036FC6}),
+        (0x00528300, {'offset': 0x0044C370, 'enable': 0xEB036FE2}),
+    ),
+    'instant_kill': (
+        ToggleFields(
+            ToggleField(
+                enable=pack_dwords(0xE92D4070, 0xE59240CC, 0xE5D44008, 0xE3540000, 0x13A06000,
+                                   0x15C260E3, 0xE8BD4070, 0xE12FFF1E),
+                disable=b'\x00' * 32),
+            ToggleField(disable=0xE5D220E3),
+            label="秒杀"),
+        (0x00527A00, {'offset': 0x0044BAE0, 'enable': 0xEB036FC6}),
+        (0x00528300, {'offset': 0x0044C370, 'enable': 0xEB036FE2}),
+    ),
     'range_100': (
         ToggleFields(
             ToggleField(disable=0xE1A06002),

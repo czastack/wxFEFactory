@@ -57,6 +57,8 @@ class Main(BaseN3dsHack):
             ModelCheckBox("well_no_driy")
             ModelCheckBox("support_talk_now")
             ModelCheckBox("inf_hp")
+            ModelCheckBox("instant_kill_inf_hp")
+            ModelCheckBox("instant_kill")
             ModelCheckBox("range_100")
             ModelCheckBox("move_max")
             ModelCheckBox("all_weapon_equipment")
