@@ -4,13 +4,11 @@ from abc import ABC, abstractmethod
 from lib.hack.models import Model, Field, ArrayField, CoordField, CoordData
 from lib.hack.utils import iter_signature
 from lib.lazy import lazy
-from lib.extypes import DataClassMeta
+from lib.extypes import DataClass
 
 
 class NativeContext(Model):
-    """原生函数调用的环境
-    借鉴GTAIV中的实现
-    """
+    """原生函数调用的环境"""
     SIZE = 140
     ARG_MAX = 32
     ITEM_SIZE = 4
@@ -30,7 +28,21 @@ class NativeContext(Model):
         self.m_nArgCount = 0
         self.temp_index = 0
 
-    def push(self, signature, *args):
+    # def push(self, signature, *args):
+    #     """压入参数"""
+    #     # 写入栈的地址
+    #     index = self.m_nArgCount
+    #     if index + self.temp_index >= self.ARG_MAX:
+    #         raise ValueError('参数缓冲区容量不足')
+    #     addr = self.m_TempStack.addr_at(index)
+    #     try:
+    #         self.handler.write(addr, struct.pack(signature, *args))
+    #     except Exception as e:
+    #         print('打包参数出错', signature, *args)
+    #         raise e
+    #     self.m_nArgCount += len(args)
+
+    def push(self, signature, *args, align=4, index=None, update=True):
         """压入参数"""
         # signature
         # x: pad byte
@@ -51,22 +63,53 @@ class NativeContext(Model):
         # s: char[]
         # p: char[]
         # P: void *
-        # 写入栈的地址
-        arg_count = self.m_nArgCount
-        if arg_count + self.temp_index >= self.ARG_MAX:
+        if index is None:
+            index = self.m_nArgCount
+        origin_index = index
+        # 调用 native_call 汇编函数时用到
+        if index + self.temp_index >= self.ARG_MAX:
             raise ValueError('参数缓冲区容量不足')
-        addr = self.m_TempStack.addr_at(arg_count)
-        try:
-            self.handler.write(addr, struct.pack(signature, *args))
-        except Exception as e:
-            print('打包参数出错', signature, *args)
-            raise e
-        self.m_nArgCount += len(args)
+
+        buff = bytearray()
+        arg_it = iter(args)
+
+        for fmt in iter_signature(signature):
+            arg = next(arg_it)
+
+            if fmt == 'S':
+                # 临时字符串
+                arg = self.put_temp_string(arg, index)
+                fmt = 'L'
+
+            elif fmt == 'P':
+                # 32为要转成L
+                fmt = 'L'
+
+            # 自定义打包
+            if isinstance(arg, CustomPacker):
+                fmt, arg = arg.pack_for(self, fmt)
+
+            try:
+                data = struct.pack(fmt, arg)
+            except Exception:
+                print(fmt, arg)
+                raise
+            datasize = len(data)
+            buff.extend(data)
+            if datasize < align:
+                # 对齐字节
+                buff.extend(bytes(align - datasize))
+
+            index += 1
+
+        addr = self.m_TempStack.addr_at(origin_index)
+        self.handler.write(addr, buff)
+        if update:
+            self.m_nArgCount = index
 
     def push_manual(self, index, signature, *args):
         """手动压入参数，m_nArgCount不变"""
-        addr = self.m_TempStack.addr_at(index)
-        self.handler.write(addr, struct.pack(signature, *args))
+        self.push(signature, *args, index=index, update=False)
 
     def get_stack_addr(self, i=0):
         """ 栈从前往后取地址，传递指针参数时可以用
@@ -108,17 +151,17 @@ class NativeContext(Model):
             self.temp_index += 1
         self.handler.write(self.get_temp_addr(index), value, size)
 
-    def put_temp_string(self, data, arg_count=None):
+    def put_temp_string(self, data, index=None):
         """存放临时字符串
         :return: 字符串地址"""
         length = len(data) + 1
         if isinstance(data, str):
             data = data.encode()
-        if arg_count is None:
-            arg_count = self.m_nArgCount
+        if index is None:
+            index = self.m_nArgCount
         block_count = math.ceil(length / self.ITEM_SIZE)
 
-        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+        if index + self.temp_index + block_count > self.ARG_MAX:
             raise ValueError('字符串长度过长，参数缓冲区容量不足')
 
         self.temp_index += block_count
@@ -126,14 +169,14 @@ class NativeContext(Model):
         self.handler.write(addr, struct.pack('%ds' % (length + 1), data))
         return addr
 
-    def put_temp_simple_array(self, signature, args, arg_count=None):
+    def put_temp_simple_array(self, signature, args, index=None):
         """存放临时简单数组
         :return: 数组地址"""
         data = struct.pack(signature, *args)
         block_count = math.ceil(len(data) / self.ITEM_SIZE)
-        if arg_count is None:
-            arg_count = self.m_nArgCount
-        if arg_count + self.temp_index + block_count > self.ARG_MAX:
+        if index is None:
+            index = self.m_nArgCount
+        if index + self.temp_index + block_count > self.ARG_MAX:
             raise ValueError('数据过长，参数缓冲区容量不足')
         self.temp_index += block_count
         addr = self.get_temp_addr(self.temp_index)
@@ -196,7 +239,7 @@ class NativeContext(Model):
 
 
 class NativeContext64(NativeContext):
-    """x64原生函数调用环境 (GTAV)"""
+    """x64原生函数调用环境"""
     SIZE = 160
     ARG_MAX = 16
     ITEM_SIZE = 8
@@ -218,12 +261,14 @@ class NativeContext64(NativeContext):
         for i in range(4):
             self.fflag[i] = 0
 
-    def push(self, signature, *args):
+    def push(self, signature, *args, align=8, index=None, update=True):
         """压入参数"""
         # 除去fflag, dwFunc, this，剩余参数的序号
-        arg_count = self.m_nArgCount
+        if index is None:
+            index = self.m_nArgCount
+        origin_index = index
         # 调用 native_call 汇编函数时用到
-        if arg_count + self.temp_index >= self.ARG_MAX:
+        if index + self.temp_index >= self.ARG_MAX:
             raise ValueError('参数缓冲区容量不足')
 
         buff = bytearray()
@@ -232,17 +277,17 @@ class NativeContext64(NativeContext):
         for fmt in iter_signature(signature):
             arg = next(arg_it)
 
-            if 3 <= arg_count < 7:
+            if 3 <= index < 7:
                 if fmt == 'f':
                     # float
-                    self.fflag[arg_count - 3] = 1
+                    self.fflag[index - 3] = 1
                 elif fmt == 'd':
                     # double
-                    self.fflag[arg_count - 3] = 2
+                    self.fflag[index - 3] = 2
 
-            if fmt == 'p' or fmt == 's':
+            if fmt == 'S':
                 # 字符串(s是c style, p是pascal style)
-                arg = self.put_temp_string(arg, arg_count)
+                arg = self.put_temp_string(arg, index)
                 fmt = 'P'
 
             # 自定义打包
@@ -256,18 +301,19 @@ class NativeContext64(NativeContext):
                 raise
             datasize = len(data)
             buff.extend(data)
-            if datasize < 8:
-                # 对齐8个字节
-                buff.extend(bytes(8 - datasize))
+            if datasize < align:
+                # 对齐字节
+                buff.extend(bytes(align - datasize))
 
-            arg_count += 1
+            index += 1
 
         if args[0] is self.fflag:
             buff[:8] = self.fflag
 
-        addr = self.m_TempStack.addr_at(self.m_nArgCount)
+        addr = self.m_TempStack.addr_at(origin_index)
         self.handler.write(addr, buff)
-        self.m_nArgCount = arg_count
+        if update:
+            self.m_nArgCount = index
 
     def get_result(self, type, size=0):
         """获取调用结果"""
@@ -317,7 +363,7 @@ class ResultResolver(ABC):
         pass
 
 
-class TempPtr(metaclass=DataClassMeta):
+class TempPtr(DataClass):
     """临时地址占位符"""
     fields = ('index', 'type', 'size', 'value')
     defaults = {'type': int, 'size': 0}
@@ -335,7 +381,7 @@ class TempPtr(metaclass=DataClassMeta):
         return context.get_temp_value(self.index, self.type, self.size)
 
 
-class TempArrayPtr(metaclass=DataClassMeta):
+class TempArrayPtr(DataClass):
     """临时指针数组地址占位符 (void **params)"""
     fields = ('signature', 'args')
 

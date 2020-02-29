@@ -198,11 +198,11 @@ class Main(MonoHacktool):
     def pickup_selected_skill(self, _):
         """捡起当前第一个高亮选中的技能"""
         indexs = self.skill_listview.get_selected_list()
-        if indexs:
-            index = indexs[0]
+        index = next(indexs, None)
+        if index:
             self.PickUpSkill(datasets.skills_info[index][0])
-            if len(indexs) > 1:
-                print('选中了多个技能，但只生效第一个')
+        if next(indexs, None):
+            print('选中了多个技能，但只生效第一个')
 
     def give_checked_items(self, _):
         """给予所选物品"""

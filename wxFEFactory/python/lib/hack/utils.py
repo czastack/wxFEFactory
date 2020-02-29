@@ -235,12 +235,9 @@ def iter_signature(signature):
         if 0x30 <= ch <= 0x39:
             repeat = repeat * 10 + (ch - 0x30)
             continue
-        else:
-            fmt = chr(ch)
-
+        fmt = chr(ch)
         if repeat == 0:
             repeat = 1
-
         for _ in range(repeat):
             yield fmt
         repeat = 0

@@ -12,15 +12,15 @@ class MonoHacktool(NativeHacktool):
     context_array_reuse = 10  # 复用context_array元素个数，0表示不复用
     MONO_FUNC = {
         "mono_get_root_domain": None,
-        "mono_image_loaded": "s",
+        "mono_image_loaded": "S",
         "mono_thread_attach": "P",
         "mono_thread_detach": "P",
         "mono_security_set_mode": "i",
-        "mono_class_from_name": "Pss",  # (MonoImage *image, const char* name_space, const char *name)
-        "mono_class_get_method_from_name": "Psi",  # (MonoClass *klass, const char *name, int param_count)
+        "mono_class_from_name": "PSS",  # (MonoImage *image, const char* name_space, const char *name)
+        "mono_class_get_method_from_name": "PSi",  # (MonoClass *klass, const char *name, int param_count)
         "mono_class_vtable": "2P",  # (MonoDomain *domain, MonoClass *klass)
-        "mono_class_get_field_from_name": "Ps",  # (MonoClass *klass, const char *name)
-        "mono_class_get_property_from_name": "Ps",  # (MonoClass *klass, const char *name)
+        "mono_class_get_field_from_name": "PS",  # (MonoClass *klass, const char *name)
+        "mono_class_get_property_from_name": "PS",  # (MonoClass *klass, const char *name)
         "mono_field_get_value": "3P",  # (MonoObject *obj, MonoClassField *field, void *value)
         "mono_field_set_value": "3P",  # idem
         "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
@@ -32,7 +32,7 @@ class MonoHacktool(NativeHacktool):
         "mono_compile_method": "P",
         "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
         "mono_object_unbox": "P",  # (MonoObject *obj)
-        "mono_string_new": "Ps",  # (MonoDomain *domain, const char *text)
+        "mono_string_new": "PS",  # (MonoDomain *domain, const char *text)
     }
 
     def onattach(self):

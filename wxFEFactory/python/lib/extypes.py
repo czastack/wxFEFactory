@@ -118,9 +118,11 @@ class DataClassMeta(type):
         fields = attrs.pop('fields', None)
 
         dataclass_bases = []
-        for base in reversed(bases):
-            if base != DataClass and issubclass(base, DataClass):
-                dataclass_bases.append(base)
+
+        if bases:
+            for base in reversed(bases):
+                if base != DataClass and issubclass(base, DataClass):
+                    dataclass_bases.append(base)
 
         if dataclass_bases:
             # 处理继承

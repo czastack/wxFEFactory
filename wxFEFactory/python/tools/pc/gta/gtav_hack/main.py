@@ -436,7 +436,7 @@ class Main(BaseGTATool):
         return self.native_context.get_vector_result(8, fixed)
 
     def get_hash_key(self, name):
-        return self.native_call('GET_HASH_KEY', 's', name)
+        return self.native_call('GET_HASH_KEY', 'S', name)
 
     def _player(self):
         """获取当前角色"""
@@ -1428,9 +1428,9 @@ class Main(BaseGTATool):
         if index != -1:
             weather = datasets.WEATHER_LIST[index][1]
             if persist:
-                self.native_call('CLEAR_OVERRIDE_WEATHER', 's', weather)
+                self.native_call('CLEAR_OVERRIDE_WEATHER', 'S', weather)
             else:
-                self.native_call('SET_WEATHER_TYPE_NOW_PERSIST', 's', weather)
+                self.native_call('SET_WEATHER_TYPE_NOW_PERSIST', 'S', weather)
                 self.native_call('CLEAR_WEATHER_TYPE_PERSIST', None)
 
     def set_wind(self, tb):
