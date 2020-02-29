@@ -1,6 +1,6 @@
 from lib import ui
 from lib.hack.forms import (
-    Group, StaticGroup, ProxyInput, ListFooterButtons
+    Group, StaticGroup, ModelInput, ListFooterButtons
 )
 from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
@@ -49,25 +49,21 @@ class Main(MonoHacktool):
     def render_global(self):
         ui.Hr()
         ui.Text('游戏版本: v1.1')
-        ProxyInput("CurrentHealthValue", "生命",
-            *Descriptor(lambda: self.active_player.health, "CurrentHealthValue"))
-        ProxyInput("CurrentHealthValue", "生命上限",
-            *Descriptor(lambda: self.active_player.health.healthStat, "ModifiedValue"))
-        ProxyInput("CurrentShieldValue", "护盾",
-            *Descriptor(lambda: self.active_player.health, "CurrentShieldValue"))
-        ProxyInput("CurrentShieldValue", "护盾上限",
-            *Descriptor(lambda: self.active_player.health.shieldStat, "ModifiedValue"))
-        ProxyInput("CurrentGuardCountValue", "防御次数",
-            *Descriptor(lambda: self.active_player.health, "CurrentGuardCountValue"))
-        ProxyInput("CurrentGuardCountValue", "防御次数上限",
-            *Descriptor(lambda: self.active_player.health.guardCountStat, "ModifiedValue"))
-        ProxyInput("balance", "宝石", *Descriptor(lambda: self.active_player.platWallet, "balance"))
-        ProxyInput("balance", "金币", *Descriptor(lambda: self.active_player.goldWallet, "balance"))
-        ProxyInput("overdriveMinValue", "必杀槽最小值", *Descriptor(lambda: self.active_player, "overdriveMinValue"))
-        ProxyInput("overdriveBuildDecayRate", "必杀槽未满衰减",
-            *Descriptor(lambda: self.active_player.overdriveBuildDecayRate, "ModifiedValue"))
-        ProxyInput("overdriveActiveDecayRate", "必杀槽满后衰减",
-            *Descriptor(lambda: self.active_player.overdriveActiveDecayRate, "ModifiedValue"))
+
+        player = (self._active_player, models.Player)
+        health = (lambda: self.active_player.health, models.Health)
+
+        ModelInput("CurrentHealthValue", instance=health)
+        ModelInput("health_max", instance=health)
+        ModelInput("CurrentShieldValue", instance=health)
+        ModelInput("shield_max", instance=health)
+        ModelInput("CurrentGuardCountValue", instance=health)
+        ModelInput("guard_count_max", instance=health)
+        ModelInput("plat", instance=player)
+        ModelInput("gold", instance=player)
+        ModelInput("overdriveMinValue", instance=player)
+        ModelInput("overdriveBuildDecayRateMax", instance=player)
+        ModelInput("overdriveActiveDecayRateMax", instance=player)
 
     def render_skills(self):
         """渲染技能列表"""
@@ -100,26 +96,33 @@ class Main(MonoHacktool):
             return False
 
         self.render_assembly_buttons((
-            AssemblyItems('无冷却',
-                AssemblyItem('no_cooldown', None, b'\x48***\x2B\xC1',
+            AssemblyItems(
+                '无冷却',
+                AssemblyItem(
+                    'no_cooldown', None, b'\x48***\x2B\xC1',
                     Cooldown.get_ChargesMissing.mono_compile, Delta(0x2d), b'',
                     AssemblyGroup(b'\x89\x46', MemRead(offset=3, size=1), ORIGIN),
                     inserted=True, find_base=False, fuzzy=True),
-                AssemblyItem('no_cooldown2', None, b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
+                AssemblyItem(
+                    'no_cooldown2', None, b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
                     Cooldown.get_IsCharging.mono_compile, Delta(0x58),
                     b'\x90\x90\x30', find_base=False, replace_len=3)),
-            AssemblyItem('basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
+            AssemblyItem(
+                'basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
                 models.MeleeAttackState.HandleSelfTransition.mono_compile, Delta(0xf0),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
-            AssemblyItem('double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00',
+            AssemblyItem(
+                'double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00',
                 models.PlatWallet.Deposit.mono_compile, Delta(0x5d), b'',
                 AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
                 inserted=True, find_base=False),
-            AssemblyItem('double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00',
+            AssemblyItem(
+                'double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00',
                 models.GoldWallet.Deposit.mono_compile, Delta(0x5d), b'',
                 AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
                 inserted=True, find_base=False),
-            AssemblyItem('skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00',
+            AssemblyItem(
+                'skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00',
                 models.SkillState.get_IsEmpowered.mono_compile, Delta(0x2b),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
         ))
@@ -138,6 +141,8 @@ class Main(MonoHacktool):
     def active_player(self):
         """当前玩家"""
         return self.GameController and self.GameController.activePlayers[0]
+
+    _active_player = active_player.fget
 
     def recovery(self):
         """恢复健康"""

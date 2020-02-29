@@ -9,11 +9,6 @@ N3DS_MEMORY_SIZE = (
 
 class N3dsEmuHandler(LookAfterHandler):
     pass
-    # def address_map(self, addr):
-    #     if self._raw_addr:
-    #         return addr
-
-    #     return False
 
 
 

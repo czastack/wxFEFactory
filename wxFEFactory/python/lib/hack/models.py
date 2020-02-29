@@ -289,7 +289,7 @@ class FieldType:
     offset: Union[Sequence[int], Callable]
 
     """最基本的字段类型"""
-    def __init__(self, label):
+    def __init__(self, label=None):
         self.label = label
         self.offset = None
 
@@ -860,6 +860,45 @@ class StringField(Field):
         if value[-1] != 0:
             value += b'\x00'
         super().__set__(instance, value)
+
+
+class PropertyField(property, FieldType):
+    """属性字段"""
+    def __init__(self, fget=None, fset=None, fdel=None, label=None):
+        property.__init__(self, fget, fset, fdel, label)
+        FieldType.__init__(self, label)
+
+    def __call__(self, fget):
+        return self.getter(fget)
+
+
+class ProxyField(FieldType):
+    """代理字段"""
+    def __init__(self, fget=None, field_name=None, label=None):
+        self.fget = fget
+        self.field_name = field_name
+        if label is None and fget:
+            label = fget.__doc__
+        super().__init__(label)
+
+    def getter(self, fget):
+        self.fget = fget
+        if self.label is None:
+            self.label = fget.__doc__
+        return self
+
+    def __call__(self, fget):
+        return self.getter(fget)
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        target = self.fget(instance)
+        return getattr(target, self.field_name)
+
+    def __set__(self, instance, value):
+        target = self.fget(instance)
+        setattr(target, self.field_name, value)
 
 
 class FieldPrep:

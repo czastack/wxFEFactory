@@ -22,17 +22,17 @@ class NativeContext(Model):
         super().__init__(addr, handler)
         self.m_pArgs = self.m_pReturn = self.m_TempStack.addr
         # 字符串、数组等临时参数占的块数，每块8字节
-        self.temp_index = 0
+        self.temp_index = 1
 
     def reset(self):
         self.m_nArgCount = 0
-        self.temp_index = 0
+        self.temp_index = 1
 
     # def push(self, signature, *args):
     #     """压入参数"""
     #     # 写入栈的地址
     #     index = self.m_nArgCount
-    #     if index + self.temp_index >= self.ARG_MAX:
+    #     if index + self.temp_index > self.ARG_MAX:
     #         raise ValueError('参数缓冲区容量不足')
     #     addr = self.m_TempStack.addr_at(index)
     #     try:
@@ -67,7 +67,7 @@ class NativeContext(Model):
             index = self.m_nArgCount
         origin_index = index
         # 调用 native_call 汇编函数时用到
-        if index + self.temp_index >= self.ARG_MAX:
+        if index + self.temp_index > self.ARG_MAX:
             raise ValueError('参数缓冲区容量不足')
 
         buff = bytearray()
@@ -124,6 +124,8 @@ class NativeContext(Model):
         """ 从栈的最后开始往前取地址，传递指针参数时可以用
         :param i: 从1开始
         """
+        if i == 0:
+            i = 1
         return self.m_TempStack.addr_at(-i)
 
     def get_temp_addrs(self, start, end):
@@ -268,7 +270,7 @@ class NativeContext64(NativeContext):
             index = self.m_nArgCount
         origin_index = index
         # 调用 native_call 汇编函数时用到
-        if index + self.temp_index >= self.ARG_MAX:
+        if index + self.temp_index > self.ARG_MAX:
             raise ValueError('参数缓冲区容量不足')
 
         buff = bytearray()

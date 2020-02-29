@@ -1,4 +1,5 @@
 from tools.base.mono_models import MonoClass, MonoField, MonoStaticField, MonoArrayT, MonoProperty, MonoMethod
+from lib.hack.models import ProxyField
 
 
 class NumVarStat(MonoClass):
@@ -9,13 +10,28 @@ class NumVarStat(MonoClass):
 
 class Health(MonoClass):
     # 生命值相关
-    CurrentHealthValue = MonoProperty()  # 生命
-    CurrentShieldValue = MonoProperty()  # 护盾
-    CurrentGuardCountValue = MonoProperty()  # 防御次数
+    CurrentHealthValue = MonoProperty(label="生命")
+    CurrentShieldValue = MonoProperty(label="护盾")
+    CurrentGuardCountValue = MonoProperty(label="防御次数")
 
     healthStat = MonoField(type=NumVarStat)
     shieldStat = MonoField(type=NumVarStat)
     guardCountStat = MonoField(type=NumVarStat)
+
+    @ProxyField(field_name="ModifiedValue")
+    def health_max(self):
+        """生命上限"""
+        return self.healthStat
+
+    @ProxyField(field_name="ModifiedValue")
+    def shield_max(self):
+        """护盾上限"""
+        return self.healthStat
+
+    @ProxyField(field_name="ModifiedValue")
+    def guard_count_max(self):
+        """防御次数上限"""
+        return self.guardCountStat
 
 
 class Wallet(MonoClass):
@@ -42,7 +58,7 @@ class Player(MonoClass):
     health = MonoField(type=Health)
     goldWallet = MonoStaticField(type=Wallet)
     platWallet = MonoStaticField(type=Wallet)
-    overdriveMinValue = MonoField(type=float)  # 必杀槽最小值
+    overdriveMinValue = MonoField(type=float, label="必杀槽最小值")
     # 必杀槽未满衰减速度
     overdriveBuildDecayRate = MonoField(type=NumVarStat)
     # 必杀槽满后衰减速度
@@ -63,6 +79,26 @@ class Player(MonoClass):
     # RequestTeleportMoveToLocation = MonoMethod(param_count=2, signature='PB')
     # # Vector2 GetInputVector(bool faceInputVector = true, bool useAimVector = true, bool ignoreZero = true)
     # GetInputVector = MonoMethod(param_count=3, signature='3B')
+
+    @ProxyField(field_name="balance")
+    def gold(self):
+        """金币"""
+        return self.goldWallet
+
+    @ProxyField(field_name="balance")
+    def plat(self):
+        """宝石"""
+        return self.platWallet
+
+    @ProxyField(field_name="ModifiedValue")
+    def overdriveBuildDecayRateMax(self):
+        """必杀槽未满衰减"""
+        return self.overdriveBuildDecayRate
+
+    @ProxyField(field_name="ModifiedValue")
+    def overdriveActiveDecayRateMax(self):
+        """必杀槽满后衰减"""
+        return self.overdriveActiveDecayRate
 
 
 class GameController(MonoClass):
