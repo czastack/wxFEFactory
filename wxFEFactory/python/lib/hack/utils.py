@@ -1,6 +1,7 @@
 import abc
 import math
 import struct
+import sys
 from lib.utils import split_label_value
 
 
@@ -241,3 +242,11 @@ def iter_signature(signature):
         for _ in range(repeat):
             yield fmt
         repeat = 0
+
+
+def resolve_type(instance, name):
+    """处理字符串type"""
+    if name == 'self':
+        return instance.__class__
+    else:
+        return getattr(sys.modules[instance.__class__.__module__], name, None)

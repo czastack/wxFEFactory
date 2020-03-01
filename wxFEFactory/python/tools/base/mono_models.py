@@ -1,6 +1,7 @@
 from lib.utils import float32
 from tools.base.native_hacktool import call_arg
 from tools.base.native import NativeContext, TempPtr, TempArrayPtr
+from lib.hack.utils import resolve_type
 
 
 class MonoType:
@@ -10,7 +11,6 @@ class MonoType:
 class MonoClass(MonoType):
     """mono类"""
     namespace = ''
-    name = None
     namepath = None  # 内部类前缀 /分隔
     vtable = None
     need_vtable = False
@@ -24,7 +24,7 @@ class MonoClass(MonoType):
         if not hasattr(cls, '__abstract__'):
             cls.__abstract__ = False
         if not cls.__abstract__:
-            if cls.name is None:
+            if 'name' not in cls.__dict__:
                 cls.name = cls.__name__
                 if cls.namepath is not None:
                     cls.name = cls.namepath + cls.name
@@ -59,30 +59,43 @@ class MonoMember:
 class MonoTyping:
     """带有类型的数据"""
     def __init__(self, type, size):
-        if type is None or issubclass(type, MonoType):
-            size = 0
+        self.is_mono_type = False
+        if type is not int:
+            if type is None:
+                size = 0
+            elif isinstance(type, str) or issubclass(type, MonoType):
+                size = 0
+                self.is_mono_type = True
         self.type = type
         self.size = size
 
     @property
     def real_type(self):
-        type = self.type
-        if type and issubclass(type, MonoType):
-            type = int
-        return type
+        if self.is_mono_type:
+            return int
+        return self.type
 
     def case_value(self, result, instance):
         """传出时转换值，例如转为类实例"""
-        if self.type is not int and callable(self.type):
-            if issubclass(self.type, MonoType):
-                result = self.type(result, instance.owner)
-            else:
-                result = self.type(result)
+        vtype = self.type
+        if vtype is not int:
+            if isinstance(vtype, str):
+                vtype = resolve_type(instance, vtype)
+                if vtype:
+                    self.type = vtype
+                else:
+                    raise ValueError('无法识别的类型%s' % self.type)
+
+            if callable(vtype):
+                if issubclass(vtype, MonoType):
+                    result = vtype(result, instance.owner)
+                else:
+                    result = vtype(result)
         return result
 
     def case_boxed_value(self, result, instance):
         """转换被装箱的值，通常是mono函数调用或者property"""
-        if result and not issubclass(self.type, MonoType):
+        if result and not self.is_mono_type:
             owner = instance.owner
             # 获取值要先解包，得到地址
             result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
@@ -121,16 +134,20 @@ class MonoField(MonoMember, MonoTyping):
 
     def op_getter(self, instance):
         """用于获取值的call_arg"""
-        if not instance.mono_object or not self.mono_field:
-            raise ValueError('mono_object或mono_field未初始化')
+        if not instance.mono_object:
+            raise ValueError('mono_object未初始化')
+        if not self.mono_field:
+            raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr()
         return call_arg(*instance.owner.mono_field_get_value, instance.mono_object, self.mono_field,
             temp_ptr, ret_type=temp_ptr)
 
     def op_setter(self, instance, value):
         """用于设置值的call_arg"""
-        if not instance.mono_object or not self.mono_field:
-            raise ValueError('mono_object或mono_field未初始化')
+        if not instance.mono_object:
+            raise ValueError('mono_object未初始化')
+        if not self.mono_field:
+            raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr(value)
         return call_arg(*instance.owner.mono_field_set_value, instance.mono_object, self.mono_field, temp_ptr)
 
@@ -142,6 +159,10 @@ class MonoField(MonoMember, MonoTyping):
     def set_value(self, instance, value):
         """设置值"""
         instance.owner.native_call_1(self.op_setter(instance, self.prepare_value(value)))
+
+    def __repr__(self):
+        return '{}({}, {}, {}, {})'.format(
+            self.__class__.__name__, self.name, self.type, self.size, self.label)
 
 
 class MonoStaticField(MonoField):
@@ -203,6 +224,10 @@ class MonoProperty(MonoMember, MonoTyping):
     def set_value(self, instance, value):
         """设置值"""
         instance.owner.mono_security_call_1(self.op_setter(instance, self.prepare_value(value)))
+
+    def __repr__(self):
+        return '{}({}, {}, {}, {})'.format(
+            self.__class__.__name__, self.name, self.type, self.size, self.label)
 
 
 # class BoundField:

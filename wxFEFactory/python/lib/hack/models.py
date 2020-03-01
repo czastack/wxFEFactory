@@ -1,11 +1,11 @@
 import abc
 import copy
 import sys
+from functools import partialmethod
+from types import SimpleNamespace
 from typing import Callable, Sequence, Union
 from lib.utils import float32, Accumulator
 from lib.extypes import new_dataclass, classproperty
-from functools import partialmethod
-from types import SimpleNamespace
 from . import utils
 
 
@@ -549,11 +549,11 @@ class BitsField(Field):
 def resolve_model_t(field, instance):
     """处理字符串model_t"""
     if isinstance(field.model_t, str):
-        if field.model_t == 'self':
-            field.model_t = type(instance)
-        else:
-            field.model_t = getattr(sys.modules[instance.__class__.__module__], field.model_t)
-        return True
+        model_t = utils.resolve_type(instance, field.model_t)
+        if model_t:
+            field.model_t = model_t
+            return True
+    return False
 
 
 class ModelPtrField(Cachable, PtrField):

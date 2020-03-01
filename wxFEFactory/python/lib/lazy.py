@@ -2,15 +2,15 @@ from functools import partial
 
 
 class classlazy:
-    def __init__(self, getter):
-        self.name = '_' + getter.__name__
-        self.getter = getter
+    def __init__(self, fget):
+        self.name = '_' + fget.__name__
+        self.fget = fget
 
     def __get__(self, instance, owner=None):
         owner = owner or instance.__class__
         value = getattr(owner, self.name, None)
         if value is None:
-            value = self.getter(instance or owner)
+            value = self.fget(instance or owner)
             setattr(owner, self.name, value)
         return value
 

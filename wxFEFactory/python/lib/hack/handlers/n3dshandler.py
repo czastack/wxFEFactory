@@ -61,14 +61,14 @@ class CitraHandler(N3dsEmuHandler):
 
                         func_data = s_instance_start.to_bytes(8, 'little').join(self.InvalidateCacheRangeAsm)
                         if not self.ptrs_read(s_instance_start, (0x48, 0x28), int, 4):
-                            if self.ptrs_read(s_instance_start, (0x80, 0x28), int, 4) == 0x5D43F160:
+                            if self.ptrs_read(s_instance_start, (0x80, 0x28), int, 4) & 0xFFFF == 0xF160:
                                 func_data = func_data.replace(b'\x48\x00', b'\x80\x00', 1)
                             else:
                                 func_data = None
 
                         if func_data:
                             self.InvalidateCacheRangeAddr = self.write_function(func_data, self.InvalidateCacheRangeAddr)
-                    else:
+                    if not self.InvalidateCacheRangeAddr:
                         print('无法使用InvalidateCacheRange')
                 else:
                     print('不支持的Citra版本！')

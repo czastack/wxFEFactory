@@ -49,7 +49,7 @@ COMMON_FIELDS = {
         0x0039C93C,
     ),
     'custom_exp': (
-        ToggleField(enable=0xE3A0003C, disable=0xC3A00064, label="自定义获取经验值"),
+        ToggleField(enable=0xE3A00064, disable=0xC3A00064, label="自定义获取经验值"),
         0x004509EC,
         0x0045127C,
     ),
