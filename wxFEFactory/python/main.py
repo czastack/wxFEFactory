@@ -311,7 +311,10 @@ class MainFrame:
         """根据名称打开工具"""
         Tool = self.get_tool(name)
         tool = Tool()
-        tool.attach(self)
+        try:
+            tool.attach(self)
+        except Exception as e:
+            traceback.print_exc()
         tool.add_close_callback(self.weak.on_tool_close)
         self.opened_tools.append(tool)
         self.opened_tools_map[id(tool.win)] = tool

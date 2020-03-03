@@ -35,7 +35,7 @@ class AssemblyHacktool(BaseHackTool):
         self.reset()
         self.is32process = self.handler.is32process
 
-        for key, button in self.assembly_buttons:
+        for key, button in self.assembly_buttons.items():
             if button.checked:
                 self.toggle_assembly_button(key, True)
 
@@ -91,7 +91,7 @@ class AssemblyHacktool(BaseHackTool):
                 self.alloc_memory(start)
                 if self.allocated_memory == 0:
                     self.alloc_memory(start - 0x10000000)
-            if self.allocated_memory == 0:
+            if not self.allocated_memory:
                 self.alloc_memory()
             if self.allocated_memory == 0:
                 raise ValueError('分配内存失败')

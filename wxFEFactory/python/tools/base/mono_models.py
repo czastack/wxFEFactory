@@ -10,6 +10,7 @@ class MonoType:
 
 class MonoClass(MonoType):
     """mono类"""
+    # name: str 类名称
     namespace = ''
     namepath = None  # 内部类前缀 /分隔
     vtable = None
