@@ -102,9 +102,9 @@ COMMON_FIELDS = {
         0x003BAE00,
     ),
     'item_keep': (
-        ToggleField(enable=0xE1A00000, disable=0xEB08F683, label="道具使用不减"),
-        0x001D7024,
-        0x001D7C30,
+        ToggleField(enable=0xE1A00000, disable=None, label="道具使用不减"),
+        {'offset': 0x001D7024, 'disable': 0xEB08F683},
+        {'offset': 0x001D7C30, 'disable': 0xEB08F604},
     ),
     'inf_mila': (
         ToggleField(enable=0x13A00001, disable=0x15900008, label="无限使用米拉齿轮"),
