@@ -27,6 +27,7 @@ class CitraHandler(N3dsEmuHandler):
         super().__init__()
         self.hwnd = None
         self.g_memory_start = 0
+        self.s_instance_start = 0
         self.s_instance = 0
         self.InvalidateCacheRangeAddr = 0
 
@@ -61,7 +62,7 @@ class CitraHandler(N3dsEmuHandler):
 
                         func_data = s_instance_start.to_bytes(8, 'little').join(self.InvalidateCacheRangeAsm)
                         if not self.ptrs_read(s_instance_start, (0x48, 0x28), int, 4):
-                            if self.ptrs_read(s_instance_start, (0x80, 0x28), int, 4) & 0xFFFF == 0xF160:
+                            if self.ptrs_read(s_instance_start, (0x80, 0x28), int, 4):
                                 func_data = func_data.replace(b'\x48\x00', b'\x80\x00', 1)
                             else:
                                 func_data = None

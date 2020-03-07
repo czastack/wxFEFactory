@@ -29,9 +29,13 @@ class Main(AssemblyHacktool):
     def onattach(self):
         super().onattach()
         self._server_base = self.handler.get_module('server.dll')
+        self._client_base = self.handler.get_module('client.dll')
 
     def server_base(self):
         return self._server_base
+
+    def client_base(self):
+        return self._client_base
 
     def render_assembly_buttons_own(self):
         server_base = self.server_base
@@ -54,7 +58,7 @@ class Main(AssemblyHacktool):
                 find_base=server_base, replace_len=7, inserted=True, fuzzy=True),
             AssemblyItem('perfect_accuraty', '超级精准度', 'F3 0F 10 86 0C 0D 00 00 8B',
                 0x2DA000, delta, b'', 'C7 86 0C 0D 00 00 00 00 00 00 F3 0F 10 86 0C 0D 00 00',
-                find_base=server_base, replace_len=8, inserted=True),
+                find_base=self.client_base, replace_len=8, inserted=True),
         ))
 
     # def get_hotkeys(self):
