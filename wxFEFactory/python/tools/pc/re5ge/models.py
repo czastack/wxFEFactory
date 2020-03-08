@@ -62,7 +62,6 @@ class CharacterStruct(Model):
     chars = ArrayField(0x24, 4, ModelPtrField(0, Character))
     chars_count = Field(0x34, label="角色数量")
     saved_items = ArrayField(0x714D0, 4, ModelField(0, SavedItemHolder))
-    inventory_treasure_holder = ModelPtrField(0x168F0, InventoryTreasureItemHolder)
 
 
 class Inventory(Model):
@@ -76,3 +75,4 @@ class Money(Model):
 class Global(Model):
     character_struct = ModelPtrField(0x00DA2A5C, CharacterStruct)
     money = ModelPtrField(0x00DA23D8, Money)
+    inventory_treasure_holder = ModelPtrField((0x00DA25B4, 0x104, 0xC), InventoryTreasureItemHolder)

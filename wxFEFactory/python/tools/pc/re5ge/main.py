@@ -31,11 +31,7 @@ class Main(NativeHacktool):
             ModelInput("money.money", "金钱")
 
         with Group("player", "角色", person):
-            Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
-            ModelInput("health")
-            ModelInput("health_max")
-            ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
-            ModelCheckBox("invincible")
+            self.render_player()
 
         self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4),
             self.render_person_items)
@@ -43,6 +39,13 @@ class Main(NativeHacktool):
             self.render_saved_items)
         self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
+
+    def render_player(self):
+        Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
+        ModelInput("health")
+        ModelInput("health_max")
+        ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
+        ModelCheckBox("invincible")
 
     def render_person_items(self):
         """游戏中物品"""
@@ -68,7 +71,7 @@ class Main(NativeHacktool):
         """仓库中的物品"""
         with ui.Notebook(class_="fill") as book:
             for label, key in (('物品箱', 'inventory_items'), ('宝物箱', 'treasure_items')):
-                with Group(None, label, self._global.character_struct, cols=4):
+                with Group(None, label, self._global, cols=4):
                     for i in range(54):
                         prop = "inventory_treasure_holder.%s.%d" % (key, i)
                         select = ModelChoiceDisplay(prop + ".type", "",
