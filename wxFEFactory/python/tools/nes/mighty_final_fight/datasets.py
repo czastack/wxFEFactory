@@ -19,4 +19,4 @@ ENEMYS = (
 )
 
 
-ENEMY_LABELS, ENEMY_VALUES = utils.split_value_label(ENEMYS)
+ENEMY_LABELS, ENEMY_VALUES = utils.split_tuple_reverse(ENEMYS)

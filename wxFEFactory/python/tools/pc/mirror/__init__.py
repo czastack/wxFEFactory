@@ -1,1 +1,1 @@
-name = "魔镜"
+name = "Mirror 魔镜"

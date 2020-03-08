@@ -1,4 +1,4 @@
-from lib.utils import split_value_label
+from lib.utils import split_tuple_reverse
 
 
 VERSIONS = ('1.0', '1.1')
@@ -172,7 +172,7 @@ ITEMS = {
     0xD6: "监牢钥匙",
 }
 
-ITEM_VALUES, ITEM_LABELS = split_value_label(ITEMS)
+ITEM_VALUES, ITEM_LABELS = split_tuple_reverse(ITEMS)
 
 B = bytes.fromhex
 

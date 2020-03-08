@@ -20,7 +20,7 @@ class Global(Model):
     prisoner_flag = ByteField(0x0200CD90)  # ~0x0200CD9C
 
 
-WEAPONS, WEAPON_VALUES = utils.split_value_label((
+WEAPONS, WEAPON_VALUES = utils.split_tuple_reverse((
     (0x00, "普通"),
     (0x02, "S枪"),
     (0x03, "R枪"),

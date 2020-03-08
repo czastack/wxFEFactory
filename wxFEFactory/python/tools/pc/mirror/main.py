@@ -38,6 +38,7 @@ class Main(MonoHacktool):
 
         with Group(None, "全局", roleData):
             self.render_global()
+        self.lazy_group(Group(None, "对战", (self._starbox, models.StarBox)), self.render_starbox)
         self.lazy_group(Group(None, "玩家", (self._player, models.Player)), self.render_player)
         self.lazy_group(Group(None, "敌人", (self._enemy, models.Enemy)), self.render_enemy)
 
@@ -54,6 +55,11 @@ class Main(MonoHacktool):
         ModelInput('totalAbyssGold')
         ModelInput('playerAbyssScore')
         ModelInput('saveRage')
+
+    def render_starbox(self):
+        ModelInput('Turn')
+        ModelInput('MaxTurn')
+        ModelInput('MaxCombo')
 
     def render_role(self):
         ModelInput('CurHP')
@@ -86,6 +92,11 @@ class Main(MonoHacktool):
         return self.GameTool.roleData
 
     roleData = property(_roleData)
+
+    def _starbox(self):
+        return self.StarBox.Instance
+
+    starbox = property(_starbox)
 
     def _player(self):
         return self.StarBox.Instance.Player

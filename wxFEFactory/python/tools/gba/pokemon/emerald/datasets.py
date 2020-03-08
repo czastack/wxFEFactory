@@ -124,7 +124,7 @@ AREAS = (
     (0x421A, "凤凰、路基亚捕捉地点"),
 )
 
-AREA_LABELS, AREA_VALUES = utils.split_value_label(AREAS)
+AREA_LABELS, AREA_VALUES = utils.split_tuple_reverse(AREAS)
 
 FURNITURES = (
     "无",

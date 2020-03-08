@@ -179,7 +179,7 @@ SKILL_ITEMS = (
     (0x8314, "凌波微步"),
     (0x8315, "空中漫步"),
 )
-SKILLS, SKILL_VALUES = utils.split_value_label(SKILL_ITEMS)
+SKILLS, SKILL_VALUES = utils.split_tuple_reverse(SKILL_ITEMS)
 
 SKILLKEYS = (
     "重按A",

@@ -104,7 +104,7 @@ def flag_generator(n):
     return (1 << i for i in range(n))
 
 
-def split_value_label(options):
+def split_tuple(options):
     """把(value, label)分开"""
     if isinstance(options, dict):
         return tuple(options.keys()), tuple(options.values())
@@ -112,9 +112,9 @@ def split_value_label(options):
         return zip(*options)
 
 
-def split_label_value(options):
+def split_tuple_reverse(options):
     """把(label, value)分开"""
-    a, b = split_value_label(options)
+    a, b = split_tuple(options)
     return b, a
 
 
@@ -125,7 +125,7 @@ def prepare_option(choices, values):
             if not extypes.is_list_tuple(choices):
                 choices = tuple(choices)
             if choices and extypes.is_list_tuple(choices[0]):
-                fn = split_label_value if isinstance(choices[0][0], str) else split_value_label
+                fn = split_tuple if isinstance(choices[0][0], str) else split_tuple_reverse
                 choices, values = fn(choices)
     return choices, values
 

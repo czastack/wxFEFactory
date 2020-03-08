@@ -2,7 +2,7 @@ import abc
 import math
 import struct
 import sys
-from lib.utils import split_label_value
+from lib.utils import split_tuple
 
 
 class BaseItemProvider(metaclass=abc.ABCMeta):
@@ -83,7 +83,7 @@ class OptionProvider(BaseItemProvider):
         self.datas = datas
 
     def generate(self):
-        self._choices, self._values = split_label_value(self.datas)
+        self._choices, self._values = split_tuple(self.datas)
 
 
 class Descriptor:

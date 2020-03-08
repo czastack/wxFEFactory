@@ -61,3 +61,6 @@ class StarBox(MonoClass):
     Instance = MonoProperty(type='self')
     Enemy = MonoProperty(type=Enemy)
     Player = MonoProperty(type=Player)
+    Turn = MonoProperty(label='回合')
+    MaxTurn = MonoProperty(label='最大回合')
+    MaxCombo = MonoProperty(label='最大连击')

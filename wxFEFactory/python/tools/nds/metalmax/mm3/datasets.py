@@ -16,7 +16,7 @@ FIGURES = ("主角(男)", "猎人(男)", "机械师(男)", "战士(男)", "护�
 
 PROFS = ("猎人", "机械师", "士兵", "护士", "摔跤手", "艺术家", "狗")
 
-HOLE_TYPE, HOLE_TYPE_VALUES = utils.split_value_label((
+HOLE_TYPE, HOLE_TYPE_VALUES = utils.split_tuple_reverse((
     (0x0, "关"),
     (0x1, "主炮类"),
     (0x11, "副炮类"),

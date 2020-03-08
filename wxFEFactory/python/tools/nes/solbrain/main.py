@@ -29,7 +29,7 @@ FORMS = (
     (0x29, "αββ"),
     (0x2a, "βββ"),
 )
-FORM_LABELS, FORM_VALUES = utils.split_value_label(FORMS)
+FORM_LABELS, FORM_VALUES = utils.split_tuple_reverse(FORMS)
 
 
 class Main(BaseNesHack):
