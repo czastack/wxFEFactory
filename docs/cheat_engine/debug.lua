@@ -1,5 +1,9 @@
--- 调试KERNELBASE.WriteProcessMemory
+-- 调试KERNELBASE.WriteProcessMemory (64位)
 function debugger_onBreakpoint()
+    -- LPVOID lpBaseAddress: RDX,
+    -- LPVOID lpBuffer: ECX,
+    -- DWORD nSize: R9,
+
     local data = readBytes(R8, R9, true)
     local hexdata = {}
     for k, v in ipairs(data) do
@@ -12,6 +16,27 @@ function debugger_onBreakpoint()
 end
 
 debug_setBreakpoint(getAddress('KERNELBASE.WriteProcessMemory') + 0x13)
+
+-- 调试KERNELBASE.WriteProcessMemory (32位)
+function debugger_onBreakpoint()
+    -- LPVOID lpBaseAddress: ESP + 8,
+    -- LPVOID lpBuffer: ESP + C,
+    -- DWORD nSize: ESP + 10,
+    local lpBaseAddress = readInteger(ESP + 8)
+    local lpBuffer = readInteger(ESP + 0xC)
+    local nSize = readInteger(ESP + 0x10)
+    local data = readBytes(lpBuffer, nSize, true)
+    local hexdata = {}
+    for k, v in ipairs(data) do
+        hexdata[k] = string.format('%02X', v)
+    end
+    local buffer = string.format("'%s'", table.concat(hexdata, ' '))
+    local result = string.format('WriteProcessMemory(address=0x%08X, buffer=%s, size=%d)', lpBaseAddress, buffer, nSize)
+    print(result)
+    return 1
+end
+
+debug_setBreakpoint(getAddress('KERNELBASE.WriteProcessMemory'))
 
 
 function findBytes(data)

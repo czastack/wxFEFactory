@@ -40,7 +40,7 @@ class SavedItemHolder(Model):
 
 
 class InventoryTreasureItemHolder(Model):
-    SIZE = 0x1e60
+    SIZE = 0x1E60
     inventory_items = ArrayField(0x1C38, 54, ModelField(0, InventoryTreasureItem))
     treasure_items = ArrayField(0x2B68, 54, ModelField(0, InventoryTreasureItem))
 

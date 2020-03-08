@@ -7,6 +7,7 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
 from tools.base.native_hacktool import NativeHacktool, AssemblyItem
+from tools.base.assembly_hacktool import Delta
 from . import models, datasets
 
 
@@ -20,7 +21,7 @@ class Main(NativeHacktool):
         self._global = models.Global(0, self.handler)
         self.ingame_item = models.IngameItem(0, self.handler)
         self.saved_item = models.SavedItem(0, self.handler)
-        # self.inventory_treasure_item = models.InventoryTreasureItem(0, self.handler)
+        self.inventory_treasure_item = models.InventoryTreasureItem(0, self.handler)
         self.char_index = self._global.char_index = 0
 
     def render_main(self):
@@ -38,9 +39,9 @@ class Main(NativeHacktool):
 
         self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4),
             self.render_person_items)
-        self.lazy_group(Group("saved_items", "整理界面物品", self._saved_items, serializable=False, cols=6),
+        self.lazy_group(Group("saved_items", "整理界面物品", self._saved_items, serializable=False, cols=4),
             self.render_saved_items)
-        # self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
+        self.lazy_group(StaticGroup("物品箱/宝物箱"), self.render_inventory_treasure_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_person_items(self):
@@ -57,42 +58,47 @@ class Main(NativeHacktool):
         """整理界面个人物品"""
         for i in range(models.SavedItemHolder.items.length):
             prop = "items.%d" % i
-            select = ModelChoiceDisplay(prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices,
-                values=datasets.INVENTORY_ITEMS.values)
+            select = ModelChoiceDisplay(
+                prop + ".type", "", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values)
             with select.container:
-                ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_saved_item, self.weak,
-                    instance=self._saved_items, prop=prop))
+                ui.Button("详情", class_="btn_sm", onclick=partial(
+                    __class__.show_saved_item, self.weak, instance=self._saved_items, prop=prop))
 
-    # def render_inventory_treasure_items(self):
-    #     """仓库中的物品"""
-    #     with ui.Notebook(class_="fill") as book:
-    #         for label, key in (('物品箱', 'inventory_items'), ('宝物箱', 'treasure_items')):
-    #             with Group(None, label, self._gloabl.character_struct, cols=6):
-    #                 for i in range(54):
-    #                     prop = "inventory_treasure_holder.%s.%d" % (key, i)
-    #                     select = ModelChoiceDisplay(prop + ".type", "",
-    #                         choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
-    #                         values=datasets.INVENTORY_TREASURE_ITEMS.values)
-    #                     with select.container:
-    #                         ui.Button("详情", class_="btn_sm",
-    #                             onclick=partial(__class__.show_inventory_treasure_item, self.weak,
-    #                                 instance=self._gloabl.character_struct, prop=prop))
+    def render_inventory_treasure_items(self):
+        """仓库中的物品"""
+        with ui.Notebook(class_="fill") as book:
+            for label, key in (('物品箱', 'inventory_items'), ('宝物箱', 'treasure_items')):
+                with Group(None, label, self._global.character_struct, cols=4):
+                    for i in range(54):
+                        prop = "inventory_treasure_holder.%s.%d" % (key, i)
+                        select = ModelChoiceDisplay(prop + ".type", "",
+                            choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
+                            values=datasets.INVENTORY_TREASURE_ITEMS.values)
+                        with select.container:
+                            ui.Button("详情", class_="btn_sm",
+                                onclick=partial(__class__.show_inventory_treasure_item, self.weak,
+                                    instance=self._global.character_struct, prop=prop))
 
     def render_assembly_buttons_own(self):
-        NOP_7 = b'\x90' * 7
-        NOP_8 = b'\x90' * 8
-        NOP_9 = b'\x90' * 9
+        nop_7 = b'\x90' * 7
+        nop_8 = b'\x90' * 8
+        nop_9 = b'\x90' * 9
+        delta = Delta(0x200000)
         self.render_assembly_buttons((
-            AssemblyItem('hp_keep', '生命不减', b'\x66\x29\x8E\x64\x13\x00\x00', 0x700000, 0x800000, NOP_7),
-            AssemblyItem('ammo_keep', '弹药不减', b'\x2B\x44\x24\x08\x89\x41\x08', 0x800000, 0x900000, NOP_7),
-            AssemblyItem('infinity_ammo', '无限弹药', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, 0x700000,
-                b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', inserted=True),
-            AssemblyItem('fast_shoot', '快速射击', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, 0x900000,
-                b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', inserted=True, replace_len=5),
+            AssemblyItem('hp_keep', '生命不减', b'\x66\x29\x8E\x64\x13\x00\x00', 0x700000, delta, nop_7),
+            AssemblyItem('ammo_keep', '弹药不减', b'\x2B\x44\x24\x08\x89\x41\x08', 0x800000, delta, nop_7),
+            AssemblyItem('grenade_keep', '手雷不减', b'\x8B\x46\x08\x83\xE8\x01\x89\x44\x24\x14',
+                         0x300000, delta, b'\x90\x90\x90', replace_len=3, replace_offset=3),
+            AssemblyItem('infinity_ammo', '无限弹药', b'\x8B\x57\x08\x57\x8B\xCB', 0x500000, delta,
+                         b'', b'\xD9\x47\x0C\xD9\x5F\x08\x8B\x57\x08\x57\x8B\xCB', inserted=True),
+            AssemblyItem('fast_shoot', '快速射击', b'\xF3\x0F\x58\x46\x20\x0F\xB6', 0x800000, delta,
+                         b'', b'\xC7\x46\x20\x00\x00\xC8\x42\xF3\x0F\x58\x46\x20', inserted=True, replace_len=5),
+            AssemblyItem('no_hot', '武器不会过热', b'\xF3\x0F\x58\x86\x68\x1C\x00\x00', 0x700000, delta,
+                         b'', b'\x0F\x57\xC0\xF3\x0F\x11\x86\x68\x1C\x00\x00', inserted=True),
             AssemblyItem('merce_timer_keep', '佣兵模式时间不减', b'\xF3\x0F\x11\x87\xDC\x04\x00\x00',
-                0x300000, 0x400000, NOP_8),
+                         0x300000, delta, nop_8),
             AssemblyItem('combo_timer_keep', '连击时间不减', b'\xF3\x0F\x11\x84\x31\xA0\x06\x00\x00\x5F',
-                0x300000, 0x400000, NOP_9),
+                         0x300000, delta, nop_9),
         ))
 
     def get_ingame_item_dialog(self):
@@ -141,21 +147,21 @@ class Main(NativeHacktool):
             setattr(self, name, dialog)
         return dialog
 
-    # def get_inventory_treasure_item_dialog(self):
-    #     """仓库物品信息对话框"""
-    #     name = 'inventory_treasure_item_dialog'
-    #     dialog = getattr(self, name, None)
-    #     if dialog is None:
-    #         with DialogGroup(name, "物品详情", self.inventory_treasure_item, cols=1,
-    #                 dialog_style={'width': 600, 'height': 1400},
-    #                 closable=False, horizontal=False, button=False) as dialog:
-    #             ModelSelect("type", choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
-    #                 values=datasets.INVENTORY_TREASURE_ITEMS.values,
-    #                 instance=self.inventory_treasure_item).set_help('移动后生效')
-    #             ModelInput("quantity")
+    def get_inventory_treasure_item_dialog(self):
+        """仓库物品信息对话框"""
+        name = 'inventory_treasure_item_dialog'
+        dialog = getattr(self, name, None)
+        if dialog is None:
+            with DialogGroup(name, "物品详情", self.inventory_treasure_item, cols=1,
+                    dialog_style={'width': 600, 'height': 1400},
+                    closable=False, horizontal=False, button=False) as dialog:
+                ModelSelect("type", choices=datasets.INVENTORY_TREASURE_ITEMS.choices,
+                    values=datasets.INVENTORY_TREASURE_ITEMS.values,
+                    instance=self.inventory_treasure_item).set_help('移动后生效')
+                ModelInput("quantity")
 
-    #         setattr(self, name, dialog)
-    #     return dialog
+            setattr(self, name, dialog)
+        return dialog
 
     def get_hotkeys(self):
         this = self.weak
@@ -216,18 +222,18 @@ class Main(NativeHacktool):
         else:
             print("没有数据")
 
-    # def show_inventory_treasure_item(self, view, instance, prop):
-    #     """显示整理界面物品详情对话框"""
-    #     if callable(instance):
-    #         instance = instance()
-    #     item = getattr(instance, prop)
-    #     if item and item.addr:
-    #         self.inventory_treasure_item.addr = item.addr
-    #         dialog = self.get_inventory_treasure_item_dialog()
-    #         dialog.read()
-    #         dialog.show()
-    #     else:
-    #         print("没有数据")
+    def show_inventory_treasure_item(self, view, instance, prop):
+        """显示整理界面物品详情对话框"""
+        if callable(instance):
+            instance = instance()
+        item = getattr(instance, prop)
+        if item and item.addr:
+            self.inventory_treasure_item.addr = item.addr
+            dialog = self.get_inventory_treasure_item_dialog()
+            dialog.read()
+            dialog.show()
+        else:
+            print("没有数据")
 
     def pull_through(self):
         self.person.set_with('health', 'health_max')
