@@ -43,6 +43,7 @@ class BaseHackTool(NestedTool):
             with ui.Vertical():
                 with ui.Horizontal(class_="expand padding"):
                     ui.Button("检测", class_="vcenter", onclick=self.check_attach)
+                    ui.Button("唤醒", class_="vcenter", onclick=self.wake_widgets_up)
                     self.render_top_button()
                     self.attach_status_view = ui.Text("", class_="vcenter grow padding_left")
                     ui.CheckBox("保持最前", class_="vcenter", onchange=self.switch_keeptop)
@@ -262,7 +263,7 @@ class BaseHackTool(NestedTool):
                 data['data'][names[i]] = value
             fefactory.json_dump_file(self, data)
 
-    def wake_widgets_up(self):
+    def wake_widgets_up(self, _=None):
         for widget in self.active_widgets:
             widget.wakeup()
 
