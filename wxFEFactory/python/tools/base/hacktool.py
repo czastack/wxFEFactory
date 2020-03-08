@@ -1,18 +1,18 @@
 import abc
 import base64
 import os
-import traceback
 import fefactory
 import __main__
-from .basetool import NestedTool
 from application import CONFIG_DIR
 from lib.config import Config, ConfigGroup
 from lib.hack.forms import Widget, BaseGroup
 from lib.hack.handlers import ProxyHandler
 from lib import ui
+from .basetool import NestedTool
 
 
-class AppendWidgetsList(list):
+class WidgetAppendList(list):
+    """控件添加列表"""
     def __enter__(self):
         Widget.event_emitter.on('widget_init', self.append)
 
@@ -32,7 +32,7 @@ class BaseHackTool(NestedTool):
         self.config = Config(os.path.join(CONFIG_DIR, "{}.config.json".format(self.module_name)))
         if callable(self.handler_class):
             self.handler = self.handler_class()
-        self.active_widgets = AppendWidgetsList()
+        self.active_widgets = WidgetAppendList()
 
     def attach(self, frame):
         super().attach(frame)
@@ -290,7 +290,9 @@ class ProxyHackTool(BaseHackTool):
                     if hotkeys:
                         self.win.register_hotkeys(hotkeys)
                 self.onattach()
-                return True
+                break
         else:
             self.attach_status_view.label = '绑定失败, 未找到支持的进程'
             return False
+
+        return True
