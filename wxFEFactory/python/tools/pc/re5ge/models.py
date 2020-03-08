@@ -40,6 +40,7 @@ class SavedItemHolder(Model):
 
 
 class InventoryTreasureItemHolder(Model):
+    """物品箱/宝物箱"""
     SIZE = 0x1E60
     inventory_items = ArrayField(0x1C38, 54, ModelField(0, InventoryTreasureItem))
     treasure_items = ArrayField(0x2B68, 54, ModelField(0, InventoryTreasureItem))
@@ -62,10 +63,6 @@ class CharacterStruct(Model):
     chars = ArrayField(0x24, 4, ModelPtrField(0, Character))
     chars_count = Field(0x34, label="角色数量")
     saved_items = ArrayField(0x714D0, 4, ModelField(0, SavedItemHolder))
-
-
-class Inventory(Model):
-    pass
 
 
 class Money(Model):

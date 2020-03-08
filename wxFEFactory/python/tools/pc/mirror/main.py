@@ -28,6 +28,7 @@ class Main(MonoHacktool):
             models.Enemy,
             models.Player,
             models.StarBox,
+            models.BaseItem,
         ))
 
         self.GameTool = models.GameTool(0, self)
@@ -41,6 +42,7 @@ class Main(MonoHacktool):
         self.lazy_group(Group(None, "对战", (self._starbox, models.StarBox)), self.render_starbox)
         self.lazy_group(Group(None, "玩家", (self._player, models.Player)), self.render_player)
         self.lazy_group(Group(None, "敌人", (self._enemy, models.Enemy)), self.render_enemy)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_global(self):
         ModelInput('Money')
@@ -87,6 +89,19 @@ class Main(MonoHacktool):
     def render_enemy(self):
         self.render_role()
         ModelInput('BrokeClothLevel')
+
+    def render_assembly_buttons_own(self):
+        BaseItem = models.BaseItem
+        if not BaseItem.Cast.mono_compile:
+            print('需要先加载游戏')
+            return False
+
+        self.render_assembly_buttons((
+            AssemblyItem(
+                'item_keep', '物品使用不消失', '8B 45 D0 39 00 E8 24 00 00 00',
+                    BaseItem.Cast.mono_compile + 0x300, Delta(0x200), 'C6 47 28 00',
+                    find_base=False, replace_offset=5, replace_len=5),
+        ))
 
     def _roleData(self):
         return self.GameTool.roleData

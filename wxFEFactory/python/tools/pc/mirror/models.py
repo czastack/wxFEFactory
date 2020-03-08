@@ -1,4 +1,4 @@
-from tools.base.mono_models import MonoClass, MonoField, MonoStaticField, MonoProperty, MonoStaticField
+from tools.base.mono_models import MonoClass, MonoField, MonoStaticField, MonoProperty, MonoStaticField, MonoMethod
 
 
 class GirlData(MonoClass):
@@ -64,3 +64,7 @@ class StarBox(MonoClass):
     Turn = MonoProperty(label='回合')
     MaxTurn = MonoProperty(label='最大回合')
     MaxCombo = MonoProperty(label='最大连击')
+
+
+class BaseItem(MonoClass):
+    Cast = MonoMethod(compile=True)
