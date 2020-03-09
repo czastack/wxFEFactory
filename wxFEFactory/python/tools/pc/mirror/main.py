@@ -34,6 +34,10 @@ class Main(MonoHacktool):
         self.GameTool = models.GameTool(0, self)
         self.StarBox = models.StarBox(0, self)
 
+        self.assembly_address_dict = {
+            'item_keep': models.BaseItem.Cast.mono_compile + 0x300,
+        }
+
     def render_main(self):
         roleData = (self._roleData, models.GirlData)
 
@@ -91,16 +95,11 @@ class Main(MonoHacktool):
         ModelInput('BrokeClothLevel')
 
     def render_assembly_buttons_own(self):
-        BaseItem = models.BaseItem
-        if not BaseItem.Cast.mono_compile:
-            print('需要先加载游戏')
-            return False
-
         self.render_assembly_buttons((
             AssemblyItem(
                 'item_keep', '物品使用不消失', '8B 45 D0 39 00 E8 24 00 00 00',
-                    BaseItem.Cast.mono_compile + 0x300, Delta(0x200), 'C6 47 28 00',
-                    find_base=False, replace_offset=5, replace_len=5),
+                None, Delta(0x200), 'C6 47 28 00',
+                find_base=False, replace_offset=5, replace_len=5),
         ))
 
     def _roleData(self):

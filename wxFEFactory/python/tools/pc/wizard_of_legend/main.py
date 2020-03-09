@@ -2,7 +2,6 @@ from lib import ui
 from lib.hack.forms import (
     Group, StaticGroup, ModelInput, ListFooterButtons
 )
-from lib.hack.utils import Descriptor
 from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, MemRead, ORIGIN
 from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, Delta
@@ -17,6 +16,7 @@ class Main(MonoHacktool):
     def __init__(self):
         super().__init__()
         self.GameController = None
+        self.Item = None
 
     def onattach(self):
         super().onattach()
@@ -37,6 +37,15 @@ class Main(MonoHacktool):
 
         self.GameController = models.GameController(0, self)
         self.Item = models.Item(0, self)
+
+        self.assembly_address_dict = {
+            'no_cooldown': models.Cooldown.get_ChargesMissing.mono_compile,
+            'no_cooldown2': models.Cooldown.get_IsCharging.mono_compile,
+            'basic_continue': models.MeleeAttackState.HandleSelfTransition.mono_compile,
+            'double_plat': models.PlatWallet.Deposit.mono_compile,
+            'double_gold': models.GoldWallet.Deposit.mono_compile,
+            'skill_empowered': models.SkillState.get_IsEmpowered.mono_compile,
+        }
 
     def render_main(self):
         with Group("player", "全局", None):
@@ -90,40 +99,29 @@ class Main(MonoHacktool):
             ui.Button(label="给予高亮", class_="button", onclick=self.give_selected_items)
 
     def render_assembly_buttons_own(self):
-        Cooldown = models.Cooldown
-        if not Cooldown.get_ChargesMissing.mono_compile:
-            print('需要先加载游戏')
-            return False
-
         self.render_assembly_buttons((
             AssemblyItems(
                 '无冷却',
                 AssemblyItem(
-                    'no_cooldown', None, b'\x48***\x2B\xC1',
-                    Cooldown.get_ChargesMissing.mono_compile, Delta(0x2d), b'',
+                    'no_cooldown', None, b'\x48***\x2B\xC1', None, Delta(0x2d), b'',
                     AssemblyGroup(b'\x89\x46', MemRead(offset=3, size=1), ORIGIN),
                     inserted=True, find_base=False, fuzzy=True),
                 AssemblyItem(
-                    'no_cooldown2', None, b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
-                    Cooldown.get_IsCharging.mono_compile, Delta(0x58),
+                    'no_cooldown2', None, b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0', None, Delta(0x58),
                     b'\x90\x90\x30', find_base=False, replace_len=3)),
             AssemblyItem(
-                'basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0',
-                models.MeleeAttackState.HandleSelfTransition.mono_compile, Delta(0xf0),
+                'basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0', None, Delta(0xf0),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
             AssemblyItem(
-                'double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00',
-                models.PlatWallet.Deposit.mono_compile, Delta(0x5d), b'',
+                'double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00', None, Delta(0x5d), b'',
                 AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
                 inserted=True, find_base=False),
             AssemblyItem(
-                'double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00',
-                models.GoldWallet.Deposit.mono_compile, Delta(0x5d), b'',
+                'double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00', None, Delta(0x5d), b'',
                 AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
                 inserted=True, find_base=False),
             AssemblyItem(
-                'skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00',
-                models.SkillState.get_IsEmpowered.mono_compile, Delta(0x2b),
+                'skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00', None, Delta(0x2b),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
         ))
 
