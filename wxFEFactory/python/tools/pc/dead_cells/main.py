@@ -101,13 +101,13 @@ class Main(AssemblyHacktool):
             AssemblyItem('curse_clear', '诅咒消除', '89 88 C4 02 00 00 8B 90 C4 02 00 00',
                          find_start, find_end, b'', '31 C0 89 88 C4 02 00 00',
                          replace_len=6, inserted=True, help='至少击杀一名敌人(与诅咒快消互斥)'),
-            AssemblyItem('player_ptr', '玩家地址', '8B 90 E8 00 00 00 89 55 F4 F2',
+            AssemblyItem('player_ptr', '玩家地址', '8B 88 E8 00 00 00 89 4D F4 F2',
                          find_start, find_end, b'',
                          AssemblyGroup(
                              'A3',
                              Variable('player_ptr'),
                              Cmp('quick_health', 1),
-                             '0F 85 0C 00 00 00 8B 88 EC 00 00 00 89 88 E8 00 00 00 8B 90 E8 00 00 00'
+                             '0F 85 0C 00 00 00 8B 88 EC 00 00 00 89 88 E8 00 00 00 8B 88 E8 00 00 00'
                          ),
                          args=('player_ptr', 'quick_health'), replace_len=6, inserted=True),
             AssemblySwitch('quick_health', '生命快速恢复'),
