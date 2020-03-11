@@ -20,22 +20,18 @@ class Main(AssemblyHacktool):
     def __init__(self):
         super().__init__()
         self.handler = MemHandler()
-        # self.player = models.Player(self.variable_getter('player_ptr'), self.handler)
-        self.hlhandle = models.HlHandle(0, self.handler)
+        self._global = models.Global(0, self.handler)
 
     def onattach(self):
         super().onattach()
-        self._libhl = self.handler.get_module('libhl.dll')
-        self._hl_base = self.handler.ptrs_read(self._libhl + 0x00049184, (0x560, 4))
-        self.hlhandle.addr = self._hl_base
+        self._global.addr = self.handler.base_addr
 
     def render_main(self):
-        hlhandle = self.hlhandle
         with Group(None, "全局"):
             self.render_global()
-        self.lazy_group(Group("game", "游戏数据", (lambda: hlhandle.game, models.Game)), self.render_game)
-        self.lazy_group(Group("progress", "统计", (lambda: hlhandle.progress, models.Progress)), self.render_progress)
-        self.lazy_group(Group("player", "玩家", (lambda: hlhandle.player, models.Player)), self.render_player)
+        self.lazy_group(Group("game", "游戏数据", (lambda: self.manager.game, models.Game)), self.render_game)
+        self.lazy_group(Group("progress", "统计", (lambda: self.manager.progress, models.Progress)), self.render_progress)
+        self.lazy_group(Group("player", "玩家", (lambda: self.manager.player, models.Player)), self.render_player)
         self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
@@ -60,17 +56,16 @@ class Main(AssemblyHacktool):
             ModelInput(name)
 
     def render_weapon(self):
-        hlhandle = self.hlhandle
-        primary_weapon = (lambda: hlhandle.player.primary_weapon, models.Weapon)
-        secondary_weapon = (lambda: hlhandle.player.secondary_weapon, models.Weapon)
+        primary_weapon = (lambda: self.manager.player.primary_weapon, models.Weapon)
+        secondary_weapon = (lambda: self.manager.player.secondary_weapon, models.Weapon)
         for label, instance in (('主武器', primary_weapon), ('副武器', secondary_weapon)):
             Title(label)
             ModelAddrInput(instance=instance)
             for name in models.Weapon.field_names:
                 ModelInput(name, instance=instance)
 
-        left_skill = (lambda: hlhandle.player.left_skill, models.Skill)
-        right_skill = (lambda: hlhandle.player.right_skill, models.Skill)
+        left_skill = (lambda: self.manager.player.left_skill, models.Skill)
+        right_skill = (lambda: self.manager.player.right_skill, models.Skill)
         for label, instance in (('左技能', left_skill), ('右技能', right_skill)):
             Title(label)
             ModelAddrInput(instance=instance)
@@ -222,17 +217,26 @@ class Main(AssemblyHacktool):
             (VK.MOD_ALT, VK.DOWN, self.move_down),
         )
 
+    @property
+    def manager(self):
+        return self._global.manager
+
     def move_left(self):
-        self.hlhandle.player.coord_x -= 5
+        """左移"""
+        self.manager.player.coord_x -= 5
 
     def move_right(self):
-        self.hlhandle.player.coord_x += 5
+        """右移"""
+        self.manager.player.coord_x += 5
 
     def move_up(self):
-        self.hlhandle.player.coord_y -= 5
+        """上移"""
+        self.manager.player.coord_y -= 5
 
     def move_down(self):
-        self.hlhandle.player.coord_y += 5
+        """下移"""
+        self.manager.player.coord_y += 5
 
     def quick_health(self):
+        """快速回复"""
         self.toggle_assembly_button('quick_health')

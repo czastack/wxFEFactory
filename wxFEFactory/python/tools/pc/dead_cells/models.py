@@ -42,7 +42,7 @@ class Progress(Model):
 
 class Game(Model):
     """运行时游戏数据"""
-    time = Field(0x28, type=float, size=8, label="时 间")
+    time = Field(0x28, type=float, size=8, label="时间")
     gold = Field(0x34, label="金币")
     nohit_kill = Field(0x50, label="无伤击杀数")
     nohit_kill_max = Field(0x54, label="最大无伤击杀数")
@@ -101,8 +101,12 @@ class Player(Model):
     )
 
 
-class HlHandle(Model):
-    mgr_addr = Field(0x18)
-    player = ModelPtrField((0x18, 0x64), Player)
-    progress = ModelPtrField((0x18, 0x58, 0x28), Progress)
-    game = ModelPtrField((0x18, 0x5C), Game)
+class Manager(Model):
+    player = ModelPtrField(0x64, Player)
+    progress = ModelPtrField((0x58, 0x28), Progress)
+    game = ModelPtrField(0x5C, Game)
+
+
+class Global(Model):
+    # 1.7
+    manager = ModelPtrField((0x0050E898, 0x18), Manager)
