@@ -21,6 +21,7 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
+        self.player_ins = models.Player(0, self.handler)
 
     def onattach(self):
         super().onattach()
@@ -31,7 +32,7 @@ class Main(AssemblyHacktool):
             self.render_global()
         self.lazy_group(Group("game", "游戏数据", (lambda: self.manager.game, models.Game)), self.render_game)
         self.lazy_group(Group("progress", "统计", (lambda: self.manager.progress, models.Progress)), self.render_progress)
-        self.lazy_group(Group("player", "玩家", (lambda: self.manager.player, models.Player)), self.render_player)
+        self.lazy_group(Group("player", "玩家", (lambda: self.player, models.Player)), self.render_player)
         self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
@@ -56,16 +57,16 @@ class Main(AssemblyHacktool):
             ModelInput(name)
 
     def render_weapon(self):
-        primary_weapon = (lambda: self.manager.player.primary_weapon, models.Weapon)
-        secondary_weapon = (lambda: self.manager.player.secondary_weapon, models.Weapon)
+        primary_weapon = (lambda: self.player.primary_weapon, models.Weapon)
+        secondary_weapon = (lambda: self.player.secondary_weapon, models.Weapon)
         for label, instance in (('主武器', primary_weapon), ('副武器', secondary_weapon)):
             Title(label)
             ModelAddrInput(instance=instance)
             for name in models.Weapon.field_names:
                 ModelInput(name, instance=instance)
 
-        left_skill = (lambda: self.manager.player.left_skill, models.Skill)
-        right_skill = (lambda: self.manager.player.right_skill, models.Skill)
+        left_skill = (lambda: self.player.left_skill, models.Skill)
+        right_skill = (lambda: self.player.right_skill, models.Skill)
         for label, instance in (('左技能', left_skill), ('右技能', right_skill)):
             Title(label)
             ModelAddrInput(instance=instance)
@@ -221,21 +222,29 @@ class Main(AssemblyHacktool):
     def manager(self):
         return self._global.manager
 
+    @property
+    def player(self):
+        player_ptr = self.get_variable_value('player_ptr')
+        if player_ptr:
+            self.player_ins.addr = player_ptr
+            return self.player_ins
+        return self.manager.player
+
     def move_left(self):
         """左移"""
-        self.manager.player.coord_x -= 5
+        self.player.coord_x -= 5
 
     def move_right(self):
         """右移"""
-        self.manager.player.coord_x += 5
+        self.player.coord_x += 5
 
     def move_up(self):
         """上移"""
-        self.manager.player.coord_y -= 5
+        self.player.coord_y -= 5
 
     def move_down(self):
         """下移"""
-        self.manager.player.coord_y += 5
+        self.player.coord_y += 5
 
     def quick_health(self):
         """快速回复"""

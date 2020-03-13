@@ -107,6 +107,8 @@ class Model:
                 result = self.handle_complex_attr(field, func)
                 if result is not COMLEX_ATTR_NONE:
                     return result
+                else:
+                    raise ValueError('{} has no such field {}'.format(self, field))
             else:
                 field = temp
 

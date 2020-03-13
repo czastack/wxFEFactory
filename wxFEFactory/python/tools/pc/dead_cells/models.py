@@ -109,4 +109,5 @@ class Manager(Model):
 
 class Global(Model):
     # 1.7
+    # TODO
     manager = ModelPtrField((0x0050E898, 0x18), Manager)
