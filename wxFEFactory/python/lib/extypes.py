@@ -105,11 +105,12 @@ def weakmethod(method):
 
 
 class classproperty:
-    def __init__(self, method):
-        self.method = method
+    """类属性"""
+    def __init__(self, fget):
+        self.fget = fget
 
     def __get__(self, instance, owner):
-        return self.method(owner)
+        return self.fget(owner)
 
 
 class DataClassMeta(type):

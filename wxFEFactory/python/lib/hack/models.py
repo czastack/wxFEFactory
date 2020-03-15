@@ -419,6 +419,11 @@ class WordField(Field):
     __init__ = partialmethod(Field.__init__, size=2)
 
 
+class DWordField(Field):
+    """双字节字段"""
+    __init__ = partialmethod(Field.__init__, size=4)
+
+
 class QWordField(Field):
     """四字节字段"""
     __init__ = partialmethod(Field.__init__, size=8)
@@ -435,7 +440,6 @@ class BytesField(Field):
         super().__init__(offset, bytes, size, label)
 
 
-DWordField = Field
 U8Field = ByteField
 U16Field = WordField
 U32Field = DWordField

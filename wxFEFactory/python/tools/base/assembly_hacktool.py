@@ -1,7 +1,7 @@
 import types
 from functools import partial
 from typing import Union, List
-from lib.extypes import new_dataclass, DataClass
+from lib.extypes import list_tuple, DataClass
 from lib.hack import utils
 from lib import ui
 from .hacktool import BaseHackTool
@@ -136,7 +136,7 @@ class AssemblyHacktool(BaseHackTool):
                 if not self.assembly_address_dict and self.assembly_address_sources:
                     for _, address_dict in self.assembly_address_sources.items():
                         temp = address_dict[item.key]
-                        if isinstance(temp, (list, tuple)):
+                        if isinstance(temp, list_tuple):
                             find_start, find_end = temp
                         else:
                             find_start = temp
@@ -145,7 +145,7 @@ class AssemblyHacktool(BaseHackTool):
                             break
                 if self.assembly_address_dict:
                     temp = self.assembly_address_dict[item.key]
-                    if isinstance(temp, (list, tuple)):
+                    if isinstance(temp, list_tuple):
                         find_start, find_end = temp
                     else:
                         find_start = temp
