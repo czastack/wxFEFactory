@@ -1,7 +1,9 @@
 import abc
 from lib import ui
 from lib.ui.components import Pagination
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
+from lib.hack.forms import (
+    Group, StaticGroup, ModelInput, ModelAddrInput, ModelSelect, ModelCoordWidget, ModelFlagWidget, Choice
+)
 from lib.win32.keys import VK
 from ..base import BaseGbaHack
 
@@ -51,7 +53,7 @@ class GSHack(BaseGbaHack):
 
     def render_person(self):
         Choice("角色", self.datasets.PERSONS, self.on_person_change)
-        ModelInput("addr_hex", "地址", readonly=True)
+        ModelAddrInput()
         ModelInput("level", "等级")
         ModelInput("exp", "经验")
         ModelInput("hp", "HP")

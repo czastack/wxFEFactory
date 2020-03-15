@@ -1,7 +1,7 @@
 from functools import partial
 from lib import ui
 from lib.hack.forms import (
-    Group, StaticGroup, ModelInput, ModelAddrInput, ProxyInput, Title
+    Group, StaticGroup, ModelInput, ModelAddrInput, ProxyInput, Title, ChoiceWidget
 )
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
@@ -9,7 +9,7 @@ from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, Cmp, ORIG
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
 )
-from . import models
+from . import models, datasets
 
 
 class Main(AssemblyHacktool):
@@ -22,6 +22,8 @@ class Main(AssemblyHacktool):
         self.handler = MemHandler()
         self.manager_ins = models.Manager(0, self.handler)
         self.player_ins = models.Player(0, self.handler)
+        self.inventory_item = models.InventoryItem(0, self.handler)
+        self.inventory_items = None
 
     def onattach(self):
         super().onattach()
@@ -32,7 +34,8 @@ class Main(AssemblyHacktool):
         self.lazy_group(Group("runstats", "游戏数据", (lambda: self.manager.runstats, models.RunStats)), self.render_runstats)
         self.lazy_group(Group("progress", "统计", (lambda: self.manager.progress, models.Progress)), self.render_progress)
         self.lazy_group(Group("player", "玩家", (lambda: self.player, models.Player)), self.render_player)
-        self.lazy_group(Group("weapon", "武器", None), self.render_weapon)
+        self.lazy_group(Group("weapon", "武器/技能", None), self.render_weapon)
+        self.lazy_group(Group("inventory", "装备", self.inventory_item), self.render_inventory)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
@@ -71,6 +74,14 @@ class Main(AssemblyHacktool):
             ModelAddrInput(instance=instance)
             for name in models.Skill.field_names:
                 ModelInput(name, instance=instance)
+
+    def render_inventory(self):
+        self.inventory_view = ChoiceWidget("装备", (), self.on_inventory_change)
+        with self.inventory_view.container:
+            ui.Button(label="读取列表", class_="button", onclick=self.read_inventory)
+        ModelAddrInput()
+        for name in models.InventoryItem.field_names:
+            ModelInput(name)
 
     def render_assembly_buttons_own(self):
         find_start = 0x0C000000
@@ -240,6 +251,25 @@ class Main(AssemblyHacktool):
             self.player_ins.addr = player_ptr
             return self.player_ins
         return self.manager.player
+
+    def on_inventory_change(self, lb):
+        """装备切换"""
+        if self.inventory_items:
+            self.inventory_item.addr = self.inventory_items[lb.index].addr
+
+    def read_inventory(self, _):
+        """读取装备列表"""
+        inventory = self.player.inventory
+        choices = []
+        inventory_items = []
+        for i in range(inventory.length):
+            item = inventory[i]
+            if not (item.addr and (0 < item.level < 16)):
+                break
+            choices.append('{:02d}: {}'.format(i + 1, datasets.LEVEL_LIST[item.level - 1]))
+            inventory_items.append(item)
+        self.inventory_view.Set(choices)
+        self.inventory_items = inventory_items
 
     def move_left(self):
         """左移"""

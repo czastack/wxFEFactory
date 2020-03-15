@@ -18,7 +18,6 @@ class ExTool(BaseGbaHack):
             ModelInput("enemy_count", "敌方人数")
 
         with Group("player", "角色", person, cols=4) as group:
-            # ModelInput("addr_hex", "地址", readonly=True)
             Choice("角色", ("国夫", "阿力"), self.on_person_change)
             ModelInput("punch", "拳")
             ModelInput("foot", "脚")

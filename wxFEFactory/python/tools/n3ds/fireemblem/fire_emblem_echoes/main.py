@@ -2,7 +2,9 @@ import abc
 from functools import partial
 from lib import ui
 from lib.ui.components import Pagination
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice, ChoiceWidget
+from lib.hack.forms import (
+    Group, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect, ModelFlagWidget, Choice, ChoiceWidget
+)
 from lib.win32.keys import VK
 from tools.n3ds.base import BaseN3dsHack
 from . import models, datasets
@@ -70,10 +72,10 @@ class Main(BaseN3dsHack):
             ModelInput("system.renown", "名声值")
 
     def render_person(self):
-        self.chars_view = ChoiceWidget("角色", (), self.on_person_change)
+        self.chars_view = ChoiceWidget("角色", (), self.on_char_change)
         with self.chars_view.container:
             ui.Button(label="读取列表", class_="button", onclick=self.read_chars)
-        ModelInput("addr_hex", "地址", readonly=True)
+        ModelAddrInput()
         ModelInput("index")
         ModelInput("level")
         ModelInput("exp")
@@ -136,7 +138,7 @@ class Main(BaseN3dsHack):
     def _global(self):
         return self._global_ins
 
-    def on_person_change(self, lb):
+    def on_char_change(self, lb):
         """角色切换"""
         self.person_index = lb.index
 
@@ -148,7 +150,7 @@ class Main(BaseN3dsHack):
             charname = chars[i].charname
             if not charname:
                 break
-            choices.append('%02d-%s' % (i + 1, charname))
+            choices.append('{:02d}-{}'.format(i + 1, charname))
         self.chars_view.Set(choices)
 
     # def read_chars(self, _):

@@ -1,7 +1,7 @@
 import abc
 from lib import ui
 from lib.ui.components import Pagination
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelFlagWidget, Choice
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect, ModelFlagWidget, Choice
 from lib.win32.keys import VK
 from ..base import BaseNdsHack
 
@@ -69,7 +69,7 @@ class FeHack(BaseNdsHack):
 
     def render_person(self):
         datasets = self.datasets
-        ModelInput("addr_hex", "地址", readonly=True)
+        ModelAddrInput()
         ModelInput("no", "序号")
         ModelSelect("prof", "职业", choices=datasets.PROFESSIONS, values=datasets.PROFESSION_VALUES)
         ModelInput("level", "等级")
@@ -106,7 +106,7 @@ class FeHack(BaseNdsHack):
         with ui.Horizontal(class_="fill"):
             self.copy_iteminfo_view = ui.Choice(class_="fill", choices=datasets.ITEMS)
             ui.Button("复制", onclick=self.copy_iteminfo)
-        ModelInput("addr_hex", "地址", readonly=True)
+        ModelAddrInput()
         ModelInput("name_ptr", "名称指针", hex=True)
         ModelInput("desc_ptr", "介绍文本", hex=True)
         ModelInput("icon", "图标序号")

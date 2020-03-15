@@ -60,10 +60,15 @@ class RunStats(Model):
     survival_upgrades = Field((0x18, 0xC), label="生存升级")
 
 
-class Weapon(Model):
-    """武器"""
+
+class InventoryItem(Model):
+    """物品"""
     level = Field(0xC, label="等级")
     reforged_times = Field((0x10, 4), label="锻造次数")  # (level - 1 = 升级到S级)
+
+
+class Weapon(InventoryItem):
+    """武器"""
     ammo = Field(0x18, label="弹药")
 
 
@@ -99,7 +104,7 @@ class Player(Model):
     # Dashing 62
     timer = ArrayField((0x140, 8), 100, Field(0, float, 8))
     # 武器槽
-    weapon_slots = ArrayField((0x300, 0x4, 0x330, 0x4, 0x8, 0x10), 50, ModelPtrField(0, Weapon))
+    inventory = ArrayField((0x300, 0x4, 0x334, 0x4, 0x8, 0x10), 50, ModelPtrField(0, InventoryItem))
     primary_weapon = ModelPtrField((0x300, 8), Weapon)
     secondary_weapon = ModelPtrField((0x304, 8), Weapon)
     left_skill = ModelPtrField((0x320, 8, 0x10), Skill)

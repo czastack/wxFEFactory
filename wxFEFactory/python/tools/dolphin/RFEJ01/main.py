@@ -1,5 +1,5 @@
 from functools import partial
-from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
+from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect
 from lib.win32.keys import VK
 from lib import ui
 from ..base import BaseDolphinHack
@@ -23,7 +23,7 @@ class Main(BaseDolphinHack):
             ModelInput("exp3", "据点3分配经验值")
 
         with Group("player", "角色", person, cols=4):
-            ModelInput("addr_hex", "地址", readonly=True)
+            ModelAddrInput()
             ModelInput("no", "角色编号", readonly=True)
             ModelSelect("prof", "职业", choices=datasets.PROFESSIONS,
                 values=tuple(0x80989A70 + i * 0x11C for i in range(len(datasets.PROFESSIONS))))
