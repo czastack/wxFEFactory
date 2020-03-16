@@ -135,9 +135,9 @@ class Main(AssemblyHacktool):
                          find_start, find_end, '0F 57 ED 90', replace_offset=-9, replace_len=4),
             AssemblyItem('no_injured', '敌人无伤害', '2B 85 6C FF FF FF 89 85 70 FF FF FF 8B 4D 08 * * * * * * 8B',
                          find_start, find_end, b'', AssemblyGroup(
-                             '83 BD 6C FF FF FF 00 7E 1F 52 8B 55 08 3B 15', Variable(
+                             '83 BD 6C FF FF FF 00 7E 17 52 8B 55 08 3B 15', Variable(
                                  'player_ptr'),
-                             '75 0E C7 85 6C FF FF FF 00 00 00 00 5A 2B 85 6C FF FF FF'),
+                             '75 0A C7 85 6C FF FF FF 00 00 00 00 5A 2B 85 6C FF FF FF'),
                          replace_len=6, inserted=True, depends='player_ptr'),
             AssemblyItem('one_kill', '一击必杀', '89 81 E8 00 00 00 8B 55 08',
                          find_start, find_end, b'', AssemblyGroup(

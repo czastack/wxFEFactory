@@ -35,6 +35,9 @@ class AssemblyHacktool(BaseHackTool):
         self.reset()
         self.is32process = self.handler.is32process
 
+    def onattached(self):
+        super().onattached()
+
         for key, button in self.assembly_buttons.items():
             if button.checked:
                 self.toggle_assembly_button(key, True)

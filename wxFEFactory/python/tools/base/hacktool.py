@@ -74,6 +74,7 @@ class BaseHackTool(NestedTool):
                 if hotkeys:
                     self.win.register_hotkeys(hotkeys)
             self.onattach()
+            self.onattached()
             return True
         else:
             self.attach_status_view.label = '没有检测到 ' + (self.WINDOW_NAME or self.CLASS_NAME)
@@ -165,6 +166,9 @@ class BaseHackTool(NestedTool):
     def onattach(self):
         if self.key_hook:
             self.win.setHook(0 if self.key_hook_ll else self.handler.thread_id)
+
+    def onattached(self):
+        pass
 
     def ondetach(self):
         pass
@@ -290,6 +294,7 @@ class ProxyHackTool(BaseHackTool):
                     if hotkeys:
                         self.win.register_hotkeys(hotkeys)
                 self.onattach()
+                self.onattached()
                 break
         else:
             self.attach_status_view.label = '绑定失败, 未找到支持的进程'
