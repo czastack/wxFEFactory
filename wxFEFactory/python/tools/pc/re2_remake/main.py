@@ -141,57 +141,35 @@ class Main(NativeHacktool):
             AssemblyItem('no_recoil', '稳定射击', 'F3 0F 10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', None, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True, replace_len=5),
-            # cmp [player_addr], 0
-            # je short cancel
-            # push rax
-            # push rcx
-            # push rdx
-            # mov rax, [player_addr]
-            # mov rax, [rax+F8] ; 变成Character地址
-            # mov rcx, [rax+108]
-            # mov rcx, [rcx+54]
-            # mov rdx, [rax+130]
-            # cmp rcx, 10
-            # je short is_shoot
-            # cmp rcx, 20
-            # je short is_shoot
-            # mov rcx, [normal_speed]
-            # jmp short not_shoot
-            # is_shoot:
-            # mov rcx, [rapid_fire_speed]
-            # not_shoot:
-            # mov [rdx+50], rcx
-            # pop rdx
-            # pop rcx
-            # pop rax
-            # cancel:
-            AssemblyItem('rapid_fire', '快速射击', '48 8B 5C 24 30 0F 94 C0 48 8B 74 24 38', None, delta,
-                b'', AssemblyGroup(
-                    ORIGIN,
-                    Cmp('player_addr', 0),
-                    '74 49 50 51 52 48 A1', Variable('player_addr'),
-                    '48 8B 80 F8 00 00 00 48 8B 88 08 01 00 00 48 8B 49 54 48 8B 90 30 01 00 00'
-                    '48 83 F9 10 74 0F 48 83 F9 20 74 09 48 8B 0D',
-                    Offset('normal_speed'),
-                    'EB 07 48 8B 0D',
-                    Offset('rapid_fire_speed'),
-                    '48 89 4A 50 5A 59 58',
-                ),
-                inserted=True,
-                replace_len=5,
-                args=(
-                    VariableType('normal_speed', type=float, value=1.0),
-                    VariableType('rapid_fire_speed', type=float, value=10.0),
-                ),
-                depends=('inf_health_base_1')),
-            AssemblyItems('无限生命&一击必杀依赖',
+            AssemblyItems('玩家地址依赖',
                 AssemblyItem('inf_health_base_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
-                    AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 1D 50 8F 05',
+                    AssemblyGroup(
+                        '48 8B 87 30 02 00 00 48 85 C0 74 1D 50 8F 05',
                         Offset('player_addr'),
                         Cmp('b_inf_health', 1),
-                        '75 0D 53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B'),
-                    inserted=True, replace_len=7,
-                    args=(VariableType('player_addr', size=8), 'b_inf_health', 'b_one_hit_kill')),
+                        '75 0D 53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B',
+                        # 快速射击
+                        Cmp('b_rapid_fire', 1),
+                        '75 52',
+                        Cmp('player_addr', 0),
+                        '74 49 50 51 52 48 A1', Variable('player_addr'),
+                        '48 8B 80 F8 00 00 00 48 8B 88 08 01 00 00 48 8B 49 54 48 8B 90 30 01 00 00'
+                        '48 83 F9 10 74 0F 48 83 F9 20 74 09 48 8B 0D',
+                        Offset('normal_speed'),
+                        'EB 07 48 8B 0D',
+                        Offset('rapid_fire_speed'),
+                        '48 89 4A 50 5A 59 58',
+                    ),
+                    inserted=True,
+                    replace_len=7,
+                    args=(
+                        'b_inf_health',
+                        'b_one_hit_kill',
+                        'b_rapid_fire',
+                        VariableType('player_addr', size=8),
+                        VariableType('normal_speed', type=float, value=1.0),
+                        VariableType('rapid_fire_speed', type=float, value=10.0),
+                    )),
                 AssemblyItem('inf_health_base_2', None, '8B 4A 58 41 8B C0 99 33 C2 2B C2 2B C8 33 C0',
                     None, delta, b'',
                     AssemblyGroup(
@@ -205,6 +183,7 @@ class Main(NativeHacktool):
             ),
             AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base_1')),
             AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
+            AssemblySwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1')),
             AssemblyItems('暴君一击倒地且无法起身',
                 AssemblyItem('baojun_down_1', None, '39 71 58 0F 9F *', None, delta,
                     b'', '83 79 58 01 7E 07 C7 41 58 01000000 39 71 58 0F 9F C0',
