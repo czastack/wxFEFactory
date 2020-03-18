@@ -9,11 +9,11 @@ class Character(Model):
     """角色"""
     data = Field(0x54, label="数据")
     health = Field((0x230, 0x58), label="HP")
-    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=0, disable=1)
     # health_max = WordField(0x1366, label="最大HP")
-    speed = FloatField((0x130, 0x50), label="速度")
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))
+    speed = FloatField((0x130, 0x50), label="速度")
+    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=0, disable=1)
 
 
 class CharacterStruct(Model):
@@ -95,3 +95,9 @@ class CodexGlobal(Model):
     inventory = ModelPtrField((0x070B0840, 0x50), Inventory)
     camera_dist = Field((0x07081988, 0x98, 0x160, 0x34), label="摄像机参数")
     save_count = Field((0x07081A90, 0x198, 0x24), label="保存次数")
+
+
+SPECIFIC_GLOBALS = {
+    'steam': Global,
+    'codex': CodexGlobal,
+}

@@ -16,11 +16,14 @@ ADDRESS_SOURCES = {
     'steam': {
         'item_keep': 0x004FF000,
         'inf_ammo': 0x00F3D000,
+        'inf_clip1': 0x004FD000,
+        'inf_clip2': 0x004FB000,
         'inf_modai': 0x004FF000,
         'inf_knife': 0x004FD000,
         'min_save_count': 0x01C1E000,
         'quick_aim': 0x00EC4000,
         'no_recoil': 0x007CE000,
+        'rapid_fire': 0x004FD000,
         'inf_health_base_1': 0x0042A000,
         'inf_health_base_2': 0x00F87000,
         'baojun_down_1': 0x00F4A000,
@@ -34,11 +37,14 @@ ADDRESS_SOURCES = {
     'codex': {
         'item_keep': 0x00E8A800,
         'inf_ammo': 0x00401000,
+        'inf_clip1': 0x00E88000,
+        'inf_clip2': 0x00E86000,
         'inf_modai': 0x00E8A800,
         'inf_knife': 0x00E88000,
         'min_save_count': 0x00BA0000,
         'quick_aim': 0x01705000,
         'no_recoil': 0x01125000,
+        'rapid_fire': 0x00E88000,
         'inf_health_base_1': 0x004CD400,
         'inf_health_base_2': 0x00C58600,
         'baojun_down_1': 0x0178F000,
@@ -60,15 +66,17 @@ class Main(NativeHacktool):
 
     def __init__(self):
         super().__init__()
+        self.version = 'steam'
         self.handler = MemHandler()
-        self._global = models.Global(0, self.handler)
-        self.char_index = self._global.char_index = 0
+        self._global_ins = models.Global(0, self.handler)
+        self.char_index = self._global_ins.char_index = 0
         self.char_choice = None
 
     def render_main(self):
         person = (self._person, models.Character)
 
-        with Group("player", "全局", self._global):
+        with Group("player", "全局", (self._global, models.Global)):
+            self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
             ModelInput("inventory.capcity", label="物品容量")
             ModelInput("save_count")
             ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
@@ -76,12 +84,14 @@ class Main(NativeHacktool):
         with Group("player", "角色", person):
             self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_person_change)
             ModelInput("health")
-            ModelInput("speed")
             ModelInput("action")
             # ModelInput("weapon_state")
+            ModelInput("speed")
+            ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
+            ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", self._global, serializable=False, cols=4),
+        self.lazy_group(Group("person_items", "角色物品", (self._global, models.Global), serializable=False, cols=4),
             self.render_person_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
@@ -99,10 +109,21 @@ class Main(NativeHacktool):
             AssemblyItem('item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5', None, delta,
                 b'\x90\x90', replace_len=2),
 
-            AssemblyItem('inf_ammo', '弹药锁定', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
+            AssemblyItem('inf_ammo', '备弹999', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
                 None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 07 C7 41 20 E7030000',
                 inserted=True, replace_len=7),
+
+            AssemblyItems('弹夹99',
+                AssemblyItem('inf_clip1', None, '48 8B 48 10 48 85 C9 74 03 8B 59 20 85 DB',
+                    None, delta, b'',
+                    '48 8B 48 10 48 85 C9 74 13 83 79 1C 00 74 0D 83 79 14 FF 74 07 C7 41 20 63 00 00 00 48 85 C9',
+                    inserted=True, replace_len=7),
+                AssemblyItem('inf_clip2', None, '48 8B 46 10 48 85 C0 75 1E 45 33 C0 48 8B CF 41 8D 50 38 48',
+                    None, delta, b'',
+                    '48 8B 46 10 48 85 C0 74 14 83 78 1C 00 74 0E 83 78 14 FF 74 08 BB 63 00 00 00 89 58 20 48 85 C0',
+                    inserted=True, replace_len=7),
+            ),
 
             AssemblyItem('inf_modai', '保存时墨带无限', '48 8B 42 10 48 85 C0 74 03 8B 58 20 2B DF', None, delta,
                 b'', '48 8B 42 10 48 85 C0 74 07 C7 40 20 0A000000 48 85 C0 74 03 8B 58 20 2B DF',
@@ -119,7 +140,50 @@ class Main(NativeHacktool):
                 inserted=True, replace_len=8),
             AssemblyItem('no_recoil', '稳定射击', 'F3 0F 10 48 20 F2 0F 58 D6 F3 0F 11 4D 6F', None, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
-                inserted=True),
+                inserted=True, replace_len=5),
+            # cmp [player_addr], 0
+            # je short cancel
+            # push rax
+            # push rcx
+            # push rdx
+            # mov rax, [player_addr]
+            # mov rax, [rax+F8] ; 变成Character地址
+            # mov rcx, [rax+108]
+            # mov rcx, [rcx+54]
+            # mov rdx, [rax+130]
+            # cmp rcx, 10
+            # je short is_shoot
+            # cmp rcx, 20
+            # je short is_shoot
+            # mov rcx, [normal_speed]
+            # jmp short not_shoot
+            # is_shoot:
+            # mov rcx, [rapid_fire_speed]
+            # not_shoot:
+            # mov [rdx+50], rcx
+            # pop rdx
+            # pop rcx
+            # pop rax
+            # cancel:
+            AssemblyItem('rapid_fire', '快速射击', '48 8B 5C 24 30 0F 94 C0 48 8B 74 24 38', None, delta,
+                b'', AssemblyGroup(
+                    ORIGIN,
+                    Cmp('player_addr', 0),
+                    '74 49 50 51 52 48 A1', Variable('player_addr'),
+                    '48 8B 80 F8 00 00 00 48 8B 88 08 01 00 00 48 8B 49 54 48 8B 90 30 01 00 00'
+                    '48 83 F9 10 74 0F 48 83 F9 20 74 09 48 8B 0D',
+                    Offset('normal_speed'),
+                    'EB 07 48 8B 0D',
+                    Offset('rapid_fire_speed'),
+                    '48 89 4A 50 5A 59 58',
+                ),
+                inserted=True,
+                replace_len=5,
+                args=(
+                    VariableType('normal_speed', type=float, value=1.0),
+                    VariableType('rapid_fire_speed', type=float, value=10.0),
+                ),
+                depends=('inf_health_base_1')),
             AssemblyItems('无限生命&一击必杀依赖',
                 AssemblyItem('inf_health_base_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
                     AssemblyGroup('48 8B 87 30 02 00 00 48 85 C0 74 1D 50 8F 05',
@@ -207,12 +271,20 @@ class Main(NativeHacktool):
 
     def onattach(self):
         super().onattach()
-        self._global.addr = self.handler.base_addr
+        self._global_ins.addr = self.handler.base_addr
+
+    def on_version_change(self, lb):
+        self.version = lb.text
+        self._global_ins = models.SPECIFIC_GLOBALS[self.version](self._global_ins.addr, self.handler)
+        self._global_ins.char_index = self.char_index
+
+    def _global(self):
+        return self._global_ins
 
     def _person(self):
         if self.handler.active:
-            return self._global.character_struct.chars[0]
-            # chars = self._global.character_struct.chars
+            return self._global_ins.character_struct.chars[0]
+            # chars = self._global_ins.character_struct.chars
             # person = chars[self.char_index]
             # if person.addr == 0:
             #     for i in range(len(datasets.CHARACTERS)):
@@ -224,12 +296,12 @@ class Main(NativeHacktool):
 
     def _person_config(self):
         if self.handler.active:
-            return self._global.character_config.chars[self.char_index]
+            return self._global_ins.character_config.chars[self.char_index]
 
     person = property(_person)
 
     def on_person_change(self, lb):
-        self.char_index = self._global.char_index = lb.index
+        self.char_index = self._global_ins.char_index = lb.index
 
     def ingame_item_copy(self, _):
         # pyapi.set_clipboard(self.ingame_item.hex())
@@ -243,19 +315,19 @@ class Main(NativeHacktool):
         self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
 
     def pull_through_all(self):
-        character_struct = self._global.character_struct
+        character_struct = self._global_ins.character_struct
         for i in range(character_struct.chars_count):
             character_struct.chars[i].set_with('health', 'health_max')
 
     def set_ammo_full(self):
         # person = self.person
         # person.items[person.cur_item].set_with('quantity', 'max_quantity')
-        self._global.inventory.items[0].info.count = 99
+        self._global_ins.inventory.items[0].info.count = 99
 
     def set_ammo_up(self):
         # person = self.person
         # person.items[person.cur_item].quantity = 1
-        self._global.inventory.items[0].info.count += 10
+        self._global_ins.inventory.items[0].info.count += 10
 
     def save_coord(self):
         self.last_coord = self.person.coord.values()
@@ -275,7 +347,7 @@ class Main(NativeHacktool):
             self.person.coord = self.last_coord
 
     def go_up(self):
-        self._global.position_struct.coord[1] += 2
+        self._global_ins.position_struct.coord[1] += 2
 
     def go_down(self):
-        self._global.position_struct.coord[1] -= 2
+        self._global_ins.position_struct.coord[1] -= 2

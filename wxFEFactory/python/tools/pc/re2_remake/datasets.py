@@ -1,3 +1,4 @@
+VERSIONS = ('steam', 'codex')
 
 CHARACTERS = (
     "里昂",

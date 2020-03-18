@@ -6,8 +6,7 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
-from tools.base.native_hacktool import NativeHacktool, AssemblyItem
-from tools.base.assembly_hacktool import Delta
+from tools.base.native_hacktool import NativeHacktool, AssemblyItem, Delta
 from . import models, datasets
 
 

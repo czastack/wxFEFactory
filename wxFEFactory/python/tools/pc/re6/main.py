@@ -7,7 +7,7 @@ from lib.hack.forms import (
 from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
-from tools.base.native_hacktool import NativeHacktool, AssemblyItem
+from tools.base.native_hacktool import NativeHacktool, AssemblyItem, Delta
 from . import models, datasets
 
 
@@ -64,23 +64,22 @@ class Main(NativeHacktool):
                 ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
 
     def render_assembly_buttons_own(self):
-        # NOP_7 = b'\x90' * 7
-        NOP_8 = b'\x90' * 8
-        # NOP_9 = b'\x90' * 9
+        nop_8 = b'\x90' * 8
+        delta = Delta(0x200000)
         self.render_assembly_buttons((
-            AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, 0xA00000,
+            AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, delta,
                 b'\x66\x4A\x90\x90\x90'),
-            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, 0x700000, NOP_8),
-            AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, 0x700000,
+            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, delta, nop_8),
+            AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, delta,
                 b'', b'\xF3\x0F\x58\xD2\xF3\x0F\x58\xD2\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
                 inserted=True),
             AssemblyItem('merce_timer_keep', '佣兵模式时间不减',
-                b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00', 0x100000, 0x200000, NOP_8),
+                b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00', 0x100000, delta, nop_8),
             AssemblyItem('god_on_hit_kill', '血不减+一击必杀', b'\x66\x8b\x44\x24\x04\x66\x29\x81\x10\x0f\x00\x00',
-                0x600000, 0x700000, b'',
+                0x540000, delta, b'',
                 b'\x83\x79\x38\x01\x75\x0A\xC7\x81\x10\x0F\x00\x00\x00\x00\x00\x00', inserted=True),
             AssemblyItem('skill_points', '技能点数', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00',
-                0x580000, 0x640000, b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
+                0x580000, delta, b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
                 inserted=True, args=('skill_points_base',)),
         ))
 
@@ -93,11 +92,11 @@ class Main(NativeHacktool):
         dialog = getattr(self, name, None)
         if dialog is None:
             with DialogGroup(name, "物品详情", self.ingame_item, cols=1, dialog_style={'width': 800, 'height': 1400},
-                    closable=False, horizontal=False, button=False) as dialog:
+                             closable=False, horizontal=False, button=False) as dialog:
                 ModelCheckBox("enabled")
                 ModelInput("slot")
                 ModelSelect("type", choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values,
-                    instance=self.ingame_item)
+                            instance=self.ingame_item)
                 ModelInput("quantity")
                 ModelInput("max_quantity")
                 ModelInput("model", hex=True)
