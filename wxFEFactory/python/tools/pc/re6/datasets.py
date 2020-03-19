@@ -1,6 +1,9 @@
 from lib.hack.utils import OptionProvider
 
 
+VERSIONS = ('steam', 'codex')
+
+
 PERSONS = ('里昂', '海伦娜', '克里斯', '皮尔斯', '杰克', '雪莉', '艾达', '特工')
 
 

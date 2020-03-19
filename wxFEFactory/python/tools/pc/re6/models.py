@@ -89,8 +89,24 @@ class SkillPoints(Model):
 
 
 class Global(Model):
+    character_struct = ModelPtrField(0x013D0468, CharacterStruct)
+    character_config = ModelPtrField(0x013CF49C, CharacterConfig)
+    enemy_data = ModelPtrField(0x013CF40C, EnemyData)
+    char_skills = ArrayField((0x013CF454, 1832), 8, ArrayField(0, 3, Field(0)))
+    saved_item_manager2 = ModelField(0x01394D98, SavedItemManager2)
+    item_manager_func = 0x000F8A40
+
+
+class CodexGlobal(Model):
     character_struct = ModelPtrField(0x013C4428, CharacterStruct)
     character_config = ModelPtrField(0x013C345C, CharacterConfig)
-    enemy_data = ModelPtrField(0x13C33CC, EnemyData)
+    enemy_data = ModelPtrField(0x013C33CC, EnemyData)
     char_skills = ArrayField((0x013C3414, 1832), 8, ArrayField(0, 3, Field(0)))
-    saved_item_manager2 = ModelField(0x1388D58, SavedItemManager2)
+    saved_item_manager2 = ModelField(0x01388D58, SavedItemManager2)
+    item_manager_func = 0x000F7230
+
+
+SPECIFIC_GLOBALS = {
+    'steam': Global,
+    'codex': CodexGlobal,
+}
