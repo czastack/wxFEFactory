@@ -14,6 +14,7 @@ class Character(Model):
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))
     speed = FloatField((0x130, 0x50), label="速度")
+    coord = CoordField((0x160, 0x680), label="坐标")
 
 
 class CharacterStruct(Model):

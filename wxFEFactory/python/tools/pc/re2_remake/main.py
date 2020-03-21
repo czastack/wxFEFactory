@@ -5,6 +5,7 @@ from lib.hack.forms import (
     ModelChoiceDisplay
 )
 from lib.hack.handlers import MemHandler
+from lib.hack.models import PropertyField
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
 from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, AssemblySwitch
@@ -91,7 +92,8 @@ class Main(NativeHacktool):
         self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
         ModelInput("inventory.capcity", label="物品容量")
         ModelInput("save_count")
-        ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
+        # ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
+        ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
     def render_player(self):
         self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_person_change)
@@ -102,6 +104,7 @@ class Main(NativeHacktool):
         ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
         ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
         ModelCheckBox("invincible")
+        # ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
 
     def render_person_items(self):
         """游戏中物品"""
@@ -337,7 +340,23 @@ class Main(NativeHacktool):
             self.person.coord = self.last_coord
 
     def go_up(self):
-        self._global_ins.position_struct.coord[1] += 2
+        coord_z = self.person.coord[1]
+        coord_z += 2
+        self.person.coord[1] = coord_z
+        self._global_ins.position_struct.coord[1] = coord_z
 
     def go_down(self):
-        self._global_ins.position_struct.coord[1] -= 2
+        coord_z = self.person.coord[1]
+        coord_z -= 2
+        self.person.coord[1] = coord_z
+        self._global_ins.position_struct.coord[1] = coord_z
+
+    @PropertyField(label="角色坐标")
+    def char_coord(self):
+        return self.person.coord
+
+    @char_coord.setter
+    def char_coord(self, value):
+        value = list(value)
+        self.person.coord = value
+        self._global_ins.position_struct.coord = value
