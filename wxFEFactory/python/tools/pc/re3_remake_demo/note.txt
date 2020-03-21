@@ -1,0 +1,26 @@
+
+; 快速射击
+cmp [player_addr], 0
+je short cancel
+push rax
+push rcx
+push rdx
+mov rax, [player_addr]
+mov rax, [rax+F8] ; 变成Character地址
+mov rcx, [rax+108]
+mov rcx, [rcx+54]
+mov rdx, [rax+130]
+cmp rcx, 10
+je short is_shoot
+cmp rcx, 20
+je short is_shoot
+mov rcx, [normal_speed]
+jmp short not_shoot
+is_shoot:
+mov rcx, [rapid_fire_speed]
+not_shoot:
+mov [rdx+50], rcx
+pop rdx
+pop rcx
+pop rax
+cancel:

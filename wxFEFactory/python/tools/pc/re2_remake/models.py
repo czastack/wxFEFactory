@@ -9,15 +9,15 @@ class Character(Model):
     """角色"""
     data = Field(0x54, label="数据")
     health = Field((0x230, 0x58), label="HP")
+    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=0, disable=1)
     # health_max = WordField(0x1366, label="最大HP")
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))
     speed = FloatField((0x130, 0x50), label="速度")
-    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=0, disable=1)
 
 
 class CharacterStruct(Model):
-    chars = ArrayField(0x50, 4, ModelPtrField(0, Character))
+    char = ModelPtrField(0x50, Character)
 
 
 class CharacterDataStruct_1(object):

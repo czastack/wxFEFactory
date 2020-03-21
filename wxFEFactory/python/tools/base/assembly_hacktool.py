@@ -90,6 +90,7 @@ class AssemblyHacktool(BaseHackTool):
         if not self.allocated_memory:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
             if not self.handler.is32process:
+                # 64位应用程序
                 start = self.handler.base_addr - 0x10000000
                 self.alloc_memory(start)
                 if self.allocated_memory == 0:
