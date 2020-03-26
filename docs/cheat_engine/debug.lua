@@ -1,9 +1,12 @@
 -- 调试KERNELBASE.WriteProcessMemory (64位)
+local WriteProcessMemory = getAddress('KERNELBASE.WriteProcessMemory')
 function debugger_onBreakpoint()
     -- LPVOID lpBaseAddress: RDX,
     -- LPVOID lpBuffer: ECX,
     -- DWORD nSize: R9,
-
+    if EIP ~= WriteProcessMemory + 0x13 then
+        return 0
+    end
     local data = readBytes(R8, R9, true)
     local hexdata = {}
     for k, v in ipairs(data) do
@@ -15,13 +18,18 @@ function debugger_onBreakpoint()
     return 1
 end
 
-debug_setBreakpoint(getAddress('KERNELBASE.WriteProcessMemory') + 0x13)
+debug_setBreakpoint(WriteProcessMemory + 0x13)
 
 -- 调试KERNELBASE.WriteProcessMemory (32位)
+local WriteProcessMemory = getAddress('KERNELBASE.WriteProcessMemory')
+
 function debugger_onBreakpoint()
     -- LPVOID lpBaseAddress: ESP + 8,
     -- LPVOID lpBuffer: ESP + C,
     -- DWORD nSize: ESP + 10,
+    if EIP ~= WriteProcessMemory then
+       return 0
+    end
     local lpBaseAddress = readInteger(ESP + 8)
     local lpBuffer = readInteger(ESP + 0xC)
     local nSize = readInteger(ESP + 0x10)
@@ -36,7 +44,7 @@ function debugger_onBreakpoint()
     return 1
 end
 
-debug_setBreakpoint(getAddress('KERNELBASE.WriteProcessMemory'))
+debug_setBreakpoint(WriteProcessMemory)
 
 
 function findBytes(data)
