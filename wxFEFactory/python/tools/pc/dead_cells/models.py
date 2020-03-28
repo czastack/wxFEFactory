@@ -72,6 +72,12 @@ class Weapon(InventoryItem):
     ammo = Field(0x18, label="弹药")
 
 
+# class WeaponInfo(Model):
+#     """武器"""
+#     weapon_data = ModelPtrField(8, Weapon)  # 武器数据
+#     continuous_count = Field(0x20, label="连续挥动次数")
+
+
 class Skill(Model):
     """技能"""
     cooldown = Field((0x10, 0x78), float, 8, label="冷却")
@@ -105,6 +111,8 @@ class Player(Model):
     timer = ArrayField((0x140, 8), 100, Field(0, float, 8))
     # 武器槽
     inventory = ArrayField((0x300, 0x4, 0x334, 0x4, 0x8, 0x10), 50, ModelPtrField(0, InventoryItem))
+    primary_weapon = ModelPtrField((0x300, 8), Weapon)
+    # primary_weapon_info = ModelPtrField(0x300, WeaponInfo)
     primary_weapon = ModelPtrField((0x300, 8), Weapon)
     secondary_weapon = ModelPtrField((0x304, 8), Weapon)
     left_skill = ModelPtrField((0x320, 8, 0x10), Skill)
