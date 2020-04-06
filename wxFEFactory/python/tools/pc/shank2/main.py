@@ -26,7 +26,7 @@ class Main(AssemblyHacktool):
         self.render_assembly_buttons((
             AssemblyItem(
                 'inf_health', '无限生命', 'D8 9B A0 00 00 00 DF E0 F6 C4 01', 0x000F1000, delta, b'',
-                '81 BB A0000000 0000803F7E 16  81 BB A0000000 0000F0427F 0A  C7 83 A0000000 0000F042D8 9B A0000000',
+                '81 BB A0000000 0000803F  7E 16  81 BB A0000000 0000F042  7F 0A  C7 83 A0000000 0000F042  D8 9B A0000000',
                 inserted=True, replace_len=6),
             AssemblyItem(
                 'inf_score', '无限点数', '8B 40 50 8B E5 5D',

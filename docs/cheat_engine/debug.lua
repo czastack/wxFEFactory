@@ -4,7 +4,7 @@ function debugger_onBreakpoint()
     -- LPVOID lpBaseAddress: RDX,
     -- LPVOID lpBuffer: ECX,
     -- DWORD nSize: R9,
-    if EIP ~= WriteProcessMemory + 0x13 then
+    if RIP ~= WriteProcessMemory + 0x13 then
         return 0
     end
     local data = readBytes(R8, R9, true)

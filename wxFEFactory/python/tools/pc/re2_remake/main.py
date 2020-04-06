@@ -1,4 +1,3 @@
-import pyapi
 from base64 import b64decode
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
@@ -76,15 +75,15 @@ class Main(NativeHacktool):
         self.char_choice = None
 
     def render_main(self):
-        person = (self._person, models.Character)
+        character = (self._character, models.Character)
 
-        with Group("player", "全局", (self._global, models.Global)):
+        with Group("global", "全局", (self._global, models.Global)):
             self.render_global()
 
-        self.lazy_group(Group("player", "角色", person), self.render_player)
+        self.lazy_group(Group("character", "角色", character), self.render_character)
 
-        self.lazy_group(Group("person_items", "角色物品", (self._global, models.Global), serializable=False, cols=4),
-            self.render_person_items)
+        self.lazy_group(Group("character_items", "角色物品", (self._global, models.Global), serializable=False, cols=4),
+            self.render_character_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
@@ -95,8 +94,8 @@ class Main(NativeHacktool):
         # ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
         ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
-    def render_player(self):
-        self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_person_change)
+    def render_character(self):
+        self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_character_change)
         ModelInput("health")
         ModelInput("action")
         # ModelInput("weapon_state")
@@ -106,7 +105,7 @@ class Main(NativeHacktool):
         ModelCheckBox("invincible")
         # ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
 
-    def render_person_items(self):
+    def render_character_items(self):
         """游戏中物品"""
         with ModelSelect.choices_cache:
             for i in range(20):
@@ -117,43 +116,35 @@ class Main(NativeHacktool):
         delta = Delta(0x2000)
         self.render_assembly_buttons((
             AssemblyItem('item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5', None, delta, b'\x90\x90', replace_len=2),
-
             AssemblyItem(
                 'inf_ammo', '备弹999', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
                 None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 07 C7 41 20 E7030000',
                 inserted=True, replace_len=7),
-
             AssemblyItems(
                 '弹夹99',
                 AssemblyItem(
-                    'inf_clip1', None, '48 8B 48 10 48 85 C9 74 03 8B 59 20 85 DB',
-                    None, delta, b'',
+                    'inf_clip1', None, '48 8B 48 10 48 85 C9 74 03 8B 59 20 85 DB', None, delta, b'',
                     '48 8B 48 10 48 85 C9 74 13 83 79 1C 00 74 0D 83 79 14 FF 74 07 C7 41 20 63 00 00 00 48 85 C9',
                     inserted=True, replace_len=7),
                 AssemblyItem(
-                    'inf_clip2', None, '48 8B 46 10 48 85 C0 75 1E 45 33 C0 48 8B CF 41 8D 50 38 48',
-                    None, delta, b'',
+                    'inf_clip2', None, '48 8B 46 10 48 85 C0 75 1E 45 33 C0 48 8B CF 41 8D 50 38 48', None, delta, b'',
                     '48 8B 46 10 48 85 C0 74 14 83 78 1C 00 74 0E 83 78 14 FF 74 08 BB 63 00 00 00 89 58 20 48 85 C0',
                     inserted=True, replace_len=7),
             ),
-
             AssemblyItem(
                 'max_backpack', '最大背包空间', '39 B2 90 00 00 00 7E * 44 8D 46 FF', None, delta, b'',
                 'C7 82 90 00 00 00 14 00 00 00 39 B2 90 00 00 00',
                 inserted=True, replace_len=6),
-
             AssemblyItem(
                 'inf_modai', '保存时墨带无限', '48 8B 42 10 48 85 C0 74 03 8B 58 20', None, delta,
                 b'', '48 8B 42 10 48 85 C0 74 07 C7 40 20 0A000000 48 85 C0 74 03 8B 58 20',
                 inserted=True, replace_len=7),
-
             AssemblyItem(
                 'inf_knife', '小刀无限耐久', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 66 0F 6E C6',
                 None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 0B 83 79 14 2E 75 05 8B C6 89 41 20 48 85 C9',
                 inserted=True, replace_len=7),
-
             AssemblyItem('min_save_count', '最小保存次数', '8D 42 01 89 41 24', None, delta, '31 C0', replace_len=3),
             AssemblyItem(
                 'quick_aim', '快速瞄准', 'F3 0F 10 87 20010000 48', None, delta,
@@ -169,14 +160,14 @@ class Main(NativeHacktool):
                     'inf_health_base_1', None, '48 8B 87 30 02 00 00 48 85 C0 75', None, delta, b'',
                     AssemblyGroup(
                         '48 8B 87 30 02 00 00 48 85 C0 74 1D 50 8F 05',
-                        Offset('player_addr'),
+                        Offset('character_addr'),
                         Cmp('b_inf_health', 1),
                         '75 0D 53 51 48 8D 58 58 8B 4B FC 89 0B 59 5B',
                         # 快速射击
                         Cmp('b_rapid_fire', 1),
                         '75 52',
-                        Cmp('player_addr', 0),
-                        '74 49 50 51 52 48 A1', Variable('player_addr'),
+                        Cmp('character_addr', 0),
+                        '74 49 50 51 52 48 A1', Variable('character_addr'),
                         '48 8B 80 F8 00 00 00 48 8B 88 08 01 00 00 48 8B 49 54 48 8B 90 30 01 00 00'
                         '48 83 F9 10 74 0F 48 83 F9 20 74 09 48 8B 0D',
                         Offset('normal_speed'),
@@ -190,7 +181,7 @@ class Main(NativeHacktool):
                         'b_inf_health',
                         'b_one_hit_kill',
                         'b_rapid_fire',
-                        VariableType('player_addr', size=8),
+                        VariableType('character_addr', size=8),
                         VariableType('normal_speed', type=float, value=1.0),
                         VariableType('rapid_fire_speed', type=float, value=10.0),
                     )),
@@ -199,7 +190,7 @@ class Main(NativeHacktool):
                     None, delta, b'',
                     AssemblyGroup(
                         '48 8D 4A 58 48 A1',
-                        Variable('player_addr'),
+                        Variable('character_addr'),
                         '48 39 D0 75 0A 8B 41 FC 89 01 45 31 C0 EB 15',
                         Cmp('b_one_hit_kill', 1),
                         '75 0C 41 83 F8 00 7E 06 41 B8 9F 86 01 00 8B 09 41 8B C0'
@@ -266,16 +257,10 @@ class Main(NativeHacktool):
     def render_buttons_own(self):
         pass
 
-    def get_ingame_item_dialog(self):
-        """物品信息对话框"""
-        pass
-
     def get_hotkeys(self):
         this = self.weak
         return (
             (VK.MOD_ALT, VK.H, this.pull_through),
-            (VK.MOD_ALT, VK.E, this.set_ammo_up),
-            (VK.MOD_ALT, VK.R, this.set_ammo_full),
             (VK.MOD_ALT, VK(','), this.save_coord),
             (VK.MOD_ALT, VK('.'), this.load_coord),
             (VK.MOD_ALT | VK.MOD_SHIFT, VK(','), this.undo_coord),
@@ -295,68 +280,53 @@ class Main(NativeHacktool):
     def _global(self):
         return self._global_ins
 
-    def _person(self):
+    def _character(self):
         if self.handler.active:
             return self._global_ins.character_struct.char
 
-    person = property(_person)
+    character = property(_character)
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         self.char_index = self._global_ins.char_index = lb.index
 
     def pull_through(self):
-        self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
-
-    def pull_through_all(self):
-        character_struct = self._global_ins.character_struct
-        for i in range(character_struct.chars_count):
-            character_struct.char.set_with('health', 'health_max')
-
-    def set_ammo_full(self):
-        # person = self.person
-        # person.items[person.cur_item].set_with('quantity', 'max_quantity')
-        self._global_ins.inventory.items[0].info.count = 99
-
-    def set_ammo_up(self):
-        # person = self.person
-        # person.items[person.cur_item].quantity = 1
-        self._global_ins.inventory.items[0].info.count += 10
+        self.character.health = 1000.0
 
     def save_coord(self):
-        self.last_coord = self.person.coord.values()
+        self.last_coord = self.character.coord.values()
 
     def load_coord(self):
         if hasattr(self, 'last_coord'):
-            person = self.person
-            self.prev_coord = person.coord.values()
-            person.coord = self.last_coord
+            character = self.character
+            self.prev_coord = character.coord.values()
+            character.coord = self.last_coord
 
     def undo_coord(self):
         if hasattr(self, 'prev_coord'):
-            self.person.coord = self.prev_coord
+            self.character.coord = self.prev_coord
 
     def reload_coord(self):
         if hasattr(self, 'last_coord'):
-            self.person.coord = self.last_coord
+            self.character.coord = self.last_coord
 
     def go_up(self):
-        coord_z = self.person.coord[1]
+        coord_z = self.character.coord[1]
         coord_z += 2
-        self.person.coord[1] = coord_z
+        self.character.coord[1] = coord_z
         self._global_ins.position_struct.coord[1] = coord_z
 
     def go_down(self):
-        coord_z = self.person.coord[1]
+        coord_z = self.character.coord[1]
         coord_z -= 2
-        self.person.coord[1] = coord_z
+        self.character.coord[1] = coord_z
         self._global_ins.position_struct.coord[1] = coord_z
 
     @PropertyField(label="角色坐标")
     def char_coord(self):
-        return self.person.coord
+        return self.character.coord
 
     @char_coord.setter
     def char_coord(self, value):
         value = list(value)
-        self.person.coord = value
+        self.character.coord = value
         self._global_ins.position_struct.coord = value

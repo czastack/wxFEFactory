@@ -661,7 +661,7 @@ class CoordData:
     def values(self):
         addr = self.addr
         return [self.instance.handler.read(addr + i * self.owner.field_size, self.owner.type)
-            for i in range(self.owner.length)]
+                for i in range(self.owner.length)]
 
     def set(self, value):
         it = iter(value)
@@ -850,22 +850,36 @@ class ArrayData:
 
 class StringField(Field):
     """字符串字段"""
-    def __init__(self, offset, size=0, label=None, encoding='gbk'):
+    def __init__(self, offset, size=0, label=None, encoding='gbk', end='\x00', set_end=b'\x00'):
         super().__init__(offset, bytes, size or 64, label)
         self.encoding = encoding
+        self.end = end
+        self.set_end = set_end
 
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        ret = instance.handler.read(self.get_addr(instance), self.type, self.size)
-        return ret.rstrip(b'\x00').decode(self.encoding)
+        res = instance.handler.read(self.get_addr(instance), self.type, self.size)
+        if res:
+            res = res.decode(self.encoding)
+            if self.end:
+                end = res.find(self.end)
+                if end != -1:
+                    res = res[:end]
+        return res
 
     def __set__(self, instance, value):
         if isinstance(value, str):
             value = bytes(value, self.encoding)
-        if value[-1] != 0:
-            value += b'\x00'
+        if self.set_end:
+            if not value.endswith(self.set_end):
+                value += self.set_end
         super().__set__(instance, value)
+
+
+class UnicodeField(StringField):
+    def __init__(self, offset, size=0, label=None):
+        super().__init__(offset, size, label, encoding='utf-16-le', set_end=b'\x00\x00')
 
 
 class PropertyField(property, FieldType):
