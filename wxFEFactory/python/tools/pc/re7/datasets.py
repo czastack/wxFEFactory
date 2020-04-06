@@ -34,9 +34,9 @@ INVENTORYS = {
     'Flower': 'Supplements',
 
     # Documents/Books
-    'MailMia': 'Email from Mia',
-    'MiaDriversLicense': 'Mia Driving License',
-    'ProposalBookFf': 'Project Proposal',
+    'MailMia': '米娅发送的电子邮件',
+    'MiaDriversLicense': '驾照',
+    'ProposalBookFf': '节目企划书',
 
     # Keys
     'CabinKey': 'Captains Cabin Locker Key',
@@ -50,7 +50,7 @@ INVENTORYS = {
     'FloorDoorKey': 'Hatch Key',
     'LucasCardKey': 'Keycard (Blue)',
     'LucasCardKey2': 'Keycard (Red)',
-    'CylinderKey': 'Lock Pick',
+    'CylinderKey': '开锁器',
     'EntranceHallKey': 'Ox Statuette',
     'MorgueKey': 'Scorpion Key',
     'MasterKey': 'Snake Key',
@@ -115,7 +115,7 @@ INVENTORYS = {
     'AlphaGrass': 'X-ray Glasses',
 
     # Videotapes
-    'FoundFootage000': 'Derelict House Footage (1)',
+    'FoundFootage000': '"废弃房子录像"',
     'FoundFootage020': 'Derelict House Footage (2)',
     'FoundFootage010': 'FoundFootage010',
     'FoundFootage040': 'Happy Birthday',
@@ -123,22 +123,22 @@ INVENTORYS = {
     'FoundFootage050': 'Old Videotape',
 
     # Weapons - Firearms
-    'Magnum': '44 Mag',
+    'Magnum': '麦林枪',
     'Handgun_Albert': 'Albert-01',
     'Handgun_Albert_Reward': 'Albert-01 R',
     'Burner': 'Flamethrower',
     'Handgun_G17': 'G17 Handgun',
-    'GrenadeLauncher': 'Grenade Launcher',
+    'GrenadeLauncher': '榴弹发射器',
     'Handgun_M19': 'M19 Handgun',
     'Shotgun_DB': 'M21 Shotgun',
     'Shotgun_M37': 'M37 Shotgun',
     'Handgun_MPM': 'MPM Handgun',
-    'MachineGun': 'P19 Machine Gun',
+    'MachineGun': 'P19机枪',
 
     # Weapons - Melee
-    'HandAxe': 'Axe',
-    'ChainSaw': 'Chain Saw',
-    'CircularSaw': 'Circular Saw',
+    'HandAxe': '斧头',
+    'ChainSaw': '电锯',
+    'CircularSaw': '圆锯',
     'Bar': 'Crowbar',
     'Knife': 'Knife',
     'MiaKnife': 'Survival Knife',

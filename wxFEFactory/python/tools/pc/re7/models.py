@@ -18,13 +18,13 @@ class PositionStruct(Model):
 
 class BagItem(Model):
     """背包物品"""
-    name = UnicodeField((0x28, 0x80, 0x24), size=28, label="物品名称")
+    name = UnicodeField((0x28, 0x80, 0x24), size=64, label="物品名称")
     quantity = Field((0x28, 0x88), label="数量")
 
 
 class BoxItem(Model):
     """物品箱物品"""
-    name = UnicodeField((0x20, 0x24), size=28, label="物品名称")
+    name = UnicodeField((0x20, 0x24), size=64, label="物品名称")
     quantity = Field(0x28, label="数量")
 
 
