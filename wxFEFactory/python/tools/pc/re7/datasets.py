@@ -4,7 +4,7 @@ VERSIONS = ('steam', 'codex')
 # (name, label)
 INVENTORYS = {
     # Ammo
-    'MagnumBullet': '44 Mag Ammo',
+    'MagnumBullet': '44麦林枪弹药',
     'BurnerBullet': 'Burner Fuel',
     'HandgunBulletL': 'Enhanced Handgun Ammo',
     'FlameBulletS': 'Flame Rounds',

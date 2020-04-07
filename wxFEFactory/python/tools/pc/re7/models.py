@@ -34,7 +34,6 @@ class BagItem(Model):
     @name.setter
     def name(self, name):
         data = self.data
-        data.name = name
         find_data = b''.join([
             data.ptr1.to_bytes(8, 'little'), b'*' * 8, b'\x00' * 8, data.ptr2.to_bytes(8, 'little'),
             len(name).to_bytes(4, 'little'), name.encode('utf-16-le')
@@ -57,6 +56,8 @@ class BoxItem(Model):
         class_ptr2 = QWordField(0x18)
 
     data = ModelPtrField(0x20, ItemData)
+
+    data = BagItem.data
 
 
 class Manager(Model):
