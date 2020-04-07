@@ -1,6 +1,6 @@
 from lib.hack.models import (
-    Model, Field, Fields, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField,
-    CoordField, BytesField, ToggleField, UnicodeField
+    Model, Field, Fields, ByteField, WordField, QWordField, FloatField, ArrayField, ModelField, ModelPtrField,
+    CoordField, BytesField, ToggleField, UnicodeField, PropertyField
 )
 
 
@@ -18,8 +18,32 @@ class PositionStruct(Model):
 
 class BagItem(Model):
     """背包物品"""
-    name = UnicodeField((0x28, 0x80, 0x24), size=64, label="物品名称")
     quantity = Field((0x28, 0x88), label="数量")
+
+    class ItemData(Model):
+        name = UnicodeField(0x24, size=64)
+        ptr1 = QWordField(0)
+        ptr2 = QWordField(0x18)
+
+    data = ModelPtrField((0x28, 0x80), ItemData)
+
+    @PropertyField(label='物品名称')
+    def name(self):
+        return self.data.name
+
+    @name.setter
+    def name(self, name):
+        data = self.data
+        data.name = name
+        find_data = b''.join([
+            data.ptr1.to_bytes(8, 'little'), b'*' * 8, b'\x00' * 8, data.ptr2.to_bytes(8, 'little'),
+            len(name).to_bytes(4, 'little'), name.encode('utf-16-le')
+        ])
+        addr = self.handler.find_bytes(find_data, data.addr - 0x2000000, data.addr + 0x2000000, fuzzy=True)
+        if addr != -1:
+            self.data = addr
+        else:
+            print('无法替换class ptr')
 
 
 class BoxItem(Model):
@@ -27,9 +51,17 @@ class BoxItem(Model):
     name = UnicodeField((0x20, 0x24), size=64, label="物品名称")
     quantity = Field(0x28, label="数量")
 
+    class ItemData(Model):
+        name = UnicodeField(0x24, size=64)
+        class_ptr1 = QWordField(0)
+        class_ptr2 = QWordField(0x18)
+
+    data = ModelPtrField(0x20, ItemData)
+
 
 class Manager(Model):
     character = ModelPtrField((0x58, 0x28, 0x28, 0x70), Character)
+    bag_count = Field((0x60, 0x28), label="背包物品数量")
     bag_items = ArrayField((0x60, 0x20, 0x30), 20, ModelPtrField(0, BagItem))
     box_items = ArrayField((0x58, 0x68, 0x60, 0x30), 20, ModelPtrField(0, BoxItem))
 
@@ -39,8 +71,7 @@ class Global(Model):
 
 
 class CodexGlobal(Model):
-    # character = ModelPtrField((0x07088EA0, 0x50), CharacterDataStruct)
-    pass
+    manager = ModelPtrField(0, Manager)
 
 
 SPECIFIC_GLOBALS = {

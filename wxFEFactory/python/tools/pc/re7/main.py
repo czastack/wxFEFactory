@@ -15,8 +15,8 @@ from . import models, datasets
 ADDRESS_SOURCES = {
     'steam': {
         'lock_health': 0x00584000,
-        'item_keep': 0x004B1000,
-        'item_keep2': 0x002A0000,
+        'ammo_keep': 0x004B1000,
+        'item_keep': 0x002A0000,
         'inf_ammo': 0x0029E000,
         'inf_clip': 0x004B1000,
         'inf_item1': 0x002A0000,
@@ -91,10 +91,10 @@ class Main(NativeHacktool):
                 'F3 0F 10 40 20 F3 0F 11 40 24', inserted=True, replace_len=5, replace_offset=3),
 
             AssemblyItem(
-                'item_keep', '数量不减', '41 FF C8 48 8B D3 48 8B CF', None, delta, b'\x90\x90\x90', replace_len=3),
+                'ammo_keep', '子弹不减', '41 FF C8 48 8B D3 48 8B CF', None, delta, b'\x90\x90\x90', replace_len=3),
 
             AssemblyItem(
-                'item_keep2', '数量不减2', '2B F0 89 B7 88 00 00 00', None, delta, b'\x90\x90\x90\x90\x90\x90\x90\x90'),
+                'item_keep', '物品不减', '2B F0 89 B7 88 00 00 00', None, delta, b'\x90\x90\x90\x90\x90\x90\x90\x90'),
 
             AssemblyItem(
                 'inf_ammo', '备弹99', '41 03 B6 88 00 00 00', None, delta, b'',

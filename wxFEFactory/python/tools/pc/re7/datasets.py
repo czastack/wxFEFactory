@@ -123,28 +123,28 @@ INVENTORYS = {
     'FoundFootage050': 'Old Videotape',
 
     # Weapons - Firearms
-    'Magnum': '麦林枪',
-    'Handgun_Albert': 'Albert-01',
-    'Handgun_Albert_Reward': 'Albert-01 R',
-    'Burner': 'Flamethrower',
-    'Handgun_G17': 'G17 Handgun',
+    'Magnum': '44麦林枪',
+    'Handgun_Albert': '埃尔伯特01',
+    'Handgun_Albert_Reward': '埃尔伯特01R',
+    'Burner': '燃烧器',
+    'Handgun_G17': 'G17手枪',
     'GrenadeLauncher': '榴弹发射器',
-    'Handgun_M19': 'M19 Handgun',
-    'Shotgun_DB': 'M21 Shotgun',
-    'Shotgun_M37': 'M37 Shotgun',
-    'Handgun_MPM': 'MPM Handgun',
+    'Handgun_M19': 'M19手枪',
+    'Shotgun_DB': 'M21猎枪',
+    'Shotgun_M37': 'M37猎枪',
+    'Handgun_MPM': 'MPM手枪',
     'MachineGun': 'P19机枪',
 
     # Weapons - Melee
     'HandAxe': '斧头',
     'ChainSaw': '电锯',
     'CircularSaw': '圆锯',
-    'Bar': 'Crowbar',
-    'Knife': 'Knife',
-    'MiaKnife': 'Survival Knife',
+    'Bar': '撬棍',
+    'Knife': '刀子',
+    'MiaKnife': '露营刀',
 
     # Weapons - Thrown
-    'LiquidBomb': 'Remote Bomb',
+    'LiquidBomb': '遥控炸弹',
 }
 
 INVENTORY_LABELS = tuple(INVENTORYS.values())
