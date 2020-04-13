@@ -192,6 +192,10 @@ class ItemContainer(Control):
     def text(self):
         return self.GetString(self.GetSelection())
 
+    @text.setter
+    def text(self, value):
+        return self.SetString(self.GetSelection(), value)
+
 
 class ControlWithItems(ItemContainer):
     def __init__(self, onselect=None, **kwargs):

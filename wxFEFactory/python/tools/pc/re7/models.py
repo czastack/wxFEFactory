@@ -16,6 +16,10 @@ class PositionStruct(Model):
     coord = CoordField((0x18, 0x30), label="坐标")
 
 
+class Coord(Model):
+    coord = CoordField(0, label="角色坐标")
+
+
 class BagItem(Model):
     """背包物品"""
     quantity = Field((0x28, 0x88), label="数量")
@@ -34,6 +38,7 @@ class BagItem(Model):
     @name.setter
     def name(self, name):
         data = self.data
+        # 直接替换物品指针
         find_data = b''.join([
             data.ptr1.to_bytes(8, 'little'), b'*' * 8, b'\x00' * 8, data.ptr2.to_bytes(8, 'little'),
             len(name).to_bytes(4, 'little'), name.encode('utf-16-le')
@@ -67,8 +72,15 @@ class Manager(Model):
     box_items = ArrayField((0x58, 0x68, 0x60, 0x30), 20, ModelPtrField(0, BoxItem))
 
 
+class Statistics(Model):
+    """统计"""
+    herb_count = Field(0x180, label="治疗物品使用数量")
+    open_box_count = Field(0x1F0, label="已打开物品箱数量")
+
+
 class Global(Model):
     manager = ModelPtrField(0x081E4148, Manager)
+    statistics = ModelPtrField((0x081EA178, 0x88), Statistics)
 
 
 class CodexGlobal(Model):

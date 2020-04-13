@@ -861,11 +861,7 @@ class StringField(Field):
             return self
         res = instance.handler.read(self.get_addr(instance), self.type, self.size)
         if res:
-            res = res.decode(self.encoding)
-            if self.end:
-                end = res.find(self.end)
-                if end != -1:
-                    res = res[:end]
+            res = self.decode(res)
         return res
 
     def __set__(self, instance, value):
@@ -876,10 +872,25 @@ class StringField(Field):
                 value += self.set_end
         super().__set__(instance, value)
 
+    def decode(self, data):
+        data = data.decode(self.encoding)
+        if self.end:
+            end = data.find(self.end)
+            if end != -1:
+                data = data[:end]
+        return data
+
 
 class UnicodeField(StringField):
     def __init__(self, offset, size=0, label=None):
         super().__init__(offset, size, label, encoding='utf-16-le', set_end=b'\x00\x00')
+
+    def decode(self, data):
+        for i in range(0, len(data), 2):
+            if data[i] == 0 and data[i + 1] == 0:
+                data = data[:i]
+                break
+        return super().decode(data)
 
 
 class PropertyField(property, FieldType):
