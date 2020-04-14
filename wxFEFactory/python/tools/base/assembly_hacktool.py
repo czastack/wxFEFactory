@@ -19,7 +19,7 @@ class AssemblyHacktool(BaseHackTool):
         super().__init__()
         self.variable_model = VariableModel(self.weak)
         self.is32process = False
-        self.assembly_buttons = {}
+        self.assembly_items = {}
         self.reset()
 
     def reset(self):
@@ -38,9 +38,9 @@ class AssemblyHacktool(BaseHackTool):
     def onattached(self):
         super().onattached()
 
-        for key, button in self.assembly_buttons.items():
-            if button.checked:
-                self.toggle_assembly_button(key, True)
+        for key, item in self.assembly_items.items():
+            if item.checked:
+                self.toggle_assembly_function(key, True)
 
     def ondetach(self):
         super().ondetach()
@@ -54,36 +54,43 @@ class AssemblyHacktool(BaseHackTool):
     def render_assembly_buttons(self, functions, cols=4, vgap=10):
         with ui.GridLayout(cols=cols, vgap=vgap, class_="expand"):
             for item in functions:
-                button = ui.ToggleButton(label=item.label,
-                    onchange=partial(self.__class__.toggle_assembly_function, self.weak, item=item))
-                if item.help:
-                    button.SetToolTip(item.help)
-                self.assembly_buttons[item.key] = button
+                if not item.hidden:
+                    button = ui.ToggleButton(label=item.label, onchange=self.toggle_assembly_button)
+                    if item.help:
+                        button.SetToolTip(item.help)
+                    item.button = button
+                    button.key = item.key
+                self.assembly_items[item.key] = item
 
-    def toggle_assembly_function(self, btn, item):
+    def toggle_assembly_button(self, button):
+        self.toggle_assembly_function(button.key, button.checked)
+
+    def toggle_assembly_function(self, key, enable=None):
         """切换单个汇编功能"""
-        checked = btn.checked
+        item = self.assembly_items[key]
+        if enable is None:
+            enable = not item.enable
+        item.enable = enable
         if isinstance(item, AssemblyItem):
-            if checked:
+            if enable:
                 self.register_assembly(item)
             else:
                 self.unregister_assembly(item.key)
         elif isinstance(item, AssemblyItems):
             for item in item.children:
-                if checked:
+                if enable:
                     self.register_assembly(item)
                 else:
                     self.unregister_assembly(item.key)
         elif isinstance(item, AssemblySwitch):
-            if checked and item.depends:
+            if enable and item.depends:
                 for key in item.depends:
-                    self.toggle_assembly_button(key, True)
-            self.set_variable_value(item.key, int(checked))
+                    self.toggle_assembly_function(key, True)
+            self.set_variable_value(item.key, int(enable))
         elif isinstance(item, SimpleButton):
-            item.onclick(checked)
-
-    def toggle_assembly_button(self, key, checked=None):
-        self.assembly_buttons[key].toggle(checked, False)
+            item.onclick(enable)
+        if item.button:
+            item.button.checked = enable
 
     def insure_memory(self):
         """确保分配内存"""
@@ -119,7 +126,7 @@ class AssemblyHacktool(BaseHackTool):
 
         if item.depends:
             for key in item.depends:
-                self.toggle_assembly_button(key, True)
+                self.toggle_assembly_function(key, True)
 
         if item.key in self.registed_assembly:
             data = self.registed_assembly[item.key]
@@ -385,10 +392,11 @@ class AssamblyPatcher:
 
 
 class AssemblyItems:
-    def __init__(self, label, *children, help=None):
+    def __init__(self, label, *children, help=None, hidden=False):
         self.label = label
         self.children = children
         self.help = help
+        self.hidden = hidden
 
     @property
     def key(self):
@@ -422,14 +430,16 @@ class AssemblyItem(AssemblyButton):
         :param depends: 依赖
         :param ext: 其他数据
     """
-    fields = ('original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base',
-        'ordinal', 'fuzzy', 'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'depends', 'ext')
+    fields = (
+        'original', 'find_start', 'find_end', 'replace', 'assembly', 'find_base', 'ordinal', 'fuzzy',
+        'inserted', 'replace_len', 'replace_offset', 'args', 'help', 'depends', 'ext', 'enable', 'button', 'hidden')
     defaults = {
         'assembly': None,
         'find_base': True,
         'ordinal': 1,
         'fuzzy': False,
         'inserted': False,
+        'enable': False,
         'hidden': False,
         'replace_len': 0,
         'replace_offset': 0,
@@ -455,7 +465,10 @@ class AssemblyItem(AssemblyButton):
 
 class AssemblySwitch(AssemblyButton):
     """变量开关"""
-    fields = ('help', 'depends')
+    fields = ('help', 'depends', 'enable', 'button')
+    defaults = {
+        'enable': False,
+    }
 
     depends: Union[str, List[str]]
 

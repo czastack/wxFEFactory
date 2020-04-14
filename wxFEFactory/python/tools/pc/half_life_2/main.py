@@ -69,10 +69,10 @@ class Main(AssemblyHacktool):
     #     )
 
     # def pull_through(self):
-    #     self.toggle_assembly_button('health_inf')
+    #     self.toggle_assembly_function('health_inf')
 
     def no_reload_all(self, checked):
         keys = ('no_reload_grenade', 'no_reload_pistol', 'no_reload_revolver', 'no_reload_slot3',
             'no_reload_shotgun', 'no_reload_shotgun2', 'no_reload_crossbow')
         for key in keys:
-            self.toggle_assembly_button(key)
+            self.toggle_assembly_function(key)

@@ -30,8 +30,8 @@ INVENTORYS = {
     'RepairKit': '修理包',
     'ChemicalL': 'Seperating Agent',
     'Alcohol': '固体燃料',
-    'ChemicalM': 'Strong Chem Fluid',
-    'Flower': 'Supplements',
+    'ChemicalM': '强烈化学液体',
+    'Flower': '补养品',
 
     # Documents/Books
     'MailMia': '米娅发送的电子邮件',
@@ -41,7 +41,7 @@ INVENTORYS = {
     # Keys
     'CabinKey': 'Captains Cabin Locker Key',
     'EthanCarKey': 'Car Key',
-    'SpareKey': 'Corrosive',
+    'SpareKey': '腐蚀剂',
     'TalismanKey': '乌鸦钥匙',
     'WorkroomKey': '解剖室钥匙',
     '3CrestKeyA': '蓝色狗头',
@@ -78,12 +78,12 @@ INVENTORYS = {
     'SerumMaterialA': 'D系列手臂',
     'SerumMaterialB': 'D系列头部',
     'SerumTypeE': 'E-Necrotoxin',
-    'EvelynRadar1': 'Eveline Strange Bottle',
-    'EvelynRadar2': 'Eveline Tissue Samples (1)',
-    'EvelynRadar3': 'Eveline Tissue Samples (2)',
-    'EvelynRadar4': 'Eveline Tissue Samples (3)',
+    'EvelynRadar1': '奇怪的瓶子',
+    'EvelynRadar2': '伊芙琳组织样本 (1)',
+    'EvelynRadar3': '伊芙琳组织样本 (2)',
+    'EvelynRadar4': '伊芙琳组织样本 (3)',
     'Fuse': 'Fuse',
-    'FuseCh4': 'General Purpose Fuse',
+    'FuseCh4': '通用保险丝',
     'Lantern': 'Lantern',
     'EvOpener': 'Lug Wrench',
     'ToyShotgun': 'Model Shotgun',
@@ -120,7 +120,7 @@ INVENTORYS = {
     'FoundFootage010': 'FoundFootage010',
     'FoundFootage040': 'Happy Birthday',
     'FoundFootage030': '“米娅”录像带',
-    'FoundFootage050': 'Old Videotape',
+    'FoundFootage050': '旧的录像带',
 
     # Weapons - Firearms
     'Magnum': '44麦林枪',

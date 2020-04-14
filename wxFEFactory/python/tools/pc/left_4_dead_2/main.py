@@ -68,4 +68,4 @@ class Main(AssemblyHacktool):
     #     )
 
     # def pull_through(self):
-    #     self.toggle_assembly_button('health_inf')
+    #     self.toggle_assembly_function('health_inf')

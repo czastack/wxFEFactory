@@ -14,9 +14,11 @@ from . import models, datasets
 
 ADDRESS_SOURCES = {
     'steam': {
+        'init_health': 0x00D3A000,
+        'one_hit_kill': 0x00B4B000,
         'lock_health': 0x00584000,
         'ammo_keep': 0x004B1000,
-        'item_keep': 0x002A0000,
+        'item_inc': 0x002A0000,
         'inf_ammo': 0x0029E000,
         'inf_clip': 0x004B1000,
         'inf_item1': 0x002A0000,
@@ -90,14 +92,52 @@ class Main(NativeHacktool):
         delta = Delta(0x2000)
         self.render_assembly_buttons((
             AssemblyItem(
-                'lock_health', '锁血', '0F 57 F6 F3 0F 10 40 24', None, delta, b'',
-                'F3 0F 10 40 20 F3 0F 11 40 24', inserted=True, replace_len=5, replace_offset=3),
+                'init_health', '初始化生命', 'F3 0F 10 40 24 48 8B 43 50 48 39 70 18', None, delta, b'',
+                AssemblyGroup(
+                    '53 48 8B D8 48 89 1D',
+                    Offset('character_addr'),
+                    '5B',
+                    Cmp('b_inf_health', 1),
+                    '75 0A F3 0F 10 40 20 F3 0F 11 40 24 F3 0F 10 40 24',
+                ),
+                inserted=True,
+                replace_len=5,
+                args=(
+                    'b_inf_health',
+                    VariableType('character_addr', size=8),
+                ),
+                hidden=True,
+            ),
+            AssemblyItem(
+                'one_hit_kill', '初始化一击必杀', 'F3 0F 5A CA F3 0F 11 52 24 66 0F 2F C1', None, delta, b'',
+                AssemblyGroup(
+                    '50 48 A1',
+                    Variable('character_addr'),
+                    '48 39 D0 75 14 A1',
+                    Variable('b_inf_health'),
+                    '85 C0 74 24 F3 0F 10 52 24 EB 1D',
+                    Cmp('b_one_hit_kill', 1),
+                    '75 14 0F 2F 52 24 73 0E 68 00 00 C8 C2 F3 0F 10 14 24 48 83 C4 08 58 F3 0F 11 52 24',
+                ),
+                inserted=True,
+                replace_len=5,
+                replace_offset=4,
+                args=('b_one_hit_kill',),
+                depends=('init_health'),
+                hidden=True,
+            ),
+            AssemblySwitch('b_inf_health', '无限生命', depends=('init_health')),
+            AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('one_hit_kill')),
+
+            # AssemblyItem(
+            #     'lock_health', '锁血(包括boss)', '0F 57 F6 F3 0F 10 40 24', None, delta, b'',
+            #     'F3 0F 10 40 20 F3 0F 11 40 24', inserted=True, replace_len=5, replace_offset=3),
 
             AssemblyItem(
                 'ammo_keep', '子弹不减', '41 FF C8 48 8B D3 48 8B CF', None, delta, '90 90 90', replace_len=3),
 
-            # AssemblyItem(
-            #     'item_keep', '物品不减', '2B F0 89 B7 88 00 00 00', None, delta, '90 90 90 90 90 90 90 90'),
+            AssemblyItem(
+                'item_inc', '使用物品增加', '2B F0 89 B7 88 00 00 00', None, delta, 'FF C6', replace_len=2),
 
             AssemblyItem(
                 'inf_ammo', '备弹99', '41 03 B6 88 00 00 00', None, delta, b'',

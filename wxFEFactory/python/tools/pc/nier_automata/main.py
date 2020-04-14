@@ -110,4 +110,4 @@ class Main(AssemblyHacktool):
         )
 
     def quick_health(self):
-        self.toggle_assembly_button('quick_health')
+        self.toggle_assembly_function('quick_health')

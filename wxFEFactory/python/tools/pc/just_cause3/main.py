@@ -144,13 +144,13 @@ class Main(AssemblyHacktool):
         )
 
     def pull_through(self):
-        self.toggle_assembly_button('health_inf')
+        self.toggle_assembly_function('health_inf')
 
     def challenge_points_add(self):
         self.set_variable_value('challenge_points_add', 1)
 
     def toggle_challenge_time(self):
-        self.toggle_assembly_button('challenge_time')
+        self.toggle_assembly_function('challenge_time')
 
     def clear_hot_level(self):
-        self.toggle_assembly_button('clear_hot_level')
+        self.toggle_assembly_function('clear_hot_level')
