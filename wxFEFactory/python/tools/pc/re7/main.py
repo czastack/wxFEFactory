@@ -26,6 +26,8 @@ ADDRESS_SOURCES = {
         'show_action': 0x019A1000,
         'clear_time': 0x01241000,
         'teleport': 0x01322000,
+        'psychsostimulant_enable': 0x012A2000,
+        'psychsostimulant_freeze': 0x012A2000,
     },
     'codex': {
     }
@@ -44,6 +46,9 @@ class Main(NativeHacktool):
         self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
         self.coord_ins = models.Coord(0, self.handler)
+        self.coord_set = models.Coord(0, self.handler)
+        self.prev_coord = None
+        self.last_coord = None
 
     def render_main(self):
         character = (self._character, models.Character)
@@ -63,8 +68,7 @@ class Main(NativeHacktool):
         # ModelInput("inventory.capcity", label="物品容量")
         ModelInput("statistics.herb_count", "治疗物品使用数量")
         ModelInput("statistics.open_box_count", "已打开物品箱数量")
-        self.coord_widget = ModelCoordWidget(
-            "coord", instance=(self._coord, models.Coord), labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
+        self.coord_widget = ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
     def render_character(self):
         ModelInput("health")
@@ -166,14 +170,44 @@ class Main(NativeHacktool):
             AssemblyItem(
                 'clear_time', '清空游戏时间', '66 0F 5A C2 F3 0F 11 85 20 01 00 00', None, delta, '0F 57 C0', replace_len=4),
 
+            # mov [coord_addr],rsi
+            # mov rax, coord_set
+            # cmp [rax], 0
+            # je short cancel_set
+            # movss xmm8,[rax]
+            # movss [rsi],xmm8
+            # movss xmm8,[rax+4]
+            # movss [rsi+04],xmm8
+            # movss xmm8,[rax+8]
+            # movss [rsi+08],xmm8
+            # mov [rax], 0
+            # cancel_set:
+            # movss xmm2,[rsi]
+            # movss xmm1,[rsi+04]
             AssemblyItem(
                 'teleport', '开启瞬移', '50 EB 0E F3 0F 10 16 F3 0F 10 4E 04', None, delta, b'',
                 AssemblyGroup(
                     '48 89 35',
                     Offset('coord_addr'),
+                    '48 B8',
+                    Variable('coord_set'),
+                    '83 38 00 74 28 F3 44 0F 10 00 F3 44 0F 11 06 F3 44 0F 10 40 04 F3 44 0F 11 46 04 F3 44 0F 10 40 08'
+                    'F3 44 0F 11 46 08 C7 00 00 00 00 00 F3 0F 10 16 F3 0F 10 4E 04 0F 10 4E 04 0F 10 4E 04',
                     ORIGIN
                 ), inserted=True, replace_len=9, replace_offset=3,
-                args=(VariableType('coord_addr', size=8),)),
+                args=(
+                    VariableType('coord_addr', size=8),
+                    VariableType('coord_set', size=12),
+                )
+            ),
+
+            AssemblyItem(
+                'psychsostimulant_enable', '开启兴奋剂', '80 BA 3D 02 00 00 00 48 8B DA', None, delta, b'',
+                'C6 82 3D 02 00 00 01 80 BA 3D 02 00 00 00', inserted=True, replace_len=7),
+
+            AssemblyItem(
+                'psychsostimulant_freeze', '兴奋剂锁定倒计时', 'F3 0F 10 82 40 02 00 00 0F', None, delta, b'',
+                'C7 82 40 02 00 00 00 00 80 3F F3 0F 10 82 40 02 00 00', inserted=True, replace_len=8),
 
             # AssemblyItem(
             #     'max_backpack', '最大背包空间', '39 B2 90 00 00 00 7E * 44 8D 46 FF', None, delta, b'',
@@ -230,26 +264,36 @@ class Main(NativeHacktool):
         self.character.set_with('health', 'health_max')
 
     def save_coord(self):
-        self.last_coord = self.coord.coord.values()
+        self.last_coord = self.char_coord.values()
 
     def load_coord(self):
-        if hasattr(self, 'last_coord'):
-            self.prev_coord = self.coord.coord.values()
-            self.coord.coord = self.last_coord
+        if self.last_coord:
+            self.prev_coord = self.char_coord.values()
+            self.char_coord = self.last_coord
 
     def undo_coord(self):
-        if hasattr(self, 'prev_coord'):
-            self.coord.coord = self.prev_coord
+        if self.prev_coord:
+            self.char_coord = self.prev_coord
 
     def reload_coord(self):
-        if hasattr(self, 'last_coord'):
-            self.coord.coord = self.last_coord
+        if self.last_coord:
+            self.char_coord = self.last_coord
 
     def go_up(self):
-        self.coord.coord[1] += 2
+        self.char_coord[1] += 2
 
     def go_down(self):
-        self.coord.coord[1] -= 2
+        self.char_coord[1] -= 2
 
     def write_coord(self):
         self.coord_widget.write()
+
+    @PropertyField(label="角色坐标")
+    def char_coord(self):
+        return self.coord.coord
+
+    @char_coord.setter
+    def char_coord(self, value):
+        value = list(value)
+        self.coord_set.addr = self.get_variable('coord_set').addr
+        self.coord_set.coord = value
