@@ -85,7 +85,7 @@ INVENTORYS = {
     'Fuse': 'Fuse',
     'FuseCh4': '通用保险丝',
     'Lantern': 'Lantern',
-    'EvOpener': 'Lug Wrench',
+    'EvOpener': '扳手',
     'ToyShotgun': 'Model Shotgun',
     'EvCable': 'Power Cable',
     'SerumComplete': 'SerumComplete',

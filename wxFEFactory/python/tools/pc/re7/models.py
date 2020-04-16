@@ -78,8 +78,13 @@ class Statistics(Model):
     open_box_count = Field(0x1F0, label="已打开物品箱数量")
 
 
+class GameTime(object):
+    gametime = FloatField(0x120, label="游戏时间")
+
+
 class Global(Model):
     manager = ModelPtrField(0x081E4148, Manager)
+    gametime = FloatField((0x081ED378, 0x120), label="游戏时间")
     statistics = ModelPtrField((0x081EA178, 0x88), Statistics)
 
 

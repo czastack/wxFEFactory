@@ -68,6 +68,7 @@ class Main(NativeHacktool):
         # ModelInput("inventory.capcity", label="物品容量")
         ModelInput("statistics.herb_count", "治疗物品使用数量")
         ModelInput("statistics.open_box_count", "已打开物品箱数量")
+        ModelInput("gametime")
         self.coord_widget = ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
     def render_character(self):
