@@ -209,16 +209,16 @@ class CoordWidget(TwoWayWidget):
         index = self.listbox.index
         if index != 0:
             self.data_list[index - 1], self.data_list[index] = self.data_list[index], self.data_list[index - 1]
-            self.listbox.SetString(self.data_list[index]['name'], index)
-            self.listbox.SetString(self.data_list[index - 1]['name'], index - 1)
+            self.listbox.SetString(index, self.data_list[index]['name'])
+            self.listbox.SetString(index - 1, self.data_list[index - 1]['name'])
 
     def move_down(self):
         """下移一项"""
         index = self.listbox.index
         if index != self.listbox.count - 1:
             self.data_list[index + 1], self.data_list[index] = self.data_list[index], self.data_list[index + 1]
-            self.listbox.SetString(self.data_list[index]['name'], index)
-            self.listbox.SetString(self.data_list[index + 1]['name'], index + 1)
+            self.listbox.SetString(index, self.data_list[index]['name'])
+            self.listbox.SetString(index + 1, self.data_list[index + 1]['name'])
 
     def on_copy(self, view, menu):
         pyapi.set_clipboard(str(tuple(self.input_value)))
