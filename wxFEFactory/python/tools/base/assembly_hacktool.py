@@ -39,7 +39,7 @@ class AssemblyHacktool(BaseHackTool):
         super().onattached()
 
         for key, item in self.assembly_items.items():
-            if item.checked:
+            if item.enable:
                 self.toggle_assembly_function(key, True)
 
     def ondetach(self):
@@ -397,6 +397,8 @@ class AssemblyItems:
         self.children = children
         self.help = help
         self.hidden = hidden
+        self.button = None
+        self.enable = False
 
     @property
     def key(self):

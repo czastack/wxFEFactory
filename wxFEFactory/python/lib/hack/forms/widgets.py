@@ -1015,3 +1015,9 @@ def Title(label):
     """标题"""
     ui.Hr()
     return ui.Text(label)
+
+
+def StaticCheckBox(label):
+    """标题"""
+    ui.Hr()
+    return ui.CheckBox(label)

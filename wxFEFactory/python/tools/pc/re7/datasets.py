@@ -118,7 +118,7 @@ INVENTORYS = {
     'FoundFootage000': '"废弃房子录像"',
     'FoundFootage020': 'Derelict House Footage (2)',
     'FoundFootage010': 'FoundFootage010',
-    'FoundFootage040': 'Happy Birthday',
+    'FoundFootage040': '“生日快乐”录像带',
     'FoundFootage030': '“米娅”录像带',
     'FoundFootage050': '旧的录像带',
 
@@ -145,6 +145,24 @@ INVENTORYS = {
 
     # Weapons - Thrown
     'LiquidBomb': '遥控炸弹',
+
+    # 佐伊的结局
+    'NumaItem000': '拳击手人偶',
+    'NumaItem001': '冠军人偶',
+    'NumaItem003': '乔的求生指南',
+    'NumaItem004': '化学液体',
+    'NumaItem009': '废金属',
+    'NumaItem010': '树枝',
+    'NumaItem013': '急救药',
+    'NumaItem022': '小生物',
+    'NumaItem030': 'E型感染治疗药',
+    'NumaItem031': 'E型感染治疗药(满)',
+    'NumaItem071': '赤手空拳',
+    'NumaItem072': '投掷用小刀',
+    'CH9_WP001': 'AMG-78',
+    'CH9_WP003': 'M21猎枪',
+    'CH9_WP004': '投掷用长矛',
+    'CH9_WP005': '定点炸弹',
 }
 
 INVENTORY_LABELS = tuple(INVENTORYS.values())

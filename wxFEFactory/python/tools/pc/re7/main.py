@@ -1,7 +1,7 @@
 from base64 import b64decode
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
-    ModelChoiceDisplay
+    StaticCheckBox
 )
 from lib.hack.handlers import MemHandler
 from lib.hack.models import PropertyField
@@ -67,9 +67,11 @@ class Main(NativeHacktool):
         self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
         # ModelInput("inventory.capcity", label="物品容量")
         ModelInput("statistics.herb_count", "治疗物品使用数量")
-        ModelInput("statistics.open_box_count", "已打开物品箱数量")
+        ModelInput("statistics.open_box_count", "已打开物品箱数")
+        ModelInput("statistics.read_file_count", "已获得文件数")
         ModelInput("gametime")
         self.coord_widget = ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
+        self.coord_force_checkbox = StaticCheckBox("强制设置坐标")
 
     def render_character(self):
         ModelInput("health")
@@ -296,5 +298,8 @@ class Main(NativeHacktool):
     @char_coord.setter
     def char_coord(self, value):
         value = list(value)
-        self.coord_set.addr = self.get_variable('coord_set').addr
+        if self.coord_force_checkbox.checked:
+            self.coord_set.addr = self.get_variable('coord_set').addr
+        else:
+            self.coord_set.addr = self.get_variable_value('coord_addr')
         self.coord_set.coord = value

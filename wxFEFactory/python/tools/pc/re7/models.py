@@ -75,7 +75,8 @@ class Manager(Model):
 class Statistics(Model):
     """统计"""
     herb_count = Field(0x180, label="治疗物品使用数量")
-    open_box_count = Field(0x1F0, label="已打开物品箱数量")
+    open_box_count = Field(0x1F0, label="已打开物品箱数")
+    read_file_count = Field(0x730, label="已获得文件数")
 
 
 class GameTime(object):
