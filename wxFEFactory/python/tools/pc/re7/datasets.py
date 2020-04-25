@@ -159,6 +159,7 @@ INVENTORYS = {
     'NumaItem031': 'E型感染治疗药(满)',
     'NumaItem071': '赤手空拳',
     'NumaItem072': '投掷用小刀',
+    'CH9_WP000': 'AMG-78a',
     'CH9_WP001': 'AMG-78',
     'CH9_WP003': 'M21猎枪',
     'CH9_WP004': '投掷用长矛',

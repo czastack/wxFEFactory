@@ -19,6 +19,7 @@ ADDRESS_SOURCES = {
         'lock_health': 0x00584000,
         'ammo_keep': 0x004B1000,
         'item_inc': 0x002A0000,
+        'item_keep': 0x002A0000,
         'inf_ammo': 0x0029E000,
         'inf_clip': 0x004B1000,
         'inf_item1': 0x002A0000,
@@ -144,22 +145,45 @@ class Main(NativeHacktool):
                 'ammo_keep', '子弹不减', '41 FF C8 48 8B D3 48 8B CF', None, delta, '90 90 90', replace_len=3),
 
             AssemblyItem(
-                'item_inc', '使用物品增加', '2B F0 89 B7 88 00 00 00', None, delta, 'FF C6', replace_len=2),
+                'inf_clip', '弹夹99', '74 04 44 8B 40 24 41 FF C8', None, delta, b'',
+                '74 06  41 B8 7F969800', replace_len=6, inserted=True),
 
             AssemblyItem(
                 'inf_ammo', '备弹99', '41 03 B6 88 00 00 00', None, delta, b'',
                 '41 C7 86 88000000 63000000  41 03 B6 88000000', inserted=True),
 
             AssemblyItem(
-                'inf_clip', '弹夹99', '74 04 44 8B 40 24 41 FF C8', None, delta, b'',
-                '74 06  41 B8 7F969800', replace_len=6, inserted=True),
+                'item_inc', '使用物品增加', '2B F0 89 B7 88 00 00 00', None, delta, 'FF C6', replace_len=2),
+
+            # push rax
+            # mov rax, b_item_dec
+            # cmp dword ptr [rax],01
+            # jne inc_esi
+            # dec esi
+            # mov [rax], 00000000
+            # jmp out
+            # inc_esi:
+            # inc esi
+            # mov [rax], 00000001
+            # out:
+            # pop rax
+            # mov [rdi+00000088],esi
+            AssemblyItem(
+                'item_keep', '使用物品不减', '2B F0 89 B7 88 00 00 00', None, delta, b'',
+                AssemblyGroup(
+                    '50  48 B8',
+                    Variable('b_item_dec'),
+                    '83 38 01  0F85 0D000000  FF CE  C7 00 00000000  E9 08000000  FF C6  C7 00 01000000'
+                    '58  89 B7 88000000'
+                ),
+                args=('b_item_dec',), inserted=True),
 
             AssemblyItems(
                 '无限物品',
                 AssemblyItem(
                     'inf_item1', None, '2B F0 89 B7 88 00 00 00', None, delta, b'',
                     '39 C6 7F 05 83 FE 01 74 07 31 C0 BE 63 00 00 00 2B F0 89 B7 88 00 00 00',
-                    inserted=True, replace_len=8),
+                    inserted=True),
                 AssemblyItem(
                     'inf_item2', None, '48 8B D7 44 8B B7 88 00 00 00', None, delta, b'',
                     '41 BE 63 00 00 00 44 89 B7 88 00 00 00',
