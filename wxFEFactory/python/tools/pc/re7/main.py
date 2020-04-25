@@ -24,8 +24,10 @@ ADDRESS_SOURCES = {
         'inf_clip': 0x004B1000,
         'inf_item1': 0x002A0000,
         'inf_item2': 0x01BB5000,
-        'show_action': 0x019A1000,
         'clear_time': 0x01241000,
+        'pause_time': 0x01241000,
+        'jack55_pause_time': 0x00D0F000,
+        'show_action': 0x019A1000,
         'teleport': 0x01322000,
         'psychsostimulant_enable': 0x012A2000,
         'psychsostimulant_freeze': 0x012A2000,
@@ -191,11 +193,19 @@ class Main(NativeHacktool):
             ),
 
             AssemblyItem(
-                'show_action', '显示可互动及可收集物品', 'F3 0F 10 40 28 0F 5A C0 0F 5A CA', None, delta, b'',
-                '68 00 00 FA 43 F3 0F 10 04 24 48 83 C4 08', inserted=True, replace_len=5),
+                'clear_time', '清空游戏时间', '66 0F 5A C2 F3 0F 11 85 20 01 00 00', None, delta, '0F 57 C0', replace_len=4),
 
             AssemblyItem(
-                'clear_time', '清空游戏时间', '66 0F 5A C2 F3 0F 11 85 20 01 00 00', None, delta, '0F 57 C0', replace_len=4),
+                'pause_time', '暂停游戏时间', 'F3 0F 11 9D 1C 01 00 00 F2 0F 58 D1 66 0F 5A C2 F3 0F 11 85 20 01 00 00',
+                None, delta, '90 90 90 90 90 90 90 90 F2 0F 58 D1 66 0F 5A C2 90 90 90 90 90 90 90 90'),
+
+            AssemblyItem(
+                'jack55_pause_time', '杰克55岁生日暂停计数', 'F2 0F 5C F0 F2 48 0F 2C C6 48 89 83 98 00 00 00 48 85 C0',
+                None, delta, '90 90 90 90', replace_len=4),
+
+            AssemblyItem(
+                'show_action', '显示可互动及可收集物品', 'F3 0F 10 40 28 0F 5A C0 0F 5A CA', None, delta, b'',
+                '68 00 00 FA 43 F3 0F 10 04 24 48 83 C4 08', inserted=True, replace_len=5),
 
             # mov [coord_addr],rsi
             # mov rax, coord_set

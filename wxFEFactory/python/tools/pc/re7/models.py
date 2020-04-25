@@ -10,7 +10,6 @@ class Character(Model):
     health = FloatField(0x24, label="HP")
 
 
-
 class PositionStruct(Model):
     """位置数据"""
     coord = CoordField((0x18, 0x30), label="坐标")

@@ -68,7 +68,7 @@ INVENTORYS = {
 
     # Mission Items
     'Battery': 'Battery',
-    'ChainCutter': 'Bolt Cutters',
+    'ChainCutter': '断线钳',
     'BrokenHandgun_M19': 'Broken Handgun',
     'BrokenShotgun_DB': 'Broken Shotgun',
     'BurnerPartsA': 'Burner Grip',
@@ -106,7 +106,7 @@ INVENTORYS = {
     # Other
     'SupplyBoxA': 'Box from Mia (Closed)',
     'SupplyBoxOpenedA': 'Box from Mia (Opened)',
-    'SaveTape': 'Cassette Tape (Save)',
+    'SaveTape': '磁带 (存档)',
 
     # Player Upgrades
     'Depressant': '松弛剂 (提高上弹速度)',
@@ -149,10 +149,16 @@ INVENTORYS = {
     # 佐伊的结局
     'NumaItem000': '拳击手人偶',
     'NumaItem001': '冠军人偶',
+    'NumaItem002': '无限武器',
     'NumaItem003': '乔的求生指南',
     'NumaItem004': '化学液体',
+    'NumaItem006': '蜈蚣',
+    'NumaItem007': 'NumaItem007',
+    'NumaItem008': 'NumaItem008',
     'NumaItem009': '废金属',
     'NumaItem010': '树枝',
+    'NumaItem011': '小龙虾',
+    'NumaItem012': '幼虫',
     'NumaItem013': '急救药',
     'NumaItem022': '小生物',
     'NumaItem030': 'E型感染治疗药',
@@ -161,9 +167,11 @@ INVENTORYS = {
     'NumaItem072': '投掷用小刀',
     'CH9_WP000': 'AMG-78a',
     'CH9_WP001': 'AMG-78',
+    'CH9_WP002': '精神之刃',
     'CH9_WP003': 'M21猎枪',
     'CH9_WP004': '投掷用长矛',
     'CH9_WP005': '定点炸弹',
+    'CH9_WP006': 'AMG-双手',
 }
 
 INVENTORY_LABELS = tuple(INVENTORYS.values())

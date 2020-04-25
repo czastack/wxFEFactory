@@ -264,6 +264,8 @@ class AssemblyHacktool(BaseHackTool):
                 # 仅替换
                 if replace_len > len(replace):
                     replace += b'\x90' * (replace_len - len(replace))
+                elif replace_len and replace_len < len(replace):
+                    raise ValueError('replace_len < len(replace)')
 
             data = self.registed_assembly[item.key] = {'active': True, 'addr': addr, 'original': original,
                 'replace': replace, 'memory': memory}
