@@ -20,15 +20,15 @@ INVENTORYS = {
 
     # Coins
     'Coin': '古钱币',
-    'PowerUpCoin01A': 'Assault Coin',
-    'GoodLuckCoinA': 'Defense Coin',
-    'PowerUpCoin01B': 'Iron Defense Coin',
+    'PowerUpCoin01A': '猛攻硬币',
+    'GoodLuckCoinA': '防御硬币',
+    'PowerUpCoin01B': '铁壁硬币',
 
     # Crafting
     'ChemicalS': '化学液体',
     'Gunpowder': '火药',
     'RepairKit': '修理包',
-    'ChemicalL': 'Seperating Agent',
+    'ChemicalL': '分离剂',
     'Alcohol': '固体燃料',
     'ChemicalM': '强烈化学液体',
     'Flower': '补养品',
@@ -47,7 +47,7 @@ INVENTORYS = {
     '3CrestKeyA': '蓝色狗头',
     '3CrestKeyC': '红色狗头',
     '3CrestKeyB': '白色狗头',
-    'FloorDoorKey': 'Hatch Key',
+    'FloorDoorKey': '地下车库钥匙',
     'LucasCardKey': '蓝色钥匙卡',
     'LucasCardKey2': '红色钥匙卡',
     'CylinderKey': '开锁器',
@@ -86,7 +86,7 @@ INVENTORYS = {
     'FuseCh4': '通用保险丝',
     'Lantern': 'Lantern',
     'EvOpener': '扳手',
-    'ToyShotgun': 'Model Shotgun',
+    'ToyShotgun': '模型猎枪',
     'EvCable': 'Power Cable',
     'SerumComplete': 'SerumComplete',
     'SilhouettePazzlePieceOldHouse': '石雕像',
@@ -111,8 +111,10 @@ INVENTORYS = {
     # Player Upgrades
     'Depressant': '松弛剂 (提高上弹速度)',
     'Stimulant': '类固醇 (提高血值上限)',
-    'BookDefence01': 'The Secrets Of Defence',
-    'AlphaGrass': 'X-ray Glasses',
+    'BookDefence01': '防御的秘密',
+    'BookDefence02': '防御的本质',
+    'EasyBoots': '步行鞋',
+    'AlphaGrass': 'X射线眼镜',
 
     # Videotapes
     'FoundFootage000': '"废弃房子录像"',
@@ -146,7 +148,7 @@ INVENTORYS = {
     # Weapons - Thrown
     'LiquidBomb': '遥控炸弹',
 
-    # 佐伊的结局
+    # dlc佐伊的结局
     'NumaItem000': '拳击手人偶',
     'NumaItem001': '冠军人偶',
     'NumaItem002': '无限武器',
@@ -172,6 +174,25 @@ INVENTORYS = {
     'CH9_WP004': '投掷用长矛',
     'CH9_WP005': '定点炸弹',
     'CH9_WP006': 'AMG-双手',
+
+    # dlc不是英雄
+    'CKnife': '战术刀',
+    'Handgun_Albert_C': '武器之刃：埃尔伯特型01',
+    'Shotgun_Albert': '雷神之锤：埃尔伯特型02',
+    'AlbertHandgunBullet': '手枪弹药',
+    'AlbertHandgunBulletL': '反再生弹药（速效菌毒弹）',
+    'AlbertShotgunBullet': '猎枪弹药',
+    'RemedyAmpoulesM': '医疗注射器',
+    'Grenadebomb': '手榴弹',
+    'Stangrenadebomb': '神经眩晕手榴弹',
+    'UmbrellaFile00': '简报文件',
+    'UmbrellaFile01': '给新兵的信',
+    'KeyItem02Ch8': '古钱币',
+    'KeyItem03Ch8': '曲柄',
+    'KeyItem05Ch8': '齿轮',
+    'Ch8CageKey': '牢笼钥匙',
+    'DepressantAmpoules': '松弛剂 (提高上弹速度)',
+    'StimulantAmpoules': '类固醇 (提高血值上限)',
 }
 
 INVENTORY_LABELS = tuple(INVENTORYS.values())

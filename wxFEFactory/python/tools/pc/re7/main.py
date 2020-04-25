@@ -31,6 +31,9 @@ ADDRESS_SOURCES = {
         'teleport': 0x01322000,
         'psychsostimulant_enable': 0x012A2000,
         'psychsostimulant_freeze': 0x012A2000,
+        'init_health_chris': 0x016B6000,
+        'grenade_keep': 0x014FC000,
+        'oxygen_keep': 0x021AE000,
     },
     'codex': {
     }
@@ -159,11 +162,13 @@ class Main(NativeHacktool):
 
             # push rax
             # mov rax, b_item_dec
+            # cmp esi,01
+            # je short inc_esi
             # cmp dword ptr [rax],01
-            # jne inc_esi
+            # jne short inc_esi
             # dec esi
             # mov [rax], 00000000
-            # jmp out
+            # jmp short out
             # inc_esi:
             # inc esi
             # mov [rax], 00000001
@@ -175,8 +180,8 @@ class Main(NativeHacktool):
                 AssemblyGroup(
                     '50  48 B8',
                     Variable('b_item_dec'),
-                    '83 38 01  0F85 0D000000  FF CE  C7 00 00000000  E9 08000000  FF C6  C7 00 01000000'
-                    '58  89 B7 88000000'
+                    '83 FE 01  74 0F  83 38 01  75 0A  FF CE  C7 00 00000000  EB 08  FF C6  C7 00 01000000  58'
+                    '89 B7 88000000'
                 ),
                 args=('b_item_dec',), inserted=True),
 
@@ -250,6 +255,18 @@ class Main(NativeHacktool):
             #     'max_backpack', '最大背包空间', '39 B2 90 00 00 00 7E * 44 8D 46 FF', None, delta, b'',
             #     'C7 82 90 00 00 00 14 00 00 00 39 B2 90 00 00 00',
             #     inserted=True, replace_len=6),
+
+            AssemblyItem(
+                'init_health_chris', '不是英雄无限生命', 'F3 0F 10 40 24 48 8B 43 50 4C 39 60', None, delta, b'',
+                'F3 0F 10 40 20 F3 0F 11 40 24',
+                inserted=True, replace_len=5),
+
+            AssemblyItem(
+                'grenade_keep', '不是英雄手榴弹不减', 'FF C8 48 89 BC 24 90 00 00 00', None, delta, '90 90', replace_len=2),
+
+            AssemblyItem(
+                'oxygen_keep', '不是英雄手氧气不减', 'F3 0F 11 12 48 8B D1 48 8B 49 40', None, delta, '90 90 90 90',
+                replace_len=4, replace_offset=16),
         ))
 
     def render_buttons_own(self):
