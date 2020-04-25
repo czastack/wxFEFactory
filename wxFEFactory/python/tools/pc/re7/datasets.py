@@ -185,6 +185,7 @@ INVENTORYS = {
     'RemedyAmpoulesM': '医疗注射器',
     'Grenadebomb': '手榴弹',
     'Stangrenadebomb': '神经眩晕手榴弹',
+    'Thermatebomb': '燃烧手榴弹',
     'UmbrellaFile00': '简报文件',
     'UmbrellaFile01': '给新兵的信',
     'KeyItem02Ch8': '古钱币',
