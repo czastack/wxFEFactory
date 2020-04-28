@@ -179,6 +179,8 @@ INVENTORYS = {
     'CKnife': '战术刀',
     'Handgun_Albert_C': '武器之刃：埃尔伯特型01',
     'Shotgun_Albert': '雷神之锤：埃尔伯特型02',
+    'SiteScopeB': '雷神之锤瞄准器B',
+    'BookDefenceJustGuard': '容易挡开',
     'AlbertHandgunBullet': '手枪弹药',
     'AlbertHandgunBulletL': '反再生弹药（速效菌毒弹）',
     'AlbertShotgunBullet': '猎枪弹药',
@@ -192,6 +194,7 @@ INVENTORYS = {
     'KeyItem03Ch8': '曲柄',
     'KeyItem05Ch8': '齿轮',
     'Ch8CageKey': '牢笼钥匙',
+    'MineMasterKey': '小丑钥匙',
     'DepressantAmpoules': '松弛剂 (提高上弹速度)',
     'StimulantAmpoules': '类固醇 (提高血值上限)',
 }

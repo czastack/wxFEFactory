@@ -33,7 +33,7 @@ ADDRESS_SOURCES = {
         'psychsostimulant_freeze': 0x012A2000,
         'init_health_chris': 0x016B6000,
         'grenade_keep': 0x014FC000,
-        'oxygen_keep': 0x021AE000,
+        'oxygen_keep': 0x021AF000,
     },
     'codex': {
     }
@@ -265,8 +265,9 @@ class Main(NativeHacktool):
                 'grenade_keep', '不是英雄手榴弹不减', 'FF C8 48 89 BC 24 90 00 00 00', None, delta, '90 90', replace_len=2),
 
             AssemblyItem(
-                'oxygen_keep', '不是英雄手氧气不减', 'F3 0F 11 12 48 8B D1 48 8B 49 40', None, delta, '90 90 90 90',
-                replace_len=4, replace_offset=16),
+                'oxygen_keep', '不是英雄手氧气不减', 'E9 * * * * F3 0F 10 41 20 C3 CC', None, delta, b'',
+                '83 79 08 03 0F 85 07 00 00 00 C7 41 20 00 00 C8 42 F3 0F 10 41 20',
+                replace_len=5, replace_offset=5, inserted=True, fuzzy=True),
         ))
 
     def render_buttons_own(self):
