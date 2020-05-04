@@ -28,7 +28,8 @@ ADDRESS_SOURCES = {
         'lock_time': 0x0DBE6000,
         'pilot_no_cd': 0x0095E000,
         'instant_airdrop': 0x00BF2000,
-        'wing_inf_boost': 0x0F2DD000,
+        'wing_boost_restore': 0x0E503000,
+        'wing_inf_boost': 0x0E503000,
         'wing_inf_missile': 0x0F2DD000,
     },
     'steam': {
@@ -160,11 +161,13 @@ class Main(AssemblyHacktool):
                     inserted=True, replace_len=7),
                 AssemblyItem(
                     'show_target2', None, '0F B6 58 3C EB 02', None, delta, 'B3 01 90 90', replace_len=4),
+            ),
             # AssemblyItem(
             #     'challenge_add_60s', '挑战时间+60s', '', None, delta, b'',
             #     '', inserted=True, replace_len=8),
             AssemblyItem(
-                'lock_time', '锁定任务时间', 'F3 0F 5C C7 44 0F B6 F8 41 0F 2F C0', None, delta, '90 90 90 90', replace_len=4)),
+                'lock_time', '锁定任务时间', 'F3 0F 5C C7 44 0F B6 F8 41 0F 2F C0', None, delta,
+                '90 90 90 90', replace_len=4),
             AssemblyItem(
                 'pilot_no_cd', '飞行员无冷却', '0F 57 C0 0F 2E 41 24', None, delta, b'',
                 '0F 57 C0 F3 0F 10 F0 0F 2E 41 24', inserted=True, replace_len=7),
@@ -172,8 +175,33 @@ class Main(AssemblyHacktool):
                 'instant_airdrop', '瞬间产生空投', 'F3 0F 58 47 24 F3 0F 11 47 24', None, delta, b'',
                 'C7 47 24 7F 96 18 4B F3 0F 58 47 24', inserted=True, replace_len=5),
             AssemblyItem(
-                'wing_inf_boost', '飞翼无限推进', '0F 2F 07 77 0D B0 01', None, delta, b'',
-                'C7 07 00 00 10 41', inserted=True, replace_len=5),
+                'wing_boost_restore', '快速恢复飞翼推进', 'F3 0F 5E C4 F3 0F 58 C2 F3 0F 5F C3', None, delta,
+                '90 90 90 90', replace_len=4),
+            AssemblyItem(
+                'wing_inf_boost', '飞翼无限推进(自动)', 'F3 0F 5C C8 F3 0F 5F CC F3 0F 5D CB', None, delta,
+                '90 90 90 90', inserted=True, replace_len=4),
+            # xorps xmm0,xmm0
+            # comiss xmm1,xmm0
+            # je canel
+            # push rax
+            # mov eax,(float)0.8
+            # movd xmm0,eax
+            # pop rax
+            # comiss xmm1,xmm0
+            # movaps xmm0,xmm2
+            # mulss xmm0,xmm6
+            # jbe do
+            # canel:
+            # subss xmm1,xmm0
+            # do:
+            AssemblyItem(
+                'wing_inf_boost', '飞翼无限推进', '0F 28 C2 F3 0F 59 C6 F3 0F 5C C8', None, delta, b'',
+                '0F 57 C0 0F 2F C8 0F 84 1B 00 00 00 50 B8 CD CC 4C 3F 66 0F 6E C0 58 0F 2F C8 0F 28 C2'
+                'F3 0F 59 C6 0F 86 04 00 00 00 F3 0F 5C C8',
+                inserted=True),
+            # AssemblyItem(
+            #     'wing_inf_boost', '飞翼无限推进', '0F 2F 07 77 0D B0 01', None, delta, b'',
+            #     'C7 07 00 00 10 41', inserted=True, replace_len=5),
             AssemblyItem(
                 'wing_inf_missile', '飞翼无限导弹', '0F 2F 42 F8 0F B6 C1', None, delta, b'',
                 'C7 42 F8 00 00 10 41  0F 2F 42 F8  0F B6 C1', inserted=True, replace_len=7),
