@@ -17,8 +17,9 @@ ADDRESS_SOURCES = {
         'one_hit_kill_2': 0x0D31F000,
         'ammo_keep': 0x0072C000,
         'inf_ammo': 0x0D44D000,
-        'no_reload1': 0x00765000,
-        'no_reload2': 0x00765000,
+        'no_reload': 0x00759000,
+        # 'no_reload1': 0x00765000,
+        # 'no_reload2': 0x00765000,
         'cease_fire': 0x0075A000,
         'rapid_fire': 0x0075A000,
         'no_recoil_base': 0x0CC42000,
@@ -73,8 +74,10 @@ class Main(AssemblyHacktool):
                     VariableType('player_addr', size=8),
                     'b_inf_health',
                 ),
-                inserted=True
+                inserted=True,
+                hidden=True
             ),
+            AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health',)),
             AssemblyItems(
                 '一击必杀',
                 AssemblyItem(
@@ -113,6 +116,9 @@ class Main(AssemblyHacktool):
             AssemblyItem(
                 'inf_ammo', '无限备弹', '8B B4 B9 EC 02 00 00 41 39 F0', None, delta, b'',
                 'BE E7 03 00 00 44 8B C6', inserted=True, replace_len=7),
+            AssemblyItem(
+                'no_reload', '无需换弹', '8B 87 6C 05 00 00 48', None, delta, b'',
+                'C7 87 6C 05 00 00 63 00 00 00 8B 87 6C 05 00 00', inserted=True, replace_len=6),
             # AssemblyItems(
             #     '无需换弹',
             #     AssemblyItem(
@@ -216,6 +222,7 @@ class Main(AssemblyHacktool):
             # (0, VK._0, this.clear_hot_level),
             (0, VK.CAPSLOCK, lambda: this.toggle_assembly_function('ammo_keep')),
             (VK.MOD_ALT, VK.CAPSLOCK, lambda: this.toggle_assembly_function('wing_inf_boost')),
+            (VK.MOD_ALT, VK.A, lambda: this.toggle_assembly_function('no_reload')),
         )
 
     def on_version_change(self, lb):
