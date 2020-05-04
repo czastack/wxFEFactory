@@ -1,6 +1,3 @@
-VERSIONS = ('steam', 'codex')
-
-
 # (name, label)
 INVENTORYS = {
     # Ammo

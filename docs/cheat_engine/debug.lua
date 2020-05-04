@@ -1,5 +1,13 @@
 -- 调试KERNELBASE.WriteProcessMemory (64位)
 local WriteProcessMemory = getAddress('KERNELBASE.WriteProcessMemory')
+function readHex(addr, size)
+    local data = readBytes(addr, size, true)
+    local hexdata = {}
+    for k, v in ipairs(data) do
+        hexdata[k] = string.format('%02X', v)
+    end
+    return string.format("'%s'", table.concat(hexdata, ' '))
+end
 function debugger_onBreakpoint()
     -- LPVOID lpBaseAddress: RDX,
     -- LPVOID lpBuffer: ECX,
@@ -7,13 +15,8 @@ function debugger_onBreakpoint()
     if RIP ~= WriteProcessMemory + 0x13 then
         return 0
     end
-    local data = readBytes(R8, R9, true)
-    local hexdata = {}
-    for k, v in ipairs(data) do
-        hexdata[k] = string.format('%02X', v)
-    end
-    local buffer = string.format("'%s'", table.concat(hexdata, ' '))
-    local result = string.format('WriteProcessMemory(address=0x%08X, buffer=%s, size=%d)', RDX, buffer, R9)
+    local replace = readHex(R8, R9)
+    local result = string.format('WriteProcessMemory(address=0x%08X, replace=%s, size=%d)', RDX, replace, R9)
     print(result)
     return 1
 end
@@ -22,7 +25,14 @@ debug_setBreakpoint(WriteProcessMemory + 0x13)
 
 -- 调试KERNELBASE.WriteProcessMemory (32位)
 local WriteProcessMemory = getAddress('KERNELBASE.WriteProcessMemory')
-
+function readHex(addr, size)
+    local data = readBytes(addr, size, true)
+    local hexdata = {}
+    for k, v in ipairs(data) do
+        hexdata[k] = string.format('%02X', v)
+    end
+    return string.format("'%s'", table.concat(hexdata, ' '))
+end
 function debugger_onBreakpoint()
     -- LPVOID lpBaseAddress: ESP + 8,
     -- LPVOID lpBuffer: ESP + C,
@@ -33,13 +43,8 @@ function debugger_onBreakpoint()
     local lpBaseAddress = readInteger(ESP + 8)
     local lpBuffer = readInteger(ESP + 0xC)
     local nSize = readInteger(ESP + 0x10)
-    local data = readBytes(lpBuffer, nSize, true)
-    local hexdata = {}
-    for k, v in ipairs(data) do
-        hexdata[k] = string.format('%02X', v)
-    end
-    local buffer = string.format("'%s'", table.concat(hexdata, ' '))
-    local result = string.format('WriteProcessMemory(address=0x%08X, buffer=%s, size=%d)', lpBaseAddress, buffer, nSize)
+    local replace = readHex(lpBuffer, nSize)
+    local result = string.format('WriteProcessMemory(address=0x%08X, replace=%s, size=%d)', lpBaseAddress, replace, nSize)
     print(result)
     return 1
 end

@@ -70,7 +70,7 @@ class Main(NativeHacktool):
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
     def render_global(self):
-        self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
+        self.version_view = Choice("版本", ADDRESS_SOURCES.keys(), self.on_version_change)
         # ModelInput("inventory.capcity", label="物品容量")
         ModelInput("statistics.herb_count", "治疗物品使用数量")
         ModelInput("statistics.open_box_count", "已打开物品箱数")

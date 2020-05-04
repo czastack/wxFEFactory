@@ -11,7 +11,7 @@ from .assembly_code import AssemblyNode
 class AssemblyHacktool(BaseHackTool):
     """现在支持x86 jmp"""
     allocated_memory = None
-    allocation_size = 2048
+    allocation_size = 0x800
     allocation_type = 0x00003000
     assembly_address_sources = None
 
@@ -99,9 +99,11 @@ class AssemblyHacktool(BaseHackTool):
             if not self.handler.is32process:
                 # 64位应用程序
                 start = self.handler.base_addr - 0x10000000
-                self.alloc_memory(start)
-                if self.allocated_memory == 0:
-                    self.alloc_memory(start - 0x10000000)
+                for i in range(0xFFF):
+                    self.alloc_memory(start)
+                    if self.allocated_memory != 0:
+                        break
+                    start += 0x10000
             if not self.allocated_memory:
                 self.alloc_memory()
             if self.allocated_memory == 0:
