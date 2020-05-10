@@ -30,6 +30,7 @@ ADDRESS_SOURCES = {
         'pilot_no_cd': 0x0095E000,
         'instant_airdrop': 0x00BF2000,
         'wing_boost_restore': 0x0E503000,
+        'wing_inf_boost_auto': 0x0E503000,
         'wing_inf_boost': 0x0E503000,
         'wing_inf_missile': 0x0F2DD000,
     },
@@ -184,8 +185,8 @@ class Main(AssemblyHacktool):
                 'wing_boost_restore', '快速恢复飞翼推进', 'F3 0F 5E C4 F3 0F 58 C2 F3 0F 5F C3', None, delta,
                 '90 90 90 90', replace_len=4),
             AssemblyItem(
-                'wing_inf_boost', '飞翼无限推进(自动)', 'F3 0F 5C C8 F3 0F 5F CC F3 0F 5D CB', None, delta,
-                '90 90 90 90', inserted=True, replace_len=4),
+                'wing_inf_boost_auto', '飞翼无限推进(自动)', 'F3 0F 5C C8 F3 0F 5F CC F3 0F 5D CB', None, delta,
+                '90 90 90 90', replace_len=4),
             # xorps xmm0,xmm0
             # comiss xmm1,xmm0
             # je canel

@@ -72,6 +72,10 @@ class VK(KEY):
         "'": 222,
     }
 
+    LBUTTON = 1    # 鼠标左键
+    RBUTTON = 2    # 鼠标右键
+    CANCEL = 3    # Ctrl + Break
+    MBUTTON = 4    # 鼠标中键
     BACK = 8
     TAB = 9
     ENTER = 13
