@@ -19,8 +19,8 @@ ADDRESS_SOURCES = {
         'ammo_keep2': 0x00765000,
         'inf_ammo': 0x0D44D000,
         'no_reload': 0x00759000,
-        # 'no_reload1': 0x00765000,
-        # 'no_reload2': 0x00765000,
+        'no_reload1': 0x00765000,
+        'no_reload2': 0x00765000,
         'cease_fire': 0x0075A000,
         'rapid_fire': 0x0075A000,
         'no_recoil_base': 0x0CC42000,
@@ -120,9 +120,15 @@ class Main(AssemblyHacktool):
             # inc edx
             # cancel:
             # cmp dword ptr [rcx+00000264],00
-            AssemblyItem(
-                'ammo_keep2', '备弹不减(兼容导弹)', 'C2 D7 18 83 B9 64 02 00 00 00', None, delta, b'',
-                '85 D2  0F85 02000000  FF C2  83 B9 64020000 00', inserted=True, replace_offset=3, replace_len=7),
+            AssemblyItems(
+                '子弹不减(兼容导弹)',
+                AssemblyItem(
+                    'ammo_keep2', '子弹不减(兼容导弹)', 'C2 D7 18 83 B9 64 02 00 00 00', None, delta, b'',
+                    '85 D2  0F85 02000000  FF C2  83 B9 64020000 00', inserted=True, replace_offset=3, replace_len=7),
+                # 副武器
+                AssemblyItem(
+                    'no_reload2', None, '8B FA 48 8B D9 85 D2 75 3D 83 B9 70 06 00 00 01', None, delta, b'',
+                    '83 FA 00 75 02 FF C2 8B FA 48 8B D9', inserted=True, replace_len=5)),
             AssemblyItem(
                 'inf_ammo', '无限备弹', '8B B4 B9 EC 02 00 00 41 39 F0', None, delta, b'',
                 'BE E7 03 00 00 44 8B C6', inserted=True, replace_len=7),
@@ -134,6 +140,7 @@ class Main(AssemblyHacktool):
             #     AssemblyItem(
             #         'no_reload1', None, 'C2 D7 18 83 B9 64 02 00 00 00', None, delta, b'',
             #         'FF C2  83 B9 64 02 00 00 00', inserted=True, replace_offset=3, replace_len=7),
+            #     # 副武器
             #     AssemblyItem(
             #         'no_reload2', None, '8B FA 48 8B D9 85 D2 75 3D 83 B9 70 06 00 00 01', None, delta, b'',
             #         '83 FA 00 75 02 FF C2 8B FA 48 8B D9', inserted=True, replace_len=5)),
