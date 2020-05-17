@@ -4,7 +4,7 @@ from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
+    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
 )
 from tools.base import assembly_code
 from . import models
@@ -47,9 +47,11 @@ class Main(AssemblyHacktool):
             ModelInput("jump_height", "跳跃高度")
 
     def render_assembly_buttons_own(self):
+        base_depends = ('base',)
+        delta = Delta(0x2000)
         self.render_assembly_buttons((
             AssemblyItem('base', '开启', b'\x04\x00\x00\x00\x48***\x48\x8b\x0c\x01',
-                0x137500, 0x137800, b'',
+                0x137500, delta, b'',
                 assembly_code.AssemblyGroup(
                     b'\x41\x81\xFC\xFF\xFF\xFF\xFF'
                     b'\x0F\x85\x02\x01\x00\x00'
@@ -100,32 +102,32 @@ class Main(AssemblyHacktool):
                     b'\x48\x89\x4A\x18\xC3'),
                 args=(('base1', 8), 's_inf_energy', 's_inf_vigour', 's_inf_health', 's_inf_skill', 's_inf_hit',
                     's_add_atk', 's_add_def', 's_add_critical_buff', 's_add_critical'),
-                inserted=True, replace_offset=8, replace_len=14, fuzzy=True),
+                inserted=True, replace_offset=8, replace_len=14, fuzzy=True, hidden=True),
 
             AssemblyItem('base_move', '开启移动相关', b'\x48\x8B\xFA\x48\x8B\xD9\x66\x0F\x6E\xC0\x0F\x5B\xC0\x0F\x2E\xC6',
-                0x1E0D00, 0x1E1000, b'',
+                0x1E0D00, delta, b'',
                 assembly_code.AssemblyGroup(
                     assembly_code.ORIGIN,
                     b'\x48\x89\x3D', assembly_code.Offset('base_move'),
                 ),
                 args=(('base_move', 8),),
-                inserted=True, replace_len=16),
-            AssemblyItem('base_move', '超级跳跃', b'\x48\x85\xC0\x74\x0B\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3',
-                0x1B4C00, 0x1B4E00, b'',
+                inserted=True, replace_len=16, hidden=True),
+            AssemblyItem('super_jump', '超级跳跃', b'\x48\x85\xC0\x74\x0B\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3',
+                0x1B4C00, delta, b'',
                 assembly_code.AssemblyGroup(
                     b'\x48\x85\xC0\x74\x1A\x50\xA1', assembly_code.Variable('jump_height'),
                     b'\x66\x0F\x6E\xC8\x58\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3'
                 ),
                 args=(VariableType('jump_height', type=float, value=1000.0),), inserted=True),
-            AssemblySwitch('s_inf_energy', '无限体力'),
-            AssemblySwitch('s_inf_vigour', '无限元气'),
-            AssemblySwitch('s_inf_health', '无限元精'),
-            AssemblySwitch('s_inf_skill', '无限战意技'),
-            AssemblySwitch('s_inf_hit', '无限连击'),
-            AssemblySwitch('s_add_atk', '增强攻击'),
-            AssemblySwitch('s_add_def', '增加防御'),
-            AssemblySwitch('s_add_critical_buff', '增强暴击伤害加成'),
-            AssemblySwitch('s_add_critical', '增强暴击率'),
+            AssemblySwitch('s_inf_energy', '无限体力', depends=base_depends),
+            AssemblySwitch('s_inf_vigour', '无限元气', depends=base_depends),
+            AssemblySwitch('s_inf_health', '无限元精', depends=base_depends),
+            AssemblySwitch('s_inf_skill', '无限战意技', depends=base_depends),
+            AssemblySwitch('s_inf_hit', '无限连击', depends=base_depends),
+            AssemblySwitch('s_add_atk', '增强攻击', depends=base_depends),
+            AssemblySwitch('s_add_def', '增加防御', depends=base_depends),
+            AssemblySwitch('s_add_critical_buff', '增强暴击伤害加成', depends=base_depends),
+            AssemblySwitch('s_add_critical', '增强暴击率', depends=base_depends),
         ))
 
     def _global(self):

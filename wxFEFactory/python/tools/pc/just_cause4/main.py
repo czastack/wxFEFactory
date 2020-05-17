@@ -101,7 +101,7 @@ class Main(AssemblyHacktool):
                         Variable('player_addr'),
                         '48 39 F8  74 32  48 A1',
                         Variable('vehicle_addr'),
-                        '48 39 F8  74 15  ',
+                        '48 39 F8  74 15',
                         Cmp('b_one_hit_kill', 1),
                         '75 1A  66 83 FB 00  7E 14  66 BB 3075  EB 0E',
                         Cmp('b_inf_health', 1),
