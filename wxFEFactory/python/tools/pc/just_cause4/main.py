@@ -115,16 +115,30 @@ class Main(AssemblyHacktool):
             AssemblyItem(
                 'ammo_keep', '子弹不减', '41 2B C4 4C 8B 06 45 33 F6', None, delta,
                 b'\x90\x90\x90'),
+            # ver1:
             # test edx, edx
             # jnz cancel
             # inc edx
+            # cancel:
+            # cmp dword ptr [rcx+00000264],00
+
+            # ver2:
+            # cmp edx, 3F0
+            # ja short cancel
+            # cmp edx, 4
+            # ja short inc_ammo
+            # test edx, edx
+            # jnz short cancel
+            # inc_ammo:
+            # add edx, r12d
             # cancel:
             # cmp dword ptr [rcx+00000264],00
             AssemblyItems(
                 '子弹不减(兼容导弹)',
                 AssemblyItem(
                     'ammo_keep2', '子弹不减(兼容导弹)', 'C2 D7 18 83 B9 64 02 00 00 00', None, delta, b'',
-                    '85 D2  0F85 02000000  FF C2  83 B9 64020000 00', inserted=True, replace_offset=3, replace_len=7),
+                    '81 FA F0 03 00 00  77 0C  83 FA 04  77 04  85 D2  75 03  44 01 E2  83 B9 64020000 00',
+                    inserted=True, replace_offset=3, replace_len=7),
                 # 副武器
                 AssemblyItem(
                     'no_reload2', None, '8B FA 48 8B D9 85 D2 75 3D 83 B9 70 06 00 00 01', None, delta, b'',
