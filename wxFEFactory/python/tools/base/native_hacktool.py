@@ -1,5 +1,4 @@
 import base64
-from functools import partial
 from lib import extypes
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem, Delta
 from .native import NativeContext, NativeContext64, NativeContextArray, ResultResolver
@@ -10,7 +9,8 @@ class NativeHacktool(AssemblyHacktool):
     enable_native_call_n = False
 
     # x86 native_call
-    FUNCTION_NATIVE_CALL = base64.b64decode(b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GD/'
+    FUNCTION_NATIVE_CALL = base64.b64decode(
+        b'VYvsg+wMVot1CFeLVgiLAot6BINGBP6LTgRBiUX0iX34g/kBfg+LBIqJRfz/dfxJg/kBf/GD/'
         b'wF2A4tN+P9V9IlFCIX/dQyLRgTB4AKJRfQDZfSLDotFCF9eiQGL5V3DuAAQFADD')
 
     # x64 native_call
@@ -26,7 +26,8 @@ class NativeHacktool(AssemblyHacktool):
         b'VYvsUcdF/AAAAADrCYtF/IPAAYlF/ItN/DtNEH0TaVX8jAAAAANVDFL/VQiDxATr3IvlXcM=')
 
     # x64 native_call_n
-    FUNCTION_NATIVE_CALL_N_64 = base64.b64decode(b'RIlEJBhIiVQkEEiJTCQISIPsOMdEJCAAAAAA6wqLRCQg/8CJRCQgi0QkUDlEJCB9IEhj'
+    FUNCTION_NATIVE_CALL_N_64 = base64.b64decode(
+        b'RIlEJBhIiVQkEEiJTCQISIPsOMdEJCAAAAAA6wqLRCQg/8CJRCQgi0QkUDlEJCB9IEhj'
         b'RCQgSGnAoAAAAEiLTCRISAPISIvBSIvI/1QkQOvMSIPEOMM=')
 
     def __init__(self):
@@ -34,14 +35,17 @@ class NativeHacktool(AssemblyHacktool):
         self.native_call_addr = None
         self.native_call_n_addr = None
         self.native_context = None
+        self._cached_address = None
 
     def onattach(self):
         """初始化远程函数"""
         super().onattach()
-        self.native_call_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL if self.is32process
+        self.native_call_addr = self.handler.write_function(
+            self.FUNCTION_NATIVE_CALL if self.is32process
             else self.FUNCTION_NATIVE_CALL_64)
         if self.enable_native_call_n:
-            self.native_call_n_addr = self.handler.write_function(self.FUNCTION_NATIVE_CALL_N if self.is32process
+            self.native_call_n_addr = self.handler.write_function(
+                self.FUNCTION_NATIVE_CALL_N if self.is32process
                 else self.FUNCTION_NATIVE_CALL_N_64)
         if self.NativeContext is None:
             self.NativeContext = NativeContext if self.is32process else NativeContext64
@@ -78,7 +82,8 @@ class NativeHacktool(AssemblyHacktool):
         :param this: this指针，为0时使用cdecl, 1时使用stdcall, 大于1时使用thiscall
         :param arg_sign: 参数签名
         """
-        return self.native_call(self.native_call_addr, '2L' + (arg_sign if arg_sign is not None else ''),
+        return self.native_call(
+            self.native_call_addr, '2L' + (arg_sign if arg_sign is not None else ''),
             addr, this, *args, ret_type=ret_type, ret_size=ret_size)
 
     def native_call_64(self, addr, arg_sign, *args, this=0, ret_type=int, ret_size=8):
@@ -87,7 +92,8 @@ class NativeHacktool(AssemblyHacktool):
         :param this: this指针，为0则为普通函数
         :param arg_sign: 参数签名
         """
-        return self.native_call(self.native_call_addr, 'p2Q' + (arg_sign if arg_sign is not None else ''),
+        return self.native_call(
+            self.native_call_addr, 'p2Q' + (arg_sign if arg_sign is not None else ''),
             self.native_context.fflag, addr, this, *args, ret_type=ret_type, ret_size=ret_size)
 
     def native_call_sys(self, *args, **kwargs):
@@ -101,7 +107,8 @@ class NativeHacktool(AssemblyHacktool):
         """ 调用一项
         :param item: call_arg
         """
-        self.native_call_sys(item['addr'], item['arg_sign'], *item['args'],
+        self.native_call_sys(
+            item['addr'], item['arg_sign'], *item['args'],
             this=item['this'], ret_type=item['ret_type'], ret_size=item['ret_size'])
         # 函数结果
         ret_type = item['ret_type']
@@ -132,12 +139,13 @@ class NativeHacktool(AssemblyHacktool):
                 context.reset()
             if issubclass(self.NativeContext, NativeContext64):
                 context.push('p2Q' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
-                    context.fflag, item['addr'], item['this'], *item['args'])
+                             context.fflag, item['addr'], item['this'], *item['args'])
             else:
                 context.push('2L' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
-                    item['addr'], item['this'], *item['args'])
+                             item['addr'], item['this'], *item['args'])
 
-        self.native_call_sys(self.native_call_n_addr, '2Pi',
+        self.native_call_sys(
+            self.native_call_n_addr, '2Pi',
             self.native_call_addr, context_array.addr, len(call_list))
 
         # 函数结果列表
@@ -199,9 +207,22 @@ class NativeHacktool(AssemblyHacktool):
 
 
 def call_arg(addr, arg_sign, *args, this=0, ret_type=None, ret_size=4):
-    return {'addr': addr, 'arg_sign': arg_sign, 'args': args,
-        'this': this, 'ret_type': ret_type, 'ret_size': ret_size}
+    return {
+        'addr': addr, 'arg_sign': arg_sign, 'args': args,
+        'this': this, 'ret_type': ret_type, 'ret_size': ret_size
+    }
 
 
-call_arg_int32 = partial(call_arg, ret_type=int, ret_size=4)
-call_arg_int64 = partial(call_arg, ret_type=int, ret_size=8)
+class FunctionCall:
+    """函数调用容器"""
+    def __init__(self, addr, arg_sign, ret_type=None, ret_size=4):
+        self.addr = addr
+        self.arg_sign = arg_sign
+        self.ret_type = ret_type
+        self.ret_size = ret_size
+
+    def __call__(self, *args, ret_type=None):
+        """生产call arg"""
+        if ret_type is None:
+            ret_type = self.ret_type
+        return call_arg(self.addr, self.arg_sign, *args, ret_type=ret_type, ret_size=self.ret_size)

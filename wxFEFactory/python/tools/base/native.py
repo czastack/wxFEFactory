@@ -185,11 +185,16 @@ class NativeContext(Model):
         self.handler.write(addr, data)
         return addr
 
-    def get_result(self, type, size=0):
+    def get_result(self, ret_type, ret_size=0):
         """获取调用结果"""
-        if type is str:
-            return self.get_string_result(size)
-        return self.handler.read(self.m_pReturn, type, size)
+        if ret_type == 'ptr':
+            ret_type = int
+            ret_size = self.handler.ptr_size
+        elif ret_size == 'ptr':
+            ret_size = self.handler.ptr_size
+        if ret_type is str:
+            return self.get_string_result(ret_size)
+        return self.handler.read(self.m_pReturn, ret_type, ret_size)
 
     def get_vector_result(self, size=4, fixed=-1):
         """获取三个浮点数结果"""
@@ -317,12 +322,17 @@ class NativeContext64(NativeContext):
         if update:
             self.m_nArgCount = index
 
-    def get_result(self, type, size=0):
+    def get_result(self, ret_type, ret_size=0):
         """获取调用结果"""
-        if type is not float:
-            return super().get_result(type, size)
+        if ret_type is not float:
+            return super().get_result(ret_type, ret_size)
         else:
-            if size == 8:
+            if ret_type == 'ptr':
+                ret_type = int
+                ret_size = self.handler.ptr_size
+            elif ret_size == 'ptr':
+                ret_size = self.handler.ptr_size
+            if ret_size == 8:
                 return self.handler.read_double(self.m_pReturn + 16)
             return self.handler.read_float(self.m_pReturn + 8)
 

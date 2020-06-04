@@ -99,7 +99,7 @@ class MonoTyping:
         if result and not self.is_mono_type:
             owner = instance.owner
             # 获取值要先解包，得到地址
-            result = owner.native_call_1(owner.call_arg_ptr(*owner.mono_object_unbox, result))
+            result = owner.native_call_1(owner.mono_api.mono_object_unbox(result))
             # TODO 判断类型
             result = owner.handler.read(result, self.real_type, self.size)
         return self.case_value(result, instance)
@@ -140,8 +140,8 @@ class MonoField(MonoMember, MonoTyping):
         if not self.mono_field:
             raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr()
-        return call_arg(*instance.owner.mono_field_get_value, instance.mono_object, self.mono_field,
-            temp_ptr, ret_type=temp_ptr)
+        return instance.owner.mono_api.mono_field_get_value(
+            instance.mono_object, self.mono_field, temp_ptr, ret_type=temp_ptr)
 
     def op_setter(self, instance, value):
         """用于设置值的call_arg"""
@@ -150,7 +150,7 @@ class MonoField(MonoMember, MonoTyping):
         if not self.mono_field:
             raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr(value)
-        return call_arg(*instance.owner.mono_field_set_value, instance.mono_object, self.mono_field, temp_ptr)
+        return instance.owner.mono_api.mono_field_set_value(instance.mono_object, self.mono_field, temp_ptr)
 
     def get_value(self, instance):
         """获取值"""
@@ -173,7 +173,7 @@ class MonoStaticField(MonoField):
         if not self.mono_field:
             raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr()
-        return call_arg(*instance.owner.mono_field_static_get_value,
+        return instance.owner.mono_api.mono_field_static_get_value(
             instance.mono_vtable, self.mono_field, temp_ptr, ret_type=temp_ptr)
 
     def op_setter(self, instance, value):
@@ -181,7 +181,7 @@ class MonoStaticField(MonoField):
         if not self.mono_field:
             raise ValueError('mono_field未初始化')
         temp_ptr = self.temp_ptr(value)
-        return call_arg(*instance.owner.mono_field_static_set_value, instance.mono_vtable, self.mono_field, temp_ptr)
+        return instance.owner.mono_api.mono_field_static_set_value(instance.mono_vtable, self.mono_field, temp_ptr)
 
 
 class MonoProperty(MonoMember, MonoTyping):
@@ -205,7 +205,7 @@ class MonoProperty(MonoMember, MonoTyping):
         """用于获取值的call_arg"""
         if not self.mono_property:
             raise ValueError('mono_property未初始化')
-        return instance.owner.call_arg_ptr(*instance.owner.mono_property_get_value,
+        return instance.owner.mono_api.mono_property_get_value(
             self.mono_property, instance.mono_object, 0, 0)
 
     def op_setter(self, instance, value):
@@ -213,7 +213,7 @@ class MonoProperty(MonoMember, MonoTyping):
         if not self.mono_property:
             raise ValueError('mono_property未初始化')
         params = TempArrayPtr(NativeContext.type_signature(self.real_type, self.size), (value,))
-        return call_arg(*instance.owner.mono_property_set_value,
+        return instance.owner.mono_api.mono_property_set_value(
             self.mono_property, instance.mono_object, params, 0)
 
     def get_value(self, instance):
@@ -270,7 +270,7 @@ class MonoMethod(MonoMember, MonoTyping):
     def op_runtime_invoke(self, instance, values=()):
         """方法调用的call_arg"""
         params = TempArrayPtr(self.signature, values) if self.param_count else 0
-        return instance.owner.call_arg_ptr(*instance.owner.mono_runtime_invoke,
+        return instance.owner.mono_api.mono_runtime_invoke(
             self.mono_method, instance.mono_object, params, 0)
 
     def call(self, instance, values):
@@ -308,13 +308,13 @@ class MonoArray(MonoType):
             self.itemsize = itemsize
 
     def op_size(self):
-        return self.owner.call_arg_ptr(*self.owner.mono_array_length, self.mono_object)
+        return self.owner.mono_api.mono_array_length(self.mono_object)
 
     def op_addr_at(self, index):
         if index < 0:
             index += self.size
         itemsize = self.itemsize or self.owner.handler.ptr_size
-        return self.owner.call_arg_ptr(*self.owner.mono_array_addr_with_size,
+        return self.owner.mono_api.owner.mono_array_addr_with_size(
             self.mono_object, itemsize, index)
 
     @property

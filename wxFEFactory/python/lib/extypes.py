@@ -14,7 +14,7 @@ def astr(text):
     return text if isinstance(text, str) else str(text)
 
 
-class Map(dict):
+class Dict(dict):
     __slots__ = ('__dict__',)
 
     def __init__(self, *args, **kwargs):
@@ -22,10 +22,10 @@ class Map(dict):
         self.__dict__ = self
 
 
-class Dict(Map):
+class RichDict(Dict):
     """
     usage:
-        data = Dict({'a': 1})
+        data = RichDict({'a': 1})
         print(data.a)  # get 1
     """
     __slots__ = ('dafault_value',)
@@ -42,10 +42,10 @@ class Dict(Map):
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
-            return (Map.__getitem__(self, k) for k in key)
+            return (Dict.__getitem__(self, k) for k in key)
         elif isinstance(key, list):
-            return [Map.__getitem__(self, k) for k in key]
-        return Map.__getitem__(self, key)
+            return [Dict.__getitem__(self, k) for k in key]
+        return Dict.__getitem__(self, key)
 
     def __setitem__(self, key, value):
         if is_list_tuple(key):
@@ -55,16 +55,16 @@ class Dict(Map):
                 def get():
                     return value
             for k in key:
-                Map.__setitem__(self, k, get())
+                Dict.__setitem__(self, k, get())
         else:
-            Map.__setitem__(self, key, value)
+            Dict.__setitem__(self, key, value)
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, Map.__repr__(self))
+        return '%s(%s)' % (self.__class__.__name__, Dict.__repr__(self))
 
     def __and__(self, keys):
         if is_list_tuple(keys):
-            return self.__class__({key: Map.__getitem__(self, key) for key in keys})
+            return self.__class__({key: Dict.__getitem__(self, key) for key in keys})
 
 
 class INum:

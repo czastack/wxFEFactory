@@ -1,39 +1,46 @@
-from lib.extypes import WeakBinder
+from lib.extypes import Dict
 from lib.hack.handlers import MemHandler
 from tools.base.native import TempArrayPtr
 from tools.base.native_hacktool import (
-    NativeHacktool, NativeContextArray, call_arg, call_arg_int32, call_arg_int64
+    NativeHacktool, NativeContextArray, call_arg, FunctionCall
 )
 
 
 class MonoHacktool(NativeHacktool):
+    """Unity Mono游戏工具"""
     handler_class = MemHandler
     enable_native_call_n = True
     context_array_reuse = 10  # 复用context_array元素个数，0表示不复用
-    MONO_FUNC = {
-        "mono_get_root_domain": None,
-        "mono_image_loaded": "S",
-        "mono_thread_attach": "P",
-        "mono_thread_detach": "P",
-        "mono_security_set_mode": "i",
-        "mono_class_from_name": "PSS",  # (MonoImage *image, const char* name_space, const char *name)
-        "mono_class_get_method_from_name": "PSi",  # (MonoClass *klass, const char *name, int param_count)
-        "mono_class_vtable": "2P",  # (MonoDomain *domain, MonoClass *klass)
-        "mono_class_get_field_from_name": "PS",  # (MonoClass *klass, const char *name)
-        "mono_class_get_property_from_name": "PS",  # (MonoClass *klass, const char *name)
-        "mono_field_get_value": "3P",  # (MonoObject *obj, MonoClassField *field, void *value)
-        "mono_field_set_value": "3P",  # idem
-        "mono_field_static_get_value": "3P",  # (MonoVTable *vt, MonoClassField *field, void *value)
-        "mono_field_static_set_value": "3P",  # idem
-        "mono_property_set_value": "4P",  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
-        "mono_property_get_value": "4P",  # idem
-        "mono_array_addr_with_size": "PiI",  # (MonoArray *array, int size, uintptr_t idx)
-        "mono_array_length": "P",  # (MonoArray *array)
-        "mono_compile_method": "P",
-        "mono_runtime_invoke": "4P",  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
-        "mono_object_unbox": "P",  # (MonoObject *obj)
-        "mono_string_new": "PS",  # (MonoDomain *domain, const char *text)
-    }
+    MONO_FUNCS = (
+        # name, arg_sign, ret_type=None, ret_size=4
+        ("mono_get_root_domain", None, "ptr"),
+        ("mono_image_loaded", "S", "ptr"),
+        ("mono_thread_attach", "P"),
+        ("mono_thread_detach", "P"),
+        ("mono_security_set_mode", "i"),
+        ("mono_class_from_name", "PSS", "ptr"),  # (MonoImage *image, const char* name_space, const char *name)
+        ("mono_class_get_method_from_name", "PSi", "ptr"),  # (MonoClass *klass, const char *name, int param_count)
+        ("mono_class_vtable", "2P", "ptr"),  # (MonoDomain *domain, MonoClass *klass)
+        ("mono_class_get_field_from_name", "PS", "ptr"),  # (MonoClass *klass, const char *name)
+        ("mono_class_get_property_from_name", "PS", "ptr"),  # (MonoClass *klass, const char *name)
+        ("mono_field_get_value", "3P"),  # (MonoObject *obj, MonoClassField *field, void *value)
+        ("mono_field_set_value", "3P"),  # idem
+        ("mono_field_static_get_value", "3P"),  # (MonoVTable *vt, MonoClassField *field, void *value)
+        ("mono_field_static_set_value", "3P"),  # idem
+        ("mono_property_set_value", "4P"),  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
+        ("mono_property_get_value", "4P", "ptr"),  # idem
+        ("mono_array_addr_with_size", "PiI", "ptr"),  # (MonoArray *array, int size, uintptr_t idx)
+        ("mono_array_length", "P", "ptr"),  # (MonoArray *array)
+        ("mono_compile_method", "P", "ptr"),
+        ("mono_runtime_invoke", "4P", "ptr"),  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
+        ("mono_object_unbox", "P", "ptr"),  # (MonoObject *obj)
+        ("mono_string_new", "PS", "ptr"),  # (MonoDomain *domain, const char *text)
+    )
+
+    def __init__(self):
+        super().__init__()
+        self.mono_api = Dict()
+        self.context_array = None
 
     def onattach(self):
         super().onattach()
@@ -41,18 +48,19 @@ class MonoHacktool(NativeHacktool):
         if mono == 0:
             return
         helper = self.handler.get_proc_helper(mono)
-        address_map = helper.get_proc_address(self.MONO_FUNC.keys())
-        for name, sign in self.MONO_FUNC.items():
-            setattr(self, name, (address_map[name], sign))
+        address_map = helper.get_proc_address((item[0] for item in self.MONO_FUNCS))
+        # 重新获取mono函数表
+        self.mono_api.clear()
+        for name, *args in self.MONO_FUNCS:
+            self.mono_api[name] = FunctionCall(address_map[name], *args)
 
-        self.context_array = (NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
+        self.context_array = (
+            NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
             if self.context_array_reuse else None)
 
-        self.call_arg_ptr = call_arg_int32 if self.is32process else call_arg_int64
-
         self.root_domain, self.image = self.native_call_n((
-            self.call_arg_ptr(*self.mono_get_root_domain),
-            self.call_arg_ptr(*self.mono_image_loaded, "Assembly-CSharp"),
+            self.mono_api.mono_get_root_domain(),
+            self.mono_api.mono_image_loaded("Assembly-CSharp"),
         ), self.context_array)
         # print(hex(self.image))
 
@@ -64,8 +72,8 @@ class MonoHacktool(NativeHacktool):
     def mono_security_call(self, args):
         """安全调用mono api"""
         _, _, *result = self.native_call_n((
-            call_arg(*self.mono_thread_attach, self.root_domain),
-            call_arg(*self.mono_security_set_mode, 0),
+            self.mono_api.mono_thread_attach(self.root_domain),
+            self.mono_api.mono_security_set_mode(0),
             *args
         ), self.context_array)
         return result
@@ -77,8 +85,8 @@ class MonoHacktool(NativeHacktool):
     def mono_security_call_reuse(self, args):
         """安全调用多个mono api"""
         return self.native_call_n_reuse(args, self.context_array, preset=(
-            call_arg(*self.mono_thread_attach, self.root_domain),
-            call_arg(*self.mono_security_set_mode, 0),
+            self.mono_api.mono_thread_attach(self.root_domain),
+            self.mono_api.mono_security_set_mode(0),
         ))
 
     def get_mono_classes(self, items):
@@ -86,7 +94,7 @@ class MonoHacktool(NativeHacktool):
         :param items: ((namespace, name),)
         """
         return self.native_call_n_reuse((
-            self.call_arg_ptr(*self.mono_class_from_name, self.image, *item) for item in items
+            self.mono_api.mono_class_from_name(self.image, *item) for item in items
         ), self.context_array)
 
     def get_global_mono_classes(self, names):
@@ -98,23 +106,23 @@ class MonoHacktool(NativeHacktool):
         :param items: ((class, name, param_count),)
         """
         return self.native_call_n((
-            self.call_arg_ptr(*self.mono_class_get_method_from_name, *item) for item in items
+            self.mono_api.mono_class_get_method_from_name(*item) for item in items
         ), self.context_array)
 
     def get_mono_compile_methods(self, methods):
         """获取编译后的native method地址"""
         return self.mono_security_call(
-            (self.call_arg_ptr(*self.mono_compile_method, method) for method in methods)
+            (self.mono_api.mono_compile_method(method) for method in methods)
         )
 
     # def op_mono_runtime_invoke(self, method, object, signature, values):
     #     """返回调用mono函数的call_arg"""
     #     params = TempArrayPtr(signature, values)
-    #     return self.call_arg_ptr(*self.mono_runtime_invoke, method, object, params, 0)
+    #     return self.mono_api.mono_runtime_invoke(method, object, params, 0)
 
     def call_mono_string_new(self, text):
         """创建mono string"""
-        return self.mono_security_call_1(self.call_arg_ptr(*self.mono_string_new, self.root_domain, text))
+        return self.mono_security_call_1(self.mono_api.mono_string_new(self.root_domain, text))
 
     def register_classes(self, classes):
         """注册mono class列表
@@ -132,16 +140,16 @@ class MonoHacktool(NativeHacktool):
             klass.mono_class = next(result_iter)
 
             if klass.need_vtable:
-                call_args.append(self.call_arg_ptr(*self.mono_class_vtable, self.root_domain, klass.mono_class))
+                call_args.append(self.mono_api.mono_class_vtable(self.root_domain, klass.mono_class))
 
             for method in klass.methods:
-                call_args.append(self.call_arg_ptr(*self.mono_class_get_method_from_name,
+                call_args.append(self.mono_api.mono_class_get_method_from_name(
                     klass.mono_class, method.name, method.param_count))
             for field in klass.fields:
-                call_args.append(self.call_arg_ptr(*self.mono_class_get_field_from_name,
+                call_args.append(self.mono_api.mono_class_get_field_from_name(
                     klass.mono_class, field.name))
             for prop in klass.properties:
-                call_args.append(self.call_arg_ptr(*self.mono_class_get_property_from_name,
+                call_args.append(self.mono_api.mono_class_get_property_from_name(
                     klass.mono_class, prop.name))
 
         # 绑定函数、字段和属性
@@ -155,7 +163,7 @@ class MonoHacktool(NativeHacktool):
                 method.mono_method = next(result_iter)
                 # 获取编译的函数
                 if method.compile:
-                    compile_call_args.append(self.call_arg_ptr(*self.mono_compile_method, method.mono_method))
+                    compile_call_args.append(self.mono_api.mono_compile_method(method.mono_method))
 
             for field in klass.fields:
                 field.mono_field = next(result_iter)
