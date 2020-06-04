@@ -48,7 +48,7 @@ class Main(AssemblyHacktool):
         self.render_assembly_buttons((
             AssemblyItem(
                 'inf_health', '无限生命', 'F3 0F 10 80 B8 1C 00 00 F3 0F 2A C9', None, delta, b'',
-                'C7 80 B8 1C 00 00 00 3C 1C 46 F3 0F 10 80 B8 1C 00 00', inserted=True, replace_len=8),
+                'C7 80 B8 1C 00 00 00 80 BB 44 F3 0F 10 80 B8 1C 00 00', inserted=True, replace_len=8),
             AssemblyItem(
                 'vehicle_inf_health', '载具无限生命', '83 BF 64 15 00 00 00', None, delta, b'',
                 '50 9C 60 81 BE B8 1C 00 00 00 A0 0C 46 0F 8E 0C 00 00 00 8B 87 5C 15 00 00 89 87 64 15 00 00'
