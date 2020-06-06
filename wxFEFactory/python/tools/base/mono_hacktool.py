@@ -1,4 +1,4 @@
-from lib.extypes import Dict
+from types import SimpleNamespace
 from lib.hack.handlers import MemHandler
 from tools.base.native import TempArrayPtr
 from tools.base.native_hacktool import (
@@ -39,7 +39,7 @@ class MonoHacktool(NativeHacktool):
 
     def __init__(self):
         super().__init__()
-        self.mono_api = Dict()
+        self.mono_api = SimpleNamespace()
         self.context_array = None
 
     def onattach(self):
@@ -50,9 +50,9 @@ class MonoHacktool(NativeHacktool):
         helper = self.handler.get_proc_helper(mono)
         address_map = helper.get_proc_address((item[0] for item in self.MONO_FUNCS))
         # 重新获取mono函数表
-        self.mono_api.clear()
+        self.mono_api.__dict__.clear()
         for name, *args in self.MONO_FUNCS:
-            self.mono_api[name] = FunctionCall(address_map[name], *args)
+            setattr(self.mono_api, name, FunctionCall(address_map[name], *args))
 
         self.context_array = (
             NativeContextArray(self.handler, self.context_array_reuse, self.NativeContext)
@@ -62,7 +62,6 @@ class MonoHacktool(NativeHacktool):
             self.mono_api.mono_get_root_domain(),
             self.mono_api.mono_image_loaded("Assembly-CSharp"),
         ), self.context_array)
-        # print(hex(self.image))
 
     def ondetach(self):
         super().ondetach()
@@ -89,17 +88,17 @@ class MonoHacktool(NativeHacktool):
             self.mono_api.mono_security_set_mode(0),
         ))
 
-    def get_mono_classes(self, items):
+    def get_mono_classes(self, items, image=None):
         """根据mono class和mothod name获取mono class
         :param items: ((namespace, name),)
         """
         return self.native_call_n_reuse((
-            self.mono_api.mono_class_from_name(self.image, *item) for item in items
+            self.mono_api.mono_class_from_name(image or self.image, *item) for item in items
         ), self.context_array)
 
-    def get_global_mono_classes(self, names):
+    def get_global_mono_classes(self, names, image=None):
         """获取全局命名空间中的mono class"""
-        return self.get_mono_classes((("", name) for name in names))
+        return self.get_mono_classes((("", name) for name in names), image)
 
     def get_mono_methods(self, items):
         """根据mono class和mothod name获取mono class
@@ -124,13 +123,13 @@ class MonoHacktool(NativeHacktool):
         """创建mono string"""
         return self.mono_security_call_1(self.mono_api.mono_string_new(self.root_domain, text))
 
-    def register_classes(self, classes):
+    def register_classes(self, classes, image=None):
         """注册mono class列表
         :param classes: [MonoClass]
         """
         # 获取class
         items = ((klass.namespace, klass.name) for klass in classes)
-        result_iter = iter(self.get_mono_classes(items))
+        result_iter = iter(self.get_mono_classes(items, image))
 
         # 获取vtable, methods和fields
         call_args = []
@@ -138,6 +137,9 @@ class MonoHacktool(NativeHacktool):
         compile_call_args = []
         for klass in classes:
             klass.mono_class = next(result_iter)
+
+            if klass.mono_class == 0:
+                raise ValueError('{} not found'.format(klass))
 
             if klass.need_vtable:
                 call_args.append(self.mono_api.mono_class_vtable(self.root_domain, klass.mono_class))
@@ -159,17 +161,26 @@ class MonoHacktool(NativeHacktool):
                 klass.mono_vtable = next(result_iter)
                 klass.owner = self.weak
 
+                if klass.need_vtable == 0:
+                    raise ValueError('{}.mono_vtable == 0'.format(klass.name))
+
             for method in klass.methods:
                 method.mono_method = next(result_iter)
+                if method.mono_method == 0:
+                    raise ValueError('{}.mono_method == 0'.format(method.name))
                 # 获取编译的函数
                 if method.compile:
                     compile_call_args.append(self.mono_api.mono_compile_method(method.mono_method))
 
             for field in klass.fields:
                 field.mono_field = next(result_iter)
+                if field.mono_field == 0:
+                    raise ValueError('{}.mono_field == 0'.format(field.name))
 
             for prop in klass.properties:
                 prop.mono_property = next(result_iter)
+                if prop.mono_property == 0:
+                    raise ValueError('{}.mono_property == 0'.format(prop.name))
 
         # 绑定编译的函数
         if compile_call_args:

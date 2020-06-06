@@ -4,11 +4,11 @@ from tools.base.native import NativeContext, TempPtr, TempArrayPtr
 from lib.hack.utils import resolve_type
 
 
-class MonoType:
-    pass
+class MonoHeld:
+    """被托管的，有owner"""
 
 
-class MonoClass(MonoType):
+class MonoClass(MonoHeld):
     """mono类"""
     # name: str 类名称
     namespace = ''
@@ -46,6 +46,9 @@ class MonoClass(MonoType):
         # 兼容lib.hack.models
         return getattr(self.__class__, name)
 
+    def cast(self, cast_type):
+        return cast_type(self.mono_object, self.owner)
+
 
 class MonoMember:
     """mono成员"""
@@ -64,7 +67,7 @@ class MonoTyping:
         if type is not int:
             if type is None:
                 size = 0
-            elif isinstance(type, str) or issubclass(type, MonoType):
+            elif isinstance(type, str) or issubclass(type, MonoHeld):
                 size = 0
                 self.is_mono_type = True
         self.type = type
@@ -88,7 +91,7 @@ class MonoTyping:
                     raise ValueError('无法识别的类型%s' % self.type)
 
             if callable(vtype):
-                if issubclass(vtype, MonoType):
+                if issubclass(vtype, MonoHeld):
                     result = vtype(result, instance.owner)
                 else:
                     result = vtype(result)
@@ -294,7 +297,7 @@ class BoundMethod:
         return self.method.call(self.instance, values)
 
 
-class MonoArray(MonoType):
+class MonoArray(MonoHeld):
     """数组类型属性"""
     type = int
     itemsize = 0
@@ -324,6 +327,9 @@ class MonoArray(MonoType):
     def addr_at(self, index):
         return self.owner.native_call_1(self.op_addr_at(index))
 
+    def __len__(self):
+        return self.size
+
     def __getitem__(self, index):
         addr = self.addr_at(index)
         result = self.owner.handler.read(addr, int, self.itemsize)
@@ -332,7 +338,9 @@ class MonoArray(MonoType):
         return result
 
     def __setitem__(self, index, value):
-        pass
+        # raise NotImplementedError()
+        addr = self.addr_at(index)
+        self.owner.handler.write(addr, value, self.itemsize)
 
 
 class MonoArrayT(type):
