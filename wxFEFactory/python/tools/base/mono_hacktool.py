@@ -30,7 +30,7 @@ class MonoHacktool(NativeHacktool):
         ("mono_property_set_value", "4P"),  # (MonoProperty *prop, void *obj, void **params, MonoObject **exc);
         ("mono_property_get_value", "4P", "ptr"),  # idem
         ("mono_array_addr_with_size", "PiI", "ptr"),  # (MonoArray *array, int size, uintptr_t idx)
-        ("mono_array_length", "P", "ptr"),  # (MonoArray *array)
+        # ("mono_array_length", "P", "ptr"),  # (MonoArray *array)
         ("mono_compile_method", "P", "ptr"),
         ("mono_runtime_invoke", "4P", "ptr"),  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
         ("mono_object_unbox", "P", "ptr"),  # (MonoObject *obj)
@@ -52,6 +52,8 @@ class MonoHacktool(NativeHacktool):
         # 重新获取mono函数表
         self.mono_api.__dict__.clear()
         for name, *args in self.MONO_FUNCS:
+            if address_map[name] == 0:
+                raise ValueError('mono_api {} not found'.format(name))
             setattr(self.mono_api, name, FunctionCall(address_map[name], *args))
 
         self.context_array = (
@@ -161,26 +163,26 @@ class MonoHacktool(NativeHacktool):
                 klass.mono_vtable = next(result_iter)
                 klass.owner = self.weak
 
-                if klass.need_vtable == 0:
-                    raise ValueError('{}.mono_vtable == 0'.format(klass.name))
+                if not klass.need_vtable:
+                    raise ValueError('{}.mono_vtable not found'.format(klass.name))
 
             for method in klass.methods:
                 method.mono_method = next(result_iter)
-                if method.mono_method == 0:
-                    raise ValueError('{}.mono_method == 0'.format(method.name))
+                if not method.mono_method:
+                    raise ValueError('{}.mono_method not found'.format(method.name))
                 # 获取编译的函数
                 if method.compile:
                     compile_call_args.append(self.mono_api.mono_compile_method(method.mono_method))
 
             for field in klass.fields:
                 field.mono_field = next(result_iter)
-                if field.mono_field == 0:
-                    raise ValueError('{}.mono_field == 0'.format(field.name))
+                if not field.mono_field:
+                    raise ValueError('{}.mono_field not found'.format(field.name))
 
             for prop in klass.properties:
                 prop.mono_property = next(result_iter)
-                if prop.mono_property == 0:
-                    raise ValueError('{}.mono_property == 0'.format(prop.name))
+                if not prop.mono_property:
+                    raise ValueError('{}.mono_property not found'.format(prop.name))
 
         # 绑定编译的函数
         if compile_call_args:

@@ -1,5 +1,3 @@
-from lib.utils import float32
-from tools.base.native_hacktool import call_arg
 from tools.base.native import NativeContext, TempPtr, TempArrayPtr
 from lib.hack.utils import resolve_type
 
@@ -303,6 +301,8 @@ class MonoArray(MonoHeld):
     itemsize = 0
 
     def __init__(self, mono_object, owner, type=None, itemsize=None):
+        if mono_object == 0:
+            raise ValueError('mono_object == 0')
         self.mono_object = mono_object
         self.owner = owner
         if type is not None:
@@ -317,7 +317,7 @@ class MonoArray(MonoHeld):
         if index < 0:
             index += self.size
         itemsize = self.itemsize or self.owner.handler.ptr_size
-        return self.owner.mono_api.owner.mono_array_addr_with_size(
+        return self.owner.mono_api.mono_array_addr_with_size(
             self.mono_object, itemsize, index)
 
     @property
@@ -339,6 +339,7 @@ class MonoArray(MonoHeld):
 
     def __setitem__(self, index, value):
         # raise NotImplementedError()
+        # TODO 判断类型
         addr = self.addr_at(index)
         self.owner.handler.write(addr, value, self.itemsize)
 

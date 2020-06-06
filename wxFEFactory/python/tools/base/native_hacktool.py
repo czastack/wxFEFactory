@@ -82,6 +82,7 @@ class NativeHacktool(AssemblyHacktool):
         :param this: this指针，为0时使用cdecl, 1时使用stdcall, 大于1时使用thiscall
         :param arg_sign: 参数签名
         """
+        assert addr != 0, 'addr == 0'
         return self.native_call(
             self.native_call_addr, '2L' + (arg_sign if arg_sign is not None else ''),
             addr, this, *args, ret_type=ret_type, ret_size=ret_size)
@@ -92,6 +93,7 @@ class NativeHacktool(AssemblyHacktool):
         :param this: this指针，为0则为普通函数
         :param arg_sign: 参数签名
         """
+        assert addr != 0, 'addr == 0'
         return self.native_call(
             self.native_call_addr, 'p2Q' + (arg_sign if arg_sign is not None else ''),
             self.native_context.fflag, addr, this, *args, ret_type=ret_type, ret_size=ret_size)
