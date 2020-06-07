@@ -34,11 +34,40 @@ class Entity(MonoClass):
     namespace = 'Teran'
 
     NetId = MonoProperty(type=int)
+    IsOwner = MonoProperty(type=bool)
 
 
 class Hero(Entity):
     """英雄"""
     namespace = 'Teran'
+
+    propertiesInspector = MonoField(type='PropertiesInspector')
+    basicAttribute = MonoField(type='BasicAttribute')
+    CDTimeFactor = MonoField(type=float, label="CD时间倍率(最大3)")
+
+
+class PropertiesInspector(MonoClass):
+    """角色属性"""
+    name = 'Creature/PropertiesInspector'
+    namespace = 'Teran'
+
+    CurrentHp = MonoProperty(type=int, label="当前HP")
+    maxHp = MonoField(type=int, label="最大HP")
+    currentHp = MonoField(type=int, label="当前HP")
+    attack = MonoField(type=int, label="攻击")
+    defence = MonoField(type=int, label="防御")
+    critical = MonoField(type=int, label="暴击")
+    whiteHp = MonoField(type=int, label="护盾时间")
+
+
+class BasicAttribute(MonoClass):
+    """基本属性"""
+    name = 'Creature/BasicAttribute'
+    namespace = 'Teran'
+    hp = MonoField(type=int, label="HP")
+    attack = MonoField(type=int, label="攻击")
+    defence = MonoField(type=int, label="防御")
+    critical = MonoField(type=int, label="暴击")
 
 
 class DDSystem(MonoClass):
@@ -49,7 +78,10 @@ class DDSystem(MonoClass):
 
     @property
     def hero(self):
-        return self.heros._items[0].cast(Hero)
+        hero = self.heros._items[0].cast(Hero)
+        if not hero.mono_object:
+            raise ValueError('获取英雄失败')
+        return hero
 
     @property
     def bagSystem(self):

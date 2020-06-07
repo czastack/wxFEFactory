@@ -41,8 +41,10 @@ class Main(MonoHacktool):
             models.Entity,
             models.Hero,
             models.DDSystem,
-            models.PhotonNetwork,
-            models.PhotonPlayer,
+            # models.PhotonNetwork,
+            # models.PhotonPlayer,
+            models.BasicAttribute,
+            models.PropertiesInspector,
         ))
 
         self.GameObject = models.GameObject(0, self)
@@ -53,10 +55,32 @@ class Main(MonoHacktool):
     def render_main(self):
         with Group(None, "全局"):
             self.render_global()
+        self.lazy_group(Group(None, "初始属性", (self.get_hero_init, models.BasicAttribute)), self.render_hero_init)
+        self.lazy_group(Group(None, "属性", (self.get_hero_prop, models.PropertiesInspector)), self.render_hero_prop)
 
     def render_global(self):
         ModelInput('bag_money', instance=self)
         ModelInput('bag_soul', instance=self)
+
+    def render_hero_init(self):
+        ModelInput('hp')
+        ModelInput('attack')
+        ModelInput('defence')
+        ModelInput('critical')
+
+    def render_hero_prop(self):
+        ModelInput('currentHp')
+        ModelInput('maxHp')
+        ModelInput('attack')
+        ModelInput('defence')
+        ModelInput('critical')
+        ModelInput('whiteHp')
+
+    def get_hero_init(self):
+        return self.ddSystem.hero.basicAttribute
+
+    def get_hero_prop(self):
+        return self.ddSystem.hero.propertiesInspector
 
     @PropertyField(label="金钱")
     def bag_money(self):
@@ -76,6 +100,16 @@ class Main(MonoHacktool):
     def bag_soul(self, value):
         bag = self.ddSystem.bagSystem
         bag.AddSoul(int(value) - bag.m_soul)
+
+    def recover_hp(self):
+        """回复HP"""
+        self.ddSystem.hero.RpcRecoverHp(1000)
+
+    def get_hotkeys(self):
+        this = self.weak
+        return (
+            (VK.MOD_ALT, VK.H, this.recover_hp),
+        )
 
     def render_assembly_buttons_own(self):
         self.render_assembly_buttons((
