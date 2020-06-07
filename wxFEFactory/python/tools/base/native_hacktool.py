@@ -140,9 +140,11 @@ class NativeHacktool(AssemblyHacktool):
             if context_reuse:
                 context.reset()
             if issubclass(self.NativeContext, NativeContext64):
+                # 64位
                 context.push('p2Q' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
                              context.fflag, item['addr'], item['this'], *item['args'])
             else:
+                # 32位
                 context.push('2L' + (item['arg_sign'] if item['arg_sign'] is not None else ''),
                              item['addr'], item['this'], *item['args'])
 

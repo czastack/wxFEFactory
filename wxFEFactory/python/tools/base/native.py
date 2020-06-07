@@ -156,9 +156,9 @@ class NativeContext(Model):
     def put_temp_string(self, data, index=None):
         """存放临时字符串
         :return: 字符串地址"""
-        length = len(data) + 1
         if isinstance(data, str):
             data = data.encode()
+        length = len(data) + 1
         if index is None:
             index = self.m_nArgCount
         block_count = math.ceil(length / self.ITEM_SIZE)
@@ -168,7 +168,7 @@ class NativeContext(Model):
 
         self.temp_index += block_count
         addr = self.get_temp_addr(self.temp_index)
-        self.handler.write(addr, struct.pack('%ds' % (length + 1), data))
+        self.handler.write(addr, struct.pack('%ds' % length, data))
         return addr
 
     def put_temp_simple_array(self, signature, args, index=None):

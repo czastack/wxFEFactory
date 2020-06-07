@@ -19,6 +19,7 @@ class MonoHacktool(NativeHacktool):
         ("mono_thread_detach", "P"),
         ("mono_security_set_mode", "i"),
         ("mono_class_from_name", "PSS", "ptr"),  # (MonoImage *image, const char* name_space, const char *name)
+        ("mono_class_get_name", "P", str, 128),  # (MonoClass *klass)
         ("mono_class_get_method_from_name", "PSi", "ptr"),  # (MonoClass *klass, const char *name, int param_count)
         ("mono_class_vtable", "2P", "ptr"),  # (MonoDomain *domain, MonoClass *klass)
         ("mono_class_get_field_from_name", "PS", "ptr"),  # (MonoClass *klass, const char *name)
@@ -141,7 +142,7 @@ class MonoHacktool(NativeHacktool):
             klass.mono_class = next(result_iter)
 
             if klass.mono_class == 0:
-                raise ValueError('{} not found'.format(klass))
+                raise ValueError('{}.mono_class not found'.format(klass.name))
 
             if klass.need_vtable:
                 call_args.append(self.mono_api.mono_class_vtable(self.root_domain, klass.mono_class))
