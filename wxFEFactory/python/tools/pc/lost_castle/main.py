@@ -39,6 +39,7 @@ class Main(MonoHacktool):
             models.BagSystem,
             models.BagMgr,
             models.Entity,
+            models.HeroBase,
             models.Hero,
             models.DDSystem,
             # models.PhotonNetwork,
@@ -52,11 +53,17 @@ class Main(MonoHacktool):
         self.ddSystem = self.system.GetComponentByName(self.call_mono_string_new('DDSystem')).cast(models.DDSystem)
         self.PhotonNetwork = models.PhotonNetwork(0, self)
 
+        self.assembly_address_dict = {
+            'no_cd': models.HeroBase.Update.mono_compile,
+            'no_cd2': models.HeroBase.RpcHadUseSkill.mono_compile,
+        }
+
     def render_main(self):
         with Group(None, "全局"):
             self.render_global()
         self.lazy_group(Group(None, "初始属性", (self.get_hero_init, models.BasicAttribute)), self.render_hero_init)
         self.lazy_group(Group(None, "属性", (self.get_hero_prop, models.PropertiesInspector)), self.render_hero_prop)
+        self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_global(self):
         ModelInput('bag_money', instance=self)
@@ -114,7 +121,9 @@ class Main(MonoHacktool):
     def render_assembly_buttons_own(self):
         self.render_assembly_buttons((
             AssemblyItem(
-                'item_keep', '物品使用不消失', '8B 45 D0 39 00 E8 24 00 00 00',
-                None, Delta(0x200), 'C6 47 28 00',
-                find_base=False, replace_offset=5, replace_len=5),
+                'no_cd', '技能无CD', '7A 17 77 15 F3 0F 10 05 * * * * F3 0F 5A C0 F2 0F 5A E8 F3 0F 11 6D E4',
+                None, Delta(0x2000), 'C7 45 E4 00 00 C8 42', replace_len=25, find_base=False, fuzzy=True),
+            # push rbp -> ret
+            AssemblyItem(
+                'no_cd2', '技能无CD2', '55', None, Delta(0x2000), 'C3', find_base=False),
         ))

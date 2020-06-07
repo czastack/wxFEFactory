@@ -124,7 +124,7 @@ class InputConfig(ConfigCtrl):
             if code == WXK.R:
                 self.read()
                 return True
-            elif code == WXK.W:
+            elif code == WXK.W or WXK.ENTER:
                 self.write()
                 return True
         event.Skip()

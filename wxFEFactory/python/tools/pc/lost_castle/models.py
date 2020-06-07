@@ -37,7 +37,12 @@ class Entity(MonoClass):
     IsOwner = MonoProperty(type=bool)
 
 
-class Hero(Entity):
+class HeroBase(Entity):
+    Update = MonoMethod(compile=True)
+    RpcHadUseSkill = MonoMethod(compile=True)
+
+
+class Hero(HeroBase):
     """英雄"""
     namespace = 'Teran'
 
