@@ -157,41 +157,41 @@ class Main(MonoHacktool):
 
     def GetSkill(self, skill):
         """获取技能"""
-        return self.active_player.GetSkill(self.call_mono_string_new(skill))
+        return self.active_player.GetSkill(self.mono_string_new(skill))
 
     def HandleSkillUnlock(self, skill):
         """技能解锁"""
-        self.active_player.HandleSkillUnlock(self.call_mono_string_new(skill), True)
+        self.active_player.HandleSkillUnlock(self.mono_string_new(skill), True)
 
     def HandleSkillsUnlock(self, skills):
         """解锁多个技能"""
         player = self.active_player
         args = tuple(
-            player.__class__.HandleSkillUnlock.op_runtime_invoke(player, (self.call_mono_string_new(skill), True))
+            player.__class__.HandleSkillUnlock.op_runtime_invoke(player, (self.mono_string_new(skill), True))
             for skill in skills
         )
         self.mono_security_call_reuse(args)
 
     def PickUpSkill(self, skill):
         """捡起技能，原有技能会掉出"""
-        self.active_player.PickUpSkill(self.call_mono_string_new(skill), True, True)
+        self.active_player.PickUpSkill(self.mono_string_new(skill), True, True)
 
     def GiveItem(self, item):
         """给予物品"""
-        self.active_player.GiveDesignatedItem(self.call_mono_string_new(item))
+        self.active_player.GiveDesignatedItem(self.mono_string_new(item))
 
     def GiveItems(self, items):
         """给予物品"""
         player = self.active_player
         args = tuple(
-            player.__class__.GiveDesignatedItem.op_runtime_invoke(player, (self.call_mono_string_new(item),))
+            player.__class__.GiveDesignatedItem.op_runtime_invoke(player, (self.mono_string_new(item),))
             for item in items
         )
         self.mono_security_call_reuse(args)
 
     def ItemIsUnlocked(self, item, set=True):
         """设置或查询符文解锁情况"""
-        return self.Item.IsUnlocked(self.call_mono_string_new(item), set)
+        return self.Item.IsUnlocked(self.mono_string_new(item), set)
 
     def unlock_checked_skills(self, _):
         """解锁所选技能"""

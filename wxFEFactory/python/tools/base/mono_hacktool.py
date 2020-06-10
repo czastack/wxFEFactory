@@ -36,6 +36,7 @@ class MonoHacktool(NativeHacktool):
         ("mono_runtime_invoke", "4P", "ptr"),  # (MonoMethod *method, void *obj, void **params, MonoObject **exc)
         ("mono_object_unbox", "P", "ptr"),  # (MonoObject *obj)
         ("mono_string_new", "PS", "ptr"),  # (MonoDomain *domain, const char *text)
+        ("mono_string_to_utf8", "P", str),  # (MonoString *string_obj)
     )
 
     def __init__(self):
@@ -122,9 +123,14 @@ class MonoHacktool(NativeHacktool):
     #     params = TempArrayPtr(signature, values)
     #     return self.mono_api.mono_runtime_invoke(method, object, params, 0)
 
-    def call_mono_string_new(self, text):
+    def mono_string_new(self, text):
         """创建mono string"""
         return self.mono_security_call_1(self.mono_api.mono_string_new(self.root_domain, text))
+
+    def mono_string_to_utf8(self, mono_object, ret_size=None):
+        """创建mono string"""
+        result = self.mono_security_call_1(self.mono_api.mono_string_to_utf8(mono_object, ret_size=ret_size))
+        return result.decode()
 
     def register_classes(self, classes, image=None):
         """注册mono class列表

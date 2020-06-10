@@ -8,8 +8,30 @@ class List(MonoClass):
     name = 'List`1'
     namespace = 'System.Collections.Generic'
 
+    _type = None
     Count = MonoProperty(type=int)
     _items = MonoField(type=MonoArrayT(MonoClass))
+
+    def __iter__(self):
+        _items = self._items
+        for i in range(0, self.Count):
+            item = _items[i]
+            # TODO cast
+            if self._type:
+                item = item.cast(self._type)
+            yield item
+
+    def __getitem__(self, i):
+        item = self._items[i]
+        if self._type:
+            item = item.cast(self._type)
+        return item
+
+
+class ListT(type):
+    """主要用于field的type参数，表示这是一个数组"""
+    def __new__(cls, _type=MonoClass):
+        return type('ListNew', (List,), {'_type': _type})
 
 
 class BagSystem(MonoClass):
@@ -23,16 +45,16 @@ class BagSystem(MonoClass):
     AddSoul = MonoMethod(param_count=1, signature='L')
 
 
-class BagMgr(MonoClass):
-    """背包管理器"""
+class Item(MonoClass):
     namespace = 'Teran'
-    GetBagSystem = MonoMethod(param_count=1, signature='L', type=BagSystem)
+    GetItemName = MonoMethod(type=MonoClass)
+    GetIntro = MonoMethod(type=MonoClass)
+    itemName = MonoField()
 
 
 class Entity(MonoClass):
     """实体"""
     namespace = 'Teran'
-
     NetId = MonoProperty(type=int)
     IsOwner = MonoProperty(type=bool)
 
@@ -40,12 +62,13 @@ class Entity(MonoClass):
 class HeroBase(Entity):
     Update = MonoMethod(compile=True)
     RpcHadUseSkill = MonoMethod(compile=True)
+    # 切换武器 ChangeWeapon(Equipment newWeapon)
+    ChangeWeapon = MonoMethod(param_count=1, signature='P')
 
 
 class Hero(HeroBase):
     """英雄"""
     namespace = 'Teran'
-
     propertiesInspector = MonoField(type='PropertiesInspector')
     basicAttribute = MonoField(type='BasicAttribute')
     CDTimeFactor = MonoField(type=float, label="CD时间倍率(最大3)")
@@ -55,14 +78,13 @@ class PropertiesInspector(MonoClass):
     """角色属性"""
     name = 'Creature/PropertiesInspector'
     namespace = 'Teran'
-
     CurrentHp = MonoProperty(type=int, label="当前HP")
     maxHp = MonoField(type=int, label="最大HP")
     currentHp = MonoField(type=int, label="当前HP")
     attack = MonoField(type=int, label="攻击")
     defence = MonoField(type=int, label="防御")
     critical = MonoField(type=int, label="暴击")
-    whiteHp = MonoField(type=int, label="护盾时间")
+    whiteHp = MonoField(type=int, label="护盾")
 
 
 class BasicAttribute(MonoClass):
@@ -75,10 +97,35 @@ class BasicAttribute(MonoClass):
     critical = MonoField(type=int, label="暴击")
 
 
+class BagMgr(MonoClass):
+    """背包管理器"""
+    namespace = 'Teran'
+    GetBagSystem = MonoMethod(param_count=1, signature='L', type=BagSystem)
+
+
+class ItemDropSys(MonoClass):
+    """背包管理器"""
+    namespace = 'Teran'
+    equip_dropSys = MonoField(type='EquipmentDropSys')
+
+
+class EquipmentDropSys(MonoClass):
+    namespace = 'Teran'
+    GetEquip = MonoMethod(param_count=1, signature='P', type='MonoClass')
+
+
+class EquipmentMgr(MonoClass):
+    namespace = 'Teran'
+    weapons = MonoField(type=ListT(Item))
+    armors = MonoField(type=ListT(Item))
+
+
 class DDSystem(MonoClass):
     """管理类"""
     namespace = 'Teran'
     bagMgr = MonoField(type=BagMgr)
+    itemDropSys = MonoField(type=ItemDropSys)
+    equipMgr = MonoField(type=EquipmentMgr)
     heros = MonoField(type=List)
 
     @property
@@ -104,6 +151,5 @@ class PhotonNetwork(MonoClass):
 class GameObject(MonoClass):
     """游戏对象"""
     namespace = 'UnityEngine'
-
     Find = MonoMethod(param_count=1, signature='P', type='self')
     GetComponentByName = MonoMethod(param_count=1, signature='P', type=MonoClass)

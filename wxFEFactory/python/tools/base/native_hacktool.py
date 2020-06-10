@@ -225,8 +225,10 @@ class FunctionCall:
         self.ret_type = ret_type
         self.ret_size = ret_size
 
-    def __call__(self, *args, ret_type=None):
+    def __call__(self, *args, ret_type=None, ret_size=None):
         """生产call arg"""
         if ret_type is None:
             ret_type = self.ret_type
-        return call_arg(self.addr, self.arg_sign, *args, ret_type=ret_type, ret_size=self.ret_size)
+        if ret_size is None:
+            ret_size = self.ret_size
+        return call_arg(self.addr, self.arg_sign, *args, ret_type=ret_type, ret_size=ret_size)

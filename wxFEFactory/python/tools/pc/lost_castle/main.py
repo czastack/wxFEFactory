@@ -38,6 +38,10 @@ class Main(MonoHacktool):
         self.register_classes((
             models.BagSystem,
             models.BagMgr,
+            models.ItemDropSys,
+            models.EquipmentDropSys,
+            models.EquipmentMgr,
+            models.Item,
             models.Entity,
             models.HeroBase,
             models.Hero,
@@ -49,8 +53,8 @@ class Main(MonoHacktool):
         ))
 
         self.GameObject = models.GameObject(0, self)
-        self.system = self.GameObject.Find(self.call_mono_string_new('system'))
-        self.ddSystem = self.system.GetComponentByName(self.call_mono_string_new('DDSystem')).cast(models.DDSystem)
+        self.system = self.GameObject.Find(self.mono_string_new('system'))
+        self.ddSystem = self.system.GetComponentByName(self.mono_string_new('DDSystem')).cast(models.DDSystem)
         self.PhotonNetwork = models.PhotonNetwork(0, self)
 
         self.assembly_address_dict = {
@@ -110,7 +114,16 @@ class Main(MonoHacktool):
 
     def recover_hp(self):
         """回复HP"""
-        self.ddSystem.hero.RpcRecoverHp(1000)
+        prop = self.ddSystem.hero.propertiesInspector
+        prop.currentHp = prop.maxHp
+
+    def change_equipment(self, equip_name):
+        """切换武器"""
+        equip = self.ddSystem.itemDropSys.equip_dropSys.GetEquip(self.mono_string_new(equip_name))
+        if equip.mono_object:
+            self.ddSystem.hero.ChangeWeapon(equip.mono_object)
+        else:
+            raise ValueError('武器不存在: {}'.format(equip_name))
 
     def get_hotkeys(self):
         this = self.weak
