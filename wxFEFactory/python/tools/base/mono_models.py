@@ -65,6 +65,8 @@ class MonoTyping:
         if type is not int:
             if type is None:
                 size = 0
+            elif type is str:
+                self.is_mono_type = True
             elif isinstance(type, str) or issubclass(type, MonoHeld):
                 size = 0
                 self.is_mono_type = True
@@ -81,6 +83,11 @@ class MonoTyping:
         """传出时转换值，例如转为类实例"""
         vtype = self.type
         if vtype is not int:
+            if vtype is str:
+                # 转换string类型
+                result = instance.owner.mono_string_to_utf8(result, self.size)
+                return result
+
             if isinstance(vtype, str):
                 vtype = resolve_type(instance, vtype)
                 if vtype:
@@ -124,7 +131,6 @@ class MonoField(MonoMember, MonoTyping):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        # return BoundField(instance, self)
         return self.get_value(instance)
 
     def __set__(self, instance, value):
@@ -196,7 +202,6 @@ class MonoProperty(MonoMember, MonoTyping):
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        # return BoundField(instance, self)
         return self.get_value(instance)
 
     def __set__(self, instance, value):
@@ -232,26 +237,6 @@ class MonoProperty(MonoMember, MonoTyping):
             self.__class__.__name__, self.name, self.type, self.size, self.label)
 
 
-# class BoundField:
-#     """绑定(实例)的字段"""
-#     __slots__ = ('instance', 'field')
-
-#     def __init__(self, instance, field):
-#         self.instance = instance
-#         self.field = field
-
-#     def op_getter(self):
-#         return self.field.op_getter(self.instance)
-
-#     @property
-#     def value(self):
-#         return self.field.get_value(self.instance)
-
-#     @value.setter
-#     def value(self, value):
-#         return self.field.set_value(self.instance, value)
-
-
 class MonoMethod(MonoMember, MonoTyping):
     """mono方法"""
     def __init__(self, name=None, param_count=0, signature=None, compile=False, type=None, size=4):
@@ -268,16 +253,43 @@ class MonoMethod(MonoMember, MonoTyping):
             return self
         return BoundMethod(instance, self)
 
-    def op_runtime_invoke(self, instance, values=()):
+    def op_runtime_invoke(self, instance, args=()):
         """方法调用的call_arg"""
-        params = TempArrayPtr(self.signature, values) if self.param_count else 0
+        # 类型处理
+        signature = self.signature
+        arg_convert = False
+        for arg in args:
+            if isinstance(arg, (MonoClass, str)):
+                arg_convert = True
+                break
+        if arg_convert:
+            # 需要转换
+            signature_new = []
+            args_new = []
+            for fmt, arg in zip(signature, args):
+                if '0' <= fmt <= '9':
+                    raise ValueError('转换参数不支持repeat')
+                if isinstance(arg, MonoClass):
+                    arg = arg.mono_object
+                    if fmt != 'P':
+                        raise ValueError('MonoClass对象参数必须对应P')
+                elif isinstance(arg, str):
+                    # 转换成mono的string类型
+                    arg = instance.owner.mono_string_new(arg)
+                    fmt = 'P'
+                args_new.append(arg)
+                signature_new.append(fmt)
+            signature = ''.join(signature_new)
+            args = args_new
+
+        params = TempArrayPtr(signature, args) if self.param_count else 0
         return instance.owner.mono_api.mono_runtime_invoke(
             self.mono_method, instance.mono_object, params, 0)
 
-    def call(self, instance, values):
+    def call(self, instance, args):
         """直接调用"""
         owner = instance.owner
-        result = owner.mono_security_call_1(self.op_runtime_invoke(instance, values=values))
+        result = owner.mono_security_call_1(self.op_runtime_invoke(instance, args=args))
         if self.type:
             return self.case_boxed_value(result, instance)
 

@@ -121,7 +121,7 @@ class Main(MonoHacktool):
         """切换武器"""
         equip = self.ddSystem.itemDropSys.equip_dropSys.GetEquip(self.mono_string_new(equip_name))
         if equip.mono_object:
-            self.ddSystem.hero.ChangeWeapon(equip.mono_object)
+            self.ddSystem.bagSystem.pickupItem(equip.mono_object, True)
         else:
             raise ValueError('武器不存在: {}'.format(equip_name))
 

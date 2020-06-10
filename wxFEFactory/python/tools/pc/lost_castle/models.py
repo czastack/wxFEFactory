@@ -43,13 +43,15 @@ class BagSystem(MonoClass):
 
     UpdateMoney = MonoMethod()
     AddSoul = MonoMethod(param_count=1, signature='L')
+    # void pickupItem(Item item, bool isSetToCur = true)
+    pickupItem = MonoMethod(param_count=2, signature='PB')
 
 
 class Item(MonoClass):
     namespace = 'Teran'
-    GetItemName = MonoMethod(type=MonoClass)
-    GetIntro = MonoMethod(type=MonoClass)
-    itemName = MonoField()
+    GetItemName = MonoMethod(type=str, size=64)
+    GetIntro = MonoMethod(type=str, size=256)
+    itemName = MonoField(type=str, size=64)
 
 
 class Entity(MonoClass):
