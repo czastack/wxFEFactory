@@ -26,7 +26,7 @@ class CharacterDataStruct_1(object):
 
 
 class CharacterDataStruct(Model):
-    # Leon: (48, 16), Claire: (72, 16)
+    # Leon: (0x30, 0x10), Claire: (0x48, 0x10)
     chars_data = ArrayField((0x50, 0x18, 0x30), 4, ModelField(0, CharacterDataStruct_1))
 
 
@@ -78,26 +78,18 @@ class Inventory(Model):
 
 
 class Global(Model):
-    character_data = ModelPtrField((0x070A6080, 0x50), CharacterDataStruct)
-    character_struct = ModelPtrField(0x070A7CD0, CharacterStruct)
-    # char_array = 0x062C730C
-    position_struct = ModelPtrField(0x070973C8, PositionStruct)
-    inventory = ModelPtrField((0x08DCB6C0, 0x50), Inventory)
-    camera_dist = Field((0x070A87D8, 0x98, 0x160, 0x34), label="摄像机参数")
+    character_data = ModelPtrField((0x08CE7790, 0x50), CharacterDataStruct)
+    character_struct = ModelPtrField(0x08CE5710, CharacterStruct)
+    position_struct = ModelPtrField(0x08CBEE80, PositionStruct)
+    inventory = ModelPtrField((0x08CBA618, 0x50), Inventory)
+    camera_dist = Field((0x08CB4FC8, 0x98, 0x160, 0x34), label="摄像机参数")
     save_count = Field((0x070A8860, 0x198, 0x24), label="保存次数")
-
-
-class CodexGlobal(Model):
-    character_data = ModelPtrField((0x07088EA0, 0x50), CharacterDataStruct)
-    character_struct = ModelPtrField(0x0708A678, CharacterStruct)
-    # char_array = 0x062B2386
-    position_struct = ModelPtrField(0x070B0D98, PositionStruct)
-    inventory = ModelPtrField((0x070B0840, 0x50), Inventory)
-    camera_dist = Field((0x07081988, 0x98, 0x160, 0x34), label="摄像机参数")
-    save_count = Field((0x07081A90, 0x198, 0x24), label="保存次数")
+    box_state = Field((0x08CEECF0, 0x50, 0x10), label="保存次数")
+    point = Field((0x08CEA560, 0x68, 0x7C), label="点数")
+    speed = FloatField((0x08C1B4B0, 0x70, 0x380, 0x10, 0, 0x70), label="速度")
+    PlayerZRefAddress = Field((0x50, 0x1D0, 0xB0, 0x98, 0x20, 0x24), label="PlayerZRef")
 
 
 SPECIFIC_GLOBALS = {
     'steam': Global,
-    'codex': CodexGlobal,
 }

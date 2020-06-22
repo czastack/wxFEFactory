@@ -27,7 +27,7 @@ class CharacterDataStruct_1(object):
 
 
 class CharacterDataStruct(Model):
-    # Leon: (48, 16), Claire: (72, 16)
+    # Leon: (0x30, 0x10), Claire: (0x48, 0x10)
     chars_data = ArrayField((0x50, 0x18, 0x30), 4, ModelField(0, CharacterDataStruct_1))
 
 
