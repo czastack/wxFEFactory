@@ -9,7 +9,7 @@ class Character(Model):
     """角色"""
     data = Field(0x54, label="数据")
     health = Field((0x230, 0x58), label="HP")
-    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=0, disable=1)
+    invincible = ToggleField((0x230, 0x5C), label="无敌", enable=1, disable=0)
     # health_max = WordField(0x1366, label="最大HP")
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))

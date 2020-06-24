@@ -9,11 +9,9 @@ class Character(Model):
     """角色"""
     data = Field(0x54, label="数据")
     health = Field((0x2C0, 0x58), label="HP")
-    invincible = ToggleField((0x2C0, 0x5C), label="无敌", enable=0, disable=1)
-    # health_max = WordField(0x1366, label="最大HP")
+    invincible = ToggleField((0x2C0, 0x5C), label="无敌", enable=1, disable=0)
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))
-    speed = FloatField((0x130, 0x50), label="速度")
 
 
 class CharacterStruct(Model):
@@ -78,8 +76,8 @@ class Inventory(Model):
 
 
 class Global(Model):
-    character_data = ModelPtrField((0x08CE7790, 0x50), CharacterDataStruct)
-    character_struct = ModelPtrField(0x08CE5710, CharacterStruct)
+    character_data = ModelPtrField((0x08CE5710, 0x50), CharacterDataStruct)
+    character_struct = ModelPtrField(0x08CE7790, CharacterStruct)
     position_struct = ModelPtrField(0x08CBEE80, PositionStruct)
     inventory = ModelPtrField((0x08CBA618, 0x50), Inventory)
     camera_dist = Field((0x08CB4FC8, 0x98, 0x160, 0x34), label="摄像机参数")
