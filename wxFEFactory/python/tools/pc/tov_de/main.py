@@ -94,7 +94,7 @@ class Main(AssemblyHacktool):
                     '01 51 30 48 8B D9',
                 ),
                 args=('money_multi_value',),
-                inserted=True, replace_len=6, hidden=True),
+                inserted=True, replace_len=6),
 
             AssemblyItem(
                 'exp_multi', '经验倍数', '8B 49 60 03 CA 3B C8', 0x005C7000, delta, b'',
@@ -108,7 +108,7 @@ class Main(AssemblyHacktool):
                     '01 D1',
                 ),
                 args=('exp_multi_value', 'b_inf_exp'),
-                inserted=True, replace_len=5, hidden=True),
+                inserted=True, replace_len=5),
             AssemblySwitch('b_inf_exp', '无限经验', depends=('exp_multi')),
             AssemblyItem(
                 'inf_lp', '无限LP/快速学习技能', 'B8 1F 85 EB 51 F7 E1 48 8B CF C1 EA 05',
