@@ -138,7 +138,7 @@ class Main(NativeHacktool):
                         VariableType('rapid_fire_speed', type=float, value=10.0),
                     )),
                 AssemblyItem(
-                    'inf_health_base_2', None, '41 8B 49 58 44 89 C0 99',
+                    'inf_health_base_2', None, '41 8B 49 58 41 8B C0 99 C7 44 24 10 00 00 00 00',
                     None, delta, b'',
                     AssemblyGroup(
                         '49 8D 49 58 48 A1',
