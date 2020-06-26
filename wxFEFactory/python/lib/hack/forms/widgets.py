@@ -77,10 +77,10 @@ class Widget(metaclass=abc.ABCMeta):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
-            if code == WXK.R:
+            if code == WXK.R or code == WXK.SPACE:
                 self.read()
                 return True
-            elif code == WXK.W or code == 13:
+            elif code == WXK.W or code == WXK.ENTER:
                 self.write()
                 return True
             elif code == WXK('='):

@@ -121,7 +121,7 @@ class InputConfig(ConfigCtrl):
         mod = event.GetModifiers()
         code = event.GetKeyCode()
         if mod == 0:
-            if code == WXK.R:
+            if code == WXK.R or code == WXK.SPACE:
                 self.read()
                 return True
             elif code == WXK.W or WXK.ENTER:
