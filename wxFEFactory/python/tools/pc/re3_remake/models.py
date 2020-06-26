@@ -12,6 +12,7 @@ class Character(Model):
     invincible = ToggleField((0x2C0, 0x5C), label="无敌", enable=1, disable=0)
     action = Field((0x108, 0x54), label="动作")
     weapon_state = Field((0x128, 0x58))
+    ZRef = Field((0x1D0, 0xB0, 0x98, 0x20, 0x24), label="PlayerZRef")
 
 
 class CharacterStruct(Model):
@@ -81,11 +82,11 @@ class Global(Model):
     position_struct = ModelPtrField(0x08CBEE80, PositionStruct)
     inventory = ModelPtrField((0x08CBA618, 0x50), Inventory)
     camera_dist = Field((0x08CB4FC8, 0x98, 0x160, 0x34), label="摄像机参数")
-    save_count = Field((0x070A8860, 0x198, 0x24), label="保存次数")
-    box_state = Field((0x08CEECF0, 0x50, 0x10), label="保存次数")
+    save_count = Field((0x08CE4720, 0x198, 0x24), label="保存次数")
+    # box_state = Field((0x08CEECF0, 0x50, 0x10), label="打开箱子状态")  # 修复武器动画时用的
+    box_count = Field((0x08CEA560, 0x70, 0x18), label="箱子打开次数")
     point = Field((0x08CEA560, 0x68, 0x7C), label="点数")
     speed = FloatField((0x08C1B4B0, 0x70, 0x380, 0x10, 0, 0x70), label="速度")
-    PlayerZRefAddress = Field((0x50, 0x1D0, 0xB0, 0x98, 0x20, 0x24), label="PlayerZRef")
 
 
 SPECIFIC_GLOBALS = {

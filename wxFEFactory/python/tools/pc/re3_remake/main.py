@@ -23,8 +23,9 @@ ADDRESS_SOURCES = {
         'tyrant_down': 0x02151000,
         'show_action': 0x02834000,
         'reset_save_count': 0x0165E000,
-        'through_wall_xy': 0,
-        'through_wall': 0,
+        'through_wall_xy': 0x02233000,
+        'through_wall_1': 0x02233000,
+        'through_wall_2': 0x01F91000,
         'reset_time': 0x01BA3000,
         'reset_time_all': 0x01BA3000,
     },
@@ -61,6 +62,7 @@ class Main(NativeHacktool):
         self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
         ModelInput("inventory.capcity", label="物品容量")
         ModelInput("save_count")
+        ModelInput("box_count")
         ModelInput("speed")
         ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
         ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
@@ -174,12 +176,20 @@ class Main(NativeHacktool):
             AssemblyItem(
                 'reset_save_count', '重置存档次数', '8D 42 01 89 41 24 48 8B 43 50',
                 None, delta, '31 C0 90', replace_len=3),
-            # AssemblyItem(
-            #     'through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
-            #     None, delta, '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
-            # AssemblyItem(
-            #     'through_wall', '穿墙(包括地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
-            #     None, delta, '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
+            AssemblyItem(
+                'through_wall_xy', '穿墙(忽略地面)', '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
+                None, delta, '90 90 90 41 8B 46 04 89 47 34 41 8B 46 08 90 90 90'),
+            # TODO: PlayerZRef = PlayerPosition.Z
+            # AssemblyItems(
+            #     '穿墙(包括地面)',
+            #     AssemblyItem(
+            #         'through_wall_1', None, '89 47 30 41 8B 46 04 89 47 34 41 8B 46 08 89 47 38',
+            #         None, delta, '90 90 90 41 8B 46 04 90 90 90 41 8B 46 08 90 90 90'),
+            #     AssemblyItem(
+            #         'through_wall_2', None, 'F3 0F 11 4F 24 F3 0F 11 57 28 48 8B 46 50',
+            #         None, delta, '90 90 90 90 90',
+            #         inserted=True, replace_len=5),
+            # ),
             AssemblyItem(
                 'reset_time', '重置游戏时间',
                 '48 8D 04 2A 48 89 41 18 48 8B 43 50 48 39 70 18 0F 85 * * * * 48 8B 47 58', None, delta,
