@@ -13,6 +13,7 @@ from . import models, datasets
 ADDRESS_SOURCES = {
     'steam': {
         'item_keep': 0x01DA8000,
+        'item_keep_5': 0x01DA8000,
         'inf_ammo': 0x01DA5000,
         'inf_clip1': 0x01DA5000,
         'max_backpack': 0x010DF000,
@@ -63,6 +64,7 @@ class Main(NativeHacktool):
         ModelInput("inventory.capcity", label="物品容量")
         ModelInput("save_count")
         ModelInput("box_count")
+        ModelInput("herb_count")
         ModelInput("speed")
         ModelInput("point")
         ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
@@ -88,6 +90,9 @@ class Main(NativeHacktool):
         self.render_assembly_buttons((
             AssemblyItem(
                 'item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5 48 8B CE', None, delta, b'\x90\x90', replace_len=2),
+            AssemblyItem(
+                'item_keep_5', '数量不减(<5)', '2B DF 44 8B C3 48 8B D5 48 8B CE', None, delta, b'',
+                '83 FB 05 72 02 29 FB 44 8B C3', inserted=True, replace_len=5),
             AssemblyItem(
                 'inf_ammo', '备弹999', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02',
                 None, delta, b'',
@@ -134,6 +139,7 @@ class Main(NativeHacktool):
                     replace_len=7,
                     args=(
                         'b_inf_health',
+                        'b_no_hurt',
                         'b_one_hit_kill',
                         'b_rapid_fire',
                         VariableType('character_addr', size=8),
@@ -146,13 +152,16 @@ class Main(NativeHacktool):
                     AssemblyGroup(
                         '49 8D 49 58 48 A1',
                         Variable('character_addr'),
-                        '4C 39 C8 75 0A 8B 41 FC 89 01 45 31 C0 EB 17',
+                        '4C 39 C8 75 13',
+                        Cmp('b_no_hurt', 1),
+                        '75 08 8B 41 FC 89 01 45 31 C0 EB 17',
                         Cmp('b_one_hit_kill', 1),
-                        '75 0E 41 83 F8 00 7E 06 41 C7 41 58 01 00 00 00 8B 09 41 8B C0'
+                        '75 0E 41 83 F8 00 7E 08 41 C7 41 58 01 00 00 00 8B 09 41 8B C0'
                     ),
                     inserted=True, replace_len=7),
             ),
             AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base_1')),
+            AssemblySwitch('b_no_hurt', '不会受伤', depends=('inf_health_base_1')),
             AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
             # AssemblySwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1')),
             AssemblyItem(
