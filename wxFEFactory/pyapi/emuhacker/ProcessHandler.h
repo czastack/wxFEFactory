@@ -100,7 +100,7 @@ public:
 		return data;
 	}
 
-	bool write_int(addr_t addr, size_t data, size_t size)
+	bool write_int(addr_t addr, long long data, size_t size)
 	{
 		return write_uint(addr, data & ((1ull << (size << 3ull)) - 1ull), size);
 	}
