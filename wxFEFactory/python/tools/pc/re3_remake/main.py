@@ -64,6 +64,7 @@ class Main(NativeHacktool):
         ModelInput("save_count")
         ModelInput("box_count")
         ModelInput("speed")
+        ModelInput("point")
         ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
         ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
         ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")

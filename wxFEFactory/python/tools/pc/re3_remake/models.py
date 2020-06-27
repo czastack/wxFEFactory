@@ -85,7 +85,7 @@ class Global(Model):
     save_count = Field((0x08CE4720, 0x198, 0x24), label="保存次数")
     # box_state = Field((0x08CEECF0, 0x50, 0x10), label="打开箱子状态")  # 修复武器动画时用的
     box_count = Field((0x08CEA560, 0x70, 0x18), label="箱子打开次数")
-    point = Field((0x08CEA560, 0x68, 0x7C), label="点数")
+    point = Field((0x08CEA560, 0x68, 0x7C), label="商店点数")
     speed = FloatField((0x08C1B4B0, 0x70, 0x380, 0x10, 0, 0x70), label="速度")
 
 
