@@ -12,21 +12,26 @@ from . import models, datasets
 
 ADDRESS_SOURCES = {
     'steam': {
+        'anti_cheat': 0x00A57000,
         'item_keep': 0x01DA8000,
         'item_keep_5': 0x01DA8000,
         'inf_ammo': 0x01DA5000,
+        'inf_ammo_test': 0x01DA4000,
         'inf_clip1': 0x01DA5000,
         'max_backpack': 0x010DF000,
         'quick_aim': 0x01CA8000,
         'no_recoil': 0x00D41000,
+        'jill_auto_perfect_dodge': 0x014BF000,
         'inf_health_base_1': 0x0045A000,
         'inf_health_base_2': 0x00BB5000,
         'tyrant_down': 0x02151000,
+        'enemy_speed_multi': 0x01B0C000,
         'show_action': 0x02834000,
         'reset_save_count': 0x0165E000,
         'through_wall_xy': 0x02233000,
         'through_wall_1': 0x02233000,
         'through_wall_2': 0x01F91000,
+        'through_wall': 0x02822000,
         'reset_time': 0x01BA3000,
         'reset_time_all': 0x01BA3000,
     },
@@ -67,8 +72,9 @@ class Main(NativeHacktool):
         ModelInput("herb_count")
         ModelInput("speed")
         ModelInput("point")
-        ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
-        ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
+        # ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
+        # ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
+        ModelInput("enemy_speed_multi_value", "敌人速度", instance=self.variable_model)
         ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
 
     def render_character(self):
@@ -89,6 +95,8 @@ class Main(NativeHacktool):
         delta = Delta(0x2000)
         self.render_assembly_buttons((
             AssemblyItem(
+                'anti_cheat', '防反作弊', '48 8B 41 50 48 83 78 18 00 75 3D 8B', None, delta, 'C3 90 90 90', replace_len=4),
+            AssemblyItem(
                 'item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5 48 8B CE', None, delta, b'\x90\x90', replace_len=2),
             AssemblyItem(
                 'item_keep_5', '数量不减(<5)', '2B DF 44 8B C3 48 8B D5 48 8B CE', None, delta, b'',
@@ -98,6 +106,9 @@ class Main(NativeHacktool):
                 None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 07 C7 41 20 E7030000',
                 inserted=True, replace_len=7),
+            AssemblyItem(
+                'inf_ammo_test', '无限弹药', '8B 01 89 42 20 48',
+                None, delta, b'', b'\x90\x90', replace_len=2),
             AssemblyItem(
                 'inf_clip1', '弹夹99', '48 8B 48 10 48 85 C9 74 03 8B 59 20 85 DB', None, delta, b'',
                 '48 8B 48 10 48 85 C9 74 13 83 79 1C 00 74 0D 83 79 14 FF 74 07 C7 41 20 63 00 00 00 48 85 C9',
@@ -114,6 +125,9 @@ class Main(NativeHacktool):
                 'no_recoil', '稳定射击', 'F3 0F 10 48 20 F2 0F 58 D6 48 8D 44 24 20', None, delta,
                 b'', AssemblyGroup('C7 40 10 00000000 C7 40 14 00000000', ORIGIN),
                 inserted=True, replace_len=5),
+            AssemblyItem(
+                'jill_auto_perfect_dodge', '吉尔自动完美闪避', '44 88 68 61 48 8B 43 50', None, delta, b'',
+                '41 50 4D 31 C0 49 FF C0 4C 89 40 61 41 58 48 8B 43 50', inserted=True, replace_len=8),
             AssemblyItems(
                 '玩家地址依赖',
                 AssemblyItem(
@@ -165,9 +179,17 @@ class Main(NativeHacktool):
             AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
             # AssemblySwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1')),
             AssemblyItem(
-                'tyrant_down', '追踪者无法起身',
-                'F2 0F 5C F8 66 0F 5A CF F3 0F 11 8B 94 04 00 00',
+                'tyrant_down', '追踪者无法起身', 'F2 0F 5C F8 66 0F 5A CF F3 0F 11 8B 94 04 00 00',
                 None, delta, '90 90 90 90', replace_len=4),
+            AssemblyItem(
+                'enemy_speed_multi', '敌人速度', 'F3 0F 11 40 4C 48 8B 47',
+                None, delta, b'', AssemblyGroup(
+                    'F3 0F 59 05',
+                    Offset('enemy_speed_multi_value'),
+                    'F3 0F 11 40 4C'
+                ),
+                inserted=True, replace_len=5,
+                args=(VariableType('enemy_speed_multi_value', type=float, value=0.0),)),
             AssemblyItem(
                 'show_action', '显示可互动及可收集物品', 'F3 0F 59 63 6C F2 0F 10 D6', None, delta, b'',
                 AssemblyGroup(
@@ -200,6 +222,9 @@ class Main(NativeHacktool):
             #         None, delta, '90 90 90 90 90',
             #         inserted=True, replace_len=5),
             # ),
+            AssemblyItem(
+                'through_wall', '穿墙2', 'A4 44 01 76 08 4C 8D 5C 24 70',
+                None, delta, '90 90 90 90', replace_len=4),
             AssemblyItem(
                 'reset_time', '重置游戏时间',
                 '48 8D 04 2A 48 89 41 18 48 8B 43 50 48 39 70 18 0F 85 * * * * 48 8B 47 58', None, delta,
