@@ -1,5 +1,5 @@
 from lib.hack.models import (
-    Model, Field, Fields, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField,
+    Model, Field, Fields, ByteField, WordField, FloatField, SignedField, ArrayField, ModelField, ModelPtrField,
     CoordField, BytesField, ToggleField
 )
 from .datasets import INVENTORY_OPTIONS, AMMO_MAP
@@ -40,7 +40,7 @@ class InventoryItemInfo(Model):
     item_code = Field(0x10, label="物品编码")
     weapon_code = Field(0x14, label="武器编码")
     ammo_code = Field(0x1C, label="子弹编码")
-    count = Field(0x20, label="数量")
+    count = SignedField(0x20, label="数量")
 
     @property
     def choice(self):

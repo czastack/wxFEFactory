@@ -224,7 +224,7 @@ class Main(NativeHacktool):
             # ),
             AssemblyItem(
                 'through_wall', '穿墙2', 'A4 44 01 76 08 4C 8D 5C 24 70',
-                None, delta, '90 90 90 90', replace_len=4),
+                None, delta, '90 90 90 90', replace_len=4, replace_offset=1),
             AssemblyItem(
                 'reset_time', '重置游戏时间',
                 '48 8D 04 2A 48 89 41 18 48 8B 43 50 48 39 70 18 0F 85 * * * * 48 8B 47 58', None, delta,
