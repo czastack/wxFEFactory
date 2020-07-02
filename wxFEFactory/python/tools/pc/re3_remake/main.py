@@ -33,6 +33,7 @@ ADDRESS_SOURCES = {
         'through_wall_2': 0x01F91000,
         'through_wall': 0x02822000,
         'reset_time': 0x01BA3000,
+        'set_time': 0x01BA3000,
         'reset_time_all': 0x01BA3000,
     },
 }
@@ -49,6 +50,7 @@ class Main(NativeHacktool):
         self.version = 'steam'
         self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
+        self._game_time_ins = models.GameTime(0, self.handler)
         self.char_index = self._global_ins.char_index = 0
         self.char_choice = None
 
@@ -72,6 +74,7 @@ class Main(NativeHacktool):
         ModelInput("herb_count")
         ModelInput("speed")
         ModelInput("point")
+        ModelInput("time", instance=(self._game_time, models.GameTime))
         # ModelInput("rapid_fire_speed", "快速射击速度", instance=self.variable_model)
         # ModelInput("normal_speed", "快速射击时正常速度", instance=self.variable_model)
         ModelInput("enemy_speed_multi_value", "敌人速度", instance=self.variable_model)
@@ -241,6 +244,14 @@ class Main(NativeHacktool):
                 ), inserted=True, replace_len=8, fuzzy=True,
                 args=(VariableType('reset_time_temp1', 8),)),
             AssemblyItem(
+                'set_time', '设置游戏时间',
+                '48 8D 04 2A 48 89 41 18 48 8B 43 50 48 39 70 18 0F 85 * * * * 48 8B 47 58', None, delta,
+                b'', AssemblyGroup(
+                    '48 8D 04 2A 48 89 41 18 48 89 0D',
+                    Offset('game_time'),
+                ), inserted=True, replace_len=8, fuzzy=True,
+                args=(VariableType('game_time', 8),)),
+            AssemblyItem(
                 'reset_save_count', '重置总游玩时间', '48 8B 02 49 89 40 20',
                 None, delta, '48 31 C0 49 89 40 20', replace_len=7),
         ))
@@ -270,6 +281,11 @@ class Main(NativeHacktool):
 
     def _global(self):
         return self._global_ins
+
+    def _game_time(self):
+        """游戏时间"""
+        self._game_time_ins.addr = self.get_variable_value('game_time')
+        return self._game_time_ins
 
     def _character(self):
         if self.handler.active:

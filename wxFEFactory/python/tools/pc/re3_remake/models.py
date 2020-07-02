@@ -76,6 +76,13 @@ class Inventory(Model):
     items = ArrayField((0x98, 0x10, 0x20), 20, ModelPtrField(0, InventoryItem))
 
 
+class GameTime(Model):
+    f18 = Field(0x18, label="18")  # / 1000000 / 60 = 分钟
+    f20 = Field(0x20, label="20")  # 分钟-
+    f28 = Field(0x28, label="28")
+    f30 = Field(0x30, label="30")  # 小时-
+
+
 class Global(Model):
     character_data = ModelPtrField((0x08CE5710, 0x50), CharacterDataStruct)
     character_struct = ModelPtrField(0x08CE7790, CharacterStruct)

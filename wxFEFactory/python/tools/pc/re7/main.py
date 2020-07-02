@@ -75,7 +75,7 @@ class Main(NativeHacktool):
         ModelInput("statistics.herb_count", "治疗物品使用数量")
         ModelInput("statistics.open_box_count", "已打开物品箱数")
         ModelInput("statistics.read_file_count", "已获得文件数")
-        ModelInput("gametime")
+        ModelInput("game_time")
         self.coord_widget = ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
         self.coord_force_checkbox = StaticCheckBox("强制设置坐标")
 
