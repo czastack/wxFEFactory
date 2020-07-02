@@ -15,6 +15,7 @@ from . import models, datasets
 ADDRESS_SOURCES = {
     'steam': {
         'item_keep': 0x004FF000,
+        'item_keep_5': 0x004FF000,
         'inf_ammo': 0x00F3D000,
         'inf_clip1': 0x004FD000,
         'inf_clip2': 0x004FB000,
@@ -28,6 +29,7 @@ ADDRESS_SOURCES = {
         'inf_health_base_2': 0x00F87000,
         'baojun_down_1': 0x00F4A000,
         'baojun_down_2': 0x0137F000,
+        'enemy_speed_multi': 0x01C8F000,
         'show_action': 0x022C8000,
         'through_wall_xy': 0x01DD2000,
         'through_wall': 0x01DD2000,
@@ -36,6 +38,7 @@ ADDRESS_SOURCES = {
     },
     'codex': {
         'item_keep': 0x00E8A800,
+        'item_keep_5': 0x00E8A800,
         'inf_ammo': 0x00401000,
         'inf_clip1': 0x00E88000,
         'inf_clip2': 0x00E86000,
@@ -49,6 +52,7 @@ ADDRESS_SOURCES = {
         'inf_health_base_2': 0x00C58600,
         'baojun_down_1': 0x0178F000,
         'baojun_down_2': 0x01C62000,
+        'enemy_speed_multi': 0,
         'show_action': 0x022BE000,
         'through_wall_xy': 0x01DC8000,
         'through_wall': 0x01DC8000,
@@ -89,6 +93,7 @@ class Main(NativeHacktool):
         self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
         ModelInput("inventory.capcity", label="物品容量")
         ModelInput("save_count")
+        ModelInput("enemy_speed_multi_value", "敌人速度", instance=self.variable_model)
         # ModelCoordWidget("position_struct.coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True, label="角色坐标")
         ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
@@ -114,6 +119,9 @@ class Main(NativeHacktool):
         delta = Delta(0x2000)
         self.render_assembly_buttons((
             AssemblyItem('item_keep', '数量不减', '2B DF 44 8B C3 48 8B D5', None, delta, b'\x90\x90', replace_len=2),
+            AssemblyItem(
+                'item_keep_5', '数量不减(<5)', '2B DF 44 8B C3 48 8B D5', None, delta, b'',
+                '83 FB 05 72 02 29 FB 44 8B C3', inserted=True, replace_len=5),
             AssemblyItem(
                 'inf_ammo', '备弹999', '48 8B 48 10 48 85 C9 74 05 8B 41 20 EB 02 33 C0 48 85 D2',
                 None, delta, b'',
@@ -177,6 +185,7 @@ class Main(NativeHacktool):
                     replace_len=7,
                     args=(
                         'b_inf_health',
+                        'b_no_hurt',
                         'b_one_hit_kill',
                         'b_rapid_fire',
                         VariableType('character_addr', size=8),
@@ -189,13 +198,16 @@ class Main(NativeHacktool):
                     AssemblyGroup(
                         '48 8D 4A 58 48 A1',
                         Variable('character_addr'),
-                        '48 39 D0 75 0A 8B 41 FC 89 01 45 31 C0 EB 15',
+                        '48 39 D0 75 13',
+                        Cmp('b_no_hurt', 1),
+                        '75 08 8B 41 FC 89 01 45 31 C0 EB 15',
                         Cmp('b_one_hit_kill', 1),
                         '75 0C 41 83 F8 00 7E 06 41 B8 9F 86 01 00 8B 09 41 8B C0'
                     ),
                     inserted=True, replace_len=6),
             ),
             AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base_1')),
+            AssemblySwitch('b_no_hurt', '不会受伤', depends=('inf_health_base_1')),
             AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
             AssemblySwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1')),
             AssemblyItems(
@@ -211,6 +223,15 @@ class Main(NativeHacktool):
                     b'', '68 00 00 C8 41 F3 0F 10 0C 24 48 83 C4 08',
                     inserted=True, replace_len=8),
             ),
+            AssemblyItem(
+                'enemy_speed_multi', '敌人速度', 'F3 0F 11 40 4C 48 8B 47',
+                None, delta, b'', AssemblyGroup(
+                    'F3 0F 59 05',
+                    Offset('enemy_speed_multi_value'),
+                    'F3 0F 11 40 4C'
+                ),
+                inserted=True, replace_len=5,
+                args=(VariableType('enemy_speed_multi_value', type=float, value=0.0),)),
             AssemblyItem(
                 'show_action', '显示可互动及可收集物品', 'F3 0F 59 63 6C F2 0F 10 D6', None, delta, b'',
                 AssemblyGroup(
