@@ -92,6 +92,14 @@ class Main(NativeHacktool):
         self.render_assembly_buttons((
             AssemblyItem('hp_keep', '生命不减', '66 29 8E 64 13 00 00', 0x700000, delta, nop_7),
             AssemblyItem('ammo_keep', '弹药不减', '2B 44 24 08 89 41 08', 0x800000, delta, nop_7),
+            # cmp eax, 5
+            # jle short cancel
+            # sub eax,[esp+08]
+            # mov [ecx+08],eax
+            # cancel:
+            AssemblyItem(
+                'ammo_keep_5', '弹药不减(<5)', '2B 44 24 08 89 41 08', 0x800000, delta,
+                b'', '83 F8 05 7E 07 2B 44 24 08 89 41 08', inserted=True),
             AssemblyItem('grenade_keep', '手雷不减', '8B 46 08 83 E8 01 89 44 24 14',
                          0x300000, delta, '90 90 90', replace_len=3, replace_offset=3),
             AssemblyItem('infinity_ammo', '无限弹药', '8B 57 08 57 8B CB', 0x500000, delta,
