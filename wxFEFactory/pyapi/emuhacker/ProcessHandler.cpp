@@ -314,14 +314,14 @@ ProcAddressHelper* ProcessHandler::getProcAddressHelper(addr_t module)
  */
 addr_t ProcessHandler::find_bytes(BYTE *data, addr_t data_size, addr_t start, addr_t end, int ordinal, bool fuzzy)
 {
-	const DWORD PAGE_SIZE = 65536;
+	const size_t PAGE_SIZE = 8192;
 	bool finded = false;
 	BYTE page[PAGE_SIZE];
 	addr_t cur_addr = start;
 
 	BYTE *page_end = page + PAGE_SIZE - data_size;
 	BYTE *page_cursor = page;
-	int data_size_aligned = data_size; // 数据大小对其4字节
+	addr_t data_size_aligned = data_size; // 数据大小对其4字节
 	int i; // data内偏移量
 	int ord = 0; // 找到的数据序号
 
