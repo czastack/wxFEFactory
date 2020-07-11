@@ -113,16 +113,30 @@ class Main(MonoHacktool):
             AssemblyItem(
                 'basic_continue', '连续平A', b'\x40\x0F\x94\xC0\x48\x0F\xB6\xC0', None, Delta(0xf0),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
+            # 双倍宝石/金币
+            # v1.1
+            # AssemblyItem(
+            #     'double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00', None, Delta(0x5d), b'',
+            #     AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
+            #     inserted=True, find_base=False),
+            # AssemblyItem(
+            #     'double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00', None, Delta(0x5d), b'',
+            #     AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
+            #     inserted=True, find_base=False),
+            # v1.2
             AssemblyItem(
-                'double_plat', '双倍宝石', b'\xBA\x07\x00\x00\x00', None, Delta(0x5d), b'',
-                AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
+                'double_plat', '双倍宝石/金币', '03 C1 89 46 28', None, Delta(0xa0), b'',
+                AssemblyGroup(b'\x01\xC9', ORIGIN),
                 inserted=True, find_base=False),
+
+            # 技能增强
+            # v1.1
+            # AssemblyItem(
+            #     'skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00', None, Delta(0x2b),
+            #     b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
+            # v1.2
             AssemblyItem(
-                'double_gold', '双倍金币', b'\xBA\x01\x00\x00\x00', None, Delta(0x5d), b'',
-                AssemblyGroup(b'\x48\x01\xf6', ORIGIN),
-                inserted=True, find_base=False),
-            AssemblyItem(
-                'skill_empowered', '技能增强', b'\xFF\x90\xE0\x00\x00\x00', None, Delta(0x2b),
+                'skill_empowered', '技能增强', b'\xFF\x90\xE8\x00\x00\x00', None, Delta(0x2b),
                 b'\x48\x31\xC0\x48\xFF\xC0', find_base=False),
         ))
 
