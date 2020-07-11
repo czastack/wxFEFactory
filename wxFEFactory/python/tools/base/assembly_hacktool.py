@@ -463,7 +463,9 @@ class AssemblyItem(AssemblyButton):
                 self.fuzzy = True
         for name in ('original', 'replace', 'assembly'):
             value = self[name]
-            if isinstance(value, str):
+            if value == '':
+                value = b''
+            elif isinstance(value, str):
                 self[name] = bytes.fromhex(value)
         if isinstance(self.depends, str):
             self.depends = self.depends.split()

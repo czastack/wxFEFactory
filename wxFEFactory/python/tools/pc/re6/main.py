@@ -49,15 +49,17 @@ class Main(NativeHacktool):
     def render_person_items(self):
         """游戏中物品"""
         for label, index_range in (('水平武器', (0, 7)), ('药丸', (7, 8)), ('垂直武器', (8, 13)), ('其他物品', (15, 24))):
-            r = 1
+            row = 1
             for i in range(*index_range):
                 prop = "items.%d" % i
-                select = ModelChoiceDisplay(prop + ".type", "%s%d" % (label, r),
+                select = ModelChoiceDisplay(
+                    prop + ".type", "%s%d" % (label, row),
                     choices=datasets.INVENTORY_ITEMS.choices, values=datasets.INVENTORY_ITEMS.values)
                 with select.container:
-                    ui.Button("详情", class_="btn_sm", onclick=partial(__class__.show_ingame_item, self.weak,
+                    ui.Button("详情", class_="btn_sm", onclick=partial(
+                        __class__.show_ingame_item, self.weak,
                         instance=self._person, prop=prop))
-                r += 1
+                row += 1
 
     def render_person_skills(self):
         with ModelSelect.choices_cache:
@@ -68,19 +70,20 @@ class Main(NativeHacktool):
         nop_8 = b'\x90' * 8
         delta = Delta(0x200000)
         self.render_assembly_buttons((
-            AssemblyItem('ammo_keep', '子弹不减', b'\x66\x29\x54\x41\x0A\x79\x07', 0x900000, delta,
-                b'\x66\x4A\x90\x90\x90'),
-            AssemblyItem('no_recoil', '无后坐力', b'\xF3\x0F\x10\x8E\xFC\x4A\x00\x00', 0x680000, delta, nop_8),
-            AssemblyItem('rapid_fire', '快速射击', b'\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00', 0x680000, delta,
-                b'', b'\xF3\x0F\x58\xD2\xF3\x0F\x58\xD2\xF3\x0F\x5C\xC2\xF3\x0F\x11\x86\x4C\x4F\x00\x00',
-                inserted=True),
-            AssemblyItem('merce_timer_keep', '佣兵模式时间不减',
-                b'\xF3\x0F\x11\x86\x6C\x48\x00\x00\xF3\x0F\x11\x8E\x74\x48\x00\x00', 0x100000, delta, nop_8),
-            AssemblyItem('god_on_hit_kill', '血不减+一击必杀', b'\x66\x8b\x44\x24\x04\x66\x29\x81\x10\x0f\x00\x00',
-                0x540000, delta, b'',
-                b'\x83\x79\x38\x01\x75\x0A\xC7\x81\x10\x0F\x00\x00\x00\x00\x00\x00', inserted=True),
-            AssemblyItem('skill_points', '技能点数', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00',
-                0x580000, delta, b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
+            AssemblyItem('ammo_keep', '子弹不减', '66 29 54 41 0A 79 07', 0x900000, delta, '66 4A 90 90 90'),
+            AssemblyItem('no_recoil', '无后坐力', 'F3 0F 10 8E FC 4A 00 00', 0x680000, delta, nop_8),
+            AssemblyItem(
+                'rapid_fire', '快速射击', 'F3 0F 5C C2 F3 0F 11 86 4C 4F 00 00', 0x680000, delta,
+                b'', 'F3 0F 58 D2 F3 0F 58 D2 F3 0F 5C C2 F3 0F 11 86 4C 4F 00 00', inserted=True),
+            AssemblyItem(
+                'merce_timer_keep', '佣兵模式时间不减',
+                'F3 0F 11 86 6C 48 00 00 F3 0F 11 8E 74 48 00 00', 0x100000, delta, nop_8),
+            AssemblyItem(
+                'god_on_hit_kill', '血不减+一击必杀', '66 8b 44 24 04 66 29 81 10 0f 00 00', 0x540000, delta, b'',
+                '83 79 38 01 75 0A C7 81 10 0F 00 00 00 00 00 00', inserted=True),
+            AssemblyItem(
+                'skill_points', '技能点数', '8B BE 88 05 00 00 8B 8E 8C 05 00 00', 0x580000, delta,
+                b'', b'\x8B\xBE\x88\x05\x00\x00\x8B\x8E\x8C\x05\x00\x00\x89\x35%s',
                 inserted=True, args=('skill_points_base',)),
         ))
 
