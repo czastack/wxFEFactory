@@ -40,13 +40,13 @@ class Main(AssemblyHacktool):
     def render_game(self):
         pass
 
-    def render_player(self):
-        ModelAddrInput()
-        for name in models.Player.form_fields:
-            ModelInput(name)
+    # def render_player(self):
+    #     ModelAddrInput()
+    #     for name in models.Player.field_names:
+    #         ModelInput(name)
 
-    def render_weapon(self):
-        pass
+    # def render_weapon(self):
+    #     pass
 
     def render_assembly_buttons_own(self):
         delta = Delta(0x1000)
