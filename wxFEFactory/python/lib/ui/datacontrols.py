@@ -228,15 +228,17 @@ class ListView(Control):
 
     def set_checked_list(self, selection):
         """设置勾选列表"""
-        self.checkall(False)
-        for i in selection:
-            self.CheckItem(i, True)
+        if selection:
+            self.checkall(False)
+            for i in selection:
+                self.CheckItem(i, True)
 
     def set_selected_list(self, selection):
         """设置高亮列表"""
-        self.clear_selected()
-        for i in selection:
-            self.Select(i, True)
+        if selection:
+            self.clear_selected()
+            for i in selection:
+                self.Select(i, True)
 
     set_on_item_selected = event_binder(wx.EVT_LIST_ITEM_SELECTED)
 
