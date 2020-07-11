@@ -38,17 +38,18 @@ class Wallet(MonoClass):
     """钱包"""
     balance = MonoField(label="余额")
     maxBalance = MonoField(label="最大值")
+    Deposit = MonoMethod(param_count=1, compile=True)
 
 
-class PlatWallet(MonoClass):
+class PlatWallet(Wallet):
     """混沌宝石钱包"""
     # 存入
-    Deposit = MonoMethod(param_count=1, compile=True)
+    # Deposit = MonoMethod(param_count=1, compile=True)
 
 
-class GoldWallet(MonoClass):
+class GoldWallet(Wallet):
     """金币钱包"""
-    Deposit = MonoMethod(param_count=1, compile=True)
+    # Deposit = MonoMethod(param_count=1, compile=True)
 
 
 class Player(MonoClass):

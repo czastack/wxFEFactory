@@ -13,6 +13,7 @@ class AssemblyHacktool(BaseHackTool):
     allocated_memory = None
     allocation_size = 0x800
     allocation_type = 0x00003000
+    allocation_before = True  # 尝试在base_addr前找到空闲内存
     assembly_address_sources = None
 
     def __init__(self):
@@ -96,7 +97,7 @@ class AssemblyHacktool(BaseHackTool):
         """确保分配内存"""
         if not self.allocated_memory:
             # 初始化代码区 PAGE_EXECUTE_READWRITE
-            if not self.handler.is32process:
+            if not self.handler.is32process and self.allocation_before:
                 # 64位应用程序
                 start = self.handler.base_addr - 0x10000000
                 for i in range(0xFFF):

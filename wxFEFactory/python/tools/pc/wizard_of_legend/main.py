@@ -12,6 +12,7 @@ from . import models, datasets
 class Main(MonoHacktool):
     CLASS_NAME = 'UnityWndClass'
     WINDOW_NAME = 'Wizard of Legend'
+    allocation_before = False
 
     def __init__(self):
         super().__init__()
@@ -126,7 +127,8 @@ class Main(MonoHacktool):
         ))
 
     def render_hotkeys(self):
-        ui.Text("Capslock: 必杀槽满\n"
+        ui.Text(
+            "Capslock: 必杀槽满\n"
             "h: 血量满\n")
 
     def get_hotkeys(self):
