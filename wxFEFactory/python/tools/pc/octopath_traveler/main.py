@@ -5,7 +5,7 @@ from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
 )
-from . import datasets, models
+from . import assembly, datasets, models
 
 
 class Main(AssemblyHacktool):
@@ -73,7 +73,7 @@ class Main(AssemblyHacktool):
             Pagination(self.on_items_page, self.ITEMS_PAGE_TOTAL)
 
     def render_assembly_buttons_own(self):
-        delta = Delta(0x1000)
+        self.render_assembly_buttons(assembly.ASSEMBLY_ITEMS)
 
     def render_hotkeys(self):
         # ui.Text("h: 血量满\n")
