@@ -45,7 +45,7 @@ class PMHack(BaseGbaHack):
         ModelInput("battle_points_current", "战斗点数（仅绿宝石）", spin=True)
         ModelInput("battle_points_trainer_card", "训练员卡上的战斗点数（仅绿宝石）", spin=True)
 
-        ModelSelect("area", "地点瞬移", choices=datasets.AREA_LABELS, values=datasets.AREA_VALUES)
+        ModelSelect("area", "地点瞬移", choices=datasets.AREAS)
         ModelSelect("furniture_purchase", "家具购买", choices=datasets.FURNITURES)
         ModelSelect("appearance", "性别外形", choices=datasets.APPEARANCE)
         # ModelSelect("wild_pokemon", "遇到精灵", choices=datasets.POKEMONS)

@@ -90,7 +90,7 @@ class Main(BaseN3dsHack):
         ModelInput("mov")
         ModelInput("win")
         ModelInput("pro")
-        ModelSelect("item.item", "所携物品", choices=datasets.ITEM_LABELS, values=datasets.ITEM_VALUES)
+        ModelSelect("item.item", "所携物品", choices=datasets.ITEMS)
         ModelInput("item.star", "物品星级")
         ModelInput("charname", "角色", readonly=True)
         ModelInput("profname", "职业", readonly=True)
@@ -100,8 +100,7 @@ class Main(BaseN3dsHack):
         with ModelSelect.choices_cache:
             for i in range(self.CONVOY_PAGE_LENGTH):
                 item_path = "convoy.{0}.{1}+{0}_offset".format(leader, i)
-                ModelSelect(item_path + ".item", "",
-                    choices=datasets.ITEM_LABELS, values=datasets.ITEM_VALUES)
+                ModelSelect(item_path + ".item", "", choices=datasets.ITEMS)
                 with ModelInput(item_path + ".star", "星级").container:
                     ui.Button(label="复制", extra={"tooltip": "复制到行囊"}, class_="button",
                               onclick=partial(self.copy_item, source=item_path, leader=leader))

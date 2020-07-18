@@ -1,6 +1,5 @@
 from lib.hack.forms import Group, DialogGroup, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget, Input, Choice
 from lib.win32.keys import VK
-from lib import utils
 from lib import ui
 from ..base import BaseNesHack
 from . import models, datasets

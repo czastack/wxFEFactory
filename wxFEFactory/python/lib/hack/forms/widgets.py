@@ -745,7 +745,7 @@ class BaseSelect(TwoWayWidget):
         self.search_map.pop(id(view), None)
 
     def on_left_down(self, view, event):
-        if pyapi.GetKeyState(WXK.SHIFT):
+        if ui.wx.GetKeyState(WXK.SHIFT):
             view.start_text_drag(str(id(self.view)))
             return False
 
@@ -755,10 +755,10 @@ class BaseSelect(TwoWayWidget):
             instance = self.search_map.get(int(i), None)
             if instance and self != instance:
                 if instance.choices == self.choices:
-                    ctrl = pyapi.GetKeyState(WXK.CONTROL)
+                    ctrl = ui.wx.GetKeyState(WXK.CONTROL)
                     value = instance.view.index
                     if not ctrl:
-                        alt = pyapi.GetKeyState(WXK.ALT)
+                        alt = ui.wx.GetKeyState(WXK.ALT)
                         if not alt:
                             # 交换
                             instance.view.index = self.view.index
@@ -1001,7 +1001,8 @@ def TabList(data):
     book = ui.Notebook(class_="fill", wxstyle=0x0200)
     with book:
         for category in data:
-            ui.ListBox(class_="expand", choices=(item[0] for item in category[1]), extra=dict(caption=category[0]))
+            # 名称是第二个元素
+            ui.ListBox(class_="expand", choices=(item[1] for item in category[1]), extra=dict(caption=category[0]))
     return book
 
 

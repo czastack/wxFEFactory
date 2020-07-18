@@ -1,6 +1,3 @@
-from lib.utils import split_tuple_reverse
-
-
 VERSIONS = ('1.0', '1.1')
 DIFFICULTY = ('简单', '困难')
 DEAN_SONYA_EVENT = ('未击败', '击败索尼娅', '击败迪恩')
@@ -171,8 +168,6 @@ ITEMS = {
     0xFE: "纯蜂蜜",
     0xD6: "监牢钥匙",
 }
-
-ITEM_VALUES, ITEM_LABELS = split_tuple_reverse(ITEMS)
 
 B = bytes.fromhex
 

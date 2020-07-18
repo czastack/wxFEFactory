@@ -13,7 +13,7 @@ class Main(BaseNesHack):
     def render_main(self):
         with Group("global", "全局", self._global):
             ModelSelect("enemy", "角色", choices=datasets.PLAYERS)
-            ModelSelect("enemy", "敌人模型", choices=datasets.ENEMY_LABELS, values=datasets.ENEMY_VALUES)
+            ModelSelect("enemy", "敌人模型", choices=datasets.ENEMYS)
             ModelInput("level", "等级")
             ModelInput("lives", "命数")
             ModelInput("hp", "HP")

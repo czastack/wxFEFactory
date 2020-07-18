@@ -1,6 +1,5 @@
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect
 from lib.hack.models import Model, Field, ByteField, ArrayField
-from lib import utils
 from ..base import BaseNesHack
 
 

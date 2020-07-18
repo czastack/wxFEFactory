@@ -1,6 +1,5 @@
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelSelect
 from lib.hack.models import Model, Field, ByteField, WordField, MulFieldPrep
-from lib import utils
 from ..base import BaseNesHack
 
 
@@ -29,7 +28,6 @@ FORMS = (
     (0x29, "αββ"),
     (0x2a, "βββ"),
 )
-FORM_LABELS, FORM_VALUES = utils.split_tuple_reverse(FORMS)
 
 
 class Main(BaseNesHack):
@@ -49,4 +47,4 @@ class Main(BaseNesHack):
             ModelInput("p", "P")
             ModelInput("highjump", "高跳(max:255)")
             ModelInput("ammo", "枪形态时间(max:255)")
-            ModelSelect("form", "形态", choices=FORM_LABELS, values=FORM_VALUES)
+            ModelSelect("form", "形态", choices=FORMS)

@@ -3,7 +3,6 @@ import os
 import json
 import time
 from functools import partial
-from lib import utils
 from lib.lazy import lazy
 from lib.hack.forms import (Group, StaticGroup, ModelInput, ModelCoordWidget, TabList)
 from lib.win32.keys import VK
@@ -113,13 +112,11 @@ class Main(BaseGTATool):
             self.weapon_model_book = ui.Notebook(class_="fill", wxstyle=0x0200)
             with self.weapon_model_book:
                 for category in datasets.WEAPON_LIST:
-                    with ui.Vertical():
+                    with ui.Vertical(extra={'caption':category[0]}):
                         with ui.FlexGridLayout(cols=2, vgap=10, class_="fill padding") as view:
                             view.sizer.AddGrowableCol(1)
                             for item in category[1]:
                                 self.weapon_views.append(WeaponWidget(player, *item))
-                    view.parent.extra = dict(caption=category[0])
-
             with ui.Horizontal():
                 ui.Button(label="全部武器", onclick=self.give_all_weapon)
                 ui.Button(label="一键最大", onclick=self.weapon_max)
@@ -136,7 +133,7 @@ class Main(BaseGTATool):
         ModelInput("wind_speed", "风速")
         ui.Label("天气")
         with ui.Horizontal(class_="fill"):
-            self.weather_view = ui.Choice(class_="fill", choices=(item[0] for item in datasets.WEATHER_LIST))
+            self.weather_view = ui.Choice(class_="fill", choices=(item[1] for item in datasets.WEATHER_LIST))
             ui.Button("短暂", onclick=self.apply_weather)
             ui.Button("持久", onclick=partial(self.apply_weather, persist=True))
             ui.ToggleButton("起风", onchange=self.set_wind)
@@ -180,13 +177,13 @@ class Main(BaseGTATool):
 
         weapon_map = {}
         for category in datasets.WEAPON_LIST:
-            for item in category[1]:
-                weapon_map[item[0]] = item
+            for weapon in category[1]:
+                weapon_map[weapon[1]] = weapon
 
         self.weapon_components = weapon_components = []
         for item in WEAPON_COMPONENTS:
             weapon = weapon_map[item[0]]
-            weapon_components.append((weapon[1], item[1], weapon[2]))
+            weapon_components.append((weapon[2], item[1], weapon[0]))
 
         with ui.Vertical(class_="fill padding"):
             self.weapon_component_book = TabList(weapon_components)
@@ -1032,7 +1029,7 @@ class Main(BaseGTATool):
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.get_page(page_index).index
         if item_index != -1:
-            model_name = VEHICLE_MODELS[page_index][1][item_index][1]
+            model_name = VEHICLE_MODELS[page_index][1][item_index][0]
             if isinstance(model_name, int):
                 return model_name
             return self.get_cache('vehicle_model', model_name, self.get_hash_key)
@@ -1118,8 +1115,8 @@ class Main(BaseGTATool):
         """通过武器名称获取hash"""
         for group in datasets.WEAPON_LIST:
             for item in group[1]:
-                if item[0] == name:
-                    return item[2]
+                if item[1] == name:
+                    return item[0]
 
     def get_shoot_weapon(self):
         """获取要射击的武器模型"""
@@ -1333,7 +1330,7 @@ class Main(BaseGTATool):
         page_index = self.player_model_book.index
         item_index = self.player_model_book.get_page(page_index).index
         if item_index != -1:
-            model_name = PLAYER_MODELS[page_index][1][item_index][1]
+            model_name = PLAYER_MODELS[page_index][1][item_index][0]
             return self.get_cache('player_model', model_name, self.get_hash_key)
 
     def set_player_model(self, _=None):
@@ -1354,7 +1351,7 @@ class Main(BaseGTATool):
         page_index = self.object_model_book.index
         item_index = self.object_model_book.get_page(page_index).index
         if item_index != -1:
-            model_name = OBJECT_MODELS[page_index][1][item_index][1]
+            model_name = OBJECT_MODELS[page_index][1][item_index][0]
             return self.get_cache('object_model', model_name, self.get_hash_key)
 
     def create_selected_object(self, _=None, on_ground=True):
@@ -1426,7 +1423,7 @@ class Main(BaseGTATool):
         self.native_call('CLEAR_OVERRIDE_WEATHER', None)
         index = self.weather_view.index
         if index != -1:
-            weather = datasets.WEATHER_LIST[index][1]
+            weather = datasets.WEATHER_LIST[index][0]
             if persist:
                 self.native_call('CLEAR_OVERRIDE_WEATHER', 'S', weather)
             else:
@@ -1549,8 +1546,8 @@ class Main(BaseGTATool):
         item_index = self.weapon_component_book.get_page(page_index).index
         if item_index != -1:
             data = self.weapon_components[page_index]
-            weapon_hash = data[2]
-            component_hash = data[1][item_index][1]
+            weapon_hash = data[0]
+            component_hash = data[1][item_index][0]
             return weapon_hash, component_hash
 
     def give_weapon_component(self, _):

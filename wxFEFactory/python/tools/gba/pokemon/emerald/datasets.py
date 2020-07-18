@@ -1,4 +1,3 @@
-from lib import utils
 from .. import datasets
 from ..datasets import PERSONALITYS
 
@@ -123,8 +122,6 @@ AREAS = (
     (0x4219, "新大陆战斗塔"),
     (0x421A, "凤凰、路基亚捕捉地点"),
 )
-
-AREA_LABELS, AREA_VALUES = utils.split_tuple_reverse(AREAS)
 
 FURNITURES = (
     "无",

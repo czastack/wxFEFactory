@@ -1,4 +1,5 @@
 from lib.win32.keys import WXK
+from lib import extypes
 from .view import View, Control, EventFunctor, event_binder, value_property
 from . import wx
 
@@ -168,7 +169,7 @@ class ColorPicker(Control):
     """颜色选择器"""
     wxtype = wx.ColourPickerCtrl
 
-    def __init__(self, color=None, onchange=None, **kwargs):
+    def __init__(self, color=0, onchange=None, **kwargs):
         super().__init__(wxparams={'color': color}, **kwargs)
         self.set_onchange(onchange)
 
@@ -222,6 +223,8 @@ class ListBox(ControlWithItems):
 
     def __init__(self, choices=None, **kwargs):
         if choices is not None:
+            if not extypes.is_list_tuple(choices):
+                choices = tuple(choices)
             kwargs['wxparams'] = {'choices': choices}
         super().__init__(**kwargs)
 
@@ -246,6 +249,8 @@ class Choice(ControlWithItems):
 
     def __init__(self, choices=None, **kwargs):
         if choices is not None:
+            if not extypes.is_list_tuple(choices):
+                choices = tuple(choices)
             kwargs['wxparams'] = {'choices': choices}
         super().__init__(**kwargs)
 
@@ -258,6 +263,8 @@ class ComboBox(ControlWithItems):
     def __init__(self, choices=None, value="", **kwargs):
         wxparams = {'value': value}
         if choices is not None:
+            if not extypes.is_list_tuple(choices):
+                choices = tuple(choices)
             wxparams['choices'] = choices
         kwargs['wxparams'] = wxparams
         super().__init__(**kwargs)
@@ -273,7 +280,9 @@ class RadioBox(ControlWithItems):
 
     def __init__(self, title="", choices=None, **kwargs):
         wxparams = {'title': title}
-        if choices:
+        if choices is not None:
+            if not extypes.is_list_tuple(choices):
+                choices = tuple(choices)
             wxparams['choices'] = choices
         kwargs['wxparams'] = wxparams
         super().__init__(**kwargs)

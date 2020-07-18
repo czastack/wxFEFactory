@@ -130,7 +130,7 @@ class Main(BaseGTATool):
             self.vehicle_model_book = ui.Notebook(class_="fill", wxstyle=0x0200)
             with self.vehicle_model_book:
                 for category in datasets.VEHICLE_LIST:
-                    ui.ListBox(class_="expand", choices=(item[0] for item in category[1]),
+                    ui.ListBox(class_="expand", choices=(item[1] for item in category[1]),
                         extra=dict(caption=category[0]))
 
     def render_func(self):
@@ -714,7 +714,7 @@ class Main(BaseGTATool):
         page_index = self.vehicle_model_book.index
         item_index = self.vehicle_model_book.get_page(page_index).index
         if item_index != -1:
-            return datasets.VEHICLE_LIST[page_index][1][item_index][1]
+            return datasets.VEHICLE_LIST[page_index][1][item_index][0]
 
     def spawn_vehicle(self, model_id, coord=None):
         """生成载具"""

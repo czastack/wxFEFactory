@@ -35,14 +35,14 @@ class ExTool(BaseGbaHack):
         with group.footer:
             dialog_style = {'width': 1200, 'height': 640}
             indexs = (0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11)
-            for name, label, choices, values in (
-                    ("tools", "道具", datasets.ITEMS, None),
-                    ("skills", "技能", datasets.SKILLS, datasets.SKILL_VALUES),
-                    ("skillkeys", "技能按键", datasets.SKILLKEYS, None)):
+            for name, label, choices in (
+                    ("tools", "道具", datasets.ITEMS),
+                    ("skills", "技能", datasets.SKILLS),
+                    ("skillkeys", "技能按键", datasets.SKILLKEYS)):
                 with DialogGroup(name, label, person, cols=4, dialog_style=dialog_style) as dialog_group:
                     with ModelSelect.choices_cache:
                         for i in indexs:
-                            ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices, values=values)
+                            ModelSelect("%s.%d" % (name, i), "%s%02d" % (label, i + 1), choices=choices)
 
     def on_person_change(self, lb):
         self.person.addr = self.PERSON_ADDR_START + lb.index * 0x9c

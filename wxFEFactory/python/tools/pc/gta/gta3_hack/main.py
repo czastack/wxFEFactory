@@ -72,8 +72,8 @@ class Main(BaseGTA3Tool):
         self.weapon_views = []
         with ModelSelect.choices_cache:
             for i in range(1, 13):
-                self.weapon_views.append(WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i,
-                    SLOT_NO_AMMO, WEAPON_LIST))
+                self.weapon_views.append(
+                    WeaponWidget(player, "weapon%d" % i, "武器槽%d" % i, i, SLOT_NO_AMMO, WEAPON_LIST))
 
         with Group.active_group().footer:
             ui.Button(label="一键最大", onclick=self.weapon_max)
@@ -83,8 +83,8 @@ class Main(BaseGTA3Tool):
 
     def render_hotkey(self):
         with ui.Horizontal(class_="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(class_="expand", onselect=self.on_spawn_vehicle_id_change,
-                choices=(item[0] for item in VEHICLE_LIST))
+            self.spawn_vehicle_id_view = ui.ListBox(
+                class_="expand", onselect=self.on_spawn_vehicle_id_change, choices=(item[1] for item in VEHICLE_LIST))
             with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
 

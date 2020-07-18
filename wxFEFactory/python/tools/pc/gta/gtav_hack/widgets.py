@@ -5,7 +5,7 @@ from styles import btn_sm_style
 
 
 class WeaponWidget(TwoWayWidget):
-    def __init__(self, ped, name, label, weapon, has_ammo=True, callback=None):
+    def __init__(self, ped, weapon, name, label, has_ammo=True, callback=None):
         self._ped = ped
         self.weapon = weapon
         self.has_ammo = has_ammo

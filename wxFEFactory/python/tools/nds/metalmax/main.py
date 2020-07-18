@@ -161,14 +161,15 @@ class MetalMaxHack(BaseNdsHack):
             ui.Label("炮穴%d" % (i + 1))
             with ui.Horizontal(class_="fill"):
                 if self.has_holes:
-                    ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPE, values=datasets.HOLE_TYPE_VALUES)
+                    ModelSelect("hole_type.%d" % i, "类型", choices=datasets.HOLE_TYPES)
                 ModelChoiceDisplay(key + '.equip', "", choices=item_choices, values=item_values)
                 ui.Button("上次", class_="btn_sm", onclick=detail_keep_click(key))
                 ui.Button("详情", class_="btn_sm", onclick=detail_click(key))
                 ui.Button("预设", class_="btn_sm", onclick=preset_click(key))
         for i in range(self.chariot.items.length):
             key = "items.%d" % i
-            with ModelChoiceDisplay(key + '.item', "物品%d" % (i + 1),
+            with ModelChoiceDisplay(
+                    key + '.item', "物品%d" % (i + 1),
                     choices=item_choices, values=item_values).container:
                 ui.Button("上次", class_="btn_sm", onclick=detail_keep_click(key))
                 ui.Button("详情", class_="btn_sm", onclick=detail_click(key))
@@ -362,7 +363,7 @@ class MetalMaxHack(BaseNdsHack):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
         dialog = self.get_chariot_item_info_dialog()
-        if read and self.handler.active():
+        if read and self.handler.active:
             dialog.read()
         dialog.show()
 
@@ -371,7 +372,7 @@ class MetalMaxHack(BaseNdsHack):
         item = getattr(self.chariot, key)
         self.chariot_item_info.addr = item.addr
         dialog = getattr(self, dialog_name)
-        equip = self.handler.active() and self.chariot_item_info.equip
+        equip = self.handler.active and self.chariot_item_info.equip
         if equip:
             i = 0
             for item in dialog.data_list:

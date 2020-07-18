@@ -1,7 +1,7 @@
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from lib.win32.keys import VK
 from lib.hack.models import Model, Field, ByteField, WordField
-from lib import ui, utils
+from lib import ui
 from ..base import BaseGbaHack
 
 
@@ -20,7 +20,7 @@ class Global(Model):
     prisoner_flag = ByteField(0x0200CD90)  # ~0x0200CD9C
 
 
-WEAPONS, WEAPON_VALUES = utils.split_tuple_reverse((
+WEAPONS = ((
     (0x00, "普通"),
     (0x02, "S枪"),
     (0x03, "R枪"),
@@ -52,7 +52,7 @@ class Main(BaseGbaHack):
             ModelInput("ammo")
             ModelInput("bomb")
             ModelInput("shell")
-            ModelSelect("weapon", choices=WEAPONS, values=WEAPON_VALUES)
+            ModelSelect("weapon", choices=WEAPONS)
             ModelSelect("bombtype", choices=BOMB_TYPES, values=BOMB_VALUES)
 
         with StaticGroup("功能"):

@@ -83,7 +83,7 @@ class OptionProvider(BaseItemProvider):
         self.datas = datas
 
     def generate(self):
-        self._choices, self._values = split_tuple(self.datas)
+        self._values, self._choices = split_tuple(self.datas)
 
 
 class Descriptor:

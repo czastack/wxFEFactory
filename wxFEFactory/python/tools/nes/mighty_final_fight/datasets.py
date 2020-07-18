@@ -1,6 +1,3 @@
-from lib import utils
-
-
 PLAYERS = ("卡迪", "向一", "杰克")
 
 
@@ -17,6 +14,3 @@ ENEMYS = (
     (0x8383, "BOSS4"),
     (0x7474, "BOSS5"),
 )
-
-
-ENEMY_LABELS, ENEMY_VALUES = utils.split_tuple_reverse(ENEMYS)

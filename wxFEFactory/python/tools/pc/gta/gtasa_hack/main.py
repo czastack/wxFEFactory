@@ -182,11 +182,12 @@ class Main(BaseGTA3_VC_SA_Tool):
 
     def render_hotkey(self):
         with ui.Horizontal(class_="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(class_="expand", onselect=self.on_spawn_vehicle_id_change,
-                choices=(item[0] for item in VEHICLE_LIST))
+            self.spawn_vehicle_id_view = ui.ListBox(
+                class_="expand", onselect=self.on_spawn_vehicle_id_change, choices=(item[1] for item in VEHICLE_LIST))
             with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
-                ui.Text("根据左边列表生产载具: alt+V\n"
+                ui.Text(
+                    "根据左边列表生产载具: alt+V\n"
                     "瞬移到地图指针处: ctrl+alt+g\n"
                     "瞬移到标记点: alt+shift+g\n"
                     "切换转向并加速: alt+shift+m\n"

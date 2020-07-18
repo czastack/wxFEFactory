@@ -1,5 +1,3 @@
-from lib.utils import split_tuple_reverse
-
 # 机体的人物字段，同时是机师的选项
 ROBOT_CHARACTERS = (
     "多蒙",

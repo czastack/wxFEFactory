@@ -202,9 +202,9 @@ class Main(BasePs2Hack):
             setattr(self, name, dialog)
         return dialog
 
-    def show_item_info(self, view, ins, prop):
+    def show_item_info(self, view, instance, prop):
         """显示物品详情对话框"""
-        item = getattr(ins, prop)
+        item = getattr(instance, prop)
         if item and item.addr:
             self.item_info.addr = item.addr
             dialog = self.get_item_info_dialog()
@@ -225,9 +225,9 @@ class Main(BasePs2Hack):
                 dialog.read()
             dialog.show()
 
-    def show_item_preset(self, view, ins, prop):
+    def show_item_preset(self, view, instance, prop):
         """显示预设对话框"""
-        item = getattr(ins, prop)
+        item = getattr(instance, prop)
         if item and item.addr:
             self.item_info.addr = item.addr
             self.item_preset_dialog.show(self.item_info.item)

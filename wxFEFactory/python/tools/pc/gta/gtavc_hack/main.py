@@ -86,7 +86,8 @@ class Main(BaseGTA3Tool):
             with ui.GridLayout(cols=4, vgap=10, class_="expand"):
                 SimpleCheckBox("infinite_run", "无限奔跑", 0x536F25, (), b'\xEB', b'\x75')
                 SimpleCheckBox("drive_on_water", "水上开车", 0x593908, (), b'\x90\x90', b'\x74\x07')
-                SimpleCheckBox("no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
+                SimpleCheckBox(
+                    "no_falling_off_the_bike", "摩托老司机", 0x61393D, (),
                     b'\xE9\xBC\x0E\x00\x00\x90', b'\x0F\x84\xBB\x0E\x00\x90')
                 SimpleCheckBox("disable_vehicle_explosions", "不会爆炸", 0x588A77, (), b'\x90\x90', b'\x75\x09')
                 SimpleCheckBox("infinite_ammo1", "无限子弹1", 0x5D4ABE, (), b'\x90\x90\x90', b'\xFF\x4E\x08')
@@ -94,9 +95,8 @@ class Main(BaseGTA3Tool):
 
     def render_hotkey(self):
         with ui.Horizontal(class_="fill padding"):
-            self.spawn_vehicle_id_view = ui.ListBox(class_="expand",
-                onselect=self.on_spawn_vehicle_id_change,
-                choices=(item[0] for item in VEHICLE_LIST))
+            self.spawn_vehicle_id_view = ui.ListBox(
+                class_="expand", onselect=self.on_spawn_vehicle_id_change, choices=(item[1] for item in VEHICLE_LIST))
             with ui.ScrollView(class_="fill padding"):
                 self.render_common_text()
                 ui.Text("附近车辆爆炸(使用秘籍BIGBANG): alt+enter")

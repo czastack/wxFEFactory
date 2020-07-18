@@ -120,9 +120,9 @@ void UiModule::init_controls()
 
 	py::class_<NODELETE(wxColourPickerCtrl), wxControl>(ui, "ColourPickerCtrl")
 		.def(py::init<wxWindow*, wxWindowID, const wxColour&, const wxPoint&, const wxSize&, long, const wxValidator&, const wxString&>(),
-			parent, id, "col"_a = *wxBLACK, pos_v, size_v, style = wxCLRP_DEFAULT_STYLE, validator_v, name = (const char*)wxColourPickerCtrlNameStr)
+			parent, id, "color"_a = *wxBLACK, pos_v, size_v, style = wxCLRP_DEFAULT_STYLE, validator_v, name = (const char*)wxColourPickerCtrlNameStr)
 		.def("GetColour", &wxColourPickerCtrl::GetColour)
-		.def("SetColour", (void (wxColourPickerCtrl::*)(const wxColour & col)) & wxColourPickerCtrl::SetColour, "col"_a)
+		.def("SetColour", (void (wxColourPickerCtrl::*)(const wxColour & color)) & wxColourPickerCtrl::SetColour, "color"_a)
 		;
 
 	py::class_<NODELETE(wxItemContainerImmutable)>(ui, "ItemContainerImmutable")
@@ -164,7 +164,7 @@ void UiModule::init_controls()
 
 	py::class_<NODELETE(wxChoice), wxControlWithItems>(ui, "Choice")
 		.def(py::init<wxWindow*, wxWindowID, const wxPoint&, const wxSize&, const wxArrayString&, long, const wxValidator&, const wxString&>(),
-			parent, id, pos_v, size_v, choices, style_0, validator_v, name = (const char*)wxChoiceNameStr)
+			parent, id, pos_v, size_v, choices=py::tuple(), style_0, validator_v, name = (const char*)wxChoiceNameStr)
 		;
 
 	py::class_<NODELETE(wxComboBox), wxControlWithItems>(ui, "ComboBox")
@@ -178,7 +178,7 @@ void UiModule::init_controls()
 
 	py::class_<NODELETE(wxRadioBox), wxControl, wxItemContainerImmutable>(ui, "RadioBox")
 		.def(py::init<wxWindow*, wxWindowID, const wxString&, const wxPoint&, const wxSize&, const wxArrayString&, int, long, const wxValidator&, const wxString&>(),
-			parent, id, title, pos_v, size_v, choices, "majorDim"_a = 0, style_0, validator_v, name = (const char*)wxRadioBoxNameStr)
+			parent, id, title, pos_v, size_v, choices=py::tuple(), "majorDim"_a = 0, style_0, validator_v, name = (const char*)wxRadioBoxNameStr)
 		;
 
 	py::class_<NODELETE(wxFilePickerCtrl), wxControl>(ui, "FilePickerCtrl")

@@ -553,7 +553,7 @@ class BaseGTATool(NativeHacktool):
 
     def on_spawn_vehicle_id_change(self, lb):
         """刷车器listbox回调"""
-        self.spwan_vehicle_id = self.VEHICLE_LIST[lb.index][1]
+        self.spwan_vehicle_id = self.VEHICLE_LIST[lb.index][0]
 
     def spawn_vehicle_id_prev(self, _=None):
         """选中上一个载具"""

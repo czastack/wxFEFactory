@@ -273,216 +273,216 @@ WEATHER_LIST = [
 
 
 VEHICLE_LIST = (
-    ("Admiral", 445),  # CAR
-    ("Alpha", 602),  # CAR_FAST
-    ("Ambulance", 416),  # HEAVY
-    ("Andromada", 592),  # AIRPLANE
-    ("Artict Trailer 2", 450),  # TRAILER
-    ("Artict Trailer 3", 591),  # TRAILER
-    ("Artict Trailer", 435),  # TRAILER
-    ("AT-400", 577),  # AIRPLANE
-    ("Baggage Trailer 2", 607),  # TRAILER
-    ("Baggage Trailer", 606),  # TRAILER
-    ("Baggage", 485),  # MINI
-    ("Bandito", 568),  # CAR_FAST
-    ("Banshee", 429),  # CAR_FAST
-    ("Barracks", 433),  # HEAVY
-    ("Beagle", 511),  # AIRPLANE
-    ("Benson", 499),  # HEAVY
-    ("Berkley's RC Van", 459),  # HEAVY
-    ("BF Injection", 424),  # CAR
-    ("BF-400", 581),  # BIKE
-    ("Bike", 509),  # BIKE
-    ("Black Boxville", 609),  # HEAVY
-    ("Blade", 536),  # CAR_FAST
-    ("Blista Compact", 496),  # CAR
-    ("Bloodring Banger", 504),  # CAR_FAST
-    ("BMX", 481),  # BIKE
-    ("Bobcat", 422),  # CAR
-    ("Boxville", 498),  # HEAVY
-    ("Bravura", 401),  # CAR
-    ("Broadway", 575),  # CAR
-    ("Brown Streak Engine", 538),  # HEAVY
-    ("Brown Streak", 570),  # HEAVY
-    ("Buccaneer", 518),  # CAR
-    ("Buffalo", 402),  # CAR_FAST
-    ("Bullet", 541),  # CAR_FAST
-    ("Burrito", 482),  # HEAVY
-    ("Bus", 431),  # HEAVY
-    ("Cabbie", 438),  # CAR
-    ("Caddy", 457),  # MINI
-    ("Cadrona", 527),  # CAR
-    ("Camper", 483),  # HEAVY
-    ("Cargobob", 548),  # HELI
-    ("Cement Truck", 524),  # HEAVY
-    ("Cheetah", 415),  # CAR_FAST
-    ("Clover", 542),  # CAR
-    ("Club", 589),  # CAR
-    ("Coach", 437),  # HEAVY
-    ("Coastguard", 472),  # BOAT
-    ("Combine Harvester", 532),  # HEAVY
-    ("Comet", 480),  # CAR_FAST
-    ("Cropduster", 512),  # AIRPLANE
-    ("Damaged Glendale", 604),  # CAR
-    ("Damaged Sadler", 605),  # CAR
-    ("DFT-30", 578),  # HEAVY
-    ("Dinghy", 473),  # BOAT
-    ("Dodo", 593),  # AIRPLANE
-    ("Dozer", 486),  # HEAVY
-    ("Dumper", 406),  # HEAVY
-    ("Dune", 573),  # HEAVY
-    ("Elegant", 507),  # CAR
-    ("Elegy", 562),  # CAR_FAST
-    ("Emperor", 585),  # CAR
-    ("Enforcer", 427),  # HEAVY
-    ("Esperanto", 419),  # CAR
-    ("Euros", 587),  # CAR_FAST
-    ("Faggio", 462),  # BIKE
-    ("Farm Trailer", 610),  # TRAILER
-    ("FBI Rancher", 490),  # CAR
-    ("FBI Truck", 528),  # HEAVY
-    ("FCR-900", 521),  # BIKE
-    ("Feltzer", 533),  # CAR
-    ("Fire Truck with ladder", 544),  # HEAVY
-    ("Fire Truck", 407),  # HEAVY
-    ("Flash", 565),  # CAR
-    ("Flatbed", 455),  # HEAVY
-    ("Forklift", 530),  # MINI
-    ("Fortune", 526),  # CAR
-    ("Freeway", 463),  # BIKE
-    ("Freight Train Boxcar", 590),  # HEAVY
-    ("Freight Train Flatbed", 569),  # HEAVY
-    ("Freight", 537),  # HEAVY
-    ("Glendale", 466),  # CAR
-    ("Greenwood", 492),  # CAR
-    ("Hermes", 474),  # CAR
-    ("Hotdog", 588),  # HEAVY
-    ("Hotknife", 434),  # CAR_FAST
-    ("Hotring Racer 2", 502),  # CAR_FAST
-    ("Hotring Racer 3", 503),  # CAR_FAST
-    ("Hotring Racer", 494),  # CAR_FAST
-    ("HPV1000", 523),  # BIKE
-    ("Hunter", 425),  # HELI
-    ("Huntley", 579),  # CAR
-    ("Hustler", 545),  # CAR
-    ("Hydra", 520),  # AIRPLANE
-    ("Infernus", 411),  # CAR_FAST
-    ("Intruder", 546),  # CAR
-    ("Jester", 559),  # CAR_FAST
-    ("Jetmax", 493),  # BOAT
-    ("Journey", 508),  # HEAVY
-    ("Kart", 571),  # MINI
-    ("Landstalker", 400),  # CAR
-    ("Launch", 595),  # BOAT
-    ("Leviathan", 417),  # HELI
-    ("Linerunner", 403),  # HEAVY
-    ("Majestic", 517),  # CAR
-    ("Manana", 410),  # CAR
-    ("Marquis", 484),  # BOAT
-    ("Maverick", 487),  # HELI
-    ("Merit", 551),  # CAR
-    ("Mesa", 500),  # CAR
-    ("Monster 2", 556),  # HEAVY
-    ("Monster 3", 557),  # HEAVY
-    ("Monster", 444),  # HEAVY
-    ("Moonbeam", 418),  # CAR
-    ("Mountain Bike", 510),  # BIKE
-    ("Mower", 572),  # MINI
-    ("Mr. Whoopee", 423),  # HEAVY
-    ("Mule", 414),  # CAR
-    ("Nebula", 516),  # CAR
-    ("Nevada", 553),  # AIRPLANE
-    ("News Chopper", 488),  # HELI
-    ("News Van", 582),  # HEAVY
-    ("NRG-500", 522),  # BIKE
-    ("Oceanic", 467),  # CAR
-    ("Packer", 443),  # HEAVY
-    ("Patriot", 470),  # CAR
-    ("PCJ-600", 461),  # BIKE
-    ("Perennial", 404),  # CAR
-    ("Petrol Trailer", 584),  # TRAILER
-    ("Phoenix", 603),  # CAR_FAST
-    ("Picador", 600),  # CAR
-    ("Pizza Boy", 448),  # BIKE
-    ("Police Car (LS)", 596),  # CAR
-    ("Police Car (LV)", 598),  # CAR
-    ("Police Car (SF)", 597),  # CAR
-    ("Police Maverick", 497),  # HELI
-    ("Police Ranger", 599),  # CAR
-    ("Pony", 413),  # CAR
-    ("Predator", 430),  # BOAT
-    ("Premier", 426),  # CAR
-    ("Previon", 436),  # CAR
-    ("Primo", 547),  # CAR
-    ("Quadbike", 471),  # BIKE
-    ("Raindance", 563),  # HELI
-    ("Rancher", 489),  # CAR
-    ("Rancher", 505),  # CAR
-    ("RC Bandit", 441),  # MINI
-    ("RC Baron", 464),  # MINI
-    ("RC Cam", 594),  # MINI
-    ("RC Goblin", 501),  # MINI
-    ("RC Raider", 465),  # MINI
-    ("RC Tiger", 564),  # MINI
-    ("Reefer", 453),  # BOAT
-    ("Regina", 479),  # CAR
-    ("Remington", 534),  # CAR
-    ("Rhino", 432),  # HEAVY
-    ("Roadtrain", 515),  # HEAVY
-    ("Romero", 442),  # CAR
-    ("Rumpo", 440),  # CAR
-    ("Rustler", 476),  # AIRPLANE
-    ("S.W.A.T.", 601),  # HEAVY
-    ("Sabre", 475),  # CAR
-    ("Sadler", 543),  # CAR
-    ("Sanchez", 468),  # BIKE
-    ("Sandking", 495),  # CAR
-    ("Savanna", 567),  # CAR
-    ("Seasparrow", 447),  # HELI
-    ("Securicar", 428),  # HEAVY
-    ("Sentinel", 405),  # CAR
-    ("Shamal", 519),  # AIRPLANE
-    ("Skimmer", 460),  # AIRPLANE
-    ("Slamvan", 535),  # CAR_FAST
-    ("Solair", 458),  # CAR
-    ("Sparrow", 469),  # HELI
-    ("Speeder", 452),  # BOAT
-    ("Squalo", 446),  # BOAT
-    ("Stafford", 580),  # CAR
-    ("Stallion", 439),  # CAR_FAST
-    ("Stratum", 561),  # CAR
-    ("Street Sweeper Trailer", 611),  # TRAILER
-    ("Stretch", 409),  # HEAVY
-    ("Stuntplane", 513),  # AIRPLANE
-    ("Sultan", 560),  # CAR_FAST
-    ("Sunrise", 550),  # CAR
-    ("Super GT", 506),  # CAR_FAST
-    ("Sweeper", 574),  # MINI
-    ("Tahoma", 566),  # CAR
-    ("Tampa", 549),  # CAR
-    ("Tanker", 514),  # HEAVY
-    ("Taxi", 420),  # CAR
-    ("Tornado", 576),  # CAR
-    ("Towtruck", 525),  # HEAVY
-    ("Tractor", 531),  # CAR
-    ("Trashmaster", 408),  # HEAVY
-    ("Trolly", 449),  # HEAVY
-    ("Tropic", 454),  # BOAT
-    ("Tug Staircase", 608),  # TRAILER
-    ("Tug", 583),  # MINI
-    ("Turismo", 451),  # CAR_FAST
-    ("Uranus", 558),  # CAR_FAST
-    ("Utility Van", 552),  # HEAVY
-    ("Vincent", 540),  # CAR
-    ("Virgo", 491),  # CAR
-    ("Voodoo", 412),  # CAR
-    ("Vortex", 539),  # BOAT
-    ("Walton", 478),  # CAR
-    ("Washington", 421),  # CAR
-    ("Wayfarer", 586),  # BIKE
-    ("Willard", 529),  # CAR
-    ("Windsor", 555),  # CAR
-    ("Yankee", 456),  # HEAVY
-    ("Yosemite", 554),  # CAR
-    ("ZR-350", 477),  # CAR_FAST
+    (445, "Admiral"),  # CAR
+    (602, "Alpha"),  # CAR_FAST
+    (416, "Ambulance"),  # HEAVY
+    (592, "Andromada"),  # AIRPLANE
+    (450, "Artict Trailer 2"),  # TRAILER
+    (591, "Artict Trailer 3"),  # TRAILER
+    (435, "Artict Trailer"),  # TRAILER
+    (577, "AT-400"),  # AIRPLANE
+    (607, "Baggage Trailer 2"),  # TRAILER
+    (606, "Baggage Trailer"),  # TRAILER
+    (485, "Baggage"),  # MINI
+    (568, "Bandito"),  # CAR_FAST
+    (429, "Banshee"),  # CAR_FAST
+    (433, "Barracks"),  # HEAVY
+    (511, "Beagle"),  # AIRPLANE
+    (499, "Benson"),  # HEAVY
+    (459, "Berkley's RC Van"),  # HEAVY
+    (424, "BF Injection"),  # CAR
+    (581, "BF-400"),  # BIKE
+    (509, "Bike"),  # BIKE
+    (609, "Black Boxville"),  # HEAVY
+    (536, "Blade"),  # CAR_FAST
+    (496, "Blista Compact"),  # CAR
+    (504, "Bloodring Banger"),  # CAR_FAST
+    (481, "BMX"),  # BIKE
+    (422, "Bobcat"),  # CAR
+    (498, "Boxville"),  # HEAVY
+    (401, "Bravura"),  # CAR
+    (575, "Broadway"),  # CAR
+    (538, "Brown Streak Engine"),  # HEAVY
+    (570, "Brown Streak"),  # HEAVY
+    (518, "Buccaneer"),  # CAR
+    (402, "Buffalo"),  # CAR_FAST
+    (541, "Bullet"),  # CAR_FAST
+    (482, "Burrito"),  # HEAVY
+    (431, "Bus"),  # HEAVY
+    (438, "Cabbie"),  # CAR
+    (457, "Caddy"),  # MINI
+    (527, "Cadrona"),  # CAR
+    (483, "Camper"),  # HEAVY
+    (548, "Cargobob"),  # HELI
+    (524, "Cement Truck"),  # HEAVY
+    (415, "Cheetah"),  # CAR_FAST
+    (542, "Clover"),  # CAR
+    (589, "Club"),  # CAR
+    (437, "Coach"),  # HEAVY
+    (472, "Coastguard"),  # BOAT
+    (532, "Combine Harvester"),  # HEAVY
+    (480, "Comet"),  # CAR_FAST
+    (512, "Cropduster"),  # AIRPLANE
+    (604, "Damaged Glendale"),  # CAR
+    (605, "Damaged Sadler"),  # CAR
+    (578, "DFT-30"),  # HEAVY
+    (473, "Dinghy"),  # BOAT
+    (593, "Dodo"),  # AIRPLANE
+    (486, "Dozer"),  # HEAVY
+    (406, "Dumper"),  # HEAVY
+    (573, "Dune"),  # HEAVY
+    (507, "Elegant"),  # CAR
+    (562, "Elegy"),  # CAR_FAST
+    (585, "Emperor"),  # CAR
+    (427, "Enforcer"),  # HEAVY
+    (419, "Esperanto"),  # CAR
+    (587, "Euros"),  # CAR_FAST
+    (462, "Faggio"),  # BIKE
+    (610, "Farm Trailer"),  # TRAILER
+    (490, "FBI Rancher"),  # CAR
+    (528, "FBI Truck"),  # HEAVY
+    (521, "FCR-900"),  # BIKE
+    (533, "Feltzer"),  # CAR
+    (544, "Fire Truck with ladder"),  # HEAVY
+    (407, "Fire Truck"),  # HEAVY
+    (565, "Flash"),  # CAR
+    (455, "Flatbed"),  # HEAVY
+    (530, "Forklift"),  # MINI
+    (526, "Fortune"),  # CAR
+    (463, "Freeway"),  # BIKE
+    (590, "Freight Train Boxcar"),  # HEAVY
+    (569, "Freight Train Flatbed"),  # HEAVY
+    (537, "Freight"),  # HEAVY
+    (466, "Glendale"),  # CAR
+    (492, "Greenwood"),  # CAR
+    (474, "Hermes"),  # CAR
+    (588, "Hotdog"),  # HEAVY
+    (434, "Hotknife"),  # CAR_FAST
+    (502, "Hotring Racer 2"),  # CAR_FAST
+    (503, "Hotring Racer 3"),  # CAR_FAST
+    (494, "Hotring Racer"),  # CAR_FAST
+    (523, "HPV1000"),  # BIKE
+    (425, "Hunter"),  # HELI
+    (579, "Huntley"),  # CAR
+    (545, "Hustler"),  # CAR
+    (520, "Hydra"),  # AIRPLANE
+    (411, "Infernus"),  # CAR_FAST
+    (546, "Intruder"),  # CAR
+    (559, "Jester"),  # CAR_FAST
+    (493, "Jetmax"),  # BOAT
+    (508, "Journey"),  # HEAVY
+    (571, "Kart"),  # MINI
+    (400, "Landstalker"),  # CAR
+    (595, "Launch"),  # BOAT
+    (417, "Leviathan"),  # HELI
+    (403, "Linerunner"),  # HEAVY
+    (517, "Majestic"),  # CAR
+    (410, "Manana"),  # CAR
+    (484, "Marquis"),  # BOAT
+    (487, "Maverick"),  # HELI
+    (551, "Merit"),  # CAR
+    (500, "Mesa"),  # CAR
+    (556, "Monster 2"),  # HEAVY
+    (557, "Monster 3"),  # HEAVY
+    (444, "Monster"),  # HEAVY
+    (418, "Moonbeam"),  # CAR
+    (510, "Mountain Bike"),  # BIKE
+    (572, "Mower"),  # MINI
+    (423, "Mr. Whoopee"),  # HEAVY
+    (414, "Mule"),  # CAR
+    (516, "Nebula"),  # CAR
+    (553, "Nevada"),  # AIRPLANE
+    (488, "News Chopper"),  # HELI
+    (582, "News Van"),  # HEAVY
+    (522, "NRG-500"),  # BIKE
+    (467, "Oceanic"),  # CAR
+    (443, "Packer"),  # HEAVY
+    (470, "Patriot"),  # CAR
+    (461, "PCJ-600"),  # BIKE
+    (404, "Perennial"),  # CAR
+    (584, "Petrol Trailer"),  # TRAILER
+    (603, "Phoenix"),  # CAR_FAST
+    (600, "Picador"),  # CAR
+    (448, "Pizza Boy"),  # BIKE
+    (596, "Police Car (LS)"),  # CAR
+    (598, "Police Car (LV)"),  # CAR
+    (597, "Police Car (SF)"),  # CAR
+    (497, "Police Maverick"),  # HELI
+    (599, "Police Ranger"),  # CAR
+    (413, "Pony"),  # CAR
+    (430, "Predator"),  # BOAT
+    (426, "Premier"),  # CAR
+    (436, "Previon"),  # CAR
+    (547, "Primo"),  # CAR
+    (471, "Quadbike"),  # BIKE
+    (563, "Raindance"),  # HELI
+    (489, "Rancher"),  # CAR
+    (505, "Rancher"),  # CAR
+    (441, "RC Bandit"),  # MINI
+    (464, "RC Baron"),  # MINI
+    (594, "RC Cam"),  # MINI
+    (501, "RC Goblin"),  # MINI
+    (465, "RC Raider"),  # MINI
+    (564, "RC Tiger"),  # MINI
+    (453, "Reefer"),  # BOAT
+    (479, "Regina"),  # CAR
+    (534, "Remington"),  # CAR
+    (432, "Rhino"),  # HEAVY
+    (515, "Roadtrain"),  # HEAVY
+    (442, "Romero"),  # CAR
+    (440, "Rumpo"),  # CAR
+    (476, "Rustler"),  # AIRPLANE
+    (601, "S.W.A.T."),  # HEAVY
+    (475, "Sabre"),  # CAR
+    (543, "Sadler"),  # CAR
+    (468, "Sanchez"),  # BIKE
+    (495, "Sandking"),  # CAR
+    (567, "Savanna"),  # CAR
+    (447, "Seasparrow"),  # HELI
+    (428, "Securicar"),  # HEAVY
+    (405, "Sentinel"),  # CAR
+    (519, "Shamal"),  # AIRPLANE
+    (460, "Skimmer"),  # AIRPLANE
+    (535, "Slamvan"),  # CAR_FAST
+    (458, "Solair"),  # CAR
+    (469, "Sparrow"),  # HELI
+    (452, "Speeder"),  # BOAT
+    (446, "Squalo"),  # BOAT
+    (580, "Stafford"),  # CAR
+    (439, "Stallion"),  # CAR_FAST
+    (561, "Stratum"),  # CAR
+    (611, "Street Sweeper Trailer"),  # TRAILER
+    (409, "Stretch"),  # HEAVY
+    (513, "Stuntplane"),  # AIRPLANE
+    (560, "Sultan"),  # CAR_FAST
+    (550, "Sunrise"),  # CAR
+    (506, "Super GT"),  # CAR_FAST
+    (574, "Sweeper"),  # MINI
+    (566, "Tahoma"),  # CAR
+    (549, "Tampa"),  # CAR
+    (514, "Tanker"),  # HEAVY
+    (420, "Taxi"),  # CAR
+    (576, "Tornado"),  # CAR
+    (525, "Towtruck"),  # HEAVY
+    (531, "Tractor"),  # CAR
+    (408, "Trashmaster"),  # HEAVY
+    (449, "Trolly"),  # HEAVY
+    (454, "Tropic"),  # BOAT
+    (608, "Tug Staircase"),  # TRAILER
+    (583, "Tug"),  # MINI
+    (451, "Turismo"),  # CAR_FAST
+    (558, "Uranus"),  # CAR_FAST
+    (552, "Utility Van"),  # HEAVY
+    (540, "Vincent"),  # CAR
+    (491, "Virgo"),  # CAR
+    (412, "Voodoo"),  # CAR
+    (539, "Vortex"),  # BOAT
+    (478, "Walton"),  # CAR
+    (421, "Washington"),  # CAR
+    (586, "Wayfarer"),  # BIKE
+    (529, "Willard"),  # CAR
+    (555, "Windsor"),  # CAR
+    (456, "Yankee"),  # HEAVY
+    (554, "Yosemite"),  # CAR
+    (477, "ZR-350"),  # CAR_FAST
 )

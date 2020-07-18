@@ -206,7 +206,7 @@ class Main(BaseSfcHack):
         item = getattr(self.chariot, key)
         self.chariot_equip_info.addr = item.addr
         dialog = self.get_chariot_equip_info_dialog()
-        if read and self.handler.active():
+        if read and self.handler.active:
             dialog.read()
         dialog.show()
 
