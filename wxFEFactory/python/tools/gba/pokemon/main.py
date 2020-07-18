@@ -1,7 +1,7 @@
 import abc
 from lib import ui
-from lib.ui.components import Pagination
 from lib.hack.forms import Group, Groups, StaticGroup, ModelInput, ModelSelect, ModelFlagWidget
+from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from ..base import BaseGbaHack
 from . import models, datasets

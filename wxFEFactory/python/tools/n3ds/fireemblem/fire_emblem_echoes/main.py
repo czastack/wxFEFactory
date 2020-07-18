@@ -1,10 +1,10 @@
 import abc
 from functools import partial
 from lib import ui
-from lib.ui.components import Pagination
 from lib.hack.forms import (
     Group, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect, ModelFlagWidget, Choice, ChoiceWidget
 )
+from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from tools.n3ds.base import BaseN3dsHack
 from . import models, datasets

@@ -20,7 +20,6 @@ class Main(NativeHacktool):
         self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
         self.char_index = self._global_ins.char_index = 0
-        self.char_choice = None
 
     def render_main(self):
         character = (self._character, models.Character)
@@ -45,7 +44,7 @@ class Main(NativeHacktool):
         ModelCoordWidget("char_coord", instance=self, labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
 
     def render_character(self):
-        self.char_choice = Choice("角色", datasets.CHARACTERS, self.weak.on_character_change)
+        Choice("角色", datasets.CHARACTERS, self.weak.on_character_change)
         ModelInput("health")
         ModelInput("action")
         # ModelInput("weapon_state")

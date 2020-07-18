@@ -1,9 +1,9 @@
 import abc
 from lib import ui
-from lib.ui.components import Pagination
 from lib.hack.forms import (
     Group, Groups, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, DialogGroup, Choice
 )
+from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from functools import partial
 from ..base import BaseNdsHack

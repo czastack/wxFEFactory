@@ -1,9 +1,9 @@
 import os
 from lib import ui
-from lib.ui.components import Pagination
 from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, ModelChoiceDisplay, Choice
 )
+from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from lib.lazy import classlazy
 from tools.base.utils import PresetDialog

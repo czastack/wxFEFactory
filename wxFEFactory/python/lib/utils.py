@@ -1,6 +1,4 @@
 import math
-import os
-import struct
 from lib import extypes
 
 
@@ -86,7 +84,7 @@ def rgb2tuple(rgb):
 
 def rgb2bgr(rgb):
     """rgb颜色转bgr颜色"""
-    return ((rgb & 0xff) << 16 | ((rgb >> 8) & 0xff) << 8 | ((rgb >> 16) & 0xff))
+    return (rgb & 0xff) << 16 | ((rgb >> 8) & 0xff) << 8 | ((rgb >> 16) & 0xff)
 
 
 def gen_values(items):

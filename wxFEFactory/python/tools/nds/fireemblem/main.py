@@ -1,7 +1,7 @@
 import abc
 from lib import ui
-from lib.ui.components import Pagination
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelAddrInput, ModelSelect, ModelFlagWidget, Choice
+from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from ..base import BaseNdsHack
 
