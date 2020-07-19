@@ -102,11 +102,19 @@ def flag_generator(n):
     return (1 << i for i in range(n))
 
 
+_split_tuple_cache = extypes.LRUCache()
+
 def split_tuple(options):
     """把(value, label)分开"""
+    key = id(options)
+    cached = _split_tuple_cache.get(key)
+    if cached is not None:
+        return cached
     if isinstance(options, dict):
         options = options.items()
-    return zip(*options)
+    result = tuple(zip(*options))
+    _split_tuple_cache.set(key, result)
+    return result
 
 
 def split_tuple_reverse(options):

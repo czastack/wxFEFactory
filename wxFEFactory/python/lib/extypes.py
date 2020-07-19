@@ -1,3 +1,4 @@
+import collections
 import types
 import weakref
 
@@ -213,3 +214,29 @@ def new_dataclass(name, fields, default=None, defaults=None, attrs=None, bases=N
     elif DataClass not in bases:
         bases = (*bases, DataClass)
     return DataClassMeta(name, bases, the_attrs)
+
+
+class LRUCache:
+    """lru缓存"""
+    __slots__ = ('size', 'cache')
+    def __init__(self, size=8):
+        self.size = size
+        self.cache = collections.OrderedDict()
+
+    def get(self, key):
+        if key in self.cache:
+            val = self.cache.pop(key)
+            self.cache[key] = val
+        else:
+            val = None
+
+        return val
+
+    def set(self, key, val):
+        if key in self.cache:
+            val = self.cache.pop(key)
+            self.cache[key] = val
+        else:
+            if self.size and len(self.cache) == self.size:
+                self.cache.popitem(last=False)
+            self.cache[key] = val
