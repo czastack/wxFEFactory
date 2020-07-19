@@ -1,4 +1,4 @@
-from lib.hack.models import Model, Field, ByteField, WordField, FloatField, ArrayField, ModelField, ModelPtrField
+from lib.hack.models import Model, Field, FloatField, ToggleField, ArrayField, ModelField, ModelPtrField, PropertyField
 
 
 class Item(Model):
@@ -10,9 +10,11 @@ class Item(Model):
 class Character(Model):
     """角色"""
     SIZE = 0xC8
-    basedata = Field(0, label='基本角色/精灵/特殊技能')
+    basedata = Field(0, label='序号')
     level = Field(4, label='等级')
     exp = Field(8, label='EXP')
+    hp = Field(0x0C, label='HP')
+    sp = Field(0x10, label='SP')
     prof = Field(0x28, label='职业')
     prof2 = Field(0x2C, label='第二职业')
     JP = Field(0x30, label='技能点数')
@@ -36,6 +38,7 @@ class Main(Model):
     chars = ArrayField((0x370, 0x1C8, 0), 5, ModelField(0, Character))
     items = ArrayField((0x3A8, 0), 255, ModelField(0, Item))
     items_count = Field(0x3B0, label="物品数量")
+    no_encounter = ToggleField((0x78, 0x370, 0x2A8), enable=4292967266, disable=0, label="不随机遇敌")
 
 
 class BattleCharacter(Model):
@@ -60,7 +63,21 @@ class Battle(Model):
     enemys = ArrayField((0x4C0, 0x8), 5, ModelPtrField(0, BattleEnemyHolder))
 
 
+class NoEncounter(Model):
+    """不随机遇敌"""
+    value = ToggleField((0x350, 0x0, 0x1A80, 0x1B8, 0x1BD8), enable=1, disable=0)
+
+
 class Base(Model):
     main = ModelPtrField(0x0289EA48, Main)
     battle = ModelPtrField(0x0289E9C8, Battle)
-    # no_encounter = ModelPtrField(0x029E7CE8, NoEncounter)
+    _no_encounter = ModelPtrField(0x029E7CE8, NoEncounter)
+
+    @PropertyField(label="不随机遇敌")
+    def no_encounter(self):
+        return self._no_encounter.value
+
+    @no_encounter.setter
+    def no_encounter(self, value):
+        self._no_encounter.value = value
+        self.main.no_encounter = value
