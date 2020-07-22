@@ -65,12 +65,14 @@ class Battle(Model):
 
 class NoEncounter(Model):
     """不随机遇敌"""
+    _value = Field((0x350, 0x0, 0x1A80, 0x1B8, 0x1BD8))
     value = ToggleField((0x350, 0x0, 0x1A80, 0x1B8, 0x1BD8), enable=1, disable=0)
 
 
 class Base(Model):
     main = ModelPtrField(0x0289EA48, Main)
     battle = ModelPtrField(0x0289E9C8, Battle)
+    encounter = Field((0x0289F060, 0x37C), label='遇敌步数')
     _no_encounter = ModelPtrField(0x029E7CE8, NoEncounter)
 
     @PropertyField(label="不随机遇敌")

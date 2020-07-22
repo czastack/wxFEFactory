@@ -1,6 +1,7 @@
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelAddrInput, ModelSelect, Choice
 from lib.hack.handlers import MemHandler
 from lib.ui.components import Pagination
+from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
@@ -45,6 +46,7 @@ class Main(AssemblyHacktool):
 
     def render_global(self):
         ModelInput('main.money', '金钱')
+        ModelInput('encounter')
 
     def render_character(self):
         Choice("角色", datasets.CHARACTERS, self.on_character_change)
@@ -82,6 +84,7 @@ class Main(AssemblyHacktool):
     def get_hotkeys(self):
         return (
             # (VK.MOD_ALT, VK.B, self.quick_health),
+            (VK.MOD_ALT, VK.E, self.instant_encounter),
         )
 
     def _character(self):
@@ -111,3 +114,7 @@ class Main(AssemblyHacktool):
     def on_items_page(self, page):
         self.base.main.items_offset = (page - 1) * self.ITEMS_PAGE_LENGTH
         self.items_group.read()
+
+    def instant_encounter(self):
+        """立即遇敌"""
+        self.base.encounter = 1
