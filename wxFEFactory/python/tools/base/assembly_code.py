@@ -133,6 +133,26 @@ class Offset(TargetAssemblyNode):
         return self.offsetof(target, context.addr, self.size)
 
 
+class ForwardCall(AssemblyNode):
+    """重新Call"""
+    def __init__(self, size=5):
+        super().__init__()
+        self.size = size
+
+    def generate(self, owner, context):
+        data = owner.handler.read(context.original_addr, bytes, self.size)
+        if data[0] == 0xE8:
+            offset = int.from_bytes(data[1:5], 'little', signed=True)
+            # call目标地址
+            target_addr = context.original_addr + 5 + offset
+            new_offset = target_addr - context.addr - 5
+            if abs(new_offset) > 0x7FFFFFFF:
+                raise ValueError('new_offset超过范围')
+            return data[:1] + utils.u32(new_offset).to_bytes(4, 'little')
+        else:
+            raise ValueError('暂不支持的call指令: %s' % data.hex())
+
+
 class Origin(AssemblyNode):
     """查找的原始值"""
     def generate(self, owner, context):
