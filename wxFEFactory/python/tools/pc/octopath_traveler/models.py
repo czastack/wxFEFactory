@@ -83,3 +83,9 @@ class Base(Model):
     def no_encounter(self, value):
         self._no_encounter.value = value
         self.main.no_encounter = value
+
+
+class BattleResult(Model):
+    money = Field(0, label='金钱')
+    exp = Field(4, label='经验')
+    jp = Field(8, label='技能点数')

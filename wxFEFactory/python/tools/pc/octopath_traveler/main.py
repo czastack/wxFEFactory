@@ -20,6 +20,7 @@ class Main(AssemblyHacktool):
         super().__init__()
         self.handler = MemHandler()
         self.base = models.Base(0, self.handler)
+        self.battle_result = models.BattleResult(0, self.handler)
         self.base.main.items_offset = 0
         self.char_index = 0
         self.battle_character_index = 0
@@ -34,11 +35,13 @@ class Main(AssemblyHacktool):
         character = (self._character, models.Character)
         battle_character = (self._battle_character, models.BattleCharacter)
         battle_enemy = (self._battle_enemy, models.BattleEnemy)
+        battle_result = (self._battle_result, models.BattleResult)
         with Group(None, "全局", self.base):
             self.render_global()
         self.lazy_group(Group("character", "角色", character), self.render_character)
         self.lazy_group(Group("battle_character", "战斗中角色", battle_character), self.render_battle_character)
         self.lazy_group(Group("battle_enemy", "战斗中敌人", battle_enemy), self.render_battle_enemy)
+        self.lazy_group(Group("battle_result", "战斗结果", battle_result), self.render_battle_result)
         self.items_group = Group("items", "物品", self.base)
         self.lazy_group(self.items_group, self.render_items)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
@@ -65,6 +68,14 @@ class Main(AssemblyHacktool):
         ModelAddrInput()
         for name in models.BattleEnemy.field_names:
             ModelInput(name)
+
+    def render_battle_result(self):
+        ModelAddrInput()
+        for name in models.BattleResult.field_names:
+            ModelInput(name)
+        ModelInput('money_multi', '金钱倍数', instance=self.variable_model)
+        ModelInput('exp_multi', '经验倍数', instance=self.variable_model)
+        ModelInput('jp_multi', '技能点数倍数', instance=self.variable_model)
 
     def render_items(self):
         with ModelSelect.choices_cache:
@@ -101,6 +112,11 @@ class Main(AssemblyHacktool):
         if self.handler.active:
             enemys = self.base.battle.enemys
             return enemys[self.battle_enemy_index].target
+
+    def _battle_result(self):
+        if self.handler.active:
+            self.battle_result.addr = self.get_variable_value('br_ptr')
+            return self.battle_result
 
     def on_character_change(self, lb):
         self.char_index = lb.index
