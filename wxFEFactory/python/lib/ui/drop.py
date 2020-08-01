@@ -16,5 +16,4 @@ class TextDropListener(wx.TextDropTarget):
         self.listener = listener
 
     def OnDropText(self, x, y, text):
-        print(text)
         return self.listener(x, y, text) == False

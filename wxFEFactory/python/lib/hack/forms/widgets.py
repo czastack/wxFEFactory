@@ -745,9 +745,11 @@ class BaseSelect(TwoWayWidget):
         self.search_map.pop(id(view), None)
 
     def on_left_down(self, view, event):
-        if ui.wx.GetKeyState(WXK.SHIFT):
-            view.start_text_drag(str(id(self.view)))
-            return False
+        view.start_text_drag(str(id(self.view)))
+        return False
+        # if ui.wx.GetKeyState(WXK.SHIFT):
+        #     view.start_text_drag(str(id(self.view)))
+        #     return False
 
     def on_text_drop(self, x, y, text):
         """拖动事件"""

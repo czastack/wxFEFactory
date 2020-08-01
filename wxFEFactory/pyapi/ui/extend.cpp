@@ -124,22 +124,13 @@ public:
 	using wxTextDropTarget::wxTextDropTarget;
 
 	bool OnDropText(wxCoord x, wxCoord y, wxcstr text) wxOVERRIDE {
-		try
-		{
-			PYBIND11_OVERLOAD_PURE(bool, wxTextDropTarget, OnDropText, x, y, text);
-		}
-		catch (const std::exception& e)
-		{
-			const auto  a = e.what();
-			const auto  b = e.what();
-		}
+		PYBIND11_OVERLOAD_PURE(bool, wxTextDropTarget, OnDropText, x, y, text);
 	}
 };
 
 
 int start_text_drag(wxWindow *window, wxcstr text)
 {
-	py::gil_scoped_release release;
 	wxTextDataObject data(text);
 	wxDropSource dragSource(window, wxDROP_ICON(dnd_copy),
 		wxDROP_ICON(dnd_move),
