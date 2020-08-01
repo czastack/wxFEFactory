@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.3\include;E:\VS\wxWidgets-3.1.3\lib\vc_x64_lib\mswud;D:\Python\Python38\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
@@ -127,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.3\include\;E:\VS\wxWidgets-3.1.3\lib\vc_x64_lib\mswu;D:\Python\Python38\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);E:\VS\pybind11\include;E:\VS\wxWidgets-3.1.3\include;E:\VS\wxWidgets-3.1.3\lib\vc_x64_lib\mswu;D:\Python\Python38\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>wxDEBUG_LEVEL=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -176,7 +176,6 @@
     <ClInclude Include="pyapi\ui\dialogs.h" />
     <ClInclude Include="pyapi\pyapi.h" />
     <ClInclude Include="pyapi\functions.h" />
-    <ClInclude Include="pyapi\ui\drop.hpp" />
     <ClInclude Include="pyapi\ui\ui.h" />
     <ClInclude Include="pyapi\ui\thread.h" />
     <ClInclude Include="pyapi\pybindext.h" />

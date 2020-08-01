@@ -1,5 +1,6 @@
 import abc
 from . import wx
+from .drop import FileDropListener, TextDropListener
 
 
 class BinderHelper:
@@ -391,19 +392,17 @@ class View(metaclass=abc.ABCMeta):
         if self.contextmenu:
             self.contextmenu.onselect(self, event.GetId())
 
-    def set_on_file_drop(self, fn):
-        # self.SetDropTarget(FileDropListener(fn))
-        pass
+    def set_on_file_drop(self, listener):
+        self.SetDropTarget(FileDropListener(listener))
 
-    def set_on_text_drop(self, fn):
-        # self.SetDropTarget(TextDropListener(fn))
-        pass
+    def set_on_text_drop(self, listener):
+        self.SetDropTarget(TextDropListener(listener))
 
-    def start_text_drop(self, fn):
-        pass
+    def start_text_drag(self, text):
+        return wx.start_text_drag(self.wxwindow, text)
 
-    def set_on_destroy(self, fn):
-        self.bind_event(wx.EVT_DESTROY, fn)
+    def set_on_destroy(self, listener):
+        self.bind_event(wx.EVT_DESTROY, listener)
 
 
 class Layout(View):

@@ -749,10 +749,10 @@ class BaseSelect(TwoWayWidget):
             view.start_text_drag(str(id(self.view)))
             return False
 
-    def on_text_drop(self, i):
+    def on_text_drop(self, x, y, text):
         """拖动事件"""
-        if i.isdigit():
-            instance = self.search_map.get(int(i), None)
+        if text.isdigit():
+            instance = self.search_map.get(int(text), None)
             if instance and self != instance:
                 if instance.choices == self.choices:
                     ctrl = ui.wx.GetKeyState(WXK.CONTROL)

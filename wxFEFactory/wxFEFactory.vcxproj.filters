@@ -116,9 +116,6 @@
     <ClInclude Include="pyapi\ui\thread.h">
       <Filter>pyapi\ui</Filter>
     </ClInclude>
-    <ClInclude Include="pyapi\ui\drop.hpp">
-      <Filter>pyapi\ui</Filter>
-    </ClInclude>
     <ClInclude Include="myapp.h" />
     <ClInclude Include="pyapi\pyapi.h">
       <Filter>pyapi</Filter>

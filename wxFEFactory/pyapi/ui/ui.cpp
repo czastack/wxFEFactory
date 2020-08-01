@@ -276,7 +276,7 @@ void UiModule::init_ui()
 		.def("AddPendingEvent", &wxWindow::wxEvtHandler::AddPendingEvent, event)
 		.def("RegisterHotKey", &wxWindow::RegisterHotKey, "hotkeyId"_a, "modifiers"_a, "keycode"_a)
 		.def("UnregisterHotKey", &wxWindow::UnregisterHotKey, "hotkeyId"_a)
-		.def("SetDropTarget", &wxWindow::SetDropTarget, "hotkeyId"_a)
+		.def("SetDropTarget", &wxWindow::SetDropTarget, "dropTarget"_a)
 		.def("Bind", [](wxWindow* self, wxEventType eventType, pycref fn, int winid, int lastId, wxObject* userData)
 		{
 			self->Bind(wxEventTypeTag<wxEvent>(eventType), PyFunctor(fn), winid, lastId, userData);

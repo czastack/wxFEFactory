@@ -1,4 +1,5 @@
 #include <wx/wx.h>
+#include <wx/dnd.h>
 #include "ui.h"
 #include "keyhook/keyhook.h"
 
@@ -106,6 +107,49 @@ void KeyHookManager::unsetHook()
 }
 
 
+class PyFileDropTarget: public wxFileDropTarget {
+public:
+	/* Inherit the constructors */
+	using wxFileDropTarget::wxFileDropTarget;
+
+	bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) wxOVERRIDE {
+		PYBIND11_OVERLOAD_PURE(bool, wxFileDropTarget, OnDropFiles, x, y, filenames);
+	}
+};
+
+
+class PyTextDropTarget : public wxTextDropTarget {
+public:
+	/* Inherit the constructors */
+	using wxTextDropTarget::wxTextDropTarget;
+
+	bool OnDropText(wxCoord x, wxCoord y, wxcstr text) wxOVERRIDE {
+		try
+		{
+			PYBIND11_OVERLOAD_PURE(bool, wxTextDropTarget, OnDropText, x, y, text);
+		}
+		catch (const std::exception& e)
+		{
+			const auto  a = e.what();
+			const auto  b = e.what();
+		}
+	}
+};
+
+
+int start_text_drag(wxWindow *window, wxcstr text)
+{
+	py::gil_scoped_release release;
+	wxTextDataObject data(text);
+	wxDropSource dragSource(window, wxDROP_ICON(dnd_copy),
+		wxDROP_ICON(dnd_move),
+		wxDROP_ICON(dnd_none));
+	dragSource.SetData(data);
+	wxDragResult result = dragSource.DoDragDrop();
+	return (int)result;
+}
+
+
 void UiModule::init_extend()
 {
 	using namespace py::literals;
@@ -119,6 +163,15 @@ void UiModule::init_extend()
 		.def("setHook", &KeyHookManager::setHook, "thread_id"_a, "onkeyup"_a=false)
 		.def("unsetHook", &KeyHookManager::unsetHook);
 
+	py::class_<NODELETE(wxFileDropTarget), wxDropTarget, PyFileDropTarget>(ui, "FileDropTarget")
+		.def(py::init<>())
+		.def("OnDropFiles", &wxFileDropTarget::OnDropFiles, "x"_a, "y"_a, "filenames"_a);
+
+	py::class_<NODELETE(wxTextDropTarget), wxDropTarget, PyTextDropTarget>(ui, "TextDropTarget")
+		.def(py::init<>())
+		.def("OnDropText", &wxTextDropTarget::OnDropText, "x"_a, "y"_a, "text"_a);
+
+	ui.def("start_text_drag", &start_text_drag, "window"_a, "text"_a);
 
 	ui.attr("EVT_KEYHOOK") = py::int_((wxEventType)EVT_KEYHOOK);
 }
