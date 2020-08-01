@@ -1,4 +1,4 @@
-from lib.hack.forms import Group, StaticGroup, ModelInput, ModelAddrInput, ModelSelect, Choice
+from lib.hack.forms import Group, StaticGroup, ModelInput, ModelAddrInput, ModelSelect, Choice, ModelCheckBox
 from lib.hack.handlers import MemHandler
 from lib.ui.components import Pagination
 from lib.win32.keys import VK
@@ -50,6 +50,7 @@ class Main(AssemblyHacktool):
     def render_global(self):
         ModelInput('main.money', '金钱')
         ModelInput('encounter')
+        ModelCheckBox('no_encounter')
 
     def render_character(self):
         Choice("角色", datasets.CHARACTERS, self.on_character_change)

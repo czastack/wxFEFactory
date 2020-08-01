@@ -44,9 +44,9 @@ ASSEMBLY_ITEMS = (
             '48 A3', Variable('br_ptr'),
         ),
         args=(
-            VariableType('money_multi', value=100),
+            VariableType('money_multi', value=2),
             VariableType('exp_multi', value=2),
-            VariableType('jp_multi', value=10),
+            VariableType('jp_multi', value=2),
             VariableType('br_ptr', size=8),
         ),
         inserted=True, replace_len=5
