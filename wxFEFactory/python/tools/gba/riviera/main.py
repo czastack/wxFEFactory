@@ -11,16 +11,16 @@ class Main(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
 
     def render_main(self):
         with Group("global", "全局", self._global):
             self.render_global()
-        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
+        self.lazy_group(Group("character", "角色", self.character, cols=4), self.render_character)
         self.lazy_group(Group("favors", "好感度", self._global), self.render_favors)
         self.lazy_group(Group("items", "道具", self._global, cols=4), self.render_items)
         self.lazy_group(Group("event_items", "事件道具", self._global), self.render_event_items)
-        self.lazy_group(Group("person_battles", "战斗中", self._global, cols=4), self.render_person_battles)
+        self.lazy_group(Group("character_battles", "战斗中", self._global, cols=4), self.render_character_battles)
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
         with StaticGroup("快捷键"):
@@ -34,8 +34,8 @@ class Main(BaseGbaHack):
         ModelArraySelect("members", choices=datasets.PERSONS)
         ModelInput("item_num")
 
-    def render_person(self):
-        Choice("角色", datasets.PERSONS, self.on_person_change)
+    def render_character(self):
+        Choice("角色", datasets.PERSONS, self.on_character_change)
         ModelInput("hpmax")
         ModelInput("resist")
         ModelInput("str")
@@ -69,11 +69,11 @@ class Main(BaseGbaHack):
             ModelFlagWidget("event_items.%d" % i, "", labels=labels, values=datasets.EVENT_ITEM_FLAGS,
                 checkbtn=True, cols=4)
 
-    def render_person_battles(self):
+    def render_character_battles(self):
         for i in range(3):
-            ModelInput("person_battles.%d.hp" % i, "我方单位%dHP" % (i + 1))
+            ModelInput("character_battles.%d.hp" % i, "我方单位%dHP" % (i + 1))
         for i in range(3):
-            ModelInput("person_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
+            ModelInput("character_battles.%d.hp" % (i + 3), "敌方单位%dHP" % (i + 1))
 
     def render_buttons_own(self):
         self.render_buttons(('enable_extra', 'all_cg', 'all_item_book', 'all_music', 'all_face', 'all_dubbing',
@@ -84,18 +84,18 @@ class Main(BaseGbaHack):
             (VK.MOD_ALT, VK.H, self.weak.pull_through),
         )
 
-    def on_person_change(self, lb):
-        self.person.addr = models.Person.SIZE * lb.index
+    def on_character_change(self, lb):
+        self.character.addr = models.Character.SIZE * lb.index
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.addr = i * models.Person.SIZE
-            yield person
+            character.addr = i * models.Character.SIZE
+            yield character
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax
 
     def enable_extra(self, btn):
         """附加项开启"""
@@ -140,7 +140,7 @@ class Main(BaseGbaHack):
 
     def all_skills(self, btn):
         """当前角色全技能"""
-        self.person.skills = b'\xff' * 0x48
+        self.character.skills = b'\xff' * 0x48
 
     def s_ranking(self, btn):
         """获得S评价"""

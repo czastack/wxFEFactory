@@ -17,8 +17,8 @@ class Main(BaseN3dsHack):
     def __init__(self):
         super().__init__()
         self._global_ins = models.Global_1_0(0, self.handler)
-        self._person_ins = models.InGameCharacter(0, self.handler)
-        self.person_index = 0
+        self._character_ins = models.InGameCharacter(0, self.handler)
+        self.character_index = 0
         self.version = '1.0'
 
     def render_main(self):
@@ -26,7 +26,7 @@ class Main(BaseN3dsHack):
         with Group("global", "全局", _global, cols=4):
             self.render_global()
 
-        self.lazy_group(Group("player", "角色", (self._person, models.InGameCharacter), cols=4), self.render_person)
+        self.lazy_group(Group("player", "角色", (self._character, models.InGameCharacter), cols=4), self.render_character)
 
         self.lazy_group(Group("convoy1", "行囊(阿鲁姆)", _global, cols=4),
             partial(self.render_convoy, leader='alm'))
@@ -71,7 +71,7 @@ class Main(BaseN3dsHack):
             ModelSelect("system.difficulty", "难易度", choices=datasets.DIFFICULTY)
             ModelInput("system.renown", "名声值")
 
-    def render_person(self):
+    def render_character(self):
         self.chars_view = ChoiceWidget("角色", (), self.on_char_change)
         with self.chars_view.container:
             ui.Button(label="读取列表", class_="button", onclick=self.read_chars)
@@ -124,11 +124,11 @@ class Main(BaseN3dsHack):
             if self._global_ins.system.addr & 0xFFFF == 0xFF00:
                 self.version_view.set_selection(1, True)
 
-    def _person(self):
-        self._person_ins.addr = self._global_ins.chars.addr_at(self.person_index)
-        return self._person_ins
+    def _character(self):
+        self._character_ins.addr = self._global_ins.chars.addr_at(self.character_index)
+        return self._character_ins
 
-    person = property(_person)
+    character = property(_character)
 
     def on_version_change(self, lb):
         self.version = lb.text
@@ -139,7 +139,7 @@ class Main(BaseN3dsHack):
 
     def on_char_change(self, lb):
         """角色切换"""
-        self.person_index = lb.index
+        self.character_index = lb.index
 
     def read_chars(self, _):
         """读取角色列表"""
@@ -179,22 +179,22 @@ class Main(BaseN3dsHack):
                 break
 
     def move_to_cursor(self):
-        person = self.person
+        character = self.character
         _global = self._global_ins
-        person.posx = _global.curx
-        person.posy = _global.cury
+        character.posx = _global.curx
+        character.posy = _global.cury
 
     def move_left(self):
-        self.person.posx -= 1
+        self.character.posx -= 1
 
     def move_right(self):
-        self.person.posx += 1
+        self.character.posx += 1
 
     def move_up(self):
-        self.person.posy -= 1
+        self.character.posy -= 1
 
     def move_down(self):
-        self.person.posy += 1
+        self.character.posy += 1
 
     def on_convoy_page(self, page, leader, group):
         """行囊翻页"""

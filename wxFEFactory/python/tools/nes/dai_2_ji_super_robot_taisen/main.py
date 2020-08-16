@@ -10,7 +10,7 @@ class Main(BaseNesHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         # self.weapon = models.Weapon(0, self.handler)
 
     def render_main(self):
@@ -18,8 +18,8 @@ class Main(BaseNesHack):
             ModelInput("money", "金钱")
             ModelInput("exp", "驾驶员经验")
 
-        with Group("player", "我方角色", self.person, cols=4):
-            Choice("角色", datasets.PARTNERS, self.on_person_change)
+        with Group("player", "我方角色", self.character, cols=4):
+            Choice("角色", datasets.PARTNERS, self.on_character_change)
             ModelInput("ability", "机体类型(海陆空)及变身能力")
             ModelInput("spiritual_type", "精神类型")
             ModelSelect("robot", "机体图", choices=datasets.ROBOTS)
@@ -67,14 +67,14 @@ class Main(BaseNesHack):
     #         (VK.MOD_ALT, VK.H, this.pull_through),
     #     )
 
-    def on_person_change(self, lb):
-        self.person.addr = lb.index
+    def on_character_change(self, lb):
+        self.character.addr = lb.index
 
     # def on_weapon_change(self, lb):
     #     self.weapon.index = self._global.weapons.addr_at(lb.index - 1)
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PARTNERS)):
-            person.addr = i
-            yield person
+            character.addr = i
+            yield character

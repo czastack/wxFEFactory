@@ -38,7 +38,7 @@ class Global(Model):
         self._money_2p = int(str(int(value) // 10), 16)
 
 
-class Person(Model):
+class Character(Model):
     _locals = locals()
 
     for addr, name in PERSON_ATTRS:

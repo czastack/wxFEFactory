@@ -31,8 +31,8 @@ class GSHack(BaseGbaHack):
     def __init__(self):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
-        self.person = self.models.Person(0, self.handler)
-        self.person.skills_offset = 0
+        self.character = self.models.Character(0, self.handler)
+        self.character.skills_offset = 0
 
     def render_main(self):
         with Group("global", "全局", self._global):
@@ -44,15 +44,15 @@ class GSHack(BaseGbaHack):
             ModelCoordWidget("town_pos", "城镇坐标", length=2, type=int, savable=True, preset=self.coords)
             ModelCoordWidget("map_pos", "地图坐标", length=2, type=int, savable=True, preset=self.coords)
 
-        self.lazy_group(Group("player", "角色", self.person, cols=4), self.render_person)
-        self.skills_group = Group("skills", "角色精神力", self.person)
+        self.lazy_group(Group("player", "角色", self.character, cols=4), self.render_character)
+        self.skills_group = Group("skills", "角色精神力", self.character)
         self.lazy_group(self.skills_group, self.render_skills)
-        self.lazy_group(Group("skills", "角色物品", self.person, cols=4), self.render_items)
-        self.lazy_group(Group("djinnis", "角色精灵", self.person), self.render_djinnis)
+        self.lazy_group(Group("skills", "角色物品", self.character, cols=4), self.render_items)
+        self.lazy_group(Group("djinnis", "角色精灵", self.character), self.render_djinnis)
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
-    def render_person(self):
-        Choice("角色", self.datasets.PERSONS, self.on_person_change)
+    def render_character(self):
+        Choice("角色", self.datasets.PERSONS, self.on_character_change)
         ModelAddrInput()
         ModelInput("level", "等级")
         ModelInput("exp", "经验")
@@ -105,17 +105,17 @@ class GSHack(BaseGbaHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def on_person_change(self, lb):
-        self.person.addr = self.PERSON_ADDR_START + lb.index * self.models.Person.SIZE
+    def on_character_change(self, lb):
+        self.character.addr = self.PERSON_ADDR_START + lb.index * self.models.Character.SIZE
 
-    def persons(self):
-        person = self.models.Person(0, self.handler)
+    def characters(self):
+        character = self.models.Character(0, self.handler)
         for i in range(len(self.datasets.PERSONS)):
-            person.addr = self.PERSON_ADDR_START + i * self.models.Person.SIZE
-            yield person
+            character.addr = self.PERSON_ADDR_START + i * self.models.Character.SIZE
+            yield character
 
     def on_skills_page(self, page):
-        self.person.skills_offset = (page - 1) * self.SKILLS_PAGE_LENGTH
+        self.character.skills_offset = (page - 1) * self.SKILLS_PAGE_LENGTH
         self.skills_group.read()
 
     def move_left(self):
@@ -143,5 +143,5 @@ class GSHack(BaseGbaHack):
             self._global.map_y += 10
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax

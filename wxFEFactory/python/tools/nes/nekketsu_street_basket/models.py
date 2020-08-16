@@ -34,7 +34,7 @@ class Global(Model):
     skill_anywhere = ToggleFields()
 
 
-class Person(Model):
+class Character(Model):
     jump = ByteField(0x0576, label='无限跳')  # 0: 未二段跳, 0x80: 已二段跳
     power = ByteField(0x0572, label='无限威力')
     character = ByteField(0x03E3, label='角色(0~3)')

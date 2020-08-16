@@ -54,7 +54,7 @@ class Player(Entity, GTA3Player):
         return Vehicle(ptr, self.context) if ptr else None
 
     @property
-    def near_persons(self):
+    def near_characters(self):
         offset = 0x56c
         for i in range(10):
             yield Player(self.handler.read32(self.addr + offset), self.context)

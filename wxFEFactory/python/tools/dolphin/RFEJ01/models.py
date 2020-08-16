@@ -13,7 +13,7 @@ class SkillSlot(Model):
     spec = WordField(4)  # 01 01 消耗潜力值习得状态, 0102 不消耗潜力值习得状态, 0103 锁定技能消耗潜力值习得状态, 0002 先天技能，不上锁，不占技能槽
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 0x3F0
     prof = Field(0x00)  # 职业指针 step=11C
     camp = Field(0x04)  # 阵营？0x8064CDFC = 晓之团
@@ -57,7 +57,7 @@ class Global(Model):
     # 角色指针起始
     # 4.0.2: 9: 0x00914EC0-0x3F0*9
     # 5.x 9: 0x00930C80-0x3F0*9
-    persons = ArrayField(0x0092E910, 0xff, ModelField(0, Person))
+    characters = ArrayField(0x0092E910, 0xff, ModelField(0, Character))
     turn = WordField(0x003AE34A)  # 回合数
     money1 = Field(0x003AE350)
     money2 = Field(0x003AE354)

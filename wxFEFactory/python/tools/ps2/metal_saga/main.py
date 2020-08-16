@@ -21,8 +21,8 @@ class Main(BasePs2Hack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._global.human_items_offset = 0
-        self.person = models.Person(0, self.handler)
-        self.person_grow = models.PersonGrow(0, self.handler)
+        self.character = models.Character(0, self.handler)
+        self.character_grow = models.CharacterGrow(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
         self.static_item = models.StaticItem(0, self.handler)
         self.item_info = models.ItemInfo(0, self.handler)
@@ -30,7 +30,7 @@ class Main(BasePs2Hack):
         self.item_preset_dialog = PresetDialog('物品', datasets.ITEM_HEADS, datasets.ITEMS_DATA, self.item_info)
 
     def render_main(self):
-        person = self.person
+        character = self.character
         chariot = self.chariot
         with Group("global", "全局", self._global):
             ModelInput("money")
@@ -41,9 +41,9 @@ class Main(BasePs2Hack):
             ModelInput("die_count")
             ModelInput("escape_count")
 
-        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
-        self.lazy_group(Group("person_grow", "角色成长", self.person_grow, cols=4), self.render_person_grow)
-        self.lazy_group(Group("person_equips", "角色装备", person), self.render_person_equips)
+        self.lazy_group(Group("character", "角色", self.character, cols=4), self.render_character)
+        self.lazy_group(Group("character_grow", "角色成长", self.character_grow, cols=4), self.render_character_grow)
+        self.lazy_group(Group("character_equips", "角色装备", character), self.render_character_equips)
         self.human_items_group = Group("human_items", "人类道具", self._global, cols=4)
         self.lazy_group(self.human_items_group, self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
@@ -58,8 +58,8 @@ class Main(BasePs2Hack):
                 "下移: alt+right\n"
                 "恢复HP: alt+h")
 
-    def render_person(self):
-        Choice("角色", datasets.PERSONS, self.on_person_change)
+    def render_character(self):
+        Choice("角色", datasets.PERSONS, self.on_character_change)
         ModelInput("level")
         ModelInput("exp")
         ModelInput("hpmax")
@@ -71,11 +71,11 @@ class Main(BasePs2Hack):
         ModelSelect("prof", choices=datasets.PROFS)
         # ModelInput("status")
         with ModelSelect.choices_cache:
-            for i in range(self.person.skills.length):
+            for i in range(self.character.skills.length):
                 ModelSelect("skills.%d" % i, "技能%d" % (i + 1),
                     choices=datasets.SPECIAL_SKILLS.choices, values=datasets.SPECIAL_SKILLS.values)
 
-    def render_person_grow(self):
+    def render_character_grow(self):
         ModelInput("hp_init")
         ModelInput("hp_grow")
         ModelInput("atk_init")
@@ -85,16 +85,16 @@ class Main(BasePs2Hack):
         ModelInput("drive_init")
         ModelInput("drive_grow")
 
-    def render_person_equips(self):
+    def render_character_equips(self):
         for i, label in enumerate(('武器', '头部', '躯干', '手臂', '脚部', '胸甲')):
             prop = "equips.%d" % i
             select = ModelChoiceDisplay(prop + ".item", label, choices=datasets.ALL_EQUIP.choices,
                 values=datasets.ALL_EQUIP.values)
             with select.container:
                 ui.Button("详情", class_="btn_sm", onclick=partial(self.__class__.show_item_info, self.weak,
-                    instance=self.person, prop=prop))
+                    instance=self.character, prop=prop))
                 ui.Button("选择", class_="btn_sm", onclick=partial(self.__class__.show_item_preset, self.weak,
-                    instance=self.person, prop=prop))
+                    instance=self.character, prop=prop))
 
     def render_human_items(self):
         for i in range(self.HUMEN_ITEMS_PAGE_LENGTH):
@@ -234,19 +234,19 @@ class Main(BasePs2Hack):
         else:
             print("没有数据")
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         index = lb.index
-        self.person.set_addr_by_index(index)
-        self.person_grow.set_addr_by_index(index)
+        self.character.set_addr_by_index(index)
+        self.character_grow.set_addr_by_index(index)
 
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.set_addr_by_index(i)
-            yield person
+            character.set_addr_by_index(i)
+            yield character
 
     def chariots(self):
         chariot = models.Chariot(0, self.handler)
@@ -267,11 +267,11 @@ class Main(BasePs2Hack):
     #     self.chariot.posy += 24
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax
 
     def equip_all(self):
-        self.person.equip_all()
+        self.character.equip_all()
 
     def fake_down(self):
         """假装下车"""
@@ -279,12 +279,12 @@ class Main(BasePs2Hack):
         if not flag:
             i = 0
             indexs = []
-            for person in self._global.persons:
+            for character in self._global.characters:
                 if i > 5:
                     break
-                if person.driving == 1:
+                if character.driving == 1:
                     indexs.append(i)
-                    person.driving = 0
+                    character.driving = 0
                     if len(indexs) == 3:
                         break
                 i += 1
@@ -292,5 +292,5 @@ class Main(BasePs2Hack):
             self._fake_downed_indexs = indexs
         else:
             for i in self._fake_downed_indexs:
-                self._global.persons[i].driving = 1
+                self._global.characters[i].driving = 1
             self._fake_downed = False

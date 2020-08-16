@@ -22,7 +22,7 @@ class FeHack(BaseNdsHack):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
-        self._person_ins = self.models.Person(0, self.handler)
+        self._character_ins = self.models.Character(0, self.handler)
         self.item_index = 1
 
     def render_main(self):
@@ -50,8 +50,8 @@ class FeHack(BaseNdsHack):
             # ModelSelect("chapter", "章节", choices=datasets.CHAPTERS)
 
         self.lazy_group(Group("config", "配置", weak._config, cols=4), self.render_config)
-        self.lazy_group(Group("player", "角色", weak._person, cols=4), self.render_person)
-        self.lazy_group(Group("items", "角色物品", weak._person, cols=4), self.render_items)
+        self.lazy_group(Group("player", "角色", weak._character, cols=4), self.render_character)
+        self.lazy_group(Group("items", "角色物品", weak._character, cols=4), self.render_items)
         self.lazy_group(Group("iteminfos", "武器属性", weak._iteminfo), self.render_iteminfos)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
@@ -67,7 +67,7 @@ class FeHack(BaseNdsHack):
             ModelSelect("character_eye", "主人公眼睛", choices=datasets.CHARACTER_EYE)
             ModelSelect("character_cloth", "主人公服装", choices=datasets.CHARACTER_CLOTH)
 
-    def render_person(self):
+    def render_character(self):
         datasets = self.datasets
         ModelAddrInput()
         ModelInput("no", "序号")
@@ -154,13 +154,13 @@ class FeHack(BaseNdsHack):
             (VK.MOD_ALT, VK.DOWN, this.move_down),
         )
 
-    def _person(self):
-        person_addr = self._global.person_addr
-        if person_addr:
-            self._person_ins.addr = person_addr
-            return self._person_ins
+    def _character(self):
+        character_addr = self._global.character_addr
+        if character_addr:
+            self._character_ins.addr = character_addr
+            return self._character_ins
 
-    person = property(_person)
+    character = property(_character)
 
     def _config(self):
         return self._global.config
@@ -180,25 +180,25 @@ class FeHack(BaseNdsHack):
 
     def continue_move(self):
         """再移动"""
-        self.person.moved = False
+        self.character.moved = False
 
     def move_to_cursor(self):
-        person = self.person
+        character = self.character
         _global = self._global
-        person.posx = _global.curx
-        person.posy = _global.cury
+        character.posx = _global.curx
+        character.posy = _global.cury
 
     def move_left(self):
-        self.person.posx -= 1
+        self.character.posx -= 1
 
     def move_right(self):
-        self.person.posx += 1
+        self.character.posx += 1
 
     def move_up(self):
-        self.person.posy -= 1
+        self.character.posy -= 1
 
     def move_down(self):
-        self.person.posy += 1
+        self.character.posy += 1
 
     def on_train_items_page(self, page):
         self._global.train_items_offset = (page - 1) * self.TRAIN_ITEMS_PAGE_LENGTH

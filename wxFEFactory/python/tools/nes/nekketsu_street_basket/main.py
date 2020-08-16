@@ -10,7 +10,7 @@ class Main(BaseNesHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         self.equip_holder = models.EquipHolder(0, self.handler)
 
     def render_main(self):
@@ -29,8 +29,8 @@ class Main(BaseNesHack):
             ModelInput("basketry_right_bottom")
             ModelInput("ball_owner").set_help('球在人手里(0~3),地上或空中(6)')
 
-        with Group("player", "我方角色", self.person):
-            Choice("角色", ("1P", "2P", "3P", "4P"), self.on_person_change)
+        with Group("player", "我方角色", self.character):
+            Choice("角色", ("1P", "2P", "3P", "4P"), self.on_character_change)
 
             # ModelInput("jump")
             # ModelInput("power")
@@ -53,9 +53,9 @@ class Main(BaseNesHack):
             (0, VK.M, this.basketry_reset),
         )
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         index = lb.index
-        self.person.addr = index
+        self.character.addr = index
         self.equip_holder.set_addr_by_index(index)
 
     def get_ball(self):

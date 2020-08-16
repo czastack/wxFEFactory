@@ -44,7 +44,7 @@ class ItemSlot(Model):
         self._count = ((int(value) - 1) << 3) | (self._count & 0b11)
 
 
-class BasePerson(Model):
+class BaseCharacter(Model):
     SIZE = 0x14C
 
     name = Field(0, bytes, 0xF)

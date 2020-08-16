@@ -718,7 +718,7 @@ class BaseSelect(TwoWayWidget):
 
     @classmethod
     def move_about(cls, view, menu):
-        pyapi.alert("按住shift，在下拉框上按下鼠标左键，拖拽到同源下拉框上释放，能交换两者的选值；\n"
+        pyapi.alert("在下拉框上按下鼠标左键，拖拽到同源下拉框上释放，能交换两者的选值；\n"
                     "若释放时按着ctrl，则为复制值；若按着alt，则是把值移到目标处，原有区域下移或上移")
 
     @classmethod

@@ -8,7 +8,7 @@ class ItemSlot(Model):
     value = WordField(0)
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 0xA0
 
     hpmax = WordField(0x020069F8, label="HP上限")
@@ -23,7 +23,7 @@ class Person(Model):
     skills = Field(0x02006A18, bytes, 0x48)
 
 
-class PersonBattle(Model):
+class CharacterBattle(Model):
     SIZE = 0x58
     hp = WordField(0x02002668)
 
@@ -38,5 +38,5 @@ class Global(Model):
     kill_slot = WordField(0x020028E2, label="必杀槽")
     rage = WordField(0x020028EC, label="RAGE")
     battle_time = ByteField(0x020028F6, label="战斗时间")
-    person_battles = ArrayField(0, 6, ModelField(0, PersonBattle))  # 战斗中人物信息
+    character_battles = ArrayField(0, 6, ModelField(0, CharacterBattle))  # 战斗中人物信息
     event_items = ArrayField(0x02008170, 10, WordField(0))  # 事件道具

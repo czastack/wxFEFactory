@@ -11,19 +11,19 @@ class Main(BaseNesHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._global.storage_offset = 0
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
 
     def render_main(self):
-        person = self.person
+        character = self.character
         chariot = self.chariot
         with Group("global", "全局", self._global):
             ModelInput("money", "金钱")
             ModelInput("battlein", "遇敌率")
             ModelCheckBox("battlein", "不遇敌", enable=0xFF, disable=0)
 
-        with Group("player", "角色", person, cols=4):
-            Choice("角色", datasets.PERSONS, self.on_person_change)
+        with Group("player", "角色", character, cols=4):
+            Choice("角色", datasets.PERSONS, self.on_character_change)
             ModelInput("level", "等级")
             ModelInput("hpmax", "HP上限")
             ModelInput("hp", "HP")
@@ -38,7 +38,7 @@ class Main(BaseNesHack):
             ModelInput("fix", "修理")
             ModelInput("exp", "经验")
 
-        self.lazy_group(Group("human_items", "角色装备/物品", person, cols=4), self.render_human_items)
+        self.lazy_group(Group("human_items", "角色装备/物品", character, cols=4), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
 
@@ -51,10 +51,10 @@ class Main(BaseNesHack):
 
     def render_human_items(self):
         with ModelSelect.choices_cache:
-            for i in range(self.person.equips.length):
+            for i in range(self.character.equips.length):
                 ModelSelect("equips.%d" % i, "装备%d" % (i + 1),
                     choices=datasets.HUMAN_EQUIPS, values=datasets.HUMAN_EQUIP_VALUES)
-            for i in range(self.person.items.length):
+            for i in range(self.character.items.length):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1),
                     choices=datasets.HUMAN_ITEMS, values=datasets.HUMAN_ITEM_VALUES)
 
@@ -86,17 +86,17 @@ class Main(BaseNesHack):
             (0, VK.H, this.pull_through),
         )
 
-    def on_person_change(self, lb):
-        self.person.set_index(lb.index)
+    def on_character_change(self, lb):
+        self.character.set_index(lb.index)
 
     def on_chariot_change(self, lb):
         self.chariot.set_index(lb.index)
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.set_index(i)
-            yield person
+            character.set_index(i)
+            yield character
 
     def chariots(self):
         chariot = models.Chariot(0, self.handler)
@@ -121,5 +121,5 @@ class Main(BaseNesHack):
         self._global.offy += 1
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax

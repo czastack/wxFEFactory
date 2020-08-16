@@ -22,15 +22,15 @@ class FeHack(BaseGbaHack):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
-        self._person_ins = self.models.Person(0, self.handler)
+        self._character_ins = self.models.Character(0, self.handler)
 
     def render_main(self):
         with Group("global", "全局", self._global):
             self.render_global()
 
-        self.lazy_group(Group("player", "角色", self._person, cols=4), self.render_char)
-        self.lazy_group(Group("items", "角色物品", self._person, cols=4), self.render_char_items)
-        self.lazy_group(Group("support", "角色支援", self._person, cols=4), self.render_char_support)
+        self.lazy_group(Group("player", "角色", self._character, cols=4), self.render_char)
+        self.lazy_group(Group("items", "角色物品", self._character, cols=4), self.render_char_items)
+        self.lazy_group(Group("support", "角色支援", self._character, cols=4), self.render_char_support)
 
         self.train_items_group = Group("train_items", "运输队", self._global, cols=4)
         self.lazy_group(self.train_items_group, self.render_train_items)
@@ -82,7 +82,7 @@ class FeHack(BaseGbaHack):
                 ModelInput("items.%d.count" % i, "数量")
 
     def render_char_support(self):
-        for i in range(self._person_ins.support.length):
+        for i in range(self._character_ins.support.length):
             ModelInput("support.%d" % i, "好感度%d" % (i + 1)).set_help('80~160: C, 160~240: B, 240~255: A')
 
     def render_train_items(self):
@@ -110,28 +110,28 @@ class FeHack(BaseGbaHack):
             (0, VK.DELETE, self.delete_unit),
         )
 
-    def _person(self):
-        person_addr = self._global.person_addr
-        if person_addr and (person_addr & 0xFFFF0000 == 0x02020000):
-            self._person_ins.addr = person_addr
-        if self._person_ins.addr:
-            return self._person_ins
+    def _character(self):
+        character_addr = self._global.character_addr
+        if character_addr and (character_addr & 0xFFFF0000 == 0x02020000):
+            self._character_ins.addr = character_addr
+        if self._character_ins.addr:
+            return self._character_ins
 
-    person = property(_person)
+    character = property(_character)
 
     def pull_through(self):
         """再移动"""
-        self.person.set_with('hp', 'hpmax')
+        self.character.set_with('hp', 'hpmax')
 
     def continue_move(self):
         """再移动"""
-        self.person.moved = False
+        self.character.moved = False
 
     def move_to_cursor(self):
-        person = self.person
+        character = self.character
         _global = self._global
-        person.posx = _global.curx
-        person.posy = _global.cury
+        character.posx = _global.curx
+        character.posy = _global.cury
 
     def toggle_random(self):
         """切换乱数"""
@@ -144,35 +144,35 @@ class FeHack(BaseGbaHack):
 
     def reload_ammo(self):
         """恢复耐久"""
-        for item in self._person().items:
+        for item in self._character().items:
             if not item.item:
                 break
             item.count = 99
 
     def remove_weapon(self):
         """移除物品"""
-        for item in self._person().items:
+        for item in self._character().items:
             if not item.item:
                 break
             item.value = 0
 
     def move_left(self):
-        self.person.posx -= 1
+        self.character.posx -= 1
 
     def move_right(self):
-        self.person.posx += 1
+        self.character.posx += 1
 
     def move_up(self):
-        self.person.posy -= 1
+        self.character.posy -= 1
 
     def move_down(self):
-        self.person.posy += 1
+        self.character.posy += 1
 
     def hp_zero(self):
-        self.person.hp = 1
+        self.character.hp = 1
 
     def delete_unit(self):
-        unit = self.person
+        unit = self.character
         if unit.no >= 64:
             unit.unkonw_ptr = 0
             unit.prof = 0

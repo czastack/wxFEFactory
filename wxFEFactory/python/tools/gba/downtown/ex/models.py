@@ -1,5 +1,5 @@
 from lib.hack.models import Model, Field, ByteField
-from ..models import Person
+from ..models import Character
 
 
 class Global(Model):

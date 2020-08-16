@@ -51,7 +51,7 @@ class Items:
             i += 1
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 0x0240
     name = Field(0x007F8690, bytes, 24, label="名称")
     prof = ByteField(0x007F86BC, label="职业")
@@ -71,7 +71,7 @@ class Person(Model):
     # unkown_ptr = Field(0x007F86B8)
 
 
-class PersonGrow(Model):
+class CharacterGrow(Model):
     """角色成长值"""
     SIZE = 0x30
     hp_init = Field(0x003A7DD0, label="HP初始值")
@@ -115,7 +115,7 @@ class Global(Model):
 
     # wanted_status = ArrayField(0x7E910F, 16, ByteField(0))  # 0=未击破, 63=未领奖金, E3=已领奖金
 
-    persons = ArrayField(0, 10, ModelField(0, Person))
+    characters = ArrayField(0, 10, ModelField(0, Character))
     # 敌人情况
     # enemys = ArrayField(0, 10, ModelField(0, Enemy))
 

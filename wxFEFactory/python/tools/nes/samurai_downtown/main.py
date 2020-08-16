@@ -10,7 +10,7 @@ class Main(BaseNesHack):
     def __init__(self):
         super().__init__()
         self._global = models.Global(0, self.handler)
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         self.itemholder = models.ItemHolder(0, self.handler)
         self.skillholder = models.SkillHolder(0, self.handler)
 
@@ -20,8 +20,8 @@ class Main(BaseNesHack):
             ModelInput("money_1p", "1p金钱")
             ModelInput("money_2p", "2p金钱")
 
-        with Group("player", "我方角色", self.person, cols=4) as group:
-            Choice("角色", ("1P", "2P"), self.on_person_change)
+        with Group("player", "我方角色", self.character, cols=4) as group:
+            Choice("角色", ("1P", "2P"), self.on_character_change)
 
             for addr, name in models.PERSON_ATTRS:
                 ModelInput(name)
@@ -52,18 +52,18 @@ class Main(BaseNesHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         index = lb.index
-        self.person.addr = index
+        self.character.addr = index
         self.itemholder.addr = index * models.ItemHolder.SIZE
         # self.skillholder.addr = index * models.SkillHolder.SIZE
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(2):
-            person.addr = i
-            yield person
+            character.addr = i
+            yield character
 
     def pull_through(self):
-        for person in self.persons():
-            person.set_with("体力最大值", "体力当前值").set_with("气力最大值", "气力当前值")
+        for character in self.characters():
+            character.set_with("体力最大值", "体力当前值").set_with("气力最大值", "气力当前值")

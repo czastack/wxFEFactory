@@ -2,7 +2,7 @@ from lib.hack.models import Model, Field, ByteField, ArrayField, ModelField, Mod
 from ..models import ItemSlot, BaseGlobal
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 0xA8
     prof = Field(0x44)
     level = ByteField(0x6A)
@@ -71,10 +71,10 @@ class ItemInfo(Model):
 class Global(BaseGlobal):
     # chapter = ByteField(0x0202BCFA)
     # turns = WordField(0x0202BCFC)
-    person_addr = Field(0x021986F4)
+    character_addr = Field(0x021986F4)
     curx = ByteField(0x02273BD4)  # 0x02272EA4  # TODO
     cury = ByteField(0x02273BD5)  # 0x02272EA5  # TODO
-    # persons = ArrayField(0x202be48, 0xff, ModelField(0, Person))
+    # characters = ArrayField(0x202be48, 0xff, ModelField(0, Character))
     train_items = ArrayField(0x021986D0, 100, ModelField(0, ItemSlot))  # 运输队
     ourturn = ToggleField(0x021A9674, enable=0xE2812000, disable=0xE2812001)
     control_enemy = ToggleField(0x021B1830, enable=0xE1500000, disable=0xE1510000)

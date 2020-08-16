@@ -1,8 +1,8 @@
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
-from ..models import ItemSlot, BasePerson, BaseGlobal
+from ..models import ItemSlot, BaseCharacter, BaseGlobal
 
 
-class Person(BasePerson):
+class Character(BaseCharacter):
     pass
 
 

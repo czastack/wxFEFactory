@@ -28,7 +28,7 @@ class MetalMaxHack(BaseNdsHack):
         super().__init__()
         self._global = self.models.Global(0, self.handler)
         self._global.train_items_offset = 0
-        self.person = self.models.Person(0, self.handler)
+        self.character = self.models.Character(0, self.handler)
         self.chariot = self.models.Chariot(0, self.handler)
         self.chariot_item_info = self.models.ChariotItemInfo(0, self.handler)
         self.enemy = self.models.Enemy(0, self.handler)
@@ -40,8 +40,8 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("stamp")
             self.render_global_ext()
 
-        self.lazy_group(Group("person", "角色", self.person, cols=4), self.render_person)
-        self.lazy_group(Group("person_ext", "角色额外", self.person, cols=4), self.render_person_ext)
+        self.lazy_group(Group("character", "角色", self.character, cols=4), self.render_character)
+        self.lazy_group(Group("character_ext", "角色额外", self.character, cols=4), self.render_character_ext)
         self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车物品/装备", self.chariot, cols=2 if self.has_holes else 4),
             self.render_chariot_items)
@@ -63,9 +63,9 @@ class MetalMaxHack(BaseNdsHack):
     def render_global_ext(self):
         pass
 
-    def render_person(self):
+    def render_character(self):
         datasets = self.datasets
-        Choice("角色", datasets.PERSONS, self.on_person_change)
+        Choice("角色", datasets.PERSONS, self.on_character_change)
         ModelSelect("figure", choices=datasets.FIGURES)
         ModelInput("level")
         ModelInput("exp")
@@ -97,17 +97,17 @@ class MetalMaxHack(BaseNdsHack):
             ModelInput("resistance.%d" % i, "%s抗性" % label, spin=True, max=100)
 
         ModelSelect("prof", choices=datasets.PROFS)
-        if self.person.field("subprof"):
+        if self.character.field("subprof"):
             ModelSelect("subprof", choices=datasets.SUBPROFS)
 
-    def render_person_ext(self):
+    def render_character_ext(self):
         datasets = self.datasets
         for i, label in enumerate(datasets.SUBPROFS[1:]):
             ModelInput("subprof_levels.%d" % i, "%s等级" % label)
             ModelInput("subprof_exps.%d" % i, "%s经验" % label)
-        for i in range(self.person.skill_counts.length):
+        for i in range(self.character.skill_counts.length):
             ModelInput("skill_counts.%d" % i, "技能%d次数" % (i + 1))
-        for i in range(self.person.subskill_counts.length):
+        for i in range(self.character.subskill_counts.length):
             ModelInput("subskill_counts.%d" % i, "副职业技能%d次数" % (i + 1))
 
     def render_chariot(self):
@@ -391,8 +391,8 @@ class MetalMaxHack(BaseNdsHack):
                 i += 1
         dialog.ShowModal()
 
-    def on_person_change(self, lb):
-        self.person.set_addr_by_index(lb.index)
+    def on_character_change(self, lb):
+        self.character.set_addr_by_index(lb.index)
 
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
@@ -401,8 +401,8 @@ class MetalMaxHack(BaseNdsHack):
         self.enemy.set_addr_by_index(lb.index)
 
     def pull_through(self):
-        for person in self._global.persons:
-            person.set_with('hp', 'hpmax')
+        for character in self._global.characters:
+            character.set_with('hp', 'hpmax')
         for item in self._global.chariot_battle_status:
             item.set_with('sp', 'spmax')
 

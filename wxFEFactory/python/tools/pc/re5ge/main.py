@@ -24,17 +24,17 @@ class Main(NativeHacktool):
         self.char_index = self._global.char_index = 0
 
     def render_main(self):
-        person = (self._person, models.Character)
+        character = (self._character, models.Character)
 
         with Group("player", "全局", self._global):
             ModelInput("money.money", "金钱")
 
-        with Group("player", "角色", person):
+        with Group("player", "角色", character):
             self.render_player()
 
         self.lazy_group(
-            Group("person_items", "角色物品", person, serializable=False, cols=4),
-            self.render_person_items)
+            Group("character_items", "角色物品", character, serializable=False, cols=4),
+            self.render_character_items)
         self.lazy_group(
             Group("saved_items", "整理界面物品", self._saved_items, serializable=False, cols=4),
             self.render_saved_items)
@@ -42,13 +42,13 @@ class Main(NativeHacktool):
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_player(self):
-        Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_person_change)
+        Choice("角色", tuple("play%d" % i for i in range(1, 5)), self.weak.on_character_change)
         ModelInput("health")
         ModelInput("health_max")
         ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
         ModelCheckBox("invincible")
 
-    def render_person_items(self):
+    def render_character_items(self):
         """游戏中物品"""
         for i in range(models.Character.items.length):
             prop = "items.%d" % i
@@ -58,7 +58,7 @@ class Main(NativeHacktool):
             with select.container:
                 ui.Button("详情", class_="btn_sm", onclick=partial(
                     __class__.show_ingame_item, self.weak,
-                    instance=self._person, prop=prop))
+                    instance=self._character, prop=prop))
 
     def render_saved_items(self):
         """整理界面个人物品"""
@@ -199,7 +199,7 @@ class Main(NativeHacktool):
         super().onattach()
         self._global.addr = self.handler.base_addr
 
-    def _person(self):
+    def _character(self):
         if self.handler.active:
             return self._global.character_struct.chars[self.char_index]
 
@@ -207,10 +207,10 @@ class Main(NativeHacktool):
         if self.handler.active:
             return self._global.character_struct.saved_items[self.char_index]
 
-    person = property(_person)
+    character = property(_character)
     saved_items = property(_saved_items)
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         self.char_index = self._global.char_index = lb.index
 
     def show_ingame_item(self, view, instance, prop):
@@ -255,7 +255,7 @@ class Main(NativeHacktool):
             print("没有数据")
 
     def pull_through(self):
-        self.person.set_with('health', 'health_max')
+        self.character.set_with('health', 'health_max')
 
     def pull_through_all(self):
         character_struct = self._global.character_struct
@@ -263,17 +263,17 @@ class Main(NativeHacktool):
             character_struct.chars[i].set_with('health', 'health_max')
 
     def save_coord(self):
-        self.last_coord = self.person.coord.values()
+        self.last_coord = self.character.coord.values()
 
     def load_coord(self):
-        self.prev_coord = self.person.coord.values()
-        self.person.coord = self.last_coord
+        self.prev_coord = self.character.coord.values()
+        self.character.coord = self.last_coord
 
     def undo_coord(self):
-        self.person.coord = self.prev_coord
+        self.character.coord = self.prev_coord
 
     def reload_coord(self):
-        self.person.coord = self.last_coord
+        self.character.coord = self.last_coord
 
     def p1_go_p2(self):
         chars = self._global.character_struct.chars
@@ -286,7 +286,7 @@ class Main(NativeHacktool):
     def set_ingame_item(
             self, type, quantity, max_quantity, slot, fire_power=0, reload_speed=0, capacity=0,
             critical=0, piercing=0, scope=0, char_addr=0):
-        char_addr = char_addr or self.person.addr
+        char_addr = char_addr or self.character.addr
         func_addr = self.get_cached_address(
             '_set_ingame_item', b'\x8B\x44\x24\x48\x8B\x54\x24\x44\x50', 0x800000, 0x900000)
         if func_addr > 0:

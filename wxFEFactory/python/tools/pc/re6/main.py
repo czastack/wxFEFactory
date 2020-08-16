@@ -23,14 +23,14 @@ class Main(NativeHacktool):
         self.char_choice = None
 
     def render_main(self):
-        person = (self._person, models.Character)
+        character = (self._character, models.Character)
 
         with Group("player", "全局", (self._global, models.Global)):
             self.version_view = Choice("版本", datasets.VERSIONS, self.on_version_change)
             ModelInput("skill_points", instance=(self._skill_points, models.SkillPoints))
 
-        with Group("player", "角色", person):
-            self.char_choice = Choice("角色", datasets.PERSONS, self.weak.on_person_change)
+        with Group("player", "角色", character):
+            self.char_choice = Choice("角色", datasets.PERSONS, self.weak.on_character_change)
             ModelInput("health")
             ModelInput("health_max")
             ModelInput("stamina")
@@ -41,12 +41,12 @@ class Main(NativeHacktool):
             ModelCoordWidget("coord", labels=('X坐标', 'Z坐标', 'Y坐标'), savable=True)
             ModelCheckBox("invincible")
 
-        self.lazy_group(Group("person_items", "角色物品", person, serializable=False, cols=4), self.render_person_items)
-        self.lazy_group(Group("person_skills", "角色技能", (self._global, models.Global), cols=4), self.render_person_skills)
+        self.lazy_group(Group("character_items", "角色物品", character, serializable=False, cols=4), self.render_character_items)
+        self.lazy_group(Group("character_skills", "角色技能", (self._global, models.Global), cols=4), self.render_character_skills)
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
         self.lazy_group(StaticGroup("功能"), self.render_buttons_own)
 
-    def render_person_items(self):
+    def render_character_items(self):
         """游戏中物品"""
         for label, index_range in (('水平武器', (0, 7)), ('药丸', (7, 8)), ('垂直武器', (8, 13)), ('其他物品', (15, 24))):
             row = 1
@@ -58,10 +58,10 @@ class Main(NativeHacktool):
                 with select.container:
                     ui.Button("详情", class_="btn_sm", onclick=partial(
                         __class__.show_ingame_item, self.weak,
-                        instance=self._person, prop=prop))
+                        instance=self._character, prop=prop))
                 row += 1
 
-    def render_person_skills(self):
+    def render_character_skills(self):
         with ModelSelect.choices_cache:
             for i in range(3):
                 ModelSelect("char_skills.$char_index.%d" % i, "技能%d" % (i + 1), choices=datasets.SKILLS)
@@ -138,19 +138,19 @@ class Main(NativeHacktool):
     def _global(self):
         return self._global_ins
 
-    def _person(self):
+    def _character(self):
         if self.handler.active:
             chars = self._global_ins.character_struct.chars
-            person = chars[self.char_index]
-            if person.addr == 0:
+            character = chars[self.char_index]
+            if character.addr == 0:
                 for i in range(len(datasets.PERSONS)):
                     if chars[i].addr:
                         self.char_choice.index = self.char_index = i
-                        person = chars[i]
+                        character = chars[i]
                         break
-            return person
+            return character
 
-    def _person_config(self):
+    def _character_config(self):
         if self.handler.active:
             return self._global_ins.character_config.chars[self.char_index]
 
@@ -164,10 +164,10 @@ class Main(NativeHacktool):
     def saved_items(self):
         return self._global_ins.character_config.saved_items[self.char_index].items
 
-    person = property(_person)
-    person_config = property(_person_config)
+    character = property(_character)
+    character_config = property(_character_config)
 
-    def on_person_change(self, lb):
+    def on_character_change(self, lb):
         self.char_index = self._global_ins.char_index = lb.index
 
     def show_ingame_item(self, view, instance, prop):
@@ -193,7 +193,7 @@ class Main(NativeHacktool):
     def set_ingame_item(self, slot, type, ammo, character=0):
         """设置物品 TODO: 加载物品模型"""
         func_addr = self.get_cached_address('_set_ingame_item', b'\x51\x53\x55\x8B\x6C\x24\x14\xC1', 0x600000, 0x700000)
-        self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.person.addr)
+        self.native_call_auto(func_addr, '5L', slot, type, ammo, 0, 0, this=character or self.character.addr)
 
     def set_ingame_saved_item(self, slot, type, quantity=0):
         """检查点间有效"""
@@ -214,7 +214,7 @@ class Main(NativeHacktool):
         self.ingame_item.fromhex(pyapi.get_clipboard())
 
     def pull_through(self):
-        self.person.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
+        self.character.set_with('health', 'health_max').set_with('stamina', 'stamina_max')
 
     def pull_through_all(self):
         character_struct = self._global_ins.character_struct
@@ -222,47 +222,47 @@ class Main(NativeHacktool):
             character_struct.chars[i].set_with('health', 'health_max')
 
     def set_ammo_full(self):
-        person = self.person
-        person.items[person.cur_item].set_with('quantity', 'max_quantity')
+        character = self.character
+        character.items[character.cur_item].set_with('quantity', 'max_quantity')
 
     def set_ammo_one(self):
-        person = self.person
-        person.items[person.cur_item].quantity = 1
+        character = self.character
+        character.items[character.cur_item].quantity = 1
 
     def save_coord(self):
-        self.last_coord = self.person.coord.values()
+        self.last_coord = self.character.coord.values()
 
     def load_coord(self):
         if hasattr(self, 'last_coord'):
-            person = self.person
-            self.prev_coord = person.coord.values()
-            person.coord = self.last_coord
+            character = self.character
+            self.prev_coord = character.coord.values()
+            character.coord = self.last_coord
 
     def undo_coord(self):
         if hasattr(self, 'prev_coord'):
-            self.person.coord = self.prev_coord
+            self.character.coord = self.prev_coord
 
     def reload_coord(self):
         if hasattr(self, 'last_coord'):
-            self.person.coord = self.last_coord
+            self.character.coord = self.last_coord
 
     def p1_go_p2(self):
-        self._person()  # 确保当前角色正确
+        self._character()  # 确保当前角色正确
         chars = self._global_ins.character_struct.chars
         chars[self.char_index].coord = chars[self.char_index + 1].coord.values()
 
     def p2_go_p1(self):
-        self._person()  # 确保当前角色正确
+        self._character()  # 确保当前角色正确
         chars = self._global_ins.character_struct.chars
         chars[self.char_index + 1].coord = chars[self.char_index].coord.values()
 
     def unlock_guns(self, _):
         """解锁横向武器"""
         items = self._global_ins.character_config.saved_item_manager.saved_items2[self.char_index].items
-        person = self.person
+        character = self.character
         for i in range(7):
             if items[i].type:
-                person.items[i].enable = True
+                character.items[i].enable = True
 
     def give_rocket_launcher(self, _):
         """火箭发射器(检查点)"""

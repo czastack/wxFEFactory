@@ -1,7 +1,7 @@
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
-class PersonChariot(Model):
+class CharacterChariot(Model):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         for field in cls.fields:
@@ -15,7 +15,7 @@ class PersonChariot(Model):
                 data.offset = field.offset
 
 
-class Person(PersonChariot):
+class Character(CharacterChariot):
     # name = Field(0, bytes, 0xF)
     exp = Field(0x64C9, size=3)
     level = ByteField(0x647E)
@@ -40,7 +40,7 @@ class ChariotEquip(Model):
     type = ByteField(0)
 
 
-class Chariot(PersonChariot):
+class Chariot(CharacterChariot):
     sp = WordField(0x64E8)
     items = ArrayField(0x65CF, 8, ByteField(0))
     equips = ArrayField(0x6627, 8, ModelField(0, ChariotEquip))

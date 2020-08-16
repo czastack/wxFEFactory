@@ -31,7 +31,7 @@ class Char(Model):
         self.hpmax_high = (value >> 8) & 0xFF
 
 
-class Person(Char):
+class Character(Char):
     ability = ByteField(0x73D7)
     spiritual_type = ByteField(0x7537)
     robot = ByteField(0x7557)

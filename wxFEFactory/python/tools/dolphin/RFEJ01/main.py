@@ -13,7 +13,7 @@ class Main(BaseDolphinHack):
         self._global = models.Global(0, self.handler)
 
     def render_main(self):
-        person = self._person
+        character = self._character
         with Group("global", "全局", self._global):
             ModelInput("money1", "小队1金钱")
             ModelInput("money2", "小队2金钱")
@@ -22,7 +22,7 @@ class Main(BaseDolphinHack):
             ModelInput("exp2", "据点2分配经验值")
             ModelInput("exp3", "据点3分配经验值")
 
-        with Group("player", "角色", person, cols=4):
+        with Group("player", "角色", character, cols=4):
             ModelAddrInput()
             ModelInput("no", "角色编号", readonly=True)
             ModelSelect("prof", "职业", choices=datasets.PROFESSIONS,
@@ -44,8 +44,8 @@ class Main(BaseDolphinHack):
             ModelInput("magicdef_add", "魔防+")
             ModelCheckBox("moved", "已行动", enable=1, disable=0)
 
-        self.lazy_group(Group("skills", "角色技能", person), self.render_skills)
-        self.lazy_group(Group("items", "角色物品", person), self.render_items)
+        self.lazy_group(Group("skills", "角色技能", character), self.render_skills)
+        self.lazy_group(Group("items", "角色物品", character), self.render_items)
 
     def render_skills(self):
         skill_values = (0,) + tuple(0x807F09E0 + i * 0x2C for i in range(len(datasets.SKILLS) - 1))
@@ -66,19 +66,19 @@ class Main(BaseDolphinHack):
             (VK.MOD_ALT, VK.G, self.move_to_cursor),
         )
 
-    def _person(self):
+    def _character(self):
         pedid = self._global.pedid
         if pedid:
-            return self._global.persons[pedid]
+            return self._global.characters[pedid]
 
-    person = property(_person)
+    character = property(_character)
 
     def continue_move(self):
         """再移动"""
-        self.person.moved = False
+        self.character.moved = False
 
     def move_to_cursor(self):
-        person = self.person
+        character = self.character
         ram = self._global
-        person.posx = ram.curx
-        person.posy = ram.cury
+        character.posx = ram.curx
+        character.posy = ram.cury

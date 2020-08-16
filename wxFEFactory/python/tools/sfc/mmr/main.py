@@ -19,21 +19,21 @@ class Main(BaseSfcHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._global.storage_offset = 0
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
         self.chariot_equip_info = models.ChariotEquip(0, self.handler)
         self.enemy = models.Enemy(0, self.handler)
 
     def render_main(self):
-        person = self.person
+        character = self.character
         chariot = self.chariot
         with Group("global", "全局", self._global):
             ModelInput("money")
             ModelInput("battlein")
             ModelCheckBox("no_battle")
 
-        with Group("player", "角色", person, cols=4):
-            Choice("角色", datasets.PERSONS, self.on_person_change)
+        with Group("player", "角色", character, cols=4):
+            Choice("角色", datasets.PERSONS, self.on_character_change)
             ModelInput("level")
             ModelInput("exp")
             ModelInput("hpmax")
@@ -49,7 +49,7 @@ class Main(BaseSfcHack):
             ModelInput("drive")
             ModelInput("status")
 
-        self.lazy_group(Group("human_items", "角色装备/物品", person, cols=4), self.render_human_items)
+        self.lazy_group(Group("human_items", "角色装备/物品", character, cols=4), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", chariot, cols=4), self.render_chariot_items)
         self.lazy_group(Group("wanted", "赏金首", self._global, cols=4), self.render_wanted)
@@ -63,9 +63,9 @@ class Main(BaseSfcHack):
 
     def render_human_items(self):
         with ModelSelect.choices_cache:
-            for i in range(self.person.equips.length):
+            for i in range(self.character.equips.length):
                 ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS)
-            for i in range(self.person.items.length):
+            for i in range(self.character.items.length):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS)
         with Group.active_group().footer:
             ui.Button("装备全部", class_="btn_md", onclick=self.equip_all)
@@ -222,17 +222,17 @@ class Main(BaseSfcHack):
             dialog.listview.Focus(equip)
         dialog.ShowModal()
 
-    def on_person_change(self, lb):
-        self.person.set_addr_by_index(lb.index)
+    def on_character_change(self, lb):
+        self.character.set_addr_by_index(lb.index)
 
     def on_chariot_change(self, lb):
         self.chariot.set_addr_by_index(lb.index)
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.set_addr_by_index(i)
-            yield person
+            character.set_addr_by_index(i)
+            yield character
 
     def chariots(self):
         chariot = models.Chariot(0, self.handler)
@@ -253,8 +253,8 @@ class Main(BaseSfcHack):
         self.chariot.posy += 24
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax
 
     def equip_all(self):
-        self.person.equip_all()
+        self.character.equip_all()

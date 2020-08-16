@@ -237,19 +237,19 @@ class PokemonStruct(LocalModel):
         dwNoShinyId = ((dwNoShinyId ^ wNoShinyRand) << 16) | loword(dwID)
         return dwNoShinyId
 
-    def GetPersonality(self):
+    def GetCharacterality(self):
         # 性格序号
         if self.bEncoded:
             return 0
         return self.Header.dwChar % 25
 
-    def SetPersonality(self, bType):
+    def SetCharacterality(self, bType):
         if self.bEncoded:
             return
         bShiny = self.GetIsShiny()
         if bType >= 25:
             bType %= 25
-        dwDiff = bType + 25 - self.GetPersonality()
+        dwDiff = bType + 25 - self.GetCharacterality()
         if dwDiff >= 25:
             dwDiff %= 25
         if dwDiff == 0:
@@ -263,14 +263,14 @@ class PokemonStruct(LocalModel):
             dwChar += dwDiff
         self.SetChar(dwChar)
 
-    personality = property(GetPersonality, SetPersonality)
+    characterality = property(GetCharacterality, SetCharacterality)
 
     def GetSexByte(self):
         return 0 if self.bEncoded else self.Header.bSex
 
     def SetSexByte(self, bSex):
         self.Header.bSex = bSex
-        self.SetPersonality(self.GetPersonality())
+        self.SetCharacterality(self.GetCharacterality())
 
     def GetSex(self, bFemaleRatio):
         if self.bEncoded:

@@ -1,7 +1,7 @@
 from lib.hack.models import Model, Field, ByteField, WordField, BitsField, ArrayField, ModelField
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 8
 
     # name = Field(0, bytes, 0xF)

@@ -10,9 +10,9 @@ class Main(MetalMaxHack):
         from . import chariot_equips
         return chariot_equips
 
-    def render_person_ext(self):
+    def render_character_ext(self):
         datasets = self.datasets
-        for i in range(self.person.skills.length):
+        for i in range(self.character.skills.length):
             ModelInput("skills.%d.item" % i, "技能%d种类" % (i + 1))
             ModelInput("skills.%d.count" % i, "次数")
 

@@ -1,7 +1,7 @@
 from lib.hack.models import Model, Field, ByteField, WordField, ArrayField, ModelField
 
 
-class Person(Model):
+class Character(Model):
     punch = ByteField(0)
     foot = ByteField(1)
     arms = ByteField(2)

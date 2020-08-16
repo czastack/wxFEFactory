@@ -4,7 +4,7 @@ from lib.hack.models import (
 from ..models import ItemInfo, ItemInfo2, BaseGlobal
 
 
-class Person(Model):
+class Character(Model):
     SIZE = 0xC4
 
     prof = ByteField(0x02195DC8, label="职业")
@@ -127,7 +127,7 @@ class Enemy(Model):
 
 
 class Global(BaseGlobal):
-    persons = ArrayField(0, 15, ModelField(0, Person))
+    characters = ArrayField(0, 15, ModelField(0, Character))
     chariots = ArrayField(0, 12, ModelField(0, Chariot))
     chariot_battle_status = ArrayField(0, 4, ModelField(0, ChariotBattleStatus))
     money = Field(0x021947D8, label="金钱")

@@ -14,7 +14,7 @@ class Main(BaseGbaHack):
         super().__init__()
         self._global = models.Global(0, self.handler)
         self._global.storage_offset = 0
-        self.person = models.Person(0, self.handler)
+        self.character = models.Character(0, self.handler)
         self.chariot = models.Chariot(0, self.handler)
 
     def render_main(self):
@@ -22,10 +22,10 @@ class Main(BaseGbaHack):
             ModelInput("money")
             ModelInput("battlein")
 
-        with Group("player", "角色", self.person, cols=4):
+        with Group("player", "角色", self.character, cols=4):
             self.render_player()
 
-        self.lazy_group(Group("human_items", "角色装备/物品", self.person), self.render_human_items)
+        self.lazy_group(Group("human_items", "角色装备/物品", self.character), self.render_human_items)
         self.lazy_group(Group("chariot", "战车", self.chariot, cols=4), self.render_chariot)
         self.lazy_group(Group("chariot_items", "战车装备/物品", self.chariot), self.render_chariot_items)
         self.lazy_group(Group("special_bullets", "特殊炮弹", self.chariot, cols=4), self.render_special_bullets)
@@ -34,7 +34,7 @@ class Main(BaseGbaHack):
         self.lazy_group(StaticGroup("快捷键"), self.render_hotkeys)
 
     def render_player(self):
-        Choice("角色", datasets.PERSONS, self.on_person_change)
+        Choice("角色", datasets.PERSONS, self.on_character_change)
         ModelInput("level")
         ModelInput("hp")
         ModelInput("hpmax")
@@ -51,9 +51,9 @@ class Main(BaseGbaHack):
 
     def render_human_items(self):
         with ModelSelect.choices_cache:
-            for i in range(self.person.equips.length):
+            for i in range(self.character.equips.length):
                 ModelSelect("equips.%d" % i, "装备%d" % (i + 1), choices=datasets.HUMAN_EQUIPS, dragable=True)
-            for i in range(self.person.items.length):
+            for i in range(self.character.items.length):
                 ModelSelect("items.%d" % i, "物品%d" % (i + 1), choices=datasets.HUMAN_ITEMS, dragable=True)
 
     def render_chariot(self):
@@ -106,8 +106,8 @@ class Main(BaseGbaHack):
             (VK.MOD_ALT, VK.H, this.pull_through),
         )
 
-    def on_person_change(self, lb):
-        self.person.addr = lb.index * models.Person.SIZE
+    def on_character_change(self, lb):
+        self.character.addr = lb.index * models.Character.SIZE
 
     def on_chariot_change(self, lb):
         self.chariot.addr = lb.index * models.Chariot.SIZE
@@ -116,11 +116,11 @@ class Main(BaseGbaHack):
         self._global.storage_offset = (page - 1) * self.STORAGE_PAGE_LENGTH
         self.storage_group.read()
 
-    def persons(self):
-        person = models.Person(0, self.handler)
+    def characters(self):
+        character = models.Character(0, self.handler)
         for i in range(len(datasets.PERSONS)):
-            person.addr = i * models.Person.SIZE
-            yield person
+            character.addr = i * models.Character.SIZE
+            yield character
 
     def chariots(self):
         chariot = models.Chariot(0, self.handler)
@@ -141,5 +141,5 @@ class Main(BaseGbaHack):
         self._global.posy += 1
 
     def pull_through(self):
-        for person in self.persons():
-            person.hp = person.hpmax
+        for character in self.characters():
+            character.hp = character.hpmax

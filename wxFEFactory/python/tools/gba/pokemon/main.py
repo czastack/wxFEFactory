@@ -80,10 +80,10 @@ class PMHack(BaseGbaHack):
                 ModelSelect("breedInfo.wBreed", "种族", choices=self.datasets.BREED_NAMES)
                 ModelInput("Header.dwChar", "性格值", hex=True)
                 ModelInput("Header.dwID", "ID", hex=True)
-                ModelSelect("personality", "性格", choices=self.datasets.PERSONALITYS,
-                    onselect=self.on_personality_select)
+                ModelSelect("characterality", "性格", choices=self.datasets.PERSONALITYS,
+                    onselect=self.on_characterality_select)
                 ui.Text("性格描述", class_="vcenter")
-                self.personality_desc = ui.Text("", class_="vcenter")
+                self.characterality_desc = ui.Text("", class_="vcenter")
                 ModelSelect("breedInfo.wItem", "手持道具", choices=self.datasets.ITEMS)
                 ModelInput("breedInfo.dwExp", "经验值")
             with Group("basic", "能力", active_pokemon):
@@ -178,12 +178,12 @@ class PMHack(BaseGbaHack):
         self.read_active_pokemon()
         self.pokemon_group.read()
 
-    def on_personality_select(self, view):
+    def on_characterality_select(self, view):
         """个性选择切换"""
-        personality = view.index
+        characterality = view.index
         b = [1, 1, 1, 1, 1]
-        b[personality // 5] += 1
-        b[personality % 5] -= 1
+        b[characterality // 5] += 1
+        b[characterality % 5] -= 1
         sz = ("－", "　", "＋")
         desc = "攻击:{}防御:{}敏捷:{}特攻:{}特防:{}".format(*(sz[i] for i in b))
-        self.personality_desc.label = desc
+        self.characterality_desc.label = desc
