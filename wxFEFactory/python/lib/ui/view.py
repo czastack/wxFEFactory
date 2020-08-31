@@ -35,6 +35,7 @@ def value_property(self, value):
 class View(metaclass=abc.ABCMeta):
     """视图元素"""
     LAYOUTS = []
+    FREEZE_LAYOUT = None
 
     @abc.abstractproperty
     def wxtype(self):
@@ -42,14 +43,16 @@ class View(metaclass=abc.ABCMeta):
 
     def __init__(self, parent=None, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, wxstyle=0,
                  class_=None, style=None, wxparams=None, extra=None):
-        # style: None | [{}] | {}
+        """
+        :param style: None | [{}] | {}
+        """
         self.style = style
         if wxparams is None:
             wxparams = {}
         wxparams.update(id=id, pos=pos, size=size)
         if wxstyle != 0:
             wxparams['style'] = wxstyle
-        if class_ is not None:
+        if isinstance(class_, str):
             class_ = class_.split()
         self.computed_style = None
         self.class_ = class_
@@ -61,7 +64,7 @@ class View(metaclass=abc.ABCMeta):
 
         parent = parent or self.active_layout()
         if parent is not None:
-            parent.append(self)
+            parent.append_child(self)
             styles = parent.get_styles()
             if styles is not None:
                 for style in styles:
@@ -146,6 +149,7 @@ class View(metaclass=abc.ABCMeta):
         wxwindow.SetHost(self)
 
     def __getattr__(self, name):
+        """代理从wxWindows对象的属性"""
         return getattr(self.wxwindow, name)
 
     def _render(self, parent):
@@ -159,7 +163,7 @@ class View(metaclass=abc.ABCMeta):
         del self.computed_style
 
     def render(self, parent):
-        """渲染"""
+        """实际渲染wxWidgets元素"""
         self.bind_wx(self.wxtype(parent and parent.wxwindow, **self.wxparams))
 
     def onready(self):
@@ -231,6 +235,7 @@ class View(metaclass=abc.ABCMeta):
                     self.add_style(style)
 
     def compute_style(self):
+        """计算样式表"""
         style = {}
         for item in self.iter_style():
             style.update(item)
@@ -287,17 +292,6 @@ class View(metaclass=abc.ABCMeta):
                 font.SetFaceName(face)
             self.SetFont(font)
 
-        # 尺寸
-        # width = style.get('width', None)
-        # height = style.get('height', None)
-        # if width or height:
-        #     size = self.GetSize()
-        #     if width:
-        #         size.x = width
-        #     if height:
-        #         size.y = height
-        #     self.SetSize(size)
-
         # 最大/最小尺寸
         min_width = style.get('min-width', None)
         min_height = style.get('min-height', None)
@@ -346,6 +340,7 @@ class View(metaclass=abc.ABCMeta):
             self.Bind(event_type, self.handle_event)
 
     def bind_event_e(self, event_type, func, reset=True):
+        """添加事件监听器(传递事件)"""
         self.bind_event(event_type, func, reset, pass_event=True, pass_view=False)
 
     def has_event(self, event):
@@ -408,77 +403,62 @@ class View(metaclass=abc.ABCMeta):
 class Layout(View):
     """容器元素"""
     def __init__(self, *args, keep_styles=False, styles=None, **kwargs):
+        """
+        :param keep_styles: 保存临时样式表，例如之后会动态添加子元素
+        """
         super().__init__(*args, **kwargs)
         self.styles = styles
         self.children = []
         self.keep_styles = keep_styles
 
         # 合并父元素持有的样式表
-        self.tmp_styles_list = tmp_styles_list = []
+        self.tmp_styles_list = []
         parent = kwargs.get('parent', None) or self.active_layout()
         # 父元素的临时列表还没释放，本次只要检查自己的
         if parent and parent.tmp_styles_list is not None:
-            tmp_styles_list.extend(parent.tmp_styles_list)
+            self.tmp_styles_list.extend(parent.tmp_styles_list)
         else:
-            i = len(self.LAYOUTS) - 1
-            # 加上父控件的样式列表
-            while i != -1:
-                styles = self.LAYOUTS[i].styles
-                if styles is not None:
-                    if isinstance(styles, list):
-                        tmp_styles_list.extend(styles)
-                    else:
-                        tmp_styles_list.append(styles)
-                i -= 1
+            # 加上父元素的样式列表
+            for parent in reversed(View.LAYOUTS):
+                self.append_tmp_styles(parent.styles)
 
-        styles = self.styles
+        self.append_tmp_styles(self.styles)
+
+    def append_tmp_styles(self, styles):
+        """添加临时样式"""
         if styles is not None:
             if isinstance(styles, list):
-                tmp_styles_list.extend(styles)
+                self.tmp_styles_list.extend(styles)
             else:
-                tmp_styles_list.append(styles)
+                self.tmp_styles_list.append(styles)
 
     def __del__(self):
         self.children.clear()
 
     def __enter__(self):
-        self.LAYOUTS.append(self)
-        self.Freeze()
+        View.LAYOUTS.append(self)
+        if not View.FREEZE_LAYOUT:
+            View.FREEZE_LAYOUT = self
+            self.Freeze()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         View.LAYOUTS.pop()
         self.layout()
-        self.Thaw()
+        if View.FREEZE_LAYOUT == self:
+            View.FREEZE_LAYOUT = None
+            self.Thaw()
         # 释放临时样式表
         if not self.keep_styles:
             self.tmp_styles_list = None
 
-    def append(self, child):
+    def append_child(self, child):
+        """添加子元素"""
         self.children.append(child)
 
     def layout_child(self, child, style):
         """布局子元素"""
         pass
-
-    def layout(self):
-        """可选布局"""
-        pass
-
-    def relayout(self):
-        """子元素改变后重新布局"""
-        self.layout()
-
-    def get_styles(self):
-        return self.tmp_styles_list
-
-    def set_styles(self, styles):
-        """设置样式表"""
-        self.styles = styles
-        if styles is not None:
-            for child in self.children:
-                child.try_styles(styles)
-        self.relayout()
 
     def remove_child(self, child):
         """移除子元素"""
@@ -490,6 +470,26 @@ class Layout(View):
         for child in self.children:
             self.RemoveChild(child)
         self.children.clear()
+
+    def layout(self):
+        """可选布局"""
+        pass
+
+    def relayout(self):
+        """子元素改变后重新布局"""
+        self.layout()
+
+    def get_styles(self):
+        """获取样式表"""
+        return self.tmp_styles_list
+
+    def set_styles(self, styles):
+        """设置样式表"""
+        self.styles = styles
+        if styles is not None:
+            for child in self.children:
+                child.try_styles(styles)
+        self.relayout()
 
     def find_focus(self):
         """当前获取焦点的元素"""
