@@ -412,11 +412,11 @@ class Layout(View):
         self.keep_styles = keep_styles
 
         # 合并父元素持有的样式表
-        self.tmp_styles_list = []
+        self.tmp_styles = []
         parent = kwargs.get('parent', None) or self.active_layout()
         # 父元素的临时列表还没释放，本次只要检查自己的
-        if parent and parent.tmp_styles_list is not None:
-            self.tmp_styles_list.extend(parent.tmp_styles_list)
+        if parent and parent.tmp_styles is not None:
+            self.tmp_styles.extend(parent.tmp_styles)
         else:
             # 加上父元素的样式列表
             for parent in reversed(View.LAYOUTS):
@@ -428,9 +428,9 @@ class Layout(View):
         """添加临时样式"""
         if styles is not None:
             if isinstance(styles, list):
-                self.tmp_styles_list.extend(styles)
+                self.tmp_styles.extend(styles)
             else:
-                self.tmp_styles_list.append(styles)
+                self.tmp_styles.append(styles)
 
     def __del__(self):
         self.children.clear()
@@ -450,7 +450,7 @@ class Layout(View):
             self.Thaw()
         # 释放临时样式表
         if not self.keep_styles:
-            self.tmp_styles_list = None
+            self.tmp_styles = None
 
     def append_child(self, child):
         """添加子元素"""
@@ -481,7 +481,7 @@ class Layout(View):
 
     def get_styles(self):
         """获取样式表"""
-        return self.tmp_styles_list
+        return self.tmp_styles
 
     def set_styles(self, styles):
         """设置样式表"""
