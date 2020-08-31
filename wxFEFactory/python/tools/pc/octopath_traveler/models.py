@@ -35,7 +35,7 @@ class Character(Model):
 class Main(Model):
     """基本数据"""
     money = Field((0x370, 0x158), label='金钱')
-    chars = ArrayField((0x370, 0x1C8, 0), 5, ModelField(0, Character))
+    chars = ArrayField((0x370, 0x1C8, 0), 8, ModelField(0, Character))
     items = ArrayField((0x3A8, 0), 255, ModelField(0, Item))
     items_count = Field(0x3B0, label="物品数量")
     no_encounter = ToggleField((0x78, 0x370, 0x2A8), enable=4292967266, disable=0, label="不随机遇敌")
