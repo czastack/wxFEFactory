@@ -1,4 +1,5 @@
 from .view import View, Layout
+from .utils import update_wxparams
 from . import wx
 from lib.exctypes import int32
 
@@ -142,7 +143,8 @@ class StaticBox(SizerLayout):
     wxtype = wx.StaticBox
 
     def __init__(self, label, **kwargs):
-        super().__init__(wxparams={'label': label}, **kwargs)
+        update_wxparams(kwargs, label=label)
+        super().__init__(**kwargs)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.InsertSpacer(0, 15)
         self.set_sizer(sizer)

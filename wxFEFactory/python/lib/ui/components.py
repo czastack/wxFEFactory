@@ -4,6 +4,7 @@ from . import wx
 
 
 class Pagination(ui.Horizontal):
+    """分页组件"""
     def __init__(self, onpagechange, total, page=1):
         super().__init__(class_="expand center")
         this = extypes.WeakBinder(self)

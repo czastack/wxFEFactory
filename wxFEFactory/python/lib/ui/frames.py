@@ -2,6 +2,7 @@ import traceback
 import pyapi
 from lib.win32.keys import VK
 from .view import Layout
+from .utils import update_wxparams
 from . import wx
 
 
@@ -34,7 +35,8 @@ class BaseTopLevelWindow(Layout):
 
 class BaseFrame(BaseTopLevelWindow):
     def __init__(self, title, menubar=None, **kwargs):
-        super().__init__(wxparams={'title': title}, **kwargs)
+        update_wxparams(kwargs, title=title)
+        super().__init__(**kwargs)
         self.bind_event_e(wx.EVT_CLOSE_WINDOW, self.onclose)
         if menubar:
             self.set_menu(menubar)
@@ -174,7 +176,9 @@ class Dialog(BaseTopLevelWindow):
     default_style = wx.DEFAULT_DIALOG_STYLE | wx.MINIMIZE_BOX | wx.RESIZE_BORDER | wx.CLIP_CHILDREN
 
     def __init__(self, title, wxstyle=default_style, **kwargs):
-        super().__init__(wxparams={'title': title}, wxstyle=wxstyle, **kwargs)
+        update_wxparams(kwargs, title=title)
+        kwargs['wxstyle'] = wxstyle
+        super().__init__(**kwargs)
 
     def dismiss(self, ok=True):
         if self.IsModal():

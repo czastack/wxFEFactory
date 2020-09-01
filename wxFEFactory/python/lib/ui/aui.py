@@ -1,6 +1,7 @@
 from .containers import Layout
 from .frames import BaseFrame, BaseTopLevelWindow
 from .view import event_binder
+from .utils import update_wxparams
 from . import wx
 
 
@@ -197,11 +198,13 @@ class AuiMDIParentFrame(BaseFrame):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        super().__init__(wxparams={'title': title}, **kwagrs)
+        update_wxparams(kwagrs, title=title)
+        super().__init__(**kwagrs)
 
 
 class AuiMDIChildFrame(BaseTopLevelWindow):
     wxtype = wx.AuiMDIParentFrame
 
     def __init__(self, title, **kwagrs):
-        super().__init__(wxparams={'title': title}, **kwagrs)
+        update_wxparams(kwagrs, title=title)
+        super().__init__(**kwagrs)
