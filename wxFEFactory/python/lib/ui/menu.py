@@ -16,6 +16,7 @@ class MenuHolder:
 
     @classmethod
     def active_menu(cls):
+        """当前栈顶的菜单"""
         return cls.MENUS[-1] if cls.MENUS else None
 
     def __enter__(self):
@@ -26,12 +27,15 @@ class MenuHolder:
         self.MENUS.pop()
 
     def getmenu(self, itemid):
+        """获取菜单映射"""
         return self.handlers.get(itemid, None)
 
     def setmenu(self, itemid, menu):
+        """设置菜单映射"""
         self.handlers[itemid] = menu
 
     def onselect(self, owner, itemid):
+        """菜单子项选中事件"""
         menu = self.getmenu(itemid)
         if menu:
             # Call MenuItem.onselect
@@ -58,10 +62,14 @@ class Menu(MenuHolder):
 class ContextMenu(Menu):
     """右键菜单"""
     def __init__(self, onselect=None):
+        """
+        :param onselect: None | (view: View, menu: MenuItem) -> Boolean
+        """
         super().__init__(handlers={})
         self._onselect = onselect
 
     def onselect(self, view, id):
+        """菜单选中事件"""
         if Menu.onselect(self, view, id):
             return True
         elif self._onselect is not None:
@@ -72,6 +80,9 @@ class ContextMenu(Menu):
 class MenuBar(MenuHolder):
     """菜单栏"""
     def __init__(self, onselect=None):
+        """
+        :param onselect: None | (view: View, menu: MenuItem) -> Boolean
+        """
         super().__init__(handlers={})
         self._onselect = onselect
         self.wxwindow = wx.MenuBar(0)
@@ -100,6 +111,9 @@ class MenuBar(MenuHolder):
 class MenuItem:
     """菜单项"""
     def __init__(self, text="", help="", kind=wx.ITEM_NORMAL, id=-1, separator=False, onselect=None):
+        """
+        :param onselect: None | (owner: View, menu: MenuItem) -> Boolean | (menu: MenuItem) -> Boolean
+        """
         parent = MenuHolder.active_menu()
         if parent:
             if separator:

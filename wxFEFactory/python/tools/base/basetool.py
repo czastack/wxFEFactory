@@ -4,7 +4,6 @@ import __main__
 from lib import lazy, ui
 from lib.scene import BaseScene
 from styles import styles, dialog_style
-from pyapi import alert
 
 
 class BaseTool(BaseScene, metaclass=abc.ABCMeta):
@@ -104,7 +103,7 @@ class BaseTool(BaseScene, metaclass=abc.ABCMeta):
         if self.nested:
             if event and event.GetId() != 0:
                 # 第一种情况阻止关闭
-                alert('请通过菜单过Tab上的关闭按钮关闭')
+                self.alert('请通过菜单过Tab上的关闭按钮关闭')
                 return False
         elif self.win.parent:
             self.win.parent.children.remove(self.win)

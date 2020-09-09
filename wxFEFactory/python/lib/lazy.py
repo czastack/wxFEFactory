@@ -16,6 +16,7 @@ class classlazy:
 
 
 def cachable(func):
+    """返回值可缓存装饰器"""
     cache = {}
 
     def _deco(value):
@@ -28,6 +29,7 @@ def cachable(func):
 
 
 def lazy(func, type_=property, indict=False):
+    """lazy装饰器"""
     name = '_' + func.__name__
 
     def _deco(self):

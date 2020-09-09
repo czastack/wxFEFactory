@@ -651,7 +651,7 @@ class BaseGTATool(NativeHacktool):
         if path:
             with open(path) as file:
                 if not file.readline().strip() == '[Locks]':
-                    pyapi.alert('不支持的格式')
+                    self.alert('不支持的格式')
                     return
 
                 coord = [0, 0, 0]
@@ -674,7 +674,7 @@ class BaseGTATool(NativeHacktool):
             with open(jsonpath, 'w', encoding="utf-8") as file:
                 json.dump(datas, file, ensure_ascii=False)
 
-            pyapi.alert('转换成功: ' + jsonpath)
+            self.alert('转换成功: ' + jsonpath)
 
     def render_common_button(self):
         ui.Button("杀掉附近的人", onclick=self.kill_near_peds)
