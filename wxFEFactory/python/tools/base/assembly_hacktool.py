@@ -78,11 +78,11 @@ class AssemblyHacktool(BaseHackTool):
             else:
                 self.unregister_assembly(item.key)
         elif isinstance(item, AssemblyItems):
-            for item in item.children:
+            for child in item.children:
                 if enable:
-                    self.register_assembly(item)
+                    self.register_assembly(child)
                 else:
-                    self.unregister_assembly(item.key)
+                    self.unregister_assembly(child.key)
         elif isinstance(item, AssemblySwitch):
             if enable and item.depends:
                 for key in item.depends:
