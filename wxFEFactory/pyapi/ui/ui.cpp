@@ -258,6 +258,7 @@ void UiModule::init_ui()
 		.def("Enable", &wxWindow::Enable, "enable"_a=true)
 		.def("GetLabel", &wxWindow::GetLabel)
 		.def("SetLabel", &wxWindow::SetLabel, label)
+		.def("GetChildren", py::overload_cast<>(&wxWindow::GetChildren))
 		.def("Show", &wxWindow::Show, "show"_a=true)
 		.def("IsShown", &wxWindow::IsShown)
 		.def("Hide", &wxWindow::Hide)
@@ -283,15 +284,27 @@ void UiModule::init_ui()
 		}, "eventType"_a, "fn"_a, "winid"_a=(int)wxID_ANY, "lastId"_a=(int)wxID_ANY, "userData"_a=(wxObject*)nullptr)
 		;
 
-		py::setattr(module, "console", py::cast(&console));
-		ui.def("start_cache", &UiModule::start_cache)
-			.def("end_cache", &UiModule::end_cache)
-			.def("GetDisplaySize", &wxGetDisplaySize)
-			.def("GetDisplayPPI", &wxGetDisplayPPI)
-			.def("GetKeyState", wxGetKeyState)
-			.def("GetMouseState", wxGetMouseState)
-			.def("GetApp", &wxGetApp, py::return_value_policy::reference);
-		py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
-		py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
-		py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
+	// children相关
+	py::class_<NODELETE(wxListBase)>(ui, "ListBase")
+		.def("GetCount", &wxListBase::GetCount)
+		.def("__len__", &wxListBase::GetCount);
+
+	py::class_<NODELETE(wxWindowList), wxListBase>(ui, "WindowList")
+		.def("__getitem__", &wxWindowList::Item, "index"_a);
+
+	py::class_<NODELETE(wxWindowListNode)>(ui, "WindowListNode")
+		.def("GetData", &wxWindowListNode::GetData);
+	// children相关 end
+
+	py::setattr(module, "console", py::cast(&console));
+	ui.def("start_cache", &UiModule::start_cache)
+		.def("end_cache", &UiModule::end_cache)
+		.def("GetDisplaySize", &wxGetDisplaySize)
+		.def("GetDisplayPPI", &wxGetDisplayPPI)
+		.def("GetKeyState", wxGetKeyState)
+		.def("GetMouseState", wxGetMouseState)
+		.def("GetApp", &wxGetApp, py::return_value_policy::reference);
+	py::setattr(ui, "DefaultPosition", py::cast(&wxDefaultPosition));
+	py::setattr(ui, "DefaultSize", py::cast(&wxDefaultSize));
+	py::setattr(ui, "DefaultValidator", py::cast(&wxDefaultValidator));
 }
