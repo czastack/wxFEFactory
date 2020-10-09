@@ -2,7 +2,6 @@ import base64
 from functools import partial
 from lib.ui.components import SearchListBox
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
 from lib import ui
@@ -17,7 +16,6 @@ class Main(NativeHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
 
     def render_main(self):

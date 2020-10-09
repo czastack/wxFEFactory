@@ -1,6 +1,5 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
-from lib.hack.handlers import MemHandler
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, Delta, AssemblySwitch
 )
@@ -14,7 +13,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
 
     def render_main(self):

@@ -3,7 +3,6 @@ from lib import ui
 from lib.hack.forms import (
     Group, StaticGroup, ModelInput, ModelAddrInput, ProxyInput, Title, ChoiceWidget
 )
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, Cmp, ORIGIN
 from tools.base.assembly_hacktool import (
@@ -19,7 +18,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self.manager_ins = models.Manager(0, self.handler)
         self.player_ins = models.Player(0, self.handler)
         self.inventory_item = models.InventoryItem(0, self.handler)

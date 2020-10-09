@@ -3,6 +3,7 @@ from functools import partial
 from typing import Union, List
 from lib.extypes import list_tuple, DataClass
 from lib.hack import utils
+from lib.hack.handlers import MemHandler
 from lib import ui
 from .hacktool import BaseHackTool
 from .assembly_code import AssemblyNode
@@ -15,6 +16,7 @@ class AssemblyHacktool(BaseHackTool):
     allocation_type = 0x00003000
     allocation_before = True  # 尝试在base_addr前找到空闲内存
     assembly_address_sources = None
+    handler_class = MemHandler
 
     def __init__(self):
         super().__init__()

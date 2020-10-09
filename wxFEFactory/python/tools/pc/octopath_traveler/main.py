@@ -1,5 +1,4 @@
 from lib.hack.forms import Group, StaticGroup, ModelInput, ModelAddrInput, ModelSelect, Choice, ModelCheckBox
-from lib.hack.handlers import MemHandler
 from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
@@ -18,7 +17,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self.base = models.Base(0, self.handler)
         self.battle_result = models.BattleResult(0, self.handler)
         self.base.main.items_offset = 0

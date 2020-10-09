@@ -2,7 +2,6 @@ from lib import ui
 from lib.hack.forms import (
     Group, StaticGroup, ModelInput, ModelAddrInput, Title
 )
-from lib.hack.handlers import MemHandler
 from tools.base.assembly_hacktool import AssemblyHacktool
 from . import assembly, models
 
@@ -14,7 +13,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self.game = models.Game(0, self.handler)
 
     def onattach(self):

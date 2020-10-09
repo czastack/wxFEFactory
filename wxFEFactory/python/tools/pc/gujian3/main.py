@@ -1,6 +1,5 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, ModelCoordWidget
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
 from tools.base.assembly_hacktool import (
@@ -16,7 +15,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
         self._movement_ins = models.Movement(0, self.handler)
 

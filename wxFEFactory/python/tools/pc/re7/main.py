@@ -3,7 +3,6 @@ from lib.hack.forms import (
     Group, StaticGroup, DialogGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget,
     StaticCheckBox
 )
-from lib.hack.handlers import MemHandler
 from lib.hack.models import PropertyField
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
@@ -49,7 +48,6 @@ class Main(NativeHacktool):
     def __init__(self):
         super().__init__()
         self.version = 'steam'
-        self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
         self.coord_ins = models.Coord(0, self.handler)
         self.coord_set = models.Coord(0, self.handler)

@@ -1,7 +1,6 @@
 from lib.hack.forms import (
     Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice, ModelCoordWidget
 )
-from lib.hack.handlers import MemHandler
 from lib.hack.models import PropertyField
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
@@ -17,7 +16,6 @@ class Main(NativeHacktool):
     def __init__(self):
         super().__init__()
         self.version = 'steam'
-        self.handler = MemHandler()
         self._global_ins = models.Global(0, self.handler)
         self.char_index = self._global_ins.char_index = 0
 

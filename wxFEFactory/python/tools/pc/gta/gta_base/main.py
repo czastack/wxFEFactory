@@ -5,7 +5,6 @@ import time
 import traceback
 import pyapi
 from functools import partial
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib.win32.sendkey import auto, TextVK
 from lib import ui
@@ -57,7 +56,6 @@ class BaseGTATool(NativeHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self.vehicle_coord_view = None
         self.coord_view = None
 

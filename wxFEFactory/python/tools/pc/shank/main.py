@@ -1,6 +1,5 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
-from lib.hack.handlers import MemHandler
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, Delta
 )
@@ -11,14 +10,7 @@ class Main(AssemblyHacktool):
     CLASS_NAME = 'Shank'
     WINDOW_NAME = 'Shank'
 
-    def __init__(self):
-        super().__init__()
-        self.handler = MemHandler()
-        # self._global = models.Global(0, self.handler)
-
     def render_main(self):
-        # with Group("global", "全局", self._global):
-        #     pass
         self.lazy_group(StaticGroup("代码插入"), self.render_assembly_buttons_own)
 
     def render_assembly_buttons_own(self):

@@ -1,19 +1,17 @@
 from functools import partial
 from lib.hack.forms import Group, ModelCheckBox, ModelInput, ModelSelect
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from lib import ui
-from tools.base.hacktool import BaseHackTool
+from tools.pc.base import PcHacktool
 from . import models
 
 
-class Main(BaseHackTool):
+class Main(PcHacktool):
     CLASS_NAME = 'D3D Window'
     WINDOW_NAME = 'ROCKMANX8'
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self._global = models.Global(0, self.handler)
 
     def render_main(self):

@@ -1,5 +1,4 @@
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice
-from lib.hack.handlers import MemHandler
 from lib.win32.keys import VK
 from tools.base.assembly_hacktool import (
     AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
@@ -14,7 +13,6 @@ class Main(AssemblyHacktool):
 
     def __init__(self):
         super().__init__()
-        self.handler = MemHandler()
         self.version = ''
         # self._global = models.Global(0, self.handler)
 

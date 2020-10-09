@@ -1,5 +1,6 @@
 import base64
 from lib import extypes
+from lib.hack.handlers import MemHandler
 from .assembly_hacktool import AssemblyHacktool, AssemblyItem, Delta
 from .native import NativeContext, NativeContext64, NativeContextArray, ResultResolver
 
@@ -7,6 +8,7 @@ from .native import NativeContext, NativeContext64, NativeContextArray, ResultRe
 class NativeHacktool(AssemblyHacktool):
     NativeContext = None
     enable_native_call_n = False
+    handler_class = MemHandler
 
     # x86 native_call
     FUNCTION_NATIVE_CALL = base64.b64decode(
