@@ -1,5 +1,4 @@
 from types import SimpleNamespace
-from lib.hack.handlers import MemHandler
 from tools.base.native import TempArrayPtr
 from tools.base.native_hacktool import (
     NativeHacktool, NativeContextArray, call_arg, FunctionCall
@@ -8,7 +7,6 @@ from tools.base.native_hacktool import (
 
 class MonoHacktool(NativeHacktool):
     """Unity Mono游戏工具"""
-    handler_class = MemHandler
     enable_native_call_n = True
     context_array_reuse = 10  # 复用context_array元素个数，0表示不复用
     MONO_FUNCS = (
