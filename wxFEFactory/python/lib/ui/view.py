@@ -13,6 +13,7 @@ class BinderHelper:
 
 
 def event_binder(event_type, name=None, **args):
+    """生成事件绑定器"""
     def binder(self, fn, reset=True):
         self.bind_event(event_type, EventFunctor(fn, **args), reset)
     if name is not None:
@@ -24,11 +25,13 @@ def event_binder(event_type, name=None, **args):
 
 @property
 def value_property(self):
+    """调用GetValue的属性"""
     return self.GetValue()
 
 
 @value_property.setter
 def value_property(self, value):
+    """调用SetValue的属性"""
     self.SetValue(value)
 
 
@@ -65,6 +68,7 @@ class View(metaclass=abc.ABCMeta):
         parent = parent or self.active_layout()
         if parent is not None:
             parent.append_child(self)
+            # 应用父类定义的样式表
             styles = parent.get_styles()
             if styles is not None:
                 for style in styles:
@@ -153,7 +157,8 @@ class View(metaclass=abc.ABCMeta):
         return getattr(self.wxwindow, name)
 
     def _render(self, parent):
-        self.compute_style()
+        self.computed_style = self.compute_style()
+        # 尺寸会用到computed_style，所以要先计算样式
         self.render(parent)
         self.apply_style()
         self.onready()
@@ -239,7 +244,6 @@ class View(metaclass=abc.ABCMeta):
         style = {}
         for item in self.iter_style():
             style.update(item)
-        self.computed_style = style
         # 尺寸
         width = style.get('width', -1)
         height = style.get('height', -1)
@@ -252,7 +256,7 @@ class View(metaclass=abc.ABCMeta):
         style = self.computed_style
 
         if not style:
-            return style
+            return
 
         background = style.get('background', None)
         if background is not None:
@@ -514,6 +518,7 @@ class Control(View):
 
 
 class EventFunctor:
+    """专门用于事件回调"""
     def __init__(self, fn, pass_event=False, pass_view=True):
         self.fn = fn
         self.pass_event = pass_event
