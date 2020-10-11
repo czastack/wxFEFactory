@@ -23,6 +23,8 @@ class AssemblyHacktool(BaseHackTool):
         self.variable_model = VariableModel(self.weak)
         self.is32process = False
         self.assembly_items = {}
+        # 记录使用同一个变量的按钮项
+        self.assembly_variable_items = {}
         self.reset()
 
     def reset(self):
@@ -65,6 +67,11 @@ class AssemblyHacktool(BaseHackTool):
                     button.key = item.key
                 self.assembly_items[item.key] = item
 
+                if isinstance(item, VariableRadio):
+                    if item.variable not in self.assembly_variable_items:
+                        self.assembly_variable_items[item.variable] = []
+                    self.assembly_variable_items[item.variable].append(item)
+
     def toggle_assembly_button(self, button):
         self.toggle_assembly_function(button.key, button.checked)
 
@@ -85,11 +92,18 @@ class AssemblyHacktool(BaseHackTool):
                     self.register_assembly(child)
                 else:
                     self.unregister_assembly(child.key)
-        elif isinstance(item, AssemblySwitch):
+        elif isinstance(item, VariableButton):
             if enable and item.depends:
                 for key in item.depends:
                     self.toggle_assembly_function(key, True)
-            self.set_variable_value(item.key, int(enable))
+            # 把使用同一个变量的item关闭
+            if isinstance(item, VariableRadio):
+                for sibling in self.assembly_variable_items[item.variable]:
+                    if sibling != item:
+                        sibling.enable = False
+                        if sibling.button:
+                            sibling.button.checked = False
+            self.set_variable_value(item.variable, item.get_value())
         elif isinstance(item, SimpleButton):
             item.onclick(enable)
         if item.button:
@@ -421,6 +435,11 @@ class AssemblyButton(DataClass):
     fields = ('key', 'label')
 
 
+class SimpleButton(AssemblyButton):
+    """简易按钮"""
+    fields = ('help', 'onclick')
+
+
 class AssemblyItem(AssemblyButton):
     """ register_assembly 的参数类型
         :param original: 原始数据
@@ -474,11 +493,11 @@ class AssemblyItem(AssemblyButton):
             self.depends = self.depends.split()
 
 
-class AssemblySwitch(AssemblyButton):
+class VariableButton(AssemblyButton):
     """变量开关"""
-    fields = ('help', 'depends', 'enable', 'button')
+    fields = ('variable', 'help', 'depends', 'enable', 'button')
     defaults = {
-        'enable': False,
+        'variable': None,
     }
 
     depends: Union[str, List[str]]
@@ -486,11 +505,34 @@ class AssemblySwitch(AssemblyButton):
     def oninit(self):
         if isinstance(self.depends, str):
             self.depends = self.depends.split()
+        if self.variable is None:
+            self.variable = self.key
+
+    def get_value(self):
+        return None
 
 
-class SimpleButton(AssemblyButton):
-    """简易按钮"""
-    fields = ('help', 'onclick')
+class VariableSwitch(VariableButton):
+    """变量开关"""
+    defaults = {
+        'enable': False,
+    }
+
+    def get_value(self):
+        return int(self.enable)
+
+
+class VariableCheckbox(VariableButton):
+    """变量复选框"""
+    fields = ('enable_value', 'disable_value')
+
+    def get_value(self):
+        return self.enable_value if self.enable else self.disable_value
+
+
+class VariableRadio(VariableCheckbox):
+    """变量单选按钮"""
+    pass
 
 
 class VariableType(DataClass):
