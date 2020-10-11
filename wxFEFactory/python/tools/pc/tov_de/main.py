@@ -1,7 +1,7 @@
 from functools import partial
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, Delta, AssemblySwitch
+    AssemblyHacktool, AssemblyItem, AssemblyItems, Delta, VariableSwitch
 )
 from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Cmp, Variable
 from . import models
@@ -39,8 +39,8 @@ class Main(AssemblyHacktool):
                 ),
                 args=('b_inf_health', 'b_inf_tp'),
                 inserted=True, replace_len=5, hidden=True, fuzzy=True),
-            AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base')),
-            AssemblySwitch('b_inf_tp', '无限TP', depends=('inf_health_base')),
+            VariableSwitch('b_inf_health', '无限生命', depends=('inf_health_base',)),
+            VariableSwitch('b_inf_tp', '无限TP', depends=('inf_health_base',)),
             AssemblyItem(
                 'item_keep', '物品不减', '41 8B D8 8B 7C 81 38',
                 0x005B9000, delta, b'', '8B 7C 81 38 41 83 F8 00 7D 0A 8B DF 44 01 C3 7E 03 44 29 C7 41 8B D8',
@@ -76,8 +76,8 @@ class Main(AssemblyHacktool):
                 ),
                 args=('b_inf_extremity_time', 'b_extremity_level'),
                 inserted=True, replace_len=8, hidden=True),
-            AssemblySwitch('b_inf_extremity_time', '无限极限突破持续时间', depends=('extremity_base')),
-            AssemblySwitch('b_extremity_level', '最高极限突破等级', depends=('extremity_base')),
+            VariableSwitch('b_inf_extremity_time', '无限极限突破持续时间', depends=('extremity_base',)),
+            VariableSwitch('b_extremity_level', '最高极限突破等级', depends=('extremity_base',)),
             AssemblyItem(
                 'save_anytime', '随时存档', '84 C0 8D 4F 07 0F 45 DF',
                 0x003C0000, delta, '0C 01', replace_len=2),
@@ -107,7 +107,7 @@ class Main(AssemblyHacktool):
                 ),
                 args=('exp_multi_value', 'b_inf_exp'),
                 inserted=True, replace_len=5),
-            AssemblySwitch('b_inf_exp', '无限经验', depends=('exp_multi')),
+            VariableSwitch('b_inf_exp', '无限经验', depends=('exp_multi',)),
             AssemblyItem(
                 'inf_lp', '无限LP/快速学习技能', 'B8 1F 85 EB 51 F7 E1 48 8B CF C1 EA 05',
                 0x00496000, delta, b'', '48 8B CF BA 40 42 0F 00',

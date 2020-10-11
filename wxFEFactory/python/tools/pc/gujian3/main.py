@@ -3,7 +3,7 @@ from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelS
 from lib.win32.keys import VK
 from lib import ui
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from tools.base import assembly_code
 from . import models
@@ -117,15 +117,15 @@ class Main(AssemblyHacktool):
                     b'\x66\x0F\x6E\xC8\x58\xF3\x0F\x11\x48\x34\xB8\x01\x00\x00\x00\xC3'
                 ),
                 args=(VariableType('jump_height', type=float, value=1000.0),), inserted=True),
-            AssemblySwitch('s_inf_energy', '无限体力', depends=base_depends),
-            AssemblySwitch('s_inf_vigour', '无限元气', depends=base_depends),
-            AssemblySwitch('s_inf_health', '无限元精', depends=base_depends),
-            AssemblySwitch('s_inf_skill', '无限战意技', depends=base_depends),
-            AssemblySwitch('s_inf_hit', '无限连击', depends=base_depends),
-            AssemblySwitch('s_add_atk', '增强攻击', depends=base_depends),
-            AssemblySwitch('s_add_def', '增加防御', depends=base_depends),
-            AssemblySwitch('s_add_critical_buff', '增强暴击伤害加成', depends=base_depends),
-            AssemblySwitch('s_add_critical', '增强暴击率', depends=base_depends),
+            VariableSwitch('s_inf_energy', '无限体力', depends=base_depends),
+            VariableSwitch('s_inf_vigour', '无限元气', depends=base_depends),
+            VariableSwitch('s_inf_health', '无限元精', depends=base_depends),
+            VariableSwitch('s_inf_skill', '无限战意技', depends=base_depends),
+            VariableSwitch('s_inf_hit', '无限连击', depends=base_depends),
+            VariableSwitch('s_add_atk', '增强攻击', depends=base_depends),
+            VariableSwitch('s_add_def', '增加防御', depends=base_depends),
+            VariableSwitch('s_add_critical_buff', '增强暴击伤害加成', depends=base_depends),
+            VariableSwitch('s_add_critical', '增强暴击率', depends=base_depends),
         ))
 
     def _global(self):

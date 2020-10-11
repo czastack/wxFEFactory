@@ -6,7 +6,7 @@ from lib.hack.forms import (
 from lib.hack.models import PropertyField
 from lib.win32.keys import VK
 from tools.base.native_hacktool import NativeHacktool
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, AssemblySwitch
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, VariableSwitch
 from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Cmp, Variable
 from . import models, datasets
 
@@ -134,11 +134,11 @@ class Main(NativeHacktool):
                 replace_len=5,
                 replace_offset=4,
                 args=('b_one_hit_kill',),
-                depends=('init_health'),
+                depends=('init_health',),
                 hidden=True,
             ),
-            AssemblySwitch('b_inf_health', '无限生命', depends=('init_health')),
-            AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('one_hit_kill')),
+            VariableSwitch('b_inf_health', '无限生命', depends=('init_health',)),
+            VariableSwitch('b_one_hit_kill', '一击必杀', depends=('one_hit_kill',)),
 
             # AssemblyItem(
             #     'lock_health', '锁血(包括boss)', '0F 57 F6 F3 0F 10 40 24', None, delta, b'',

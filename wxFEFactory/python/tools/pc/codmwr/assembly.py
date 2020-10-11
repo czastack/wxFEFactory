@@ -1,4 +1,4 @@
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, Delta, AssemblySwitch, VariableType
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, Delta, VariableSwitch, VariableType
 from tools.base.assembly_code import AssemblyGroup, Cmp, Offset, Variable, ForwardCall, ORIGIN
 
 ADDRESS_SOURCES = {
@@ -46,8 +46,8 @@ ASSEMBLY_ITEMS = (
             ),
             inserted=True, replace_len=8),
     ),
-    AssemblySwitch('b_no_hurt', '无限生命', depends=('health_base_1')),
-    AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('health_base_1')),
+    VariableSwitch('b_no_hurt', '无限生命', depends=('health_base_1',)),
+    VariableSwitch('b_one_hit_kill', '一击必杀', depends=('health_base_1',)),
     AssemblyItem(
         'inf_ammo', '无限子弹', '01 58 08 48 8B 5C 24 08', None, delta,
         b'', 'C7 40 08 E7 03 00 00 48 8B 5C 24 08', inserted=True),
@@ -66,8 +66,8 @@ ASSEMBLY_ITEMS = (
         replace_len=8,
         hidden=True,
         args=('b_perfect_accuraty', 'b_rapid_fire')),
-    AssemblySwitch('b_perfect_accuraty', '超级精准度', depends=('accuraty_rapid')),
-    AssemblySwitch('b_rapid_fire', '快速射击', depends=('accuraty_rapid')),
+    VariableSwitch('b_perfect_accuraty', '超级精准度', depends=('accuraty_rapid',)),
+    VariableSwitch('b_rapid_fire', '快速射击', depends=('accuraty_rapid',)),
     AssemblyItem(
         'no_recoil', '无后坐力', 'F3 0F 11 0C 0B 0F 28 D9', None, delta,
         b'', '0F 57 C9 F3 0F 11 0C 0B', inserted=True, replace_len=5),

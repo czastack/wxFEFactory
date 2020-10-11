@@ -1,4 +1,4 @@
-from tools.base.assembly_hacktool import AssemblyItem, Delta, AssemblySwitch, VariableType
+from tools.base.assembly_hacktool import AssemblyItem, Delta, VariableSwitch, VariableType
 from tools.base.assembly_code import AssemblyGroup, Cmp, Offset, Variable, ForwardCall, ORIGIN
 
 delta = Delta(0x20000)
@@ -25,10 +25,10 @@ ASSEMBLY_ITEMS = (
             'b_one_hit_kill',
         ),
         inserted=True, replace_len=6, hidden=True),
-    AssemblySwitch('b_inf_health', '无限生命', depends=('health_base')),
-    AssemblySwitch('b_inf_sp', '无限SP', depends=('health_base')),
-    AssemblySwitch('b_inf_bp', '无限BP', depends=('health_base')),
-    AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('health_base')),
+    VariableSwitch('b_inf_health', '无限生命', depends=('health_base',)),
+    VariableSwitch('b_inf_sp', '无限SP', depends=('health_base',)),
+    VariableSwitch('b_inf_bp', '无限BP', depends=('health_base',)),
+    VariableSwitch('b_one_hit_kill', '一击必杀', depends=('health_base',)),
 
     AssemblyItem(
         'battle_result', '战斗结果', '41 FF 54 C5 00 48 85 DB', 0x0605B000, delta, b'',

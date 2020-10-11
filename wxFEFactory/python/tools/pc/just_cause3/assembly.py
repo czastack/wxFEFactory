@@ -1,4 +1,4 @@
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableSwitch, VariableType
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, IfInt64, Cmp, Dec
 
 
@@ -120,7 +120,7 @@ ASSEMBLY_ITEMS = (
             b'\x48\x03\x7B\x18\x48\x8B\x1B\x49\x3B\x9C\x24\x88\x01\x00\x00'),
         args=('challenge_points_add',),
         inserted=True),
-    AssemblySwitch('challenge_points_add', '挑战分数+10000'),
+    VariableSwitch('challenge_points_add', '挑战分数+10000'),
     AssemblyItem(
         'combo_keep', '连击不减', b'\xF3\x41\x0F\x11\x85\x6C\x02\x00\x00',
         0x3E00000, 0x3F00000, b'\x90\x90\x90\x90\x90\x90\x90\x90\x90'),

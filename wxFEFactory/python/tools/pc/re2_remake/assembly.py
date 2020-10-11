@@ -1,4 +1,4 @@
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, AssemblySwitch
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableType, Delta, VariableSwitch
 from tools.base.assembly_code import AssemblyGroup, ORIGIN, Offset, Cmp, Variable
 
 
@@ -143,10 +143,10 @@ ASSEMBLY_ITEMS = (
             ),
             inserted=True, replace_len=6),
     ),
-    AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_base_1')),
-    AssemblySwitch('b_no_hurt', '不会受伤', depends=('inf_health_base_1')),
-    AssemblySwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1')),
-    AssemblySwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1')),
+    VariableSwitch('b_inf_health', '无限生命', depends=('inf_health_base_1',)),
+    VariableSwitch('b_no_hurt', '不会受伤', depends=('inf_health_base_1',)),
+    VariableSwitch('b_one_hit_kill', '一击必杀', depends=('inf_health_base_1',)),
+    VariableSwitch('b_rapid_fire', '快速射击', depends=('inf_health_base_1',)),
     AssemblyItems(
         '暴君一击倒地且无法起身',
         AssemblyItem(

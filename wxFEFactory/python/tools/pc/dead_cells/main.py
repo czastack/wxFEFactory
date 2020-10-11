@@ -6,7 +6,7 @@ from lib.hack.forms import (
 from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, MemRead, Variable, Cmp, ORIGIN
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from . import models, datasets
 
@@ -132,7 +132,7 @@ class Main(AssemblyHacktool):
             AssemblyItem('curse_clear', '诅咒消除', '89 88 C4 02 00 00 8B 90 C4 02 00 00 89 55 F8',
                          find_start, find_end, b'', '31 C9 89 88 C4 02 00 00',
                          replace_len=6, inserted=True, help='至少击杀一名敌人(与诅咒快消互斥)'),
-            AssemblySwitch('quick_health', '生命快速恢复'),
+            VariableSwitch('quick_health', '生命快速恢复'),
             AssemblyItem('inf_medicine', '无限药水', '89 88 10 03 00 00 33 D2',
                          find_start, find_end, b'', 'BA 10 00 00 00 89 90 10 03 00 00',
                          replace_len=6, inserted=True),
@@ -191,7 +191,7 @@ class Main(AssemblyHacktool):
             #                  '0F 85 0C 00 00 00 8B 88 EC 00 00 00 89 88 E8 00 00 00 8B 90 E8 00 00 00'
             #              ),
             #              args=('player_ptr', 'quick_health'), replace_len=6, inserted=True),
-            # AssemblySwitch('quick_health', '生命快速恢复'),
+            # VariableSwitch('quick_health', '生命快速恢复'),
             # AssemblyItem('inf_medicine', '无限药水', '89 88 10 03 00 00 33 C9',
             #              find_start, find_end, b'', 'B9 10 00 00 00 89 88 10 03 00 00',
             #              replace_len=6, inserted=True),

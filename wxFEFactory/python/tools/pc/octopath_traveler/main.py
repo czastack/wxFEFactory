@@ -3,7 +3,7 @@ from lib.ui.components import Pagination
 from lib.win32.keys import VK
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from . import assembly, datasets, models
 

@@ -1,7 +1,7 @@
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice
 from lib.win32.keys import VK
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from . import assembly, models
 
@@ -29,14 +29,15 @@ class Main(AssemblyHacktool):
 
     def get_hotkeys(self):
         return (
-            # (0, VK.H, self.pull_through),
-            # (0, VK.P, self.challenge_points_add),
-            # (0, VK.T, self.toggle_challenge_time),
-            # (0, VK._0, self.clear_hot_level),
+            (0, VK.H, self.toggle_health),
+            (VK.MOD_ALT, VK.R, self.toggle_no_reload),
         )
 
     def on_version_change(self, lb):
         self.version = lb.text
 
-    def pull_through(self):
+    def toggle_health(self):
         self.toggle_assembly_function('inf_health')
+
+    def toggle_no_reload(self):
+        self.toggle_assembly_function('no_reload')

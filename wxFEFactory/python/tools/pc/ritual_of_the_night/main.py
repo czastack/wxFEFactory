@@ -1,7 +1,7 @@
 from lib.hack.forms import Group, StaticGroup, ModelInput
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from . import models
 
@@ -49,8 +49,8 @@ class Main(AssemblyHacktool):
                     '01 75 07 C7 41 3C 0F 27 00 00 48 8B 49 28 48 85 C9'),
                 args=(VariableType('player_addr', size=8), 'b_inf_health', 'b_inf_mp'),
                 inserted=True, fuzzy=True, replace_len=7),
-            AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health_mp',)),
-            AssemblySwitch('b_inf_mp', '无限MP', depends=('inf_health_mp',)),
+            VariableSwitch('b_inf_health', '无限生命', depends=('inf_health_mp',)),
+            VariableSwitch('b_inf_mp', '无限MP', depends=('inf_health_mp',)),
             AssemblyItem(
                 'inf_item', '无限物品/子弹', '8B 43 48 3B C6 0F', 0x84D000, delta,
                 b'', '8B 43 4C 83 F8 01 7E 0C 8B 43 48 39 F0 7E 05 8B 43 4C 31 F6 39 F0',
@@ -70,7 +70,7 @@ class Main(AssemblyHacktool):
                     '44 8B C2 48 8B D9'),
                 args=('b_inf_money', 'exp_mult'),
                 inserted=True, replace_len=6),
-            AssemblySwitch('b_inf_money', '无限金钱', depends=('money_exp_depends',)),
+            VariableSwitch('b_inf_money', '无限金钱', depends=('money_exp_depends',)),
             AssemblyItems(
                 '无限二段跳',
                 AssemblyItem(

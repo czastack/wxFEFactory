@@ -1,7 +1,7 @@
 from lib.hack.forms import Group, StaticGroup, ModelCheckBox, ModelInput, ModelSelect, Choice
 from lib.win32.keys import VK
 from tools.base.assembly_hacktool import (
-    AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+    AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 )
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 from tools.base import assembly_code

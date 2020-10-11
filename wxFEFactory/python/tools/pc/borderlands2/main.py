@@ -5,7 +5,7 @@ from lib.hack.forms import (
 )
 from lib.win32.keys import VK
 from lib import ui
-from tools.base.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, AssemblySwitch, VariableType
+from tools.base.assembly_hacktool import AssemblyHacktool, AssemblyItem, AssemblyItems, VariableSwitch, VariableType
 from tools.base.assembly_code import AssemblyGroup, Variable
 from tools.base import assembly_code
 from styles import styles

@@ -1,4 +1,4 @@
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, AssemblySwitch, VariableType, Delta
+from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, VariableSwitch, VariableType, Delta
 from tools.base.assembly_code import AssemblyGroup, Variable, Offset, Cmp
 
 
@@ -53,7 +53,7 @@ ASSEMBLY_ITEMS = (
         inserted=True,
         hidden=True
     ),
-    AssemblySwitch('b_inf_health', '无限生命', depends=('inf_health',)),
+    VariableSwitch('b_inf_health', '无限生命', depends=('inf_health',)),
     AssemblyItems(
         '一击必杀',
         AssemblyItem(
@@ -156,8 +156,8 @@ ASSEMBLY_ITEMS = (
         inserted=True,
         replace_len=8,
         hidden=True),
-    AssemblySwitch('b_no_recoil', '无后坐力', depends=('no_recoil_base',)),
-    AssemblySwitch('b_rapid_fire', '快速射击', depends=('no_recoil_base',)),
+    VariableSwitch('b_no_recoil', '无后坐力', depends=('no_recoil_base',)),
+    VariableSwitch('b_rapid_fire', '快速射击', depends=('no_recoil_base',)),
     AssemblyItem(
         'inf_vehicle_speed', '无限氮气加速', 'F3 0F 5C C8 0F 57 C0 F3 0F 5F C8 0F 2F C8', None, delta,
         '90 90 90 90', replace_len=4),
