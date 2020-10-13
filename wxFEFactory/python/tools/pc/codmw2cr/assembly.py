@@ -58,7 +58,7 @@ ASSEMBLY_ITEMS = (
             '48 39 F8 58 75 06 48 83 FC 00 EB 07 F6 87 6C 01 00 00 01'
         ),
         inserted=True,
-        replace_len=6,
+        replace_len=7,
         args=('b_no_hurt_2',),
         depends=('health_base_1',),
         hidden=True),
