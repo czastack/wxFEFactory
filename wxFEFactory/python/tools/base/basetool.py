@@ -96,14 +96,14 @@ class BaseTool(BaseScene, metaclass=abc.ABCMeta):
     def onclose(self, view=None, event=None):
         """
         有三种情况进入这里
-        1. nested且有关闭按钮，点关闭按钮触发
+        1. nested且有关闭按钮，点关闭按钮触发，可以直接调用parent.close_page
         2. 手动调用self.close_window(菜单)，由parent.close_page内调用window的onclose触发
         3. parent(AuiNotebook)点Tab的关闭按钮触发(类似情况2)
         """
         if self.nested:
             if event and event.GetId() != 0:
-                # 第一种情况阻止关闭
-                self.alert('请通过菜单过Tab上的关闭按钮关闭')
+                # 情况1
+                self.win.parent.close_page()
                 return False
         elif self.win.parent:
             self.win.parent.children.remove(self.win)

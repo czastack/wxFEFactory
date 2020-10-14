@@ -151,7 +151,7 @@ class AuiNotebook(Layout):
     def close_all_page(self):
         """关闭全部页面"""
         for i in range(self.GetPageCount()):
-            if not self.close_page(i):
+            if not self.close_page(0):
                 return False
         return True
 
