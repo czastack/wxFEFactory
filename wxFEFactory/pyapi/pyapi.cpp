@@ -53,7 +53,6 @@ PYBIND11_EMBEDDED_MODULE(pyapi, m) {
 		.def("GlobalDeleteAtom", GlobalDeleteAtom);
 
 	UiModule ui(m);
-	// init_fe(m);
 #ifdef _WIN32
 	init_auto(m);
 	init_emuhacker(m);
