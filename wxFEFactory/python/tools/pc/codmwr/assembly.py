@@ -28,7 +28,7 @@ ASSEMBLY_ITEMS = (
             inserted=True,
             replace_len=6,
             args=(
-                'b_no_hurt',
+                'inf_health',
                 'b_one_hit_kill',
                 VariableType('character_addr', size=8),
             )),
@@ -39,14 +39,14 @@ ASSEMBLY_ITEMS = (
                 '53 48 BB',
                 Variable('character_addr'),
                 '48 39 3B 75 0D',
-                Cmp('b_no_hurt', 1),
+                Cmp('inf_health', 1),
                 '75 12 31 F6 EB 0E',
                 Cmp('b_one_hit_kill', 1),
                 '75 05 BE 7F969800 5B 29 F0 89 87 84010000'
             ),
             inserted=True, replace_len=8),
     ),
-    VariableSwitch('b_no_hurt', '无限生命', depends=('health_base_1',)),
+    VariableSwitch('inf_health', '无限生命', depends=('health_base_1',)),
     VariableSwitch('b_one_hit_kill', '一击必杀', depends=('health_base_1',)),
     AssemblyItem(
         'inf_ammo', '无限子弹', '01 58 08 48 8B 5C 24 08', None, delta,
