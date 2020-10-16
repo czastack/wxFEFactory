@@ -1,4 +1,6 @@
-from tools.base.assembly_hacktool import AssemblyItem, AssemblyItems, Delta, VariableSwitch, VariableType
+from tools.base.assembly_hacktool import (
+    AssemblyItem, AssemblyItems, Delta, VariableType, VariableSwitch, VariableRadio
+)
 from tools.base.assembly_code import AssemblyGroup, Cmp, Offset, Variable, ForwardCall, ORIGIN
 
 ADDRESS_SOURCES = {
@@ -10,8 +12,7 @@ ADDRESS_SOURCES = {
         'accuraty_rapid': 0x00429000,
         'no_recoil': 0x00435000,
         'inf_hold_time': 0x00425000,
-        'super_speed': 0x0C217F10,
-        'bullet_time': 0x0C217F10,
+        'speed_base': 0x00353000,
     },
     'steam': {}
 }
@@ -74,8 +75,26 @@ ASSEMBLY_ITEMS = (
     AssemblyItem(
         'inf_hold_time', '无限屏息时间', '01 B3 44 02 00 00', None, delta,
         b'', '83 A3 44 02 00 00 00', inserted=True),
+
     AssemblyItem(
-        'super_speed', '超级速度', '00 00 80 3F', None, delta, '00 00 30 40', replace_len=4),
-    AssemblyItem(
-        'bullet_time', '子弹时间', '00 00 80 3F', None, delta, 'AB AA AA 3E', replace_len=4),
+        'speed_base', '速度依赖', 'F3 0F 10 58 10 0F 2E D8', None, delta, b'',
+        AssemblyGroup(
+            Cmp('game_speed', 0xFF),
+            '74 29',
+            Cmp('game_speed', 0),
+            '74 0F',
+            'F3 0F10 1D', Offset('game_speed'),
+            'F3 0F11 58 10 EB 11 C7 40 10 0000803F',
+            'C7 05', Offset('game_speed', size=8), 'FFFFFFFF'
+            'F3 0F10 58 10'
+        ),
+        inserted=True,
+        args=(
+            VariableType('game_speed', type=float, value=0),
+        ),
+        replace_len=5),
+    VariableRadio(
+        'super_speed', '超级速度', variable='game_speed', enable_value=2.5, disable_value=0, depends=('speed_base',)),
+    VariableRadio(
+        'bullet_time', '子弹时间', variable='game_speed', enable_value=0.3, disable_value=0, depends=('speed_base',)),
 )

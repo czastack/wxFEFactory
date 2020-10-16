@@ -31,6 +31,8 @@ class Main(AssemblyHacktool):
         return (
             (0, VK.H, self.toggle_health),
             (VK.MOD_ALT, VK.R, self.toggle_no_reload),
+            (VK.MOD_ALT, VK.V, self.toggle_bullet_time),
+            (VK.MOD_ALT, VK.B, self.toggle_super_speed),
         )
 
     def on_version_change(self, lb):
@@ -41,3 +43,9 @@ class Main(AssemblyHacktool):
 
     def toggle_no_reload(self):
         self.toggle_assembly_function('no_reload')
+
+    def toggle_super_speed(self):
+        self.toggle_assembly_function('super_speed')
+
+    def toggle_bullet_time(self):
+        self.toggle_assembly_function('bullet_time')
