@@ -1,6 +1,8 @@
 #pragma once
 #include "types.h"
 #include <windows.h>
+#include <string>
+#include <vector>
 
 typedef size_t addr_t;
 typedef wchar_t* STR;
@@ -239,5 +241,5 @@ private:
 public:
 	ProcAddressHelper(ProcessHandler *handler, LPVOID pides, addr_t module);
 	~ProcAddressHelper();
-	void getProcAddress(class wxArrayString &name_list, class wxArraySizeT& addr_list);
+	std::vector<size_t> getProcAddress(const std::vector<std::string> &name_list);
 };

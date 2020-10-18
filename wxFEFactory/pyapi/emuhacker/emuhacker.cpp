@@ -1,13 +1,14 @@
 #ifdef _WIN32
 
-#include <wx/wx.h>
 #include "../pyutils.h"
 #include "../functions.h"
 #include "emuhacker.h"
 #include "ProcessHandler.h"
 #include <windows.h>
 #include <psapi.h>
+#include <string>
 #include <tuple>
+#include <vector>
 
 
 namespace emuhacker {
@@ -27,13 +28,11 @@ namespace emuhacker {
 			else
 			{
 				// 大整数支持
-				char* buf = new char[size];
-				memset(buf, 0, size);
-				self.read(addr, buf, size);
-				py::bytes ret(buf, size);
+				auto buffer = std::make_unique<char[]>(size);
+				self.read(addr, buffer.get(), size);
+				py::bytes ret(buffer.get(), size);
 				auto result = py::reinterpret_steal<py::int_>(
-					_PyLong_FromByteArray(reinterpret_cast<unsigned char*>(buf), size, true, false));
-				delete[] buf;
+					_PyLong_FromByteArray(reinterpret_cast<unsigned char*>(buffer.get()), size, true, false));
 				return result;
 			}
 		}
@@ -49,10 +48,9 @@ namespace emuhacker {
 		}
 		else if (size)
 		{
-			char *buf = new char[size];
-			self.read(addr, buf, size);
-			py::bytes ret(buf, size);
-			delete[] buf;
+			auto buffer = std::make_unique<char[]>(size);
+			self.read(addr, buffer.get(), size);
+			py::bytes ret(buffer.get(), size);
 			return ret;
 		}
 		return None;
@@ -71,10 +69,9 @@ namespace emuhacker {
 			else
 			{
 				// 大整数支持
-				unsigned char* buf = new unsigned char[size];
-				_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(data.ptr()), buf, size, true, 0);
-				bool result = self.write(addr, buf, size);
-				delete[] buf;
+				auto buffer = std::make_unique<unsigned char[]>(size);
+				_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(data.ptr()), buffer.get(), size, true, 0);
+				bool result = self.write(addr, buffer.get(), size);
 				return result;
 			}
 		}
@@ -107,7 +104,7 @@ namespace emuhacker {
 
 	addr_t read_last_addr(ProcessHandler &self, addr_t addr, py::iterable &args)
 	{
-		wxArrayInt offsets = py::cast<wxArrayInt>(args);
+		const std::vector<int> &offsets = py::cast<std::vector<int>>(args);
 		return self.read_last_addr(addr, offsets);
 	}
 
@@ -139,32 +136,32 @@ namespace emuhacker {
 		return py::int_(-1);
 	}
 
-	wxString getModuleFile(ProcessHandler &self, addr_t module = 0)
+	std::wstring getModuleFile(ProcessHandler &self, addr_t module = 0)
 	{
-		wxChar buff[MAX_PATH];
+		TCHAR buff[MAX_PATH];
 		if (module == 0)
 		{
 			module = self.getProcessBaseAddress();
 		}
-		DWORD result = GetModuleFileNameEx(self.getProcess(), (HMODULE)module, buff, sizeof(buff) / sizeof(wxChar));
+		DWORD result = GetModuleFileNameEx(self.getProcess(), (HMODULE)module, buff, sizeof(buff) / sizeof(TCHAR));
 		if (result)
 		{
-			return wxString(buff, result);
+			return std::wstring(buff, result);
 		}
-		return wxNoneString;
+		return std::wstring(_T(""));
 	}
 
 	py::tuple getModuleVersion(ProcessHandler &self)
 	{
 		DWORD dwInfoSize, dwHandle;
-		wxcstr path = getModuleFile(self);
-		dwInfoSize = ::GetFileVersionInfoSize(path, &dwHandle);
-		wxChar* pData = new wxChar[dwInfoSize];
+		const std::wstring &path = getModuleFile(self);
+		dwInfoSize = ::GetFileVersionInfoSize(path.c_str(), &dwHandle);
+		TCHAR* pData = new TCHAR[dwInfoSize];
 		void *lpBuffer;
 		UINT uLength;
 		py::tuple result(2);
 
-		GetFileVersionInfo(path, NULL, dwInfoSize, (LPVOID)pData);
+		GetFileVersionInfo(path.c_str(), NULL, dwInfoSize, (LPVOID)pData);
 		if (VerQueryValue((LPCVOID)pData, _T("\\"), &lpBuffer, &uLength))
 		{
 			VS_FIXEDFILEINFO *pFileInfo = (VS_FIXEDFILEINFO*)lpBuffer;
@@ -181,8 +178,8 @@ namespace emuhacker {
 		BOOL  bContinue = TRUE;
 
 		cchWindowName = GetWindowText(hWnd, szWindowName, 64);
-		auto &pArgs = *(std::tuple<pycref, wxChar*, Py_ssize_t>*)lParam;
-		wxChar* prefix = std::get<1>(pArgs);
+		auto &pArgs = *(std::tuple<pycref, TCHAR*, Py_ssize_t>*)lParam;
+		TCHAR* prefix = std::get<1>(pArgs);
 		if (!prefix || wcsncmp(szWindowName, prefix, std::get<2>(pArgs)) == 0)
 		{
 			py::object ret = PyCall(std::get<0>(pArgs), (LPARAM)hWnd, szWindowName);
@@ -194,8 +191,8 @@ namespace emuhacker {
 	void enum_windows(ProcessHandler &self, pycref callback, pycref prefix)
 	{
 		Py_ssize_t prefix_len = 0;
-		wxChar *title_prefix = prefix.is_none() ? nullptr : PyUnicode_AsWideCharString(prefix.ptr(), &prefix_len);
-		std::tuple<pycref, wxChar*, Py_ssize_t> args(callback, title_prefix, prefix_len);
+		TCHAR*title_prefix = prefix.is_none() ? nullptr : PyUnicode_AsWideCharString(prefix.ptr(), &prefix_len);
+		std::tuple<pycref, TCHAR*, Py_ssize_t> args(callback, title_prefix, prefix_len);
 		EnumWindows(_enum_window, reinterpret_cast<LPARAM>(&args));
 		if (title_prefix)
 		{
@@ -208,17 +205,17 @@ namespace emuhacker {
 		return self.attach_handle((HWND)hWnd);
 	}
 
-	wxString getWindowText(ProcessHandler& self) {
+	std::wstring getWindowText(ProcessHandler& self) {
 		HWND hWnd = self.getHWnd();
 		if (hWnd)
 		{
-			wxChar buff[128];
+			TCHAR buff[128];
 			int result = ::GetWindowText(hWnd, buff, 128);
 			if (result) {
-				return wxString(buff, result);
+				return std::wstring(buff, result);
 			}
 		}
-		return wxNoneString;
+		return std::wstring(_T(""));
 	}
 
 	pyobj getProcAddress(ProcAddressHelper& self, pycref data)
@@ -226,23 +223,20 @@ namespace emuhacker {
 		if (PyUnicode_Check(data.ptr()))
 		{
 			// 直接返回函数地址
-			wxArrayString name_list;
-			name_list.Add(data.cast<wxString>());
-			wxArraySizeT addr_list(1);
-			self.getProcAddress(name_list, addr_list);
+			std::vector<std::string> name_list { data.cast<std::string>() };
+			const std::vector<size_t> &addr_list = self.getProcAddress(name_list);
 			return py::int_(addr_list[0]);
 		}
 		else if (PyIterable_Check(data.ptr()))
 		{
 			// 返回一个字典
-			wxArrayString name_list;
-			wxArrayAddAll(name_list, data);
-			wxArraySizeT addr_list(name_list.size());
-			self.getProcAddress(name_list, addr_list);
+			std::vector<std::string> name_list;
+			vectoyExtendList(name_list, data);
+			const std::vector<size_t> &addr_list = self.getProcAddress(name_list);
 			py::dict result;
 			for (size_t i = 0; i < name_list.size(); i++)
 			{
-				result[name_list[i]] = addr_list[i];
+				result[py::cast(name_list[i])] = addr_list[i];
 			}
 			return result;
 		}

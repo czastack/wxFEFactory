@@ -66,13 +66,12 @@ void py_init()
 	py::module::import("pyapi");
 	auto &app = wxGetApp();
 	auto &args = app.argv.GetArguments();
-	const wchar_t ** argv = new const wchar_t *[app.argc];
+	auto argv = std::make_unique<const wchar_t* []>(app.argc);
 	for (int i = 0; i < app.argc; ++i)
 	{
 		argv[i] = args[i].wc_str();
 	}
-	PySys_SetArgv(app.argc, (wchar_t **)argv);
-	delete[] argv;
+	PySys_SetArgv(app.argc, (wchar_t **)argv.get());
 
 	try
 	{

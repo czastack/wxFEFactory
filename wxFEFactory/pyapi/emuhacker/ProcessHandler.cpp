@@ -5,7 +5,6 @@
 #include <tchar.h>
 #include <psapi.h>
 #include <iostream>
-#include <wx/arrstr.h>
 
 
 bool Is64Bit_OS()
@@ -383,10 +382,10 @@ ProcAddressHelper::~ProcAddressHelper()
 	}
 }
 
-void ProcAddressHelper::getProcAddress(wxArrayString& name_list, wxArraySizeT& addr_list)
+std::vector<size_t> ProcAddressHelper::getProcAddress(const std::vector<std::string>& name_list)
 {
+	std::vector<size_t> addr_list(name_list.size(), 0);
 	char namebuf[128];
-
 	// 按函数名查找函数地址
 	IMAGE_EXPORT_DIRECTORY &ides = *(PIMAGE_EXPORT_DIRECTORY)m_pides;
 	addr_t namePtrAddr = m_module + ides.AddressOfNames;
@@ -420,6 +419,7 @@ void ProcAddressHelper::getProcAddress(wxArrayString& name_list, wxArraySizeT& a
 
 		namePtrAddr += sizeof(DWORD);
 	}
+	return addr_list;
 }
 
 #endif

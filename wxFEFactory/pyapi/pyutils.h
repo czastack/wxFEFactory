@@ -1,7 +1,7 @@
 #pragma once
 #undef _
-#include <pybind11/pybind11.h>
 #include <memory>
+#include <pybind11/pybind11.h>
 #include <wx/string.h>
 #include "types.h"
 #include "pybindext.h"
@@ -56,6 +56,18 @@ template<class T>
 T PyDictGet(pycref di, wxcstr key, T defval)
 {
 	return PyDictGet(di, py::str(key), defval);
+}
+
+
+template<class T>
+void vectoyExtendList(std::vector<T> &array, pycref items)
+{
+	if (!items.is_none())
+	{
+		for (auto &item : items) {
+			array.emplace_back(item.cast<T>());
+		}
+	}
 }
 
 
