@@ -6,7 +6,6 @@
 #include "functions.h"
 #include "ui/console.h"
 #include "ui/ui.h"
-#include "fe/fe.h"
 
 #ifdef __WXMSW__
 	#include "auto/auto.h"

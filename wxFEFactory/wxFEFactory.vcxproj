@@ -146,8 +146,6 @@
     <ClCompile Include="pyapi\auto\auto.cpp" />
     <ClCompile Include="pyapi\emuhacker\emuhacker.cpp" />
     <ClCompile Include="pyapi\emuhacker\ProcessHandler.cpp" />
-    <ClCompile Include="pyapi\fe\fe.cpp" />
-    <ClCompile Include="pyapi\fe\graph.cpp" />
     <ClCompile Include="pyapi\ui\aui.cpp" />
     <ClCompile Include="pyapi\ui\extend.cpp" />
     <ClCompile Include="pyapi\ui\image.cpp" />
@@ -169,9 +167,6 @@
     <ClInclude Include="pyapi\auto\auto.h" />
     <ClInclude Include="pyapi\emuhacker\emuhacker.h" />
     <ClInclude Include="pyapi\emuhacker\ProcessHandler.h" />
-    <ClInclude Include="pyapi\fe\fe.h" />
-    <ClInclude Include="pyapi\fe\feimg.hpp" />
-    <ClInclude Include="pyapi\fe\graph.h" />
     <ClInclude Include="pyapi\ui\console.h" />
     <ClInclude Include="pyapi\ui\dialogs.h" />
     <ClInclude Include="pyapi\pyapi.h" />
