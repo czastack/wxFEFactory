@@ -1,7 +1,6 @@
 #ifdef _WIN32
 
 #include "../pyutils.h"
-#include "../functions.h"
 #include "emuhacker.h"
 #include "ProcessHandler.h"
 #include <windows.h>

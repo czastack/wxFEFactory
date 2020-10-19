@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxFEFactory", "wxFEFactory\wxFEFactory.vcxproj", "{F313E674-4772-4F9B-946E-0A9D1EF2D2D4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxFEFactory", "wxFEFactory\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyhook", "keyhook\keyhook.vcxproj", "{0BBF9EF3-8224-402B-9E12-3B0E007285EF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyapi", "pyapi\pyapi.vcxproj", "{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "main\main.vcxproj", "{8B856A6B-85E9-48A7-8847-A70E648ADB1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +38,22 @@ Global
 		{0BBF9EF3-8224-402B-9E12-3B0E007285EF}.Release|x64.Build.0 = Release|x64
 		{0BBF9EF3-8224-402B-9E12-3B0E007285EF}.Release|x86.ActiveCfg = Release|Win32
 		{0BBF9EF3-8224-402B-9E12-3B0E007285EF}.Release|x86.Build.0 = Release|Win32
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Debug|x64.ActiveCfg = Debug|x64
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Debug|x64.Build.0 = Debug|x64
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Debug|x86.ActiveCfg = Debug|Win32
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Debug|x86.Build.0 = Debug|Win32
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Release|x64.ActiveCfg = Release|x64
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Release|x64.Build.0 = Release|x64
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Release|x86.ActiveCfg = Release|Win32
+		{5A703DE8-E457-4A8E-B3B2-93F0489B4C94}.Release|x86.Build.0 = Release|Win32
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Debug|x64.ActiveCfg = Debug|x64
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Debug|x64.Build.0 = Debug|x64
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Debug|x86.ActiveCfg = Debug|Win32
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Debug|x86.Build.0 = Debug|Win32
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Release|x64.ActiveCfg = Release|x64
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Release|x64.Build.0 = Release|x64
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Release|x86.ActiveCfg = Release|Win32
+		{8B856A6B-85E9-48A7-8847-A70E648ADB1D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
