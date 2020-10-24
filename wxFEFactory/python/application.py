@@ -7,7 +7,7 @@ from lib.utils import HistoryList
 from lib.config import Configurable
 from project import Project
 
-CONFIG_DIR = 'configs'
+CONFIG_DIR = 'config'
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.json')
 CONFIG_START_OPTION = os.path.join(CONFIG_DIR, 'start_option.json')
 

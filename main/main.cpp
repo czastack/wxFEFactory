@@ -43,4 +43,6 @@ extern "C" int WINAPI wWinMain(
 			exit(120);
 		}
 	}
+
+	return 0;
 }
