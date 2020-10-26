@@ -4,6 +4,7 @@ import wx
 import wx.aui
 import wx.py
 
+from common import CONF_DIR
 from widgets.buttonpanel import ButtonPanel
 
 
@@ -20,12 +21,14 @@ class MainFrame(wx.Frame):
 
         self.Freeze()
         self.menubar = wx.MenuBar(0)
+        self.InitMenuBar()
         self.SetMenuBar(self.menubar)
 
         self.statusBar = self.CreateStatusBar(1, wx.STB_SIZEGRIP, wx.ID_ANY)
 
-        self.auiToolBar = wx.aui.AuiToolBar(self, size=self.FromDIP(wx.Size(-1, 50)), style=wx.aui.AUI_TB_HORZ_LAYOUT)
-        # self.auiToolBar.Realize()
+        self.auiToolBar = wx.aui.AuiToolBar(self, size=self.FromDIP(wx.Size(-1, 50)), style=(
+            wx.aui.AUI_TB_TEXT))
+        self.InitToolBar()
         self.mgr.AddPane(self.auiToolBar, wx.aui.AuiPaneInfo().Top().CaptionVisible(
             False).CloseButton(False))
 
@@ -39,6 +42,7 @@ class MainFrame(wx.Frame):
 
         self.mgr.Update()
         self.Centre(wx.BOTH)
+
         self.Thaw()
 
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -48,10 +52,7 @@ class MainFrame(wx.Frame):
         """
         加载配置
         """
-        confDir = os.path.join(os.path.dirname(sys.executable), 'config')
-        if not os.path.exists(confDir):
-            os.mkdir(confDir)
-        fileName = os.path.join(confDir, 'config.ini')
+        fileName = os.path.join(CONF_DIR, 'config.ini')
         self.config = wx.FileConfig(localFilename=fileName)
         self.config.SetRecordDefaults(True)
 
@@ -66,6 +67,16 @@ class MainFrame(wx.Frame):
             self.bottomPanel.shell.destroy()
             self.mgr.UnInit()
             event.Skip()
+
+    def InitMenuBar(self):
+        """初始化菜单"""
+        menu1 = wx.Menu()
+        self.menubar.Append(menu1, "MyMenu")
+
+    def InitToolBar(self):
+        """初始化工具"""
+        tool = self.auiToolBar.AddTool(wx.ID_ANY, "打开工具", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None)
+        self.auiToolBar.Realize()
 
 
 if __name__ == "__main__":
