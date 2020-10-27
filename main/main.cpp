@@ -32,7 +32,7 @@ extern "C" int WINAPI wWinMain(
 	if (Py_IsInitialized())
 	{
 		FILE* fp;
-		fopen_s(&fp, "python/main2.py", "rb");
+		fopen_s(&fp, "python/main.py", "rb");
 
 		if (fp)
 		{
