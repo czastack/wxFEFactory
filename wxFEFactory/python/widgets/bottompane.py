@@ -25,7 +25,7 @@ class MyShell(wx.py.shell.Shell):
         super().OnKeyDown(event)
 
 
-class ButtonPanel(wx.aui.AuiNotebook):
+class BottomPane(wx.aui.AuiNotebook):
     """
     底部面板
     """
